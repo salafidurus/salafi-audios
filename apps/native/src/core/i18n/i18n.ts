@@ -4,6 +4,7 @@ import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 import { DevSettings, I18nManager } from "react-native";
 
+import { syncTypographyToLocale } from "../styles/theme/typography-sync";
 import { getStoredLocale, storeLocale } from "./locale-storage";
 import { mergeLocaleMessages } from "./merge-locale-messages";
 
@@ -68,6 +69,7 @@ export async function initI18n(): Promise<void> {
 export async function changeLocale(locale: Locale): Promise<void> {
   await storeLocale(locale);
   await i18n.changeLanguage(locale);
+  syncTypographyToLocale(locale);
 
   const shouldBeRtl = isRtl(locale);
   if (I18nManager.isRTL !== shouldBeRtl) {
