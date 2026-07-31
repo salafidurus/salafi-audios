@@ -53,6 +53,7 @@ export function LegalToggleScreen() {
   const styles = StyleSheet.create((theme) => ({
     container: {
       flex: 1,
+      backgroundColor: theme.colors.surface.canvas,
     },
     controlContainer: {
       padding: 12,
