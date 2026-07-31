@@ -5,7 +5,7 @@ import { useSearchProcessing } from "@sd/domain-search";
 import { useRouter, useNavigation } from "expo-router";
 import { Activity, useState, useEffect, useCallback } from "react";
 import { View, Text, Pressable } from "react-native";
-import { useUnistyles } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { ExploreRecentScreen } from "@/features/explore/screens/explore-recent.screen";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
@@ -17,7 +17,7 @@ import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+    <View style={styles.errorBoundary}>
       <Text>Something went wrong</Text>
       <Pressable onPress={retry}>
         <Text>Try again</Text>
@@ -73,7 +73,7 @@ export default function ExploreIndexRoute() {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.screen}>
       <Activity mode={isSearching ? "hidden" : "visible"}>
         <ExploreRecentScreen
           onNavigateToListing={navigateToListing}
@@ -82,9 +82,9 @@ export default function ExploreIndexRoute() {
       </Activity>
 
       <Activity mode={isSearching ? "visible" : "hidden"}>
-        <View style={{ flex: 1, paddingHorizontal: 16 }}>
+        <View style={styles.searchResults}>
           {shouldSearch ? (
-            <View style={{ marginVertical: 8 }}>
+            <View style={styles.searchFilter}>
               <SearchFilter value={filter} onChange={setFilter} topics={topics} />
             </View>
           ) : null}
@@ -100,3 +100,24 @@ export default function ExploreIndexRoute() {
     </View>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  errorBoundary: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.surface.canvas,
+  },
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
+  },
+  searchResults: {
+    flex: 1,
+    paddingHorizontal: 16,
+    backgroundColor: theme.colors.surface.canvas,
+  },
+  searchFilter: {
+    marginVertical: 8,
+  },
+}));
