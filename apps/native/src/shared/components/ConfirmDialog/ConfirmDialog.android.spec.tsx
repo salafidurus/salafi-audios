@@ -1,6 +1,8 @@
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import React from "react";
 
+import { lightNativeTheme } from "@/core/styles/theme";
+
 import { ConfirmDialog } from "./ConfirmDialog.android";
 
 describe("ConfirmDialog (Android)", () => {
@@ -67,5 +69,25 @@ describe("ConfirmDialog (Android)", () => {
     );
     await fireEvent.press(screen.getByText("Cancel"));
     expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("themes the dialog container, title, and text colors", async () => {
+    await render(
+      <ConfirmDialog
+        visible={true}
+        onDismiss={() => {}}
+        onConfirm={() => {}}
+        title="Sign Out?"
+        message="Are you sure?"
+        confirmLabel="Sign Out"
+        cancelLabel="Cancel"
+      />,
+    );
+
+    expect(screen.getByTestId("alert-dialog").props.colors).toEqual({
+      containerColor: lightNativeTheme.colors.surface.elevated,
+      titleContentColor: lightNativeTheme.colors.content.strong,
+      textContentColor: lightNativeTheme.colors.content.default,
+    });
   });
 });

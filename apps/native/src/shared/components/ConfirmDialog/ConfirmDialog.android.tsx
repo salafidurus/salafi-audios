@@ -29,7 +29,14 @@ export function ConfirmDialog({
 
   return (
     <Host matchContents>
-      <AlertDialog onDismissRequest={onDismiss}>
+      <AlertDialog
+        onDismissRequest={onDismiss}
+        colors={{
+          containerColor: theme.colors.surface.elevated,
+          titleContentColor: theme.colors.content.strong,
+          textContentColor: theme.colors.content.default,
+        }}
+      >
         <AlertDialog.Title>
           <Text color={theme.colors.content.strong}>{title}</Text>
         </AlertDialog.Title>

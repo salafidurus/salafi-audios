@@ -343,9 +343,10 @@ jest.mock("@expo/ui/jetpack-compose", () => {
 
   // Visibility is controlled by the caller conditionally rendering AlertDialog
   // (matches the real controlled-component contract), so the mock just renders
-  // its compound-component children as-is.
-  function AlertDialog({ children }) {
-    return React.createElement(View, null, children);
+  // its compound-component children as-is. `colors` is forwarded onto the
+  // wrapping View (queryable via testID) so specs can assert theming reaches it.
+  function AlertDialog({ children, colors }) {
+    return React.createElement(View, { testID: "alert-dialog", colors }, children);
   }
   AlertDialog.Title = function AlertDialogTitle({ children }) {
     return React.createElement(View, null, children);
