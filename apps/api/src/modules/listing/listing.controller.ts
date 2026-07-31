@@ -8,6 +8,7 @@ import type {
   RelatedListingDto,
   ListingContentsDto,
   LastPlayedLessonDto,
+  ListingProgressSummaryDto,
   FeedPageDto,
 } from '@sd/core-contracts';
 import { SkipThrottle } from '@nestjs/throttler';
@@ -66,6 +67,19 @@ export class ListingController {
   ): Promise<LastPlayedLessonDto | null> {
     if (!user?.id) return Promise.resolve(null);
     return this.service.getLastPlayedLesson(id, user.id);
+  }
+
+  @Get(':id/progress-summary')
+  @ApiOperation({ summary: "Get a user's progress rollup across a listing's playable leaves" })
+  @ApiOkResponse({
+    description: 'Total/completed leaf counts, percent complete, and completion state',
+  })
+  getProgressSummary(
+    @Param('id') id: string,
+    @CurrentUser() user?: { id: string },
+  ): Promise<ListingProgressSummaryDto | null> {
+    if (!user?.id) return Promise.resolve(null);
+    return this.service.getProgressSummary(id, user.id);
   }
 
   @Get(':id/related')
