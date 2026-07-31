@@ -18,6 +18,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { authClient } from "./auth/auth-client";
 import { getApiBaseUrl } from "./config/runtime-env";
 import { i18n, initI18n } from "./i18n/i18n";
+import { initIntegrations } from "./integrations";
 import { queryClient, persister } from "./query-client";
 import { syncTypographyToLocale } from "./styles/theme/typography-sync";
 
@@ -62,6 +63,8 @@ export function Providers({ children }: Props) {
   const router = useRouter();
 
   useEffect(() => {
+    initIntegrations();
+
     const baseUrl = getApiBaseUrl();
     if (baseUrl) {
       initApiClient({ baseUrl });

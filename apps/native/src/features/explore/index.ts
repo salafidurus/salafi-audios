@@ -1,9 +1,5 @@
 // Components
 export {
-  ExploreContentCard,
-  type ExploreContentCardProps,
-} from "./components/explore-content-card/explore-content-card";
-export {
   ExplorePodcastRow,
   type ExplorePodcastRowProps,
 } from "./components/explore-podcast-row/explore-podcast-row";

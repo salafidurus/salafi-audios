@@ -8,5 +8,3 @@ export {
 
 // Components
 export { LibraryItemRow } from "./components/library-item-row/library-item-row";
-export { ProgressIndicator } from "./components/progress-indicator/progress-indicator";
-export { ResumeBadge } from "./components/resume-badge/resume-badge";

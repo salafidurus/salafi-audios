@@ -1,9 +1,9 @@
-// Screens
+export { SearchFilter, type SearchFilterProps } from "./components/SearchFilter/SearchFilter";
 export {
-  SearchHomeScreen,
-  type SearchHomeScreenProps,
-} from "./screens/search-home/search-home.screen";
+  SearchResultItem,
+  type SearchResultItemProps,
+} from "./components/SearchResultItem/SearchResultItem";
 export {
-  SearchProcessingScreen,
-  type SearchProcessingScreenProps,
-} from "./screens/search-processing/search-processing.screen";
+  SearchResultsList,
+  type SearchResultsListProps,
+} from "./components/SearchResultsList/SearchResultsList";
