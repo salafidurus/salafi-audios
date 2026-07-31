@@ -1,10 +1,11 @@
 import { useProgressStore } from "@sd/domain-audio";
 import { useLibraryProgressScreen } from "@sd/domain-content";
 import React, { useCallback } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { LibraryItemRow } from "@/features/library/components/library-item-row/library-item-row";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
@@ -31,11 +32,23 @@ export function LibraryScreen({ onNavigateToListing }: LibraryScreenProps) {
   if (isFetching && items.length === 0) {
     return (
       <ScreenView center>
-        <Text style={styles.loadingText}>
-          {t("library.loadingSection", "Loading {{section}}…", {
+        <EmptyState
+          message={t("library.loadingSection", "Loading {{section}}…", {
             section: t("library.inProgress", "In Progress"),
           })}
-        </Text>
+          variant="loading"
+        />
+      </ScreenView>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <ScreenView center>
+        <EmptyState
+          message={t("library.emptyProgress", "No lectures in progress.")}
+          variant="empty"
+        />
       </ScreenView>
     );
   }
@@ -44,28 +57,20 @@ export function LibraryScreen({ onNavigateToListing }: LibraryScreenProps) {
     <ScreenView>
       <ScrollView contentContainerStyle={styles.listContent}>
         <List>
-          {items.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>
-                {t("library.emptyProgress", "No lectures in progress.")}
-              </Text>
-            </View>
-          ) : (
-            items.map((item, index) => (
-              <LibraryItemRow
-                key={item.id}
-                item={item}
-                variant="progress"
-                testID={`library-progress-row-${item.id}`}
-                onPress={() => handleItemPress(item.listingSlug)}
-                hideBorder={index === items.length - 1}
-                actions={[
-                  { id: "complete", title: t("library.markAsCompleted", "Mark as Completed") },
-                ]}
-                onAction={() => markCompleted(item.listingId)}
-              />
-            ))
-          )}
+          {items.map((item, index) => (
+            <LibraryItemRow
+              key={item.id}
+              item={item}
+              variant="progress"
+              testID={`library-progress-row-${item.id}`}
+              onPress={() => handleItemPress(item.listingSlug)}
+              hideBorder={index === items.length - 1}
+              actions={[
+                { id: "complete", title: t("library.markAsCompleted", "Mark as Completed") },
+              ]}
+              onAction={() => markCompleted(item.listingId)}
+            />
+          ))}
         </List>
       </ScrollView>
     </ScreenView>

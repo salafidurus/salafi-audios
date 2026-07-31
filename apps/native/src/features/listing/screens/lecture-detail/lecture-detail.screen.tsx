@@ -15,6 +15,7 @@ import { TopicChips } from "@/features/listing/components/topic-chips/topic-chip
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { Button } from "@/shared/components/Button/Button";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 export type LectureDetailScreenProps = {
@@ -37,7 +38,7 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   if (isFetching) {
     return (
       <ScreenView center>
-        <AppText variant="bodyMd">{t("lecture.loading", "Loading lecture…")}</AppText>
+        <EmptyState message={t("lecture.loading", "Loading lecture…")} variant="loading" />
       </ScreenView>
     );
   }
@@ -45,7 +46,7 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   if (!lecture) {
     return (
       <ScreenView center>
-        <AppText variant="titleMd">{t("lecture.notFound", "Lecture not found")}</AppText>
+        <EmptyState message={t("lecture.notFound", "Lecture not found")} variant="error" />
       </ScreenView>
     );
   }

@@ -1,5 +1,7 @@
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 
 export type ExploreStatusViewProps = {
   message: string;
@@ -10,12 +12,12 @@ export type ExploreStatusViewProps = {
 export function ExploreStatusView({ message, onRetry, retryLabel }: ExploreStatusViewProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.message}>{message}</Text>
-      {onRetry ? (
-        <Pressable onPress={onRetry} style={styles.retryButton}>
-          <Text style={styles.retryLabel}>{retryLabel}</Text>
-        </Pressable>
-      ) : null}
+      <EmptyState
+        message={message}
+        variant={onRetry ? "error" : "empty"}
+        onRetry={onRetry}
+        retryLabel={retryLabel}
+      />
     </View>
   );
 }

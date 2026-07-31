@@ -10,6 +10,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 
 export type LibraryItemRowProps = {
   item: LibraryItemDto;
@@ -82,10 +83,11 @@ export function LibraryItemRow({
           <AppText variant="bodyMd" numberOfLines={2}>
             {lectureTitle}
           </AppText>
-          <AppText variant="caption" style={styles.subtitle}>
-            {item.scholarName}
-            {item.seriesTitle ? ` · ${item.seriesTitle}` : ""}
-          </AppText>
+          <MarqueeText
+            text={`${item.scholarName}${item.seriesTitle ? ` · ${item.seriesTitle}` : ""}`}
+            variant="caption"
+            style={styles.subtitle}
+          />
           <AppText variant="xs" style={styles.meta}>
             {item.durationSeconds
               ? t("lecture.minutes", "{{count}} min", {

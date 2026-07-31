@@ -1,4 +1,4 @@
-import { View, type TextStyle } from "react-native";
+import { Pressable, View, type TextStyle } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
@@ -8,6 +8,8 @@ export type EmptyStateVariant = "empty" | "loading" | "error";
 export type EmptyStateProps = {
   message: string;
   variant?: EmptyStateVariant;
+  onRetry?: () => void;
+  retryLabel?: string;
 };
 
 function getTextStyleMap(): Record<EmptyStateVariant, TextStyle> {
@@ -18,12 +20,24 @@ function getTextStyleMap(): Record<EmptyStateVariant, TextStyle> {
   };
 }
 
-export function EmptyState({ message, variant = "empty" }: EmptyStateProps) {
+export function EmptyState({
+  message,
+  variant = "empty",
+  onRetry,
+  retryLabel = "Try Again",
+}: EmptyStateProps) {
   return (
     <View style={[styles.emptyState, styles[variant]]}>
       <AppText variant="bodyMd" style={getTextStyleMap()[variant]}>
         {message}
       </AppText>
+      {onRetry ? (
+        <Pressable onPress={onRetry} style={styles.retryButton}>
+          <AppText variant="labelMd" style={styles.retryLabel}>
+            {retryLabel}
+          </AppText>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -34,6 +48,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.scale.lg,
     alignItems: "center",
     justifyContent: "center",
+    gap: theme.spacing.scale.md,
   },
   empty: {
     backgroundColor: theme.colors.surface.default,
@@ -59,5 +74,16 @@ const styles = StyleSheet.create((theme) => ({
   text_error: {
     color: theme.colors.state.dangerContent,
     textAlign: "center",
+  },
+  retryButton: {
+    paddingHorizontal: theme.spacing.scale.xl,
+    paddingVertical: theme.spacing.scale.sm,
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.action.primary,
+    borderRadius: theme.radius.scale.sm,
+  },
+  retryLabel: {
+    color: theme.colors.action.primary,
+    fontWeight: "600",
   },
 }));

@@ -20,6 +20,16 @@ jest.mock("@/core/auth/use-auth", () => ({
   useAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false, user: undefined })),
 }));
 
+jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
+  ScreenView: ({ children }: { children: React.ReactNode }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ReactM = require("react");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { View } = require("react-native");
+    return ReactM.createElement(View, null, children);
+  },
+}));
+
 const mockedUseAccountProfile = jest.mocked(useAccountProfile) as any;
 const mockedUseUpdateProfile = jest.mocked(useUpdateProfile) as any;
 const mockedUseDeleteAccount = jest.mocked(useDeleteAccount) as any;

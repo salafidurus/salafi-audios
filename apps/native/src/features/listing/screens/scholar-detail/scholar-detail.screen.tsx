@@ -8,6 +8,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { ScholarContentList } from "@/features/listing/components/scholar-content-list/scholar-content-list";
 import { ScholarHeader } from "@/features/listing/components/scholar-header/scholar-header";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 export type ScholarDetailScreenProps = {
@@ -67,7 +68,7 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   if (isFetching) {
     return (
       <ScreenView center>
-        <AppText variant="bodyMd">Loading scholar…</AppText>
+        <EmptyState message="Loading scholar…" variant="loading" />
       </ScreenView>
     );
   }
@@ -75,7 +76,7 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   if (!scholar) {
     return (
       <ScreenView center>
-        <AppText variant="titleMd">Scholar not found</AppText>
+        <EmptyState message="Scholar not found" variant="error" />
       </ScreenView>
     );
   }

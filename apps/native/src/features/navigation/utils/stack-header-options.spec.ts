@@ -13,6 +13,9 @@ describe("getTabStackScreenOptions", () => {
       headerStyle: { backgroundColor: lightNativeTheme.colors.surface.default },
       headerTintColor: lightNativeTheme.colors.content.strong,
       headerShadowVisible: false,
+      contentStyle: {
+        backgroundColor: lightNativeTheme.colors.surface.canvas,
+      },
     });
   });
 });
@@ -29,6 +32,9 @@ describe("getFormSheetScreenOptions", () => {
       headerStyle: { backgroundColor: lightNativeTheme.colors.surface.default },
       headerTintColor: lightNativeTheme.colors.content.strong,
       headerShadowVisible: false,
+      contentStyle: {
+        backgroundColor: lightNativeTheme.colors.surface.canvas,
+      },
     });
   });
 
