@@ -10,8 +10,10 @@ import { useEffect, useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 
 import { authClient } from "@/core/auth/auth-client";
+import { useAuth } from "@/core/auth/use-auth";
 import { ToastContainer } from "@/core/toast";
 
+import { initProgressPersistence } from "./audio/progress-persistence";
 import { createI18n } from "./i18n/i18n";
 import { createIdbPersister, purgeQueryCacheDb } from "./persister";
 
@@ -26,6 +28,12 @@ type Props = {
 
 export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   const [i18n] = useState(() => createI18n(initialLocale));
+  const { isAuthenticated, user } = useAuth();
+
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    return initProgressPersistence(user.id);
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
     initApiClient(apiBaseUrl ? { baseUrl: apiBaseUrl } : undefined);
