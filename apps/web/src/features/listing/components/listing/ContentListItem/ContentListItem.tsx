@@ -29,6 +29,8 @@ export type ContentListItemProps = {
   scholarSlug?: string;
   seriesId?: string;
   seriesTitle?: string;
+  moduleId?: string;
+  moduleTitle?: string;
   collectionId?: string;
   allTracksInContext?: Track[];
 };
@@ -39,6 +41,8 @@ export function ContentListItem({
   scholarSlug,
   seriesId,
   seriesTitle,
+  moduleId,
+  moduleTitle,
   collectionId,
   allTracksInContext,
 }: ContentListItemProps) {
@@ -77,6 +81,8 @@ export function ContentListItem({
       durationSeconds: item.durationSeconds || item.primaryAudioAsset?.durationSeconds || 0,
       seriesId: seriesId ?? null,
       seriesTitle: seriesTitle ?? null,
+      moduleId: moduleId ?? null,
+      moduleTitle: moduleTitle ?? null,
       collectionId: collectionId ?? null,
     };
 

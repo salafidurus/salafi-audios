@@ -123,6 +123,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
             {contents?.format === "single" && (
               <ContentList
                 items={filteredSingleOrSeriesItems}
+                format="single"
                 scholarName={formatScholarName(listing.scholar)}
                 scholarSlug={listing.scholar.slug}
               />
@@ -131,6 +132,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
             {contents?.format === "series" && (
               <ContentList
                 items={filteredSingleOrSeriesItems}
+                format="series"
                 scholarName={formatScholarName(listing.scholar)}
                 scholarSlug={listing.scholar.slug}
                 seriesId={listing.id}

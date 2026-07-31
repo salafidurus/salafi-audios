@@ -1,8 +1,8 @@
 "use client";
 
 import type { ListingModuleDto, ListingContentItemDto } from "@sd/core-contracts";
-import type { Track } from "@sd/domain-audio";
 
+import { buildTrackQueue, type Track } from "@sd/domain-audio";
 import React, { useState, useRef } from "react";
 
 import { AppText } from "@/shared/components/AppText/AppText";
@@ -40,24 +40,12 @@ export function CollectionContentLayout({
     data: m.lessons,
   }));
 
-  // Construct all tracks across all modules for full queue context
-  const allTracksInContext: Track[] = [];
-  let isFirst = true;
-  for (const mod of modules) {
-    for (const lesson of mod.lessons) {
-      allTracksInContext.push({
-        id: lesson.id,
-        title: lesson.title,
-        artist: scholarName,
-        url: isFirst ? (lesson.primaryAudioAsset?.url ?? "") : "",
-        durationSeconds: lesson.durationSeconds || lesson.primaryAudioAsset?.durationSeconds || 0,
-        seriesId: mod.id,
-        seriesTitle: mod.title,
-        collectionId: collectionId ?? null,
-      });
-      isFirst = false;
-    }
-  }
+  // Construct all tracks across all modules for full queue context, crossing
+  // module boundaries in order (all of module N's lessons, then module N+1's).
+  const allTracksInContext: Track[] = buildTrackQueue(
+    { id: collectionId ?? "", title: "", format: "collection", scholarName, scholarSlug },
+    { format: "collection", modules },
+  );
 
   return (
     <div className={`${styles.layout} ${isTocCollapsed ? styles.tocCollapsed : ""}`}>
@@ -81,8 +69,8 @@ export function CollectionContentLayout({
                 item={lesson}
                 scholarName={scholarName}
                 scholarSlug={scholarSlug}
-                seriesId={sectionKey}
-                seriesTitle={mod?.title}
+                moduleId={sectionKey}
+                moduleTitle={mod?.title}
                 collectionId={collectionId}
                 allTracksInContext={allTracksInContext}
               />

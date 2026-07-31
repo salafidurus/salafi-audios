@@ -1,8 +1,8 @@
 "use client";
 
-import type { ListingContentItemDto } from "@sd/core-contracts";
-import type { Track } from "@sd/domain-audio";
+import type { ListingContentItemDto, ListingContentsDto } from "@sd/core-contracts";
 
+import { buildTrackQueue, type Track } from "@sd/domain-audio";
 import React from "react";
 
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
@@ -12,6 +12,7 @@ import styles from "./ContentList.module.css";
 
 export type ContentListProps = {
   items: ListingContentItemDto[];
+  format: "single" | "series";
   scholarName?: string;
   scholarSlug?: string;
   seriesId?: string;
@@ -20,21 +21,19 @@ export type ContentListProps = {
 
 export function ContentList({
   items,
+  format,
   scholarName = "",
   scholarSlug,
   seriesId,
   seriesTitle,
 }: ContentListProps) {
-  // Construct all tracks in order for queue context
-  const allTracksInContext: Track[] = items.map((item, i) => ({
-    id: item.id,
-    title: item.title,
-    artist: scholarName,
-    url: i === 0 ? (item.primaryAudioAsset?.url ?? "") : "",
-    durationSeconds: item.durationSeconds || item.primaryAudioAsset?.durationSeconds || 0,
-    seriesId: seriesId ?? null,
-    seriesTitle: seriesTitle ?? null,
-  }));
+  const contents: ListingContentsDto =
+    format === "series" ? { format: "series", items } : { format: "single", items };
+
+  const allTracksInContext: Track[] = buildTrackQueue(
+    { id: seriesId ?? "", title: seriesTitle ?? "", format, scholarName, scholarSlug },
+    contents,
+  );
 
   return (
     <div className={styles.container}>

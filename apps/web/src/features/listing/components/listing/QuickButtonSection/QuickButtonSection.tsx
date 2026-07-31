@@ -2,7 +2,7 @@
 
 import type { ListingDetailDto, ListingContentsDto } from "@sd/core-contracts";
 
-import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
+import { useAudio, useProgressStore, buildTrackQueue, type Track } from "@sd/domain-audio";
 import { useLastPlayedLesson } from "@sd/domain-content";
 import { Play, Pause, RotateCcw } from "lucide-react";
 import React from "react";
@@ -51,8 +51,9 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
       ? currentTrack?.seriesId === listing.id
       : currentTrack?.collectionId === listing.id;
 
-  // Helper to extract all tracks in order from contents
-  const getAllTracks = (): Track[] => {
+  // Builds the full ordered queue from contents, optionally starting eager
+  // URL resolution at a specific track (e.g. resuming mid-series/collection).
+  const getAllTracks = (startAtId?: string): Track[] => {
     if (!contents) {
       if (listing.primaryAudioAsset) {
         return [
@@ -70,40 +71,18 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
       return [];
     }
 
-    if (contents.format === "single" || contents.format === "series") {
-      return contents.items.map((item, i) => ({
-        id: item.id,
-        title: item.title,
-        artist: formatScholarName(listing.scholar),
-        // Only first track gets immediate URL upfront, others are lazily resolved by audioService
-        url: i === 0 ? (item.primaryAudioAsset?.url ?? "") : "",
-        durationSeconds: item.durationSeconds || item.primaryAudioAsset?.durationSeconds || 0,
+    return buildTrackQueue(
+      {
+        id: listing.id,
+        title: listing.title,
+        format: listing.format,
+        scholarName: formatScholarName(listing.scholar),
+        scholarSlug: listing.scholar.slug,
         artworkUrl: listing.scholar.imageUrl,
-        seriesId: contents.format === "series" ? listing.id : null,
-        seriesTitle: contents.format === "series" ? listing.title : null,
-      }));
-    }
-
-    // collection format
-    const allTracks: Track[] = [];
-    let first = true;
-    for (const mod of contents.modules) {
-      for (const lesson of mod.lessons) {
-        allTracks.push({
-          id: lesson.id,
-          title: lesson.title,
-          artist: formatScholarName(listing.scholar),
-          url: first ? (lesson.primaryAudioAsset?.url ?? "") : "",
-          durationSeconds: lesson.durationSeconds || lesson.primaryAudioAsset?.durationSeconds || 0,
-          artworkUrl: listing.scholar.imageUrl,
-          seriesId: mod.id,
-          seriesTitle: mod.title,
-          collectionId: listing.id,
-        });
-        first = false;
-      }
-    }
-    return allTracks;
+      },
+      contents,
+      { startAtId },
+    );
   };
 
   const handlePlayPauseToggle = async () => {
@@ -134,15 +113,13 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
       return;
     }
 
-    const allTracks = getAllTracks();
+    // Find the track to resume, and build the queue starting eager URL
+    // resolution there instead of always at the first track.
+    const resumeId = isSingle ? listing.id : lastPlayed?.listingId;
+    const allTracks = getAllTracks(resumeId);
     if (allTracks.length === 0) return;
 
-    // Find the track to resume
-    const resumeId = isSingle ? listing.id : lastPlayed?.listingId;
-    const startIndex = resumeId ? allTracks.findIndex((t) => t.id === resumeId) : 0;
-    const targetIndex = startIndex >= 0 ? startIndex : 0;
-    const targetTrack = allTracks[targetIndex] || allTracks[0];
-
+    const targetTrack = (resumeId && allTracks.find((t) => t.id === resumeId)) || allTracks[0];
     if (!targetTrack) return;
     await audioService.playListing(targetTrack, allTracks);
   };
