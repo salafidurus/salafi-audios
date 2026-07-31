@@ -5,7 +5,7 @@ import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useInfiniteScholarsList } from "@sd/domain-content";
 import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
-import { FlatList } from "react-native";
+import { FlatList, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -60,29 +60,29 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
 
   if (isError && allScholars.length === 0) {
     return (
-      <>
+      <View style={styles.screen}>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView
           message={getErrorStateText("feed", t)}
           onRetry={() => refetch()}
           retryLabel={t("feed.retry", "Try Again")}
         />
-      </>
+      </View>
     );
   }
 
   if (isFetching && allScholars.length === 0) {
     return (
-      <>
+      <View style={styles.screen}>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreSkeleton />
-      </>
+      </View>
     );
   }
 
   if (filteredScholars.length === 0) {
     return (
-      <>
+      <View style={styles.screen}>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView
           message={
@@ -91,12 +91,12 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
               : getEmptyStateText("feed", t)
           }
         />
-      </>
+      </View>
     );
   }
 
   return (
-    <>
+    <View style={styles.screen}>
       <Stack.Screen options={headerSearchOptions} />
       <List style={styles.listCard}>
         <FlatList
@@ -108,11 +108,15 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
           ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
         />
       </List>
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
+  },
   listCard: {
     margin: theme.spacing.scale.md,
   },

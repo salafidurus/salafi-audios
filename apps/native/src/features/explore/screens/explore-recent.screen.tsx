@@ -5,7 +5,7 @@ import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
 import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
-import { FlatList } from "react-native";
+import { FlatList, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -144,37 +144,37 @@ export function ExploreRecentScreen({
 
   if (isError && items.length === 0) {
     return (
-      <>
+      <View style={styles.screen}>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView
           message={getErrorStateText("feed", t)}
           onRetry={() => refetch()}
           retryLabel={t("feed.retry", "Try Again")}
         />
-      </>
+      </View>
     );
   }
 
   if (isFetching && items.length === 0) {
     return (
-      <>
+      <View style={styles.screen}>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreSkeleton />
-      </>
+      </View>
     );
   }
 
   if (items.length === 0) {
     return (
-      <>
+      <View style={styles.screen}>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView message={getEmptyStateText("feed", t)} />
-      </>
+      </View>
     );
   }
 
   return (
-    <>
+    <View style={styles.screen}>
       <Stack.Screen options={headerSearchOptions} />
       <FlatList
         data={items}
@@ -185,11 +185,15 @@ export function ExploreRecentScreen({
         contentContainerStyle={styles.listContent}
         ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
       />
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
+  },
   listContent: {
     padding: theme.spacing.scale.md,
     gap: theme.spacing.scale.md,
