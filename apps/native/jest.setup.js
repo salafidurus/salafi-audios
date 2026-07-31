@@ -171,11 +171,12 @@ jest.mock("@expo/ui/community/segmented-control", () => {
     onValueChange,
     onChange,
     enabled = true,
+    appearance,
     testID,
   }) {
     return React.createElement(
       View,
-      { testID },
+      { testID: testID ?? "native-segmented-control", appearance },
       values.map((value, index) =>
         React.createElement(
           Pressable,
