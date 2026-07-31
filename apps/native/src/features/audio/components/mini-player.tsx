@@ -1,4 +1,5 @@
 import { useAudio } from "@sd/domain-audio";
+import { useFormattedScholarName } from "@sd/domain-content";
 import { Image } from "expo-image";
 import { Play, Pause, ChevronDown, Music } from "lucide-react-native";
 import React, { useState } from "react";
@@ -22,6 +23,7 @@ export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
   const { t } = useTranslation();
   const [modalVisible, setModalVisible] = useState(false);
   const insets = useSafeAreaInsets();
+  const displayArtist = useFormattedScholarName(currentTrack?.artist, currentTrack?.scholarSlug);
 
   if (!currentTrack) return null;
 
@@ -66,7 +68,7 @@ export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
               {currentTrack.title}
             </Text>
             <Text style={styles.artist} numberOfLines={1}>
-              {currentTrack.artist}
+              {displayArtist}
             </Text>
           </View>
 
@@ -111,7 +113,7 @@ export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
               <Text style={styles.modalTitle} numberOfLines={2}>
                 {currentTrack.title}
               </Text>
-              <Text style={styles.modalArtist}>{currentTrack.artist}</Text>
+              <Text style={styles.modalArtist}>{displayArtist}</Text>
             </View>
 
             <View style={styles.progressSection}>

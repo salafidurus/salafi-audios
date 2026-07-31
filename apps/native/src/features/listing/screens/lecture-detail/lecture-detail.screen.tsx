@@ -69,6 +69,7 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
       id: lecture.id,
       title,
       artist: lecture.scholar.name,
+      scholarSlug: lecture.scholar.slug,
       url: "",
       durationSeconds: lecture.durationSeconds ?? 0,
       artworkUrl: lecture.scholar.imageUrl ?? undefined,

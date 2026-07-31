@@ -37,6 +37,7 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
       id: asset.id,
       title: lecture.title,
       artist: lecture.scholar.name,
+      scholarSlug: lecture.scholar.slug,
       url: asset.url,
       durationSeconds: asset.durationSeconds ?? lecture.durationSeconds ?? 0,
       artworkUrl: undefined,
@@ -52,6 +53,7 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
             id: nextLecture.id,
             title: nextLecture.title,
             artist: lecture.scholar.name,
+            scholarSlug: lecture.scholar.slug,
             url: "", // resolved lazily by DurusAudioService
             durationSeconds: 0,
             seriesId: lecture.seriesContext?.seriesId ?? null,
