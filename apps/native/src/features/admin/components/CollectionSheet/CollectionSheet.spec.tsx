@@ -3,6 +3,11 @@ import React from "react";
 
 import { CollectionSheet } from "./CollectionSheet";
 
+jest.mock("@/core/i18n/use-translation", () => ({
+  useTranslation: () => ({
+    t: (_key: string, fallback: string) => fallback,
+  }),
+}));
 jest.mock("@/features/admin/api/admin-scholars.api", () => ({
   createCollection: jest.fn(),
   updateCollection: jest.fn(),

@@ -9,6 +9,14 @@
       "assignScholar": "تعيين لشيخ",
       "selectFiles": "اختر ملفات صوتية",
       "uploadAll": "رفع الكل"
+    },
+    "collectionEdit": {
+      "titleRequired": "العنوان مطلوب",
+      "editTitle": "تعديل المجموعة",
+      "newTitle": "مجموعة جديدة",
+      "titleLabel": "العنوان *",
+      "descriptionLabel": "الوصف",
+      "languageLabel": "اللغة"
     }
   }
 }

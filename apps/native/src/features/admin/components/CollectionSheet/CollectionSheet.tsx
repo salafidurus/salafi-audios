@@ -4,6 +4,7 @@ import { useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { useTranslation } from "@/core/i18n/use-translation";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 
 import { createCollection, updateCollection } from "../../api/admin-scholars.api";
@@ -36,6 +37,7 @@ export function CollectionSheet({
   onSaved,
 }: CollectionSheetProps) {
   const { theme } = useUnistyles();
+  const { t } = useTranslation();
   const [state, dispatch] = useReducer(reduce, {
     title: collection?.title ?? "",
     description: collection?.description ?? "",
@@ -50,7 +52,7 @@ export function CollectionSheet({
 
   const handleSave = async () => {
     if (!title.trim()) {
-      dispatch({ error: "Title is required" });
+      dispatch({ error: t("admin.collectionEdit.titleRequired", "Title is required") });
       return;
     }
     dispatch({ isSaving: true, error: null });
@@ -78,15 +80,21 @@ export function CollectionSheet({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{collection ? "Edit Collection" : "New Collection"}</Text>
+      <Text style={styles.title}>
+        {collection
+          ? t("admin.collectionEdit.editTitle", "Edit Collection")
+          : t("admin.collectionEdit.newTitle", "New Collection")}
+      </Text>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.label}>Title *</Text>
+        <Text style={styles.label}>{t("admin.collectionEdit.titleLabel", "Title *")}</Text>
         <TextInput
           value={title}
           onChangeText={(v) => dispatch({ title: v })}
           style={styles.input}
         />
-        <Text style={styles.label}>Description</Text>
+        <Text style={styles.label}>
+          {t("admin.collectionEdit.descriptionLabel", "Description")}
+        </Text>
         <TextInput
           value={description}
           onChangeText={(v) => dispatch({ description: v })}
@@ -94,7 +102,7 @@ export function CollectionSheet({
           numberOfLines={3}
           style={styles.input}
         />
-        <Text style={styles.label}>Language</Text>
+        <Text style={styles.label}>{t("admin.collectionEdit.languageLabel", "Language")}</Text>
         <TextInput
           value={language}
           onChangeText={(v) => dispatch({ language: v })}
@@ -109,11 +117,11 @@ export function CollectionSheet({
           {isSaving ? (
             <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (
-            <Text style={styles.saveBtnText}>Save</Text>
+            <Text style={styles.saveBtnText}>{t("common.save", "Save")}</Text>
           )}
         </Pressable>
         <Pressable onPress={onClose} style={styles.cancelBtn}>
-          <Text style={styles.cancelBtnText}>Cancel</Text>
+          <Text style={styles.cancelBtnText}>{t("common.cancel", "Cancel")}</Text>
         </Pressable>
       </View>
     </View>
