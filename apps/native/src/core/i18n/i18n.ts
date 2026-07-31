@@ -1,9 +1,9 @@
-import { type Locale, isRtl } from "@sd/core-i18n";
-import * as Updates from "expo-updates";
+import type { Locale } from "@sd/core-i18n";
+
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
-import { DevSettings, I18nManager } from "react-native";
 
+import { syncDirectionToLocale } from "../styles/theme/direction-sync";
 import { syncTypographyToLocale } from "../styles/theme/typography-sync";
 import { getStoredLocale, storeLocale } from "./locale-storage";
 import { mergeLocaleMessages } from "./merge-locale-messages";
@@ -74,18 +74,7 @@ export async function initI18n(): Promise<void> {
         await i18n.changeLanguage(locale);
       }
 
-      const shouldBeRtl = isRtl(locale);
-
-      if (I18nManager.isRTL !== shouldBeRtl) {
-        I18nManager.forceRTL(shouldBeRtl);
-        if (!__DEV__) {
-          try {
-            await Updates.reloadAsync();
-          } catch {
-            // expo-updates not available in this build
-          }
-        }
-      }
+      syncDirectionToLocale(locale);
     })();
   }
 
@@ -97,18 +86,5 @@ export async function changeLocale(locale: Locale): Promise<void> {
   ensureLocaleLoaded(locale);
   await i18n.changeLanguage(locale);
   syncTypographyToLocale(locale);
-
-  const shouldBeRtl = isRtl(locale);
-  if (I18nManager.isRTL !== shouldBeRtl) {
-    I18nManager.forceRTL(shouldBeRtl);
-    if (__DEV__) {
-      DevSettings.reload();
-    } else {
-      try {
-        await Updates.reloadAsync();
-      } catch {
-        // expo-updates not available in this build
-      }
-    }
-  }
+  syncDirectionToLocale(locale);
 }
