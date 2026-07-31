@@ -3,6 +3,11 @@ import React from "react";
 
 import { AudioUploaderSheet } from "./AudioUploaderSheet";
 
+jest.mock("@/core/i18n/use-translation", () => ({
+  useTranslation: () => ({
+    t: (_key: string, fallback: string) => fallback,
+  }),
+}));
 jest.mock("expo-document-picker", () => ({ getDocumentAsync: jest.fn() }));
 jest.mock("expo-file-system", () => {
   class MockFile {

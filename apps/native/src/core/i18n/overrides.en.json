@@ -3,6 +3,12 @@
     "listingEdit": {
       "title": "Edit Listing",
       "status": "Status"
+    },
+    "audioUploader": {
+      "title": "Upload Audio",
+      "assignScholar": "Assign to Scholar",
+      "selectFiles": "Select Audio Files",
+      "uploadAll": "Upload All"
     }
   }
 }

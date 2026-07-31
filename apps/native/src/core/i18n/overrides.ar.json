@@ -3,6 +3,12 @@
     "listingEdit": {
       "title": "تعديل القائمة",
       "status": "الحالة"
+    },
+    "audioUploader": {
+      "title": "رفع الصوتيات",
+      "assignScholar": "تعيين لشيخ",
+      "selectFiles": "اختر ملفات صوتية",
+      "uploadAll": "رفع الكل"
     }
   }
 }
