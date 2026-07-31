@@ -92,4 +92,46 @@ describe("SettingsProfileScreen", () => {
 
     expect(screen.getByDisplayValue("Jane Updated")).toBeTruthy();
   });
+
+  it("opens a themed confirm dialog and calls onSignOut when confirmed", async () => {
+    mockedUseAccountProfile.mockReturnValue({
+      data: baseProfile,
+      isFetching: false,
+      error: null,
+    });
+    const onSignOut = jest.fn();
+
+    await render(<SettingsProfileScreen onSignOut={onSignOut} />);
+
+    expect(screen.queryByText("Are you sure you want to sign out?")).toBeNull();
+
+    await fireEvent.press(screen.getByText("Sign Out"));
+
+    expect(screen.getByText("Sign Out?")).toBeTruthy();
+    expect(screen.getByText("Are you sure you want to sign out?")).toBeTruthy();
+
+    const confirmButtons = screen.getAllByText("Sign Out");
+    await fireEvent.press(confirmButtons[confirmButtons.length - 1]!);
+
+    expect(onSignOut).toHaveBeenCalledTimes(1);
+  });
+
+  it("dismisses the confirm dialog without calling onSignOut when cancelled", async () => {
+    mockedUseAccountProfile.mockReturnValue({
+      data: baseProfile,
+      isFetching: false,
+      error: null,
+    });
+    const onSignOut = jest.fn();
+
+    await render(<SettingsProfileScreen onSignOut={onSignOut} />);
+
+    await fireEvent.press(screen.getByText("Sign Out"));
+    expect(screen.getByText("Sign Out?")).toBeTruthy();
+
+    await fireEvent.press(screen.getByText("Cancel"));
+
+    expect(screen.queryByText("Sign Out?")).toBeNull();
+    expect(onSignOut).not.toHaveBeenCalled();
+  });
 });

@@ -7,6 +7,7 @@ import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
+import { ConfirmDialog } from "@/shared/components/ConfirmDialog/ConfirmDialog";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
@@ -27,6 +28,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   const { mutate: deleteAccount, isPending: isDeletingAccount } = useDeleteAccount();
   const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
   const [isEditing, setIsEditing] = useState(false);
+  const [isSignOutDialogVisible, setIsSignOutDialogVisible] = useState(false);
 
   useEffect(() => {
     if (!isEditing) setDisplayName(profile?.displayName ?? "");
@@ -82,18 +84,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   };
 
   const handleSignOut = () => {
-    Alert.alert(
-      t("account.profile.signOutTitle", "Sign Out?"),
-      t("account.profile.signOutPrompt", "Are you sure you want to sign out?"),
-      [
-        { text: t("account.profile.cancel", "Cancel"), style: "cancel" },
-        {
-          text: t("account.signOut", "Sign Out"),
-          style: "destructive",
-          onPress: () => onSignOut?.(),
-        },
-      ],
-    );
+    setIsSignOutDialogVisible(true);
   };
 
   return (
@@ -218,6 +209,20 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
           </AppText>
         </Pressable>
       </View>
+
+      <ConfirmDialog
+        visible={isSignOutDialogVisible}
+        onDismiss={() => setIsSignOutDialogVisible(false)}
+        onConfirm={() => {
+          setIsSignOutDialogVisible(false);
+          onSignOut?.();
+        }}
+        title={t("account.profile.signOutTitle", "Sign Out?")}
+        message={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
+        confirmLabel={t("account.signOut", "Sign Out")}
+        cancelLabel={t("account.profile.cancel", "Cancel")}
+        destructive
+      />
     </ScrollView>
   );
 }
