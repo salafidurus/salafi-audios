@@ -7,19 +7,19 @@ import { StyleSheet } from "react-native-unistyles";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
 
-import { bulkLectureAction } from "../../api/admin-lectures.api";
+import { bulkListingAction } from "../../api/admin-listings.api";
 import { AudioUploaderSheet } from "../../components/AudioUploaderSheet/AudioUploaderSheet";
 import { BulkActionBar } from "../../components/BulkActionBar/BulkActionBar";
-import { LectureEditSheet } from "../../components/LectureEditSheet/LectureEditSheet";
-import { useAdminLectures } from "../../hooks/use-admin-lectures";
+import { ListingEditSheet } from "../../components/ListingEditSheet/ListingEditSheet";
+import { useAdminListings } from "../../hooks/use-admin-listings";
 
-export function AdminLecturesScreen() {
-  const { data, isLoading, refetch } = useAdminLectures();
+export function AdminListingsScreen() {
+  const { data, isLoading, refetch } = useAdminListings();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isBulkLoading, setIsBulkLoading] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
-  const [editingLectureId, setEditingLectureId] = useState<string | null>(null);
-  const lectures = data?.items ?? [];
+  const [editingListingId, setEditingListingId] = useState<string | null>(null);
+  const listings = data?.items ?? [];
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -38,7 +38,7 @@ export function AdminLecturesScreen() {
       if (selectedIds.size > 0) {
         toggleSelect(id);
       } else {
-        setEditingLectureId(id);
+        setEditingListingId(id);
       }
     },
     [selectedIds],
@@ -47,7 +47,7 @@ export function AdminLecturesScreen() {
   const handleBulkAction = async (action: "publish" | "archive") => {
     setIsBulkLoading(true);
     try {
-      await bulkLectureAction({ action, ids: Array.from(selectedIds) });
+      await bulkListingAction({ action, ids: Array.from(selectedIds) });
     } catch {
       // Ignored for UX robustness
     }
@@ -58,12 +58,12 @@ export function AdminLecturesScreen() {
 
   const handleRowAction = async (id: string, action: string) => {
     if (action === "edit") {
-      setEditingLectureId(id);
+      setEditingListingId(id);
       return;
     }
     if (action === "publish" || action === "archive") {
       try {
-        await bulkLectureAction({ action, ids: [id] });
+        await bulkListingAction({ action, ids: [id] });
       } catch {
         // Ignored for UX robustness
       }
@@ -75,7 +75,7 @@ export function AdminLecturesScreen() {
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <AppText variant="titleLg">Lectures</AppText>
+          <AppText variant="titleLg">Listings</AppText>
           <Pressable onPress={() => setShowUploader(true)} style={styles.uploadBtn}>
             <AppText variant="labelMd" style={styles.uploadBtnText}>
               + Upload
@@ -89,7 +89,7 @@ export function AdminLecturesScreen() {
           </AppText>
         ) : (
           <List>
-            {lectures.map((item, index) => {
+            {listings.map((item, index) => {
               const isSelected = selectedIds.has(item.id);
               const actions: MenuAction[] = [
                 { id: "edit", title: "Edit" },
@@ -99,9 +99,9 @@ export function AdminLecturesScreen() {
               return (
                 <List.Item
                   key={item.id}
-                  testID={`admin-lecture-row-${item.id}`}
+                  testID={`admin-listing-row-${item.id}`}
                   onPress={() => handleRowPress(item.id)}
-                  hideBorder={index === lectures.length - 1}
+                  hideBorder={index === listings.length - 1}
                   style={isSelected ? styles.rowSelected : undefined}
                 >
                   <View style={styles.rowContent}>
@@ -139,11 +139,11 @@ export function AdminLecturesScreen() {
         }}
       />
 
-      <LectureEditSheet
-        lectureId={editingLectureId}
-        onClose={() => setEditingLectureId(null)}
+      <ListingEditSheet
+        listingId={editingListingId}
+        onClose={() => setEditingListingId(null)}
         onSaved={() => {
-          setEditingLectureId(null);
+          setEditingListingId(null);
           refetch();
         }}
       />

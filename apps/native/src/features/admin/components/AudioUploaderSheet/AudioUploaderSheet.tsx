@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { getPresignedUrl, uploadToR2, createLecture } from "../../api/admin-lectures.api";
+import { getPresignedUrl, uploadToR2, createListing } from "../../api/admin-listings.api";
 
 async function getNativeAudioDuration(uri: string): Promise<number | undefined> {
   try {
@@ -158,7 +158,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
           await uploadToR2(uploadUrl, item.uri, item.mimeType, (p) =>
             setItemState(i, { progress: p, status: "uploading" }),
           );
-          await createLecture({
+          await createListing({
             title: item.name.replace(/\.[^.]+$/, ""),
             audioKey: objectKey,
             scholarId: selectedScholarId,

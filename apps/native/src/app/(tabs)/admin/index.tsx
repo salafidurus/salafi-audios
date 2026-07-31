@@ -7,7 +7,7 @@ export default function AdminDashboardRoute() {
 
   return (
     <AdminDashboardScreen
-      onNavigateToLectures={() => router.push("/(tabs)/admin/lectures")}
+      onNavigateToListings={() => router.push("/(tabs)/admin/listings")}
       onNavigateToScholars={() => router.push("/(tabs)/admin/scholars")}
     />
   );

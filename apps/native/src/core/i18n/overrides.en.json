@@ -1,1 +1,8 @@
-{}
+{
+  "admin": {
+    "listingEdit": {
+      "title": "Edit Listing",
+      "status": "Status"
+    }
+  }
+}

@@ -17,9 +17,9 @@ export default function AdminLayout() {
         }}
       />
       <Stack.Screen
-        name="lectures"
+        name="listings"
         options={{
-          title: t("admin.lectures", "Lectures"),
+          title: t("admin.listings", "Listings"),
           headerLargeTitle: false,
         }}
       />
