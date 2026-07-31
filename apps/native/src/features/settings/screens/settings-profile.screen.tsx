@@ -1,6 +1,6 @@
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
 import { useEffect, useState } from "react";
-import { Alert, Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
@@ -29,6 +29,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
   const [isEditing, setIsEditing] = useState(false);
   const [isSignOutDialogVisible, setIsSignOutDialogVisible] = useState(false);
+  const [isDeleteAccountDialogVisible, setIsDeleteAccountDialogVisible] = useState(false);
 
   useEffect(() => {
     if (!isEditing) setDisplayName(profile?.displayName ?? "");
@@ -66,21 +67,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      t("account.profile.deleteAccount", "Delete Account"),
-      t(
-        "account.profile.deleteAccountPrompt",
-        "This action is permanent and cannot be undone. All your data will be deleted.",
-      ),
-      [
-        { text: t("account.profile.cancel", "Cancel"), style: "cancel" },
-        {
-          text: t("account.profile.deleteAccountConfirm", "Delete Account"),
-          style: "destructive",
-          onPress: () => deleteAccount(undefined, { onSuccess: () => onSignOut?.() }),
-        },
-      ],
-    );
+    setIsDeleteAccountDialogVisible(true);
   };
 
   const handleSignOut = () => {
@@ -220,6 +207,23 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
         title={t("account.profile.signOutTitle", "Sign Out?")}
         message={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
         confirmLabel={t("account.signOut", "Sign Out")}
+        cancelLabel={t("account.profile.cancel", "Cancel")}
+        destructive
+      />
+
+      <ConfirmDialog
+        visible={isDeleteAccountDialogVisible}
+        onDismiss={() => setIsDeleteAccountDialogVisible(false)}
+        onConfirm={() => {
+          setIsDeleteAccountDialogVisible(false);
+          deleteAccount(undefined, { onSuccess: () => onSignOut?.() });
+        }}
+        title={t("account.profile.deleteAccount", "Delete Account")}
+        message={t(
+          "account.profile.deleteAccountPrompt",
+          "This action is permanent and cannot be undone. All your data will be deleted.",
+        )}
+        confirmLabel={t("account.profile.deleteAccountConfirm", "Delete Account")}
         cancelLabel={t("account.profile.cancel", "Cancel")}
         destructive
       />

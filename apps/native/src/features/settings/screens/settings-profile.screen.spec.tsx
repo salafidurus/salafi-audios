@@ -134,4 +134,67 @@ describe("SettingsProfileScreen", () => {
     expect(screen.queryByText("Sign Out?")).toBeNull();
     expect(onSignOut).not.toHaveBeenCalled();
   });
+
+  it("opens a themed confirm dialog and deletes the account when confirmed", async () => {
+    mockedUseAccountProfile.mockReturnValue({
+      data: baseProfile,
+      isFetching: false,
+      error: null,
+    });
+    const deleteAccount = jest.fn();
+    mockedUseDeleteAccount.mockReturnValue({ mutate: deleteAccount, isPending: false });
+    const onSignOut = jest.fn();
+
+    await render(<SettingsProfileScreen onSignOut={onSignOut} />);
+
+    expect(
+      screen.queryByText(
+        "This action is permanent and cannot be undone. All your data will be deleted.",
+      ),
+    ).toBeNull();
+
+    await fireEvent.press(screen.getByText("Delete Account"));
+
+    expect(
+      screen.getByText(
+        "This action is permanent and cannot be undone. All your data will be deleted.",
+      ),
+    ).toBeTruthy();
+
+    const deleteButtons = screen.getAllByText("Delete Account");
+    await fireEvent.press(deleteButtons[deleteButtons.length - 1]!);
+
+    expect(deleteAccount).toHaveBeenCalledTimes(1);
+    const [, options] = deleteAccount.mock.calls[0]!;
+    options.onSuccess();
+    expect(onSignOut).toHaveBeenCalledTimes(1);
+  });
+
+  it("dismisses the delete-account dialog without deleting when cancelled", async () => {
+    mockedUseAccountProfile.mockReturnValue({
+      data: baseProfile,
+      isFetching: false,
+      error: null,
+    });
+    const deleteAccount = jest.fn();
+    mockedUseDeleteAccount.mockReturnValue({ mutate: deleteAccount, isPending: false });
+
+    await render(<SettingsProfileScreen />);
+
+    await fireEvent.press(screen.getByText("Delete Account"));
+    expect(
+      screen.getByText(
+        "This action is permanent and cannot be undone. All your data will be deleted.",
+      ),
+    ).toBeTruthy();
+
+    await fireEvent.press(screen.getByText("Cancel"));
+
+    expect(
+      screen.queryByText(
+        "This action is permanent and cannot be undone. All your data will be deleted.",
+      ),
+    ).toBeNull();
+    expect(deleteAccount).not.toHaveBeenCalled();
+  });
 });
