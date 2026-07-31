@@ -25,7 +25,7 @@ export function SegmentedControl<T extends string>({
   onChange,
   ariaLabel,
 }: SegmentedControlProps<T>) {
-  const { theme } = useUnistyles();
+  const { theme, rt } = useUnistyles();
   const selectedIndex = options.findIndex((opt) => opt.value === value);
 
   return (
@@ -44,6 +44,7 @@ export function SegmentedControl<T extends string>({
           if (opt) onChange(opt.value);
         }}
         tintColor={theme.colors.action.primary}
+        appearance={rt.themeName === "dark" ? "dark" : "light"}
         style={base.control}
       />
     </View>

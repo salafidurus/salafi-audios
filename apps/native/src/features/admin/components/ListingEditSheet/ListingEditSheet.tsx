@@ -4,18 +4,19 @@ import { useEffect, useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { useTranslation } from "@/core/i18n/use-translation";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 
-import { fetchAdminLectureDetail, updateLecture } from "../../api/admin-lectures.api";
+import { fetchAdminListingDetail, updateListing } from "../../api/admin-listings.api";
 
-type LectureEditSheetProps = {
-  lectureId: string | null;
+type ListingEditSheetProps = {
+  listingId: string | null;
   onClose: () => void;
   onSaved: () => void;
 };
 
 type FormState = {
-  lecture: AdminListingDetailDto | null;
+  listing: AdminListingDetailDto | null;
   title: string;
   description: string;
   language: string;
@@ -27,10 +28,11 @@ function reduce(state: FormState, patch: Partial<FormState>): FormState {
   return { ...state, ...patch };
 }
 
-export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditSheetProps) {
+export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditSheetProps) {
   const { theme } = useUnistyles();
+  const { t } = useTranslation();
   const [state, dispatch] = useReducer(reduce, {
-    lecture: null,
+    listing: null,
     title: "",
     description: "",
     language: "",
@@ -40,29 +42,29 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
 
   useEffect(() => {
     // react-doctor-disable-next-line react-doctor/no-event-handler
-    if (!lectureId) {
-      dispatch({ lecture: null });
+    if (!listingId) {
+      dispatch({ listing: null });
       return;
     }
-    fetchAdminLectureDetail(lectureId).then((data) => {
+    fetchAdminListingDetail(listingId).then((data) => {
       dispatch({
-        lecture: data,
+        listing: data,
         title: data.title ?? "",
         description: data.description ?? "",
         language: data.language ?? "",
       });
     });
-  }, [lectureId]);
+  }, [listingId]);
 
-  if (!lectureId) return null;
+  if (!listingId) return null;
 
-  const { lecture, title, description, language, isSaving, error } = state;
+  const { listing, title, description, language, isSaving, error } = state;
 
   const handleSave = async () => {
-    if (!lecture) return;
+    if (!listing) return;
     dispatch({ isSaving: true, error: null });
     try {
-      await updateLecture(lecture.id, {
+      await updateListing(listing.id, {
         title,
         ...(description ? { description } : {}),
         ...(language ? { language: language as Locale } : {}),
@@ -77,18 +79,18 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Edit Lecture</Text>
-      {!lecture ? (
+      <Text style={styles.title}>{t("admin.listingEdit.title", "Edit Listing")}</Text>
+      {!listing ? (
         <ActivityIndicator style={styles.loader} />
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Text style={styles.label}>Title</Text>
+          <Text style={styles.label}>{t("admin.listingEdit.titleLabel", "Title")}</Text>
           <TextInput
             value={title}
             onChangeText={(v) => dispatch({ title: v })}
             style={styles.input}
           />
-          <Text style={styles.label}>Description</Text>
+          <Text style={styles.label}>{t("admin.listingEdit.descriptionLabel", "Description")}</Text>
           <TextInput
             value={description}
             onChangeText={(v) => dispatch({ description: v })}
@@ -96,7 +98,7 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
             numberOfLines={3}
             style={styles.input}
           />
-          <Text style={styles.label}>Language</Text>
+          <Text style={styles.label}>{t("admin.listingEdit.languageLabel", "Language")}</Text>
           <TextInput
             value={language}
             onChangeText={(v) => dispatch({ language: v })}
@@ -104,20 +106,22 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
             placeholderTextColor={theme.colors.content.muted}
             style={styles.input}
           />
-          <Text style={styles.statusText}>Status: {lecture.status}</Text>
+          <Text style={styles.statusText}>
+            {t("admin.listingEdit.status", "Status")}: {listing.status}
+          </Text>
           {error && <Text style={styles.errorText}>{error}</Text>}
         </ScrollView>
       )}
       <View style={styles.buttonRow}>
-        <Pressable onPress={handleSave} disabled={isSaving || !lecture} style={styles.saveBtn}>
+        <Pressable onPress={handleSave} disabled={isSaving || !listing} style={styles.saveBtn}>
           {isSaving ? (
             <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (
-            <Text style={styles.saveBtnText}>Save</Text>
+            <Text style={styles.saveBtnText}>{t("common.save", "Save")}</Text>
           )}
         </Pressable>
         <Pressable onPress={onClose} style={styles.cancelBtn}>
-          <Text style={styles.cancelBtnText}>Cancel</Text>
+          <Text style={styles.cancelBtnText}>{t("common.cancel", "Cancel")}</Text>
         </Pressable>
       </View>
     </View>

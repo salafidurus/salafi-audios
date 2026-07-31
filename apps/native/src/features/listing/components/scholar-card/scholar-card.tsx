@@ -1,5 +1,6 @@
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
+import { useFormatScholarName } from "@sd/domain-content";
 import { Pressable, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -11,11 +12,13 @@ export type ScholarCardProps = {
 };
 
 export function ScholarCard({ scholar, onPress }: ScholarCardProps) {
+  const formatScholarName = useFormatScholarName();
+
   return (
     <Pressable onPress={() => onPress?.(scholar.slug)} style={styles.card}>
       <UserAvatar image={scholar.imageUrl} name={scholar.name} size={64} />
       <Text style={styles.name} numberOfLines={2}>
-        {scholar.name}
+        {formatScholarName(scholar)}
       </Text>
       {scholar.mainLanguage && <Text style={styles.language}>{scholar.mainLanguage}</Text>}
       <Text style={styles.lectureCount}>{scholar.lectureCount} lectures</Text>

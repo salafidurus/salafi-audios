@@ -1,18 +1,15 @@
 import { Stack } from "expo-router";
+import { useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { getTabStackScreenOptions } from "@/features/navigation/utils/stack-header-options";
 
 export default function AdminLayout() {
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: true,
-        headerTransparent: false,
-        headerLargeTitle: true,
-      }}
-    >
+    <Stack screenOptions={getTabStackScreenOptions(theme)}>
       <Stack.Screen
         name="index"
         options={{
@@ -20,9 +17,9 @@ export default function AdminLayout() {
         }}
       />
       <Stack.Screen
-        name="lectures"
+        name="listings"
         options={{
-          title: t("admin.lectures", "Lectures"),
+          title: t("admin.listings", "Listings"),
           headerLargeTitle: false,
         }}
       />

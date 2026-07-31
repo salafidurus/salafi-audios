@@ -137,6 +137,7 @@ export function SettingsGeneralScreen() {
 const styles = StyleSheet.create((theme) => ({
   screen: {
     flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
   },
   content: {
     paddingHorizontal: theme.spacing.layout.pageX,

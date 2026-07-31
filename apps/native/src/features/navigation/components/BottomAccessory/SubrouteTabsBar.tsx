@@ -90,7 +90,7 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.surface.default,
-    borderRadius: theme.radius.component.chip || 20,
+    borderRadius: theme.radius.component.chip,
     borderWidth: 1,
     borderColor: theme.colors.border.subtle,
     alignSelf: "stretch",
@@ -111,13 +111,13 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: theme.spacing.scale.xs || 4,
-    borderRadius: theme.radius.component.chip || 18,
-    paddingHorizontal: theme.spacing.scale.sm || 12,
-    paddingVertical: theme.spacing.scale.xs || 6,
+    gap: theme.spacing.scale.xs,
+    borderRadius: theme.radius.component.chip,
+    paddingHorizontal: theme.spacing.scale.sm,
+    paddingVertical: theme.spacing.scale.xs,
   },
   tabActive: {
-    backgroundColor: theme.colors.surface.subtle || "#eaeaea",
+    backgroundColor: theme.colors.surface.subtle,
   },
   label: {
     ...theme.typography.labelMd,

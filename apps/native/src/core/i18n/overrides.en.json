@@ -1,1 +1,33 @@
-{}
+{
+  "admin": {
+    "listingEdit": {
+      "title": "Edit Listing",
+      "status": "Status",
+      "titleLabel": "Title",
+      "descriptionLabel": "Description",
+      "languageLabel": "Language"
+    },
+    "audioUploader": {
+      "title": "Upload Audio",
+      "assignScholar": "Assign to Scholar",
+      "selectFiles": "Select Audio Files",
+      "uploadAll": "Upload All"
+    },
+    "collectionEdit": {
+      "titleRequired": "Title is required",
+      "editTitle": "Edit Collection",
+      "newTitle": "New Collection",
+      "titleLabel": "Title *",
+      "descriptionLabel": "Description",
+      "languageLabel": "Language"
+    },
+    "seriesEdit": {
+      "titleRequired": "Title is required",
+      "editTitle": "Edit Series",
+      "newTitle": "New Series",
+      "titleLabel": "Title *",
+      "descriptionLabel": "Description",
+      "languageLabel": "Language"
+    }
+  }
+}

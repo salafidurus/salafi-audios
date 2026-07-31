@@ -35,6 +35,7 @@ const SUPPORT_SECTIONS = [
 const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
   },
   contentContainer: {
     padding: 16,

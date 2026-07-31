@@ -6,7 +6,9 @@ import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { getPresignedUrl, uploadToR2, createLecture } from "../../api/admin-lectures.api";
+import { useTranslation } from "@/core/i18n/use-translation";
+
+import { getPresignedUrl, uploadToR2, createListing } from "../../api/admin-listings.api";
 
 async function getNativeAudioDuration(uri: string): Promise<number | undefined> {
   try {
@@ -109,6 +111,7 @@ function QueueItem({ item }: QueueItemProps) {
 
 export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioUploaderSheetProps) {
   const { theme } = useUnistyles();
+  const { t } = useTranslation();
   const { data: scholarsData } = useScholarsList();
   const scholars = scholarsData?.scholars ?? [];
   const [selectedScholarId, setSelectedScholarId] = useState<string | null>(null);
@@ -158,7 +161,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
           await uploadToR2(uploadUrl, item.uri, item.mimeType, (p) =>
             setItemState(i, { progress: p, status: "uploading" }),
           );
-          await createLecture({
+          await createListing({
             title: item.name.replace(/\.[^.]+$/, ""),
             audioKey: objectKey,
             scholarId: selectedScholarId,
@@ -199,9 +202,11 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Upload Audio</Text>
+      <Text style={styles.title}>{t("admin.audioUploader.title", "Upload Audio")}</Text>
 
-      <Text style={styles.label}>Assign to Scholar</Text>
+      <Text style={styles.label}>
+        {t("admin.audioUploader.assignScholar", "Assign to Scholar")}
+      </Text>
       <FlatList
         data={scholars}
         horizontal
@@ -212,7 +217,9 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
       />
 
       <Pressable onPress={handlePick} style={styles.pickBtn}>
-        <Text style={styles.pickBtnText}>Select Audio Files</Text>
+        <Text style={styles.pickBtnText}>
+          {t("admin.audioUploader.selectFiles", "Select Audio Files")}
+        </Text>
       </Pressable>
 
       <FlatList
@@ -231,11 +238,13 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
           {isUploading ? (
             <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (
-            <Text style={styles.uploadBtnText}>Upload All</Text>
+            <Text style={styles.uploadBtnText}>
+              {t("admin.audioUploader.uploadAll", "Upload All")}
+            </Text>
           )}
         </Pressable>
         <Pressable onPress={onClose} style={styles.cancelBtn}>
-          <Text style={styles.cancelBtnText}>Cancel</Text>
+          <Text style={styles.cancelBtnText}>{t("common.cancel", "Cancel")}</Text>
         </Pressable>
       </View>
     </View>

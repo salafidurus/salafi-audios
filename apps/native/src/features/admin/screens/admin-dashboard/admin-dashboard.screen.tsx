@@ -4,13 +4,13 @@ import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 
 type AdminDashboardScreenProps = {
-  onNavigateToLectures?: () => void;
+  onNavigateToListings?: () => void;
   onNavigateToScholars?: () => void;
   onNavigateToPermissions?: () => void;
 };
 
 export function AdminDashboardScreen({
-  onNavigateToLectures,
+  onNavigateToListings,
   onNavigateToScholars,
 }: AdminDashboardScreenProps) {
   const { t } = useTranslation();
@@ -19,8 +19,8 @@ export function AdminDashboardScreen({
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <Text style={styles.title}>{t("admin.title", "Admin Dashboard")}</Text>
 
-      <Pressable onPress={onNavigateToLectures} style={[styles.card, styles.cardLectures]}>
-        <Text style={styles.cardTitle}>{t("admin.lectures", "Lectures")}</Text>
+      <Pressable onPress={onNavigateToListings} style={[styles.card, styles.cardListings]}>
+        <Text style={styles.cardTitle}>{t("admin.listings", "Listings")}</Text>
         <Text style={styles.cardSubtitle}>{t("admin.manageAudios", "Manage audio content")}</Text>
       </Pressable>
 
@@ -37,6 +37,7 @@ export function AdminDashboardScreen({
 const styles = StyleSheet.create((theme) => ({
   screen: {
     flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
   },
   content: {
     padding: theme.spacing.scale.lg,
@@ -55,7 +56,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.scale.md,
     borderStartWidth: 4,
   },
-  cardLectures: {
+  cardListings: {
     borderStartColor: theme.colors.state.danger,
   },
   cardScholars: {

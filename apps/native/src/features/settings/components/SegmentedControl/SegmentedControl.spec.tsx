@@ -8,7 +8,37 @@ const options = [
   { value: "dark", label: "Dark" },
 ] as const;
 
+const mockUseUnistyles = jest.fn();
+
+// Overrides the global react-native-unistyles mock (jest.setup.js) so this
+// spec can control `rt.themeName`, which the global mock always leaves `{}`.
+// SegmentedControl only calls useUnistyles (no StyleSheet.create), so that's
+// the only export this override needs to provide.
+jest.mock("react-native-unistyles", () => ({
+  useUnistyles: () => mockUseUnistyles(),
+}));
+
 describe("SegmentedControl", () => {
+  beforeEach(() => {
+    mockUseUnistyles.mockReturnValue({
+      theme: { colors: { action: { primary: "#000" } } },
+      rt: { themeName: "light" },
+    });
+  });
+
+  it("passes the current theme name as the native appearance override", async () => {
+    mockUseUnistyles.mockReturnValue({
+      theme: { colors: { action: { primary: "#000" } } },
+      rt: { themeName: "dark" },
+    });
+
+    await render(
+      <SegmentedControl options={[...options]} value="system" onChange={() => undefined} />,
+    );
+
+    expect(screen.getByTestId("native-segmented-control").props.appearance).toBe("dark");
+  });
+
   it("renders every option label", async () => {
     await render(
       <SegmentedControl options={[...options]} value="system" onChange={() => undefined} />,

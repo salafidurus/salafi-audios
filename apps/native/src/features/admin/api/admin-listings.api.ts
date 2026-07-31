@@ -50,7 +50,7 @@ export async function uploadToR2(
   }
 }
 
-export async function updateLecture(
+export async function updateListing(
   id: string,
   data: UpdateListingDetailsDto,
 ): Promise<AdminListingDetailDto> {
@@ -61,7 +61,7 @@ export async function updateLecture(
   });
 }
 
-export async function createLecture(data: CreateListingDto): Promise<AdminListingDetailDto> {
+export async function createListing(data: CreateListingDto): Promise<AdminListingDetailDto> {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.create,
     method: "POST",
@@ -69,7 +69,7 @@ export async function createLecture(data: CreateListingDto): Promise<AdminListin
   });
 }
 
-export async function fetchAdminLectures(params?: {
+export async function fetchAdminListings(params?: {
   scholarId?: string;
   status?: string;
   page?: number;
@@ -85,14 +85,14 @@ export async function fetchAdminLectures(params?: {
   });
 }
 
-export async function fetchAdminLectureDetail(id: string): Promise<AdminListingDetailDto> {
+export async function fetchAdminListingDetail(id: string): Promise<AdminListingDetailDto> {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.detail(id),
     method: "GET",
   });
 }
 
-export async function bulkLectureAction(data: BulkActionDto): Promise<BulkActionResultDto> {
+export async function bulkListingAction(data: BulkActionDto): Promise<BulkActionResultDto> {
   return httpClient<BulkActionResultDto>({
     url: endpoints.admin.listings.bulk,
     method: "POST",

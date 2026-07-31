@@ -3,6 +3,11 @@ import React from "react";
 
 import { AudioUploaderSheet } from "./AudioUploaderSheet";
 
+jest.mock("@/core/i18n/use-translation", () => ({
+  useTranslation: () => ({
+    t: (_key: string, fallback: string) => fallback,
+  }),
+}));
 jest.mock("expo-document-picker", () => ({ getDocumentAsync: jest.fn() }));
 jest.mock("expo-file-system", () => {
   class MockFile {
@@ -39,10 +44,10 @@ jest.mock("@sd/domain-content", () => ({
     isLoading: false,
   }),
 }));
-jest.mock("@/features/admin/api/admin-lectures.api", () => ({
+jest.mock("@/features/admin/api/admin-listings.api", () => ({
   getPresignedUrl: jest.fn(),
   uploadToR2: jest.fn(),
-  createLecture: jest.fn(),
+  createListing: jest.fn(),
 }));
 
 describe("AudioUploaderSheet", () => {

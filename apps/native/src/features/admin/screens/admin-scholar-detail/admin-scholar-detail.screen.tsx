@@ -245,6 +245,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
 const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
   },
   scrollContent: {
     padding: theme.spacing.scale.lg,

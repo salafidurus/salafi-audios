@@ -1,5 +1,6 @@
 import type { ScholarDetailDto } from "@sd/core-contracts";
 
+import { useFormatScholarName } from "@sd/domain-content";
 import { Linking, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -19,6 +20,7 @@ function openLink(url: string) {
 }
 
 export function ScholarHeader({ scholar }: ScholarHeaderProps) {
+  const formatScholarName = useFormatScholarName();
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
 
   return (
@@ -27,7 +29,7 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
         <UserAvatar image={scholar.imageUrl} name={scholar.name} size={96} />
       </View>
       <AppText variant="titleLg" style={styles.name}>
-        {scholar.name}
+        {formatScholarName(scholar)}
       </AppText>
       {scholar.country || scholar.mainLanguage ? (
         <AppText variant="caption" style={styles.meta}>

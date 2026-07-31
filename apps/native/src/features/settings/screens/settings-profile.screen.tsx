@@ -1,17 +1,19 @@
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
-import { useState } from "react";
-import { Alert, Pressable, ScrollView, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
+import { ConfirmDialog } from "@/shared/components/ConfirmDialog/ConfirmDialog";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
+import { getRtlAwareTextAlign } from "../utils/rtl-text-align";
 
 export type SettingsProfileScreenProps = {
   onSignOut?: () => void;
@@ -26,6 +28,12 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   const { mutate: deleteAccount, isPending: isDeletingAccount } = useDeleteAccount();
   const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
   const [isEditing, setIsEditing] = useState(false);
+  const [isSignOutDialogVisible, setIsSignOutDialogVisible] = useState(false);
+  const [isDeleteAccountDialogVisible, setIsDeleteAccountDialogVisible] = useState(false);
+
+  useEffect(() => {
+    if (!isEditing) setDisplayName(profile?.displayName ?? "");
+  }, [profile?.displayName, isEditing]);
 
   if (isFetching) {
     return (
@@ -59,36 +67,11 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      t("account.profile.deleteAccount", "Delete Account"),
-      t(
-        "account.profile.deleteAccountPrompt",
-        "This action is permanent and cannot be undone. All your data will be deleted.",
-      ),
-      [
-        { text: t("account.profile.cancel", "Cancel"), style: "cancel" },
-        {
-          text: t("account.profile.deleteAccountConfirm", "Delete Account"),
-          style: "destructive",
-          onPress: () => deleteAccount(undefined, { onSuccess: () => onSignOut?.() }),
-        },
-      ],
-    );
+    setIsDeleteAccountDialogVisible(true);
   };
 
   const handleSignOut = () => {
-    Alert.alert(
-      t("account.profile.signOutTitle", "Sign Out?"),
-      t("account.profile.signOutPrompt", "Are you sure you want to sign out?"),
-      [
-        { text: t("account.profile.cancel", "Cancel"), style: "cancel" },
-        {
-          text: t("account.signOut", "Sign Out"),
-          style: "destructive",
-          onPress: () => onSignOut?.(),
-        },
-      ],
-    );
+    setIsSignOutDialogVisible(true);
   };
 
   return (
@@ -213,6 +196,37 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
           </AppText>
         </Pressable>
       </View>
+
+      <ConfirmDialog
+        visible={isSignOutDialogVisible}
+        onDismiss={() => setIsSignOutDialogVisible(false)}
+        onConfirm={() => {
+          setIsSignOutDialogVisible(false);
+          onSignOut?.();
+        }}
+        title={t("account.profile.signOutTitle", "Sign Out?")}
+        message={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
+        confirmLabel={t("account.signOut", "Sign Out")}
+        cancelLabel={t("account.profile.cancel", "Cancel")}
+        destructive
+      />
+
+      <ConfirmDialog
+        visible={isDeleteAccountDialogVisible}
+        onDismiss={() => setIsDeleteAccountDialogVisible(false)}
+        onConfirm={() => {
+          setIsDeleteAccountDialogVisible(false);
+          deleteAccount(undefined, { onSuccess: () => onSignOut?.() });
+        }}
+        title={t("account.profile.deleteAccount", "Delete Account")}
+        message={t(
+          "account.profile.deleteAccountPrompt",
+          "This action is permanent and cannot be undone. All your data will be deleted.",
+        )}
+        confirmLabel={t("account.profile.deleteAccountConfirm", "Delete Account")}
+        cancelLabel={t("account.profile.cancel", "Cancel")}
+        destructive
+      />
     </ScrollView>
   );
 }
@@ -248,7 +262,7 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing.layout.pageX,
     gap: theme.spacing.scale.md,
   },
-  screen: { flex: 1 },
+  screen: { flex: 1, backgroundColor: theme.colors.surface.canvas },
   content: {
     paddingHorizontal: theme.spacing.layout.pageX,
     paddingVertical: theme.spacing.layout.pageY,
@@ -286,8 +300,8 @@ const styles = StyleSheet.create((theme) => ({
   input: {
     fontSize: 14,
     color: theme.colors.content.default,
-    textAlign: "right",
-    minWidth: 100,
+    textAlign: getRtlAwareTextAlign(),
+    flex: 1,
   },
   inputDisabled: {
     color: theme.colors.content.muted,
