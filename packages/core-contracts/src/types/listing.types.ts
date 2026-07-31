@@ -276,6 +276,22 @@ export const LastPlayedLessonDtoSchema = z.object({
 });
 export type LastPlayedLessonDto = z.infer<typeof LastPlayedLessonDtoSchema>;
 
+/**
+ * Read-time aggregate of a user's progress across a Listing's playable leaves
+ * (itself for a Single, its Lessons for a Series, or all Lessons across all
+ * Modules for a Collection). Computed on demand from `UserListingProgress` —
+ * not separately stored.
+ */
+export const ListingProgressSummaryDtoSchema = z.object({
+  listingId: z.string(),
+  format: ListingFormatSchema,
+  totalCount: z.number(),
+  completedCount: z.number(),
+  percentComplete: z.number(),
+  isCompleted: z.boolean(),
+});
+export type ListingProgressSummaryDto = z.infer<typeof ListingProgressSummaryDtoSchema>;
+
 export const UpdateListingDetailsDtoSchema = z.object({
   title: z.string().min(1, "Title must not be empty").optional(),
   description: z.string().optional(),
