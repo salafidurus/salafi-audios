@@ -42,9 +42,26 @@ describe("DurusAudioService", () => {
     durationSeconds: 1800,
   };
 
+  const mockTrack2: Track = {
+    id: "l2",
+    title: "Lecture 2",
+    artist: "Scholar 1",
+    url: "https://stream2.mp3",
+    durationSeconds: 1200,
+  };
+
+  const mockTrack3: Track = {
+    id: "l3",
+    title: "Lecture 3",
+    artist: "Scholar 1",
+    url: "https://stream3.mp3",
+    durationSeconds: 900,
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     usePlaybackStore.getState().actions.stop();
+    useProgressStore.setState({ progressMap: {}, savedMap: {}, lastSyncedAt: null });
     (httpClient as any).mockResolvedValue({ url: "https://resolved.stream.mp3" });
 
     mockEngine = {
@@ -161,5 +178,113 @@ describe("DurusAudioService", () => {
 
     expect(httpClient).not.toHaveBeenCalled();
     expect(mockEngine.load).toHaveBeenCalledWith(localTrack);
+  });
+
+  it("should advance through the full queue across multiple skipToNext calls", async () => {
+    await service.playListing(mockTrack, [mockTrack, mockTrack2, mockTrack3]);
+
+    await service.skipToNext();
+    expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack2);
+
+    await service.skipToNext();
+    expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack3);
+
+    // No more tracks — should stop rather than reload track1.
+    await service.skipToNext();
+    expect(mockEngine.stop).toHaveBeenCalled();
+    expect(usePlaybackStore.getState().currentTrack).toBeNull();
+  });
+
+  it("should sync queue and current index into usePlaybackStore when playing a listing", async () => {
+    await service.playListing(mockTrack, [mockTrack, mockTrack2, mockTrack3]);
+
+    expect(usePlaybackStore.getState().queue).toEqual([mockTrack, mockTrack2, mockTrack3]);
+    expect(usePlaybackStore.getState().currentIndex).toBe(0);
+
+    await service.skipToNext();
+    expect(usePlaybackStore.getState().currentIndex).toBe(1);
+  });
+
+  it("should go to the previous track when near the start of the current track", async () => {
+    await service.playListing(mockTrack, [mockTrack, mockTrack2]);
+    await service.skipToNext();
+    usePlaybackStore.getState().actions.setPosition(1);
+
+    await service.skipToPrevious();
+
+    expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack);
+    expect(usePlaybackStore.getState().currentIndex).toBe(0);
+  });
+
+  it("should restart the current track instead of skipping back once past the threshold", async () => {
+    await service.playListing(mockTrack, [mockTrack, mockTrack2]);
+    await service.skipToNext();
+    vi.clearAllMocks();
+    usePlaybackStore.getState().actions.setPosition(10);
+
+    await service.skipToPrevious();
+
+    expect(mockEngine.seek).toHaveBeenCalledWith(0);
+    expect(mockEngine.load).not.toHaveBeenCalled();
+  });
+
+  it("should restart from 0 when skipping previous with no earlier track", async () => {
+    await service.playListing(mockTrack);
+    usePlaybackStore.getState().actions.setPosition(1);
+
+    await service.skipToPrevious();
+
+    expect(mockEngine.seek).toHaveBeenCalledWith(0);
+    expect(mockEngine.load).toHaveBeenCalledTimes(1);
+  });
+
+  it("should seek to a previously saved, non-completed position when playing a listing", async () => {
+    useProgressStore.getState().actions.setProgress(mockTrack.id, 120, 1800);
+
+    await service.playListing(mockTrack);
+
+    expect(mockEngine.seek).toHaveBeenCalledWith(120);
+  });
+
+  it("should not resume when the saved progress is already completed", async () => {
+    useProgressStore.getState().actions.setProgress(mockTrack.id, 120, 1800);
+    useProgressStore.getState().actions.markCompleted(mockTrack.id);
+
+    await service.playListing(mockTrack);
+
+    expect(mockEngine.seek).not.toHaveBeenCalled();
+  });
+
+  it("should skip resume when fromStart is requested", async () => {
+    useProgressStore.getState().actions.setProgress(mockTrack.id, 120, 1800);
+
+    await service.playListing(mockTrack, undefined, { fromStart: true });
+
+    expect(mockEngine.seek).not.toHaveBeenCalled();
+  });
+
+  it("should prefetch the next track's stream URL in the background", async () => {
+    const stubTrack2: Track = { ...mockTrack2, url: "" };
+    (httpClient as any).mockImplementation(({ url }: { url: string }) =>
+      Promise.resolve({ url: `https://resolved${url}` }),
+    );
+
+    await service.playListing(mockTrack, [mockTrack, stubTrack2]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(httpClient).toHaveBeenCalledWith({
+      url: "/audio/listings/l2/stream",
+      method: "GET",
+    });
+
+    // The prefetched URL should already be resolved by the time we skip to it,
+    // so skipToNext's own resolveStreamUrl call is skipped.
+    (httpClient as any).mockClear();
+    await service.skipToNext();
+    expect(httpClient).not.toHaveBeenCalled();
+    expect(mockEngine.load).toHaveBeenLastCalledWith({
+      ...stubTrack2,
+      url: "https://resolved/audio/listings/l2/stream",
+    });
   });
 });
