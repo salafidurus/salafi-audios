@@ -21,29 +21,42 @@ const mockIsSaved = jest.fn(() => false);
 const mockAddSaved = jest.fn();
 const mockRemoveSaved = jest.fn();
 
-jest.mock("@sd/domain-audio", () => ({
-  useListingProgress: jest.fn(() => ({
-    progressPercent: 0,
-    resumePositionSeconds: 0,
-    isCompleted: false,
-  })),
-  useAudio: jest.fn(() => ({
-    isPlaying: false,
-    currentTrack: null,
-    playListing: jest.fn(),
-    pause: jest.fn(),
-    resume: jest.fn(),
-  })),
-  useProgressStore: jest.fn((selector: (state: unknown) => unknown) =>
-    selector({
-      actions: {
-        isSaved: mockIsSaved,
-        addSaved: mockAddSaved,
-        removeSaved: mockRemoveSaved,
-      },
-      progressMap: {},
-    }),
-  ),
+jest.mock("@sd/domain-audio", () => {
+  const actual = jest.requireActual("@sd/domain-audio");
+  return {
+    ...actual,
+    useListingProgress: jest.fn(() => ({
+      progressPercent: 0,
+      resumePositionSeconds: 0,
+      isCompleted: false,
+    })),
+    useAudio: jest.fn(() => ({
+      isPlaying: false,
+      currentTrack: null,
+      playListing: jest.fn(),
+      pause: jest.fn(),
+      resume: jest.fn(),
+    })),
+    useProgressStore: jest.fn((selector: (state: unknown) => unknown) =>
+      selector({
+        actions: {
+          isSaved: mockIsSaved,
+          addSaved: mockAddSaved,
+          removeSaved: mockRemoveSaved,
+        },
+        progressMap: {},
+      }),
+    ),
+  };
+});
+
+jest.mock("@sd/core-contracts", () => ({
+  httpClient: jest.fn(),
+  endpoints: {
+    listings: {
+      contents: (id: string) => `/listings/${id}/contents`,
+    },
+  },
 }));
 
 jest.mock("@/features/audio", () => ({
@@ -72,6 +85,10 @@ jest.mock("@sd/domain-content", () => ({
 }));
 
 describe("ExplorePodcastRow", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("renders title and scholar name", async () => {
     await render(<ExplorePodcastRow item={baseItem} />);
     expect(screen.getByText("Test Lecture")).toBeTruthy();
@@ -158,5 +175,66 @@ describe("ExplorePodcastRow", () => {
     });
     await render(<ExplorePodcastRow item={baseItem} />);
     expect(screen.queryByTestId("progress-bar-track")).toBeNull();
+  });
+
+  it("fetches contents and plays the full ordered queue starting at the first lesson for a series row", async () => {
+    const audioMock = jest.requireMock("@/features/audio").audioService;
+    const httpClientMock = jest.requireMock("@sd/core-contracts").httpClient;
+    httpClientMock.mockResolvedValue({
+      format: "series",
+      items: [
+        {
+          id: "lesson-1",
+          slug: "lesson-1",
+          title: "Lesson 1",
+          orderIndex: 0,
+          primaryAudioAsset: { id: "a1", url: "https://s/lesson-1.mp3" },
+        },
+        {
+          id: "lesson-2",
+          slug: "lesson-2",
+          title: "Lesson 2",
+          orderIndex: 1,
+          primaryAudioAsset: { id: "a2", url: "https://s/lesson-2.mp3" },
+        },
+      ],
+    });
+
+    const seriesItem: FeedContentItemDto = { ...baseItem, kind: "series" };
+    await render(<ExplorePodcastRow item={seriesItem} />);
+    await fireEvent.press(screen.getByTestId("podcast-row"));
+
+    expect(httpClientMock).toHaveBeenCalledWith({
+      url: "/listings/lec-1/contents",
+      method: "GET",
+    });
+    const lastCall = audioMock.playListing.mock.calls.at(-1);
+    const [playedTrack, playedQueue] = lastCall;
+    expect(playedTrack.id).toBe("lesson-1");
+    expect(playedQueue.map((t: { id: string }) => t.id)).toEqual(["lesson-1", "lesson-2"]);
+  });
+
+  it("falls back to a single-track play if fetching a series row's contents fails", async () => {
+    const audioMock = jest.requireMock("@/features/audio").audioService;
+    const httpClientMock = jest.requireMock("@sd/core-contracts").httpClient;
+    httpClientMock.mockRejectedValue(new Error("network error"));
+
+    const seriesItem: FeedContentItemDto = { ...baseItem, kind: "series" };
+    await render(<ExplorePodcastRow item={seriesItem} />);
+    await fireEvent.press(screen.getByTestId("podcast-row"));
+
+    expect(audioMock.playListing).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "lec-1" }),
+      expect.anything(),
+    );
+  });
+
+  it("does not fetch contents for a single-format row", async () => {
+    const httpClientMock = jest.requireMock("@sd/core-contracts").httpClient;
+
+    await render(<ExplorePodcastRow item={baseItem} />);
+    await fireEvent.press(screen.getByTestId("podcast-row"));
+
+    expect(httpClientMock).not.toHaveBeenCalled();
   });
 });
