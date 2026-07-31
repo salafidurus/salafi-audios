@@ -1,25 +1,42 @@
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
+import { Stack } from "expo-router";
+import { useState } from "react";
 import { ScrollView, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
+
+import { filterScholars } from "./filter-scholars";
 
 type AdminScholarsScreenProps = {
   onNavigateToScholar: (slug: string) => void;
 };
 
 export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreenProps) {
+  const { theme } = useUnistyles();
   const { data, isLoading } = useApiQuery<ScholarListItemDto[]>(["scholars", "list"], () =>
     httpClient<ScholarListItemDto[]>({ url: endpoints.scholars.list, method: "GET" }),
   );
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const scholars = data ?? [];
+  const scholars = filterScholars(data ?? [], searchQuery);
+
+  const headerSearchOptions = {
+    headerSearchBarOptions: {
+      placeholder: "Search scholars...",
+      onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
+      onCancelButtonPress: () => setSearchQuery(""),
+      ...getThemedSearchBarOptions(theme),
+    },
+  };
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={headerSearchOptions} />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <AppText variant="titleLg">Scholars</AppText>

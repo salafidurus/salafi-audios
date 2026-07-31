@@ -10,6 +10,10 @@ jest.mock("@sd/core-contracts", () => ({
   endpoints: { scholars: { list: "/scholars" } },
 }));
 
+jest.mock("expo-router", () => ({
+  Stack: { Screen: () => null },
+}));
+
 jest.mock("@shopify/flash-list", () => {
   const { FlatList } = jest.requireActual<typeof import("react-native")>("react-native");
   return {

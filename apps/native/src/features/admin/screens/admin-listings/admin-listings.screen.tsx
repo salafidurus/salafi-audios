@@ -1,9 +1,11 @@
 import type { MenuAction } from "@expo/ui/community/menu";
 
+import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
 
@@ -12,14 +14,26 @@ import { AudioUploaderSheet } from "../../components/AudioUploaderSheet/AudioUpl
 import { BulkActionBar } from "../../components/BulkActionBar/BulkActionBar";
 import { ListingEditSheet } from "../../components/ListingEditSheet/ListingEditSheet";
 import { useAdminListings } from "../../hooks/use-admin-listings";
+import { filterListings } from "./filter-listings";
 
 export function AdminListingsScreen() {
+  const { theme } = useUnistyles();
   const { data, isLoading, refetch } = useAdminListings();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isBulkLoading, setIsBulkLoading] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
   const [editingListingId, setEditingListingId] = useState<string | null>(null);
-  const listings = data?.items ?? [];
+  const [searchQuery, setSearchQuery] = useState("");
+  const listings = filterListings(data?.items ?? [], searchQuery);
+
+  const headerSearchOptions = {
+    headerSearchBarOptions: {
+      placeholder: "Search listings...",
+      onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
+      onCancelButtonPress: () => setSearchQuery(""),
+      ...getThemedSearchBarOptions(theme),
+    },
+  };
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -73,6 +87,7 @@ export function AdminListingsScreen() {
 
   return (
     <View style={styles.screen}>
+      <Stack.Screen options={headerSearchOptions} />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <AppText variant="titleLg">Listings</AppText>

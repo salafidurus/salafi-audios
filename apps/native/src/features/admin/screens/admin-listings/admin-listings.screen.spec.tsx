@@ -5,6 +5,9 @@ import { bulkListingAction } from "../../api/admin-listings.api";
 import { useAdminListings } from "../../hooks/use-admin-listings";
 import { AdminListingsScreen } from "./admin-listings.screen";
 
+jest.mock("expo-router", () => ({
+  Stack: { Screen: () => null },
+}));
 jest.mock("../../hooks/use-admin-listings", () => ({
   useAdminListings: jest.fn(),
 }));
