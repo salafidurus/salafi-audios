@@ -18,6 +18,7 @@ export default function TabsLayout() {
         minimizeBehavior="onScrollDown"
         tintColor={theme.colors.content.primary}
         rippleColor={theme.colors.surface.hover}
+        indicatorColor={theme.colors.surface.subtle}
         backgroundColor={theme.colors.surface.default}
         labelVisibilityMode="labeled"
       >
