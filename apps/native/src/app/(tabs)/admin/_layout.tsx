@@ -13,20 +13,20 @@ export default function AdminLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: t("admin.title", "Admin Dashboard"),
+          title: t("admin.dashboard.title", "Admin Dashboard"),
         }}
       />
       <Stack.Screen
         name="listings"
         options={{
-          title: t("admin.listings", "Listings"),
+          title: t("navigation.subnav.admin.listings", "Listings"),
           headerLargeTitle: false,
         }}
       />
       <Stack.Screen
         name="scholars"
         options={{
-          title: t("admin.scholars", "Scholars"),
+          title: t("navigation.admin.scholars", "Scholars"),
           headerLargeTitle: false,
         }}
       />

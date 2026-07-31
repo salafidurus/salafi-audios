@@ -245,7 +245,7 @@ export function SettingsProfileScreen({ onSignOut, onSignIn }: SettingsProfileSc
           "account.profile.signInDesc",
           "Create an account or sign in to manage your profile and roles.",
         )}
-        actionLabel={t("account.signIn", "Sign In")}
+        actionLabel={t("account.profile.signIn", "Sign In")}
         onPress={() => onSignIn?.()}
       />
     );

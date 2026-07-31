@@ -110,7 +110,7 @@ export function SignInScreen({
             </View>
             <Text style={styles.googleBtnText}>
               {googleLoading
-                ? t("auth.signIn.signingIn", "Signing in…")
+                ? t("auth.signIn.submitting", "Signing in…")
                 : t("auth.signIn.continueWithGoogle", "Continue with Google")}
             </Text>
           </View>

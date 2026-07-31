@@ -19,14 +19,14 @@ export default function SettingsLayout() {
       <Stack.Screen
         name="profile"
         options={{
-          title: t("settings.profile", "Profile"),
+          title: t("navigation.subnav.settings.profile", "Profile"),
           headerLargeTitle: false,
         }}
       />
       <Stack.Screen
         name="legal"
         options={{
-          title: t("settings.legal", "Legal"),
+          title: t("account.legal", "Legal"),
           headerLargeTitle: false,
         }}
       />

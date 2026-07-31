@@ -1,5 +1,17 @@
 {
+  "account": {
+    "actions": "الإجراءات",
+    "profileDesc": "إدارة معلومات ملفك الشخصي.",
+    "saved": "تم الحفظ.",
+    "signInToAccess": "سجّل الدخول للوصول إلى ملفك الشخصي",
+    "profile": {
+      "signInTitle": "سجّل الدخول لعرض ملفك الشخصي"
+    }
+  },
   "admin": {
+    "manageAudios": "إدارة المحتوى الصوتي",
+    "manageSeries": "إدارة الشيوخ والسلاسل",
+    "scholarDetail": "تفاصيل الشيخ",
     "listingEdit": {
       "title": "تعديل القائمة",
       "status": "الحالة",
@@ -29,5 +41,28 @@
       "descriptionLabel": "الوصف",
       "languageLabel": "اللغة"
     }
+  },
+  "audio": {
+    "now_playing": "قيد التشغيل الآن"
+  },
+  "auth": {
+    "signIn": {
+      "continueWithGoogle": "المتابعة باستخدام جوجل"
+    }
+  },
+  "explore": {
+    "searchRecent": "البحث في الصوتيات الأخيرة..."
+  },
+  "navigation": {
+    "show_miniplayer": "إظهار المشغل المصغر",
+    "show_subroutes": "إظهار أقسام القسم الفرعي"
+  },
+  "scholarContent": {
+    "filterPlaceholder": "تصفية المحتوى…",
+    "searchNoMatch": "لا يوجد شيوخ يطابقون بحثك.",
+    "searchScholars": "البحث عن الشيوخ..."
+  },
+  "settings": {
+    "support": "الدعم"
   }
 }

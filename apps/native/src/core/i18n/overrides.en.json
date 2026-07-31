@@ -1,5 +1,17 @@
 {
+  "account": {
+    "actions": "Actions",
+    "profileDesc": "Manage your personal profile information.",
+    "saved": "Saved.",
+    "signInToAccess": "Sign in to access your profile",
+    "profile": {
+      "signInTitle": "Sign in to view your profile"
+    }
+  },
   "admin": {
+    "manageAudios": "Manage audio content",
+    "manageSeries": "Manage scholars & series",
+    "scholarDetail": "Scholar Detail",
     "listingEdit": {
       "title": "Edit Listing",
       "status": "Status",
@@ -29,5 +41,28 @@
       "descriptionLabel": "Description",
       "languageLabel": "Language"
     }
+  },
+  "audio": {
+    "now_playing": "Now Playing"
+  },
+  "auth": {
+    "signIn": {
+      "continueWithGoogle": "Continue with Google"
+    }
+  },
+  "explore": {
+    "searchRecent": "Search recent audios..."
+  },
+  "navigation": {
+    "show_miniplayer": "Show mini player",
+    "show_subroutes": "Show section subroutes"
+  },
+  "scholarContent": {
+    "filterPlaceholder": "Filter content…",
+    "searchNoMatch": "No scholars match your search.",
+    "searchScholars": "Search scholars..."
+  },
+  "settings": {
+    "support": "Support"
   }
 }
