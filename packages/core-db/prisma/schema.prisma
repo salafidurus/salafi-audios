@@ -406,14 +406,22 @@ model UserListingProgress {
 
 model FavoriteListing {
   userId    String
-  listingId String   @db.Uuid
-  createdAt DateTime @default(now())
+  listingId String    @db.Uuid
+  createdAt DateTime  @default(now())
+  // Not @updatedAt — deliberately app-code-settable, mirroring UserListingProgress,
+  // so a client-supplied timestamp can drive LWW conflict resolution in bulkSync.
+  updatedAt DateTime  @default(now())
+  // Tombstone: unsave sets this instead of deleting the row, so delta sync
+  // (?since=) can propagate a removal to other devices instead of the row
+  // silently vanishing from a `since` query with no trace.
+  deletedAt DateTime?
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@id([userId, listingId])
   @@index([userId, createdAt], map: "idx_fav_user_createdat")
+  @@index([userId, updatedAt], map: "idx_fav_user_updatedat")
   @@index([listingId], map: "idx_fav_listing")
 }
 
