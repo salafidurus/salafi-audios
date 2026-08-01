@@ -29,9 +29,9 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { theme } = useUnistyles();
   const { anchor } = useLocalSearchParams<{ slug: string; anchor?: string }>();
   const { data: lecture, isFetching } = useListingDetail(slug);
-  const { data: seriesContents } = useListingContents(lecture?.seriesContext?.seriesId ?? "");
+  const { data: seriesContents } = useListingContents(lecture?.seriesContext?.seriesSlug ?? "");
   const isContainer = lecture?.format === "series" || lecture?.format === "collection";
-  const { data: ownContents } = useListingContents(isContainer ? lecture!.id : "");
+  const { data: ownContents } = useListingContents(isContainer ? lecture!.slug : "");
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
 
@@ -164,14 +164,16 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const handleSave = () => {
     const nextSaved = !isSaved;
     // Optimistic local update for instant button state; rolled back if the server call fails.
+    // Keyed by the stable uuid id (matches how saved state is hydrated from the server).
     if (nextSaved) {
       addSaved(lecture.id);
     } else {
       removeSaved(lecture.id);
     }
 
+    // Prefer the slug over the uuid id for the API call — reads far better in server logs/traces.
     toggleSaved.mutate(
-      { listingId: lecture.id, saved: nextSaved },
+      { listingId: lecture.slug ?? lecture.id, saved: nextSaved },
       {
         onError: () => {
           if (nextSaved) {

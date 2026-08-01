@@ -188,7 +188,7 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
 
       {/* Save Button */}
       <div className={styles.saveWrapper}>
-        <LectureSaveButton lectureId={listing.id} />
+        <LectureSaveButton lectureId={listing.id} lectureSlug={listing.slug} />
       </div>
     </div>
   );

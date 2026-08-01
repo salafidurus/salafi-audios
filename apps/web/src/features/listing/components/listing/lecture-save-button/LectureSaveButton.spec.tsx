@@ -66,6 +66,17 @@ describe("LectureSaveButton", () => {
     );
   });
 
+  it("prefers the slug over the uuid id for the toggle-saved mutation call", () => {
+    render(<LectureSaveButton lectureId="lec-5" lectureSlug="tafsir-al-fatiha" />);
+    fireEvent.click(screen.getByText("Save"));
+    expect(mockMutate).toHaveBeenCalledWith(
+      { listingId: "tafsir-al-fatiha", saved: true },
+      expect.objectContaining({ onError: expect.any(Function) }),
+    );
+    // Local optimistic state still keys by the stable uuid id.
+    expect(useProgressStore.getState().actions.isSaved("lec-5")).toBe(true);
+  });
+
   it("persists the unsave via the toggle-saved mutation", () => {
     useProgressStore.getState().actions.addSaved("lec-6");
     render(<LectureSaveButton lectureId="lec-6" />);

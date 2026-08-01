@@ -9,6 +9,7 @@ import type {
 import { PrismaService } from '../../core/db/prisma.service';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
+import { isListingUuid } from '../../shared/utils/listing-identifier';
 import { ListingRepository } from '../listing/listing.repo';
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -236,18 +237,37 @@ export class LibraryRepository {
     return { items, nextCursor };
   }
 
-  async saveLecture(userId: string, listingId: string): Promise<void> {
+  /** Returns false when `idOrSlug` doesn't resolve to a real Listing (no row written). */
+  async saveLecture(userId: string, idOrSlug: string): Promise<boolean> {
+    const listingId = await this.resolveListingId(idOrSlug);
+    if (!listingId) return false;
+
     await this.prisma.favoriteListing.upsert({
       where: { userId_listingId: { userId, listingId } },
       create: { userId, listingId },
       update: {},
     });
+    return true;
   }
 
-  async unsaveLecture(userId: string, listingId: string): Promise<void> {
+  /** Returns false when `idOrSlug` doesn't resolve to a real Listing (no row deleted). */
+  async unsaveLecture(userId: string, idOrSlug: string): Promise<boolean> {
+    const listingId = await this.resolveListingId(idOrSlug);
+    if (!listingId) return false;
+
     await this.prisma.favoriteListing.deleteMany({
       where: { userId, listingId },
     });
+    return true;
+  }
+
+  private async resolveListingId(idOrSlug: string): Promise<string | null> {
+    if (isListingUuid(idOrSlug)) return idOrSlug;
+    const listing = await this.prisma.listing.findFirst({
+      where: { slug: idOrSlug },
+      select: { id: true },
+    });
+    return listing?.id ?? null;
   }
 
   async bulkSave(userId: string, listingIds: string[]): Promise<void> {

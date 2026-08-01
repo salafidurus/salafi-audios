@@ -30,7 +30,9 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const headerContentRef = useRef<HTMLDivElement>(null);
 
   const { data: listing, isFetching: isFetchingDetail } = useListingDetail(slug);
-  const { data: contents, isFetching: isFetchingContents } = useListingContents(listing?.id ?? "");
+  const { data: contents, isFetching: isFetchingContents } = useListingContents(
+    listing?.slug ?? "",
+  );
 
   useEffect(() => {
     const hash = window.location.hash;

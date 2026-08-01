@@ -12,9 +12,11 @@ import styles from "./LectureSaveButton.module.css";
 
 export type LectureSaveButtonProps = {
   lectureId: string;
+  /** Preferred over `lectureId` for the API call — reads far better in server logs/traces. */
+  lectureSlug?: string;
 };
 
-export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
+export function LectureSaveButton({ lectureId, lectureSlug }: LectureSaveButtonProps) {
   const { isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const isSaved = useProgressStore((s) => s.actions.isSaved(lectureId));
@@ -30,6 +32,7 @@ export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
 
     const nextSaved = !isSaved;
     // Optimistic local update for instant button state; rolled back if the server call fails.
+    // Keyed by the stable uuid id (matches how saved state is hydrated from the server).
     if (nextSaved) {
       addSaved(lectureId);
     } else {
@@ -37,7 +40,7 @@ export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
     }
 
     toggleSaved.mutate(
-      { listingId: lectureId, saved: nextSaved },
+      { listingId: lectureSlug ?? lectureId, saved: nextSaved },
       {
         onError: () => {
           if (nextSaved) {

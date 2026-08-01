@@ -1,6 +1,8 @@
 import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { AudioRepository, isPositionCompleted } from './audio.repo';
 
+const UUID = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
+
 describe('isPositionCompleted', () => {
   it('returns false when duration is missing or zero', () => {
     expect(isPositionCompleted(100, undefined)).toBe(false);
@@ -40,7 +42,7 @@ describe('AudioRepository', () => {
   beforeEach(() => {
     prisma = {
       listing: {
-        findUnique: vi.fn<any>(),
+        findFirst: vi.fn<any>(),
         findMany: vi.fn<any>(),
       },
       userListingProgress: {
@@ -56,22 +58,64 @@ describe('AudioRepository', () => {
 
   describe('upsertProgress', () => {
     it("derives isCompleted from the listing's own stored duration when the client omits it", async () => {
-      prisma.listing.findUnique.mockResolvedValue({ durationSeconds: 100 });
+      prisma.listing.findFirst.mockResolvedValue({ id: UUID, durationSeconds: 100 });
       prisma.userListingProgress.findUnique.mockResolvedValue(null);
 
-      await repo.upsertProgress('user1', 'listing1', 95, undefined, undefined);
+      await repo.upsertProgress('user1', UUID, 95, undefined, undefined);
 
-      expect(prisma.listing.findUnique).toHaveBeenCalledWith({
-        where: { id: 'listing1' },
-        select: { durationSeconds: true },
+      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
+        where: { id: UUID },
+        select: { id: true, durationSeconds: true },
       });
       const upsertArgs = prisma.userListingProgress.upsert.mock.calls[0][0];
       expect(upsertArgs.create.isCompleted).toBe(true); // 95/100 = 95%
       expect(upsertArgs.update.isCompleted).toBe(true);
     });
 
+    it('resolves the listing by slug when the param is not a uuid, and upserts using the resolved id', async () => {
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
+      prisma.userListingProgress.findUnique.mockResolvedValue(null);
+
+      await repo.upsertProgress('user1', 'tafsir-al-fatiha', 10, undefined, undefined);
+
+      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'tafsir-al-fatiha' },
+        select: { id: true, durationSeconds: true },
+      });
+      expect(prisma.userListingProgress.findUnique).toHaveBeenCalledWith({
+        where: { userId_listingId: { userId: 'user1', listingId: 'listing1' } },
+        select: { isCompleted: true },
+      });
+      const upsertArgs = prisma.userListingProgress.upsert.mock.calls[0][0];
+      expect(upsertArgs.where).toEqual({
+        userId_listingId: { userId: 'user1', listingId: 'listing1' },
+      });
+      expect(upsertArgs.create.listingId).toBe('listing1');
+    });
+
+    it('resolves a uuid param directly by id, without a slug lookup', async () => {
+      prisma.listing.findFirst.mockResolvedValue({ id: UUID, durationSeconds: 100 });
+      prisma.userListingProgress.findUnique.mockResolvedValue(null);
+
+      await repo.upsertProgress('user1', UUID, 10, undefined, undefined);
+
+      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
+        where: { id: UUID },
+        select: { id: true, durationSeconds: true },
+      });
+    });
+
+    it('returns false and does not upsert when the listing cannot be resolved', async () => {
+      prisma.listing.findFirst.mockResolvedValue(null);
+
+      const result = await repo.upsertProgress('user1', 'missing-slug', 10, undefined, undefined);
+
+      expect(result).toBe(false);
+      expect(prisma.userListingProgress.upsert).not.toHaveBeenCalled();
+    });
+
     it('respects an explicit client isCompleted override even when the derived value disagrees', async () => {
-      prisma.listing.findUnique.mockResolvedValue({ durationSeconds: 1000 });
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 1000 });
       prisma.userListingProgress.findUnique.mockResolvedValue(null);
 
       await repo.upsertProgress('user1', 'listing1', 10, undefined, true);
@@ -81,7 +125,7 @@ describe('AudioRepository', () => {
     });
 
     it('never flips isCompleted back to false once already true (monotonic)', async () => {
-      prisma.listing.findUnique.mockResolvedValue({ durationSeconds: 1000 });
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 1000 });
       prisma.userListingProgress.findUnique.mockResolvedValue({ isCompleted: true });
 
       // A later sync reports an earlier position and no explicit completion (e.g. a replay).
@@ -92,7 +136,7 @@ describe('AudioRepository', () => {
     });
 
     it('stays false for a fresh row when neither the client nor the derivation indicates completion', async () => {
-      prisma.listing.findUnique.mockResolvedValue({ durationSeconds: 1000 });
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 1000 });
       prisma.userListingProgress.findUnique.mockResolvedValue(null);
 
       await repo.upsertProgress('user1', 'listing1', 10, undefined, undefined);
@@ -161,6 +205,30 @@ describe('AudioRepository', () => {
       const [strings] = prisma.$executeRaw.mock.calls[0];
       const sql = strings.join('?');
       expect(sql).toContain('"isCompleted" = "UserListingProgress"."isCompleted" OR');
+    });
+  });
+
+  describe('findListingById', () => {
+    it('resolves by slug when the param is not a uuid', async () => {
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
+
+      await repo.findListingById('tafsir-al-fatiha');
+
+      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'tafsir-al-fatiha' },
+        select: { id: true, durationSeconds: true },
+      });
+    });
+
+    it('resolves by id directly when the param is a uuid', async () => {
+      prisma.listing.findFirst.mockResolvedValue({ id: UUID, durationSeconds: 100 });
+
+      await repo.findListingById(UUID);
+
+      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
+        where: { id: UUID },
+        select: { id: true, durationSeconds: true },
+      });
     });
   });
 });

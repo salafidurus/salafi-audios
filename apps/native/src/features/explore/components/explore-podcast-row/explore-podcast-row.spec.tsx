@@ -205,7 +205,7 @@ describe("ExplorePodcastRow", () => {
     await fireEvent.press(screen.getByTestId("podcast-row"));
 
     expect(httpClientMock).toHaveBeenCalledWith({
-      url: "/listings/lec-1/contents",
+      url: "/listings/test-lecture/contents",
       method: "GET",
     });
     const lastCall = audioMock.playListing.mock.calls.at(-1);

@@ -360,4 +360,21 @@ describe("LectureDetailScreen", () => {
       expect.objectContaining({ onError: expect.any(Function) }),
     );
   });
+
+  it("prefers the slug over the uuid id for the toggle-saved mutation call", async () => {
+    mockedUseListingDetail.mockReturnValue({
+      data: { ...singleLecture, id: "uuid-1", slug: "tafsir-al-fatiha" },
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<LectureDetailScreen slug="tafsir-al-fatiha" />);
+    await fireEvent.press(screen.getByText("Save"));
+
+    expect(mockAddSaved).toHaveBeenCalledWith("uuid-1");
+    expect(mockToggleSavedMutate).toHaveBeenCalledWith(
+      { listingId: "tafsir-al-fatiha", saved: true },
+      expect.objectContaining({ onError: expect.any(Function) }),
+    );
+  });
 });

@@ -32,6 +32,7 @@ import type {
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
+import { isListingUuid } from '../../shared/utils/listing-identifier';
 
 @Injectable()
 export class ListingRepository {
@@ -39,7 +40,7 @@ export class ListingRepository {
 
   async findDetailById(id: string): Promise<ListingDetailDto | null> {
     const locale = getRequestLocale();
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const isUuid = isListingUuid(id);
 
     const listing = await this.prisma.listing.findFirst({
       where: {
@@ -265,7 +266,7 @@ export class ListingRepository {
 
   async findContentsById(id: string): Promise<ListingContentsDto | null> {
     const locale = getRequestLocale();
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const isUuid = isListingUuid(id);
 
     const listing = await this.prisma.listing.findFirst({
       where: {
@@ -458,7 +459,7 @@ export class ListingRepository {
   }
 
   async findLastPlayedLesson(id: string, userId: string): Promise<LastPlayedLessonDto | null> {
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const isUuid = isListingUuid(id);
 
     const targetListing = await this.prisma.listing.findFirst({
       where: {
@@ -508,7 +509,7 @@ export class ListingRepository {
    * always reflects the current set of published children.
    */
   async getProgressSummary(id: string, userId: string): Promise<ListingProgressSummaryDto | null> {
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const isUuid = isListingUuid(id);
 
     const listing = await this.prisma.listing.findFirst({
       where: {
@@ -571,11 +572,13 @@ export class ListingRepository {
     };
   }
 
-  async findRelated(listingId: string, limit = 6): Promise<RelatedListingDto[]> {
+  async findRelated(id: string, limit = 6): Promise<RelatedListingDto[]> {
     const locale = getRequestLocale();
+    const isUuid = isListingUuid(id);
     const listing = await this.prisma.listing.findFirst({
-      where: { id: listingId, deletedAt: null },
+      where: { ...(isUuid ? { id } : { slug: id }), deletedAt: null },
       select: {
+        id: true,
         scholarId: true,
         parentId: true,
         topics: {
@@ -591,7 +594,7 @@ export class ListingRepository {
     const related = await this.prisma.listing.findMany({
       where: {
         AND: [
-          { id: { not: listingId } },
+          { id: { not: listing.id } },
           { deletedAt: null },
           { status: Status.published },
           { scholar: { isActive: true } },

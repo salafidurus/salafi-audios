@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../core/db/prisma.service';
 import { Status } from '@sd/core-db';
 import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
+import { isListingUuid } from '../../shared/utils/listing-identifier';
 
 const COMPLETION_PERCENT_THRESHOLD = 0.95;
 const COMPLETION_TAIL_SECONDS = 30;
@@ -54,26 +55,28 @@ export class AudioRepository {
     }));
   }
 
+  /** Returns false when `idOrSlug` doesn't resolve to a real Listing (no row written). */
   async upsertProgress(
     userId: string,
-    listingId: string,
+    idOrSlug: string,
     positionSeconds: number,
     _durationSeconds?: number,
     isCompleted?: boolean,
-  ): Promise<void> {
-    const [listing, existing] = await Promise.all([
-      this.prisma.listing.findUnique({
-        where: { id: listingId },
-        select: { durationSeconds: true },
-      }),
-      this.prisma.userListingProgress.findUnique({
-        where: { userId_listingId: { userId, listingId } },
-        select: { isCompleted: true },
-      }),
-    ]);
+  ): Promise<boolean> {
+    const listing = await this.prisma.listing.findFirst({
+      where: isListingUuid(idOrSlug) ? { id: idOrSlug } : { slug: idOrSlug },
+      select: { id: true, durationSeconds: true },
+    });
+    if (!listing) return false;
+
+    const listingId = listing.id;
+    const existing = await this.prisma.userListingProgress.findUnique({
+      where: { userId_listingId: { userId, listingId } },
+      select: { isCompleted: true },
+    });
 
     const derivedCompleted =
-      isCompleted ?? isPositionCompleted(positionSeconds, listing?.durationSeconds);
+      isCompleted ?? isPositionCompleted(positionSeconds, listing.durationSeconds);
     // Monotonic: once completed, a later sync can never un-complete it.
     const finalCompleted = existing?.isCompleted ? true : derivedCompleted;
 
@@ -91,6 +94,7 @@ export class AudioRepository {
         updatedAt: new Date(),
       },
     });
+    return true;
   }
 
   async bulkSync(userId: string, items: ProgressSyncItemDto[]): Promise<void> {
@@ -138,9 +142,9 @@ export class AudioRepository {
     await this.prisma.$transaction(operations);
   }
 
-  async findListingById(listingId: string) {
-    return this.prisma.listing.findUnique({
-      where: { id: listingId },
+  async findListingById(idOrSlug: string) {
+    return this.prisma.listing.findFirst({
+      where: isListingUuid(idOrSlug) ? { id: idOrSlug } : { slug: idOrSlug },
       select: { id: true, durationSeconds: true }, // Only fetch fields needed for stream response
     });
   }
