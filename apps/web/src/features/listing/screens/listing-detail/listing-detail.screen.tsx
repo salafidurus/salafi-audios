@@ -1,6 +1,7 @@
 "use client";
 
 import { useListingDetail, useListingContents } from "@sd/domain-content";
+import { useRouter } from "next/navigation";
 import React, { useState, useRef, useEffect, useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -12,6 +13,7 @@ import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import { CollectionContentLayout } from "../../components/listing/CollectionContentLayout/CollectionContentLayout";
 import { ContentList } from "../../components/listing/ContentList/ContentList";
+import { contentItemAnchorId } from "../../components/listing/ContentListItem/ContentListItem";
 import { MetaDataSection } from "../../components/listing/MetaDataSection/MetaDataSection";
 import { QuickButtonSection } from "../../components/listing/QuickButtonSection/QuickButtonSection";
 import { SeriesContextBar } from "../../components/listing/series-context-bar/series-context-bar";
@@ -23,12 +25,35 @@ export type ListingDetailScreenProps = {
 
 export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const formatScholarName = useFormatScholarName();
   const [searchQuery, setSearchQuery] = useState("");
+  const [highlightItemId, setHighlightItemId] = useState<string | undefined>(undefined);
   const headerContentRef = useRef<HTMLDivElement>(null);
 
   const { data: listing, isFetching: isFetchingDetail } = useListingDetail(slug);
   const { data: contents, isFetching: isFetchingContents } = useListingContents(listing?.id ?? "");
+
+  // Slugs are flat and don't encode nesting, so a Lesson/Module's own slug
+  // resolves to itself — redirect to the top-level page it belongs under,
+  // anchored to this item so the parent page can scroll to and highlight it.
+  useEffect(() => {
+    if (listing?.rootListing) {
+      router.replace(`/listings/${listing.rootListing.slug}#${listing.id}`);
+    }
+  }, [listing, router]);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) setHighlightItemId(hash.slice(1));
+  }, []);
+
+  useEffect(() => {
+    if (!highlightItemId || !contents) return;
+    document
+      .getElementById(contentItemAnchorId(highlightItemId))
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [highlightItemId, contents]);
 
   // Measure sticky header height dynamically (including outer padding) for scroll margin and TOC offset
   useEffect(() => {
@@ -92,6 +117,14 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
     );
   }
 
+  if (listing.rootListing) {
+    return (
+      <ScreenView center>
+        <AppText variant="bodyMd">{t("lecture.loading", "Loading content…")}</AppText>
+      </ScreenView>
+    );
+  }
+
   return (
     <ScreenView>
       <StickyHeaderLayout>
@@ -137,6 +170,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
                 scholarSlug={listing.scholar.slug}
                 seriesId={listing.id}
                 seriesTitle={listing.title}
+                highlightItemId={highlightItemId}
               />
             )}
 
@@ -146,6 +180,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
                 scholarName={formatScholarName(listing.scholar)}
                 scholarSlug={listing.scholar.slug}
                 collectionId={listing.id}
+                highlightItemId={highlightItemId}
               />
             )}
 

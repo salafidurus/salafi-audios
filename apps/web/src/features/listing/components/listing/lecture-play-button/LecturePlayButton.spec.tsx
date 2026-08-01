@@ -39,6 +39,7 @@ const baseLecture: ListingDetailDto = {
   topics: [],
   primaryAudioAsset: null,
   seriesContext: null,
+  rootListing: null,
 };
 
 describe("LecturePlayButton", () => {

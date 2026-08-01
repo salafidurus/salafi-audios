@@ -8,6 +8,19 @@
   text-align: left;
 }
 
+.highlighted {
+  animation: highlightFade 2s ease-out;
+}
+
+@keyframes highlightFade {
+  0% {
+    background-color: var(--surface-hover);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
 .contentCol {
   display: flex;
   flex-direction: column;
