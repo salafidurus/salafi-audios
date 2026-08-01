@@ -109,7 +109,7 @@ export class ListingRepository {
 
     if (!listing) return null;
 
-    const seriesContext = await this.resolveSeriesContext(listing.parentId, locale);
+    const { seriesContext, rootListing } = await this.resolveAncestry(listing.parentId, locale);
     const primaryAudio = listing.audioAssets[0] ?? null;
 
     const resolved = resolveContentTranslation({
@@ -163,28 +163,81 @@ export class ListingRepository {
           }
         : null,
       seriesContext,
+      rootListing,
     };
   }
 
+  private resolveTranslatedTitle(
+    item: {
+      title: string;
+      language: Locale | null;
+      translations: { title: string }[];
+    },
+    locale: Locale,
+  ): string {
+    return resolveContentTranslation({
+      base: { title: item.title },
+      originalLanguage: item.language,
+      targetLocale: locale,
+      publishedTranslation: item.translations[0] ?? null,
+    }).fields.title;
+  }
+
   /**
-   * Resolves which Series/Module this listing is nested under, for breadcrumb-style
-   * display. Prev/next lecture navigation is not resolved here — it only ever knew
-   * about direct siblings, so it silently failed to cross Module boundaries inside a
-   * Collection. Real prev/next playback navigation is derived client-side from the
-   * full ordered play queue (built from `findContentsById`) instead.
+   * Resolves both the immediate Series/Module a listing is nested under (for
+   * breadcrumb display) and its ultimate top-level Listing ancestor (for
+   * redirecting a Lesson/Module's own slug to the top-level page it belongs
+   * under — slugs are flat, so a nested item's slug never encodes its
+   * parent). Listing nesting is capped at 3 levels (Collection -> Module ->
+   * Lesson), so at most one extra hop past the immediate parent is needed.
+   * Prev/next lecture navigation is not resolved here — it only ever knew
+   * about direct siblings, so it silently failed to cross Module boundaries
+   * inside a Collection. Real prev/next playback navigation is derived
+   * client-side from the full ordered play queue (built from
+   * `findContentsById`) instead.
    */
-  private async resolveSeriesContext(
+  private async resolveAncestry(
     parentId: string | null,
     locale: Locale,
-  ): Promise<ListingDetailDto['seriesContext']> {
-    if (!parentId) return null;
+  ): Promise<{
+    seriesContext: ListingDetailDto['seriesContext'];
+    rootListing: ListingDetailDto['rootListing'];
+  }> {
+    if (!parentId) return { seriesContext: null, rootListing: null };
 
-    const parentSeries = await this.prisma.listing.findFirst({
-      where: {
-        id: parentId,
-        deletedAt: null,
-        status: Status.published,
+    const parent = await this.prisma.listing.findFirst({
+      where: { id: parentId, deletedAt: null, status: Status.published },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        language: true,
+        parentId: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
       },
+    });
+
+    if (!parent) return { seriesContext: null, rootListing: null };
+
+    const seriesContext = {
+      seriesId: parent.id,
+      seriesTitle: this.resolveTranslatedTitle(parent, locale),
+      seriesSlug: parent.slug,
+    };
+
+    if (!parent.parentId) {
+      return {
+        seriesContext,
+        rootListing: { id: parent.id, slug: parent.slug, title: seriesContext.seriesTitle },
+      };
+    }
+
+    const grandparent = await this.prisma.listing.findFirst({
+      where: { id: parent.parentId, deletedAt: null, status: Status.published },
       select: {
         id: true,
         slug: true,
@@ -198,24 +251,15 @@ export class ListingRepository {
       },
     });
 
-    if (!parentSeries) return null;
-
-    const titleOf = (item: {
-      title: string;
-      language: Locale | null;
-      translations: { title: string }[];
-    }): string =>
-      resolveContentTranslation({
-        base: { title: item.title },
-        originalLanguage: item.language,
-        targetLocale: locale,
-        publishedTranslation: item.translations[0] ?? null,
-      }).fields.title;
+    if (!grandparent) return { seriesContext, rootListing: null };
 
     return {
-      seriesId: parentSeries.id,
-      seriesTitle: titleOf(parentSeries),
-      seriesSlug: parentSeries.slug,
+      seriesContext,
+      rootListing: {
+        id: grandparent.id,
+        slug: grandparent.slug,
+        title: this.resolveTranslatedTitle(grandparent, locale),
+      },
     };
   }
 

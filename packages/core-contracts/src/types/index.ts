@@ -42,6 +42,8 @@ export {
   ListingRefDtoSchema,
   type SeriesContextDto,
   SeriesContextDtoSchema,
+  type RootListingDto,
+  RootListingDtoSchema,
   type ListingDetailDto,
   ListingDetailDtoSchema,
   type RelatedListingDto,
