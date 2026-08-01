@@ -232,29 +232,29 @@ describe("progress.sync", () => {
   describe("persisted retry queue (initProgressSync / drainPendingProgress)", () => {
     it("queues a failed push in the persisted outbox rather than only in-memory", async () => {
       const adapter = createFakeStorageAdapter();
-      await initProgressSync(adapter);
+      await initProgressSync(adapter, "user-1");
 
       (httpClient as any).mockRejectedValueOnce(new Error("network down"));
       syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
       await flushPendingProgress();
 
-      const persisted = await adapter.getItem("sd:outbox:progress");
+      const persisted = await adapter.getItem("sd:outbox:progress:user-1");
       expect(persisted).not.toBeNull();
       expect(JSON.parse(persisted!)).toHaveLength(1);
     });
 
     it("recovers a queued push across a simulated restart and retries it via drainPendingProgress", async () => {
       const adapter = createFakeStorageAdapter();
-      await initProgressSync(adapter);
+      await initProgressSync(adapter, "user-1");
 
       (httpClient as any).mockRejectedValueOnce(new Error("network down"));
       syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
       await flushPendingProgress();
       (httpClient as any).mockClear();
 
-      // Simulate an app restart: re-init against the same backing storage.
+      // Simulate an app restart: re-init the same user against the same backing storage.
       (httpClient as any).mockResolvedValue(undefined);
-      await initProgressSync(adapter);
+      await initProgressSync(adapter, "user-1");
       await drainPendingProgress();
 
       expect(httpClient).toHaveBeenCalledWith({
@@ -264,12 +264,30 @@ describe("progress.sync", () => {
       });
       // The entry is removed on success; the outbox writes through an updated
       // (now-empty) array rather than deleting the storage key outright.
-      expect(JSON.parse((await adapter.getItem("sd:outbox:progress"))!)).toEqual([]);
+      expect(JSON.parse((await adapter.getItem("sd:outbox:progress:user-1"))!)).toEqual([]);
+    });
+
+    it("scopes the outbox by userId so a second user's session cannot see or retry the first user's queued push", async () => {
+      const adapter = createFakeStorageAdapter();
+      await initProgressSync(adapter, "user-1");
+      (httpClient as any).mockRejectedValueOnce(new Error("network down"));
+      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
+      await flushPendingProgress();
+      (httpClient as any).mockClear();
+
+      // A different user signs in on the same device/browser.
+      (httpClient as any).mockResolvedValue(undefined);
+      await initProgressSync(adapter, "user-2");
+      await drainPendingProgress();
+
+      expect(httpClient).not.toHaveBeenCalled();
+      // user-1's queued entry is untouched under its own key, not silently dropped.
+      expect(JSON.parse((await adapter.getItem("sd:outbox:progress:user-1"))!)).toHaveLength(1);
     });
 
     it("notifies onProgressFlushed listeners when drainPendingProgress successfully retries an entry", async () => {
       const adapter = createFakeStorageAdapter();
-      await initProgressSync(adapter);
+      await initProgressSync(adapter, "user-1");
       (httpClient as any).mockRejectedValueOnce(new Error("network down"));
       syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
       await flushPendingProgress();
@@ -286,7 +304,7 @@ describe("progress.sync", () => {
 
     it("drainPendingProgress does not notify listeners when there was nothing queued", async () => {
       const adapter = createFakeStorageAdapter();
-      await initProgressSync(adapter);
+      await initProgressSync(adapter, "user-1");
 
       const listener = vi.fn();
       const unsubscribe = onProgressFlushed(listener);

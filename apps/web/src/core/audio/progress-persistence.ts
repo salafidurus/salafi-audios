@@ -1,13 +1,17 @@
 "use client";
 
 import {
+  drainPendingProgress,
   flushPendingProgress,
   hydrateProgressFromServer,
   hydrateSavedFromServer,
+  initProgressSync,
   onProgressFlushed,
   useProgressStore,
   type ListingProgress,
 } from "@sd/domain-audio";
+
+import { createLocalStorageAdapter } from "../sync/local-storage-adapter";
 
 const STORAGE_KEY_PREFIX = "sd:progress-cache:v1:";
 const DEFAULT_PERSIST_THROTTLE_MS = 5000;
@@ -56,6 +60,7 @@ export function initProgressPersistence(
     useProgressStore.getState().actions.loadProgress(cached);
   }
 
+  void initProgressSync(createLocalStorageAdapter(), userId).then(() => drainPendingProgress());
   void hydrateProgressFromServer();
   void hydrateSavedFromServer();
 

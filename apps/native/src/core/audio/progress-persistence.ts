@@ -1,13 +1,17 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
+  drainPendingProgress,
   flushPendingProgress,
   hydrateProgressFromServer,
   hydrateSavedFromServer,
+  initProgressSync,
   onProgressFlushed,
   useProgressStore,
   type ListingProgress,
 } from "@sd/domain-audio";
 import { AppState, type AppStateStatus } from "react-native";
+
+import { createSqliteKvAdapter } from "../sync/sqlite-kv-adapter";
 
 const STORAGE_KEY_PREFIX = "sd:progress-cache:v1:";
 const DEFAULT_PERSIST_THROTTLE_MS = 5000;
@@ -56,6 +60,7 @@ export function initProgressPersistence(
     useProgressStore.getState().actions.loadProgress(cached);
   });
 
+  void initProgressSync(createSqliteKvAdapter(), userId).then(() => drainPendingProgress());
   void hydrateProgressFromServer();
   void hydrateSavedFromServer();
 

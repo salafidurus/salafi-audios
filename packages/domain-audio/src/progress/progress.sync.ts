@@ -52,17 +52,21 @@ const proxyAdapter: StorageAdapter = {
   setItem: (key, value) => delegateAdapter.setItem(key, value),
   removeItem: (key) => delegateAdapter.removeItem(key),
 };
-const outbox = createOutboxStore(proxyAdapter, "progress");
+// Namespaced by userId (see `initProgressSync`) so a second user signing in on
+// the same device never sees — or retries — a prior user's queued push. Starts
+// under a generic namespace until the first `initProgressSync` call scopes it.
+let outbox = createOutboxStore(proxyAdapter, "progress");
 
 /**
- * Upgrades the retry queue to a persisted `StorageAdapter` and recovers any
- * entries a previous session left queued after a failed push. Call once at
- * startup, before the first `syncProgressToBackend` call, after the app's
- * platform storage adapter is constructed.
+ * Upgrades the retry queue to a persisted `StorageAdapter`, scoped to `userId`,
+ * and recovers any entries a previous session for that same user left queued
+ * after a failed push. Call once per authenticated session, before the first
+ * `syncProgressToBackend` call, after the app's platform storage adapter is
+ * constructed.
  */
-export async function initProgressSync(adapter: StorageAdapter): Promise<void> {
-  outbox.useOutboxStore.setState({ entries: [] });
+export async function initProgressSync(adapter: StorageAdapter, userId: string): Promise<void> {
   delegateAdapter = adapter;
+  outbox = createOutboxStore(proxyAdapter, `progress:${userId}`);
   await outbox.hydrate();
 }
 

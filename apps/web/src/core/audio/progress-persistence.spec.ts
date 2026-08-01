@@ -96,6 +96,56 @@ describe("initProgressPersistence", () => {
     cleanup();
   });
 
+  it("retries a progress push left queued in localStorage from a previous session", async () => {
+    window.localStorage.setItem(
+      `sd:outbox:progress:${USER_ID}`,
+      JSON.stringify([
+        {
+          id: "outbox-1",
+          type: "progress-update",
+          payload: { listingId: "l9", positionSeconds: 30, durationSeconds: 200 },
+          createdAt: Date.now(),
+          retries: 0,
+        },
+      ]),
+    );
+
+    const cleanup = initProgressPersistence(USER_ID);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(httpClient).toHaveBeenCalledWith({
+      url: "/audio/progress/l9",
+      method: "PUT",
+      body: { positionSeconds: 30, durationSeconds: 200 },
+    });
+    cleanup();
+  });
+
+  it("does not retry a push queued under a different user's outbox key", async () => {
+    window.localStorage.setItem(
+      `sd:outbox:progress:other-user`,
+      JSON.stringify([
+        {
+          id: "outbox-1",
+          type: "progress-update",
+          payload: { listingId: "l9", positionSeconds: 30, durationSeconds: 200 },
+          createdAt: Date.now(),
+          retries: 0,
+        },
+      ]),
+    );
+
+    const cleanup = initProgressPersistence(USER_ID);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(httpClient).not.toHaveBeenCalledWith({
+      url: "/audio/progress/l9",
+      method: "PUT",
+      body: { positionSeconds: 30, durationSeconds: 200 },
+    });
+    cleanup();
+  });
+
   it("persists store changes to the per-user cache after the throttle window", async () => {
     const cleanup = initProgressPersistence(USER_ID, { persistThrottleMs: 10 });
 
