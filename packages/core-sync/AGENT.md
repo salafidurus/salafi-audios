@@ -33,8 +33,12 @@ supplies its own adapter (`apps/web/src/core/sync/local-storage-adapter.ts`,
 
 ## Entrypoints
 
-- `src/index.ts` is the only public entrypoint — this package is fully platform-agnostic.
-- No intermediate barrels inside `src/`; export only from the root `src/index.ts`.
+- `src/index.ts` is the production entrypoint — this package is fully platform-agnostic.
+- `src/test-utils/index.ts` (`@sd/core-sync/test-utils`) is a second, deliberately separate
+  entrypoint for test-only helpers (e.g. `createFakeStorageAdapter`), so production code never
+  pulls test scaffolding into its dependency graph. Do not re-export test-utils from the main
+  `src/index.ts`.
+- No intermediate barrels beyond these two entrypoints.
 
 ## Rules
 

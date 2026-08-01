@@ -13,6 +13,8 @@ export {
   hydrateSavedFromServer,
   onProgressFlushed,
   bulkSyncProgress,
+  initProgressSync,
+  drainPendingProgress,
 } from "./progress/progress.sync";
 export { usePlaybackStore } from "./store/playback.store";
 export { DurusAudioService } from "./service/audio.service";

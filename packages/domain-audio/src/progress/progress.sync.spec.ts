@@ -1,12 +1,15 @@
 import { httpClient } from "@sd/core-contracts";
+import { createFakeStorageAdapter } from "@sd/core-sync/test-utils";
 import { vi, describe, it, expect, beforeEach } from "bun:test";
 
 import { useProgressStore } from "./progress.store";
 import {
   bulkSyncProgress,
+  drainPendingProgress,
   flushPendingProgress,
   hydrateProgressFromServer,
   hydrateSavedFromServer,
+  initProgressSync,
   onProgressFlushed,
   syncProgressToBackend,
 } from "./progress.sync";
@@ -223,6 +226,75 @@ describe("progress.sync", () => {
       await bulkSyncProgress([]);
 
       expect(httpClient).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("persisted retry queue (initProgressSync / drainPendingProgress)", () => {
+    it("queues a failed push in the persisted outbox rather than only in-memory", async () => {
+      const adapter = createFakeStorageAdapter();
+      await initProgressSync(adapter);
+
+      (httpClient as any).mockRejectedValueOnce(new Error("network down"));
+      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
+      await flushPendingProgress();
+
+      const persisted = await adapter.getItem("sd:outbox:progress");
+      expect(persisted).not.toBeNull();
+      expect(JSON.parse(persisted!)).toHaveLength(1);
+    });
+
+    it("recovers a queued push across a simulated restart and retries it via drainPendingProgress", async () => {
+      const adapter = createFakeStorageAdapter();
+      await initProgressSync(adapter);
+
+      (httpClient as any).mockRejectedValueOnce(new Error("network down"));
+      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
+      await flushPendingProgress();
+      (httpClient as any).mockClear();
+
+      // Simulate an app restart: re-init against the same backing storage.
+      (httpClient as any).mockResolvedValue(undefined);
+      await initProgressSync(adapter);
+      await drainPendingProgress();
+
+      expect(httpClient).toHaveBeenCalledWith({
+        url: "/audio/progress/l1",
+        method: "PUT",
+        body: { positionSeconds: 90, durationSeconds: 1800 },
+      });
+      // The entry is removed on success; the outbox writes through an updated
+      // (now-empty) array rather than deleting the storage key outright.
+      expect(JSON.parse((await adapter.getItem("sd:outbox:progress"))!)).toEqual([]);
+    });
+
+    it("notifies onProgressFlushed listeners when drainPendingProgress successfully retries an entry", async () => {
+      const adapter = createFakeStorageAdapter();
+      await initProgressSync(adapter);
+      (httpClient as any).mockRejectedValueOnce(new Error("network down"));
+      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
+      await flushPendingProgress();
+
+      const listener = vi.fn();
+      const unsubscribe = onProgressFlushed(listener);
+      (httpClient as any).mockResolvedValue(undefined);
+
+      await drainPendingProgress();
+
+      expect(listener).toHaveBeenCalledTimes(1);
+      unsubscribe();
+    });
+
+    it("drainPendingProgress does not notify listeners when there was nothing queued", async () => {
+      const adapter = createFakeStorageAdapter();
+      await initProgressSync(adapter);
+
+      const listener = vi.fn();
+      const unsubscribe = onProgressFlushed(listener);
+
+      await drainPendingProgress();
+
+      expect(listener).not.toHaveBeenCalled();
+      unsubscribe();
     });
   });
 });

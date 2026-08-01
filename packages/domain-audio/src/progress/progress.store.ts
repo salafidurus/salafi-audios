@@ -1,3 +1,4 @@
+import { resolveLastWriteWins } from "@sd/core-sync";
 import { create } from "zustand";
 
 export type ListingProgress = {
@@ -63,11 +64,14 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
         };
       }),
 
+    // Last-write-wins by `updatedAt`, mirroring the server's own conflict-resolution
+    // convention (AudioRepository.bulkSync) — a pulled entry never overwrites a newer
+    // unsynced local edit still sitting in the outbox waiting to be pushed.
     loadProgress: (entries) =>
       set((state) => {
         const newMap = { ...state.progressMap };
         for (const entry of entries) {
-          newMap[entry.listingId] = entry;
+          newMap[entry.listingId] = resolveLastWriteWins(newMap[entry.listingId], entry);
         }
         return { progressMap: newMap };
       }),
