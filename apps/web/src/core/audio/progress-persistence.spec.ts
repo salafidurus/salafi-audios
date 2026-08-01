@@ -1,6 +1,6 @@
 import "@/test-setup";
 import { httpClient } from "@sd/core-contracts";
-import { syncProgressToBackend, useProgressStore } from "@sd/domain-audio";
+import { flushPendingProgress, syncProgressToBackend, useProgressStore } from "@sd/domain-audio";
 import { describe, it, expect, beforeEach, vi } from "bun:test";
 
 import { initProgressPersistence } from "./progress-persistence";
@@ -151,5 +151,29 @@ describe("initProgressPersistence", () => {
     window.dispatchEvent(new Event("beforeunload"));
 
     expect(httpClient).not.toHaveBeenCalled();
+  });
+
+  it("calls onFlushed once a debounced progress sync actually reaches the server", async () => {
+    const onFlushed = vi.fn();
+    const cleanup = initProgressPersistence(USER_ID, { onFlushed });
+
+    syncProgressToBackend({ listingId: "l5", positionSeconds: 3, durationSeconds: 100 });
+    Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
+    document.dispatchEvent(new Event("visibilitychange"));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(onFlushed).toHaveBeenCalledTimes(1);
+    cleanup();
+  });
+
+  it("stops calling onFlushed after cleanup", async () => {
+    const onFlushed = vi.fn();
+    const cleanup = initProgressPersistence(USER_ID, { onFlushed });
+    cleanup();
+
+    syncProgressToBackend({ listingId: "l6", positionSeconds: 3, durationSeconds: 100 });
+    await flushPendingProgress();
+
+    expect(onFlushed).not.toHaveBeenCalled();
   });
 });

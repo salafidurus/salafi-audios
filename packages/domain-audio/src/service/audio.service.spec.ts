@@ -5,13 +5,14 @@ import type { PlaybackEngine, PlaybackEngineEvents } from "../engine/playback.en
 import type { Track } from "../types/track.types";
 
 import { useProgressStore } from "../progress/progress.store";
-import { syncProgressToBackend } from "../progress/progress.sync";
+import { syncProgressToBackend, flushPendingProgress } from "../progress/progress.sync";
 import { usePlaybackStore } from "../store/playback.store";
 import { DurusAudioService } from "./audio.service";
 
 // Mock progress sync module to avoid network triggers in tests
 vi.mock("../progress/progress.sync", () => ({
   syncProgressToBackend: vi.fn<() => void>(),
+  flushPendingProgress: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
   syncLocalToServer: vi.fn<() => void>(),
   saveListing: vi.fn<() => void>(),
   unsaveListing: vi.fn<() => void>(),
@@ -163,6 +164,16 @@ describe("DurusAudioService", () => {
     expect(useProgressStore.getState().progressMap[mockTrack.id]?.completedAt).toBeDefined();
     expect(usePlaybackStore.getState().currentTrack).toBeNull();
     expect(usePlaybackStore.getState().status).toBe("idle");
+  });
+
+  it("should immediately flush completion to the server on track end, bypassing the sync debounce", async () => {
+    await service.playListing(mockTrack);
+    await engineEvents.onTrackEnd!();
+
+    expect(syncProgressToBackend).toHaveBeenCalledWith(
+      expect.objectContaining({ listingId: mockTrack.id }),
+    );
+    expect(flushPendingProgress).toHaveBeenCalled();
   });
 
   it("should load engine with existing url when track.url is non-empty and not a local file", async () => {

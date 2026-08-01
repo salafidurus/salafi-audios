@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { httpClient } from "@sd/core-contracts";
-import { syncProgressToBackend, useProgressStore } from "@sd/domain-audio";
+import { flushPendingProgress, syncProgressToBackend, useProgressStore } from "@sd/domain-audio";
 import { AppState } from "react-native";
 
 import { initProgressPersistence } from "./progress-persistence";
@@ -144,6 +144,34 @@ describe("initProgressPersistence", () => {
     cleanup();
 
     expect(removeSpy).toHaveBeenCalled();
+    jest.restoreAllMocks();
+  });
+
+  it("calls onFlushed once a debounced progress sync actually reaches the server", async () => {
+    const addListenerSpy = jest.spyOn(AppState, "addEventListener");
+    const onFlushed = jest.fn();
+    const cleanup = initProgressPersistence(USER_ID, { onFlushed });
+
+    syncProgressToBackend({ listingId: "l5", positionSeconds: 3, durationSeconds: 100 });
+    const onChange = addListenerSpy.mock.calls.find((call) => call[0] === "change")?.[1];
+    onChange?.("background");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(onFlushed).toHaveBeenCalledTimes(1);
+    cleanup();
+    addListenerSpy.mockRestore();
+  });
+
+  it("stops calling onFlushed after cleanup", async () => {
+    jest.spyOn(AppState, "addEventListener").mockReturnValue({ remove: jest.fn() } as any);
+    const onFlushed = jest.fn();
+    const cleanup = initProgressPersistence(USER_ID, { onFlushed });
+    cleanup();
+
+    syncProgressToBackend({ listingId: "l6", positionSeconds: 3, durationSeconds: 100 });
+    await flushPendingProgress();
+
+    expect(onFlushed).not.toHaveBeenCalled();
     jest.restoreAllMocks();
   });
 });

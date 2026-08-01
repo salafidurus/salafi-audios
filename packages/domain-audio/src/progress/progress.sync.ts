@@ -9,15 +9,33 @@ import {
 import { useProgressStore } from "./progress.store";
 
 let syncTimeout: ReturnType<typeof setTimeout> | null = null;
-const SYNC_DEBOUNCE_MS = 5000;
+// Batched: individual position ticks debounce into one write per listing every
+// couple of minutes rather than every few seconds. `flushPendingProgress` is
+// still called directly at lesson-end and app-background, so completion and
+// backgrounding are never delayed by this window.
+const SYNC_DEBOUNCE_MS = 120_000;
 
 const pendingUpdates = new Map<
   string,
   { listingId: string; positionSeconds: number; durationSeconds: number }
 >();
 
+const flushListeners = new Set<() => void>();
+
+/**
+ * Subscribes to "a progress flush just completed" — used by each app's
+ * progress-persistence layer to invalidate library queries once fresh data
+ * has actually reached the server, without domain-audio depending on
+ * react-query. Returns an unsubscribe function.
+ */
+export function onProgressFlushed(listener: () => void): () => void {
+  flushListeners.add(listener);
+  return () => flushListeners.delete(listener);
+}
+
 async function flushPending(): Promise<void> {
   const updates = Array.from(pendingUpdates.values());
+  if (updates.length === 0) return;
   pendingUpdates.clear();
 
   await Promise.all(
@@ -34,6 +52,8 @@ async function flushPending(): Promise<void> {
       }),
     ),
   );
+
+  for (const listener of flushListeners) listener();
 }
 
 /**

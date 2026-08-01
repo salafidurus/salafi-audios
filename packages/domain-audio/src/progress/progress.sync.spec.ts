@@ -7,6 +7,7 @@ import {
   flushPendingProgress,
   hydrateProgressFromServer,
   hydrateSavedFromServer,
+  onProgressFlushed,
   syncProgressToBackend,
 } from "./progress.sync";
 
@@ -106,6 +107,40 @@ describe("progress.sync", () => {
         method: "GET",
         params: { since: "2026-01-01T00:00:00.000Z" },
       });
+    });
+  });
+
+  describe("onProgressFlushed", () => {
+    it("notifies subscribers after a flush completes, even a partially-failed one", async () => {
+      const listener = vi.fn();
+      const unsubscribe = onProgressFlushed(listener);
+
+      syncProgressToBackend({ listingId: "l1", positionSeconds: 1, durationSeconds: 100 });
+      await flushPendingProgress();
+
+      expect(listener).toHaveBeenCalledTimes(1);
+      unsubscribe();
+    });
+
+    it("stops notifying once unsubscribed", async () => {
+      const listener = vi.fn();
+      const unsubscribe = onProgressFlushed(listener);
+      unsubscribe();
+
+      syncProgressToBackend({ listingId: "l1", positionSeconds: 1, durationSeconds: 100 });
+      await flushPendingProgress();
+
+      expect(listener).not.toHaveBeenCalled();
+    });
+
+    it("does not notify when flushing with nothing pending", async () => {
+      const listener = vi.fn();
+      const unsubscribe = onProgressFlushed(listener);
+
+      await flushPendingProgress();
+
+      expect(listener).not.toHaveBeenCalled();
+      unsubscribe();
     });
   });
 

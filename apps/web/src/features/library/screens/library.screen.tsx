@@ -1,6 +1,7 @@
 "use client";
 
-import { useInfiniteLibraryProgress } from "@sd/domain-content";
+import { useProgressStore, usePlaybackStore } from "@sd/domain-audio";
+import { useInfiniteLibraryProgress, mergeLiveProgress } from "@sd/domain-content";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -18,8 +19,16 @@ export function LibraryScreen() {
 
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteLibraryProgress();
+  const progressMap = useProgressStore((s) => s.progressMap);
+  const currentTrack = usePlaybackStore((s) => s.currentTrack);
 
-  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
+  // Live position/completion always wins over the last-fetched server snapshot,
+  // so a tick shows up instantly instead of waiting for the batched sync + refetch.
+  const allItems = mergeLiveProgress(
+    data?.pages.flatMap((page) => page.items) ?? [],
+    progressMap,
+    currentTrack,
+  );
 
   if (!isAuthenticated) {
     return (

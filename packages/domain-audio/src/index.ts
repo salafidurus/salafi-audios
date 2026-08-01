@@ -11,6 +11,7 @@ export {
   flushPendingProgress,
   hydrateProgressFromServer,
   hydrateSavedFromServer,
+  onProgressFlushed,
   bulkSyncProgress,
 } from "./progress/progress.sync";
 export { usePlaybackStore } from "./store/playback.store";

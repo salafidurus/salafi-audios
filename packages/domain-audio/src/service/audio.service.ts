@@ -4,7 +4,7 @@ import type { PlaybackEngine } from "../engine/playback.engine";
 import type { Track } from "../types/track.types";
 
 import { useProgressStore } from "../progress/progress.store";
-import { syncProgressToBackend } from "../progress/progress.sync";
+import { flushPendingProgress, syncProgressToBackend } from "../progress/progress.sync";
 import { QueueManager } from "../queue/queue.manager";
 import { usePlaybackStore } from "../store/playback.store";
 
@@ -175,6 +175,15 @@ export class DurusAudioService {
       const duration = usePlaybackStore.getState().durationSeconds;
       useProgressStore.getState().actions.setProgress(currentTrack.id, duration, duration);
       useProgressStore.getState().actions.markCompleted(currentTrack.id);
+
+      // Completion should hit the DB right away, not wait for the batched
+      // sync debounce window.
+      syncProgressToBackend({
+        listingId: currentTrack.id,
+        positionSeconds: duration,
+        durationSeconds: duration,
+      });
+      await flushPendingProgress();
     }
     await this.skipToNext();
   }
