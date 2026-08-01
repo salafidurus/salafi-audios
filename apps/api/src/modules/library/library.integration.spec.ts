@@ -22,9 +22,10 @@ const mockLibraryService = {
   getInProgress: vi.fn<any>().mockResolvedValue({ items: [], hasMore: false }),
   getCompleted: vi.fn<any>().mockResolvedValue({ items: [], hasMore: false }),
   getSaved: vi.fn<any>().mockResolvedValue({ items: [], hasMore: false }),
+  getSavedDelta: vi.fn<any>().mockResolvedValue([]),
   saveLecture: vi.fn<any>().mockResolvedValue(undefined),
   unsaveLecture: vi.fn<any>().mockResolvedValue(undefined),
-  bulkSave: vi.fn<any>().mockResolvedValue(undefined),
+  bulkSyncSaved: vi.fn<any>().mockResolvedValue(undefined),
 };
 
 describe('LibraryController — auth boundaries', () => {
@@ -75,10 +76,15 @@ describe('LibraryController — auth boundaries', () => {
     expect(response.status).toBe(401);
   });
 
+  it('GET /me/library/saved/delta returns 401 without a session', async () => {
+    const response = await request(app.getHttpServer()).get('/me/library/saved/delta');
+    expect(response.status).toBe(401);
+  });
+
   it('POST /me/library/saved/sync returns 401 without a session', async () => {
     const response = await request(app.getHttpServer())
       .post('/me/library/saved/sync')
-      .send({ lectureIds: [] });
+      .send({ items: [] });
     expect(response.status).toBe(401);
   });
 

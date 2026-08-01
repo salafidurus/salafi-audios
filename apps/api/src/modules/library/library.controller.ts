@@ -2,7 +2,7 @@ import { Controller, Delete, Get, Param, Post, Query, Body } from '@nestjs/commo
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CurrentUser } from '../../core/auth/decorators';
-import type { LibraryPageDto, RecentProgressDto } from '@sd/core-contracts';
+import type { LibraryPageDto, RecentProgressDto, SavedDeltaItemDto } from '@sd/core-contracts';
 import { LibraryService } from './library.service';
 import { SavedSyncDto } from './dto/saved-sync.dto';
 
@@ -49,11 +49,23 @@ export class LibraryController {
     return this.library.getSaved(user.id, cursor);
   }
 
+  @Get('saved/delta')
+  @ApiOperation({
+    summary: 'Get saved (favorite) listings changed since a cursor, including tombstones',
+  })
+  @ApiOkResponse({ description: 'Delta of saved listings, including removals' })
+  getSavedDelta(
+    @CurrentUser() user: { id: string },
+    @Query('since') since?: string,
+  ): Promise<SavedDeltaItemDto[]> {
+    return this.library.getSavedDelta(user.id, since);
+  }
+
   @Post('saved/sync')
   @ApiOperation({ summary: 'Bulk sync saved listings' })
   @ApiOkResponse({ description: 'Saved listings synced' })
   syncSaved(@CurrentUser() user: { id: string }, @Body() body: SavedSyncDto): Promise<void> {
-    return this.library.bulkSave(user.id, body.listingIds ?? []);
+    return this.library.bulkSyncSaved(user.id, body.items ?? []);
   }
 
   @Post('save/:listingId')

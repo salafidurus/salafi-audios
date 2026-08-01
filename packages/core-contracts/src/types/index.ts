@@ -195,8 +195,12 @@ export {
   LibraryItemDtoSchema,
   type LibraryPageDto,
   LibraryPageDtoSchema,
+  type SavedSyncItemDto,
+  SavedSyncItemDtoSchema,
   type SavedSyncDto,
   SavedSyncDtoSchema,
+  type SavedDeltaItemDto,
+  SavedDeltaItemDtoSchema,
 } from "../types/library.types";
 export {
   type UserProfileDto,

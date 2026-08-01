@@ -1,5 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { LibraryPageDto, RecentProgressDto } from '@sd/core-contracts';
+import type {
+  LibraryPageDto,
+  RecentProgressDto,
+  SavedDeltaItemDto,
+  SavedSyncItemDto,
+} from '@sd/core-contracts';
 import { LibraryRepository } from './library.repo';
 
 @Injectable()
@@ -21,6 +26,10 @@ export class LibraryService {
     return { items, nextCursor, hasMore: !!nextCursor };
   }
 
+  async getSavedDelta(userId: string, since?: string): Promise<SavedDeltaItemDto[]> {
+    return this.repo.findSavedDelta(userId, since ? new Date(since) : undefined);
+  }
+
   async getRecentProgress(userId: string): Promise<RecentProgressDto | null> {
     return this.repo.getRecentProgress(userId);
   }
@@ -39,7 +48,7 @@ export class LibraryService {
     }
   }
 
-  async bulkSave(userId: string, listingIds: string[]): Promise<void> {
-    await this.repo.bulkSave(userId, listingIds);
+  async bulkSyncSaved(userId: string, items: SavedSyncItemDto[]): Promise<void> {
+    await this.repo.bulkSync(userId, items);
   }
 }
