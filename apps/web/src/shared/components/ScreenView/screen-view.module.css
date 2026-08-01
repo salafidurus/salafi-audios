@@ -8,20 +8,20 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  width: 70%;
-  max-width: 1400px;
+  width: var(--content-width-desktop);
+  max-width: var(--content-max-width);
   margin-inline: auto;
 }
 
 @media (max-width: 1199px) {
   .content {
-    width: 90%;
+    width: var(--content-width-tablet);
   }
 }
 
 @media (max-width: 899px) {
   .content {
-    width: 100%;
+    width: var(--content-width-mobile);
   }
 }
 

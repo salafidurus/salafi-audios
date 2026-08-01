@@ -24,7 +24,7 @@ export class SearchService {
   ): Promise<SearchCatalogResultsDto> {
     const trimmed = query.q?.trim();
     if (!trimmed) {
-      return { collections: [], series: [], singles: [] };
+      return { collections: [], series: [], singles: [], hasMore: false };
     }
 
     const limit = Math.min(query.limit ?? DEFAULT_SEARCH_LIMIT, MAX_SEARCH_LIMIT);
@@ -37,16 +37,17 @@ export class SearchService {
       scholarSlug: query.scholarSlug,
     };
 
-    const [collections, series, singles] = await Promise.all([
-      this.repo.listCollections(listQuery, limit, includeRelated),
-      this.repo.listSeries(listQuery, limit, includeRelated),
-      this.repo.listSingles(listQuery, limit, includeRelated),
-    ]);
+    const { collections, series, singles } = await this.repo.searchListings(
+      listQuery,
+      limit,
+      includeRelated,
+    );
 
     return {
       collections,
       series,
       singles,
+      hasMore: false,
     };
   }
 }

@@ -1,0 +1,23 @@
+-- AlterEnum
+BEGIN;
+CREATE TYPE "Permission_new" AS ENUM ('SCHOLARS_VIEW', 'SCHOLARS_CREATE', 'SCHOLARS_EDIT', 'SCHOLARS_DELETE', 'SCHOLARS_PUBLISH', 'LISTINGS_VIEW', 'LISTINGS_CREATE', 'LISTINGS_EDIT', 'LISTINGS_DELETE', 'LISTINGS_PUBLISH', 'TOPICS_VIEW', 'TOPICS_CREATE', 'TOPICS_EDIT', 'TOPICS_DELETE', 'TOPICS_PUBLISH', 'TRANSLATIONS_VIEW', 'TRANSLATIONS_CREATE', 'TRANSLATIONS_EDIT', 'TRANSLATIONS_DELETE', 'TRANSLATIONS_PUBLISH', 'MEDIA_UPLOAD', 'MEDIA_DELETE', 'USERS_VIEW', 'USERS_EDIT', 'USERS_DELETE', 'USERS_GRANT_PERMISSIONS', 'USERS_GRANT_ROLES');
+ALTER TABLE "UserPermission" ALTER COLUMN "permission" TYPE "Permission_new" USING ("permission"::text::"Permission_new");
+ALTER TYPE "Permission" RENAME TO "Permission_old";
+ALTER TYPE "Permission_new" RENAME TO "Permission";
+DROP TYPE "public"."Permission_old";
+COMMIT;
+
+-- DropForeignKey
+ALTER TABLE "LiveSession" DROP CONSTRAINT "LiveSession_channelId_fkey";
+
+-- DropForeignKey
+ALTER TABLE "LivestreamChannel" DROP CONSTRAINT "LivestreamChannel_scholarId_fkey";
+
+-- DropTable
+DROP TABLE "LiveSession";
+
+-- DropTable
+DROP TABLE "LivestreamChannel";
+
+-- DropEnum
+DROP TYPE "LiveSessionStatus";

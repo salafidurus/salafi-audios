@@ -1,0 +1,102 @@
+.root {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-scale-lg);
+  padding-bottom: var(--space-scale-sm);
+}
+
+.avatar {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatarFallback {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background-color: var(--surface-primary-subtle);
+  color: var(--content-primary-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--typo-body-md-font-family);
+  font-size: 38px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.infoColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-scale-xs);
+  flex: 1;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--typo-title-lg-font-family), serif;
+  font-size: var(--typo-title-lg-font-size);
+  font-weight: var(--typo-title-lg-font-weight);
+  line-height: var(--typo-title-lg-line-height);
+  letter-spacing: var(--typo-title-lg-letter-spacing);
+  color: var(--content-strong);
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-xs);
+}
+
+.statText {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  font-weight: 500;
+}
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-xs);
+  margin-top: 2px;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-scale-md);
+  border: 1px solid var(--border-subtle);
+  color: var(--content-subtle);
+  text-decoration: none;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.socialLink:hover {
+  color: var(--content-default);
+  border-color: var(--border-default);
+  background-color: var(--surface-hover);
+}
+
+@media (max-width: 640px) {
+  .root {
+    gap: var(--space-scale-md);
+  }
+
+  .avatar,
+  .avatarFallback {
+    width: 80px;
+    height: 80px;
+    font-size: 28px;
+  }
+}

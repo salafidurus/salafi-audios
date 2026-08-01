@@ -1,7 +1,8 @@
+import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
+
 import { useMemo } from "react";
 import { Pressable, ScrollView, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
 
 export type SearchFilterValue = TopicSlug[];
 
@@ -18,10 +19,10 @@ export type SearchFilterProps = {
 
 export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
   const options = useMemo<FilterOption[]>(() => {
-    const sortedTopics = topics.toSorted((a, b) => a.name.localeCompare(b.name));
+    const sortedTopics = [...topics].sort((a, b) => a.name.ar.localeCompare(b.name.ar));
     return [
       { id: "all", label: "All" },
-      ...sortedTopics.map((topic) => ({ id: topic.slug, label: topic.name })),
+      ...sortedTopics.map((topic) => ({ id: topic.slug, label: topic.name.ar })),
     ];
   }, [topics]);
 

@@ -1,8 +1,9 @@
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { Public } from '../../modules/auth/decorators';
+import { Public } from '../auth/decorators';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { HealthCheck, HealthCheckResult, HealthCheckService } from '@nestjs/terminus';
+import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
+import type { HealthCheckResult } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CDNHealthIndicator } from './cdn-health.indicator';
 import { PrismaHealthIndicator } from './prisma-health.indicator';
@@ -25,7 +26,7 @@ export class HealthController {
   @HealthCheck()
   getHealth(): Promise<HealthCheckResult> {
     return this.health.check([
-      () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
+      () => this.prismaHealth.pingCheck('database', { timeout: 5000 }),
       () => this.cdnHealth.pingCheck('cdn', { timeout: 5000 }),
     ]);
   }
@@ -43,6 +44,6 @@ export class HealthController {
   @ApiOkResponse({ description: 'Ok when core dependencies (database) are available' })
   @HealthCheck()
   getReadiness(): Promise<HealthCheckResult> {
-    return this.health.check([() => this.prismaHealth.pingCheck('database', { timeout: 300 })]);
+    return this.health.check([() => this.prismaHealth.pingCheck('database', { timeout: 5000 })]);
   }
 }

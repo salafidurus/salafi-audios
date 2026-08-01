@@ -1,0 +1,154 @@
+"use client";
+
+import { type AdminScholarListItemDto, COUNTRY_NAMES } from "@sd/core-contracts";
+import { X, Send, Film, ExternalLink, Pencil, Languages } from "lucide-react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
+import { Button } from "@/shared/components/Button";
+import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
+import { UserAvatar } from "@/shared/components/user-avatar";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
+
+import styles from "./scholar-item.module.css";
+
+export interface ScholarItemProps {
+  scholar: AdminScholarListItemDto;
+  onEdit: () => void;
+  onTranslate?: () => void;
+}
+
+export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) {
+  const { isMobile } = useResponsive();
+  const { t } = useTranslation();
+  const formatScholarName = useFormatScholarName();
+  const countryName = scholar.country
+    ? (COUNTRY_NAMES[scholar.country as keyof typeof COUNTRY_NAMES] ?? scholar.country)
+    : null;
+
+  const hasSocials =
+    scholar.socialTwitter ||
+    scholar.socialTelegram ||
+    scholar.socialYoutube ||
+    scholar.socialWebsite;
+
+  return (
+    <List.Item interactive className={styles.listItem}>
+      <div className={styles.container}>
+        <div className={styles.avatarBlock}>
+          <UserAvatar image={scholar.imageUrl ?? null} name={scholar.name} fill />
+        </div>
+        <div className={styles.detailsBody}>
+          <MarqueeText
+            text={formatScholarName(scholar)}
+            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
+          />
+          <div className={styles.metaRow}>
+            <span className={styles.slug}>{scholar.slug}</span>
+            {countryName && (
+              <>
+                <span className={styles.sep}>&bull;</span>
+                <span className={styles.country}>{isMobile ? scholar.country : countryName}</span>
+              </>
+            )}
+          </div>
+          {scholar.translations.length > 0 && (
+            <div className={styles.translationRow}>
+              {scholar.translations.map((t) => (
+                <span key={t.locale} className={styles.translationChip}>
+                  {t.locale}
+                  <span
+                    className={`${styles.translationDot} ${
+                      t.status === "published" ? styles.dotPublished : styles.dotDraft
+                    }`}
+                  />
+                </span>
+              ))}
+            </div>
+          )}
+          {scholar.bio && <p className={styles.bio}>{scholar.bio}</p>}
+          {hasSocials && (
+            <div className={styles.socialRow}>
+              {scholar.socialTwitter && (
+                <a
+                  href={scholar.socialTwitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.socialLink}
+                  title="Twitter"
+                  aria-label="Twitter"
+                >
+                  <X size={14} />
+                </a>
+              )}
+              {scholar.socialTelegram && (
+                <a
+                  href={scholar.socialTelegram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.socialLink}
+                  title="Telegram"
+                  aria-label="Telegram"
+                >
+                  <Send size={14} />
+                </a>
+              )}
+              {scholar.socialYoutube && (
+                <a
+                  href={scholar.socialYoutube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.socialLink}
+                  title="YouTube"
+                  aria-label="YouTube"
+                >
+                  <Film size={14} />
+                </a>
+              )}
+              {scholar.socialWebsite && (
+                <a
+                  href={scholar.socialWebsite}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.socialLink}
+                  title="Website"
+                  aria-label="Website"
+                >
+                  <ExternalLink size={14} />
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      <List.Item.Actions>
+        <PermissionGate requires="SCHOLARS_EDIT">
+          <Button
+            variant={isMobile ? "outline" : "ghost"}
+            size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
+            onClick={onEdit}
+            icon={<Pencil size={16} />}
+            aria-label={`Edit ${scholar.name}`}
+          >
+            {isMobile && t("common.edit", "Edit")}
+          </Button>
+        </PermissionGate>
+        <PermissionGate requires="TRANSLATIONS_VIEW">
+          <Button
+            variant={isMobile ? "outline" : "ghost"}
+            size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
+            onClick={onTranslate}
+            icon={<Languages size={16} />}
+            aria-label={`Translate ${scholar.name}`}
+          >
+            {isMobile && t("admin.translations.button", "Translations")}
+          </Button>
+        </PermissionGate>
+      </List.Item.Actions>
+    </List.Item>
+  );
+}

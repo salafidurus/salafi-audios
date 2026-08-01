@@ -1,6 +1,8 @@
 import { useCallback, useMemo } from "react";
-import { useDownloadsStore } from "../store/downloads.store";
+
 import type { DownloadStatus } from "../types";
+
+import { useDownloadsStore } from "../store/downloads.store";
 
 export function useDownload(lectureId: string) {
   const download = useDownloadsStore((s) => s.downloads[lectureId]);

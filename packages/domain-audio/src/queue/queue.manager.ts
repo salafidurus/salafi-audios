@@ -24,8 +24,48 @@ export class QueueManager {
     return null;
   }
 
+  previous(): Track | null {
+    if (this.hasPrevious()) {
+      this.currentIndex--;
+      return this.getCurrentTrack();
+    }
+    return null;
+  }
+
+  jumpTo(index: number): Track | null {
+    if (index >= 0 && index < this.queue.length) {
+      this.currentIndex = index;
+      return this.getCurrentTrack();
+    }
+    return null;
+  }
+
   hasNext(): boolean {
     return this.currentIndex + 1 < this.queue.length;
+  }
+
+  hasPrevious(): boolean {
+    return this.currentIndex > 0;
+  }
+
+  getCurrentIndex(): number {
+    return this.currentIndex;
+  }
+
+  /** Peek the next track without advancing the current position. */
+  getNextTrack(): Track | null {
+    if (this.hasNext()) {
+      return this.queue[this.currentIndex + 1] ?? null;
+    }
+    return null;
+  }
+
+  /** Peek the previous track without moving the current position. */
+  getPreviousTrack(): Track | null {
+    if (this.hasPrevious()) {
+      return this.queue[this.currentIndex - 1] ?? null;
+    }
+    return null;
   }
 
   getQueue(): Track[] {

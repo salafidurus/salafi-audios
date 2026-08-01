@@ -8,8 +8,10 @@ export {
   type UseSearchProcessingOptions,
 } from "./hooks/use-search-processing";
 
+export { useInfiniteSearch, type UseInfiniteSearchOptions } from "./hooks";
+
 // Utils & types
 export { buildSearchResultRows, type SearchResultRow } from "./utils/build-search-result-rows";
 
 // Quick browse
-export { useQuickBrowse } from "./use-quickbrowse";
+export { useContinueListening } from "./use-continue-listening";

@@ -1,5 +1,7 @@
-import { vi, type Mocked } from 'vitest';
+import type { Mocked } from '../../test/setup';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import type {
   ScholarDetailDto,
@@ -14,6 +16,7 @@ import { ScholarsService } from './scholars.service';
 describe('ScholarsService', () => {
   let service: ScholarsService;
   let repo: Mocked<ScholarsRepository>;
+  let cacheManager: any;
 
   const mockScholarDetail: ScholarDetailDto & {
     lectureCount: number;
@@ -25,10 +28,9 @@ describe('ScholarsService', () => {
     name: 'Shaykh Ibn Uthaymeen',
     bio: 'Great scholar',
     imageUrl: 'image1.jpg',
-    country: 'Saudi Arabia',
+    country: 'SA',
     mainLanguage: 'ar',
     isActive: true,
-    isKibar: true,
     socialTwitter: '@example',
     socialTelegram: 'example',
     socialYoutube: 'example',
@@ -45,19 +47,29 @@ describe('ScholarsService', () => {
   };
 
   beforeEach(async () => {
+    cacheManager = {
+      del: vi.fn().mockResolvedValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ScholarsService,
         {
           provide: ScholarsRepository,
           useValue: {
-            list: vi.fn(),
-            findBySlug: vi.fn(),
-            getContent: vi.fn(),
-            create: vi.fn(),
-            update: vi.fn(),
-            findById: vi.fn(),
-          } satisfies Partial<Mocked<ScholarsRepository>>,
+            list: vi.fn<any>(),
+            findBySlug: vi.fn<any>(),
+            getContent: vi.fn<any>(),
+            getFormData: vi.fn<any>(),
+            create: vi.fn<any>(),
+            update: vi.fn<any>(),
+            findById: vi.fn<any>(),
+            upsertScholarTranslation: vi.fn<any>(),
+          } as Partial<Mocked<ScholarsRepository>>,
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: cacheManager,
         },
       ],
     }).compile();
@@ -80,7 +92,6 @@ describe('ScholarsService', () => {
             slug: 'test-scholar',
             imageUrl: 'test.jpg',
             mainLanguage: 'en',
-            isKibar: false,
             lectureCount: 10,
           },
         ],
@@ -132,6 +143,13 @@ describe('ScholarsService', () => {
     });
   });
 
+  describe('getFormData', () => {
+    it('method exists and is callable', () => {
+      expect(service.getFormData).toBeDefined();
+      expect(typeof service.getFormData).toBe('function');
+    });
+  });
+
   describe('create', () => {
     it('should create a new scholar', async () => {
       const dto: CreateScholarDto = {
@@ -139,33 +157,33 @@ describe('ScholarsService', () => {
         slug: 'new-scholar',
         bio: 'Bio details',
         imageUrl: 'new.jpg',
-        isKibar: false,
-        isFeatured: false,
         isActive: true,
+        country: 'SA',
+        mainLanguage: 'ar',
       };
       const created = {
         id: 's2',
         ...dto,
         bio: dto.bio ?? null,
         imageUrl: dto.imageUrl ?? null,
+        imageKey: null,
         isActive: dto.isActive ?? true,
-        isKibar: dto.isKibar ?? false,
-        isFeatured: dto.isFeatured ?? false,
         createdAt: new Date(),
         updatedAt: new Date(),
-        country: null,
-        mainLanguage: null,
+        country: dto.country,
+        mainLanguage: dto.mainLanguage,
+        title: null,
+        orderIndex: 999,
         socialTwitter: null,
         socialTelegram: null,
         socialYoutube: null,
         socialWebsite: null,
-        ingestionBatchId: null,
         createdBy: null,
         updatedBy: null,
         deletedBy: null,
       };
 
-      repo.create.mockResolvedValue(created);
+      repo.create.mockResolvedValue(created as any);
 
       const result = await service.create(dto);
 
@@ -176,37 +194,34 @@ describe('ScholarsService', () => {
 
   describe('update', () => {
     it('should update existing scholar', async () => {
-      const dto: UpdateScholarDto = { name: 'Updated Name' };
+      const dto: UpdateScholarDto = { name: 'Updated Name', title: 'sheikh' };
       const existing = {
         id: 's1',
         slug: 'test',
         name: 'Old Name',
         bio: null,
         createdAt: new Date(),
-        country: null,
-        mainLanguage: null,
+        country: 'SA',
+        mainLanguage: 'ar',
         imageUrl: null,
         isActive: true,
-        isKibar: false,
-        isFeatured: false,
         socialTwitter: null,
         socialTelegram: null,
         socialYoutube: null,
         socialWebsite: null,
         updatedAt: new Date(),
-        ingestionBatchId: null,
         createdBy: null,
         updatedBy: null,
         deletedBy: null,
       };
       const updated = { ...existing, name: dto.name! };
 
-      repo.findById.mockResolvedValue(existing);
-      repo.update.mockResolvedValue(updated);
+      repo.findById.mockResolvedValue(existing as any);
+      repo.update.mockResolvedValue(updated as any);
 
       const result = await service.update('s1', dto);
 
-      expect(result).toEqual(updated);
+      expect(result).toEqual(updated as any);
       expect(repo.findById).toHaveBeenCalledWith('s1');
       expect(repo.update).toHaveBeenCalledWith('s1', dto);
     });

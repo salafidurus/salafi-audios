@@ -1,0 +1,7 @@
+{
+  "name": "expo-bottom-accessory",
+  "platforms": ["android"],
+  "android": {
+    "modules": ["expo.modules.bottomaccessory.ExpoBottomAccessoryModule"]
+  }
+}

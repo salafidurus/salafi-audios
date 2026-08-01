@@ -1,5 +1,7 @@
-import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect } from "bun:test";
+import React from "react";
+
 import { AuthRequiredState } from "./AuthRequiredState";
 
 describe("AuthRequiredState", () => {

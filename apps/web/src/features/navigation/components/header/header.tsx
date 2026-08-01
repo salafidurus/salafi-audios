@@ -1,12 +1,14 @@
 "use client";
 
+import { routes } from "@sd/core-contracts";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { routes } from "@sd/core-contracts";
-import styles from "./header.module.css";
+import { useEffect, useRef } from "react";
+
 import { Button } from "@/shared/components/Button/Button";
+
+import styles from "./header.module.css";
 
 export function Header() {
   const headerRef = useRef<HTMLElement | null>(null);
@@ -14,8 +16,9 @@ export function Header() {
 
   useEffect(() => {
     const el = headerRef.current;
-    if (!el) return;
-
+    if (!el) {
+      return;
+    }
     const html = document.documentElement;
 
     const update = () => {

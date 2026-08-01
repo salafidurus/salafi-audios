@@ -1,5 +1,6 @@
-import React from "react";
 import { render, screen } from "@testing-library/react-native";
+import React from "react";
+
 import { MiniPlayer } from "./mini-player";
 
 jest.mock("@sd/domain-audio", () => ({
@@ -37,12 +38,20 @@ jest.mock("./playback-controls", () => ({
   PlaybackControls: () => null,
 }));
 
+const mockUseFormattedScholarName = jest.fn((artist: string, _scholarSlug?: string) => artist);
+
+jest.mock("@sd/domain-content", () => ({
+  useFormattedScholarName: (artist?: string | null, scholarSlug?: string | null) =>
+    mockUseFormattedScholarName(artist ?? "", scholarSlug ?? undefined),
+}));
+
 const { useAudio } = jest.requireMock("@sd/domain-audio");
 
 const mockTrack = {
   id: "track-1",
   title: "Test Lecture",
-  artist: "Shaykh Ahmad",
+  artist: "Ahmad",
+  scholarSlug: "ahmad",
   durationSeconds: 3600,
   artworkUrl: "https://example.com/art.jpg",
 };
@@ -68,6 +77,20 @@ describe("MiniPlayer", () => {
     });
     await render(<MiniPlayer />);
     expect(screen.getByText("Test Lecture")).toBeTruthy();
+    expect(screen.getByText("Ahmad")).toBeTruthy();
+  });
+
+  it("renders the artist name with honorific title when available", async () => {
+    mockUseFormattedScholarName.mockReturnValueOnce("Shaykh Ahmad");
+    useAudio.mockReturnValue({
+      currentTrack: mockTrack,
+      isPlaying: false,
+      isLoading: false,
+      progressPercent: 0,
+      positionSeconds: 0,
+    });
+    await render(<MiniPlayer />);
+    expect(mockUseFormattedScholarName).toHaveBeenCalledWith("Ahmad", "ahmad");
     expect(screen.getByText("Shaykh Ahmad")).toBeTruthy();
   });
 
@@ -79,7 +102,8 @@ describe("MiniPlayer", () => {
       progressPercent: 0,
       positionSeconds: 0,
     });
-    await render(<MiniPlayer />);
+    const { getByTestId } = await render(<MiniPlayer />);
+    expect(getByTestId("play-button")).toBeTruthy();
   });
 
   it("calls pause when play button pressed while playing", async () => {

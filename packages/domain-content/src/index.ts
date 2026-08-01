@@ -1,18 +1,31 @@
-export { useFeed, useFeedScholars } from "./use-feed";
-export { useFeedRecentScreen } from "./use-feed-recent";
-export { useFeedFollowingScreen } from "./use-feed-following";
-export { useFeedRecent, useFeedFollowing, useFeedList } from "./feed.api";
-export { useLibrarySaved, useLibraryCompleted, useLibraryProgress } from "./library.api";
+// Infinite scroll hooks
+export {
+  useInfiniteScholarsList,
+  useInfiniteLibrarySaved,
+  useInfiniteLibraryCompleted,
+  useInfiniteLibraryProgress,
+  useInfiniteAdminScholars,
+  useInfiniteAdminListings,
+  useAdminListingSeriesByScholar,
+  useAdminTopicsList,
+  type UseInfiniteScholarsListOptions,
+  type UseInfiniteLibrarySavedOptions,
+  type UseInfiniteLibraryCompletedOptions,
+  type UseInfiniteLibraryProgressOptions,
+  type UseInfiniteAdminScholarsOptions,
+  type UseInfiniteAdminListingsOptions,
+} from "./hooks";
+
+export { useExploreRecentScreen } from "./use-explore-recent";
 export { useLibrarySavedScreen } from "./use-library-saved";
 export { useLibraryCompletedScreen } from "./use-library-completed";
 export { useLibraryProgressScreen } from "./use-library-progress";
-export { useListingDetail } from "./listing.api";
+export { useListingDetail, useListingContents, useLastPlayedLesson } from "./listing.api";
 export {
   useScholarsList,
   useScholarDetail,
   useScholarContent,
   useScholarTopics,
-  splitScholarContent,
 } from "./scholar.api";
 export {
   useContentTranslations,
@@ -20,3 +33,9 @@ export {
   usePublishTranslation,
   useUnpublishTranslation,
 } from "./translations.api";
+export {
+  formatScholarName,
+  useFormatScholarName,
+  useFormattedScholarName,
+  type ScholarWithNameAndTitle,
+} from "./utils/format-scholar-name";

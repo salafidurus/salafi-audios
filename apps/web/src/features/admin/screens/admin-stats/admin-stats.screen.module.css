@@ -1,0 +1,16 @@
+.pageTitle {
+  font-size: var(--typo-display-lg-font-size);
+  font-weight: 700;
+  margin-bottom: var(--space-layout-section-y);
+}
+
+.description {
+  color: var(--content-muted);
+}
+
+@media (max-width: 640px) {
+  .pageTitle {
+    font-size: var(--typo-title-lg-font-size);
+    margin-bottom: var(--space-md);
+  }
+}

@@ -1,12 +1,62 @@
 "use client";
 
-import { Responsive } from "@/shared/components/Responsive";
-import { LibraryDesktopScreen } from "./library.screen.desktop";
-import { LibraryMobileScreen } from "./library.screen.mobile";
+import { useInfiniteLibraryProgress } from "@sd/domain-content";
+
+import { useAuth } from "@/core/auth/use-auth";
+import { useTranslation } from "@/core/i18n/use-translation";
+import { LibraryListRow } from "@/features/library/components/library-list-row/library-list-row";
+import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 
 export function LibraryScreen() {
-  const mobile = <LibraryMobileScreen />;
-  const desktop = <LibraryDesktopScreen />;
-  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
-  return <Responsive mobile={mobile} desktop={desktop} />;
+  const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
+
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteLibraryProgress();
+
+  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
+
+  if (!isAuthenticated) {
+    return (
+      <ScreenView contentStyle={{ flex: 1 }}>
+        <AuthRequiredState
+          title={t("library.authProgressTitle", "Sign in to view your progress")}
+          description={t(
+            "library.authProgressDesc",
+            "Start listening to lectures and track your progress",
+          )}
+        />
+      </ScreenView>
+    );
+  }
+
+  return (
+    <ScreenView contentStyle={{ flex: 1 }}>
+      <StickyHeaderLayout>
+        <StickyHeaderLayout.Header>
+          <PageHeader title={t("library.inProgress", "In Progress")} />
+        </StickyHeaderLayout.Header>
+        <StickyHeaderLayout.Content>
+          <InfiniteScrollList
+            data={allItems}
+            isLoading={isLoading}
+            hasMore={hasNextPage ?? false}
+            onLoadMore={() => fetchNextPage()}
+            isFetchingNextPage={isFetchingNextPage}
+            renderItem={(item) => <LibraryListRow item={item} variant="progress" />}
+            emptyMessage={t(
+              "library.emptyProgress",
+              "No lectures started yet. Browse the catalog to begin listening.",
+            )}
+          />
+        </StickyHeaderLayout.Content>
+      </StickyHeaderLayout>
+      <ScrollToTopButton />
+    </ScreenView>
+  );
 }

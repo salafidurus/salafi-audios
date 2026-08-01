@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
@@ -14,10 +14,10 @@ describe('HealthController', () => {
 
   beforeEach(async () => {
     prismaHealth = {
-      pingCheck: vi.fn().mockResolvedValue({ database: { status: 'up' } }),
+      pingCheck: vi.fn<any>().mockResolvedValue({ database: { status: 'up' } }),
     };
     cdnHealth = {
-      pingCheck: vi.fn().mockResolvedValue({ cdn: { status: 'up' } }),
+      pingCheck: vi.fn<any>().mockResolvedValue({ cdn: { status: 'up' } }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -35,7 +35,7 @@ describe('HealthController', () => {
   it('getHealth calls database and CDN indicators', async () => {
     await controller.getHealth();
     expect(prismaHealth.pingCheck).toHaveBeenCalledWith('database', {
-      timeout: 300,
+      timeout: 5000,
     });
     expect(cdnHealth.pingCheck).toHaveBeenCalledWith('cdn', {
       timeout: 5000,
@@ -45,7 +45,7 @@ describe('HealthController', () => {
   it('getReadiness calls database indicator but not CDN indicator', async () => {
     await controller.getReadiness();
     expect(prismaHealth.pingCheck).toHaveBeenCalledWith('database', {
-      timeout: 300,
+      timeout: 5000,
     });
     expect(cdnHealth.pingCheck).not.toHaveBeenCalled();
   });

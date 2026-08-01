@@ -1,6 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../shared/db/prisma.service';
+import { PrismaService } from '../../core/db/prisma.service';
+import { Status } from '@sd/core-db';
 import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
+
+const COMPLETION_PERCENT_THRESHOLD = 0.95;
+const COMPLETION_TAIL_SECONDS = 30;
+
+/**
+ * Server-side completion safety net: a position counts as "complete" once it
+ * reaches 95% of the track, OR is within the last 30 seconds — whichever comes
+ * first. The tail branch only applies once the track is longer than 30s, so a
+ * sub-30s clip can't trivially "complete" at position 0.
+ */
+export function isPositionCompleted(
+  positionSeconds: number,
+  durationSeconds?: number | null,
+): boolean {
+  if (!durationSeconds || durationSeconds <= 0) return false;
+
+  return (
+    positionSeconds >= durationSeconds * COMPLETION_PERCENT_THRESHOLD ||
+    (durationSeconds > COMPLETION_TAIL_SECONDS &&
+      positionSeconds >= durationSeconds - COMPLETION_TAIL_SECONDS)
+  );
+}
 
 @Injectable()
 export class AudioRepository {
@@ -35,20 +58,36 @@ export class AudioRepository {
     userId: string,
     listingId: string,
     positionSeconds: number,
-    durationSeconds?: number,
+    _durationSeconds?: number,
     isCompleted?: boolean,
   ): Promise<void> {
+    const [listing, existing] = await Promise.all([
+      this.prisma.listing.findUnique({
+        where: { id: listingId },
+        select: { durationSeconds: true },
+      }),
+      this.prisma.userListingProgress.findUnique({
+        where: { userId_listingId: { userId, listingId } },
+        select: { isCompleted: true },
+      }),
+    ]);
+
+    const derivedCompleted =
+      isCompleted ?? isPositionCompleted(positionSeconds, listing?.durationSeconds);
+    // Monotonic: once completed, a later sync can never un-complete it.
+    const finalCompleted = existing?.isCompleted ? true : derivedCompleted;
+
     await this.prisma.userListingProgress.upsert({
       where: { userId_listingId: { userId, listingId } },
       create: {
         userId,
         listingId,
         positionSeconds,
-        isCompleted: isCompleted ?? false,
+        isCompleted: finalCompleted,
       },
       update: {
         positionSeconds,
-        ...(isCompleted !== undefined ? { isCompleted } : {}),
+        isCompleted: finalCompleted,
         updatedAt: new Date(),
       },
     });
@@ -57,9 +96,19 @@ export class AudioRepository {
   async bulkSync(userId: string, items: ProgressSyncItemDto[]): Promise<void> {
     if (items.length === 0) return;
 
+    // Duration comes from each Listing's own canonical record, never trusted
+    // from the client, to keep the completion derivation below consistent.
+    const listings = await this.prisma.listing.findMany({
+      where: { id: { in: items.map((item) => item.listingId) } },
+      select: { id: true, durationSeconds: true },
+    });
+    const durationById = new Map(listings.map((listing) => [listing.id, listing.durationSeconds]));
+
     const operations = items.map((item) => {
       const clientUpdatedAt = new Date(item.updatedAt);
-      const isCompleted = !!item.completedAt;
+      const isCompleted =
+        !!item.completedAt ||
+        isPositionCompleted(item.positionSeconds, durationById.get(item.listingId));
 
       return this.prisma.$executeRaw`
         INSERT INTO "UserListingProgress" ("userId", "listingId", "positionSeconds", "isCompleted", "updatedAt")
@@ -71,11 +120,13 @@ export class AudioRepository {
             THEN "UserListingProgress"."positionSeconds"
             ELSE ${item.positionSeconds}
           END,
-          "isCompleted" = CASE
-            WHEN "UserListingProgress"."updatedAt" > ${clientUpdatedAt}
-            THEN "UserListingProgress"."isCompleted"
-            ELSE ${isCompleted}
-          END,
+          "isCompleted" = "UserListingProgress"."isCompleted" OR (
+            CASE
+              WHEN "UserListingProgress"."updatedAt" > ${clientUpdatedAt}
+              THEN "UserListingProgress"."isCompleted"
+              ELSE ${isCompleted}
+            END
+          ),
           "updatedAt" = CASE
             WHEN "UserListingProgress"."updatedAt" > ${clientUpdatedAt}
             THEN "UserListingProgress"."updatedAt"
@@ -90,18 +141,66 @@ export class AudioRepository {
   async findListingById(listingId: string) {
     return this.prisma.listing.findUnique({
       where: { id: listingId },
+      select: { id: true, durationSeconds: true }, // Only fetch fields needed for stream response
     });
   }
 
   async findPrimaryAsset(listingId: string) {
-    return this.prisma.audioAsset.findFirst({
+    const directPrimary = await this.prisma.audioAsset.findFirst({
       where: { listingId, isPrimary: true },
+      select: {
+        url: true,
+        durationSeconds: true,
+        format: true,
+      },
+    });
+
+    if (directPrimary) return directPrimary;
+
+    return this.prisma.audioAsset.findFirst({
+      where: {
+        listing: {
+          parentId: listingId,
+          status: Status.published,
+          deletedAt: null,
+        },
+        isPrimary: true,
+      },
+      orderBy: [{ listing: { orderIndex: 'asc' } }, { listing: { createdAt: 'asc' } }],
+      select: {
+        url: true,
+        durationSeconds: true,
+        format: true,
+      },
     });
   }
 
   async findFirstAsset(listingId: string) {
-    return this.prisma.audioAsset.findFirst({
+    const directAsset = await this.prisma.audioAsset.findFirst({
       where: { listingId },
+      select: {
+        url: true,
+        durationSeconds: true,
+        format: true,
+      },
+    });
+
+    if (directAsset) return directAsset;
+
+    return this.prisma.audioAsset.findFirst({
+      where: {
+        listing: {
+          parentId: listingId,
+          status: Status.published,
+          deletedAt: null,
+        },
+      },
+      orderBy: [{ listing: { orderIndex: 'asc' } }, { listing: { createdAt: 'asc' } }],
+      select: {
+        url: true,
+        durationSeconds: true,
+        format: true,
+      },
     });
   }
 }

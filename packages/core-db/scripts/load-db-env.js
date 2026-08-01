@@ -1,6 +1,6 @@
+import dotenv from "dotenv";
 import fs from "node:fs";
 import path from "node:path";
-import dotenv from "dotenv";
 
 export function loadDbEnvFiles(baseDir = process.cwd()) {
   const nodeEnv = process.env.NODE_ENV ?? "development";

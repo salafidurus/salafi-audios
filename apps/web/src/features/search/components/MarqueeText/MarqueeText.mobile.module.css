@@ -1,9 +1,0 @@
-.container {
-  overflow: hidden;
-  flex-shrink: 1;
-}
-
-.text {
-  white-space: nowrap;
-  display: inline-block;
-}

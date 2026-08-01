@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+
 import { useSearchCatalog, useTopicsList } from "../api/search.api";
 import { buildSearchResultRows, type SearchResultRow } from "../utils/build-search-result-rows";
 

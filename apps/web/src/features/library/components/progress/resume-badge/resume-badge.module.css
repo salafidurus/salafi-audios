@@ -1,0 +1,19 @@
+.completedBadge {
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-success);
+  font-weight: 600;
+  padding: var(--space-xs) var(--space-scale-xs);
+  background-color: var(--surface-success-subtle);
+  border-radius: var(--radius-xs);
+  display: inline-block;
+}
+
+.resumeBadge {
+  font-size: var(--typo-caption-font-size);
+  color: var(--action-primary);
+  font-weight: 500;
+  padding: var(--space-xs) var(--space-scale-xs);
+  background-color: var(--surface-primary-subtle);
+  border-radius: var(--radius-xs);
+  display: inline-block;
+}

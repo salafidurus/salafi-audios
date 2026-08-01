@@ -1,45 +1,46 @@
 # AGENT.md - packages/core-db
 
-This package owns Prisma schema, migrations, and DB client utilities.
+Owns Prisma schema, migrations, and DB client for the Salafi Durus platform.
 
-## Core data rules
+## Boundaries
 
-- Store authoritative relational state only.
-- Do not store media blobs, analytics/event streams, UI state, or secrets.
-- Keep state transitions explicit (do not infer lifecycle implicitly).
+- **Depends on:** `@prisma/client`, `prisma` (dev)
+- **Consumed by:** `apps/api`
 
-## Modeling discipline
+## Key Commands
 
-- Favor explicit foreign keys and normalized models.
-- Separate opaque internal IDs from public slugs.
-- Avoid destructive changes without migration strategy.
-- Keep migrations reproducible and review-friendly.
+- `bun run --filter @sd/core-db build` — Generate client + build
+- `bun run --filter @sd/core-db typecheck` — Type check (auto-generates client first)
+- `bun run --filter @sd/core-db prisma:generate` — Regenerate Prisma client from schema
+- `bun run --filter @sd/core-db prisma:validate` — Validate schema syntax
+- `bun run --filter @sd/core-db prisma:format` — Format schema file
+- `bun run --filter @sd/core-db migrate:create-only` — Create a new migration
+- `bun run --filter @sd/core-db migrate:deploy` — Apply pending migrations
+- `bun run --filter @sd/core-db grant:role <email> <role>` — Grant a role to a user
+- `bun run --filter @sd/core-db test` — Run tests (bun:test)
 
-## Path aliases
+## Structure
 
-- Use `@/` for package-local imports (maps to `src/*`).
+```text
+├── schema.prisma       # Authoritative data model
+├── migrations/         # Ordered migration files
+└── prisma.config.ts    # Prisma configuration
+src/
+├── index.ts            # Re-exports PrismaClient
+└── generated/prisma/   # Generated client (do NOT hand-edit)
+scripts/
+├── copy-generated-to-dist.js
+├── grant-role.js
+├── grant-permission.js
+└── migrate-with-auto-name.js
+```
 
-## Prisma workflow (root commands)
+## Constraints
 
-- Generate client: `bun run prisma:generate`
-- Validate schema: `bun run prisma:validate`
-- Format schema: `bun run prisma:format`
-- Create migration: `bun run migrate:create-only`
-- Deploy migrations: `bun run migrate:deploy`
-
-Env file precedence for local DB commands:
-
-- `.env` -> `.env.local` -> `.env.<NODE_ENV>` -> `.env.<NODE_ENV>.local`
-- Existing process env vars (for CI/secrets) are never overridden by env files.
-
-## Safety notes
-
-- Do not embed environment values in source or migrations.
-- Keep generated output derived from schema, not hand-edited.
-- Never commit generated DB artifacts under `packages/core-db/src/generated/`.
-
-## Common CI failure
-
-- Symptom: `Cannot find module '@sd/core-db/client'` during `apps/api` build, followed by many PrismaService type errors.
-- Cause: Turbo remote cache restores `dist/**` outputs but not `src/generated/**` (Prisma Client is generated output).
-- Fix: ensure `@sd/core-db` build produces Prisma client under `packages/core-db/dist/generated/prisma/` (this package's `build` script copies it there).
+- **Never hand-edit** `src/generated/` — always regenerate from `prisma/schema.prisma`.
+- Store authoritative relational state only — no media blobs, analytics streams, or UI state.
+- Do not embed environment values in source or migration files.
+- Favor explicit foreign keys and normalized models; separate internal IDs from public slugs.
+- **CI gotcha:** Remote cache restores `dist/` but not `src/generated/`. The build script handles this by copying generated output to `dist/generated/prisma/`.
+- Path alias `@/` maps to `src/*`.
+- Env file precedence: `.env` → `.env.local` → `.env.<NODE_ENV>` → `.env.<NODE_ENV>.local`

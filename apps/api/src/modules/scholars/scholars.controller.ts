@@ -1,8 +1,11 @@
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { Public } from '../../modules/auth/decorators';
-import { Controller, Get, Param } from '@nestjs/common';
+import { Public } from '../../core/auth/decorators';
+import { Controller, Get, Param, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
+import { CacheTTL } from '@nestjs/cache-manager';
+import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
+import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
 import type {
   ScholarListItemDto,
   ScholarDetailDto,
@@ -16,6 +19,8 @@ import { ScholarsService } from './scholars.service';
 @ApiCommonErrors()
 @Public()
 @Controller('scholars')
+@UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor) // Cache control must wrap cache interceptor to capture cache hits
+@CacheTTL(10 * 60 * 1000) // 10 minutes cache (scholar data changes infrequently)
 export class ScholarsController {
   constructor(private readonly scholars: ScholarsService) {}
 

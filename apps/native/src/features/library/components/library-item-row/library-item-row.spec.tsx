@@ -1,6 +1,8 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react-native";
 import type { LibraryItemDto } from "@sd/core-contracts";
+
+import { render, screen, fireEvent } from "@testing-library/react-native";
+import React from "react";
+
 import { LibraryItemRow } from "./library-item-row";
 
 jest.mock("lucide-react-native", () => ({
@@ -23,7 +25,7 @@ jest.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 
-jest.mock("@/features/i18n/content-preference", () => ({
+jest.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: () => false,
 }));
 
@@ -126,5 +128,27 @@ describe("LibraryItemRow", () => {
     await render(<LibraryItemRow item={baseItem} variant="saved" onPress={onPress} />);
     await fireEvent.press(screen.getByText("The Book of Tawheed").parent!);
     expect(onPress).toHaveBeenCalled();
+  });
+
+  it("opens a long-press menu and reports the pressed action when actions are provided", async () => {
+    const onAction = jest.fn();
+    await render(
+      <LibraryItemRow
+        item={baseItem}
+        variant="saved"
+        testID="library-item-row-item-1"
+        actions={[{ id: "remove", title: "Remove from Saved" }]}
+        onAction={onAction}
+      />,
+    );
+
+    await fireEvent.press(screen.getByTestId("library-item-row-item-1-action-remove"));
+
+    expect(onAction).toHaveBeenCalledWith("remove");
+  });
+
+  it("renders no menu wiring when actions are not provided", async () => {
+    await render(<LibraryItemRow item={baseItem} variant="saved" />);
+    expect(screen.queryByTestId(/-action-/)).toBeNull();
   });
 });

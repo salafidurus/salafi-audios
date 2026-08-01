@@ -1,0 +1,96 @@
+"use client";
+
+import type { ScholarChipDto } from "@sd/core-contracts";
+import type React from "react";
+
+import Image from "next/image";
+
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
+
+export type FeedScholarRowProps = {
+  scholars: ScholarChipDto[];
+  onScholarPress?: (slug: string) => void;
+};
+
+const scholarButtonStyle: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  minWidth: 72,
+  cursor: "pointer",
+  background: "none",
+  border: "none",
+  padding: 0,
+};
+
+export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps) {
+  const formatScholarName = useFormatScholarName();
+  return (
+    <div style={{ padding: "12px 0" }}>
+      <div
+        style={{
+          fontSize: "var(--typo-body-sm-font-size)",
+          fontWeight: 600,
+          color: "var(--content-strong)",
+          marginBottom: 8,
+          paddingInlineStart: 4,
+        }}
+      >
+        Popular Scholars
+      </div>
+      <div
+        className="no-scrollbar"
+        style={{
+          display: "flex",
+          gap: 12,
+          overflowX: "auto",
+          paddingBottom: 8,
+        }}
+      >
+        {scholars.map((scholar) => (
+          <button
+            key={scholar.id}
+            type="button"
+            onClick={() => onScholarPress?.(scholar.slug)}
+            style={scholarButtonStyle}
+          >
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                backgroundColor: "var(--surface-hover)",
+                marginBottom: 4,
+                overflow: "hidden",
+                position: "relative",
+              }}
+            >
+              {scholar.imageUrl && (
+                <Image
+                  src={scholar.imageUrl}
+                  alt={scholar.name}
+                  width={48}
+                  height={48}
+                  style={{ objectFit: "cover" }}
+                />
+              )}
+            </div>
+            <div
+              style={{
+                fontSize: "var(--typo-caption-font-size)",
+                color: "var(--content-muted)",
+                textAlign: "center",
+                maxWidth: 72,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {formatScholarName(scholar)}
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}

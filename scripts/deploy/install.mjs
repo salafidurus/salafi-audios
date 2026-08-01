@@ -1,10 +1,11 @@
 #!/usr/bin/env bun
 import fs from "node:fs";
 import path from "node:path";
-import { findMonorepoRoot } from "../utils/paths.mjs";
+
 import { overwriteRootWithPrunedWorkspace } from "../utils/filesystem.mjs";
-import { getTurboVersion, validateEnvironment } from "../utils/turbo.mjs";
 import { log, error, success, setPrefix } from "../utils/logging.mjs";
+import { findMonorepoRoot } from "../utils/paths.mjs";
+import { getTurboVersion, validateEnvironment } from "../utils/turbo.mjs";
 
 setPrefix("[Deploy:Install]");
 
@@ -49,12 +50,11 @@ try {
 
   // 5. Strip lifecycle scripts from the pruned root package.json.
   //    turbo prune --docker does not include scripts/ or .git/, so
-  //    postinstall and prepare (husky) would fail in the deploy env.
+  //    prepare (husky) would fail in the deploy env.
   log("Stripping lifecycle scripts...");
   const pkgPath = path.join(rootDir, "package.json");
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
   if (pkg.scripts) {
-    delete pkg.scripts.postinstall;
     delete pkg.scripts.prepare;
   }
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");

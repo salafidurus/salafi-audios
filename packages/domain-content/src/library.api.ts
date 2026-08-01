@@ -8,7 +8,7 @@ import {
 
 export function useLibrarySaved(cursor?: string, enabled = true) {
   return useApiQuery(
-    queryKeys.library.saved(cursor),
+    queryKeys.library.saved.all(),
     () =>
       httpClient<LibraryPageDto>({
         url: endpoints.library.saved,
@@ -21,7 +21,7 @@ export function useLibrarySaved(cursor?: string, enabled = true) {
 
 export function useLibraryCompleted(cursor?: string, enabled = true) {
   return useApiQuery(
-    queryKeys.library.completed(cursor),
+    queryKeys.library.completed.all(),
     () =>
       httpClient<LibraryPageDto>({
         url: endpoints.library.completed,
@@ -34,7 +34,7 @@ export function useLibraryCompleted(cursor?: string, enabled = true) {
 
 export function useLibraryProgress(cursor?: string, enabled = true) {
   return useApiQuery(
-    queryKeys.library.progress(cursor),
+    queryKeys.library.progress.all(),
     () =>
       httpClient<LibraryPageDto>({
         url: endpoints.library.progress,

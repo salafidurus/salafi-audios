@@ -1,0 +1,87 @@
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.title {
+  font-size: clamp(3.5rem, 8vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+  color: var(--content-default);
+  position: relative;
+  z-index: 1;
+}
+
+.title::before {
+  content: "";
+  position: absolute;
+  inset: -1.5rem -3rem;
+  background: var(--accent-primary-subtle-surface);
+  filter: blur(48px);
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 999px;
+}
+
+.taglineContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.tagline {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-weight: 400;
+  line-height: 1.8;
+  letter-spacing: 0.03em;
+  margin: 0;
+  max-width: 900px;
+  color: var(--content-secondary);
+  font-family: var(--font-body-ar, sans-serif);
+}
+
+.taglineTranslation {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-weight: 400;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 800px;
+  color: var(--content-muted);
+}
+
+.surahReference {
+  font-weight: 500;
+  color: var(--content-primary-strong);
+}
+
+@media (max-width: 640px) {
+  .hero {
+    gap: 0.75rem;
+  }
+
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .tagline {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    letter-spacing: 0.02em;
+  }
+
+  .taglineTranslation {
+    font-size: clamp(0.85rem, 2vw, 1rem);
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .hero {
+  direction: rtl;
+}

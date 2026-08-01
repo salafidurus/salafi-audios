@@ -6,34 +6,24 @@
  */
 import { routes } from "./routes";
 
-export type Section = "feed" | "live" | "library" | "settings";
+export type Section = "explore" | "library" | "settings" | "adminContents";
 
 export type TabConfig = { id: string; label: string; labelKey: string; icon: string };
 
 export const SECTION_TABS: Record<Section, TabConfig[]> = {
-  feed: [
-    { id: "popular", label: "Popular", labelKey: "navigation.subnav.feed.popular", icon: "flame" },
-    { id: "recent", label: "Recent", labelKey: "navigation.subnav.feed.recent", icon: "clock" },
+  explore: [
+    { id: "recent", label: "Recent", labelKey: "navigation.subnav.explore.recent", icon: "clock" },
     {
-      id: "following",
-      label: "Following",
-      labelKey: "navigation.subnav.feed.following",
-      icon: "heart",
-    },
-  ],
-  live: [
-    { id: "ongoing", label: "Live Now", labelKey: "navigation.subnav.live.ongoing", icon: "radio" },
-    {
-      id: "scheduled",
-      label: "Scheduled",
-      labelKey: "navigation.subnav.live.scheduled",
-      icon: "calendar",
+      id: "scholar",
+      label: "Scholars",
+      labelKey: "navigation.subnav.explore.scholar",
+      icon: "graduation-cap",
     },
     {
-      id: "ended",
-      label: "Ended",
-      labelKey: "navigation.subnav.live.ended",
-      icon: "check-circle",
+      id: "curation",
+      label: "Curation",
+      labelKey: "navigation.subnav.explore.curation",
+      icon: "sparkles",
     },
   ],
   library: [
@@ -64,27 +54,40 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
       labelKey: "navigation.subnav.settings.profile",
       icon: "user",
     },
-    { id: "legal", label: "Legal", labelKey: "navigation.subnav.settings.legal", icon: "scale" },
+  ],
+  adminContents: [
+    {
+      id: "topics",
+      label: "Topics",
+      labelKey: "navigation.subnav.admin.topics",
+      icon: "folder",
+    },
+    {
+      id: "listings",
+      label: "Listings",
+      labelKey: "navigation.subnav.admin.listings",
+      icon: "list",
+    },
   ],
 };
 
 export const DEFAULT_TABS: Record<Section, string> = {
-  feed: "popular",
-  live: "ongoing",
+  explore: "recent",
   library: "started",
   settings: "general",
+  adminContents: "topics",
 };
 
 export const SECTION_LABELS: Record<Section, string> = {
-  feed: "Explore",
-  live: "Live",
+  explore: "Explore",
   library: "Library",
   settings: "Settings",
+  adminContents: "Content",
 };
 
 export const SECTION_ROUTES: Record<Section, string> = {
-  feed: routes.feed.index,
-  live: routes.live.index,
+  explore: routes.explore.index,
   library: routes.library.index,
   settings: routes.settings.index,
+  adminContents: routes.admin.contents,
 };

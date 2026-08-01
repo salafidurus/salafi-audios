@@ -1,7 +1,8 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import { findMonorepoRoot } from "./utils/paths.mjs";
+
 import { log, error, success, setPrefix } from "./utils/logging.mjs";
+import { findMonorepoRoot } from "./utils/paths.mjs";
 
 setPrefix("[VerifyBuild]");
 

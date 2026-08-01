@@ -3,8 +3,8 @@ name: project-guardrails
 description: |
   NON-NEGOTIABLE architectural rules for Salafi Durus. LOAD THIS SKILL when: starting any
   implementation, modifying backend/API, changing data models, working with auth, handling
-  offline/sync, creating new files, or any code changes. Contains critical guardrails that
-  must never be violated.
+  offline/sync, working in a worktree, creating new files, or any code changes. Contains
+  critical guardrails that must never be violated.
 ---
 
 # Project Guardrails
@@ -13,7 +13,7 @@ These rules are NON-NEGOTIABLE. Violations will be rejected.
 
 ## Mandatory Pre-Work Checks
 
-- **Before implementing ANY change**, read the **workspace-specific AGENT.md** file in the directory you're modifying (e.g., `apps/api/AGENT.md`, `apps/web/AGENT.md`, `apps/mobile/AGENT.md`, `packages/*/AGENT.md`). These contain critical workspace rules, quality expectations, and command references specific to that package.
+- **Before implementing ANY change**, read the **workspace-specific AGENT.md** file in the directory you're modifying (e.g., `apps/api/AGENT.md`, `apps/web/AGENT.md`, `apps/native/AGENT.md`, `packages/*/AGENT.md`). These contain critical workspace rules, quality expectations, and command references specific to that package.
 - **Consult relevant documentation** from `docs/` as indicated in the table below before starting work on that topic.
 
 ## Documentation Quick Reference
@@ -29,6 +29,21 @@ These rules are NON-NEGOTIABLE. Violations will be rejected.
 | Web app structure and SEO strategy                | `docs/web.md`          |
 | Environments, configuration, and CI/CD            | `docs/dev-ops.md`      |
 | Current roadmap and phase progress                | `docs/AGENT.md`        |
+
+## Referenced Rules
+
+These `.agents/rules/` files contain always-on behavioral rules that complement these guardrails:
+
+| Rule file            | What it covers                                                  |
+| -------------------- | --------------------------------------------------------------- |
+| `worktree-rules.md`  | Git worktree creation, env copy, pre-work verification, cleanup |
+| `tdd-rules.md`       | Strict TDD workflow: red → green → commit                       |
+| `rtk-rules.md`       | CLI token optimization via RTK                                  |
+| `codegraph-rules.md` | Structural code search via CodeGraph                            |
+
+## Git Discipline
+
+- Never use `git --no-verify`. If a hook fails, fix the underlying problem — do not circumvent it.
 
 ## Backend Authority
 
@@ -47,19 +62,13 @@ docs/      → authoritative documentation
 
 ### Package Map
 
-- **`@sd/shared`**: Cross-app utilities only (no platform-specific UI). Platform primitives live in each app's `src/shared/`.
 - **`@sd/core-*`**: Foundational infrastructure (auth, api, config, styles, i18n, env, db, contracts).
 - **`@sd/domain-content`**: Data hooks for lectures, scholars, series, feed, library.
 - **`@sd/domain-account`**: Data hooks for user profile and auth state.
-- **`@sd/domain-live`**: Data hooks for live sessions and channels.
 - **`@sd/domain-playback`**: Playback engine and player state (Zustand + hooks).
 - **`@sd/domain-progress`**: Progress tracking state (Zustand + hooks).
 - **`@sd/domain-search`**: Search and quick-browse hooks.
 - **`@sd/design-tokens`**: Design tokens — authoritative source.
-- **`@sd/util-ingest`**: Content ingestion tooling.
-
-Shared lint/TS config lives at the repo root (`tsconfig.*.json`, `eslint.config.*.mjs`),
-not in a package.
 
 **Dependency rules:**
 
@@ -71,30 +80,19 @@ not in a package.
 
 ## App Structure
 
-### Mobile (`apps/mobile/src/`)
+### Mobile (`apps/native/src/`)
 
 - **`app/`**: Routing ONLY — Expo Router. Imports screen components from `../features` or `../shared`.
 - **`features/<name>/`**: One folder per feature. Contains `components/`, `hooks/`, `screens/`, `utils/`.
 - **`shared/`**: Primitives used across 2+ features within the mobile app.
-
-Platform extension rules:
-
-- `.tsx` — base native (iOS + Android)
-- `.ios.tsx` — iOS-only (only when behavior truly diverges)
-- `.android.tsx` — Android-only (only when behavior truly diverges)
+- **`core/`**: Platform bootstrap (providers, config, auth).
 
 ### Web (`apps/web/src/`)
 
-- **`app/`**: Routing, layouts, and server components ONLY — Next.js App Router. Imports from `../features` or `../shared`.
-- **`features/<name>/`**: One folder per feature. Contains `components/`, `hooks/`, `screens/`, `utils/`.
+- **`app/`**: Routing, layouts, and server components ONLY — Next.js App Router.
+- **`features/<name>/`**: One folder per feature.
 - **`shared/`**: Primitives used across 2+ features within the web app.
-- Web is Next.js only — no React Native Web, no Expo Web.
-
-Platform extension rules:
-
-- `.tsx` — base, fully CSS-responsive (default — use this unless layout truly diverges)
-- `.desktop.tsx` — desktop-only layout variant
-- `.mobile.tsx` — mobile-web layout variant
+- **`core/`**: Platform bootstrap (providers, env, auth, styles).
 
 ### Backend (`apps/api/src/`)
 
@@ -118,52 +116,32 @@ Platform extension rules:
 
 ## API Contract
 
-- `@sd/contracts` is the source of truth for all API interactions.
-- Update types manually in `packages/contracts/src/types/` when backend response shapes change.
+- `@sd/core-contracts` is the source of truth for all API interactions.
+- Update types manually in `packages/core-contracts/src/types/` when backend response shapes change.
 
-## Design Token Usage Guide: `spacing`, `radius`, and `typography`
+## Design Token Usage
 
-Use tokens by **semantic role** from `packages/design-tokens`.
+Use tokens by **semantic role** from `packages/design-tokens`. Full reference in `packages/design-tokens/AGENT.md`.
 
-- **Spacing**: Use `layout` for pages/sections, `component` for padding/gaps, `scale` as a fallback.
-- **Radius**: Use `component` first (card, chip, panel), `scale` as a fallback.
-- **Typography**: Use by purpose (display, title, body, label, caption), not by size.
+## TDD
 
-## TDD — Non-Negotiable Workflow
+Strict TDD is required. See `.agents/rules/tdd-rules.md` for the full workflow.
 
-Every code change follows this exact sequence. No exceptions.
+## Agent Worktree Enforcement
 
-1. **Write the failing test** — describe behavior, not implementation.
-2. **Run it** — confirm it fails with the expected error (not a setup error).
-3. **Write minimal implementation** to make it pass.
-4. **Run it again** — confirm it passes.
-5. **Run all tests** — confirm nothing else broke (`pnpm test`).
-6. **Commit** — test and implementation in the same commit.
-
-Test everything: screens, components, hooks, utils, stores, services, guards.
-The only exceptions: framework DI wiring, third-party library internals, generated artifacts.
-
-Co-locate test files next to the source file:
-
-- `SomeComponent.tsx` → `SomeComponent.spec.tsx`
-- `use-some-hook.ts` → `use-some-hook.spec.ts`
-- `some.screen.tsx` → `some.screen.spec.tsx`
+- All AI agents must work inside a git worktree. See `.agents/rules/worktree-rules.md`.
+- Agents must either create a new worktree in the `.worktrees` folder, or ask the user if they should use one of the available worktrees or create a new one.
 
 ## Quick Commands
 
 ```bash
-pnpm dev              # All apps (api, web, native)
-pnpm dev:api          # Backend only
-pnpm dev:web          # Web only
-pnpm dev:native       # Native only
-pnpm build            # Build all
-pnpm lint             # Lint all
-pnpm typecheck        # Typecheck all
-pnpm test             # Test all
-pnpm format           # Format codebase
+bun run dev              # All apps (api, web, native)
+bun run dev:api          # Backend only
+bun run dev:web          # Web only
+bun run dev:native       # Native only
+bun run build            # Build all
+bun run lint             # Lint all
+bun run typecheck        # Typecheck all
+bun run test             # Test all
+bun run format           # Format codebase
 ```
-
-## Agent Worktree Enforcement
-
-- All AI agents must work inside a git worktree.
-- Agents must either create a new worktree in the `.worktrees` (or `.worktree`) folder, or ask the user if they should use one of the available worktrees or create a new one.

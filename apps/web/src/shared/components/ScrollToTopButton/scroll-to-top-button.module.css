@@ -1,0 +1,36 @@
+.button {
+  position: fixed;
+  bottom: calc(var(--space-scale-xl) * 2 + 60px);
+  inset-inline-end: calc(var(--space-scale-xl) * 2);
+  z-index: 40;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-component-gap-sm);
+  padding: var(--space-component-gap-md) var(--space-component-gap-lg);
+  border-radius: 9999px;
+
+  background-color: var(--action-primary);
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+
+  box-shadow: var(--shadow-lg);
+
+  color: white;
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+    background-color: var(--action-primary-hover, var(--action-primary));
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
-import { findMonorepoRoot } from "../utils/paths.mjs";
 import { log, error, setPrefix } from "../utils/logging.mjs";
+import { findMonorepoRoot } from "../utils/paths.mjs";
 
 setPrefix("[Deploy:Start]");
 

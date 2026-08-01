@@ -1,8 +1,8 @@
 import { Controller, Delete, Get, Param, Post, Query, Body } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { CurrentUser } from '../../modules/auth/decorators';
-import type { LibraryPageDto } from '@sd/core-contracts';
+import { CurrentUser } from '../../core/auth/decorators';
+import type { LibraryPageDto, RecentProgressDto } from '@sd/core-contracts';
 import { LibraryService } from './library.service';
 import { SavedSyncDto } from './dto/saved-sync.dto';
 
@@ -11,6 +11,13 @@ import { SavedSyncDto } from './dto/saved-sync.dto';
 @Controller('me/library')
 export class LibraryController {
   constructor(private readonly library: LibraryService) {}
+
+  @Get('recent-progress')
+  @ApiOperation({ summary: 'Get most recent listening progress' })
+  @ApiOkResponse({ description: 'Most recent in-progress listing or null' })
+  getRecentProgress(@CurrentUser() user: { id: string }): Promise<RecentProgressDto | null> {
+    return this.library.getRecentProgress(user.id);
+  }
 
   @Get('progress')
   @ApiOperation({ summary: 'Get in-progress listings' })

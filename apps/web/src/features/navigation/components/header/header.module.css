@@ -37,6 +37,7 @@
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   flex-shrink: 0;
+  border: 1px solid var(--border-primary);
 }
 
 .brandImg {
@@ -53,6 +54,11 @@
   line-height: 1;
   color: var(--content-strong);
   white-space: nowrap;
+  transition: color 150ms ease;
+}
+
+.brand:hover .brandText {
+  color: var(--content-primary);
 }
 
 .actions {

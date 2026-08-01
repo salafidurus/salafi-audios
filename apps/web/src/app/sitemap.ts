@@ -21,34 +21,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/feed`,
+      url: `${baseUrl}/explore`,
       lastModified: new Date(),
       changeFrequency: "daily" as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/feed/recent`,
+      url: `${baseUrl}/explore/recent`,
       lastModified: new Date(),
       changeFrequency: "daily" as const,
       priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/live`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/live/scheduled`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.4,
-    },
-    {
-      url: `${baseUrl}/live/ended`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.4,
     },
     {
       url: `${baseUrl}/scholars`,
@@ -64,6 +46,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/cookie-policy`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.3,

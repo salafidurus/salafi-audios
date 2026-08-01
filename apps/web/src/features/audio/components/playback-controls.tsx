@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
-import type { CSSProperties } from "react";
-import { useAudio } from "@sd/domain-audio";
-import { audioService } from "../index";
-import { Play, Pause, RotateCw, RotateCcw } from "lucide-react";
+import { useAudio, useQueue } from "@sd/domain-audio";
+import { Play, Pause, RotateCw, RotateCcw, SkipBack, SkipForward } from "lucide-react";
+import React, { type CSSProperties } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+
+import { audioService } from "../audio-service";
 
 const outerStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 16 };
 
@@ -12,8 +14,8 @@ const speedButtonStyle: CSSProperties = {
   padding: "4px 8px",
   borderRadius: 12,
   border: "none",
-  backgroundColor: "#f1f5f9",
-  color: "#475569",
+  backgroundColor: "var(--surface-subtle)",
+  color: "var(--content-muted)",
   fontSize: 12,
   fontWeight: "bold",
   cursor: "pointer",
@@ -26,7 +28,7 @@ const controlsGroupStyle: CSSProperties = { display: "flex", alignItems: "center
 const skipButtonStyle: CSSProperties = {
   background: "none",
   border: "none",
-  color: "#475569",
+  color: "var(--content-muted)",
   cursor: "pointer",
   display: "flex",
   flexDirection: "column",
@@ -34,16 +36,38 @@ const skipButtonStyle: CSSProperties = {
   position: "relative",
 };
 
+const trackButtonStyle: CSSProperties = {
+  background: "none",
+  border: "none",
+  color: "var(--content-muted)",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+};
+
+const trackButtonDisabledStyle: CSSProperties = {
+  ...trackButtonStyle,
+  color: "var(--content-subtle, var(--content-muted))",
+  cursor: "default",
+  opacity: 0.4,
+};
+
 const skipLabelStyle: CSSProperties = {
   fontSize: 12,
   fontWeight: "bold",
   position: "absolute",
   top: 8,
-  color: "#475569",
+  color: "var(--content-muted)",
 };
+
+function handlePrevious() {
+  audioService.skipToPrevious();
+}
 
 export function PlaybackControls() {
   const { isPlaying, isLoading, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
+  const { hasNext } = useQueue();
+  const { t } = useTranslation();
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -51,6 +75,11 @@ export function PlaybackControls() {
     } else {
       audioService.resume();
     }
+  };
+
+  const handleNext = () => {
+    if (!hasNext) return;
+    audioService.skipToNext();
   };
 
   const handleSkipForward = () => {
@@ -70,20 +99,21 @@ export function PlaybackControls() {
     audioService.setSpeed(speeds[nextIndex]!);
   };
 
-  if (!hasTrack) return null;
-
+  if (!hasTrack) {
+    return null;
+  }
   const playButtonStyle: CSSProperties = {
     width: 40,
     height: 40,
     borderRadius: 20,
     border: "none",
-    backgroundColor: "#2563eb",
-    color: "#fff",
+    backgroundColor: "var(--action-primary)",
+    color: "var(--content-on-primary)",
     cursor: isLoading ? "wait" : "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    boxShadow: "0 4px 6px -1px rgba(37, 99, 235, 0.2)",
+    boxShadow: "var(--shadow-sm)",
   };
 
   return (
@@ -92,7 +122,7 @@ export function PlaybackControls() {
         type="button"
         onClick={handleCycleSpeed}
         style={speedButtonStyle}
-        title="Playback Speed"
+        title={t("audio.playbackSpeed", "Playback Speed")}
       >
         {speed.toFixed(2)}x
       </button>
@@ -100,9 +130,18 @@ export function PlaybackControls() {
       <div style={controlsGroupStyle}>
         <button
           type="button"
+          onClick={handlePrevious}
+          style={trackButtonStyle}
+          aria-label={t("audio.previousTrack", "Previous track")}
+        >
+          <SkipBack size={18} fill="currentColor" />
+        </button>
+
+        <button
+          type="button"
           onClick={handleSkipBackward}
           style={skipButtonStyle}
-          aria-label="Skip backward 30 seconds"
+          aria-label={t("audio.skipBackward", "Skip backward 30 seconds")}
         >
           <RotateCcw size={22} />
           <span style={skipLabelStyle}>30</span>
@@ -113,14 +152,14 @@ export function PlaybackControls() {
           onClick={handlePlayPause}
           disabled={isLoading}
           style={playButtonStyle}
-          aria-label={isPlaying ? "Pause" : "Play"}
+          aria-label={isPlaying ? t("audio.pause", "Pause") : t("audio.play", "Play")}
         >
           {isLoading ? (
             <span style={{ fontSize: 12 }}>…</span>
           ) : isPlaying ? (
-            <Pause size={18} fill="#fff" />
+            <Pause size={18} fill="currentColor" />
           ) : (
-            <Play size={18} fill="#fff" style={{ marginLeft: 2 }} />
+            <Play size={18} fill="currentColor" style={{ marginLeft: 2 }} />
           )}
         </button>
 
@@ -128,10 +167,20 @@ export function PlaybackControls() {
           type="button"
           onClick={handleSkipForward}
           style={skipButtonStyle}
-          aria-label="Skip forward 30 seconds"
+          aria-label={t("audio.skipForward", "Skip forward 30 seconds")}
         >
           <RotateCw size={22} />
           <span style={skipLabelStyle}>30</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={handleNext}
+          disabled={!hasNext}
+          style={hasNext ? trackButtonStyle : trackButtonDisabledStyle}
+          aria-label={t("audio.nextTrack", "Next track")}
+        >
+          <SkipForward size={18} fill="currentColor" />
         </button>
       </div>
     </div>

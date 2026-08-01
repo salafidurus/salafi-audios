@@ -1,12 +1,38 @@
-import { Platform, useColorScheme } from "react-native";
-import { type Href, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
-import { authClient } from "@/core/auth";
+import { type Href, useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect } from "react";
+
+import { useAuth } from "@/core/auth";
+import { useNativeAppleSignIn } from "@/features/auth/hooks/use-native-apple-sign-in";
+import { useNativeGoogleSignIn } from "@/features/auth/hooks/use-native-google-sign-in";
 import { SignInScreen } from "@/features/auth/screens/sign-in/sign-in.screen";
 
 export default function SignInRoute() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
+  const { from } = useLocalSearchParams<{ from?: string }>();
+  const { isAuthenticated } = useAuth();
+  const {
+    signIn: nativeAppleSignIn,
+    isLoading: appleLoading,
+    error: appleError,
+  } = useNativeAppleSignIn();
+  const {
+    signIn: nativeGoogleSignIn,
+    isLoading: googleLoading,
+    error: googleError,
+  } = useNativeGoogleSignIn();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (from) {
+        router.replace(from as Href);
+      } else if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace(routes.home as Href);
+      }
+    }
+  }, [isAuthenticated, from, router]);
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -19,18 +45,13 @@ export default function SignInRoute() {
 
   return (
     <SignInScreen
-      googleButtonSource={
-        Platform.OS === "android"
-          ? colorScheme === "dark"
-            ? require("../../../assets/auth/google-continue-dark-1x-android.png")
-            : require("../../../assets/auth/google-continue-light-1x-android.png")
-          : colorScheme === "dark"
-            ? require("../../../assets/auth/google-continue-dark-1x-ios.png")
-            : require("../../../assets/auth/google-continue-light-1x-ios.png")
-      }
       onBack={handleBack}
-      onSignInWithGoogle={() => authClient.signIn.social({ provider: "google" })}
-      onSignInWithApple={() => authClient.signIn.social({ provider: "apple" })}
+      onSignInWithGoogle={() => nativeGoogleSignIn()}
+      onSignInWithApple={() => nativeAppleSignIn()}
+      appleLoading={appleLoading}
+      googleLoading={googleLoading}
+      appleError={appleError}
+      googleError={googleError}
     />
   );
 }

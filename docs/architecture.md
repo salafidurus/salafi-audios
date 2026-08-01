@@ -26,19 +26,51 @@ The monorepo exists because the web app, mobile app, and backend are one coordin
 
 ### Top-Level Areas
 
-- `apps/`: deployable applications.
-- `packages/`: shared libraries, contracts, config, and tokens.
-- `docs/`: authoritative cross-cutting documentation.
+- `apps/api` — authoritative backend core
+- `apps/web` — public/admin web client (Next.js, CSS-responsive — no React Native Web)
+- `apps/native` — offline-first native client (iOS + Android — no Expo Web)
+- `packages/*` — shared libraries: core infra, domain state, design tokens, cross-app utilities
+- `docs/` — product + implementation authority
+
+### App Source Structure
+
+Both apps follow this layout:
+
+```text
+src/
+  app/      ← routing ONLY — imports screen components from ../features or ../shared
+  features/ ← one folder per feature; each owns components, hooks, screens, utils
+  shared/   ← components and hooks used across 2+ features within this app
+  core/     ← platform bootstrap (providers, config, auth, styles)
+```
+
+### Platform File Extensions
+
+Mobile (`apps/native`): `.tsx` (base), `.ios.tsx` (iOS-only), `.android.tsx` (Android-only).
+
+Web (`apps/web`): `.tsx` (base, CSS-responsive), `.desktop.tsx` (desktop-only), `.mobile.tsx` (mobile-web).
+
+### Package Map
+
+- `packages/core-db` — Database schema and client
+- `packages/core-env` — Environment variable schemas
+- `packages/core-i18n` — Internationalization config and keys
+- `packages/core-contracts` — Shared TypeScript contracts (DTOs, types, query hooks)
+- `packages/core-api` — Platform-agnostic API client infrastructure
+- `packages/design-tokens` — Design tokens (colors, spacing, radius, typography) — authoritative source
+- `packages/domain-content` — Lectures, scholars, series, feed, library data hooks
+- `packages/domain-account` — User profile and auth state hooks
+- `packages/domain-playback` — Playback engine and player state
+- `packages/domain-progress` — Progress tracking state
+- `packages/domain-search` — Search and quick-browse hooks
+
+Shared lint/TS config lives at the repo root (`tsconfig.base.json`, `tsconfig.packages.json`, `tsconfig.nest.json`, `eslint.config.base.mjs`, `eslint.config.packages.mjs`, `eslint.config.nest.mjs`). Apps extend/compose these; `next`/`expo` specifics are inlined into `apps/web` and `apps/native`.
 
 ### Package Roles
 
-- **`@sd/shared`**: generic cross-app utilities (no platform-specific UI primitives).
-- **`@sd/core-*`**: cross-cutting infrastructure such as auth and API. Note: `core-styles`, `core-config`, and `core-env` have been dissolved — styling bootstrap, environment config, and env validation now live in each app's `src/core/` directory (or the consuming package's `src/env.ts`).
-- **`@sd/domain-*`**: shared data and state hooks organized by bounded context (`domain-content`, `domain-account`, `domain-live`, `domain-playback`, `domain-progress`, `domain-search`).
-- **`@sd/core-contracts`**: shared public API contracts and query helpers.
-- **`@sd/core-db`**: schema, migrations, and generated database client.
-- **`@sd/core-env`**: ~~environment parsing and validation~~ dissolved — each consumer owns its local `env.ts`.
-- **`@sd/design-tokens`**: authoritative visual tokens.
+- **`@sd/core-*`**: Foundational infrastructure (auth, api, config, styles, i18n, env, db, contracts). `core-styles`, `core-config`, and `core-env` have been dissolved — styling bootstrap, environment config, and env validation now live in each app's `src/core/` directory (or the consuming package's `src/env.ts`).
+- **`@sd/domain-*`**: Shared data and state hooks organized by bounded context (`domain-content`, `domain-account`, `domain-playback`, `domain-progress`, `domain-search`).
+- **`@sd/design-tokens`**: Authoritative visual tokens.
 
 ## 4. Dependency and Boundary Rules
 
@@ -89,19 +121,31 @@ These rules are enforcement rules, not style preferences.
 
 The repo uses platform-specific module extensions to colocate a feature while keeping implementations explicit:
 
-- `.desktop.web.tsx`
-- `.mobile.web.tsx`
-- `.web.tsx`
-- `.native.tsx`
-- `.ios.tsx` / `.android.tsx`
-- base `.tsx`
+### App-Level Extensions
+
+| Context               | Extension      | When                           |
+| --------------------- | -------------- | ------------------------------ |
+| Mobile (shared)       | `.tsx`         | iOS + Android                  |
+| Mobile (iOS-only)     | `.ios.tsx`     | Behavior truly diverges        |
+| Mobile (Android-only) | `.android.tsx` | Behavior truly diverges        |
+| Web (shared)          | `.tsx`         | Fully CSS-responsive (default) |
+| Web (desktop)         | `.desktop.tsx` | Desktop-only layout            |
+| Web (mobile-web)      | `.mobile.tsx`  | Mobile-web layout              |
+
+### Shared Package Extensions
+
+| Context           | Extension                              | When                 |
+| ----------------- | -------------------------------------- | -------------------- |
+| Platform-agnostic | `.ts` / `.tsx`                         | Works everywhere     |
+| Mobile native     | `.native.ts` / `.native.tsx`           | iOS + Android        |
+| Web (shared)      | `.web.ts` / `.web.tsx`                 | Desktop + mobile web |
+| Desktop web only  | `.desktop.web.ts` / `.desktop.web.tsx` | Desktop-only impl    |
+| Mobile web only   | `.mobile.web.ts` / `.mobile.web.tsx`   | Mobile web only      |
 
 ### Package Entrypoint Rules
 
 - Use plain `index.ts` only when the package public surface is fully platform-agnostic and there is no real web/native split.
 - If a package has distinct platform behavior, use `index.web.ts` and `index.native.ts` as the only public entrypoints.
-- `index.web.ts` is reserved for code that is intended for `apps/web`.
-- `index.native.ts` is reserved for code that is intended for `apps/native`.
 - Intermediate barrel files inside `src/` are not allowed. Export only from the package root entrypoint files.
 
 ### Package Structure Rules
@@ -109,15 +153,6 @@ The repo uses platform-specific module extensions to colocate a feature while ke
 - Use explicit folders such as `components/`, `screens/`, `hooks/`, `utils/`, `types/`, `api/`, and `store/`.
 - Do not leave platform implementation files loose in `src/` if they belong to one of those categories.
 - Route-level or app-level assembly belongs in apps, not inside low-level shared packages.
-
-### Platform Naming Rules
-
-- Use plain `.ts` / `.tsx` only for platform-agnostic files.
-- Use `.native.ts` / `.native.tsx` for mobile native files.
-- Use `.web.ts` / `.web.tsx` for web files shared by mobile web and desktop web.
-- Use `.desktop.web.ts` / `.desktop.web.tsx` for desktop-web-only implementations.
-- Use `.mobile.web.ts` / `.mobile.web.tsx` for mobile-web-only implementations.
-- Prefer explicit exported names such as `ButtonMobileNative`, `AuthRequiredStateResponsive`, or `UnistylesStyleDesktopWeb` instead of generic component names for platform-bound code.
 
 ### Dependency Rules
 
@@ -139,12 +174,12 @@ This keeps Expo Router responsible for tab state, route structure, and screen li
 
 ### Web Navigation
 
-The shipped web app currently preserves the same high-level section model and section re-entry behavior, but it still uses its own web navigation surface rather than the mobile shell implementation as a shared source of truth.
+The shipped web app currently preserves the same high-level section model and section re-entry behavior, but it still uses its own web navigation surface (sidebar) rather than the mobile shell implementation as a shared source of truth.
 
 ## 9. Technology Stack
 
 - Monorepo: Bun Workspaces, Turborepo
 - Backend: NestJS, Prisma, PostgreSQL (with native UUIDv4 primary keys and pg_trgm GIN indexing)
-- Web: Next.js, React, Unistyles
-- Mobile: Expo, React Native, Expo Router, Unistyles
+- Web: Next.js, React, CSS Modules + CSS custom properties (design tokens)
+- Mobile: Expo, React Native, Expo Router, react-native-unistyles
 - Shared: TypeScript, Zod, TanStack Query

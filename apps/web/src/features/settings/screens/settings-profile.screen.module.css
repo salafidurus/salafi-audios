@@ -16,29 +16,6 @@
   margin-bottom: var(--space-scale-3xl);
 }
 
-.avatarImage {
-  width: 4rem;
-  height: 4rem;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.avatarInitials {
-  width: 4rem;
-  height: 4rem;
-  border-radius: 50%;
-  background: var(--action-primary);
-  color: var(--content-on-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--typo-title-md-font-size);
-  font-weight: 700;
-  flex-shrink: 0;
-  letter-spacing: 0.05em;
-}
-
 .profileName {
   margin: 0;
   font-size: var(--typo-body-md-font-size);
@@ -72,29 +49,6 @@
 
 .input:focus {
   border-color: var(--action-primary);
-}
-
-.saveButton {
-  padding: var(--space-scale-xs) var(--space-scale-md);
-  background: var(--action-primary);
-  color: var(--content-on-primary);
-  border: none;
-  border-radius: var(--radius-component-chip);
-  font-size: var(--typo-body-sm-font-size);
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: opacity 150ms ease;
-}
-
-.saveButton:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.saveButton:focus-visible {
-  outline: 2px solid var(--action-primary);
-  outline-offset: 2px;
 }
 
 .readOnly {
@@ -137,29 +91,19 @@
   margin: var(--space-scale-sm) 0;
 }
 
-.signOutRow {
+.actionRow {
+  display: flex;
+  gap: var(--space-component-gap-md);
   margin-top: var(--space-scale-3xl);
   padding-top: var(--space-scale-xl);
   border-top: var(--border-width-default) solid var(--border-subtle);
 }
 
-.signOutButton {
-  padding: var(--space-scale-sm) var(--space-scale-xl);
-  border: var(--border-width-default) solid var(--action-danger);
-  border-radius: var(--radius-component-chip);
-  background: transparent;
-  color: var(--action-danger);
-  font-size: var(--typo-body-sm-font-size);
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 150ms ease,
-    color 150ms ease;
-}
-
-.signOutButton:hover {
-  background: var(--action-danger);
-  color: var(--content-on-primary);
+@media (max-width: 640px) {
+  .actionRow {
+    flex-direction: column;
+    gap: var(--space-component-gap-sm);
+  }
 }
 
 /* Sign-in CTA */
@@ -183,20 +127,10 @@
   color: var(--content-muted);
 }
 
-.signInButton {
-  padding: var(--space-scale-sm) var(--space-scale-2xl);
-  background: var(--action-primary);
-  color: var(--content-on-primary);
-  border: none;
-  border-radius: var(--radius-component-chip);
-  font-size: var(--typo-body-md-font-size);
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 150ms ease;
-}
-
-.signInButton:hover {
-  opacity: 0.88;
+.rolesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-scale-sm);
 }
 
 .loading,

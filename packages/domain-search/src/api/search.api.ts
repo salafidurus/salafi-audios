@@ -26,7 +26,7 @@ export function useSearchCatalog(
 
 export function useTopicsList(options?: Parameters<typeof useApiQuery<TopicDetailDto[]>>[2]) {
   return useApiQuery(
-    queryKeys.topics.list(),
+    queryKeys.topics.all,
     () =>
       httpClient<TopicDetailDto[]>({
         url: endpoints.topics.list,

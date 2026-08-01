@@ -1,6 +1,8 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 
 export type SearchResultEmptyProps = {
   shouldSearch: boolean;
@@ -22,9 +24,11 @@ export function SearchResultEmpty({
         : t("search.noResults", "No results found.")
     : t("search.startTyping", "Start typing to search.");
 
+  const variant = errorMessage ? "error" : isFetching ? "loading" : "empty";
+
   return (
     <View style={styles.container}>
-      <Text style={styles.message}>{message}</Text>
+      <EmptyState message={message} variant={variant} />
     </View>
   );
 }

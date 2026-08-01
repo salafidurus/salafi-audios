@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
 
 export const SearchCatalogParamsSchema = z.object({
@@ -30,6 +31,8 @@ export const SearchCatalogResultsDtoSchema = z.object({
   collections: z.array(SearchCatalogItemDtoSchema),
   series: z.array(SearchCatalogItemDtoSchema),
   singles: z.array(SearchCatalogItemDtoSchema),
+  nextCursor: z.string().optional(),
+  hasMore: z.boolean().optional(),
 });
 export type SearchCatalogResultsDto = z.infer<typeof SearchCatalogResultsDtoSchema>;
 
@@ -44,6 +47,7 @@ export const SearchQueryDtoSchema = z.object({
     }, z.array(z.string()))
     .optional(),
   scholarSlug: z.string().optional(),
+  cursor: z.string().optional(),
   limit: z
     .preprocess((val) => {
       if (val === undefined || val === null || val === "") return undefined;

@@ -1,5 +1,6 @@
 import { Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
 import { ScreenView } from "../ScreenView/ScreenView";
 
 type ScreenInProgressProps = {
@@ -12,7 +13,7 @@ export function ScreenInProgress({
   description = "This feature is under development",
 }: ScreenInProgressProps) {
   return (
-    <ScreenView center backgroundVariant="mixedWash">
+    <ScreenView center>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{description}</Text>
     </ScreenView>

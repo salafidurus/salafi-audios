@@ -1,19 +1,29 @@
+import { useAudio } from "@sd/domain-audio";
+import { useFormattedScholarName } from "@sd/domain-content";
+import { Image } from "expo-image";
+import { Play, Pause, ChevronDown, Music } from "lucide-react-native";
 import React, { useState } from "react";
 import { View, Pressable, Text, Modal, ActivityIndicator } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { Image } from "expo-image";
-import { useAudio } from "@sd/domain-audio";
-import { audioService } from "../audio-service";
-import { Play, Pause, ChevronDown, Music } from "lucide-react-native";
-import { ProgressBar } from "./progress-bar";
-import { PlaybackControls } from "./playback-controls";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-export function MiniPlayer() {
+import { useTranslation } from "@/core/i18n/use-translation";
+
+import { audioService } from "../audio-service";
+import { PlaybackControls } from "./playback-controls";
+import { ProgressBar } from "./progress-bar";
+
+export type MiniPlayerProps = {
+  embedded?: boolean;
+};
+
+export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
   const { currentTrack, isPlaying, isLoading, progressPercent, positionSeconds } = useAudio();
   const { theme } = useUnistyles();
+  const { t } = useTranslation();
   const [modalVisible, setModalVisible] = useState(false);
   const insets = useSafeAreaInsets();
+  const displayArtist = useFormattedScholarName(currentTrack?.artist, currentTrack?.scholarSlug);
 
   if (!currentTrack) return null;
 
@@ -34,7 +44,10 @@ export function MiniPlayer() {
     <>
       <Pressable
         onPress={() => setModalVisible(true)}
-        style={[styles.container, { bottom: insets.bottom + 8 }]}
+        style={[
+          embedded ? styles.containerEmbedded : styles.container,
+          !embedded && { bottom: insets.bottom + 8 },
+        ]}
       >
         {/* Progress Bar underlaid at the very top of mini-player */}
         <View style={styles.miniProgressTrack}>
@@ -55,11 +68,11 @@ export function MiniPlayer() {
               {currentTrack.title}
             </Text>
             <Text style={styles.artist} numberOfLines={1}>
-              {currentTrack.artist}
+              {displayArtist}
             </Text>
           </View>
 
-          <Pressable onPress={handlePlayPause} style={styles.playButton}>
+          <Pressable onPress={handlePlayPause} style={styles.playButton} testID="play-button">
             {isLoading ? (
               <ActivityIndicator size="small" color={theme.colors.content.strong} />
             ) : isPlaying ? (
@@ -83,7 +96,7 @@ export function MiniPlayer() {
             <Pressable onPress={() => setModalVisible(false)} style={styles.closeButton}>
               {ChevronDownIcon}
             </Pressable>
-            <Text style={styles.modalHeaderTitle}>Now Playing</Text>
+            <Text style={styles.modalHeaderTitle}>{t("audio.now_playing", "Now Playing")}</Text>
             <View style={styles.placeholder} />
           </View>
 
@@ -100,7 +113,7 @@ export function MiniPlayer() {
               <Text style={styles.modalTitle} numberOfLines={2}>
                 {currentTrack.title}
               </Text>
-              <Text style={styles.modalArtist}>{currentTrack.artist}</Text>
+              <Text style={styles.modalArtist}>{displayArtist}</Text>
             </View>
 
             <View style={styles.progressSection}>
@@ -133,6 +146,16 @@ const styles = StyleSheet.create((theme) => ({
     start: theme.spacing.scale.md,
     end: theme.spacing.scale.md,
     height: 64,
+    borderRadius: theme.radius.scale.md,
+    backgroundColor: theme.colors.surface.default,
+    ...theme.shadows.sm,
+    overflow: "hidden",
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.border.subtle,
+  },
+  containerEmbedded: {
+    flex: 1,
+    height: 52,
     borderRadius: theme.radius.scale.md,
     backgroundColor: theme.colors.surface.default,
     ...theme.shadows.sm,
@@ -188,9 +211,16 @@ const styles = StyleSheet.create((theme) => ({
     height: "100%",
     backgroundColor: theme.colors.action.primary,
   },
-  // Fullscreen Modal Styles
+  // Fullscreen Modal Styles.
+  // RN's <Modal> mounts its own render root (AppContainer/Surface), which
+  // always derives ITS OWN root layout direction from the native
+  // I18nManager flag — it does not inherit `direction` from the app's main
+  // root. Setting it explicitly here gives this subtree its own resolved
+  // direction (Yoga honors a per-node override regardless of the owning
+  // surface's direction), so this mirrors correctly without a restart.
   modalContainer: {
     flex: 1,
+    direction: theme.direction,
     backgroundColor: theme.colors.surface.default,
   },
   modalHeader: {

@@ -1,33 +1,56 @@
-import { vi, type Mocked } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'bun:test';
+import type { Mocked } from '../../test/setup';
 import { NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TopicDetailDto } from '@sd/core-contracts';
-import { UpsertTopicDto } from './dto/upsert-topic.dto';
+import type { TopicDetailDto, TranslationViewDto } from '@sd/core-contracts';
 import { TopicsRepository } from './topics.repo';
 import { TopicsService } from './topics.service';
 
 describe('TopicsService', () => {
   let service: TopicsService;
   let repo: Mocked<TopicsRepository>;
+  let cacheManager: any;
 
-  const sample: TopicDetailDto = {
+  const sampleTopic: TopicDetailDto = {
     id: 't1',
     slug: 'aqeedah',
-    name: 'Aqeedah',
+    name: { ar: 'العقيدة' },
+    orderIndex: 0,
     createdAt: new Date().toISOString(),
   };
 
+  const sampleTranslations: TranslationViewDto[] = [
+    {
+      locale: 'en',
+      status: 'draft',
+      fields: { name: 'Aqeedah' },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  ];
+
   beforeEach(async () => {
+    cacheManager = {
+      del: vi.fn().mockResolvedValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TopicsService,
         {
           provide: TopicsRepository,
           useValue: {
-            list: vi.fn(),
-            findBySlug: vi.fn(),
-            upsertBySlug: vi.fn(),
-          } satisfies Partial<Mocked<TopicsRepository>>,
+            list: vi.fn<any>(),
+            findBySlug: vi.fn<any>(),
+            upsertBySlug: vi.fn<any>(),
+            upsertTopicTranslation: vi.fn<any>(),
+            listTopicTranslations: vi.fn<any>(),
+          } as Partial<Mocked<TopicsRepository>>,
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: cacheManager,
         },
       ],
     }).compile();
@@ -36,26 +59,65 @@ describe('TopicsService', () => {
     repo = module.get(TopicsRepository) as Mocked<TopicsRepository>;
   });
 
+  // ─── Existing tests (preserved) ─────────────────────────────────────────
+
   it('getBySlug throws NotFoundException if missing', async () => {
     repo.findBySlug.mockResolvedValue(null);
     await expect(service.getBySlug('missing')).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  it('upsert throws NotFoundException when parentSlug is missing', async () => {
-    const dto: UpsertTopicDto = {
-      slug: 'child',
-      name: 'Child',
-      parentSlug: 'missing-parent',
-    };
-    repo.upsertBySlug.mockResolvedValue(null);
+  // ─── getAdminDetail ────────────────────────────────────────────────────
 
-    await expect(service.upsert(dto)).rejects.toBeInstanceOf(NotFoundException);
+  it('getAdminDetail returns topic with translations', async () => {
+    repo.findBySlug.mockResolvedValue(sampleTopic);
+    repo.listTopicTranslations.mockResolvedValue(sampleTranslations);
+
+    const result = await service.getAdminDetail('aqeedah');
+    expect(result.id).toBe('t1');
+    expect(result.translations).toHaveLength(1);
+    expect(result.translations[0]?.locale).toBe('en');
   });
 
-  it('upsert returns DTO from repo', async () => {
-    const dto: UpsertTopicDto = { slug: 'aqeedah', name: 'Aqeedah' };
-    repo.upsertBySlug.mockResolvedValue(sample);
+  it('getAdminDetail throws NotFoundException if topic missing', async () => {
+    repo.findBySlug.mockResolvedValue(null);
+    await expect(service.getAdminDetail('missing')).rejects.toBeInstanceOf(NotFoundException);
+  });
 
-    await expect(service.upsert(dto)).resolves.toEqual(sample);
+  // ─── createWithTranslations (main-language-only) ───────────────────────
+
+  it('createWithTranslations creates topic from main-language fields only', async () => {
+    repo.upsertBySlug.mockResolvedValue(sampleTopic);
+    repo.findBySlug.mockResolvedValue(sampleTopic);
+    repo.listTopicTranslations.mockResolvedValue([]);
+
+    const result = await service.createWithTranslations({
+      slug: 'aqeedah',
+      name: { ar: 'العقيدة' },
+    });
+
+    expect(repo.upsertBySlug).toHaveBeenCalledWith({
+      slug: 'aqeedah',
+      name: 'العقيدة',
+    });
+    expect(repo.upsertTopicTranslation).not.toHaveBeenCalled();
+    expect(result.translations).toHaveLength(0);
+  });
+
+  // ─── updateWithTranslations (main-language-only) ───────────────────────
+
+  it('updateWithTranslations updates only the main-language name', async () => {
+    repo.upsertBySlug.mockResolvedValue(sampleTopic);
+    repo.findBySlug.mockResolvedValue(sampleTopic);
+    repo.listTopicTranslations.mockResolvedValue(sampleTranslations);
+
+    await service.updateWithTranslations('aqeedah', {
+      name: { ar: 'العقيدة المحدثة' },
+    });
+
+    expect(repo.upsertBySlug).toHaveBeenCalledWith({
+      slug: 'aqeedah',
+      name: 'العقيدة المحدثة',
+    });
+    expect(repo.upsertTopicTranslation).not.toHaveBeenCalled();
   });
 });

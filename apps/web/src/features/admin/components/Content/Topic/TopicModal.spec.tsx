@@ -1,0 +1,31 @@
+import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "bun:test";
+
+import { TopicModal } from "./TopicModal";
+
+describe("TopicModal", () => {
+  it("does not render when isOpen is false", () => {
+    render(<TopicModal isOpen={false} onClose={() => {}} onSaved={() => {}} />);
+    expect(screen.queryByText(/add topic/i)).not.toBeInTheDocument();
+  });
+
+  it("renders form fields for add topic modal (Arabic is the main language)", () => {
+    render(<TopicModal isOpen onClose={() => {}} onSaved={() => {}} />);
+
+    expect(screen.getByLabelText(/slug/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/arabic name/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/english name/i)).not.toBeInTheDocument();
+  });
+
+  it("shows error when slug or Arabic name is missing on submit", async () => {
+    const { fireEvent, waitFor } = await import("@testing-library/react");
+    render(<TopicModal isOpen onClose={() => {}} onSaved={() => {}} />);
+
+    const doneButton = screen.getByRole("button", { name: /done/i });
+    fireEvent.click(doneButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/slug and an arabic name are required/i)).toBeInTheDocument();
+    });
+  });
+});

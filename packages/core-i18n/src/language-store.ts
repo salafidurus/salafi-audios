@@ -1,5 +1,5 @@
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES, type Locale } from "./supported-locales";
 import { resolveLocale } from "./locale-utils";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES, type Locale } from "./supported-locales";
 
 /**
  * Minimal async storage interface that both web (localStorage adapter) and

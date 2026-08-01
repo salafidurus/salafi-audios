@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { HealthCheckError, HealthIndicator, HealthIndicatorResult } from '@nestjs/terminus';
+import { HealthCheckError, HealthIndicator } from '@nestjs/terminus';
+import type { HealthIndicatorResult } from '@nestjs/terminus';
 import { S3Client } from 'bun';
-import { ConfigService } from '../../shared/config/config.service';
+import { ConfigService } from '../config/config.service';
 
 @Injectable()
 export class CDNHealthIndicator extends HealthIndicator {
   private readonly s3: S3Client;
 
-  constructor(private readonly config: ConfigService) {
+  constructor(config: ConfigService) {
     super();
     this.s3 = new S3Client({
       accessKeyId: config.R2_ACCESS_KEY_ID,

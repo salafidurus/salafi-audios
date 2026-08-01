@@ -1,0 +1,189 @@
+"use client";
+
+import { queryKeys, type UserRole } from "@sd/core-contracts";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useReducer, useState, type ReactNode } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+import {
+  fetchUserRoles,
+  grantRole,
+  revokeRole,
+  type AdminRolesListResponse,
+} from "@/features/admin/api/admin.api";
+import { Button } from "@/shared/components/Button";
+import { Modal } from "@/shared/components/Modal/Modal";
+
+import { ROLES_ARRAY } from "./constants";
+import styles from "./RoleDialog.module.css";
+import { RoleItem } from "./RoleItem";
+
+export interface RoleDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onRolesChange?: () => void;
+  userId: string;
+  userName?: string;
+}
+
+interface State {
+  userRoles: AdminRolesListResponse | null;
+  loading: boolean;
+  errors: Record<string, string | null>;
+}
+
+type Action =
+  | { type: "LOAD_START" }
+  | { type: "LOAD_SUCCESS"; payload: AdminRolesListResponse }
+  | { type: "LOAD_ERROR" }
+  | { type: "SET_ROLES"; payload: AdminRolesListResponse }
+  | { type: "SET_ERROR"; role: string; message: string }
+  | { type: "CLEAR_ERROR"; role: string };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "LOAD_START":
+      return { ...state, loading: true };
+    case "LOAD_SUCCESS":
+      return { ...state, userRoles: action.payload, loading: false };
+    case "LOAD_ERROR":
+      return { ...state, userRoles: { roles: [] }, loading: false };
+    case "SET_ROLES":
+      return { ...state, userRoles: action.payload, loading: false };
+    case "SET_ERROR":
+      return {
+        ...state,
+        errors: { ...state.errors, [action.role]: action.message },
+        loading: false,
+      };
+    case "CLEAR_ERROR":
+      return { ...state, errors: { ...state.errors, [action.role]: null } };
+    default:
+      return state;
+  }
+}
+
+const initialState: State = {
+  userRoles: null,
+  loading: false,
+  errors: {},
+};
+
+export function RoleDialog({
+  isOpen,
+  onClose,
+  onRolesChange,
+  userId,
+  userName = userId,
+}: RoleDialogProps): ReactNode {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const [pendingRoles, setPendingRoles] = useState<Set<UserRole>>(new Set());
+  const [saving, setSaving] = useState(false);
+
+  const currentRoles = state.userRoles?.roles.map((r) => r.role) ?? [];
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    dispatch({ type: "LOAD_START" });
+
+    fetchUserRoles(userId)
+      .then((data) => {
+        dispatch({ type: "LOAD_SUCCESS", payload: data });
+        setPendingRoles(new Set(data.roles.map((r) => r.role)));
+      })
+      .catch(() => dispatch({ type: "LOAD_ERROR" }));
+  }, [isOpen, userId]);
+
+  const handleToggle = (role: UserRole) => {
+    setPendingRoles((prev) => {
+      const next = new Set(prev);
+      if (next.has(role)) {
+        next.delete(role);
+      } else {
+        next.add(role);
+      }
+      return next;
+    });
+  };
+
+  const handleDone = async () => {
+    setSaving(true);
+
+    const toGrant: UserRole[] = [];
+    const toRevoke: UserRole[] = [];
+
+    for (const role of ROLES_ARRAY) {
+      const hadIt = currentRoles.includes(role);
+      const hasItNow = pendingRoles.has(role);
+
+      if (!hadIt && hasItNow) {
+        toGrant.push(role);
+      } else if (hadIt && !hasItNow) {
+        toRevoke.push(role);
+      }
+    }
+
+    try {
+      await Promise.all([
+        ...toGrant.map((role) => grantRole(userId, role)),
+        ...toRevoke.map((role) => revokeRole(userId, role)),
+      ]);
+
+      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
+      onRolesChange?.();
+      onClose();
+    } catch (error) {
+      console.error("Failed to complete batch role updates", error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!isOpen) {
+    return null;
+  }
+  const customTitle = (
+    <div className={styles.titleContainer}>
+      <span className={styles.titleMain}>{t("admin.permissions.manageRoles", "Manage Roles")}</span>
+      <span className={styles.titleSub}>{userName}</span>
+    </div>
+  );
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={customTitle as any}
+      width="narrow"
+      height="auto"
+      footer={
+        <Button variant="primary" onClick={handleDone} disabled={saving}>
+          {saving ? t("admin.permissions.saving", "Saving…") : t("admin.permissions.done", "Done")}
+        </Button>
+      }
+    >
+      {state.loading && !state.userRoles ? (
+        <div className={styles.loading}>
+          {t("admin.permissions.loadingRoles", "Loading roles…")}
+        </div>
+      ) : (
+        <div className={styles.rolesList}>
+          {ROLES_ARRAY.map((role) => (
+            <RoleItem
+              key={role}
+              role={role}
+              isPending={pendingRoles.has(role)}
+              error={state.errors[role] ?? null}
+              saving={saving}
+              onToggle={handleToggle}
+            />
+          ))}
+        </div>
+      )}
+    </Modal>
+  );
+}

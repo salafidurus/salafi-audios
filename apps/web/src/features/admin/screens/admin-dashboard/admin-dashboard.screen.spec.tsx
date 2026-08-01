@@ -1,19 +1,27 @@
-import { vi, type Mock } from "vitest";
+import { useAdminPermissions } from "@sd/domain-account";
 import { render, screen } from "@testing-library/react";
-import { AdminDashboardScreen } from "./admin-dashboard.screen";
-import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 
-vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
+import { useAuth } from "@/core/auth/use-auth";
+
+import { AdminDashboardScreen } from "./admin-dashboard.screen";
+
+vi.mock("@sd/domain-account", () => ({
   useAdminPermissions: vi.fn(),
+}));
+
+vi.mock("@/core/auth/use-auth", () => ({
+  useAuth: vi.fn(),
 }));
 
 describe("AdminDashboardScreen", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (useAuth as Mock<any>).mockReturnValue({ isAuthenticated: true });
   });
 
   it("renders loading state when fetching permissions", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: undefined,
       isFetching: true,
     });
@@ -22,10 +30,25 @@ describe("AdminDashboardScreen", () => {
     expect(screen.getByText("Loading…")).toBeInTheDocument();
   });
 
-  it("renders sections based on user permissions", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+  it("shows cards when user has only view-level permissions", () => {
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: {
-        permissions: ["manage:scholars", "manage:content", "manage:livestreams"],
+        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW"],
+      },
+      isFetching: false,
+    });
+
+    render(<AdminDashboardScreen />);
+
+    expect(screen.getByRole("link", { name: /scholars/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /contents/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /users/i })).toBeInTheDocument();
+  });
+
+  it("renders sections based on user permissions", () => {
+    (useAdminPermissions as Mock<any>).mockReturnValue({
+      data: {
+        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW"],
       },
       isFetching: false,
     });
@@ -37,14 +60,14 @@ describe("AdminDashboardScreen", () => {
     expect(scholarsLink).toBeInTheDocument();
     expect(scholarsLink).toHaveAttribute("href", "/admin/scholars");
 
-    // Check Lectures section (uses manage:content)
-    const lecturesLink = screen.getByRole("link", { name: /lectures/i });
-    expect(lecturesLink).toBeInTheDocument();
-    expect(lecturesLink).toHaveAttribute("href", "/admin/lectures");
+    // Check Contents section (consolidated Topics/Lectures)
+    const contentsLink = screen.getByRole("link", { name: /contents/i });
+    expect(contentsLink).toBeInTheDocument();
+    expect(contentsLink).toHaveAttribute("href", "/admin/contents");
 
-    // Check Livestreams section (links to /admin/live)
-    const livestreamsLink = screen.getByRole("link", { name: /livestreams/i });
-    expect(livestreamsLink).toBeInTheDocument();
-    expect(livestreamsLink).toHaveAttribute("href", "/admin/live");
+    // Check Users section
+    const usersLink = screen.getByRole("link", { name: /users/i });
+    expect(usersLink).toBeInTheDocument();
+    expect(usersLink).toHaveAttribute("href", "/admin/users");
   });
 });

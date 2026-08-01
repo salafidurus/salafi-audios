@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { useResponsive } from "@/shared/hooks/use-responsive";
-import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
+
 import { AuthModal } from "@/features/auth";
+import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+
 import { AuthRequiredStateDesktop } from "./AuthRequiredState.desktop";
 import { AuthRequiredStateMobile } from "./AuthRequiredState.mobile";
 

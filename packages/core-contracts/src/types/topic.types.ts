@@ -1,15 +1,23 @@
 import { z } from "zod";
+
 import { StatusValueSchema } from "./common.types";
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
+import { TranslationViewDtoSchema } from "./translation.types";
 
 export const TopicSlugSchema = z.string();
 export type TopicSlug = z.infer<typeof TopicSlugSchema>;
 
+export const TopicNameSchema = z.object({
+  ar: z.string().min(1, "Arabic name is required"),
+  en: z.string().optional(),
+});
+export type TopicName = z.infer<typeof TopicNameSchema>;
+
 export const TopicViewDtoSchema = z.object({
   id: z.string(),
   slug: TopicSlugSchema,
-  name: z.string(),
-  parentId: z.string().optional(),
+  name: TopicNameSchema,
+  orderIndex: z.number().default(99),
   createdAt: z.string(),
 });
 export type TopicViewDto = z.infer<typeof TopicViewDtoSchema>;
@@ -17,8 +25,8 @@ export type TopicViewDto = z.infer<typeof TopicViewDtoSchema>;
 export const TopicDetailDtoSchema = z.object({
   id: z.string(),
   slug: TopicSlugSchema,
-  name: z.string(),
-  parentId: z.string().optional(),
+  name: TopicNameSchema,
+  orderIndex: z.number().default(99),
   createdAt: z.string(),
 });
 export type TopicDetailDto = z.infer<typeof TopicDetailDtoSchema>;
@@ -39,13 +47,6 @@ export const TopicLectureViewDtoSchema = z.object({
 });
 export type TopicLectureViewDto = z.infer<typeof TopicLectureViewDtoSchema>;
 
-export const UpsertTopicDtoSchema = z.object({
-  slug: z.string().min(1, "Slug must not be empty"),
-  name: z.string().min(1, "Name must not be empty"),
-  parentSlug: z.string().optional(),
-});
-export type UpsertTopicDto = z.infer<typeof UpsertTopicDtoSchema>;
-
 export const SaveTopicTranslationDtoSchema = z.object({
   locale: LocaleSchema,
   name: z.string().min(1, "Name must not be empty"),
@@ -56,3 +57,30 @@ export const UpdateTopicTranslationDtoSchema = z.object({
   name: z.string().optional(),
 });
 export type UpdateTopicTranslationDto = z.infer<typeof UpdateTopicTranslationDtoSchema>;
+
+export const AdminTopicDetailDtoSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  name: TopicNameSchema,
+  orderIndex: z.number().default(99),
+  createdAt: z.string(),
+  translations: z.array(TranslationViewDtoSchema),
+});
+export type AdminTopicDetailDto = z.infer<typeof AdminTopicDetailDtoSchema>;
+
+export const CreateTopicWithTranslationsDtoSchema = z.object({
+  slug: z.string().min(1, "Slug is required"),
+  name: z.object({
+    ar: z.string().min(1, "Arabic name is required"),
+  }),
+  orderIndex: z.number().optional(),
+});
+export type CreateTopicWithTranslationsDto = z.infer<typeof CreateTopicWithTranslationsDtoSchema>;
+
+export const UpdateTopicWithTranslationsDtoSchema = z.object({
+  name: z.object({
+    ar: z.string().min(1, "Arabic name is required"),
+  }),
+  orderIndex: z.number().optional(),
+});
+export type UpdateTopicWithTranslationsDto = z.infer<typeof UpdateTopicWithTranslationsDtoSchema>;

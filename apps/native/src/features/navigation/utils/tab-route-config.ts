@@ -1,13 +1,15 @@
-import { BookOpen, Cloud, Mic, Search, Settings } from "lucide-react-native";
 import type { ComponentType } from "react";
+
 import { routes } from "@sd/core-contracts";
+import { BookOpen, Cloud, Search, Settings } from "lucide-react-native";
+
 import { DEFAULT_TABS, SECTION_TABS, type Section } from "../types";
 
 export type RootTab = Section | "search";
 
 export type RootTabConfig = {
   id: RootTab;
-  routeName: "feed" | "live" | "(search)" | "library" | "settings";
+  routeName: "explore" | "(search)" | "library" | "settings";
   /** English fallback label. */
   label: string;
   /** i18n key (under the `tabs` namespace) resolved at render time. */
@@ -16,8 +18,7 @@ export type RootTabConfig = {
 };
 
 export const ROOT_TABS: RootTabConfig[] = [
-  { id: "feed", routeName: "feed", label: "Feed", labelKey: "tabs.feed", Icon: Cloud },
-  { id: "live", routeName: "live", label: "Live", labelKey: "tabs.live", Icon: Mic },
+  { id: "explore", routeName: "explore", label: "Explore", labelKey: "tabs.explore", Icon: Cloud },
   { id: "search", routeName: "(search)", label: "Search", labelKey: "tabs.search", Icon: Search },
   {
     id: "library",
@@ -36,8 +37,7 @@ export const ROOT_TABS: RootTabConfig[] = [
 ];
 
 const GROUP_NAME_TO_TAB: Record<RootTabConfig["routeName"], RootTab> = {
-  feed: "feed",
-  live: "live",
+  explore: "explore",
   "(search)": "search",
   library: "library",
   settings: "settings",
@@ -49,16 +49,17 @@ export function getRootTabByRouteName(routeName: string): RootTabConfig | undefi
 }
 
 export function getRootTabFromPathname(pathname: string): RootTab {
-  if (pathname === routes.home || pathname.startsWith(routes.search)) {
+  if (pathname.startsWith("/search")) {
     return "search";
   }
 
-  if (pathname.startsWith(routes.feed.index)) {
-    return "feed";
-  }
-
-  if (pathname.startsWith(routes.live.index)) {
-    return "live";
+  if (
+    pathname === "/" ||
+    pathname.startsWith("/scholar") ||
+    pathname.startsWith("/curation") ||
+    pathname.startsWith("/recent")
+  ) {
+    return "explore";
   }
 
   if (pathname.startsWith(routes.library.index)) {
@@ -69,15 +70,38 @@ export function getRootTabFromPathname(pathname: string): RootTab {
     return "settings";
   }
 
-  return "search";
+  return "explore";
+}
+
+export function isTabRoute(pathname: string): boolean {
+  if (
+    pathname === "/" ||
+    pathname === "/recent" ||
+    pathname === "/scholar" ||
+    pathname === "/curation" ||
+    pathname.startsWith("/search") ||
+    pathname.startsWith("/library") ||
+    pathname.startsWith("/settings")
+  ) {
+    return true;
+  }
+  return false;
 }
 
 export function getActiveSubsection(pathname: string, section: Section): string {
   const normalizedPath =
     pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
   const parts = normalizedPath.split("/").filter(Boolean);
-  const candidate = parts[1];
 
+  if (section === "explore") {
+    const candidate = parts[0] || "recent";
+    if (candidate === "scholar" || candidate === "curation" || candidate === "recent") {
+      return candidate;
+    }
+    return "recent";
+  }
+
+  const candidate = parts[1];
   return SECTION_TABS[section].some((tab) => tab.id === candidate)
     ? candidate!
     : DEFAULT_TABS[section];
@@ -86,6 +110,13 @@ export function getActiveSubsection(pathname: string, section: Section): string 
 export function buildSectionPath(section: Section, tabId?: string): string {
   const activeTab =
     tabId && SECTION_TABS[section].some((tab) => tab.id === tabId) ? tabId : DEFAULT_TABS[section];
+
+  if (section === "explore") {
+    if (activeTab === "recent") {
+      return "/";
+    }
+    return `/${activeTab}`;
+  }
 
   if (activeTab === DEFAULT_TABS[section]) {
     return `/${section}`;

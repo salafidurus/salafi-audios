@@ -16,10 +16,58 @@ datasource db {
 //////////////////////////
 
 enum UserRole {
-  user
-  admin
-  editor
-  superadmin
+  listener // Default role - regular authenticated user
+  scholar // Content creator
+  translator // Language translator
+  editor // Content editor
+  admin // Platform administrator
+  superadmin // Full system access
+}
+
+enum Permission {
+  // Scholar Permissions
+  SCHOLARS_VIEW
+  SCHOLARS_CREATE
+  SCHOLARS_EDIT
+  SCHOLARS_DELETE
+  SCHOLARS_PUBLISH
+
+  // Listing Permissions (Collections, Series, Singles, Modules, Lessons)
+  LISTINGS_VIEW
+  LISTINGS_CREATE
+  LISTINGS_EDIT
+  LISTINGS_DELETE
+  LISTINGS_PUBLISH
+
+  // Topic Permissions
+  TOPICS_VIEW
+  TOPICS_CREATE
+  TOPICS_EDIT
+  TOPICS_DELETE
+  TOPICS_PUBLISH
+
+  // Translation Permissions
+  TRANSLATIONS_VIEW
+  TRANSLATIONS_CREATE
+  TRANSLATIONS_EDIT
+  TRANSLATIONS_DELETE
+  TRANSLATIONS_PUBLISH
+
+  // Media Permissions
+  MEDIA_UPLOAD
+  MEDIA_DELETE
+
+  // User Management Permissions
+  USERS_VIEW
+  USERS_EDIT
+  USERS_DELETE
+  USERS_GRANT_PERMISSIONS
+  USERS_GRANT_ROLES
+}
+
+enum ScholarPermissionType {
+  OWN_CONTENT
+  ASSIGNED_EDITOR
 }
 
 enum Status {
@@ -45,12 +93,6 @@ enum ScholarRole {
   scholar_editor
 }
 
-enum LiveSessionStatus {
-  scheduled
-  live
-  ended
-}
-
 enum Locale {
   en
   ar
@@ -61,23 +103,11 @@ enum TranslationStatus {
   published
 }
 
-//////////////////////////
-// Ingestion batch (for seed/dummy dataset lifecycle)
-//////////////////////////
-
-model IngestionBatch {
-  id          String   @id @default(cuid())
-  tag         String
-  environment String
-  createdAt   DateTime @default(now())
-
-  scholars    Scholar[]    @relation("IngestBatchScholars")
-  listings    Listing[]    @relation("IngestBatchListings")
-  audioAssets AudioAsset[] @relation("IngestBatchAudioAssets")
-
-  @@unique([tag, environment])
-  @@index([tag])
-  @@index([environment])
+enum ScholarTitle {
+  allamah
+  sheikh
+  ustadh
+  akh
 }
 
 //////////////////////////
@@ -90,9 +120,9 @@ model User {
   email         String    @unique
   emailVerified Boolean   @default(false)
   image         String?
+  role          String    @default("user")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  role          UserRole  @default(user)
   banned        Boolean   @default(false)
   banReason     String?
   banExpires    DateTime?
@@ -101,45 +131,87 @@ model User {
   preferredLanguage Locale?
 
   // Relations
-  sessions            Session[]
-  accounts            Account[]
-  scholarRoles        UserScholarRole[]
-  createdScholarRoles UserScholarRole[]     @relation("createdByUser")
-  progress            UserListingProgress[]
-  favorites           FavoriteListing[]
+  sessions Session[]
+  accounts Account[]
 
-  adminPermissions        AdminPermission[]
-  adminPermissionsGranted AdminPermission[] @relation("AdminPermissionGranter")
+  // Role and Permission Management
+  roles                  UserRoleAssignment[]
+  roleAssignmentsGranted UserRoleAssignment[] @relation("UserRoleGranter")
+  permissions            UserPermission[]
+  permissionsGranted     UserPermission[]     @relation("UserPermissionGranter")
+
+  // Scholar and Translator Management
+  scholarRoles           UserScholarRole[]
+  createdScholarRoles    UserScholarRole[]    @relation("createdByUser")
+  translatorRoles        UserTranslatorRole[]
+  createdTranslatorRoles UserTranslatorRole[] @relation("createdByUser")
+
+  // Content Management
+  progress  UserListingProgress[]
+  favorites FavoriteListing[]
 }
 
-model AdminPermission {
-  userId      String
-  permission  String
-  grantedAt   DateTime @default(now())
-  grantedById String?
+model UserRoleAssignment {
+  id        String   @id @default(cuid())
+  userId    String
+  role      UserRole
+  grantedAt DateTime @default(now())
+  grantedBy String?
 
-  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  grantedBy User? @relation("AdminPermissionGranter", fields: [grantedById], references: [id], onDelete: SetNull)
+  user          User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedByUser User? @relation("UserRoleGranter", fields: [grantedBy], references: [id], onDelete: SetNull)
 
-  @@id([userId, permission])
+  @@unique([userId, role])
+  @@index([userId])
+  @@index([role])
+}
+
+model UserPermission {
+  id         String     @id @default(cuid())
+  userId     String
+  permission Permission
+  grantedAt  DateTime   @default(now())
+  grantedBy  String?
+
+  user          User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedByUser User? @relation("UserPermissionGranter", fields: [grantedBy], references: [id], onDelete: SetNull)
+
+  @@unique([userId, permission])
   @@index([userId])
   @@index([permission])
 }
 
 model UserScholarRole {
-  userId          String
-  scholarId       String
-  role            ScholarRole
-  createdAt       DateTime    @default(now())
-  createdByUserId String?
+  id             String                @id @default(cuid())
+  userId         String
+  scholarId      String
+  permissionType ScholarPermissionType
+  createdAt      DateTime              @default(now())
+  createdBy      String?
 
-  user          User    @relation(fields: [userId], references: [id], onDelete: Restrict)
-  scholar       Scholar @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  createdByUser User?   @relation("createdByUser", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scholar       Scholar @relation(fields: [scholarId], references: [id], onDelete: Cascade)
+  createdByUser User?   @relation("createdByUser", fields: [createdBy], references: [id], onDelete: SetNull)
 
-  @@id([userId, scholarId, role])
-  @@index([scholarId, role], map: "idx_user_scholar_role_scholar_role")
+  @@unique([userId, scholarId, permissionType])
+  @@index([scholarId, permissionType], map: "idx_user_scholar_role_scholar_permission")
   @@index([userId], map: "idx_user_scholar_role_user")
+}
+
+model UserTranslatorRole {
+  id         String   @id @default(cuid())
+  userId     String
+  locale     Locale
+  canPublish Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  createdBy  String?
+
+  user          User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdByUser User? @relation("createdByUser", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@unique([userId, locale])
+  @@index([userId])
+  @@index([locale])
 }
 
 //////////////////////////
@@ -147,23 +219,24 @@ model UserScholarRole {
 //////////////////////////
 
 model Scholar {
-  id           String   @id @default(cuid())
+  id           String        @id @default(cuid())
   slug         String
   name         String
   bio          String?
-  country      String?
-  mainLanguage Locale?
+  country      String        @default("SA")
+  mainLanguage Locale        @default(ar)
   imageUrl     String?
-  isActive     Boolean  @default(true)
-  isKibar      Boolean  @default(false)
-  isFeatured   Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  imageKey     String?
+  isActive     Boolean       @default(true)
+  title        ScholarTitle?
+  orderIndex   Int           @default(999)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   // Decoupled audit columns
-  createdBy String? @db.Uuid
-  updatedBy String? @db.Uuid
-  deletedBy String? @db.Uuid
+  createdBy String?
+  updatedBy String?
+  deletedBy String?
 
   // Social links
   socialTwitter  String?
@@ -171,16 +244,13 @@ model Scholar {
   socialYoutube  String?
   socialWebsite  String?
 
-  ingestionBatchId String?
-  ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])
-
-  listings           Listing[]
-  userRoles          UserScholarRole[]
-  livestreamChannels LivestreamChannel[]
-  translations       ScholarTranslation[]
+  listings     Listing[]
+  userRoles    UserScholarRole[]
+  translations ScholarTranslation[]
 
   @@unique([slug], map: "uq_scholar_slug")
   @@index([isActive], map: "idx_scholar_active")
+  @@index([title, orderIndex], map: "idx_scholar_title_order")
 }
 
 //////////////////////////
@@ -196,6 +266,7 @@ model Listing {
   description              String?
   format                   ListingFormat
   coverImageUrl            String?
+  coverImageKey            String?
   language                 Locale?
   status                   Status        @default(draft)
   publishedAt              DateTime?
@@ -210,12 +281,9 @@ model Listing {
   deleteAfterAt DateTime?
 
   // Decoupled audit columns
-  createdBy String? @db.Uuid
-  updatedBy String? @db.Uuid
-  deletedBy String? @db.Uuid
-
-  ingestionBatchId String?
-  ingestionBatch   IngestionBatch? @relation("IngestBatchListings", fields: [ingestionBatchId], references: [id])
+  createdBy String?
+  updatedBy String?
+  deletedBy String?
 
   scholar              Scholar               @relation(fields: [scholarId], references: [id], onDelete: Restrict)
   parent               Listing?              @relation("ListingHierarchy", fields: [parentId, scholarId], references: [id, scholarId], onDelete: Restrict)
@@ -232,6 +300,7 @@ model Listing {
   @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
   @@index([parentId])
   @@index([scholarId, status])
+  @@index([scholarId, format])
   @@index([publishedAt])
   @@index([deletedAt])
   @@index([deleteAfterAt])
@@ -272,6 +341,7 @@ model AudioAsset {
   id              String   @id @default(cuid())
   listingId       String   @db.Uuid
   url             String
+  objectKey       String?
   format          String?
   bitrateKbps     Int?
   sizeBytes       BigInt?
@@ -279,9 +349,6 @@ model AudioAsset {
   source          String?
   isPrimary       Boolean  @default(false)
   createdAt       DateTime @default(now())
-
-  ingestionBatchId String?
-  ingestionBatch   IngestionBatch? @relation("IngestBatchAudioAssets", fields: [ingestionBatchId], references: [id])
 
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
@@ -293,19 +360,17 @@ model AudioAsset {
 //////////////////////////
 
 model Topic {
-  id        String   @id @default(cuid())
-  slug      String
-  name      String
-  parentId  String?
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  slug       String
+  name       String
+  orderIndex Int      @default(99)
+  createdAt  DateTime @default(now())
 
-  parent        Topic?             @relation("TopicToParent", fields: [parentId], references: [id], onDelete: Cascade)
-  children      Topic[]            @relation("TopicToParent")
   listingTopics ListingTopic[]
   translations  TopicTranslation[]
 
   @@unique([slug], map: "uq_topic_slug")
-  @@index([parentId], map: "idx_topic_parent")
+  @@index([orderIndex], map: "idx_topic_order")
 }
 
 model ListingTopic {
@@ -350,48 +415,6 @@ model FavoriteListing {
   @@id([userId, listingId])
   @@index([userId, createdAt], map: "idx_fav_user_createdat")
   @@index([listingId], map: "idx_fav_listing")
-}
-
-//////////////////////////
-// Livestreams
-//////////////////////////
-
-model LivestreamChannel {
-  id           String   @id @default(cuid())
-  scholarId    String?
-  telegramId   String   @unique
-  telegramSlug String?
-  displayName  String
-  language     Locale?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  scholar  Scholar?      @relation(fields: [scholarId], references: [id], onDelete: SetNull)
-  sessions LiveSession[]
-
-  @@index([isActive])
-  @@index([scholarId])
-}
-
-model LiveSession {
-  id            String            @id @default(cuid())
-  channelId     String
-  status        LiveSessionStatus @default(scheduled)
-  title         String?
-  scheduledAt   DateTime?
-  startedAt     DateTime?
-  endedAt       DateTime?
-  telegramMsgId String?
-  viewerCount   Int?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-
-  channel LivestreamChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
-
-  @@index([channelId, status])
-  @@index([status, scheduledAt])
-  @@index([status, startedAt])
 }
 
 //////////////////////////
@@ -471,13 +494,12 @@ model ListingTranslation {
 }
 
 model TopicTranslation {
-  id        String            @id @default(cuid())
+  id        String   @id @default(cuid())
   topicId   String
   locale    Locale
-  status    TranslationStatus @default(draft)
   name      String
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
 

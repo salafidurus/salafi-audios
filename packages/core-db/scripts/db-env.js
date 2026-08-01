@@ -1,6 +1,5 @@
 /**
  * Minimal DB env validation for migration scripts.
- * Mirrors the schema in packages/util-ingest/src/env.ts without the zod dependency.
  */
 
 /** @param {NodeJS.ProcessEnv} raw */

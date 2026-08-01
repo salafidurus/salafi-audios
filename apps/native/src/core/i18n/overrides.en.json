@@ -1,1 +1,68 @@
-{}
+{
+  "account": {
+    "actions": "Actions",
+    "profileDesc": "Manage your personal profile information.",
+    "saved": "Saved.",
+    "signInToAccess": "Sign in to access your profile",
+    "profile": {
+      "signInTitle": "Sign in to view your profile"
+    }
+  },
+  "admin": {
+    "manageAudios": "Manage audio content",
+    "manageSeries": "Manage scholars & series",
+    "scholarDetail": "Scholar Detail",
+    "listingEdit": {
+      "title": "Edit Listing",
+      "status": "Status",
+      "titleLabel": "Title",
+      "descriptionLabel": "Description",
+      "languageLabel": "Language"
+    },
+    "audioUploader": {
+      "title": "Upload Audio",
+      "assignScholar": "Assign to Scholar",
+      "selectFiles": "Select Audio Files",
+      "uploadAll": "Upload All"
+    },
+    "collectionEdit": {
+      "titleRequired": "Title is required",
+      "editTitle": "Edit Collection",
+      "newTitle": "New Collection",
+      "titleLabel": "Title *",
+      "descriptionLabel": "Description",
+      "languageLabel": "Language"
+    },
+    "seriesEdit": {
+      "titleRequired": "Title is required",
+      "editTitle": "Edit Series",
+      "newTitle": "New Series",
+      "titleLabel": "Title *",
+      "descriptionLabel": "Description",
+      "languageLabel": "Language"
+    }
+  },
+  "audio": {
+    "now_playing": "Now Playing"
+  },
+  "auth": {
+    "signIn": {
+      "continueWithGoogle": "Continue with Google"
+    }
+  },
+  "explore": {
+    "searchRecent": "Search recent audios..."
+  },
+  "navigation": {
+    "show_miniplayer": "Show mini player",
+    "show_subroutes": "Show section subroutes"
+  },
+  "scholarContent": {
+    "filterPlaceholder": "Filter content…",
+    "searchNoMatch": "No scholars match your search.",
+    "searchScholars": "Search scholars..."
+  },
+  "settings": {
+    "support": "Support"
+  }
+}

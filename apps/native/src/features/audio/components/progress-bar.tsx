@@ -1,8 +1,10 @@
+import type { GestureResponderEvent } from "react-native";
+
+import { useAudio } from "@sd/domain-audio";
 import React, { useRef } from "react";
 import { View, Pressable } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import type { GestureResponderEvent } from "react-native";
-import { useAudio } from "@sd/domain-audio";
+
 import { audioService } from "../audio-service";
 
 export function ProgressBar() {

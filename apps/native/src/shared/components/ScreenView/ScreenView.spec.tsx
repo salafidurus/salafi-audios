@@ -1,6 +1,7 @@
-import React from "react";
 import { render, screen } from "@testing-library/react-native";
+import React from "react";
 import { View } from "react-native";
+
 import { ScreenView } from "./ScreenView";
 
 jest.mock("react-native-safe-area-context", () => {

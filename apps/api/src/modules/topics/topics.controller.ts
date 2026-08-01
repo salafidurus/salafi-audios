@@ -1,9 +1,12 @@
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { Public } from '../../modules/auth/decorators';
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Public } from '../../core/auth/decorators';
+import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
-import type { TopicDetailDto, TopicViewDto, TopicLectureViewDto } from '@sd/core-contracts';
+import { CacheTTL } from '@nestjs/cache-manager';
+import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
+import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
+import type { TopicDetailDto, TopicLectureViewDto } from '@sd/core-contracts';
 import { TopicsService } from './topics.service';
 
 @SkipThrottle()
@@ -11,6 +14,8 @@ import { TopicsService } from './topics.service';
 @ApiCommonErrors()
 @Public()
 @Controller('topics')
+@UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor) // Cache control must wrap cache interceptor to capture cache hits
+@CacheTTL(10 * 60 * 1000) // 10 minutes cache (topics change infrequently)
 export class TopicsController {
   constructor(private readonly topics: TopicsService) {}
 
@@ -26,13 +31,6 @@ export class TopicsController {
   @ApiOkResponse({ description: 'Topic details' })
   getBySlug(@Param('slug') slug: string): Promise<TopicDetailDto> {
     return this.topics.getBySlug(slug);
-  }
-
-  @Get(':slug/children')
-  @ApiOperation({ summary: 'List direct children of a topic' })
-  @ApiOkResponse({ description: 'List of child topics' })
-  listChildren(@Param('slug') slug: string): Promise<TopicViewDto[]> {
-    return this.topics.listChildren(slug);
   }
 
   @Get(':slug/lectures')

@@ -5,3 +5,6 @@ export {
   LibraryCompletedScreen,
   type LibraryCompletedScreenProps,
 } from "./screens/library-completed.screen";
+
+// Components
+export { LibraryItemRow } from "./components/library-item-row/library-item-row";

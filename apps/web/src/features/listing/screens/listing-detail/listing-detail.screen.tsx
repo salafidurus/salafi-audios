@@ -1,32 +1,160 @@
 "use client";
 
-import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
-import type { ListingViewDto } from "@sd/core-contracts";
-import { LectureDetailScreen } from "@/features/lecture/screens/lecture-detail/lecture-detail.screen";
-import { ScreenInProgressResponsive } from "@/shared/components/ScreenInProgress/ScreenInProgress";
+import { useListingDetail, useListingContents } from "@sd/domain-content";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 
-export function ListingDetailScreen({ id }: { id: string }) {
-  const { data, isFetching } = useApiQuery<ListingViewDto>(
-    queryKeys.listings.detail(id),
-    () =>
-      httpClient<ListingViewDto>({
-        url: endpoints.listings.detail(id),
-        method: "GET",
-      }),
-    { enabled: !!id },
+import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { Search } from "@/shared/components/Search";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
+
+import { CollectionContentLayout } from "../../components/listing/CollectionContentLayout/CollectionContentLayout";
+import { ContentList } from "../../components/listing/ContentList/ContentList";
+import { MetaDataSection } from "../../components/listing/MetaDataSection/MetaDataSection";
+import { QuickButtonSection } from "../../components/listing/QuickButtonSection/QuickButtonSection";
+import { SeriesContextBar } from "../../components/listing/series-context-bar/series-context-bar";
+import styles from "./listing-detail.screen.module.css";
+
+export type ListingDetailScreenProps = {
+  slug: string;
+};
+
+export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
+  const { t } = useTranslation();
+  const formatScholarName = useFormatScholarName();
+  const [searchQuery, setSearchQuery] = useState("");
+  const headerContentRef = useRef<HTMLDivElement>(null);
+
+  const { data: listing, isFetching: isFetchingDetail } = useListingDetail(slug);
+  const { data: contents, isFetching: isFetchingContents } = useListingContents(listing?.id ?? "");
+
+  // Measure sticky header height dynamically (including outer padding) for scroll margin and TOC offset
+  useEffect(() => {
+    const el = headerContentRef.current;
+    if (!el) return;
+
+    const updateHeight = () => {
+      const stickyHeaderEl = el.closest('[class*="stickyHeader"]') as HTMLElement | null;
+      const height = stickyHeaderEl
+        ? stickyHeaderEl.getBoundingClientRect().height
+        : el.getBoundingClientRect().height + 32;
+      document.documentElement.style.setProperty("--sticky-header-height", `${height}px`);
+    };
+
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, [listing, contents]);
+
+  const isMultiItem = listing?.format === "series" || listing?.format === "collection";
+  const query = searchQuery.trim().toLowerCase();
+
+  // Filter items for search
+  const filteredSingleOrSeriesItems = useMemo(() => {
+    if (!contents || (contents.format !== "single" && contents.format !== "series")) return [];
+    if (!query) return contents.items;
+    return contents.items.filter((item) => item.title.toLowerCase().includes(query));
+  }, [contents, query]);
+
+  const filteredModules = useMemo(() => {
+    if (!contents || contents.format !== "collection") return [];
+    if (!query) return contents.modules;
+
+    const result: typeof contents.modules = [];
+    for (const m of contents.modules) {
+      const matchingLessons = m.lessons.filter(
+        (l) => l.title.toLowerCase().includes(query) || m.title.toLowerCase().includes(query),
+      );
+      if (matchingLessons.length > 0) {
+        result.push({ ...m, lessons: matchingLessons });
+      }
+    }
+    return result;
+  }, [contents, query]);
+
+  if (isFetchingDetail) {
+    return (
+      <ScreenView center>
+        <AppText variant="bodyMd">{t("lecture.loading", "Loading content…")}</AppText>
+      </ScreenView>
+    );
+  }
+
+  if (!listing) {
+    return (
+      <ScreenView center>
+        <AppText variant="titleMd">{t("lecture.notFound", "Content not found")}</AppText>
+      </ScreenView>
+    );
+  }
+
+  return (
+    <ScreenView>
+      <StickyHeaderLayout>
+        <StickyHeaderLayout.Header>
+          <div ref={headerContentRef}>
+            <div className={styles.headerTopRow}>
+              <MetaDataSection listing={listing} />
+              <QuickButtonSection listing={listing} contents={contents} />
+            </div>
+
+            {isMultiItem && (
+              <div className={styles.searchWrapper}>
+                <Search.Bar
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  placeholder={t("listing.searchPlaceholder", "Search lessons…")}
+                />
+              </div>
+            )}
+          </div>
+        </StickyHeaderLayout.Header>
+
+        <StickyHeaderLayout.Content>
+          <div className={styles.contentWrapper}>
+            {isFetchingContents && !contents && (
+              <AppText variant="bodySm">{t("lecture.loading", "Loading lessons…")}</AppText>
+            )}
+
+            {contents?.format === "single" && (
+              <ContentList
+                items={filteredSingleOrSeriesItems}
+                format="single"
+                scholarName={formatScholarName(listing.scholar)}
+                scholarSlug={listing.scholar.slug}
+              />
+            )}
+
+            {contents?.format === "series" && (
+              <ContentList
+                items={filteredSingleOrSeriesItems}
+                format="series"
+                scholarName={formatScholarName(listing.scholar)}
+                scholarSlug={listing.scholar.slug}
+                seriesId={listing.id}
+                seriesTitle={listing.title}
+              />
+            )}
+
+            {contents?.format === "collection" && (
+              <CollectionContentLayout
+                modules={filteredModules}
+                scholarName={formatScholarName(listing.scholar)}
+                scholarSlug={listing.scholar.slug}
+                collectionId={listing.id}
+              />
+            )}
+
+            {listing.seriesContext && (
+              <SeriesContextBar seriesContext={listing.seriesContext} lectureId={listing.id} />
+            )}
+          </div>
+        </StickyHeaderLayout.Content>
+      </StickyHeaderLayout>
+    </ScreenView>
   );
-
-  if (isFetching) {
-    return <div style={{ textAlign: "center", padding: "2rem" }}>Loading…</div>;
-  }
-
-  if (!data) {
-    return <div style={{ textAlign: "center", padding: "2rem" }}>Content not found.</div>;
-  }
-
-  if (data.format === "single") {
-    return <LectureDetailScreen id={data.id} />;
-  }
-
-  return <ScreenInProgressResponsive />;
 }

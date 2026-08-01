@@ -1,5 +1,6 @@
-import { routes, routeDefinitions, resolveRouteAccess } from "./routes";
 import type { RouteAccess } from "./routes";
+
+import { routes, routeDefinitions, resolveRouteAccess } from "./routes";
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -91,9 +92,9 @@ describe("routeDefinitions – validity", () => {
 
 describe("resolveRouteAccess", () => {
   it("matches the longest prefix, not a parent rule", () => {
-    expect(resolveRouteAccess("/feed/following")).toBe("auth-required");
-    expect(resolveRouteAccess("/feed")).toBe("public");
-    expect(resolveRouteAccess("/feed/recent")).toBe("public");
+    expect(resolveRouteAccess("/admin/users")).toBe("auth-required");
+    expect(resolveRouteAccess("/admin")).toBe("auth-required");
+    expect(resolveRouteAccess("/explore/scholar")).toBe("public");
   });
 
   it("normalizes a trailing slash", () => {
@@ -103,7 +104,6 @@ describe("resolveRouteAccess", () => {
 
   it("matches nested sub-paths via prefix", () => {
     expect(resolveRouteAccess("/settings/profile/edit")).toBe("auth-optional");
-    expect(resolveRouteAccess("/live/session-123")).toBe("public");
     expect(resolveRouteAccess("/library/saved")).toBe("auth-optional");
     expect(resolveRouteAccess("/admin/users")).toBe("auth-required");
   });
@@ -126,9 +126,9 @@ describe("resolveRouteAccess", () => {
     expect(resolveRouteAccess("/search")).toBe("public");
   });
 
-  it("gates the newly protected leaves", () => {
-    expect(resolveRouteAccess("/feed/following")).toBe("auth-required");
-    expect(resolveRouteAccess("/admin")).toBe("auth-required");
+  it("gates auth-required paths", () => {
+    expect(resolveRouteAccess("/admin/dashboard")).toBe("auth-required");
+    expect(resolveRouteAccess("/admin/scholars")).toBe("auth-required");
   });
 
   it("/settings/profile is auth-optional — shows AuthRequiredState, does not redirect", () => {

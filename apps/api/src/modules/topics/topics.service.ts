@@ -1,17 +1,24 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import {
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
+import type {
   TopicDetailDto,
-  TopicViewDto,
   TopicLectureViewDto,
   TranslationViewDto,
+  AdminTopicDetailDto,
+  CreateTopicWithTranslationsDto,
+  UpdateTopicWithTranslationsDto,
 } from '@sd/core-contracts';
-import { UpsertTopicDto } from './dto/upsert-topic.dto';
+import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { TopicsRepository } from './topics.repo';
 
 @Injectable()
 export class TopicsService {
-  constructor(private readonly repo: TopicsRepository) {}
+  constructor(
+    private readonly repo: TopicsRepository,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   list(): Promise<TopicDetailDto[]> {
     return this.repo.list();
@@ -21,20 +28,6 @@ export class TopicsService {
     const found = await this.repo.findBySlug(slug);
     if (!found) throw new NotFoundException(`Topic "${slug}" not found`);
     return found;
-  }
-
-  async upsert(dto: UpsertTopicDto): Promise<TopicDetailDto> {
-    const result = await this.repo.upsertBySlug(dto);
-    if (!result && dto.parentSlug) {
-      throw new NotFoundException(`Parent topic "${dto.parentSlug}" not found`);
-    }
-    return result ?? (await this.getBySlug(dto.slug)); // safe fallback if upsert somehow returns null without parentSlug
-  }
-
-  async listChildren(slug: string): Promise<TopicViewDto[]> {
-    const result = await this.repo.listChildrenBySlug(slug);
-    if (result === null) throw new NotFoundException('Topic not found');
-    return result;
   }
 
   async listLectures(slug: string, limit?: number): Promise<TopicLectureViewDto[]> {
@@ -47,31 +40,95 @@ export class TopicsService {
     const found = await this.repo.findBySlug(slug);
     if (!found) throw new NotFoundException(`Topic "${slug}" not found`);
     await this.repo.deleteBySlug(slug);
+    await this.invalidateCache(slug);
   }
 
-  // ─── Topic translations ───────────────────────────────────────────────────
+  private async invalidateCache(slug?: string): Promise<void> {
+    // LocaleCacheInterceptor uses format: ${url}:${locale}[:${userId}]
+    const cacheKeysToInvalidate: string[] = [];
+
+    // Invalidate list cache
+    for (const locale of SUPPORTED_LOCALES) {
+      cacheKeysToInvalidate.push(`/topics:${locale}`);
+    }
+
+    // Also invalidate detail caches when a specific slug is provided
+    if (slug) {
+      for (const locale of SUPPORTED_LOCALES) {
+        cacheKeysToInvalidate.push(`/topics/${slug}:${locale}`);
+      }
+    }
+
+    await Promise.all(cacheKeysToInvalidate.map((key) => this.cacheManager.del(key)));
+  }
+
+  // ─── New admin combined methods ─────────────────────────────────────────
+
+  async getAdminDetail(slug: string): Promise<AdminTopicDetailDto> {
+    const found = await this.repo.findBySlug(slug);
+    if (!found) throw new NotFoundException(`Topic "${slug}" not found`);
+    const translations = await this.repo.listTopicTranslations(found.id);
+    return { ...found, translations };
+  }
+
+  async createWithTranslations(dto: CreateTopicWithTranslationsDto): Promise<AdminTopicDetailDto> {
+    const result = await this.upsertMainFields(dto.slug, {
+      name: dto.name,
+      orderIndex: dto.orderIndex,
+    });
+    await this.invalidateCache(result.slug);
+    return result;
+  }
+
+  async updateWithTranslations(
+    slug: string,
+    dto: UpdateTopicWithTranslationsDto,
+  ): Promise<AdminTopicDetailDto> {
+    const result = await this.upsertMainFields(slug, {
+      name: dto.name,
+      orderIndex: dto.orderIndex,
+    });
+    await this.invalidateCache(slug);
+    return result;
+  }
+
+  private async upsertMainFields(
+    slug: string,
+    data: { name: { ar: string }; orderIndex?: number },
+  ): Promise<AdminTopicDetailDto> {
+    const topic = await this.repo.upsertBySlug({
+      slug,
+      name: data.name.ar,
+      orderIndex: data.orderIndex,
+    });
+
+    return this.getAdminDetail(topic.slug);
+  }
+
+  // ─── Topic translations (separate endpoints) ───────────────────────────
 
   listTranslations(topicId: string): Promise<TranslationViewDto[]> {
     return this.repo.listTopicTranslations(topicId);
   }
 
-  upsertTranslation(topicId: string, dto: SaveTopicTranslationDto): Promise<TranslationViewDto> {
-    return this.repo.upsertTopicTranslation(topicId, dto);
+  async upsertTranslation(
+    topicId: string,
+    dto: SaveTopicTranslationDto,
+  ): Promise<TranslationViewDto> {
+    const result = await this.repo.upsertTopicTranslation(topicId, dto);
+    // Invalidate both list and detail caches for all locales
+    await this.invalidateCache();
+    return result;
   }
 
-  updateTranslation(
+  async updateTranslation(
     topicId: string,
     locale: string,
     fields: Partial<{ name: string }>,
   ): Promise<TranslationViewDto> {
-    return this.repo.updateTopicTranslation(topicId, locale, fields);
-  }
-
-  publishTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
-    return this.repo.publishTopicTranslation(topicId, locale);
-  }
-
-  unpublishTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
-    return this.repo.unpublishTopicTranslation(topicId, locale);
+    const result = await this.repo.updateTopicTranslation(topicId, locale, fields);
+    // Invalidate both list and detail caches for all locales
+    await this.invalidateCache();
+    return result;
   }
 }

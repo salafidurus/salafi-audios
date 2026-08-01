@@ -8,11 +8,12 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "lint": "oxlint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:cov": "vitest run --coverage",
-    "test:prepush": "vitest run --changed=origin/main"
+    "test": "bun test --isolate",
+    "test:watch": "bun test --watch",
+    "test:cov": "bun test --coverage",
+    "test:prepush": "bun test --isolate"
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",

@@ -2,11 +2,12 @@ import { z } from "zod";
 
 export const UserProfileDtoSchema = z.object({
   id: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   displayName: z.string(),
   avatarUrl: z.string().optional(),
-  role: z.string(),
   emailVerified: z.boolean(),
+  roles: z.array(z.string()),
+  permissions: z.array(z.string()).default([]),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

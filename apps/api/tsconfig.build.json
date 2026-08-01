@@ -1,16 +1,13 @@
 {
-  // Build config — drives NestJS CLI compilation and produces the dist/ output.
-  "extends": "../../tsconfig.nest.json",
+  // Typecheck config — API runs from .ts source via Bun (no build output needed).
+  "extends": ["../../tsconfig.nest.json", "../../tsconfig.strict.json"],
   "compilerOptions": {
-    "declaration": false,
-    "types": ["node", "bun-types"],
-    "removeComments": true,
-    "sourceMap": true,
-    "outDir": "./dist",
-    "incremental": true,
+    "types": ["bun-types", "node"],
     "noFallthroughCasesInSwitch": true,
-    "noEmit": false
+    "noEmit": true,
+    // Bun can import .ts files directly
+    "allowImportingTsExtensions": true
   },
-  "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"],
-  "include": ["src/**/*.ts"]
+  "exclude": ["node_modules", "dist", "**/*.spec.ts"],
+  "include": ["src/**/*.ts", "test/**/*.ts"]
 }

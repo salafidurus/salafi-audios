@@ -1,0 +1,158 @@
+.row {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-md);
+  width: 100%;
+}
+
+.avatarSection {
+  position: relative;
+  width: 20%;
+  flex-shrink: 0;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-component-panel-sm);
+  background: var(--surface-subtle);
+}
+
+@media (min-width: 640px) {
+  .avatarSection {
+    width: 14%;
+  }
+}
+
+.avatarImage {
+  object-fit: cover;
+}
+
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-component-panel-sm);
+  background-color: var(--surface-primary-subtle);
+  color: var(--content-primary-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-lg-font-size);
+  font-weight: 600;
+}
+
+.centerSection {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+}
+
+.title {
+  font-family: var(--typo-title-md-font-family);
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
+  line-height: var(--typo-title-md-line-height);
+  letter-spacing: var(--typo-title-md-letter-spacing);
+  color: var(--content-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scholarName {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: var(--typo-body-sm-font-weight);
+  line-height: var(--typo-body-sm-line-height);
+  color: var(--content-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  font-weight: var(--typo-caption-font-weight);
+  line-height: var(--typo-caption-line-height);
+  color: var(--content-muted);
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-scale-full);
+  border: 1px solid var(--border-default);
+  background-color: var(--surface-default);
+  color: var(--content-default);
+  cursor: pointer;
+  transition: all 150ms ease;
+  gap: 0;
+}
+
+.actionButton:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border-hover);
+  color: var(--content-strong);
+}
+
+.actionButton:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Mobile: outline variant with label — full width, pill shape */
+.actionButtonMobile {
+  width: 100%;
+  height: auto;
+  border-radius: 999px;
+  padding: 0.52rem 0.82rem;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.actionLabel {
+  white-space: nowrap;
+}
+
+.playButton.playing {
+  background-color: var(--action-primary);
+  border-color: var(--action-primary);
+  color: var(--content-on-primary);
+}
+
+.playButton.playing:hover {
+  opacity: 0.9;
+}
+
+.saveButton.saved {
+  color: var(--content-primary);
+  border-color: var(--border-primary);
+}
+
+.progressBarContainer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--surface-subtle);
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background-color: var(--action-primary);
+  transition: width 200ms ease;
+}
