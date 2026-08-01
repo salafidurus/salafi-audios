@@ -116,7 +116,7 @@ async function bootstrap() {
   });
   await app.startAllMicroservices();
 
-  await app.listen(config.PORT);
+  await app.listen(config.PORT, '0.0.0.0');
 }
 
 void bootstrap();
