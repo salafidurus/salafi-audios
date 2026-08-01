@@ -1,5 +1,5 @@
 import { useProgressStore } from "@sd/domain-audio";
-import { useLibrarySavedScreen } from "@sd/domain-content";
+import { useLibrarySavedScreen, useToggleSaved } from "@sd/domain-content";
 import { useCallback } from "react";
 import { ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -18,7 +18,9 @@ export type LibrarySavedScreenProps = {
 export function LibrarySavedScreen({ onNavigateToListing }: LibrarySavedScreenProps) {
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useLibrarySavedScreen(isAuthenticated);
+  const addSaved = useProgressStore((s) => s.actions.addSaved);
   const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+  const toggleSaved = useToggleSaved();
   const { t } = useTranslation();
 
   const handleItemPress = useCallback(
@@ -26,6 +28,17 @@ export function LibrarySavedScreen({ onNavigateToListing }: LibrarySavedScreenPr
       onNavigateToListing?.(slug);
     },
     [onNavigateToListing],
+  );
+
+  const handleRemove = useCallback(
+    (listingId: string, listingSlug: string) => {
+      removeSaved(listingId);
+      toggleSaved.mutate(
+        { listingId: listingSlug, saved: false },
+        { onError: () => addSaved(listingId) },
+      );
+    },
+    [removeSaved, addSaved, toggleSaved],
   );
 
   if (isFetching && items.length === 0) {
@@ -69,7 +82,7 @@ export function LibrarySavedScreen({ onNavigateToListing }: LibrarySavedScreenPr
                   attributes: { destructive: true },
                 },
               ]}
-              onAction={() => removeSaved(item.listingId)}
+              onAction={() => handleRemove(item.listingId, item.listingSlug)}
             />
           ))}
         </List>

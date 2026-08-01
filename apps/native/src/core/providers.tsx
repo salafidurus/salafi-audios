@@ -4,7 +4,7 @@ import {
   setLocaleProvider,
   setUnauthorizedHandler,
 } from "@sd/core-api";
-import { routes, shouldPersistQuery, DEFAULT_MAX_AGE } from "@sd/core-contracts";
+import { routes, shouldPersistQuery, queryKeys, DEFAULT_MAX_AGE } from "@sd/core-contracts";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { useFonts } from "expo-font";
 import { type Href, useRouter } from "expo-router";
@@ -112,7 +112,11 @@ export function Providers({ children }: Props) {
   // configureApiClient() has been called, and effects fire in declaration order.
   useEffect(() => {
     if (!isAuthenticated || !user?.id) return;
-    return initProgressPersistence(user.id);
+    return initProgressPersistence(user.id, {
+      onFlushed: () => {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.library.all });
+      },
+    });
   }, [isAuthenticated, user?.id]);
 
   useEffect(() => {

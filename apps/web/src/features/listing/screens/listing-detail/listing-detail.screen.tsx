@@ -15,6 +15,7 @@ import { ContentList } from "../../components/listing/ContentList/ContentList";
 import { MetaDataSection } from "../../components/listing/MetaDataSection/MetaDataSection";
 import { QuickButtonSection } from "../../components/listing/QuickButtonSection/QuickButtonSection";
 import { SeriesContextBar } from "../../components/listing/series-context-bar/series-context-bar";
+import { contentItemAnchorId } from "../../utils/content-item-anchor-id";
 import styles from "./listing-detail.screen.module.css";
 
 export type ListingDetailScreenProps = {
@@ -25,10 +26,25 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const { t } = useTranslation();
   const formatScholarName = useFormatScholarName();
   const [searchQuery, setSearchQuery] = useState("");
+  const [highlightItemId, setHighlightItemId] = useState<string | undefined>(undefined);
   const headerContentRef = useRef<HTMLDivElement>(null);
 
   const { data: listing, isFetching: isFetchingDetail } = useListingDetail(slug);
-  const { data: contents, isFetching: isFetchingContents } = useListingContents(listing?.id ?? "");
+  const { data: contents, isFetching: isFetchingContents } = useListingContents(
+    listing?.slug ?? "",
+  );
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) setHighlightItemId(hash.slice(1));
+  }, []);
+
+  useEffect(() => {
+    if (!highlightItemId || !contents) return;
+    document
+      .getElementById(contentItemAnchorId(highlightItemId))
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [highlightItemId, contents]);
 
   // Measure sticky header height dynamically (including outer padding) for scroll margin and TOC offset
   useEffect(() => {
@@ -92,6 +108,18 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
     );
   }
 
+  if (listing.rootListing) {
+    // The server-rendered page redirects a nested Lesson/Module's own slug to
+    // its top-level listing (see app/.../listings/[slug]/page.tsx) before this
+    // ever mounts. This guards against rendering the wrong content in the
+    // rare case a client-side cache serves stale data past that redirect.
+    return (
+      <ScreenView center>
+        <AppText variant="bodyMd">{t("lecture.loading", "Loading content…")}</AppText>
+      </ScreenView>
+    );
+  }
+
   return (
     <ScreenView>
       <StickyHeaderLayout>
@@ -137,6 +165,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
                 scholarSlug={listing.scholar.slug}
                 seriesId={listing.id}
                 seriesTitle={listing.title}
+                highlightItemId={highlightItemId}
               />
             )}
 
@@ -146,6 +175,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
                 scholarName={formatScholarName(listing.scholar)}
                 scholarSlug={listing.scholar.slug}
                 collectionId={listing.id}
+                highlightItemId={highlightItemId}
               />
             )}
 

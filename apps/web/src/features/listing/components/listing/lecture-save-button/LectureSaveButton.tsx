@@ -1,6 +1,7 @@
 "use client";
 
 import { useProgressStore } from "@sd/domain-audio";
+import { useToggleSaved } from "@sd/domain-content";
 import React, { useState } from "react";
 
 import { useAuth } from "@/core/auth";
@@ -11,14 +12,17 @@ import styles from "./LectureSaveButton.module.css";
 
 export type LectureSaveButtonProps = {
   lectureId: string;
+  /** Preferred over `lectureId` for the API call — reads far better in server logs/traces. */
+  lectureSlug?: string;
 };
 
-export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
+export function LectureSaveButton({ lectureId, lectureSlug }: LectureSaveButtonProps) {
   const { isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const isSaved = useProgressStore((s) => s.actions.isSaved(lectureId));
   const addSaved = useProgressStore((s) => s.actions.addSaved);
   const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+  const toggleSaved = useToggleSaved();
 
   const handleClick = () => {
     if (!isAuthenticated) {
@@ -26,11 +30,27 @@ export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
       return;
     }
 
-    if (isSaved) {
-      removeSaved(lectureId);
-    } else {
+    const nextSaved = !isSaved;
+    // Optimistic local update for instant button state; rolled back if the server call fails.
+    // Keyed by the stable uuid id (matches how saved state is hydrated from the server).
+    if (nextSaved) {
       addSaved(lectureId);
+    } else {
+      removeSaved(lectureId);
     }
+
+    toggleSaved.mutate(
+      { listingId: lectureSlug ?? lectureId, saved: nextSaved },
+      {
+        onError: () => {
+          if (nextSaved) {
+            removeSaved(lectureId);
+          } else {
+            addSaved(lectureId);
+          }
+        },
+      },
+    );
   };
 
   return (

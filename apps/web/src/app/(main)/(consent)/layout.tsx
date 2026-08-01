@@ -7,12 +7,10 @@ import { Sidebar } from "@/features/navigation/components/sidebar/sidebar";
 import { TopSubnavTabs } from "@/features/navigation/components/top-subnav-tabs/top-subnav-tabs";
 
 export default function ConsentLayout({ children }: { children: React.ReactNode }) {
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
-
   return (
     <>
       <CookieConsentGate />
-      <AnalyticsScripts apiBaseUrl={apiBaseUrl} />
+      <AnalyticsScripts />
       <div className="appFrame">
         <div className="appConsentShell">
           <Sidebar />

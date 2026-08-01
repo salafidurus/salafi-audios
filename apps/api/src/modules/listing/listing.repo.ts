@@ -39,11 +39,10 @@ export class ListingRepository {
 
   async findDetailById(id: string): Promise<ListingDetailDto | null> {
     const locale = getRequestLocale();
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
     const listing = await this.prisma.listing.findFirst({
       where: {
-        ...(isUuid ? { id } : { slug: id }),
+        slug: id,
         deletedAt: null,
         status: Status.published,
         scholar: { isActive: true },
@@ -109,7 +108,7 @@ export class ListingRepository {
 
     if (!listing) return null;
 
-    const seriesContext = await this.resolveSeriesContext(listing.parentId, locale);
+    const { seriesContext, rootListing } = await this.resolveAncestry(listing.parentId, locale);
     const primaryAudio = listing.audioAssets[0] ?? null;
 
     const resolved = resolveContentTranslation({
@@ -163,28 +162,81 @@ export class ListingRepository {
           }
         : null,
       seriesContext,
+      rootListing,
     };
   }
 
+  private resolveTranslatedTitle(
+    item: {
+      title: string;
+      language: Locale | null;
+      translations: { title: string }[];
+    },
+    locale: Locale,
+  ): string {
+    return resolveContentTranslation({
+      base: { title: item.title },
+      originalLanguage: item.language,
+      targetLocale: locale,
+      publishedTranslation: item.translations[0] ?? null,
+    }).fields.title;
+  }
+
   /**
-   * Resolves which Series/Module this listing is nested under, for breadcrumb-style
-   * display. Prev/next lecture navigation is not resolved here — it only ever knew
-   * about direct siblings, so it silently failed to cross Module boundaries inside a
-   * Collection. Real prev/next playback navigation is derived client-side from the
-   * full ordered play queue (built from `findContentsById`) instead.
+   * Resolves both the immediate Series/Module a listing is nested under (for
+   * breadcrumb display) and its ultimate top-level Listing ancestor (for
+   * redirecting a Lesson/Module's own slug to the top-level page it belongs
+   * under — slugs are flat, so a nested item's slug never encodes its
+   * parent). Listing nesting is capped at 3 levels (Collection -> Module ->
+   * Lesson), so at most one extra hop past the immediate parent is needed.
+   * Prev/next lecture navigation is not resolved here — it only ever knew
+   * about direct siblings, so it silently failed to cross Module boundaries
+   * inside a Collection. Real prev/next playback navigation is derived
+   * client-side from the full ordered play queue (built from
+   * `findContentsById`) instead.
    */
-  private async resolveSeriesContext(
+  private async resolveAncestry(
     parentId: string | null,
     locale: Locale,
-  ): Promise<ListingDetailDto['seriesContext']> {
-    if (!parentId) return null;
+  ): Promise<{
+    seriesContext: ListingDetailDto['seriesContext'];
+    rootListing: ListingDetailDto['rootListing'];
+  }> {
+    if (!parentId) return { seriesContext: null, rootListing: null };
 
-    const parentSeries = await this.prisma.listing.findFirst({
-      where: {
-        id: parentId,
-        deletedAt: null,
-        status: Status.published,
+    const parent = await this.prisma.listing.findFirst({
+      where: { id: parentId, deletedAt: null, status: Status.published },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        language: true,
+        parentId: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
       },
+    });
+
+    if (!parent) return { seriesContext: null, rootListing: null };
+
+    const seriesContext = {
+      seriesId: parent.id,
+      seriesTitle: this.resolveTranslatedTitle(parent, locale),
+      seriesSlug: parent.slug,
+    };
+
+    if (!parent.parentId) {
+      return {
+        seriesContext,
+        rootListing: { id: parent.id, slug: parent.slug, title: seriesContext.seriesTitle },
+      };
+    }
+
+    const grandparent = await this.prisma.listing.findFirst({
+      where: { id: parent.parentId, deletedAt: null, status: Status.published },
       select: {
         id: true,
         slug: true,
@@ -198,34 +250,24 @@ export class ListingRepository {
       },
     });
 
-    if (!parentSeries) return null;
-
-    const titleOf = (item: {
-      title: string;
-      language: Locale | null;
-      translations: { title: string }[];
-    }): string =>
-      resolveContentTranslation({
-        base: { title: item.title },
-        originalLanguage: item.language,
-        targetLocale: locale,
-        publishedTranslation: item.translations[0] ?? null,
-      }).fields.title;
+    if (!grandparent) return { seriesContext, rootListing: null };
 
     return {
-      seriesId: parentSeries.id,
-      seriesTitle: titleOf(parentSeries),
-      seriesSlug: parentSeries.slug,
+      seriesContext,
+      rootListing: {
+        id: grandparent.id,
+        slug: grandparent.slug,
+        title: this.resolveTranslatedTitle(grandparent, locale),
+      },
     };
   }
 
   async findContentsById(id: string): Promise<ListingContentsDto | null> {
     const locale = getRequestLocale();
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
     const listing = await this.prisma.listing.findFirst({
       where: {
-        ...(isUuid ? { id } : { slug: id }),
+        slug: id,
         deletedAt: null,
         status: Status.published,
         scholar: { isActive: true },
@@ -414,11 +456,9 @@ export class ListingRepository {
   }
 
   async findLastPlayedLesson(id: string, userId: string): Promise<LastPlayedLessonDto | null> {
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
     const targetListing = await this.prisma.listing.findFirst({
       where: {
-        ...(isUuid ? { id } : { slug: id }),
+        slug: id,
         deletedAt: null,
       },
       select: { id: true },
@@ -463,31 +503,54 @@ export class ListingRepository {
    * Computed on demand from `UserListingProgress` — not separately stored, so it
    * always reflects the current set of published children.
    */
-  async getProgressSummary(id: string, userId: string): Promise<ListingProgressSummaryDto | null> {
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
+  /** Public/HTTP path — client always supplies the slug. */
+  async getProgressSummary(
+    slug: string,
+    userId: string,
+  ): Promise<ListingProgressSummaryDto | null> {
     const listing = await this.prisma.listing.findFirst({
-      where: {
-        ...(isUuid ? { id } : { slug: id }),
-        deletedAt: null,
-      },
+      where: { slug, deletedAt: null },
       select: { id: true, format: true },
     });
-
     if (!listing) return null;
 
-    const actualId = listing.id;
+    return this.computeProgressSummary(listing.id, listing.format, userId);
+  }
 
-    if (listing.format === 'single') {
+  /**
+   * For callers that already hold a resolved Listing uuid — e.g.
+   * LibraryRepository's rollup, which derives a top-level ancestor id by
+   * walking `parentId` chains on raw progress rows, never a client-supplied
+   * slug. Skips the slug lookup `getProgressSummary` does above.
+   */
+  async getProgressSummaryByListingId(
+    id: string,
+    userId: string,
+  ): Promise<ListingProgressSummaryDto | null> {
+    const listing = await this.prisma.listing.findFirst({
+      where: { id, deletedAt: null },
+      select: { id: true, format: true },
+    });
+    if (!listing) return null;
+
+    return this.computeProgressSummary(listing.id, listing.format, userId);
+  }
+
+  private async computeProgressSummary(
+    actualId: string,
+    format: ListingProgressSummaryDto['format'],
+    userId: string,
+  ): Promise<ListingProgressSummaryDto> {
+    if (format === 'single') {
       const progress = await this.prisma.userListingProgress.findUnique({
         where: { userId_listingId: { userId, listingId: actualId } },
         select: { isCompleted: true },
       });
-      return this.toProgressSummary(actualId, listing.format, 1, progress?.isCompleted ? 1 : 0);
+      return this.toProgressSummary(actualId, format, 1, progress?.isCompleted ? 1 : 0);
     }
 
     const [row] =
-      listing.format === 'series'
+      format === 'series'
         ? await this.prisma.$queryRaw<{ total: number; completed: number }[]>`
             SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
             FROM "Listing" l
@@ -508,7 +571,7 @@ export class ListingRepository {
               AND m."status" = 'published'
           `;
 
-    return this.toProgressSummary(actualId, listing.format, row?.total ?? 0, row?.completed ?? 0);
+    return this.toProgressSummary(actualId, format, row?.total ?? 0, row?.completed ?? 0);
   }
 
   private toProgressSummary(
@@ -527,11 +590,12 @@ export class ListingRepository {
     };
   }
 
-  async findRelated(listingId: string, limit = 6): Promise<RelatedListingDto[]> {
+  async findRelated(id: string, limit = 6): Promise<RelatedListingDto[]> {
     const locale = getRequestLocale();
     const listing = await this.prisma.listing.findFirst({
-      where: { id: listingId, deletedAt: null },
+      where: { slug: id, deletedAt: null },
       select: {
+        id: true,
         scholarId: true,
         parentId: true,
         topics: {
@@ -547,7 +611,7 @@ export class ListingRepository {
     const related = await this.prisma.listing.findMany({
       where: {
         AND: [
-          { id: { not: listingId } },
+          { id: { not: listing.id } },
           { deletedAt: null },
           { status: Status.published },
           { scholar: { isActive: true } },

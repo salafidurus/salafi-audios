@@ -3,6 +3,7 @@
 import type { LibraryItemDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
+import { getLibraryItemPercent } from "@sd/domain-content";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -29,10 +30,7 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
   const title = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
   const initial = scholarName ? scholarName.trim().charAt(0).toUpperCase() : "?";
 
-  const progress =
-    item.durationSeconds && item.progressSeconds
-      ? Math.round((item.progressSeconds / item.durationSeconds) * 100)
-      : null;
+  const progress = getLibraryItemPercent(item);
 
   const savedAtFormatted = useFormattedDate(item.savedAt || "", {
     year: "numeric",

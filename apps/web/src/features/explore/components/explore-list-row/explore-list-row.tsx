@@ -4,6 +4,7 @@ import type { FeedContentItemDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
 import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
+import { useToggleSaved } from "@sd/domain-content";
 import { Play, Pause, Bookmark } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -36,6 +37,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const isSaved = useProgressStore((s) => s.actions.isSaved(item.id));
   const addSaved = useProgressStore((s) => s.actions.addSaved);
   const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+  const toggleSaved = useToggleSaved();
 
   const progress = useProgressStore((s) => s.progressMap[item.id]);
   const isInProgress = progress && progress.positionSeconds > 0 && !progress.completedAt;
@@ -72,11 +74,25 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isSaved) {
-      removeSaved(item.id);
-    } else {
+    const nextSaved = !isSaved;
+    if (nextSaved) {
       addSaved(item.id);
+    } else {
+      removeSaved(item.id);
     }
+
+    toggleSaved.mutate(
+      { listingId: item.slug, saved: nextSaved },
+      {
+        onError: () => {
+          if (nextSaved) {
+            removeSaved(item.id);
+          } else {
+            addSaved(item.id);
+          }
+        },
+      },
+    );
   };
 
   const initial = scholarName ? scholarName.trim().charAt(0).toUpperCase() : "?";

@@ -20,6 +20,7 @@ export { useExploreRecentScreen } from "./use-explore-recent";
 export { useLibrarySavedScreen } from "./use-library-saved";
 export { useLibraryCompletedScreen } from "./use-library-completed";
 export { useLibraryProgressScreen } from "./use-library-progress";
+export { useToggleSaved } from "./library.api";
 export { useListingDetail, useListingContents, useLastPlayedLesson } from "./listing.api";
 export {
   useScholarsList,
@@ -39,3 +40,5 @@ export {
   useFormattedScholarName,
   type ScholarWithNameAndTitle,
 } from "./utils/format-scholar-name";
+export { getLibraryItemPercent } from "./utils/library-item-progress";
+export { mergeLiveProgress } from "./utils/merge-live-progress";

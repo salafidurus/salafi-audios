@@ -17,6 +17,8 @@ export type CollectionContentLayoutProps = {
   scholarName?: string;
   scholarSlug?: string;
   collectionId?: string;
+  /** Item id to scroll to and briefly highlight on mount (e.g. a lesson linked via URL anchor). */
+  highlightItemId?: string;
 };
 
 export function CollectionContentLayout({
@@ -24,6 +26,7 @@ export function CollectionContentLayout({
   scholarName = "",
   scholarSlug,
   collectionId,
+  highlightItemId,
 }: CollectionContentLayoutProps) {
   const [isTocCollapsed, setIsTocCollapsed] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -73,6 +76,7 @@ export function CollectionContentLayout({
                 moduleTitle={mod?.title}
                 collectionId={collectionId}
                 allTracksInContext={allTracksInContext}
+                highlightItemId={highlightItemId}
               />
             );
           }}

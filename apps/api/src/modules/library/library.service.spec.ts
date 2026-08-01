@@ -1,6 +1,7 @@
 import type { Mocked } from '../../test/setup';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 import type { LibraryPageDto } from '@sd/core-contracts';
 import { LibraryRepository } from './library.repo';
 import { LibraryService } from './library.service';
@@ -125,21 +126,35 @@ describe('LibraryService', () => {
 
   describe('saveListing', () => {
     it('should save listing for user', async () => {
-      repo.saveLecture.mockResolvedValue(undefined);
+      repo.saveLecture.mockResolvedValue(true);
 
       await service.saveListing('user1', 'listing1');
 
       expect(repo.saveLecture).toHaveBeenCalledWith('user1', 'listing1');
     });
+
+    it('should throw NotFoundException when the listing id/slug cannot be resolved', async () => {
+      repo.saveLecture.mockResolvedValue(false);
+
+      await expect(service.saveListing('user1', 'missing-slug')).rejects.toThrow(NotFoundException);
+    });
   });
 
   describe('unsaveListing', () => {
     it('should unsave listing for user', async () => {
-      repo.unsaveLecture.mockResolvedValue(undefined);
+      repo.unsaveLecture.mockResolvedValue(true);
 
       await service.unsaveListing('user1', 'listing1');
 
       expect(repo.unsaveLecture).toHaveBeenCalledWith('user1', 'listing1');
+    });
+
+    it('should throw NotFoundException when the listing id/slug cannot be resolved', async () => {
+      repo.unsaveLecture.mockResolvedValue(false);
+
+      await expect(service.unsaveListing('user1', 'missing-slug')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

@@ -4,7 +4,7 @@ import type { PlaybackEngine } from "../engine/playback.engine";
 import type { Track } from "../types/track.types";
 
 import { useProgressStore } from "../progress/progress.store";
-import { syncProgressToBackend } from "../progress/progress.sync";
+import { flushPendingProgress, syncProgressToBackend } from "../progress/progress.sync";
 import { QueueManager } from "../queue/queue.manager";
 import { usePlaybackStore } from "../store/playback.store";
 
@@ -136,8 +136,10 @@ export class DurusAudioService {
     }
 
     // Empty URL stub (series continuation) — lazily fetch a fresh signed URL.
+    // Prefer the slug over the uuid id — same listing either way, but a slug
+    // reads far better in server logs/network traces.
     const { url } = await httpClient<StreamUrlResponse>({
-      url: endpoints.audio.listings.stream(track.id),
+      url: endpoints.audio.listings.stream(track.slug ?? track.id),
       method: "GET",
     });
 
@@ -175,6 +177,16 @@ export class DurusAudioService {
       const duration = usePlaybackStore.getState().durationSeconds;
       useProgressStore.getState().actions.setProgress(currentTrack.id, duration, duration);
       useProgressStore.getState().actions.markCompleted(currentTrack.id);
+
+      // Completion should hit the DB right away, not wait for the batched
+      // sync debounce window. Prefer the slug for the request URL — same
+      // listing either way, but reads far better in server logs/traces.
+      syncProgressToBackend({
+        listingId: currentTrack.slug ?? currentTrack.id,
+        positionSeconds: duration,
+        durationSeconds: duration,
+      });
+      await flushPendingProgress();
     }
     await this.skipToNext();
   }
@@ -186,9 +198,10 @@ export class DurusAudioService {
       const duration = usePlaybackStore.getState().durationSeconds;
       useProgressStore.getState().actions.setProgress(currentTrack.id, positionSeconds, duration);
 
-      // debounced sync to server
+      // debounced sync to server — prefer the slug for the request URL, same
+      // reasoning as onTrackEnd above.
       syncProgressToBackend({
-        listingId: currentTrack.id,
+        listingId: currentTrack.slug ?? currentTrack.id,
         positionSeconds,
         durationSeconds: duration,
       });

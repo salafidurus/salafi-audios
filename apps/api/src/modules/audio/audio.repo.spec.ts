@@ -40,7 +40,7 @@ describe('AudioRepository', () => {
   beforeEach(() => {
     prisma = {
       listing: {
-        findUnique: vi.fn<any>(),
+        findFirst: vi.fn<any>(),
         findMany: vi.fn<any>(),
       },
       userListingProgress: {
@@ -56,22 +56,52 @@ describe('AudioRepository', () => {
 
   describe('upsertProgress', () => {
     it("derives isCompleted from the listing's own stored duration when the client omits it", async () => {
-      prisma.listing.findUnique.mockResolvedValue({ durationSeconds: 100 });
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
       prisma.userListingProgress.findUnique.mockResolvedValue(null);
 
-      await repo.upsertProgress('user1', 'listing1', 95, undefined, undefined);
+      await repo.upsertProgress('user1', 'tafsir-al-fatiha', 95, undefined, undefined);
 
-      expect(prisma.listing.findUnique).toHaveBeenCalledWith({
-        where: { id: 'listing1' },
-        select: { durationSeconds: true },
+      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'tafsir-al-fatiha' },
+        select: { id: true, durationSeconds: true },
       });
       const upsertArgs = prisma.userListingProgress.upsert.mock.calls[0][0];
       expect(upsertArgs.create.isCompleted).toBe(true); // 95/100 = 95%
       expect(upsertArgs.update.isCompleted).toBe(true);
     });
 
+    it('resolves the listing by slug and upserts using the resolved id', async () => {
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
+      prisma.userListingProgress.findUnique.mockResolvedValue(null);
+
+      await repo.upsertProgress('user1', 'tafsir-al-fatiha', 10, undefined, undefined);
+
+      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'tafsir-al-fatiha' },
+        select: { id: true, durationSeconds: true },
+      });
+      expect(prisma.userListingProgress.findUnique).toHaveBeenCalledWith({
+        where: { userId_listingId: { userId: 'user1', listingId: 'listing1' } },
+        select: { isCompleted: true },
+      });
+      const upsertArgs = prisma.userListingProgress.upsert.mock.calls[0][0];
+      expect(upsertArgs.where).toEqual({
+        userId_listingId: { userId: 'user1', listingId: 'listing1' },
+      });
+      expect(upsertArgs.create.listingId).toBe('listing1');
+    });
+
+    it('returns false and does not upsert when the listing cannot be resolved', async () => {
+      prisma.listing.findFirst.mockResolvedValue(null);
+
+      const result = await repo.upsertProgress('user1', 'missing-slug', 10, undefined, undefined);
+
+      expect(result).toBe(false);
+      expect(prisma.userListingProgress.upsert).not.toHaveBeenCalled();
+    });
+
     it('respects an explicit client isCompleted override even when the derived value disagrees', async () => {
-      prisma.listing.findUnique.mockResolvedValue({ durationSeconds: 1000 });
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 1000 });
       prisma.userListingProgress.findUnique.mockResolvedValue(null);
 
       await repo.upsertProgress('user1', 'listing1', 10, undefined, true);
@@ -81,7 +111,7 @@ describe('AudioRepository', () => {
     });
 
     it('never flips isCompleted back to false once already true (monotonic)', async () => {
-      prisma.listing.findUnique.mockResolvedValue({ durationSeconds: 1000 });
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 1000 });
       prisma.userListingProgress.findUnique.mockResolvedValue({ isCompleted: true });
 
       // A later sync reports an earlier position and no explicit completion (e.g. a replay).
@@ -92,7 +122,7 @@ describe('AudioRepository', () => {
     });
 
     it('stays false for a fresh row when neither the client nor the derivation indicates completion', async () => {
-      prisma.listing.findUnique.mockResolvedValue({ durationSeconds: 1000 });
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 1000 });
       prisma.userListingProgress.findUnique.mockResolvedValue(null);
 
       await repo.upsertProgress('user1', 'listing1', 10, undefined, undefined);
@@ -161,6 +191,19 @@ describe('AudioRepository', () => {
       const [strings] = prisma.$executeRaw.mock.calls[0];
       const sql = strings.join('?');
       expect(sql).toContain('"isCompleted" = "UserListingProgress"."isCompleted" OR');
+    });
+  });
+
+  describe('findListingById', () => {
+    it('resolves strictly by slug', async () => {
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
+
+      await repo.findListingById('tafsir-al-fatiha');
+
+      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'tafsir-al-fatiha' },
+        select: { id: true, durationSeconds: true },
+      });
     });
   });
 });

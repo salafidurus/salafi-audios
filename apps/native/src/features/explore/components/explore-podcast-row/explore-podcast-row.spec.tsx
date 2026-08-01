@@ -79,9 +79,12 @@ const mockUseFormattedScholarName = jest.fn(
   (scholarName: string, _scholarSlug?: string) => scholarName,
 );
 
+const mockMutate = jest.fn();
+
 jest.mock("@sd/domain-content", () => ({
   useFormattedScholarName: (scholarName: string, scholarSlug: string) =>
     mockUseFormattedScholarName(scholarName, scholarSlug),
+  useToggleSaved: jest.fn(() => ({ mutate: mockMutate })),
 }));
 
 describe("ExplorePodcastRow", () => {
@@ -155,6 +158,42 @@ describe("ExplorePodcastRow", () => {
     expect(mockRemoveSaved).toHaveBeenCalledWith(baseItem.id);
   });
 
+  it("persists the save via the toggle-saved mutation, keyed by slug", async () => {
+    mockIsSaved.mockReturnValue(false);
+
+    await render(<ExplorePodcastRow item={baseItem} />);
+    await fireEvent.press(screen.getByTestId("podcast-row-item-action-save"));
+
+    expect(mockMutate).toHaveBeenCalledWith(
+      { listingId: baseItem.slug, saved: true },
+      expect.objectContaining({ onError: expect.any(Function) }),
+    );
+  });
+
+  it("persists the unsave via the toggle-saved mutation", async () => {
+    mockIsSaved.mockReturnValue(true);
+
+    await render(<ExplorePodcastRow item={baseItem} />);
+    await fireEvent.press(screen.getByTestId("podcast-row-item-action-save"));
+
+    expect(mockMutate).toHaveBeenCalledWith(
+      { listingId: baseItem.slug, saved: false },
+      expect.objectContaining({ onError: expect.any(Function) }),
+    );
+  });
+
+  it("rolls back the optimistic save if the mutation fails", async () => {
+    mockIsSaved.mockReturnValue(false);
+
+    await render(<ExplorePodcastRow item={baseItem} />);
+    await fireEvent.press(screen.getByTestId("podcast-row-item-action-save"));
+
+    const [, { onError }] = mockMutate.mock.calls[0]!;
+    onError();
+
+    expect(mockRemoveSaved).toHaveBeenCalledWith(baseItem.id);
+  });
+
   it("shows progress bar when 0 < progressPercent < 100", async () => {
     const mock = jest.requireMock("@sd/domain-audio").useListingProgress;
     mock.mockReturnValue({
@@ -205,7 +244,7 @@ describe("ExplorePodcastRow", () => {
     await fireEvent.press(screen.getByTestId("podcast-row"));
 
     expect(httpClientMock).toHaveBeenCalledWith({
-      url: "/listings/lec-1/contents",
+      url: "/listings/test-lecture/contents",
       method: "GET",
     });
     const lastCall = audioMock.playListing.mock.calls.at(-1);

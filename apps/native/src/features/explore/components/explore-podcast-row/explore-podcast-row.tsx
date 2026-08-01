@@ -5,7 +5,7 @@ import type { Track } from "@sd/domain-audio";
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useAudio, useProgressStore, useListingProgress, buildTrackQueue } from "@sd/domain-audio";
-import { useFormattedScholarName } from "@sd/domain-content";
+import { useFormattedScholarName, useToggleSaved } from "@sd/domain-content";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -44,6 +44,7 @@ export function ExplorePodcastRow({
   const isSaved = useProgressStore((s) => s.actions.isSaved(item.id));
   const addSaved = useProgressStore((s) => s.actions.addSaved);
   const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+  const toggleSaved = useToggleSaved();
 
   const handlePlay = async () => {
     if (isCurrentTrack) {
@@ -61,7 +62,7 @@ export function ExplorePodcastRow({
     if (item.kind !== "single") {
       try {
         const contents = await httpClient<ListingContentsDto>({
-          url: endpoints.listings.contents(item.id),
+          url: endpoints.listings.contents(item.slug),
           method: "GET",
         });
         const queue = buildTrackQueue(
@@ -109,11 +110,25 @@ export function ExplorePodcastRow({
   };
 
   const handleSave = () => {
-    if (isSaved) {
-      removeSaved(item.id);
-    } else {
+    const nextSaved = !isSaved;
+    if (nextSaved) {
       addSaved(item.id);
+    } else {
+      removeSaved(item.id);
     }
+
+    toggleSaved.mutate(
+      { listingId: item.slug, saved: nextSaved },
+      {
+        onError: () => {
+          if (nextSaved) {
+            removeSaved(item.id);
+          } else {
+            addSaved(item.id);
+          }
+        },
+      },
+    );
   };
 
   const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";
