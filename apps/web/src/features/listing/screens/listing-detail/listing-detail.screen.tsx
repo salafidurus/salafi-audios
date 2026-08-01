@@ -1,7 +1,6 @@
 "use client";
 
 import { useListingDetail, useListingContents } from "@sd/domain-content";
-import { useRouter } from "next/navigation";
 import React, { useState, useRef, useEffect, useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -13,10 +12,10 @@ import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import { CollectionContentLayout } from "../../components/listing/CollectionContentLayout/CollectionContentLayout";
 import { ContentList } from "../../components/listing/ContentList/ContentList";
-import { contentItemAnchorId } from "../../components/listing/ContentListItem/ContentListItem";
 import { MetaDataSection } from "../../components/listing/MetaDataSection/MetaDataSection";
 import { QuickButtonSection } from "../../components/listing/QuickButtonSection/QuickButtonSection";
 import { SeriesContextBar } from "../../components/listing/series-context-bar/series-context-bar";
+import { contentItemAnchorId } from "../../utils/content-item-anchor-id";
 import styles from "./listing-detail.screen.module.css";
 
 export type ListingDetailScreenProps = {
@@ -25,7 +24,6 @@ export type ListingDetailScreenProps = {
 
 export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const { t } = useTranslation();
-  const router = useRouter();
   const formatScholarName = useFormatScholarName();
   const [searchQuery, setSearchQuery] = useState("");
   const [highlightItemId, setHighlightItemId] = useState<string | undefined>(undefined);
@@ -33,15 +31,6 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
 
   const { data: listing, isFetching: isFetchingDetail } = useListingDetail(slug);
   const { data: contents, isFetching: isFetchingContents } = useListingContents(listing?.id ?? "");
-
-  // Slugs are flat and don't encode nesting, so a Lesson/Module's own slug
-  // resolves to itself — redirect to the top-level page it belongs under,
-  // anchored to this item so the parent page can scroll to and highlight it.
-  useEffect(() => {
-    if (listing?.rootListing) {
-      router.replace(`/listings/${listing.rootListing.slug}#${listing.id}`);
-    }
-  }, [listing, router]);
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -118,6 +107,10 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   }
 
   if (listing.rootListing) {
+    // The server-rendered page redirects a nested Lesson/Module's own slug to
+    // its top-level listing (see app/.../listings/[slug]/page.tsx) before this
+    // ever mounts. This guards against rendering the wrong content in the
+    // rare case a client-side cache serves stale data past that redirect.
     return (
       <ScreenView center>
         <AppText variant="bodyMd">{t("lecture.loading", "Loading content…")}</AppText>

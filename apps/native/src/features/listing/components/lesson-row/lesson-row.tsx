@@ -3,8 +3,8 @@ import type { Track } from "@sd/domain-audio";
 
 import { useAudio, useListingProgress } from "@sd/domain-audio";
 import { Play, Pause } from "lucide-react-native";
-import { useEffect, useState } from "react";
-import { Animated, Pressable, View, type LayoutChangeEvent } from "react-native";
+import { Pressable, View, type LayoutChangeEvent } from "react-native";
+import { EaseView } from "react-native-ease";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { audioService } from "@/features/audio";
@@ -30,23 +30,12 @@ export function LessonRow({ item, queue, highlighted = false, onLayout }: Lesson
   const { theme } = useUnistyles();
   const { isPlaying, currentTrack } = useAudio();
   const { progressPercent, isCompleted } = useListingProgress(item.id);
-  const [highlightOpacity] = useState(() => new Animated.Value(0));
 
   const isCurrentTrack = currentTrack?.id === item.id;
   const isCurrentlyPlaying = isCurrentTrack && isPlaying;
   const durationStr = formatDuration(
     item.durationSeconds || item.primaryAudioAsset?.durationSeconds,
   );
-
-  useEffect(() => {
-    if (!highlighted) return;
-    highlightOpacity.setValue(1);
-    Animated.timing(highlightOpacity, {
-      toValue: 0,
-      duration: 2000,
-      useNativeDriver: false,
-    }).start();
-  }, [highlighted, highlightOpacity]);
 
   const handlePress = async () => {
     if (isCurrentTrack) {
@@ -69,48 +58,41 @@ export function LessonRow({ item, queue, highlighted = false, onLayout }: Lesson
       onLayout={(e: LayoutChangeEvent) => onLayout?.(item.id, e.nativeEvent.layout.y)}
       testID={`lesson-row-${item.id}`}
     >
-      <Animated.View
-        style={[
-          styles.highlightOverlay,
-          { backgroundColor: theme.colors.surface.hover, opacity: highlightOpacity },
-        ]}
-      />
-      <Pressable onPress={handlePress} style={styles.row}>
-        <View style={styles.content}>
-          <AppText variant="bodyLg" numberOfLines={2}>
-            {item.title}
-          </AppText>
-          {durationStr ? (
-            <AppText variant="bodySm" style={styles.meta}>
-              {durationStr}
+      <EaseView
+        initialAnimate={highlighted ? { backgroundColor: theme.colors.surface.hover } : undefined}
+        animate={{ backgroundColor: "transparent" }}
+        transition={{ type: "timing", duration: 2000 }}
+      >
+        <Pressable onPress={handlePress} style={styles.row}>
+          <View style={styles.content}>
+            <AppText variant="bodyLg" numberOfLines={2}>
+              {item.title}
             </AppText>
-          ) : null}
-          {progressPercent > 0 && !isCompleted ? (
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
-            </View>
-          ) : null}
-        </View>
-        <View style={styles.playButton}>
-          {isCurrentlyPlaying ? (
-            <Pause size={18} color={theme.colors.content.strong} />
-          ) : (
-            <Play size={18} color={theme.colors.content.strong} />
-          )}
-        </View>
-      </Pressable>
+            {durationStr ? (
+              <AppText variant="bodySm" style={styles.meta}>
+                {durationStr}
+              </AppText>
+            ) : null}
+            {progressPercent > 0 && !isCompleted ? (
+              <View style={styles.progressTrack}>
+                <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
+              </View>
+            ) : null}
+          </View>
+          <View style={styles.playButton}>
+            {isCurrentlyPlaying ? (
+              <Pause size={18} color={theme.colors.content.strong} />
+            ) : (
+              <Play size={18} color={theme.colors.content.strong} />
+            )}
+          </View>
+        </Pressable>
+      </EaseView>
     </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  highlightOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
   row: {
     flexDirection: "row",
     alignItems: "center",

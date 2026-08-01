@@ -11,12 +11,6 @@ vi.mock("@sd/domain-content", () => ({
   useToggleSaved: vi.fn().mockReturnValue({ mutate: vi.fn() }),
 }));
 
-const mockRouterReplace = vi.fn();
-
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ replace: mockRouterReplace }),
-}));
-
 vi.mock("@/core/auth", () => ({
   useAuth: vi.fn().mockReturnValue({ isAuthenticated: false, user: null }),
 }));
@@ -69,7 +63,6 @@ beforeEach(() => {
   mockUseListingDetail.mockReturnValue({ data: undefined, isFetching: false });
   mockUseListingContents.mockReturnValue({ data: undefined, isFetching: false });
   mockUseLastPlayedLesson.mockReturnValue({ data: null, isFetching: false });
-  mockRouterReplace.mockClear();
   window.location.hash = "";
 });
 
@@ -99,15 +92,18 @@ describe("ListingDetailScreen", () => {
     expect(screen.getAllByText("Play").length).toBeGreaterThan(0);
   });
 
-  it("does not redirect when the resolved listing is already top-level", () => {
+  it("renders normally when the resolved listing is already top-level", () => {
     mockUseListingDetail.mockReturnValue({ data: mockSingleListing, isFetching: false });
     mockUseListingContents.mockReturnValue({ data: mockSingleContents, isFetching: false });
 
     render(<ListingDetailScreen slug="tawheed-lecture" />);
-    expect(mockRouterReplace).not.toHaveBeenCalled();
+    expect(screen.getAllByText("Kitab At-Tawheed Lecture").length).toBeGreaterThan(0);
   });
 
-  it("redirects to the root listing, anchored to itself, when the resolved listing is nested", () => {
+  it("shows a loading guard instead of the wrong content when the resolved listing is nested", () => {
+    // The server-rendered page (app/.../listings/[slug]/page.tsx) redirects a
+    // nested Lesson/Module's slug before this screen ever mounts with real
+    // data; this only covers the defensive fallback if that's ever bypassed.
     mockUseListingDetail.mockReturnValue({
       data: {
         ...mockSingleListing,
@@ -119,7 +115,6 @@ describe("ListingDetailScreen", () => {
 
     render(<ListingDetailScreen slug="tawheed-lecture" />);
 
-    expect(mockRouterReplace).toHaveBeenCalledWith("/listings/explanation-of-tawheed#lesson-1");
     expect(screen.getByText("Loading content…")).toBeTruthy();
     expect(screen.queryByText("Kitab At-Tawheed Lecture")).toBeNull();
   });

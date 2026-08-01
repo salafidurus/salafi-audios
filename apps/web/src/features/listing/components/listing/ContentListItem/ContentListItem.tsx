@@ -11,11 +11,8 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
+import { contentItemAnchorId } from "../../../utils/content-item-anchor-id";
 import styles from "./ContentListItem.module.css";
-
-export function contentItemAnchorId(itemId: string): string {
-  return `content-item-${itemId}`;
-}
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return "";
