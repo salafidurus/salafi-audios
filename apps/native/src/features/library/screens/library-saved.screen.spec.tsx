@@ -27,6 +27,15 @@ jest.mock("react-native-safe-area-context", () => ({
 
 jest.mock("@sd/domain-content", () => ({
   useLibrarySavedScreen: jest.fn(),
+  getLibraryItemPercent: (item: LibraryItemDto) => {
+    if (item.totalLeafCount && item.totalLeafCount > 0) {
+      return Math.round(((item.completedLeafCount ?? 0) / item.totalLeafCount) * 100);
+    }
+    if (item.durationSeconds && item.progressSeconds) {
+      return Math.round((item.progressSeconds / item.durationSeconds) * 100);
+    }
+    return null;
+  },
 }));
 
 jest.mock("../../../core/auth/use-auth", () => ({

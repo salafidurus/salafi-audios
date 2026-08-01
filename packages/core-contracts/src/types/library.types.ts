@@ -15,6 +15,9 @@ export const LibraryItemDtoSchema = z.object({
   savedAt: z.string().optional(),
   completedAt: z.string().optional(),
   progressSeconds: z.number().optional(),
+  /** Lesson-count rollup for a series/collection entry (e.g. "3 of 5 lessons"). Absent for a standalone lecture. */
+  completedLeafCount: z.number().optional(),
+  totalLeafCount: z.number().optional(),
   originalLanguage: LocaleSchema.optional(),
   /** Original-language listing title, set only when `listingTitle` is translated. */
   originalListingTitle: z.string().optional(),

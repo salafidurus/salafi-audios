@@ -39,3 +39,4 @@ export {
   useFormattedScholarName,
   type ScholarWithNameAndTitle,
 } from "./utils/format-scholar-name";
+export { getLibraryItemPercent } from "./utils/library-item-progress";
