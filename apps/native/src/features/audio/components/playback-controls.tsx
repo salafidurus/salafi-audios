@@ -1,13 +1,18 @@
-import { useAudio } from "@sd/domain-audio";
-import { Play, Pause, RotateCw, RotateCcw } from "lucide-react-native";
+import { useAudio, useQueue } from "@sd/domain-audio";
+import { Play, Pause, RotateCw, RotateCcw, SkipBack, SkipForward } from "lucide-react-native";
 import React from "react";
 import { View, Pressable, Text } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { audioService } from "../audio-service";
 
+function handlePrevious() {
+  audioService.skipToPrevious();
+}
+
 export function PlaybackControls() {
   const { isPlaying, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
+  const { hasNext } = useQueue();
   const { theme } = useUnistyles();
 
   const handlePlayPause = () => {
@@ -16,6 +21,11 @@ export function PlaybackControls() {
     } else {
       audioService.resume();
     }
+  };
+
+  const handleNext = () => {
+    if (!hasNext) return;
+    audioService.skipToNext();
   };
 
   const handleSkipForward = () => {
@@ -37,6 +47,7 @@ export function PlaybackControls() {
 
   const onPrimary = theme.colors.content.onPrimary;
   const strong = theme.colors.content.strong;
+  const muted = theme.colors.content.muted;
   const RotateCcwIcon = <RotateCcw size={28} color={strong} />;
   const PauseIcon = <Pause size={32} color={onPrimary} fill={onPrimary} />;
   const PlayIcon = <Play size={32} color={onPrimary} fill={onPrimary} />;
@@ -51,6 +62,14 @@ export function PlaybackControls() {
       </Pressable>
 
       <View style={styles.centerControls}>
+        <Pressable
+          onPress={handlePrevious}
+          style={styles.trackButton}
+          accessibilityLabel="Previous track"
+        >
+          <SkipBack size={20} color={strong} fill={strong} />
+        </Pressable>
+
         <Pressable onPress={handleSkipBackward} style={styles.controlButton}>
           {RotateCcwIcon}
           <Text style={styles.skipLabel}>30</Text>
@@ -63,6 +82,15 @@ export function PlaybackControls() {
         <Pressable onPress={handleSkipForward} style={styles.controlButton}>
           {RotateCwIcon}
           <Text style={styles.skipLabel}>30</Text>
+        </Pressable>
+
+        <Pressable
+          onPress={handleNext}
+          disabled={!hasNext}
+          style={styles.trackButton}
+          accessibilityLabel="Next track"
+        >
+          <SkipForward size={20} color={hasNext ? strong : muted} fill={hasNext ? strong : muted} />
         </Pressable>
       </View>
 
@@ -98,6 +126,10 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
+  },
+  trackButton: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   skipLabel: {
     fontSize: 12,
