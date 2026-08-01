@@ -313,7 +313,7 @@ export const createColors = (mode: "light" | "dark") => {
         }
       : {
           default: c.neutral[750], // #262626  — standard component border
-          subtle: c.neutral[800], // #1C1C1E  — barely-there divider (on canvas bg)
+          subtle: c.neutral[750], // #262626  — visible divider (was neutral[800] #1C1C1E)
           strong: c.neutral[700], // #323232  — emphasized borders
           muted: c.neutral[850], // #141414  — near-invisible boundary
           hover: c.neutral[600], // #3F3F46  — hover border emphasis

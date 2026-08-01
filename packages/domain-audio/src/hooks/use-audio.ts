@@ -1,5 +1,4 @@
 import { usePlaybackStore } from "../store/playback.store";
-import { useProgressStore } from "../progress/progress.store";
 
 export function useAudio() {
   const currentTrack = usePlaybackStore((s) => s.currentTrack);
@@ -28,19 +27,5 @@ export function useAudio() {
     isPaused,
     hasTrack,
     progressPercent,
-  };
-}
-
-// Backwards compatibility alias for temporary web package compilation until Stage 7
-export function usePlayback() {
-  const audio = useAudio();
-  return {
-    ...audio,
-    play: () => {},
-    pause: () => {},
-    resume: () => {},
-    seek: () => {},
-    stop: () => {},
-    skipToNext: () => {},
   };
 }

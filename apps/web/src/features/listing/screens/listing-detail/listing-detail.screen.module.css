@@ -1,0 +1,27 @@
+.headerTopRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-lg, 24px);
+  width: 100%;
+}
+
+.searchWrapper {
+  margin-top: var(--space-component-gap-md, 16px);
+  width: 100%;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-xl, 32px);
+  padding-top: var(--space-component-gap-md, 16px);
+  padding-bottom: var(--space-component-gap-xl, 32px);
+}
+
+@media (min-width: 768px) {
+  .headerTopRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

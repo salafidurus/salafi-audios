@@ -1,6 +1,8 @@
-import * as Sentry from "@sentry/react-native";
 import type { ComponentType } from "react";
+
+import * as Sentry from "@sentry/react-native";
 import { vexo } from "vexo-analytics";
+
 import { getRuntimeEnv, isDev } from "./config/runtime-env";
 
 export function initIntegrations(): void {

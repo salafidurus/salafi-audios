@@ -1,16 +1,8 @@
-import { type Href, useRouter } from "expo-router";
-import { routes } from "@sd/core-contracts";
 import { LibraryScreen } from "@/features/library/screens/library.screen";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export default function LibraryIndexRoute() {
-  const router = useRouter();
+  const { navigateToListing } = useListingNavigation();
 
-  return (
-    <LibraryScreen
-      onNavigateToLecture={(id: string) => {
-        const path = routes.lectures.detail(id);
-        router.push(path as Href);
-      }}
-    />
-  );
+  return <LibraryScreen onNavigateToListing={navigateToListing} />;
 }

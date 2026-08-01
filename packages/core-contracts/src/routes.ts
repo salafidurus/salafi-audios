@@ -12,21 +12,17 @@ export const routes = {
   home: "/",
   search: "/search",
 
-  feed: {
-    index: "/feed",
-    recent: "/feed/recent",
-    following: "/feed/following",
+  explore: {
+    index: "/explore",
+    recent: "/explore/recent",
+    scholar: "/explore/scholar",
+    curation: "/explore/curation",
   },
 
   library: {
     index: "/library",
     saved: "/library/saved",
     completed: "/library/completed",
-  },
-
-  live: {
-    index: "/live",
-    session: (id: string) => `/live/${id}` as const,
   },
 
   settings: {
@@ -40,16 +36,8 @@ export const routes = {
     detail: (slug: string) => `/scholars/${slug}` as const,
   },
 
-  collections: {
-    detail: (id: string) => `/collections/${id}` as const,
-  },
-
-  series: {
-    detail: (id: string) => `/series/${id}` as const,
-  },
-
-  lectures: {
-    detail: (id: string) => `/lectures/${id}` as const,
+  listings: {
+    detail: (slug: string) => `/listings/${slug}` as const,
   },
 
   admin: {
@@ -64,6 +52,7 @@ export const routes = {
   support: "/support",
   privacy: "/privacy",
   termsOfUse: "/terms-of-use",
+  cookiePolicy: "/cookie-policy",
 } as const;
 
 /**
@@ -93,16 +82,18 @@ export interface RouteDefinition {
  * preserve their prior semantics. Routes not listed fall back to "public".
  */
 export const routeDefinitions: RouteDefinition[] = [
-  { path: routes.feed.following, access: "auth-required" },
-  { path: routes.feed.index, access: "public" },
+  { path: routes.explore.index, access: "public" },
+  { path: routes.explore.recent, access: "public" },
+  { path: routes.explore.scholar, access: "public" },
+  { path: routes.explore.curation, access: "public" },
   { path: routes.settings.profile, access: "auth-optional" },
   { path: routes.settings.legal, access: "public" },
   { path: routes.settings.index, access: "auth-optional" },
   { path: routes.library.index, access: "auth-optional" },
-  { path: routes.live.index, access: "public" },
   { path: routes.search, access: "public" },
   { path: routes.scholars.index, access: "public" },
   { path: routes.support, access: "public" },
+  { path: routes.cookiePolicy, access: "public" },
   { path: routes.admin.index, access: "auth-required" },
   { path: routes.home, access: "public" },
 ];

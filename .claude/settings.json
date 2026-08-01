@@ -8,34 +8,39 @@
     "server-memory": {},
     "next-devtools": {
       "command": "npx",
-      "args": [
-        "-y",
-        "next-devtools-mcp@latest"
-      ]
+      "args": ["-y", "next-devtools-mcp@latest"]
     },
     "prisma": {
       "command": "npx",
-      "args": [
-        "-y",
-        "prisma",
-        "mcp"
-      ]
+      "args": ["-y", "prisma", "mcp"]
     }
   },
   "instructions": [
     "Read the relevant AGENT.md file before working in any workspace (apps/api/AGENT.md, apps/web/AGENT.md, apps/mobile/AGENT.md, or packages/*/AGENT.md)"
   ],
+  "constraints": {
+    "git": {
+      "disallowedFlags": ["--no-verify"],
+      "reason": "Pre-commit and pre-push hooks enforce code quality and test validation. Always fix the actual issues instead of bypassing hooks.",
+      "enforced": true,
+      "appliesTo": ["commit", "push"]
+    }
+  },
+  "codeQuality": {
+    "requirePreCommitHooks": true,
+    "description": "All git commits must pass pre-commit hooks. If a hook fails, investigate and fix the underlying issue."
+  },
   "permissions": {
     "allow": [
       "Read(*)",
-      "Write(**/*.ts)",
-      "Write(**/*.tsx)",
-      "Write(**/*.js)",
-      "Write(**/*.jsx)",
-      "Write(**/*.json)",
-      "Write(**/*.css)",
-      "Write(**/*.md)",
-      "Write(**/*.mdx)",
+      "Edit(**/*.ts)",
+      "Edit(**/*.tsx)",
+      "Edit(**/*.js)",
+      "Edit(**/*.jsx)",
+      "Edit(**/*.json)",
+      "Edit(**/*.css)",
+      "Edit(**/*.md)",
+      "Edit(**/*.mdx)",
       "Bash(grep *)",
       "Bash(grep:*)",
       "Bash(cat *)",
@@ -119,18 +124,18 @@
       "Bash(rm -rf **/out*)",
       "Bash(rm -rf **/build*)",
       "Bash(rm -rf **/coverage*)",
-      "Bash(pnpm install)",
-      "Bash(pnpm install *)",
-      "Bash(pnpm --filter * add *)",
+      "Bash(bun install)",
+      "Bash(bun install *)",
+      "Bash(bun --filter * add *)",
       "mcp__argent"
     ],
     "ask": [
-      "Bash(npx kill-port*)",
+      "Bash(bunx kill-port*)",
       "Bash(git push *)",
       "Bash(git restore *)",
       "Bash(git reset *)",
       "Bash(rm *)",
-      "Write(**/*.env*)"
+      "Edit(**/*.env*)"
     ],
     "deny": [
       "Bash(curl * -d *)",
@@ -139,7 +144,7 @@
       "Bash(curl * -X PUT*)",
       "Bash(curl * -X DELETE*)",
       "Bash(curl * -T *)",
-      "Bash(pnpm add *)"
+      "Bash(bun add *)"
     ]
   }
 }

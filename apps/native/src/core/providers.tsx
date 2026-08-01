@@ -4,23 +4,28 @@ import {
   setLocaleProvider,
   setUnauthorizedHandler,
 } from "@sd/core-api";
-import { createQueryClient, routes } from "@sd/core-contracts";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { routes, shouldPersistQuery, DEFAULT_MAX_AGE } from "@sd/core-contracts";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { useFonts } from "expo-font";
 import { type Href, useRouter } from "expo-router";
 import { type ReactNode, useEffect, useState } from "react";
-import { authClient } from "./auth/auth-client";
 import { I18nextProvider } from "react-i18next";
-import { LogBox } from "react-native";
+import { LogBox, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
+import { initProgressPersistence } from "./audio/progress-persistence";
+import { authClient } from "./auth/auth-client";
+import { useAuth } from "./auth/use-auth";
 import { getApiBaseUrl } from "./config/runtime-env";
 import { i18n, initI18n } from "./i18n/i18n";
+import { initIntegrations } from "./integrations";
+import { queryClient, persister } from "./query-client";
+import { syncTypographyToLocale } from "./styles/theme/typography-sync";
 
 LogBox.ignoreLogs(["API client initialization failed", "Open debugger to view warnings"]);
-
-const queryClient = createQueryClient();
 
 function AppFontsProvider({ children }: { children: ReactNode }) {
   const [loaded] = useFonts({
@@ -35,6 +40,14 @@ function AppFontsProvider({ children }: { children: ReactNode }) {
     "GeistMono-Medium": require("../../assets/fonts/GeistMono-Medium.ttf"),
     "GeistMono-SemiBold": require("../../assets/fonts/GeistMono-SemiBold.ttf"),
     "GeistMono-Bold": require("../../assets/fonts/GeistMono-Bold.ttf"),
+    "Alexandria-Regular": require("../../assets/fonts/Alexandria-Regular.ttf"),
+    "Alexandria-Medium": require("../../assets/fonts/Alexandria-Medium.ttf"),
+    "Alexandria-SemiBold": require("../../assets/fonts/Alexandria-SemiBold.ttf"),
+    "Alexandria-Bold": require("../../assets/fonts/Alexandria-Bold.ttf"),
+    "IBMPlexSansArabic-Regular": require("../../assets/fonts/IBMPlexSansArabic-Regular.ttf"),
+    "IBMPlexSansArabic-Medium": require("../../assets/fonts/IBMPlexSansArabic-Medium.ttf"),
+    "IBMPlexSansArabic-SemiBold": require("../../assets/fonts/IBMPlexSansArabic-SemiBold.ttf"),
+    "IBMPlexSansArabic-Bold": require("../../assets/fonts/IBMPlexSansArabic-Bold.ttf"),
   });
 
   if (!loaded) {
@@ -44,6 +57,16 @@ function AppFontsProvider({ children }: { children: ReactNode }) {
   return children;
 }
 
+function RootDirectionView({ children }: { children: ReactNode }) {
+  const { theme } = useUnistyles();
+
+  return (
+    <View key={theme.direction} style={styles.directionContainer}>
+      {children}
+    </View>
+  );
+}
+
 type Props = {
   children: ReactNode;
 };
@@ -51,8 +74,11 @@ type Props = {
 export function Providers({ children }: Props) {
   const [i18nReady, setI18nReady] = useState(false);
   const router = useRouter();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
+    initIntegrations();
+
     const baseUrl = getApiBaseUrl();
     if (baseUrl) {
       initApiClient({ baseUrl });
@@ -69,15 +95,32 @@ export function Providers({ children }: Props) {
     setLocaleProvider(() => i18n.language);
 
     setUnauthorizedHandler(() => {
-      authClient.signOut().then(() => {
-        router.replace(routes.home as Href);
-      });
+      authClient
+        .signOut()
+        .catch(() => {
+          // Ignore network errors during signout
+        })
+        .finally(async () => {
+          queryClient.clear();
+          await persister.removeClient();
+          router.replace(routes.home as Href);
+        });
     });
   }, [router]);
 
+  // Must run after the initApiClient effect above — httpClient throws until
+  // configureApiClient() has been called, and effects fire in declaration order.
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    return initProgressPersistence(user.id);
+  }, [isAuthenticated, user?.id]);
+
   useEffect(() => {
     void initI18n()
-      .then(() => setI18nReady(true))
+      .then(() => {
+        setI18nReady(true);
+        syncTypographyToLocale(i18n.language as "en" | "ar");
+      })
       .catch((err) => {
         console.warn("[i18n] init failed, falling back to default:", err);
         setI18nReady(true);
@@ -89,16 +132,39 @@ export function Providers({ children }: Props) {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         <KeyboardProvider>
-          <QueryClientProvider client={queryClient}>
+          <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{
+              persister,
+              maxAge: DEFAULT_MAX_AGE,
+              dehydrateOptions: {
+                shouldDehydrateQuery: (query: any) =>
+                  query.state.status === "success" && shouldPersistQuery(query.queryKey),
+              },
+            }}
+          >
             <I18nextProvider i18n={i18n}>
-              <AppFontsProvider>{children}</AppFontsProvider>
+              <AppFontsProvider>
+                <RootDirectionView>{children}</RootDirectionView>
+              </AppFontsProvider>
             </I18nextProvider>
-          </QueryClientProvider>
+          </PersistQueryClientProvider>
         </KeyboardProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  root: {
+    flex: 1,
+    direction: theme.direction,
+  },
+  directionContainer: {
+    flex: 1,
+    direction: theme.direction,
+  },
+}));

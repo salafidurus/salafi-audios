@@ -1,10 +1,16 @@
 {
   // Shared base compiler options for every workspace. Family presets
   // (tsconfig.packages.json, tsconfig.nest.json) and apps extend this file.
+  // Updated to align with Bun's recommended TypeScript configuration.
   "compilerOptions": {
-    // target ES2023 for broad modern-runtime compat; lib ES2024 exposes all modern built-ins
-    "target": "ES2023",
-    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    // Bun prefers ESNext for latest features and optimizations
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    // Let bundlers/runtimes handle module format — Bun's preferred approach
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    // Modern JSX transform (can be overridden per-app)
+    "jsx": "react-jsx",
     "strict": true,
     // Skip .d.ts validation in node_modules — speeds up compilation significantly
     "skipLibCheck": true,
@@ -15,6 +21,24 @@
     // Array index / object key access returns T | undefined — prevents common runtime crashes
     "noUncheckedIndexedAccess": true,
     // Treat every file as a module — avoids accidental global scripts under modern tooling
-    "moduleDetection": "force"
+    "moduleDetection": "force",
+    // Each file must be transpilable in isolation — required by modern bundlers
+    "isolatedModules": true,
+    // Bun supports importing .ts extensions directly
+    "allowImportingTsExtensions": true,
+    // Better CommonJS interop for mixed module systems
+    "allowSyntheticDefaultImports": true,
+    // Default to typecheck-only; build configs override this
+    "noEmit": true,
+    // Include Bun and Node type definitions
+    "types": ["bun-types", "node"],
+    // Stricter checks - gradually enable these for better code quality
+    // For immediate strict mode, extend tsconfig.strict.json instead
+    "noImplicitReturns": true,
+    "noImplicitOverride": true
+    // Disabled by default (enable per-package when ready):
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noPropertyAccessFromIndexSignature": true
   }
 }

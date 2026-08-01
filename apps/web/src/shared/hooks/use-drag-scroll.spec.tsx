@@ -1,6 +1,7 @@
-import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { vi } from "vitest";
+import { describe, it, expect, vi } from "bun:test";
+import React from "react";
+
 import { useDragScroll } from "./use-drag-scroll";
 
 function TestComponent({

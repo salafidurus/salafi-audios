@@ -1,74 +1,129 @@
 "use client";
 
-import { useState } from "react";
-import { useAuth } from "@/core/auth";
-import { useAccountProfile, useUpdateProfile } from "@sd/domain-account";
-import { authClient } from "@/core/auth/auth-client";
-import { AuthModal } from "@/features/auth";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { SettingsSection } from "@/shared/components/SettingsSection/SettingsSection";
-import { SettingsRow } from "@/shared/components/SettingsRow/SettingsRow";
+import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+
+import { useAuth } from "@/core/auth";
+import { authClient } from "@/core/auth/auth-client";
+import { useTranslation } from "@/core/i18n/use-translation";
+import { AuthModal } from "@/features/auth";
+import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
+import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
+import { Button } from "@/shared/components/Button/Button";
+import { EmptyState } from "@/shared/components/EmptyState";
+import { Modal } from "@/shared/components/Modal";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+
 import styles from "./settings-profile.screen.module.css";
 
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0] ?? "")
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
-
 function ProfileContent() {
-  const { data: profile, isFetching } = useAccountProfile();
-  const { mutate: updateProfile, isPending, isSuccess, isError } = useUpdateProfile();
+  const { t } = useTranslation();
+  const {
+    data: profile,
+    isFetching: isLoadingProfile,
+    isError: isProfileLoadError,
+    error: profileLoadError,
+  } = useAccountProfile();
+  const {
+    mutate: updateProfile,
+    isPending: isUpdatingProfile,
+    isSuccess: isUpdateSuccess,
+    isError: isUpdateError,
+  } = useUpdateProfile();
   const router = useRouter();
-  const [prevProfileId, setPrevProfileId] = useState(profile?.id);
-  const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
+  const [displayName, setDisplayName] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const { mutate: deleteAccount, isPending: isDeletingAccount } = useDeleteAccount();
 
-  if (profile && profile.id !== prevProfileId) {
-    setPrevProfileId(profile.id);
-    setDisplayName(profile.displayName ?? "");
-  }
+  useEffect(() => {
+    if (profile) {
+      setDisplayName(profile.displayName ?? "");
+    }
+  }, [profile]);
 
   const handleSignOut = async () => {
-    await authClient.signOut();
-    router.push("/");
+    try {
+      await authClient.signOut();
+    } catch (err) {
+      console.error("Sign out error", err);
+    } finally {
+      if (typeof window !== "undefined" && window.location && !process.env.VITEST) {
+        window.location.href = "/";
+      } else {
+        router.push("/");
+      }
+    }
   };
 
-  if (isFetching) {
-    return <p className={styles.loading}>Loading profile…</p>;
+  const handleDeleteAccount = () => {
+    deleteAccount(undefined, {
+      onSuccess: () => {
+        authClient.signOut();
+        router.push("/");
+      },
+    });
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setDisplayName(profile?.displayName ?? "");
+    setIsEditing(false);
+  };
+
+  const handleSave = () => {
+    updateProfile({ displayName });
+    setIsEditing(false);
+  };
+
+  if (isLoadingProfile) {
+    return (
+      <EmptyState variant="loading" message={t("account.profile.loading", "Loading profile…")} />
+    );
+  }
+
+  if (isProfileLoadError) {
+    const errorMessage =
+      profileLoadError instanceof Error
+        ? profileLoadError.message
+        : t("account.profile.loadError", "Failed to load profile");
+    return <EmptyState variant="error" message={errorMessage} />;
   }
 
   if (!profile) {
-    return <p className={styles.empty}>Profile not available.</p>;
+    return <EmptyState message={t("account.profile.notAvailable", "Profile not available.")} />;
   }
 
   const currentDisplayName = displayName;
   const isDirty = currentDisplayName !== (profile.displayName ?? "");
-
-  const initials = getInitials(profile.displayName || profile.email);
+  const nonListenerRoles = profile.roles.filter((r) => r !== "listener");
 
   return (
     <>
       <div className={styles.avatarRow}>
-        {profile.avatarUrl ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={profile.avatarUrl} alt="" className={styles.avatarImage} />
-        ) : (
-          <div className={styles.avatarInitials} aria-hidden="true">
-            {initials}
-          </div>
-        )}
+        <UserAvatar
+          image={profile.avatarUrl ?? null}
+          name={profile.displayName || profile.email}
+          size={72}
+        />
         <div>
           <p className={styles.profileName}>{profile.displayName}</p>
           <p className={styles.profileEmail}>{profile.email}</p>
         </div>
       </div>
 
-      <SettingsSection title="Account">
-        <SettingsRow label="Display Name" sublabel="Shown across the app">
+      <SettingsSection title={t("account.title", "Account")}>
+        <SettingsRow
+          label={t("account.profile.displayName", "Display Name")}
+          sublabel={t("account.profile.displayNameSublabel", "Shown across the app")}
+        >
           <div className={styles.editableField}>
             <input
               id="settings-display-name"
@@ -76,65 +131,139 @@ function ProfileContent() {
               className={styles.input}
               value={currentDisplayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Your display name"
-              aria-label="Display name"
+              placeholder={t("account.profile.displayNamePlaceholder", "Your display name")}
+              aria-label={t("account.profile.displayNameAria", "Display name")}
+              disabled={!isEditing}
             />
-            <button
-              type="button"
-              className={styles.saveButton}
-              disabled={!isDirty || isPending}
-              onClick={() => updateProfile({ displayName: currentDisplayName })}
-            >
-              {isPending ? "Saving…" : "Save"}
-            </button>
+            {!isEditing ? (
+              <Button onClick={handleEdit}>{t("account.profile.edit", "Edit")}</Button>
+            ) : (
+              <>
+                <Button variant="outline" onClick={handleCancel} disabled={isUpdatingProfile}>
+                  {t("account.profile.cancel", "Cancel")}
+                </Button>
+                <Button
+                  disabled={!isDirty || isUpdatingProfile}
+                  onClick={handleSave}
+                  loading={isUpdatingProfile}
+                >
+                  {isUpdatingProfile
+                    ? t("account.profile.saving", "Saving…")
+                    : t("account.profile.save", "Save")}
+                </Button>
+              </>
+            )}
           </div>
         </SettingsRow>
-        <SettingsRow label="Email">
+        <SettingsRow label={t("account.profile.email", "Email")}>
           <span className={styles.readOnly}>{profile.email}</span>
         </SettingsRow>
       </SettingsSection>
 
-      {(isSuccess || isError) && (
-        <p className={isSuccess ? styles.successText : styles.errorText}>
-          {isSuccess ? "Display name saved." : "Failed to save. Please try again."}
+      {(isUpdateSuccess || isUpdateError) && (
+        <p className={isUpdateSuccess ? styles.successText : styles.errorText}>
+          {isUpdateSuccess
+            ? t("account.profile.displayNameSaved", "Display name saved.")
+            : t("account.profile.displayNameSaveFailed", "Failed to save. Please try again.")}
         </p>
       )}
 
-      <SettingsSection title="Roles &amp; Access">
-        <SettingsRow label="Role">
-          <span className={styles.roleBadge}>{profile.role}</span>
-        </SettingsRow>
-        <SettingsRow label="Email Verified">
+      <SettingsSection title={t("account.title", "Account")}>
+        <SettingsRow label={t("account.profile.emailVerified", "Email Verified")}>
           <span className={profile.emailVerified ? styles.verifiedBadge : styles.unverifiedBadge}>
-            {profile.emailVerified ? "Verified" : "Unverified"}
+            {profile.emailVerified
+              ? t("account.profile.verified", "Verified")
+              : t("account.profile.unverified", "Unverified")}
           </span>
         </SettingsRow>
+        {nonListenerRoles.length > 0 && (
+          <SettingsRow label={t("account.profile.roles", "Roles")}>
+            <div className={styles.rolesRow}>
+              {nonListenerRoles.map((r) => (
+                <span key={r} className={styles.roleBadge}>
+                  {r}
+                </span>
+              ))}
+            </div>
+          </SettingsRow>
+        )}
       </SettingsSection>
 
-      <div className={styles.signOutRow}>
-        <button type="button" className={styles.signOutButton} onClick={handleSignOut}>
-          Sign Out
-        </button>
+      <div className={styles.actionRow}>
+        <Button
+          variant="outline"
+          data-testid="sign-out-trigger"
+          onClick={() => setShowSignOutModal(true)}
+        >
+          {t("account.signOut", "Sign Out")}
+        </Button>
+        <Button
+          variant="danger"
+          data-testid="delete-account-trigger"
+          onClick={() => setShowDeleteAccountModal(true)}
+          disabled={isDeletingAccount}
+          loading={isDeletingAccount}
+        >
+          {isDeletingAccount
+            ? t("account.profile.deleting", "Deleting…")
+            : t("account.profile.deleteAccount", "Delete Account")}
+        </Button>
       </div>
+
+      <Modal.ConfirmDialog
+        isOpen={showSignOutModal}
+        onClose={() => setShowSignOutModal(false)}
+        onConfirm={handleSignOut}
+        title={t("account.profile.signOutTitle", "Sign Out?")}
+        confirmLabel={t("account.profile.signOutConfirm", "Sign Out")}
+        confirmVariant="danger"
+        testId="confirm-modal-confirm"
+        cancelTestId="confirm-modal-cancel"
+        modalTestId="confirm-modal"
+      >
+        <p>{t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}</p>
+      </Modal.ConfirmDialog>
+
+      <Modal.ConfirmText
+        isOpen={showDeleteAccountModal}
+        onClose={() => setShowDeleteAccountModal(false)}
+        onConfirm={handleDeleteAccount}
+        title={t("account.profile.deleteAccount", "Delete Account")}
+        message={t(
+          "account.profile.deleteAccountPrompt",
+          "This action is permanent and cannot be undone. All your data will be deleted.",
+        )}
+        confirmLabel={t("account.profile.deleteAccountConfirm", "Delete Account")}
+        confirmVariant="danger"
+        confirmWord={t("account.profile.deleteConfirmWord", "DELETE")}
+        testId="confirm-modal-confirm"
+        modalTestId="delete-account-modal"
+      />
     </>
   );
 }
 
 function SignInCta() {
+  const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
   return (
     <div className={styles.signInCta}>
-      <p className={styles.signInTitle}>Sign in to view your profile and roles.</p>
-      <p className={styles.signInDesc}>
-        Create an account or sign in to manage your profile and roles.
+      <p className={styles.signInTitle}>
+        {t("account.profile.signInCta", "Sign in to view your profile and roles.")}
       </p>
-      <button type="button" className={styles.signInButton} onClick={() => setShowModal(true)}>
-        Sign In
-      </button>
+      <p className={styles.signInDesc}>
+        {t(
+          "account.profile.signInDesc",
+          "Create an account or sign in to manage your profile and roles.",
+        )}
+      </p>
+      <Button variant="primary" onClick={() => setShowModal(true)}>
+        {t("account.profile.signIn", "Sign In")}
+      </Button>
       <AuthModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        message="Sign in to view your profile and roles."
+        message={t("account.profile.signInCta", "Sign in to view your profile and roles.")}
       />
     </div>
   );
@@ -142,13 +271,12 @@ function SignInCta() {
 
 export function SettingsProfileScreen() {
   const { isAuthenticated, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <ScreenView>
-      <div className={styles.page}>
-        <h1 className={styles.title}>Profile</h1>
-        {isLoading ? null : isAuthenticated ? <ProfileContent /> : <SignInCta />}
-      </div>
+      <PageHeader title={t("account.profile.title", "Profile")} />
+      {isLoading ? null : isAuthenticated ? <ProfileContent /> : <SignInCta />}
     </ScreenView>
   );
 }

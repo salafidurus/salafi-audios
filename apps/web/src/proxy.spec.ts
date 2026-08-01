@@ -1,17 +1,17 @@
-import { vi, type Mock } from "vitest";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { vi, describe, it, expect, beforeEach, type Mock } from "bun:test";
+import { NextResponse, type NextRequest } from "next/server";
+
 import { proxy } from "./proxy";
 
 vi.mock("next/server", () => ({
   NextResponse: {
-    redirect: vi.fn(),
-    next: vi.fn(),
+    redirect: vi.fn<any>(),
+    next: vi.fn<any>(),
   },
 }));
 
-const mockRedirect = NextResponse.redirect as Mock;
-const mockNext = NextResponse.next as Mock;
+const mockRedirect = NextResponse.redirect as Mock<any>;
+const mockNext = NextResponse.next as Mock<any>;
 
 function makeRequest(pathname: string, cookieValue?: string): NextRequest {
   return {
@@ -32,7 +32,7 @@ describe("proxy", () => {
   });
 
   describe("auth-required paths", () => {
-    it.each(["/feed/following", "/admin", "/admin/dashboard"])(
+    it.each(["/admin", "/admin/dashboard", "/admin/scholars"])(
       "redirects unauthenticated request to %s → /sign-in",
       (pathname) => {
         proxy(makeRequest(pathname, undefined));
@@ -42,10 +42,10 @@ describe("proxy", () => {
     );
 
     it("redirects to /sign-in carrying the original path in the `from` query", () => {
-      proxy(makeRequest("/feed/following", undefined));
+      proxy(makeRequest("/admin", undefined));
       const redirectedTo = mockRedirect.mock.calls[0]![0] as URL;
       expect(redirectedTo.pathname).toBe("/sign-in");
-      expect(redirectedTo.searchParams.get("from")).toBe("/feed/following");
+      expect(redirectedTo.searchParams.get("from")).toBe("/admin");
     });
 
     it.each(["/account/profile", "/admin/dashboard"])(
@@ -62,7 +62,7 @@ describe("proxy", () => {
     it.each([
       "/account",
       "/account/profile",
-      "/feed",
+      "/explore",
       "/live",
       "/library",
       "/search",

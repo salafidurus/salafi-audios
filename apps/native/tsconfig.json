@@ -4,11 +4,16 @@
   "compilerOptions": {
     // react-jsx uses the automatic runtime (React 17+) — no manual React import needed
     "jsx": "react-jsx",
+    // Note: composite disabled due to Better Auth type inference issue
+    // See: https://better-auth.com/docs/concepts/typescript
+    "incremental": true,
     "types": ["jest", "node"],
     "moduleSuffixes": [".native", ".web", ""],
     "paths": {
+      "expo-bottom-accessory": ["./modules/expo-bottom-accessory/src/index.ts"],
       "@/*": ["./src/*"],
       "@/assets/*": ["./assets/*"]
     }
-  }
+  },
+  "exclude": ["node_modules"]
 }

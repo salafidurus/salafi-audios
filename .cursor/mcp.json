@@ -1,11 +1,3 @@
 {
-  "mcpServers": {
-    "argent": {
-      "command": "argent",
-      "args": ["mcp"],
-      "env": {
-        "ARGENT_MCP_LOG": "C:\\Users\\olanr\\.argent\\mcp-calls.log"
-      }
-    }
-  }
+  "mcpServers": {}
 }

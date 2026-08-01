@@ -1,38 +1,34 @@
-import { PrismaService } from '../../shared/db/prisma.service';
+import { PrismaService } from '../../core/db/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
-import {
+import type {
   TopicDetailDto,
-  TopicViewDto,
   TopicLectureViewDto,
   TranslationViewDto,
-  type Locale,
+  Locale,
 } from '@sd/core-contracts';
-import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
-import { isLegacyTopicSchemaFailure } from './topics-error.utils';
-import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
+import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
+import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 const topicViewSelect = {
   id: true,
   slug: true,
   name: true,
-  parentId: true,
+  orderIndex: true,
   createdAt: true,
+  translations: {
+    select: {
+      locale: true,
+      name: true,
+    },
+  },
 } satisfies Prisma.TopicSelect;
 
 type TopicViewRecord = Prisma.TopicGetPayload<{
   select: typeof topicViewSelect;
 }>;
-
-type LegacyTopicRow = {
-  id: string;
-  slug: string;
-  name: string;
-  parentId: string | null;
-  createdAt: Date | string;
-};
 
 @Injectable()
 export class TopicsRepository {
@@ -42,18 +38,6 @@ export class TopicsRepository {
     const records = await this.findManyTopics();
 
     return records.map((r) => this.toViewDto(r));
-  }
-
-  async listChildrenBySlug(slug: string): Promise<TopicViewDto[] | null> {
-    const parent = await this.prisma.topic.findUnique({
-      where: { slug },
-      select: { id: true },
-    });
-    if (!parent) return null;
-
-    const records = await this.findManyTopics({ parentId: parent.id });
-
-    return records.map((t) => this.toViewDto(t));
   }
 
   async listPublishedLecturesByTopicSlug(
@@ -155,29 +139,43 @@ export class TopicsRepository {
   }
 
   /**
-   * Upsert Topic by slug, optionally setting parent by parentSlug.
-   *
-   * Returns null if parentSlug is provided but parent does not exist.
+   * Upsert Topic by slug.
    */
-  async upsertBySlug(input: UpsertTopicDto): Promise<TopicDetailDto | null> {
-    const parentId = await this.resolveOptionalParentId(input.parentSlug);
-    if (input.parentSlug && !parentId) return null;
+  async upsertBySlug(input: {
+    slug: string;
+    name: string;
+    orderIndex?: number;
+  }): Promise<TopicDetailDto> {
+    return this.prisma.$transaction(async (tx) => {
+      const record = await tx.topic.upsert({
+        where: { slug: input.slug },
+        select: topicViewSelect,
+        create: {
+          slug: input.slug,
+          name: input.name,
+          orderIndex: input.orderIndex ?? 99,
+        },
+        update: {
+          name: input.name,
+          orderIndex: input.orderIndex,
+        },
+      });
 
-    const record = await this.prisma.topic.upsert({
-      where: { slug: input.slug },
-      select: topicViewSelect,
-      create: {
-        slug: input.slug,
-        name: input.name,
-        parentId,
-      },
-      update: {
-        name: input.name,
-        parentId,
-      },
+      // Arabic is always the main language for topics — mirror the main
+      // content into a matching TopicTranslation so it's always in sync.
+      await syncMainLanguageTranslation({
+        upsert: (locale, fields) =>
+          tx.topicTranslation.upsert({
+            where: { topicId_locale: { topicId: record.id, locale } },
+            create: { topicId: record.id, locale, name: fields.name },
+            update: { name: fields.name },
+          }),
+        newLocale: 'ar',
+        newFields: { name: input.name },
+      });
+
+      return this.toViewDto(record);
     });
-
-    return this.toViewDto(record);
   }
 
   async deleteBySlug(slug: string): Promise<void> {
@@ -190,14 +188,12 @@ export class TopicsRepository {
 
   private mapTopicTranslation(t: {
     locale: string;
-    status: string;
     name: string;
     createdAt: Date;
     updatedAt: Date;
   }): TranslationViewDto {
     return {
       locale: t.locale as Locale,
-      status: t.status === 'published' ? 'published' : 'draft',
       fields: { name: t.name },
       createdAt: t.createdAt.toISOString(),
       updatedAt: t.updatedAt.toISOString(),
@@ -218,7 +214,7 @@ export class TopicsRepository {
   ): Promise<TranslationViewDto> {
     const record = await this.prisma.topicTranslation.upsert({
       where: { topicId_locale: { topicId, locale: dto.locale } },
-      create: { topicId, locale: dto.locale, name: dto.name, status: 'draft' },
+      create: { topicId, locale: dto.locale, name: dto.name },
       update: { name: dto.name },
     });
     return this.mapTopicTranslation(record);
@@ -236,113 +232,33 @@ export class TopicsRepository {
     return this.mapTopicTranslation(record);
   }
 
-  async publishTopicTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
-    const record = await this.prisma.topicTranslation.update({
-      where: { topicId_locale: { topicId, locale: locale as Locale } },
-      data: { status: 'published' },
-    });
-    return this.mapTopicTranslation(record);
-  }
-
-  async unpublishTopicTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
-    const record = await this.prisma.topicTranslation.update({
-      where: { topicId_locale: { topicId, locale: locale as Locale } },
-      data: { status: 'draft' },
-    });
-    return this.mapTopicTranslation(record);
-  }
-
-  private async resolveOptionalParentId(parentSlug?: string): Promise<string | null> {
-    if (!parentSlug) return null;
-
-    const parent = await this.prisma.topic.findUnique({
-      where: { slug: parentSlug },
-      select: { id: true },
-    });
-
-    return parent?.id ?? null;
-  }
-
   private async findManyTopics(
-    where?: { slug?: string; parentId?: string },
+    where?: { slug?: string },
     take?: number,
-  ): Promise<Array<TopicViewRecord | LegacyTopicRow>> {
-    try {
-      return await this.prisma.topic.findMany({
-        where,
-        orderBy: [{ name: 'asc' }],
-        select: topicViewSelect,
-        take,
-      });
-    } catch (error) {
-      if (!isLegacyTopicSchemaFailure(error)) {
-        throw error;
-      }
-
-      return this.findManyTopicsLegacy(where, take);
-    }
+  ): Promise<TopicViewRecord[]> {
+    return this.prisma.topic.findMany({
+      where,
+      orderBy: [{ orderIndex: 'asc' }],
+      select: topicViewSelect,
+      take,
+    });
   }
 
-  private async findManyTopicsLegacy(
-    where?: { slug?: string; parentId?: string },
-    take?: number,
-  ): Promise<LegacyTopicRow[]> {
-    const columns = await this.getTopicColumnSet();
-    const parentExpr = columns.has('parentId') ? '"parentId"' : 'NULL::text AS "parentId"';
-    const createdAtExpr = columns.has('createdAt')
-      ? '"createdAt"'
-      : 'CURRENT_TIMESTAMP AS "createdAt"';
-    const conditions: string[] = [];
-    const params: unknown[] = [];
+  private toViewDto(record: TopicViewRecord): TopicDetailDto {
+    const createdAt = record.createdAt.toISOString();
 
-    if (where?.slug) {
-      params.push(where.slug);
-      conditions.push(`"slug" = $${params.length}`);
-    }
-
-    if (where?.parentId) {
-      if (!columns.has('parentId')) {
-        return [];
-      }
-      params.push(where.parentId);
-      conditions.push(`"parentId" = $${params.length}`);
-    }
-
-    let query = `SELECT "id", "slug", "name", ${parentExpr}, ${createdAtExpr} FROM "Topic"`;
-
-    if (conditions.length > 0) {
-      query += ` WHERE ${conditions.join(' AND ')}`;
-    }
-
-    query += ' ORDER BY "name" ASC';
-
-    if (typeof take === 'number') {
-      params.push(take);
-      query += ` LIMIT $${params.length}`;
-    }
-
-    return this.prisma.$queryRawUnsafe<LegacyTopicRow[]>(query, ...params);
-  }
-
-  private async getTopicColumnSet(): Promise<Set<string>> {
-    const rows = await this.prisma.$queryRaw<
-      Array<{ column_name: string }>
-    >`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'Topic'`;
-
-    return new Set(rows.map((row) => row.column_name));
-  }
-
-  private toViewDto(record: TopicViewRecord | LegacyTopicRow): TopicDetailDto {
-    const createdAt =
-      record.createdAt instanceof Date
-        ? record.createdAt.toISOString()
-        : new Date(record.createdAt).toISOString();
+    // Arabic is the main language for topics — record.name already holds
+    // the Arabic content; English (if present) comes from the translation.
+    const enTranslation = record.translations.find((t) => t.locale === 'en')?.name;
 
     return {
       id: record.id,
       slug: record.slug,
-      name: record.name,
-      parentId: record.parentId ?? undefined,
+      name: {
+        ar: record.name,
+        en: enTranslation,
+      },
+      orderIndex: record.orderIndex,
       createdAt,
     };
   }

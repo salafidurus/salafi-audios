@@ -1,4 +1,2 @@
-export const SUPPORTED_LOCALES = ["en", "ar"] as const;
-export type Locale = (typeof SUPPORTED_LOCALES)[number];
-export const DEFAULT_LOCALE: Locale = "en";
-export const RTL_LOCALES: readonly Locale[] = ["ar"];
+// Re-export locale types and constants from @sd/core-contracts (canonical source)
+export { SUPPORTED_LOCALES, type Locale, DEFAULT_LOCALE, RTL_LOCALES } from "@sd/core-contracts";

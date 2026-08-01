@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.loading,
+.empty {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--content-muted);
+  font-size: var(--typo-body-md-font-size);
+}
+
+.toolbar {
+  display: flex;
+  gap: var(--space-component-gap-md);
+  flex-wrap: wrap;
+}

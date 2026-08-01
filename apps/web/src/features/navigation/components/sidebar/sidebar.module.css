@@ -288,3 +288,14 @@
   background: var(--surface-hover);
   border-color: var(--border-default);
 }
+
+.sidebarLanguageSwitch {
+  margin-bottom: var(--space-component-gap-md);
+  width: 100%;
+}
+
+.collapsed .sidebarLanguageSwitch {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-component-gap-sm);
+}

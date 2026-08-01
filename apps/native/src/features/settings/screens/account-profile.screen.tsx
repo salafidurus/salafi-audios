@@ -1,9 +1,15 @@
-import { useState } from "react";
-import { Pressable, ScrollView, TextInput, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useAccountProfile, useUpdateProfile } from "@sd/domain-account";
-import { AppText } from "@/shared/components/AppText/AppText";
+import { useState } from "react";
+import { Pressable, ScrollView, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { TextInput } from "@/shared/components/TextInput/TextInput";
+
+import { SettingsRow } from "../components/SettingsRow/SettingsRow";
+import { SettingsSection } from "../components/SettingsSection/SettingsSection";
+import { getRtlAwareTextAlign } from "../utils/rtl-text-align";
 
 export type AccountProfileScreenProps = {
   onBack?: () => void;
@@ -32,33 +38,32 @@ function AccountProfileForm({
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <AppText variant="titleLg" style={styles.title}>
-        {t("account.editProfile", "Edit Profile")}
-      </AppText>
-      <View style={styles.form}>
-        <View style={styles.field}>
-          <AppText variant="labelMd">{t("account.displayName", "Display Name")}</AppText>
+      <SettingsSection
+        title={t("account.editProfile", "Edit Profile")}
+        description={t("account.profileDesc", "Manage your personal profile information.")}
+      >
+        <SettingsRow label={t("account.profile.displayName", "Display Name")}>
           <TextInput
             value={displayName}
             onChangeText={setDisplayName}
-            placeholder={t("account.displayNamePlaceholder", "Your display name")}
+            placeholder={t("account.profile.displayNamePlaceholder", "Your display name")}
             placeholderTextColor={theme.colors.content.muted}
             style={styles.input}
           />
-        </View>
-        <View style={styles.field}>
-          <AppText variant="labelMd">{t("account.email", "Email")}</AppText>
+        </SettingsRow>
+        <SettingsRow label={t("account.profile.email", "Email")} hideBorder>
           <TextInput
             value={profile.email}
             editable={false}
             style={[styles.input, styles.inputDisabled]}
           />
-        </View>
-      </View>
+        </SettingsRow>
+      </SettingsSection>
+
       <View style={styles.actions}>
         {isError && (
           <AppText variant="caption" style={{ color: theme.colors.state.dangerContent }}>
-            {t("account.saveFailed", "Failed to save. Please try again.")}
+            {t("account.profile.displayNameSaveFailed", "Failed to save. Please try again.")}
           </AppText>
         )}
         {isSuccess && (
@@ -72,7 +77,7 @@ function AccountProfileForm({
           style={[styles.saveButton, (isPending || unchanged) && styles.saveButtonDisabled]}
         >
           <AppText variant="bodyMd" style={{ color: theme.colors.content.onPrimary }}>
-            {isPending ? t("account.saving", "Saving…") : t("account.save", "Save")}
+            {isPending ? t("account.profile.saving", "Saving…") : t("account.profile.save", "Save")}
           </AppText>
         </Pressable>
       </View>
@@ -82,13 +87,13 @@ function AccountProfileForm({
 
 export function AccountProfileScreen(_props: AccountProfileScreenProps) {
   const { t } = useTranslation();
-  const { data: profile, isFetching } = useAccountProfile();
+  const { data: profile, isLoading } = useAccountProfile();
   const { mutate: updateProfile, isPending, isSuccess, isError } = useUpdateProfile();
 
-  if (isFetching) {
+  if (isLoading) {
     return (
       <View style={styles.centered}>
-        <AppText variant="bodyMd">{t("account.loadingProfile", "Loading profile...")}</AppText>
+        <AppText variant="bodyMd">{t("account.profile.loading", "Loading profile...")}</AppText>
       </View>
     );
   }
@@ -97,7 +102,7 @@ export function AccountProfileScreen(_props: AccountProfileScreenProps) {
     return (
       <View style={styles.centered}>
         <AppText variant="bodyMd">
-          {t("account.profileUnavailable", "Profile not available")}
+          {t("account.profile.notAvailable", "Profile not available")}
         </AppText>
       </View>
     );
@@ -122,37 +127,26 @@ const styles = StyleSheet.create((theme) => ({
   },
   screen: {
     flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
   },
   content: {
     paddingHorizontal: theme.spacing.layout.pageX,
     paddingVertical: theme.spacing.layout.pageY,
   },
-  title: {
-    color: theme.colors.content.strong,
-  },
-  form: {
-    marginTop: theme.spacing.scale.xl,
-    gap: theme.spacing.component.gapLg,
-  },
-  field: {
-    gap: theme.spacing.scale.xs,
-  },
   input: {
-    paddingVertical: theme.spacing.scale.sm,
-    paddingHorizontal: theme.spacing.scale.md,
-    borderWidth: theme.border.width.default,
-    borderColor: theme.colors.border.default,
-    borderRadius: theme.radius.scale.sm,
     fontSize: 14,
     color: theme.colors.content.default,
+    textAlign: getRtlAwareTextAlign(theme.direction),
+    flex: 1,
   },
   inputDisabled: {
-    backgroundColor: theme.colors.surface.subtle,
+    color: theme.colors.content.muted,
   },
   actions: {
-    marginTop: theme.spacing.scale.xl,
+    marginTop: theme.spacing.scale.md,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "flex-end",
     gap: theme.spacing.scale.md,
   },
   saveButton: {

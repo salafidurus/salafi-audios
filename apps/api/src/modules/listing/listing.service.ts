@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import { Status } from '@sd/core-db';
 import type {
   ListingDetailDto,
@@ -6,17 +8,33 @@ import type {
   AdminListingListDto,
   AdminListingDetailDto,
   CreateListingDto,
-  AdminListingUpdateDto,
+  UpdateListingDetailsDto,
+  UpdateListingMediaDto,
+  AdminListingMediaDetailDto,
   BulkActionDto,
   BulkActionResultDto,
   TranslationViewDto,
   SaveListingTranslationDto,
+  ListingRefDto,
+  ListingContentsDto,
+  LastPlayedLessonDto,
+  ListingProgressSummaryDto,
+  FeedPageDto,
+  AdminArrangeDataDto,
+  ArrangeCommitDto,
+  ArrangeCommitResultDto,
 } from '@sd/core-contracts';
+import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ListingRepository } from './listing.repo';
+import { RecentListingsRepo } from './listing-recent.repo';
 
 @Injectable()
 export class ListingService {
-  constructor(private readonly repo: ListingRepository) {}
+  constructor(
+    private readonly repo: ListingRepository,
+    private readonly recentRepo: RecentListingsRepo,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async getById(id: string): Promise<ListingDetailDto> {
     const listing = await this.repo.findDetailById(id);
@@ -28,8 +46,26 @@ export class ListingService {
     return this.repo.findRelated(id);
   }
 
+  async getRecentListings(cursor?: string, limit?: number): Promise<FeedPageDto> {
+    return this.recentRepo.getRecentListings(cursor, limit);
+  }
+
+  async getContents(id: string): Promise<ListingContentsDto> {
+    const contents = await this.repo.findContentsById(id);
+    if (!contents) throw new NotFoundException(`Listing "${id}" not found`);
+    return contents;
+  }
+
+  async getLastPlayedLesson(id: string, userId: string): Promise<LastPlayedLessonDto | null> {
+    return this.repo.findLastPlayedLesson(id, userId);
+  }
+
+  async getProgressSummary(id: string, userId: string): Promise<ListingProgressSummaryDto | null> {
+    return this.repo.getProgressSummary(id, userId);
+  }
+
   listAdmin(params: {
-    page: number;
+    cursor?: string;
     scholarId?: string;
     status?: string;
     search?: string;
@@ -43,38 +79,100 @@ export class ListingService {
     return listing;
   }
 
-  createListing(
+  getFormData(listingId: string) {
+    return this.repo.getFormData(listingId);
+  }
+
+  getSeriesOptions(scholarId: string): Promise<ListingRefDto[]> {
+    return this.repo.findSeriesOptionsByScholar(scholarId);
+  }
+
+  async createListing(
     dto: CreateListingDto & { publicUrl?: string },
     createdBy?: string,
   ): Promise<{ id: string; title: string }> {
-    return this.repo.createWithAudioAsset(dto, createdBy);
+    const result = await this.repo.createWithAudioAsset(dto, createdBy);
+    await this.invalidateCache(result.id);
+    return result;
   }
 
-  async updateListing(
+  async updateListingDetails(
     id: string,
-    dto: AdminListingUpdateDto,
+    dto: UpdateListingDetailsDto,
     updatedBy?: string,
   ): Promise<{ success: boolean }> {
-    const ok = await this.repo.updateListing(id, dto, updatedBy);
+    const ok = await this.repo.updateListingDetails(id, dto, updatedBy);
     if (!ok) throw new NotFoundException(`Listing "${id}" not found`);
+    await this.invalidateCache(id);
     return { success: true };
+  }
+
+  async updateListingMedia(
+    id: string,
+    dto: UpdateListingMediaDto,
+    updatedBy?: string,
+  ): Promise<{ success: boolean }> {
+    const ok = await this.repo.updateListingMedia(id, dto, updatedBy);
+    if (!ok) throw new NotFoundException(`Listing "${id}" not found`);
+    await this.invalidateCache(id);
+    return { success: true };
+  }
+
+  async getMediaData(id: string): Promise<AdminListingMediaDetailDto> {
+    const data = await this.repo.getMediaData(id);
+    if (!data) throw new NotFoundException(`Listing "${id}" not found`);
+    return data;
+  }
+
+  async getArrangeData(id: string): Promise<AdminArrangeDataDto> {
+    const data = await this.repo.getArrangeData(id);
+    if (!data) throw new NotFoundException(`Listing "${id}" not found`);
+    return data;
+  }
+
+  async arrangeCommit(
+    id: string,
+    dto: ArrangeCommitDto,
+    userId?: string,
+  ): Promise<ArrangeCommitResultDto> {
+    const { result, affectedIds } = await this.repo.arrangeCommit(id, dto, userId);
+    await Promise.all(affectedIds.map((affectedId) => this.invalidateCache(affectedId)));
+    return result;
   }
 
   async publishListing(id: string): Promise<{ success: boolean }> {
     const ok = await this.repo.updateListingStatus(id, Status.published);
     if (!ok) throw new NotFoundException(`Listing "${id}" not found`);
+    await this.invalidateCache(id);
     return { success: true };
   }
 
   async archiveListing(id: string): Promise<{ success: boolean }> {
     const ok = await this.repo.updateListingStatus(id, Status.archived);
     if (!ok) throw new NotFoundException(`Listing "${id}" not found`);
+    await this.invalidateCache(id);
     return { success: true };
   }
 
   async bulkAction(dto: BulkActionDto): Promise<BulkActionResultDto> {
     const status = dto.action === 'publish' ? Status.published : Status.archived;
-    return this.repo.bulkUpdateStatus(dto.ids, status);
+    const result = await this.repo.bulkUpdateStatus(dto.ids, status);
+    // Invalidate cache for all affected listings
+    await Promise.all(dto.ids.map((id) => this.invalidateCache(id)));
+    return result;
+  }
+
+  private async invalidateCache(id: string): Promise<void> {
+    // LocaleCacheInterceptor uses format: ${url}:${locale}[:${userId}]
+    const cacheKeysToInvalidate: string[] = [];
+
+    // Invalidate listing detail and contents caches
+    for (const locale of SUPPORTED_LOCALES) {
+      cacheKeysToInvalidate.push(`/listings/${id}:${locale}`);
+      cacheKeysToInvalidate.push(`/listings/${id}/contents:${locale}`);
+    }
+
+    await Promise.all(cacheKeysToInvalidate.map((key) => this.cacheManager.del(key)));
   }
 
   // ─── Translations ─────────────────────────────────────────────────────────
@@ -83,26 +181,34 @@ export class ListingService {
     return this.repo.listListingTranslations(listingId);
   }
 
-  upsertTranslation(
+  async upsertTranslation(
     listingId: string,
     dto: SaveListingTranslationDto,
   ): Promise<TranslationViewDto> {
-    return this.repo.upsertListingTranslation(listingId, dto);
+    const result = await this.repo.upsertListingTranslation(listingId, dto);
+    await this.invalidateCache(listingId);
+    return result;
   }
 
-  updateTranslation(
+  async updateTranslation(
     listingId: string,
     locale: string,
     fields: Partial<{ title: string; description: string | null }>,
   ): Promise<TranslationViewDto> {
-    return this.repo.updateListingTranslation(listingId, locale, fields);
+    const result = await this.repo.updateListingTranslation(listingId, locale, fields);
+    await this.invalidateCache(listingId);
+    return result;
   }
 
-  publishTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
-    return this.repo.publishListingTranslation(listingId, locale);
+  async publishTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
+    const result = await this.repo.publishListingTranslation(listingId, locale);
+    await this.invalidateCache(listingId);
+    return result;
   }
 
-  unpublishTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
-    return this.repo.unpublishListingTranslation(listingId, locale);
+  async unpublishTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
+    const result = await this.repo.unpublishListingTranslation(listingId, locale);
+    await this.invalidateCache(listingId);
+    return result;
   }
 }

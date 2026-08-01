@@ -1,4 +1,5 @@
-import { vi, type Mocked } from 'vitest';
+import type { Mocked } from '../../test/setup';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
 import type { LibraryPageDto } from '@sd/core-contracts';
 import { LibraryRepository } from './library.repo';
@@ -33,13 +34,13 @@ describe('LibraryService', () => {
         {
           provide: LibraryRepository,
           useValue: {
-            findInProgress: vi.fn(),
-            findCompleted: vi.fn(),
-            findSaved: vi.fn(),
-            saveLecture: vi.fn(),
-            unsaveLecture: vi.fn(),
-            bulkSave: vi.fn(),
-          } satisfies Partial<Mocked<LibraryRepository>>,
+            findInProgress: vi.fn<any>(),
+            findCompleted: vi.fn<any>(),
+            findSaved: vi.fn<any>(),
+            saveLecture: vi.fn<any>(),
+            unsaveLecture: vi.fn<any>(),
+            bulkSave: vi.fn<any>(),
+          } as Partial<Mocked<LibraryRepository>>,
         },
       ],
     }).compile();

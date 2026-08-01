@@ -1,44 +1,35 @@
-import { useCallback } from "react";
-import { Text, FlatList } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import type { LibraryItemDto } from "@sd/core-contracts";
 import { useLibraryCompletedScreen } from "@sd/domain-content";
+import { useCallback } from "react";
+import { ScrollView } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { LibraryItemRow } from "@/features/library/components/library-item-row/library-item-row";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
+import { List } from "@/shared/components/List";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 export type LibraryCompletedScreenProps = {
-  onNavigateToLecture?: (id: string) => void;
+  onNavigateToListing?: (slug: string) => void;
 };
 
-export function LibraryCompletedScreen({ onNavigateToLecture }: LibraryCompletedScreenProps) {
+export function LibraryCompletedScreen({ onNavigateToListing }: LibraryCompletedScreenProps) {
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useLibraryCompletedScreen(isAuthenticated);
   const { t } = useTranslation();
 
   const handleItemPress = useCallback(
-    (lectureId: string) => {
-      onNavigateToLecture?.(lectureId);
+    (slug: string) => {
+      onNavigateToListing?.(slug);
     },
-    [onNavigateToLecture],
-  );
-
-  const renderItem = useCallback(
-    ({ item }: { item: LibraryItemDto }) => (
-      <LibraryItemRow
-        item={item}
-        variant="completed"
-        onPress={() => handleItemPress(item.listingId)}
-      />
-    ),
-    [handleItemPress],
+    [onNavigateToListing],
   );
 
   if (isFetching && items.length === 0) {
     return (
       <ScreenView center>
-        <Text style={styles.loadingText}>{t("common.loading", "Loading...")}</Text>
+        <EmptyState message={t("common.loading", "Loading...")} variant="loading" />
       </ScreenView>
     );
   }
@@ -46,21 +37,29 @@ export function LibraryCompletedScreen({ onNavigateToLecture }: LibraryCompleted
   if (items.length === 0) {
     return (
       <ScreenView center>
-        <Text style={styles.emptyText}>
-          {t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
-        </Text>
+        <EmptyState
+          message={t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
+          variant="empty"
+        />
       </ScreenView>
     );
   }
 
   return (
     <ScreenView>
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
-      />
+      <ScrollView contentContainerStyle={styles.listContent}>
+        <List>
+          {items.map((item, index) => (
+            <LibraryItemRow
+              key={item.id}
+              item={item}
+              variant="completed"
+              onPress={() => handleItemPress(item.listingSlug)}
+              hideBorder={index === items.length - 1}
+            />
+          ))}
+        </List>
+      </ScrollView>
     </ScreenView>
   );
 }
@@ -74,6 +73,8 @@ const styles = StyleSheet.create((theme) => ({
     textAlign: "center",
   },
   listContent: {
+    paddingHorizontal: theme.spacing.layout.pageX,
+    paddingVertical: theme.spacing.layout.pageY,
     paddingBottom: theme.spacing.scale["2xl"],
   },
 }));

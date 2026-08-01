@@ -1,12 +1,18 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 import type { LibraryItemDto } from "@sd/core-contracts";
+
 import { pickContentField } from "@sd/core-i18n";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import React from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
+import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
+
 import styles from "./library-list-row.module.css";
 
 export type LibraryListRowProps = {
@@ -17,25 +23,38 @@ export type LibraryListRowProps = {
 export function LibraryListRow({ item, variant }: LibraryListRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
+  const isRtl = useIsRtl();
+  const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
 
   const title = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
-  const initial = item.scholarName ? item.scholarName.trim().charAt(0).toUpperCase() : "?";
+  const initial = scholarName ? scholarName.trim().charAt(0).toUpperCase() : "?";
 
   const progress =
     item.durationSeconds && item.progressSeconds
       ? Math.round((item.progressSeconds / item.durationSeconds) * 100)
       : null;
 
+  const savedAtFormatted = useFormattedDate(item.savedAt || "", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+  const completedAtFormatted = useFormattedDate(item.completedAt || "", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
   let rightLabelText = "";
   if (variant === "progress" && progress !== null) {
     rightLabelText = t("library.percentListened", "{{percent}}% listened", { percent: progress });
   } else if (variant === "saved" && item.savedAt) {
     rightLabelText = t("library.savedOn", "Saved {{date}}", {
-      date: new Date(item.savedAt).toLocaleDateString(),
+      date: savedAtFormatted,
     });
   } else if (variant === "completed" && item.completedAt) {
     rightLabelText = t("library.completedOn", "Completed {{date}}", {
-      date: new Date(item.completedAt).toLocaleDateString(),
+      date: completedAtFormatted,
     });
   } else if (item.durationSeconds) {
     rightLabelText = t("lecture.minutes", "{{count}} min", {
@@ -44,7 +63,7 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
   }
 
   return (
-    <Link href={`/listing/${item.listingSlug}`} className={`${styles.row} listRow`}>
+    <Link href={`/listings/${item.listingSlug}`} className={`${styles.row} listRow`}>
       <div className={styles.avatarSection}>
         <div className={styles.avatarFallback} aria-hidden="true">
           {initial}
@@ -54,12 +73,20 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
       <div className={styles.centerSection}>
         <div className={styles.title}>{title}</div>
         <div className={styles.metadata}>
-          {item.scholarName}
+          {scholarName}
           {item.seriesTitle && ` · ${item.seriesTitle}`}
         </div>
         {variant === "progress" && progress !== null && (
-          <div className={styles.progressBarContainer} aria-hidden="true">
-            <div className={styles.progressBar} style={{ width: `${progress}%` }} />
+          <div
+            className={styles.progressBarContainer}
+            aria-hidden="true"
+            data-testid="progress-bar-container"
+          >
+            <div
+              className={styles.progressBar}
+              style={{ width: `${progress}%` }}
+              data-testid="progress-bar"
+            />
           </div>
         )}
       </div>
@@ -70,7 +97,11 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
             {rightLabelText}
           </span>
         )}
-        <ChevronRight className={styles.chevron} size={20} />
+        {isRtl ? (
+          <ChevronLeft className={styles.chevron} size={20} />
+        ) : (
+          <ChevronRight className={styles.chevron} size={20} />
+        )}
       </div>
     </Link>
   );

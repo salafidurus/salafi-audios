@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "bun:test";
+import React from "react";
+
 import { SettingsGeneralScreen } from "./settings-general.screen";
 
-vi.mock("@/features/i18n", () => ({
+vi.mock("@/features/settings/i18n", () => ({
   LanguageSwitch: () => <div data-testid="language-switch">LanguageSwitch</div>,
   ContentLanguageToggle: () => (
     <div data-testid="content-language-toggle">ContentLanguageToggle</div>
@@ -16,7 +17,7 @@ vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
   ),
 }));
 
-vi.mock("@/shared/components/SettingsSection/SettingsSection", () => ({
+vi.mock("@/features/settings/components/SettingsSection/SettingsSection", () => ({
   SettingsSection: ({ title, children }: { title: string; children: React.ReactNode }) => (
     <section>
       <h2>{title}</h2>
@@ -25,7 +26,7 @@ vi.mock("@/shared/components/SettingsSection/SettingsSection", () => ({
   ),
 }));
 
-vi.mock("@/shared/components/SettingsRow/SettingsRow", () => ({
+vi.mock("@/features/settings/components/SettingsRow/SettingsRow", () => ({
   SettingsRow: ({ label, children }: { label: string; children?: React.ReactNode }) => (
     <div>
       <span>{label}</span>
@@ -34,7 +35,7 @@ vi.mock("@/shared/components/SettingsRow/SettingsRow", () => ({
   ),
 }));
 
-vi.mock("@/shared/components/SegmentedControl/SegmentedControl", () => ({
+vi.mock("@/features/settings/components/SegmentedControl/SegmentedControl", () => ({
   SegmentedControl: ({
     options,
     value,
@@ -121,14 +122,13 @@ describe("SettingsGeneralScreen", () => {
     const darkButton = screen.getByRole("button", { name: "Dark" });
     fireEvent.click(darkButton);
 
-    expect(localStorageMock.getItem("theme-preference")).toBe("dark");
+    expect(localStorageMock.getItem("theme-preference:v1")).toBe("dark");
     expect(dispatchSpy).toHaveBeenCalledWith(expect.any(Event));
   });
 
   it("shows sub-toggles when master notification is ON", async () => {
     render(<SettingsGeneralScreen />);
     await act(async () => {});
-    expect(screen.getByText("Live Sessions")).toBeInTheDocument();
     expect(screen.getByText("Followed Scholars")).toBeInTheDocument();
     expect(screen.getByText("New Lectures")).toBeInTheDocument();
   });
@@ -141,7 +141,6 @@ describe("SettingsGeneralScreen", () => {
     const switches = screen.getAllByRole("switch");
     fireEvent.click(switches[0]!);
 
-    expect(screen.queryByText("Live Sessions")).not.toBeInTheDocument();
     expect(screen.queryByText("Followed Scholars")).not.toBeInTheDocument();
     expect(screen.queryByText("New Lectures")).not.toBeInTheDocument();
   });

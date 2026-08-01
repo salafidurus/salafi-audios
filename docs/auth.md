@@ -12,140 +12,169 @@ mechanism that implements them.
   never own the trust model. UI-level auth checks are UX, not security.
 - Authentication is **OAuth-only** (Google + Apple). There is no email/password
   flow.
-- The implementation is **[Better Auth](https://www.better-auth.com/)**, mounted
-  inside NestJS.
-- **The web and API are deployed on different sites (different registrable
-  domains) in production.** This single fact drives most of the design below:
-  browsers block third-party cookies (Safari ITP fully, Chrome progressively),
-  so the web client cannot authenticate to the API with a cookie. It uses a
-  **bearer token** instead.
+- The implementation is **[Better Auth v1.6.23+](https://www.better-auth.com/)**,
+  mounted as a Fastify route in NestJS.
+- **The web and API are deployed on the same root domain** (`salafidurus.com`),
+  allowing secure session cookie sharing across subdomains. This simplifies the
+  authentication flow: the web app authenticates with the same session cookies as
+  the native app, without bearer token complexity.
 
 ## Credential model per platform
 
 There is one shared HTTP client (`packages/core-contracts/src/http.ts`) used for
-all domain data calls (catalog, account, library, admin, …). It can attach
-either an `Authorization: Bearer` header or a `Cookie` header, depending on what
-each app wires up at startup. Each platform uses the credential that is robust
-for it:
+all domain data calls (catalog, account, library, admin, …). Each platform
+handles credentials identically, using session cookies:
 
-| Platform | Session credential                    | Storage                                       | Why                                                                                                                                    |
+| Platform | Session credential                    | Storage                                       | How                                                                                                                                    |
 | -------- | ------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Web      | `Authorization: Bearer <token>`       | `localStorage` (`sd.bearer_token`)            | Cross-site; browsers block third-party cookies, but a bearer header is never blocked.                                                  |
-| Native   | `Cookie: better-auth.session_token=…` | `expo-secure-store` (via `@better-auth/expo`) | React Native `fetch` has no cookie jar and no CORS/ITP restrictions, so forwarding the stored cookie as a header is simplest and safe. |
-| API      | Validates either credential           | n/a                                           | The Better Auth `bearer()` plugin converts an `Authorization: Bearer` header into a session; cookies are validated natively.           |
+| Web      | `Cookie: better-auth.session_token=…` | Browser cookie jar                            | Same-domain cookies automatically sent via `credentials: 'include'`. HttpOnly flag prevents XSS. Browser handles all cookie mechanics. |
+| Native   | `Cookie: better-auth.session_token=…` | `expo-secure-store` (via `@better-auth/expo`) | `@better-auth/expo` stores session in SecureStore and forwards via `Cookie` header (RN has no cookie jar).                             |
+| API      | Validates cookies natively            | n/a                                           | Better Auth validates session cookies directly.                                                                                        |
 
 The wiring happens once at app startup:
 
-- Web — `apps/web/src/core/providers.tsx` calls
-  `setAccessTokenProvider(() => getBearerToken())`.
+- Web — `apps/web/src/core/auth/auth-client.ts` configures auth with
+  `credentials: 'include'`.
 - Native — `apps/native/src/core/providers.tsx` calls
-  `setCookieProvider(() => authClient.getCookie())`.
+  `setCookieProvider(() => authClient.getCookie())` to forward the stored cookie.
 
 Both providers feed `packages/core-api/src/utils/api-client.ts`, which forwards
 them into the shared `httpClient`.
 
 ## Server configuration
 
-`apps/api/src/modules/auth/auth.instance.ts` builds the Better Auth instance.
+`apps/api/src/core/auth/auth.instance.ts` builds the Better Auth instance.
 Relevant plugins:
 
 - `expo()` — owns the native OAuth deep-link handoff and SecureStore session
   persistence.
-- `bearer()` — accepts `Authorization: Bearer <token>` on requests and emits a
-  `set-auth-token` response header whenever it issues or refreshes a session.
-- `oneTimeToken()` — mints and verifies single-use tokens used for the web OAuth
-  handoff (see below).
 - `admin()` — role/permission support.
 
-`apps/api/src/main.ts` mounts Better Auth as Express middleware at `/api/auth/*`
-and configures CORS. Two CORS details matter for cross-site auth:
+Better Auth is configured with:
+
+- `advanced.crossSubDomainCookies` — enables session cookie sharing across
+  `salafidurus.com` and `api.salafidurus.com` subdomains (disabled in development).
+- `advanced.useSecureCookies` — forces `Secure` flag in production (HTTPS-only).
+- `session.expiresIn` — session lifetime (7 days by default).
+- `session.updateAge` — automatic session refresh threshold (1 day by default).
+
+`apps/api/src/main.ts` mounts Better Auth as a Fastify route at `/api/auth/*`
+and configures CORS:
 
 - `credentials: true` and an origin allowlist (`CORS_ORIGINS`).
-- `exposedHeaders` includes `set-auth-token`, so the cross-origin web client can
-  read the token the `bearer()` plugin emits.
+- `exposedHeaders` includes `Set-Cookie` for cookie header inspection.
 
-`trustedOrigins` is set to `CORS_ORIGINS`. Better Auth also implicitly trusts its
-own `baseURL` origin, which is why the OAuth bridge (below), hosted on the API
-origin, is a valid `callbackURL`.
+`trustedOrigins` is set to `CORS_ORIGINS` (web) plus `CORS_ORIGINS_NATIVE`
+(native deep-link schemes, e.g. `salafidurus-dev://`, `exp://`). Better Auth
+validates absolute `callbackURL` values against this combined list.
 
 ## Session validation on the API
 
-`apps/api/src/modules/auth/auth.guard.ts` is the global `AuthGuard`. For every
-non-`@Public()` route it calls `getAuth().api.getSession({ headers })`. Because
-the `bearer()` plugin runs first and converts an `Authorization: Bearer` header
-into the session cookie the rest of Better Auth expects, **the guard needs no
-special-casing** — it validates bearer (web) and cookie (native) requests
-identically, then enforces bans and roles and attaches `request.user`.
+`apps/api/src/core/auth/auth.guard.ts` is the global `AuthGuard`. For every
+non-`@Public()` route it calls `getAuth().api.getSession({ headers })`. This
+validates the session cookie, then enforces bans and roles and attaches
+`request.user`.
 
 ## OAuth flows
 
-### Web (cross-site) — the bridge + one-time token
+### Web (same-domain) — direct OAuth callback
 
-The hard part of cross-site OAuth is that the session is established on the API
-origin (the Google callback sets a first-party cookie there), but the web SPA on
-a different origin cannot read that cookie, and the `set-auth-token` header on a
-redirect response is not readable by JavaScript. We bridge the gap with a
-one-time token carried in the redirect URL.
+With the web and API on the same root domain, the OAuth flow is straightforward:
+the session cookie set on the API origin is automatically sent to the web origin
+on the same domain.
 
 ```text
 Browser (web origin)                 API origin                         Google
         |                                |                                 |
  1. signIn.social({                      |                                 |
-      provider, callbackURL=BRIDGE })    |                                 |
-        | ------------------------------> /api/auth/sign-in/social         |
+      provider,                          |                                 |
+      callbackURL='https://salafidurus.com/auth/callback?redirect=/dashboard'
+    })                                   |                                 |
+        | --- redirect to sign-in/social -----> /api/auth/sign-in/social   |
         |                                | --- redirect to Google -------> |
         | <-------------------- redirect to Google ---------------------- |
         | --- user authenticates -------------------------------------->  |
-        | <----------- redirect to /api/auth/callback/google ------------ |
+        | <---------- redirect to /api/auth/callback/google ------------- |
         | -----------------------------> callback: create session,        |
-        |                                set first-party session cookie    |
-        |                                then redirect to callbackURL:     |
-        |                                /auth-bridge/oauth-complete        |
-        | -----------------------------> bridge (has session cookie):      |
-        |                                generateOneTimeToken()            |
-        | <--- 302 to WEB/auth/callback?ott=<token> --------------------- |
+        |                                set `domain=.salafidurus.com`     |
+        |                                cookie                           |
+        | <--- 302 to https://salafidurus.com/auth/callback?redirect=... |
  2. /auth/callback page:                 |                                 |
-    oneTimeToken.verify({ token }) ----> /api/auth/one-time-token/verify  |
-        | <--- 200 + `set-auth-token` header ---------------------------- |
-    store bearer token in localStorage   |                                 |
-    router.replace(redirect)             |                                 |
+    authClient.useSession() reads        |                                 |
+    session from cookie (automatic),     |                                 |
+    then router.replace(redirect)        |                                 |
 ```
 
 Key pieces:
 
-- The social `callbackURL` is **absolute** and points at the API OAuth bridge,
-  built by `apps/web/src/features/auth/oauth-callback-url.ts`. A _relative_
-  `callbackURL` would resolve against Better Auth's `baseURL` (the API) and
-  strand the browser on the API showing raw JSON — this was the original bug.
-- The bridge — `apps/api/src/modules/auth/auth-bridge.controller.ts`
-  (`GET /auth-bridge/oauth-complete`, marked `@Public()`) — runs while the
-  browser is on the API origin holding the first-party session cookie. It mints a
-  one-time token and 302-redirects to the web app with it. The redirect target is
-  validated against `CORS_ORIGINS` to prevent open redirects; no token is minted
-  for an untrusted target.
-- The web callback page — `apps/web/src/app/auth/callback/page.tsx` — exchanges
-  the one-time token via `authClient.oneTimeToken.verify(...)`. That response
-  carries `set-auth-token`, which the auth client's `onSuccess` hook stores. It
-  then redirects to the original in-app path (validated to be a relative path).
+- The social `callbackURL` is **absolute**, pointing at the web app's callback
+  endpoint. Better Auth validates it against `trustedOrigins` (which includes
+  the web origin).
+- The cookie is set with `domain=.salafidurus.com`, shared across both subdomains.
+  The `SameSite=Lax` flag allows cookies on OAuth redirects while protecting against
+  CSRF.
+- The web callback page — `apps/web/src/app/auth/callback/page.tsx` — uses
+  `authClient.useSession()` to detect the session from the cookie (automatically
+  sent by the browser). It then redirects to the original in-app path.
 
 ### Native — Better Auth Expo plugin
 
-Native does not use the bridge. `@better-auth/expo` performs the OAuth handoff
-over the app's deep-link scheme and persists the session cookie in
+Native does not use the web callback page. `@better-auth/expo` performs the OAuth
+handoff over the app's deep-link scheme and persists the session cookie in
 `expo-secure-store`. `apps/native/src/core/auth/auth-client.ts` configures the
 `expoClient` plugin; `authClient.getCookie()` returns the stored cookie string,
 which the shared `httpClient` forwards as a `Cookie` header on API calls.
 
-## Token capture, sign-out, and 401 handling
+### Native — Apple and Google native sign-in
 
-- **Capture (web):** `apps/web/src/core/auth/auth-client.ts` configures the
-  Better Auth client with `fetchOptions.auth` (sends the stored bearer token on
-  the client's own calls) and an `onSuccess` hook that stores any `set-auth-token`
-  header. This captures the token on the one-time-token exchange and on any later
-  session refresh.
-- **Sign-out:** the same `onSuccess` clears the stored token when a `/sign-out`
-  call succeeds. The web bearer token lives only in `localStorage`, so clearing
-  it fully logs the browser out.
+Apple and Google both bypass the browser-redirect flow entirely on native,
+using their respective native SDKs to obtain a device-signed identity token
+and exchanging it directly — no deep-link handoff, no in-app browser.
+
+- **Apple** (`apps/native/src/features/auth/hooks/use-native-apple-sign-in.ts`):
+  gets an `identityToken` from `expo-apple-authentication`, POSTs it to a
+  bespoke endpoint (`apps/api/src/core/auth/apple-native.controller.ts`), then
+  manually writes the returned session into the `@better-auth/expo`
+  `SecureStore` cookie shape and forces a session refresh.
+- **Google** (`apps/native/src/features/auth/hooks/use-native-google-sign-in.ts`):
+  gets an `idToken` from `@react-native-google-signin/google-signin`
+  (`GoogleSignin.configure({ webClientId })` → `GoogleSignin.signIn()`), then
+  calls Better Auth's built-in idToken support —
+  `authClient.signIn.social({ provider: "google", idToken: { token } })`.
+  No custom backend endpoint is needed: Better Auth verifies the token's `aud`
+  claim against the existing `GOOGLE_CLIENT_ID`, and the `expo()` plugin
+  handles session persistence the same way it does for the browser flow.
+
+The native Google SDK is always configured with the **Web** OAuth client ID
+(`webClientId`), not the Android one — Google issues the idToken audienced to
+whichever client ID is passed there, and that's what the backend verifies
+against. The Android OAuth client registered in Google Cloud Console (package
+name + SHA-1 fingerprint) only authorizes the device to show the native
+account picker; it never appears in any client-side or server-side config.
+
+#### Both flows must force a session refetch afterward
+
+Better Auth's core client only auto-triggers a `useSession()` refetch for a
+fixed set of paths (`/sign-in/email`, `/sign-out`, etc.) — `/sign-in/social`
+isn't one of them. `@better-auth/expo`'s own `Set-Cookie`-triggered refetch
+_should_ cover the gap for the Google idToken flow, but empirically doesn't
+reliably update the reactive session atom in time — and Apple's flow (a
+custom endpoint with a manually-written cookie) never goes through that path
+at all. Both hooks therefore call `refreshSession()`
+(`apps/native/src/core/auth/auth-client.ts`) after persisting the session,
+which directly invokes the session atom's own `refetch()` — the same
+function `useSession()` itself uses — rather than a raw, atom-bypassing
+`$fetch()` call. Skipping this step is the classic symptom of "sign-in
+succeeds, cookie is written, but the app still acts signed out."
+
+## Session management and sign-out
+
+- **Session detection:** Web uses `authClient.useSession()`, which returns the
+  session from the cookie. Native uses the same hook, but the cookie comes from
+  SecureStore via `@better-auth/expo`.
+- **Sign-out:** `authClient.signOut()` clears the session on the API. The browser
+  automatically clears the session cookie (set with appropriate domain/path).
+  Native's SecureStore is also cleared by `@better-auth/expo`.
 - **401 handling:** `packages/core-api/src/utils/api-client.ts` invokes a
   registered unauthorized handler on any `401`. Each app wires it
   (`providers.tsx`) to clear local credentials and redirect to sign-in. A 401
@@ -153,14 +182,13 @@ which the shared `httpClient` forwards as a `Cookie` header on API calls.
 
 ## Security considerations
 
-- **Web token in `localStorage`:** readable by JavaScript, so it is exposed to
-  XSS. This is the accepted trade-off for cross-site SPA→API auth (cookies are
-  not viable cross-site). Mitigate with a strict Content-Security-Policy and a
-  reasonable session TTL.
-- **Open-redirect protection:** the bridge only redirects to origins in
-  `CORS_ORIGINS`; the web callback only forwards to relative in-app paths.
-- **One-time tokens** are single-use and short-lived (Better Auth default
-  ~3 minutes); they carry no session material on their own.
+- **HttpOnly cookies:** session cookies are not accessible via JavaScript, mitigating
+  XSS attacks. The browser automatically includes them on all same-domain requests.
+- **Secure flag:** in production, cookies are HTTPS-only, preventing MITM attacks.
+- **SameSite=Lax:** allows cookies on top-level navigation (OAuth redirects) while
+  blocking cross-site request forgery.
+- **Open-redirect protection:** Better Auth validates absolute `callbackURL` values
+  against `trustedOrigins`; the web callback page validates relative redirect paths.
 - **Authority remains server-side:** every protected request is validated by the
   API regardless of what the client believes.
 
@@ -168,42 +196,76 @@ which the shared `httpClient` forwards as a `Cookie` header on API calls.
 
 ### API (`apps/api`)
 
-- `BETTER_AUTH_URL` — the API's own origin (used as `baseURL`).
-- `BETTER_AUTH_SECRET` — session/token signing secret.
-- `CORS_ORIGIN` — comma-separated list of allowed web origins. Used for both CORS
-  and the bridge redirect allowlist, and as `trustedOrigins`.
+- `BETTER_AUTH_URL` — the API's own origin (e.g., `https://api.salafidurus.com`).
+- `BETTER_AUTH_SECRET` — session/token signing secret (minimum 32 characters).
+- `COOKIE_DOMAIN` — root domain for session cookie sharing
+  (e.g., `salafidurus.com`). Disabled in development (uses `localhost`).
+- `CORS_ORIGIN` — comma-separated list of allowed web origins (e.g.,
+  `https://salafidurus.com`). Used for CORS validation and `trustedOrigins`.
+- `CORS_ORIGINS_NATIVE` — comma-separated list of trusted native deep-link
+  schemes (defaults to `salafidurus-dev://,exp://`). Mind the "S" — a common
+  typo is `CORS_ORIGIN_NATIVE` (singular), which Zod silently ignores in favor
+  of the default.
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`, `APPLE_CLIENT_ID` /
   `APPLE_CLIENT_SECRET`.
 
 ### Web (`apps/web`)
 
 - `NEXT_PUBLIC_API_URL` — the API origin (auth client `baseURL` and data calls).
-- `NEXT_PUBLIC_WEB_URL` — the web origin (used to build the OAuth callback
-  target).
+- `NEXT_PUBLIC_WEB_URL` — the web origin (used to build the absolute OAuth
+  `callbackURL`).
 
 ### Native (`apps/native`)
 
-- `EXPO_PUBLIC_API_URL` — the API origin.
+- `EXPO_PUBLIC_API_URL` — the API origin. On the Android emulator in dev,
+  `getApiBaseUrl()` (`apps/native/src/core/config/runtime-env.ts`) rewrites a
+  `localhost`/`127.0.0.1` value to `10.0.2.2` automatically, since the
+  emulator's own `localhost` refers to itself, not the host machine.
+- `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` — the same value as the API's
+  `GOOGLE_CLIENT_ID` (the Web client). Passed to
+  `GoogleSignin.configure({ webClientId })` for native Google sign-in.
 
 ### Google Cloud Console
 
-- Web client authorized redirect URI: `https://<API_DOMAIN>/api/auth/callback/google`.
-  The bridge endpoint and `/auth/callback` are internal and are **not** Google
-  redirect URIs.
+- Authorized redirect URI: `https://api.salafidurus.com/api/auth/callback/google`.
+- (Not the web `/auth/callback` — that is internal to the web app.)
 - Android client: package `com.salafidevs.salafidurus.dev` (+ SHA-1 fingerprint).
 - iOS client: bundle ID `com.salafidevs.salafidurus.dev`.
 
-Keep `CORS_ORIGIN` (API) and `NEXT_PUBLIC_WEB_URL` / `NEXT_PUBLIC_API_URL` (web)
-in sync per environment; a mismatch fails fast at the bridge redirect allowlist.
+Keep `COOKIE_DOMAIN` (API) and `NEXT_PUBLIC_WEB_URL` / `NEXT_PUBLIC_API_URL`
+(web) consistent per environment; a mismatch breaks OAuth flow.
 
-## Local development and cross-site emulation
+#### Android debug keystore is committed and pinned
 
-`localhost:3000` (web) and `localhost:4000` (api) are the _same_ site (only the
-port differs), so cookies happen to work locally even though they will not in
-production. To exercise the real cross-site path locally, point
-`NEXT_PUBLIC_API_URL` at `http://127.0.0.1:4000` (a different site from
-`localhost`) and add it to the API's `CORS_ORIGIN`. Auth still works because it
-no longer depends on cookies.
+`apps/native/android/` is otherwise gitignored (regenerated by `expo
+prebuild`), but `android/app/debug.keystore` is deliberately committed —
+debug keys aren't secret, and native Google Sign-In on Android needs a
+_stable_ SHA-1 fingerprint that matches what's registered on the
+`salafi-durus-android-dev` OAuth client. A freshly auto-generated debug
+keystore has a different SHA-1 and fails with `DEVELOPER_ERROR`.
+
+`bun run prebuild:clean` (`expo prebuild --clean`) wipes and regenerates
+`android/` entirely, which would delete the committed keystore and cause a new
+one to be auto-generated on the next build. A `postprebuild:clean` script
+(`apps/native/package.json`) restores the committed file from git
+immediately after, before the subsequent Gradle build can generate a
+replacement.
+
+If the debug keystore is ever intentionally rotated (e.g. compromised), the
+new SHA-1 must be re-registered on `salafi-durus-android-dev` in Google Cloud
+Console, or native Google Sign-In on Android breaks with `DEVELOPER_ERROR`
+again.
+
+## Local development
+
+`localhost:3000` (web) and `localhost:4000` (api) are treated as the same site
+(only port differs), so cookies work locally without special configuration.
+Better Auth automatically disables `crossSubDomainCookies` in development
+(`NODE_ENV !== 'production'`), so cookies still function during testing.
+
+To test the production flow locally (with different domains), use ngrok or a
+hosts file entry to simulate `salafidurus.localhost` and `api.salafidurus.localhost`,
+then configure cookies accordingly.
 
 ## Adding a protected endpoint
 
@@ -215,18 +277,19 @@ no longer depends on cookies.
 
 ## File map
 
-| Concern                                | File                                                  |
-| -------------------------------------- | ----------------------------------------------------- |
-| Shared HTTP client (credential attach) | `packages/core-contracts/src/http.ts`                 |
-| Credential providers                   | `packages/core-api/src/utils/api-client.ts`           |
-| Better Auth server instance + plugins  | `apps/api/src/modules/auth/auth.instance.ts`          |
-| CORS + middleware mount                | `apps/api/src/main.ts`                                |
-| Session validation guard               | `apps/api/src/modules/auth/auth.guard.ts`             |
-| OAuth bridge (web handoff)             | `apps/api/src/modules/auth/auth-bridge.controller.ts` |
-| Web auth client + token capture        | `apps/web/src/core/auth/auth-client.ts`               |
-| Web bearer token store                 | `apps/web/src/core/auth/bearer-token.ts`              |
-| Web OAuth callback URL builder         | `apps/web/src/features/auth/oauth-callback-url.ts`    |
-| Web OAuth callback page                | `apps/web/src/app/auth/callback/page.tsx`             |
-| Web startup wiring                     | `apps/web/src/core/providers.tsx`                     |
-| Native auth client (Expo)              | `apps/native/src/core/auth/auth-client.ts`            |
-| Native startup wiring                  | `apps/native/src/core/providers.tsx`                  |
+| Concern                                | File                                                               |
+| -------------------------------------- | ------------------------------------------------------------------ |
+| Shared HTTP client (credential attach) | `packages/core-contracts/src/http.ts`                              |
+| Credential providers                   | `packages/core-api/src/utils/api-client.ts`                        |
+| Better Auth server instance + plugins  | `apps/api/src/core/auth/auth.instance.ts`                          |
+| CORS + Fastify route mount             | `apps/api/src/main.ts`                                             |
+| Session validation guard               | `apps/api/src/core/auth/auth.guard.ts`                             |
+| Apple native sign-in endpoint          | `apps/api/src/core/auth/apple-native.controller.ts`                |
+| Web auth client + session detection    | `apps/web/src/core/auth/auth-client.ts`                            |
+| Web OAuth callback page                | `apps/web/src/app/auth/callback/page.tsx`                          |
+| Web startup wiring                     | `apps/web/src/core/providers.tsx`                                  |
+| Native auth client (Expo)              | `apps/native/src/core/auth/auth-client.ts`                         |
+| Native runtime env / base URL resolve  | `apps/native/src/core/config/runtime-env.ts`                       |
+| Native Apple native sign-in hook       | `apps/native/src/features/auth/hooks/use-native-apple-sign-in.ts`  |
+| Native Google native sign-in hook      | `apps/native/src/features/auth/hooks/use-native-google-sign-in.ts` |
+| Native startup wiring                  | `apps/native/src/core/providers.tsx`                               |

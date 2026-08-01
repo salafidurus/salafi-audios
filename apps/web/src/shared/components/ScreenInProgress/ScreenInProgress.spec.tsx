@@ -1,4 +1,6 @@
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "bun:test";
+
 import { ScreenInProgressResponsive } from "./ScreenInProgress";
 
 describe("ScreenInProgressResponsive", () => {

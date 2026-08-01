@@ -1,0 +1,29 @@
+/* Base empty state styles */
+.emptyState {
+  padding: var(--space-scale-xl) var(--space-scale-lg);
+  text-align: center;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+}
+
+/* Empty variant - default */
+.emptyState[data-variant="empty"] {
+  color: var(--content-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-card, 12px);
+  background-color: var(--surface-default);
+}
+
+/* Loading variant */
+.emptyState[data-variant="loading"] {
+  color: var(--content-subtle);
+}
+
+/* Error variant */
+.emptyState[data-variant="error"] {
+  color: var(--content-error);
+  border: 1px solid var(--border-error);
+  border-radius: var(--radius-component-card, 12px);
+  background-color: var(--surface-error);
+}

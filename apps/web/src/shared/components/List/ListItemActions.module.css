@@ -1,0 +1,42 @@
+/* List.Item.Actions container — flex layout for action buttons */
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  width: var(--actions-width-desktop, auto);
+  gap: var(--space-component-gap-sm);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Desktop/Tablet orientation: horizontal (default) */
+.orientation-horizontal {
+  flex-direction: row;
+  margin-inline-start: auto;
+}
+
+/* Desktop/Tablet orientation: vertical */
+.orientation-vertical {
+  flex-direction: column;
+  margin-inline-start: auto;
+  gap: var(--space-scale-xs);
+}
+
+/* Mobile responsive: actions appear below content (parent ListItem flex-direction: column) */
+@media (max-width: 640px) {
+  .actions {
+    width: 100%;
+    margin-inline-start: 0;
+    margin-top: var(--space-component-gap-sm);
+    gap: var(--space-scale-xs);
+  }
+
+  /* Mobile orientation: horizontal (default) */
+  .mobile-orientation-horizontal {
+    flex-direction: row;
+  }
+
+  /* Mobile orientation: vertical */
+  .mobile-orientation-vertical {
+    flex-direction: column;
+  }
+}

@@ -1,10 +1,25 @@
+/** HTTP client configuration for platform-specific authentication.
+ *
+ * Authentication modes (in priority order):
+ * 1. **Web (cookies)**: Session cookies set by API are sent automatically via
+ *    `credentials: 'include'`. No token provider needed.
+ * 2. **Native (cookie forwarding)**: @better-auth/expo stores session cookie
+ *    in SecureStore. Use `getCookie()` to retrieve and forward via Cookie header.
+ * 3. **Legacy (bearer tokens)**: For backward compatibility. Use `getAccessToken()`
+ *    to provide a bearer token. Note: this mode is deprecated.
+ */
 export type HttpClientConfig = {
   baseUrl: string;
+  /** (Optional) Legacy bearer token provider for backward compatibility.
+   * Primary auth is via cookies (credentials: 'include'). */
   getAccessToken?: () => string | undefined | null;
+  /** (Required for native) Session cookie provider. RN fetch has no cookie jar,
+   * so must manually forward session cookie via Cookie header. */
   getCookie?: () => string | undefined | null;
   /** Active content locale; sent as `Accept-Language` so the API resolves
    * translations to the user's selected language. */
   getLocale?: () => string | undefined | null;
+  /** (Optional) Callback for non-2xx responses (e.g., session expiry on 401). */
   onError?: (status: number) => void;
 };
 
@@ -75,19 +90,21 @@ export async function httpClient<T>(options: {
   try {
     res = await fetch(endpoint.toString(), {
       method: options.method,
-      // Cross-origin auth: send the bearer token (web) or forwarded cookie
-      // (native via @better-auth/expo). credentials:"include" keeps same-origin
-      // and dev cookie flows working; a caller-supplied Cookie header wins.
+      // Send cookies automatically (web via browser, native via @better-auth/expo).
+      // Cookies are sent via either credentials:"include" (web) or Cookie header
+      // (native). For native, getCookie() will override via headers below.
       credentials: "include",
       headers: {
-        "Content-Type": "application/json",
+        ...(payload !== undefined && payload !== null
+          ? { "Content-Type": "application/json" }
+          : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(cookie ? { Cookie: cookie } : {}),
         ...(locale ? { "Accept-Language": locale } : {}),
         ...options.headers,
       },
       body: payload ? JSON.stringify(payload) : undefined,
-      signal: controller.signal,
+      signal: controller.signal as any,
     });
   } catch {
     throw new Error("Network request failed. Check API availability and base URL configuration.");

@@ -1,10 +1,12 @@
-import { createColors } from "@sd/design-tokens";
 import type { AppColors } from "@sd/design-tokens";
-import { createAccentRecipesNative, type AccentRecipesNative } from "./recipes";
-import { spacingNative, type SpacingNative } from "./spacing";
-import { radiusNative, type RadiusNative } from "./radius";
+
+import { createColors } from "@sd/design-tokens";
+
 import { borderNative, type BorderNative } from "./border";
+import { radiusNative, type RadiusNative } from "./radius";
+import { createAccentRecipesNative, type AccentRecipesNative } from "./recipes";
 import { createShadowsNative, type ShadowsNativeTheme } from "./shadows";
+import { spacingNative, type SpacingNative } from "./spacing";
 import { typographyNative, type TypographyNative } from "./typography";
 
 export type AppThemeNative = {
@@ -15,6 +17,7 @@ export type AppThemeNative = {
   border: BorderNative;
   shadows: ShadowsNativeTheme;
   typography: TypographyNative;
+  direction: "ltr" | "rtl";
 };
 
 export const createThemeNative = (mode: "light" | "dark"): AppThemeNative => {
@@ -28,6 +31,7 @@ export const createThemeNative = (mode: "light" | "dark"): AppThemeNative => {
     border: borderNative,
     shadows: createShadowsNative(mode),
     typography: typographyNative,
+    direction: "ltr",
   };
 };
 

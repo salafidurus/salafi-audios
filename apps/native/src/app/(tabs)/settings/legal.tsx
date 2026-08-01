@@ -1,5 +1,5 @@
-import { TermsOfUseScreen } from "@/features/legal/screens/terms-of-use.screen";
+import { LegalToggleScreen } from "@/features/settings";
 
 export default function AccountLegalRoute() {
-  return <TermsOfUseScreen />;
+  return <LegalToggleScreen />;
 }

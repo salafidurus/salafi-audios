@@ -1,13 +1,15 @@
-import type { ButtonHTMLAttributes } from "react";
-import React from "react";
+import React, { type ButtonHTMLAttributes } from "react";
+
 import styles from "./button.module.css";
 
-type ButtonVariant = "primary" | "surface" | "outline" | "ghost" | "danger";
+type ButtonVariant = "primary" | "secondary" | "surface" | "outline" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg" | "icon";
+type ButtonRadius = "pill" | "md" | "sm";
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  radius?: ButtonRadius;
   label?: string;
   loading?: boolean;
   icon?: React.ReactNode;
@@ -15,13 +17,14 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   fullWidth?: boolean;
 };
 
-function cx(...values: Array<string | undefined | false>) {
+function cx(...values: (string | undefined | false)[]) {
   return values.filter(Boolean).join(" ");
 }
 
 export function Button({
   variant = "surface",
   size = "md",
+  radius = "pill",
   className,
   type,
   label,
@@ -43,6 +46,7 @@ export function Button({
         styles.button,
         styles[`variant-${variant}`],
         styles[`size-${size}`],
+        styles[`radius-${radius}`],
         fullWidth && styles["full-width"],
         className,
       )}

@@ -1,12 +1,222 @@
 "use client";
 
-import { Responsive } from "@/shared/components/Responsive";
-import { AdminPermissionsDesktopScreen } from "./admin-permissions.screen.desktop";
-import { AdminPermissionsMobileScreen } from "./admin-permissions.screen.mobile";
+import { ADMIN_PERMISSIONS, type AdminPermission } from "@sd/core-contracts";
+import { useState } from "react";
 
-const MOBILE = <AdminPermissionsMobileScreen />;
-const DESKTOP = <AdminPermissionsDesktopScreen />;
+import { useTranslation } from "@/core/i18n/use-translation";
+import {
+  fetchUserPermissions,
+  grantPermission,
+  revokePermission,
+  type AdminPermissionsListResponse,
+} from "@/features/admin/api/admin.api";
+import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
+import { RevokePermissionConfirmModal } from "@/features/admin/components/RevokePermissionConfirmModal";
+import { Button } from "@/shared/components/Button";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+
+import styles from "./admin-permissions.screen.module.css";
 
 export function AdminPermissionsScreen() {
-  return <Responsive mobile={MOBILE} desktop={DESKTOP} />;
+  const { isMobile } = useResponsive();
+  const { t } = useTranslation();
+  const [userId, setUserId] = useState("");
+  const [userPerms, setUserPerms] = useState<AdminPermissionsListResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [revokeModalOpen, setRevokeModalOpen] = useState(false);
+  const [permissionToRevoke, setPermissionToRevoke] = useState<string | null>(null);
+
+  const handleLookup = async () => {
+    if (!userId.trim()) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await fetchUserPermissions(userId.trim());
+      setUserPerms(data);
+    } catch {
+      setUserPerms({ permissions: [] });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGrant = async (permission: AdminPermission) => {
+    setLoading(true);
+    try {
+      const data = await grantPermission(userId.trim(), permission);
+      setUserPerms(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRevokeClick = (permission: string) => {
+    setPermissionToRevoke(permission);
+    setRevokeModalOpen(true);
+  };
+
+  const handleConfirmRevoke = async () => {
+    if (!permissionToRevoke) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await revokePermission(userId.trim(), permissionToRevoke);
+      setUserPerms(data);
+      setRevokeModalOpen(false);
+      setPermissionToRevoke(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const currentPermissions = userPerms?.permissions.map((p) => p.permission) ?? [];
+
+  return (
+    <ScreenView>
+      <RevokePermissionConfirmModal
+        isOpen={revokeModalOpen}
+        onClose={() => {
+          setRevokeModalOpen(false);
+          setPermissionToRevoke(null);
+        }}
+        onConfirm={handleConfirmRevoke}
+        permissionName={permissionToRevoke ?? ""}
+        userName={userId}
+      />
+
+      <PageHeader
+        title={
+          !isMobile
+            ? t("admin.permissions.title", "Manage Permissions")
+            : t("admin.permissions.titleMobile", "Permissions")
+        }
+      />
+
+      <PermissionGate requires="USERS_GRANT_PERMISSIONS">
+        <div className={styles.lookupSection}>
+          <input
+            aria-label={t("admin.permissions.userIdLabel", "User ID")}
+            placeholder={t("admin.permissions.userIdPlaceholder", "User ID")}
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleLookup()}
+            className={styles.input}
+          />
+          <Button variant="primary" onClick={handleLookup} disabled={loading}>
+            {loading
+              ? !isMobile
+                ? t("admin.permissions.saving", "Loading…")
+                : "…"
+              : t("admin.permissions.lookup", "Lookup")}
+          </Button>
+        </div>
+
+        {userPerms && !isMobile && (
+          <h2 className={styles.sectionTitle}>
+            {t("admin.permissions.userPermissionsHeader", {
+              defaultValue: "Permissions for {{userId}}",
+              userId,
+            })}
+          </h2>
+        )}
+
+        {userPerms && !isMobile ? (
+          <table className={styles.table}>
+            <thead className={styles.tableHeader}>
+              <tr>
+                <th className={styles.tableHead}>
+                  {t("admin.permissions.permissionTableHeader", "Permission")}
+                </th>
+                <th className={styles.tableHead}>
+                  {t("admin.permissions.statusTableHeader", "Status")}
+                </th>
+                <th className={styles.tableHead}>
+                  {t("admin.permissions.actionTableHeader", "Action")}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {ADMIN_PERMISSIONS.map((perm) => {
+                const hasIt = currentPermissions.includes(perm);
+                return (
+                  <tr key={perm} className={styles.tableRow}>
+                    <td className={`${styles.tableCell} ${styles.cellMonospace}`}>{perm}</td>
+                    <td className={styles.tableCell}>
+                      <span
+                        className={`${styles.statusBadge} ${
+                          hasIt ? styles.statusGranted : styles.statusNotGranted
+                        }`}
+                      >
+                        {hasIt
+                          ? t("admin.permissions.granted", "Granted")
+                          : t("admin.permissions.notGranted", "Not granted")}
+                      </span>
+                    </td>
+                    <td className={styles.tableCell}>
+                      {hasIt ? (
+                        <Button
+                          variant="danger"
+                          onClick={() => handleRevokeClick(perm)}
+                          disabled={loading}
+                        >
+                          {t("admin.permissions.revoke", "Revoke")}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="primary"
+                          onClick={() => handleGrant(perm)}
+                          disabled={loading}
+                        >
+                          {t("admin.permissions.grant", "Grant")}
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        ) : userPerms ? (
+          <>
+            {ADMIN_PERMISSIONS.map((perm) => {
+              const hasIt = currentPermissions.includes(perm);
+              return (
+                <div key={perm} className={styles.permissionCard}>
+                  <div className={styles.permissionInfo}>
+                    <div className={styles.permissionName}>{perm}</div>
+                    <div
+                      className={`${styles.permissionStatus} ${
+                        hasIt ? styles.statusGranted : styles.statusNotGranted
+                      }`}
+                    >
+                      {hasIt
+                        ? t("admin.permissions.granted", "Granted")
+                        : t("admin.permissions.notGranted", "Not granted")}
+                    </div>
+                  </div>
+                  {hasIt ? (
+                    <Button
+                      variant="danger"
+                      onClick={() => handleRevokeClick(perm)}
+                      disabled={loading}
+                    >
+                      {t("admin.permissions.revoke", "Revoke")}
+                    </Button>
+                  ) : (
+                    <Button variant="primary" onClick={() => handleGrant(perm)} disabled={loading}>
+                      {t("admin.permissions.grant", "Grant")}
+                    </Button>
+                  )}
+                </div>
+              );
+            })}
+          </>
+        ) : null}
+      </PermissionGate>
+    </ScreenView>
+  );
 }

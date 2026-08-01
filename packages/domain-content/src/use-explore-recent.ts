@@ -1,0 +1,19 @@
+import { httpClient, endpoints, queryKeys, type FeedPageDto } from "@sd/core-contracts";
+import { useInfiniteQuery } from "@tanstack/react-query";
+
+export function useExploreRecentScreen() {
+  return useInfiniteQuery<FeedPageDto>({
+    queryKey: [queryKeys.listings.recent],
+    queryFn: async ({ pageParam }) => {
+      const params: Record<string, string> = {};
+      if (pageParam) params.cursor = pageParam as string;
+      return httpClient<FeedPageDto>({
+        url: endpoints.listings.recent,
+        method: "GET",
+        params,
+      });
+    },
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+  });
+}

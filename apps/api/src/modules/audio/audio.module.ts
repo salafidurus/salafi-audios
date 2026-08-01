@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { DbModule } from '../../shared/db/db.module';
+import { DbModule } from '../../core/db/db.module';
 import { AudioController } from './audio.controller';
 import { AudioService } from './audio.service';
 import { AudioRepository } from './audio.repo';

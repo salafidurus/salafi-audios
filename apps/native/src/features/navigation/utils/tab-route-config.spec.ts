@@ -3,26 +3,22 @@ import { getRootTabFromPathname, getActiveSubsection } from "./tab-route-config"
 jest.mock("lucide-react-native", () => ({
   BookOpen: "BookOpen",
   Cloud: "Cloud",
-  Mic: "Mic",
   Search: "Search",
   Settings: "Settings",
 }));
 
 describe("getRootTabFromPathname", () => {
-  it("returns search for root path /", () => {
-    expect(getRootTabFromPathname("/")).toBe("search");
+  it("returns explore for root path /", () => {
+    expect(getRootTabFromPathname("/")).toBe("explore");
   });
   it("returns search for /search", () => {
     expect(getRootTabFromPathname("/search")).toBe("search");
   });
-  it("returns feed for /feed", () => {
-    expect(getRootTabFromPathname("/feed")).toBe("feed");
+  it("returns explore for /explore", () => {
+    expect(getRootTabFromPathname("/explore")).toBe("explore");
   });
-  it("returns feed for /feed/recent", () => {
-    expect(getRootTabFromPathname("/feed/recent")).toBe("feed");
-  });
-  it("returns live for /live", () => {
-    expect(getRootTabFromPathname("/live")).toBe("live");
+  it("returns explore for /explore/recent", () => {
+    expect(getRootTabFromPathname("/explore/recent")).toBe("explore");
   });
   it("returns library for /library", () => {
     expect(getRootTabFromPathname("/library")).toBe("library");
@@ -33,20 +29,20 @@ describe("getRootTabFromPathname", () => {
   it("returns settings for /settings", () => {
     expect(getRootTabFromPathname("/settings")).toBe("settings");
   });
-  it("returns search for unknown paths", () => {
-    expect(getRootTabFromPathname("/unknown")).toBe("search");
+  it("returns explore for unknown paths", () => {
+    expect(getRootTabFromPathname("/unknown")).toBe("explore");
   });
 });
 
 describe("getActiveSubsection", () => {
   it("returns default tab when no subsection", () => {
-    expect(getActiveSubsection("/feed", "feed")).toBe("popular");
+    expect(getActiveSubsection("/", "explore")).toBe("recent");
   });
   it("returns matched subsection", () => {
-    expect(getActiveSubsection("/feed/recent", "feed")).toBe("recent");
+    expect(getActiveSubsection("/recent", "explore")).toBe("recent");
   });
   it("returns default tab for unrecognized subsection", () => {
-    expect(getActiveSubsection("/feed/unknown", "feed")).toBe("popular");
+    expect(getActiveSubsection("/unknown", "explore")).toBe("recent");
   });
   it("returns matched library subsection", () => {
     expect(getActiveSubsection("/library/saved", "library")).toBe("saved");
@@ -55,6 +51,6 @@ describe("getActiveSubsection", () => {
     expect(getActiveSubsection("/library", "library")).toBe("started");
   });
   it("strips trailing slash", () => {
-    expect(getActiveSubsection("/feed/recent/", "feed")).toBe("recent");
+    expect(getActiveSubsection("/recent/", "explore")).toBe("recent");
   });
 });

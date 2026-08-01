@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { ListingFormatSchema } from "./listing.types";
 import {
   ContentOriginalFieldsSchema,
@@ -35,6 +36,7 @@ export const RecentProgressDtoSchema = z.object({
   lectureTitle: z.string(),
   lectureSlug: z.string(),
   scholarName: z.string(),
+  scholarSlug: z.string(),
   durationSeconds: z.number(),
   positionSeconds: z.number(),
 });

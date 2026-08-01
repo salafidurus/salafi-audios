@@ -1,18 +1,42 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { Public } from '../../modules/auth/decorators';
+import { Public, CurrentUser } from '../../core/auth/decorators';
 import { ListingService } from './listing.service';
-import type { ListingDetailDto, RelatedListingDto } from '@sd/core-contracts';
+import type {
+  ListingDetailDto,
+  RelatedListingDto,
+  ListingContentsDto,
+  LastPlayedLessonDto,
+  ListingProgressSummaryDto,
+  FeedPageDto,
+} from '@sd/core-contracts';
 import { SkipThrottle } from '@nestjs/throttler';
+import { CacheTTL } from '@nestjs/cache-manager';
+import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
+import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
 
 @SkipThrottle()
 @ApiTags('Listings')
 @ApiCommonErrors()
 @Public()
 @Controller('listings')
+@UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
+@CacheTTL(10 * 60 * 1000) // 10 minutes cache
 export class ListingController {
   constructor(private readonly service: ListingService) {}
+
+  @Get('recent')
+  @CacheTTL(5 * 60 * 1000) // 5 minutes cache
+  @ApiOperation({ summary: 'Get recent top-level listings' })
+  @ApiOkResponse({ description: 'Paginated recent listings feed (single, series, collection)' })
+  async getRecentListings(
+    @Query('cursor') cursor?: string,
+    @Query('limit') limitStr?: string,
+  ): Promise<FeedPageDto> {
+    const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
+    return this.service.getRecentListings(cursor, limit);
+  }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get listing detail by ID or slug' })
@@ -21,6 +45,41 @@ export class ListingController {
   })
   getById(@Param('id') id: string): Promise<ListingDetailDto> {
     return this.service.getById(id);
+  }
+
+  @Get(':id/contents')
+  @ApiOperation({ summary: 'Get contents tree for a listing' })
+  @ApiOkResponse({
+    description: 'Flat or sectioned content tree for single, series, or collection',
+  })
+  getContents(@Param('id') id: string): Promise<ListingContentsDto> {
+    return this.service.getContents(id);
+  }
+
+  @Get(':id/last-played')
+  @ApiOperation({ summary: 'Get last played lesson in series or collection for user' })
+  @ApiOkResponse({
+    description: 'Last played lesson progress or null',
+  })
+  getLastPlayedLesson(
+    @Param('id') id: string,
+    @CurrentUser() user?: { id: string },
+  ): Promise<LastPlayedLessonDto | null> {
+    if (!user?.id) return Promise.resolve(null);
+    return this.service.getLastPlayedLesson(id, user.id);
+  }
+
+  @Get(':id/progress-summary')
+  @ApiOperation({ summary: "Get a user's progress rollup across a listing's playable leaves" })
+  @ApiOkResponse({
+    description: 'Total/completed leaf counts, percent complete, and completion state',
+  })
+  getProgressSummary(
+    @Param('id') id: string,
+    @CurrentUser() user?: { id: string },
+  ): Promise<ListingProgressSummaryDto | null> {
+    if (!user?.id) return Promise.resolve(null);
+    return this.service.getProgressSummary(id, user.id);
   }
 
   @Get(':id/related')

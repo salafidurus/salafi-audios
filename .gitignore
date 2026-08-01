@@ -19,13 +19,19 @@ generated/
 .claude/settings.local.json
 .codex/
 .claude/
+!.claude/commands/
 .omc/
 .gemini/
 .opencode/
+!.opencode/commands/
+!.opencode/agents/
 **/.codex/
 **/.claude/
+!**/.claude/commands/
 **/.gemini/
 **/.opencode/
+!**/.opencode/commands/
+!**/.opencode/agents/
 **/AGENTS.md
 **/CLAUDE.md
 **/GEMINI.md
@@ -49,11 +55,20 @@ infra/envs/*.env
 # generated DB artifacts (derived, never committed)
 packages/db/src/generated/
 
+# Python cache files
+__pycache__/
+**/__pycache__/
+*.pyc
+
 # IDE and Tool settings
 .vscode/mcp.json
 
 # Turborepo
 .turbo
+
+# TypeScript incremental compilation cache
+*.tsbuildinfo
+
 # CocoIndex Code (ccc)
 /.cocoindex_code/
 
@@ -64,4 +79,8 @@ packages/db/src/generated/
 # Deployment artifacts
 .pruned-target
 out/
+
+# Generated uploads and local API routes (should not be committed)
+apps/web/public/uploads/
+apps/web/src/app/api/
 

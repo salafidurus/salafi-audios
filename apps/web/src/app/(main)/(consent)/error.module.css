@@ -1,0 +1,29 @@
+.container {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(2rem, 6vw, 4rem) var(--space-layout-page-x);
+}
+
+.card {
+  width: min(36rem, 100%);
+  border-radius: var(--radius-component-panel);
+  border: 1px solid var(--chrome-border);
+  background: var(--surface-raised, var(--surface-default));
+  box-shadow: var(--shadow-md);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
+  letter-spacing: -0.02em;
+}
+
+.description {
+  margin: 0.6rem auto 0;
+  color: var(--content-muted);
+  max-width: 45ch;
+}

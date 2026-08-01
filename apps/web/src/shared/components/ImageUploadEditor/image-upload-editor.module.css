@@ -1,0 +1,86 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.imageWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.imageContainer {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface-subtle);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.imageContainer:hover .editOverlay {
+  opacity: 1;
+}
+
+.placeholder {
+  width: 120px;
+  height: 120px;
+  border: 2px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.placeholder:hover {
+  border-color: var(--content-accent);
+  background: var(--surface-default);
+}
+
+.placeholderContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--content-subtle);
+}
+
+.placeholderText {
+  font-size: var(--typo-body-sm-font-size);
+  text-align: center;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-danger);
+  color: var(--content-danger);
+  border-radius: var(--radius-sm);
+  font-size: var(--typo-body-sm-font-size);
+}

@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   endpoints,
   httpClient,
@@ -7,13 +6,17 @@ import {
   type UserProfileDto,
   type UpdateProfileDto,
 } from "@sd/core-contracts";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export function useAccountProfile() {
-  return useApiQuery(queryKeys.account.profile(), () =>
-    httpClient<UserProfileDto>({
-      url: endpoints.account.profile,
-      method: "GET",
-    }),
+export function useAccountProfile(options?: { enabled?: boolean }) {
+  return useApiQuery(
+    queryKeys.account.profile(),
+    () =>
+      httpClient<UserProfileDto>({
+        url: endpoints.account.profile,
+        method: "GET",
+      }),
+    options,
   );
 }
 
@@ -28,6 +31,20 @@ export function useUpdateProfile() {
       }),
     onSuccess: (updated) => {
       queryClient.setQueryData(queryKeys.account.profile(), updated);
+    },
+  });
+}
+
+export function useDeleteAccount() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      httpClient<void>({
+        url: endpoints.account.deleteAccount,
+        method: "DELETE",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.account.all });
     },
   });
 }

@@ -1,37 +1,31 @@
 import { Pressable, ScrollView, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
 import { useTranslation } from "@/core/i18n/use-translation";
 
 type AdminDashboardScreenProps = {
-  onNavigateToLectures?: () => void;
-  onNavigateToLive?: () => void;
+  onNavigateToListings?: () => void;
   onNavigateToScholars?: () => void;
   onNavigateToPermissions?: () => void;
 };
 
 export function AdminDashboardScreen({
-  onNavigateToLectures,
-  onNavigateToLive,
+  onNavigateToListings,
   onNavigateToScholars,
 }: AdminDashboardScreenProps) {
   const { t } = useTranslation();
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{t("admin.title", "Admin Dashboard")}</Text>
+      <Text style={styles.title}>{t("admin.dashboard.title", "Admin Dashboard")}</Text>
 
-      <Pressable onPress={onNavigateToLectures} style={[styles.card, styles.cardLectures]}>
-        <Text style={styles.cardTitle}>{t("admin.lectures", "Lectures")}</Text>
+      <Pressable onPress={onNavigateToListings} style={[styles.card, styles.cardListings]}>
+        <Text style={styles.cardTitle}>{t("navigation.subnav.admin.listings", "Listings")}</Text>
         <Text style={styles.cardSubtitle}>{t("admin.manageAudios", "Manage audio content")}</Text>
       </Pressable>
 
-      <Pressable onPress={onNavigateToLive} style={[styles.card, styles.cardLive]}>
-        <Text style={styles.cardTitle}>{t("admin.live", "Live")}</Text>
-        <Text style={styles.cardSubtitle}>{t("admin.manageSessions", "Manage live sessions")}</Text>
-      </Pressable>
-
       <Pressable onPress={onNavigateToScholars} style={[styles.card, styles.cardScholars]}>
-        <Text style={styles.cardTitle}>{t("admin.scholars", "Scholars")}</Text>
+        <Text style={styles.cardTitle}>{t("navigation.admin.scholars", "Scholars")}</Text>
         <Text style={styles.cardSubtitle}>
           {t("admin.manageSeries", "Manage scholars & series")}
         </Text>
@@ -43,6 +37,7 @@ export function AdminDashboardScreen({
 const styles = StyleSheet.create((theme) => ({
   screen: {
     flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
   },
   content: {
     padding: theme.spacing.scale.lg,
@@ -61,11 +56,8 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.scale.md,
     borderStartWidth: 4,
   },
-  cardLectures: {
+  cardListings: {
     borderStartColor: theme.colors.state.danger,
-  },
-  cardLive: {
-    borderStartColor: theme.colors.action.secondary,
   },
   cardScholars: {
     borderStartColor: theme.colors.state.success,

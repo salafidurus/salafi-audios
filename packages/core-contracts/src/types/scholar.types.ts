@@ -1,9 +1,15 @@
 import { z } from "zod";
+
+import { CountryCodeSchema } from "./country.types";
 import {
   ContentOriginalFieldsSchema,
   LocaleSchema,
   ScholarOriginalFieldsSchema,
 } from "./localization.types";
+import { TranslationViewDtoSchema } from "./translation.types";
+
+export const ScholarTitleSchema = z.enum(["allamah", "sheikh", "ustadh", "akh"]);
+export type ScholarTitle = z.infer<typeof ScholarTitleSchema>;
 
 export const ScholarContentItemDtoSchema = z.object({
   id: z.string(),
@@ -12,6 +18,7 @@ export const ScholarContentItemDtoSchema = z.object({
   type: z.enum(["collection", "series", "single"]),
   recencyAt: z.string(),
   coverImageUrl: z.string().optional(),
+  scholarImageUrl: z.string().optional(),
   lectureCount: z.number().optional(),
   durationSeconds: z.number().optional(),
   originalLanguage: LocaleSchema.optional(),
@@ -30,7 +37,7 @@ export const ScholarViewDtoSchema = z.object({
   name: z.string(),
   bio: z.string().optional(),
   isActive: z.boolean(),
-  isKibar: z.boolean(),
+  title: ScholarTitleSchema.optional(),
 });
 export type ScholarViewDto = z.infer<typeof ScholarViewDtoSchema>;
 
@@ -39,7 +46,7 @@ export const ScholarDetailDtoSchema = z.object({
   slug: z.string(),
   name: z.string(),
   bio: z.string().optional(),
-  country: z.string().optional(),
+  country: CountryCodeSchema.optional(),
   mainLanguage: LocaleSchema.optional(),
   /** Language the original (untranslated) name/bio are written in. */
   originalLanguage: LocaleSchema.optional(),
@@ -47,7 +54,7 @@ export const ScholarDetailDtoSchema = z.object({
   original: ScholarOriginalFieldsSchema.optional(),
   imageUrl: z.string().optional(),
   isActive: z.boolean(),
-  isKibar: z.boolean(),
+  title: ScholarTitleSchema.optional(),
   socialTwitter: z.string().optional(),
   socialTelegram: z.string().optional(),
   socialYoutube: z.string().optional(),
@@ -75,7 +82,7 @@ export const ScholarListItemDtoSchema = z.object({
   mainLanguage: LocaleSchema.optional(),
   originalLanguage: LocaleSchema.optional(),
   original: ScholarOriginalFieldsSchema.optional(),
-  isKibar: z.boolean(),
+  title: ScholarTitleSchema.optional(),
   lectureCount: z.number(),
 });
 export type ScholarListItemDto = z.infer<typeof ScholarListItemDtoSchema>;
@@ -134,13 +141,34 @@ export const CreateScholarDtoSchema = z.object({
   slug: z.string().min(1, "Slug must not be empty"),
   bio: z.string().optional(),
   imageUrl: z.string().optional(),
-  isKibar: z.boolean().optional(),
-  isFeatured: z.boolean().optional(),
+  imageKey: z.string().optional(),
   isActive: z.boolean().optional(),
+  country: CountryCodeSchema.default("SA"),
+  mainLanguage: LocaleSchema.default("ar"),
+  title: ScholarTitleSchema.optional(),
+  orderIndex: z.number().optional(),
+  socialTwitter: z.url().optional().or(z.literal("")),
+  socialTelegram: z.url().optional().or(z.literal("")),
+  socialYoutube: z.url().optional().or(z.literal("")),
+  socialWebsite: z.url().optional().or(z.literal("")),
 });
 export type CreateScholarDto = z.infer<typeof CreateScholarDtoSchema>;
 
-export const UpdateScholarDtoSchema = CreateScholarDtoSchema.partial();
+export const UpdateScholarDtoSchema = z.object({
+  name: z.string().min(1, "Name must not be empty").optional(),
+  bio: z.string().optional(),
+  imageUrl: z.string().optional(),
+  imageKey: z.string().optional(),
+  isActive: z.boolean().optional(),
+  country: CountryCodeSchema.optional(),
+  mainLanguage: LocaleSchema.optional(),
+  title: ScholarTitleSchema.optional(),
+  orderIndex: z.number().optional(),
+  socialTwitter: z.url().optional().or(z.literal("")),
+  socialTelegram: z.url().optional().or(z.literal("")),
+  socialYoutube: z.url().optional().or(z.literal("")),
+  socialWebsite: z.url().optional().or(z.literal("")),
+});
 export type UpdateScholarDto = z.infer<typeof UpdateScholarDtoSchema>;
 
 export const SaveScholarTranslationDtoSchema = z.object({
@@ -155,3 +183,67 @@ export const UpdateScholarTranslationDtoSchema = z.object({
   bio: z.string().nullable().optional(),
 });
 export type UpdateScholarTranslationDto = z.infer<typeof UpdateScholarTranslationDtoSchema>;
+
+export const ScholarFormDataDtoSchema = z.object({
+  scholar: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    bio: z.string().optional(),
+    imageUrl: z.string().optional(),
+    country: CountryCodeSchema.optional(),
+    mainLanguage: LocaleSchema.optional(),
+    isActive: z.boolean(),
+    title: ScholarTitleSchema.optional(),
+    orderIndex: z.number().default(999),
+    socialTwitter: z.string().optional(),
+    socialTelegram: z.string().optional(),
+    socialYoutube: z.string().optional(),
+    socialWebsite: z.string().optional(),
+    createdAt: z.string(),
+    updatedAt: z.string().optional(),
+  }),
+  translations: z.array(TranslationViewDtoSchema),
+});
+export type ScholarFormDataDto = z.infer<typeof ScholarFormDataDtoSchema>;
+
+const AdminScholarTranslationSchema = z.object({
+  locale: LocaleSchema,
+  name: z.string(),
+  status: z.enum(["draft", "published"]),
+});
+
+export const AdminScholarListItemDtoSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  name: z.string(),
+  bio: z.string().optional(),
+  country: CountryCodeSchema.optional(),
+  mainLanguage: LocaleSchema.optional(),
+  imageUrl: z.string().optional(),
+  isActive: z.boolean(),
+  title: ScholarTitleSchema.optional(),
+  orderIndex: z.number().default(999),
+  socialTwitter: z.string().optional(),
+  socialTelegram: z.string().optional(),
+  socialYoutube: z.string().optional(),
+  socialWebsite: z.string().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string().optional(),
+  translations: z.array(AdminScholarTranslationSchema),
+});
+export type AdminScholarListItemDto = z.infer<typeof AdminScholarListItemDtoSchema>;
+
+export const AdminScholarListDtoSchema = z.object({
+  items: z.array(AdminScholarListItemDtoSchema),
+  nextCursor: z.string().optional(),
+  hasMore: z.boolean(),
+});
+export type AdminScholarListDto = z.infer<typeof AdminScholarListDtoSchema>;
+
+export const ScholarListDtoSchema = z.object({
+  scholars: z.array(ScholarListItemDtoSchema),
+  nextCursor: z.string().optional(),
+  hasMore: z.boolean(),
+});
+export type ScholarListDto = z.infer<typeof ScholarListDtoSchema>;

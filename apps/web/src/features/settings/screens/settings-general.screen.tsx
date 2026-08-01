@@ -1,55 +1,63 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { LanguageSwitch, ContentLanguageToggle } from "@/features/i18n";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { SettingsSection } from "@/shared/components/SettingsSection/SettingsSection";
-import { SettingsRow } from "@/shared/components/SettingsRow/SettingsRow";
-import { SegmentedControl } from "@/shared/components/SegmentedControl/SegmentedControl";
+import { useState, useCallback, useEffect } from "react";
+
 import type { ThemePreference } from "@/core/styles/ThemeSync";
-import styles from "./settings-general.screen.module.css";
 
-const THEME_KEY = "theme-preference";
-const THEME_CHANGE_EVENT = "theme-change";
-
-const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
-  { value: "system", label: "System" },
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
-];
+import { useTranslation } from "@/core/i18n/use-translation";
+import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
+import { SegmentedControl } from "@/features/settings/components/SegmentedControl/SegmentedControl";
+import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
+import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
+import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { Toggle } from "@/shared/components/Toggle";
 
 interface NotificationState {
   master: boolean;
-  live: boolean;
   scholars: boolean;
   lectures: boolean;
 }
 
-const NOTIF_KEY = "notification-settings";
+const NOTIF_KEY = "notification-settings:v1";
 
 function loadNotifState(): NotificationState {
   if (typeof window === "undefined") {
-    return { master: true, live: true, scholars: true, lectures: true };
+    return { master: true, scholars: true, lectures: true };
   }
   try {
     const raw = localStorage.getItem(NOTIF_KEY);
-    if (raw) return JSON.parse(raw) as NotificationState;
+    if (raw) {
+      return JSON.parse(raw) as NotificationState;
+    }
   } catch {
     // ignore parse errors
   }
-  return { master: true, live: true, scholars: true, lectures: true };
+  return { master: true, scholars: true, lectures: true };
 }
 
 function loadThemePreference(): ThemePreference {
-  if (typeof window === "undefined") return "system";
+  if (typeof window === "undefined") {
+    return "system";
+  }
   const stored = localStorage.getItem(THEME_KEY);
-  if (stored === "light" || stored === "dark") return stored;
+  if (stored === "light" || stored === "dark") {
+    return stored;
+  }
   return "system";
 }
 
 export function SettingsGeneralScreen() {
+  const { t } = useTranslation();
   const [themePreference, setThemePreference] = useState<ThemePreference>(loadThemePreference);
   const [notif, setNotif] = useState<NotificationState>(loadNotifState);
+
+  const themeOptions: { value: ThemePreference; label: string }[] = [
+    { value: "system", label: t("settings.general.themeOptions.system", "System") },
+    { value: "light", label: t("settings.general.themeOptions.light", "Light") },
+    { value: "dark", label: t("settings.general.themeOptions.dark", "Dark") },
+  ];
 
   const handleThemeChange = useCallback((value: ThemePreference) => {
     setThemePreference(value);
@@ -57,108 +65,109 @@ export function SettingsGeneralScreen() {
     window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem(NOTIF_KEY, JSON.stringify(notif));
+  }, [notif]);
+
   const handleNotifChange = useCallback(
-    (key: keyof NotificationState) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      setNotif((prev) => {
-        const next = { ...prev, [key]: e.target.checked };
-        localStorage.setItem(NOTIF_KEY, JSON.stringify(next));
-        return next;
-      });
+    (key: keyof NotificationState) => (checked: boolean) => {
+      setNotif((prev) => ({ ...prev, [key]: checked }));
     },
     [],
   );
 
+  // Persist notification state to localStorage
+  useEffect(() => {
+    localStorage.setItem(NOTIF_KEY, JSON.stringify(notif));
+  }, [notif]);
+
   return (
     <ScreenView>
-      <div className={styles.page}>
-        <h1 className={styles.title}>Settings</h1>
+      <PageHeader title={t("settings.general.title", "Settings")} />
 
-        <SettingsSection title="Language" description="Configure app and content language.">
-          <SettingsRow label="App Language" sublabel="Interface language for the app">
-            <LanguageSwitch />
-          </SettingsRow>
-          <SettingsRow label="Content Language" sublabel="Preferred translation language">
-            <ContentLanguageToggle />
-          </SettingsRow>
-        </SettingsSection>
-
-        <SettingsSection title="Display" description="Choose a theme for the interface.">
-          <SettingsRow label="Theme" sublabel="System follows your OS preference">
-            <SegmentedControl
-              options={THEME_OPTIONS}
-              value={themePreference}
-              onChange={handleThemeChange}
-              ariaLabel="Theme preference"
-            />
-          </SettingsRow>
-        </SettingsSection>
-
-        <SettingsSection title="Notifications" description="Manage what notifications you receive.">
-          <SettingsRow label="Enable Notifications" sublabel="Master toggle for all notifications">
-            <label className={styles.toggle}>
-              <input
-                type="checkbox"
-                role="switch"
-                aria-checked={notif.master}
-                aria-label="Enable Notifications"
-                checked={notif.master}
-                onChange={handleNotifChange("master")}
-                className={styles.toggleInput}
-              />
-              <span className={styles.toggleTrack} />
-            </label>
-          </SettingsRow>
-          {notif.master && (
-            <>
-              <SettingsRow label="Live Sessions" sublabel="Notify when a live session starts">
-                <label className={styles.toggle}>
-                  <input
-                    type="checkbox"
-                    role="switch"
-                    aria-checked={notif.live}
-                    aria-label="Notify for Live Sessions"
-                    checked={notif.live}
-                    onChange={handleNotifChange("live")}
-                    className={styles.toggleInput}
-                  />
-                  <span className={styles.toggleTrack} />
-                </label>
-              </SettingsRow>
-              <SettingsRow
-                label="Followed Scholars"
-                sublabel="Notify when a followed scholar posts"
-              >
-                <label className={styles.toggle}>
-                  <input
-                    type="checkbox"
-                    role="switch"
-                    aria-checked={notif.scholars}
-                    aria-label="Notify for Followed Scholars"
-                    checked={notif.scholars}
-                    onChange={handleNotifChange("scholars")}
-                    className={styles.toggleInput}
-                  />
-                  <span className={styles.toggleTrack} />
-                </label>
-              </SettingsRow>
-              <SettingsRow label="New Lectures" sublabel="Notify when new lectures are published">
-                <label className={styles.toggle}>
-                  <input
-                    type="checkbox"
-                    role="switch"
-                    aria-checked={notif.lectures}
-                    aria-label="Notify for New Lectures"
-                    checked={notif.lectures}
-                    onChange={handleNotifChange("lectures")}
-                    className={styles.toggleInput}
-                  />
-                  <span className={styles.toggleTrack} />
-                </label>
-              </SettingsRow>
-            </>
+      <SettingsSection
+        title={t("settings.general.languageSection", "Language")}
+        description={t("settings.general.languageDesc", "Configure app and content language.")}
+      >
+        <SettingsRow
+          label={t("settings.general.appLanguage", "App Language")}
+          sublabel={t("settings.general.appLanguageDesc", "Interface language for the app")}
+        >
+          <LanguageSwitch />
+        </SettingsRow>
+        <SettingsRow
+          label={t("settings.general.contentLanguage", "Content Language")}
+          sublabel={t(
+            "settings.general.contentLanguageDesc",
+            "Show content in its original language",
           )}
-        </SettingsSection>
-      </div>
+        >
+          <ContentLanguageToggle />
+        </SettingsRow>
+      </SettingsSection>
+
+      <SettingsSection
+        title={t("settings.general.displaySection", "Display")}
+        description={t("settings.general.displayDesc", "Choose a theme for the interface.")}
+      >
+        <SettingsRow
+          label={t("settings.general.theme", "Theme")}
+          sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
+        >
+          <SegmentedControl
+            options={themeOptions}
+            value={themePreference}
+            onChange={handleThemeChange}
+            ariaLabel={t("settings.general.themeAria", "Theme preference")}
+          />
+        </SettingsRow>
+      </SettingsSection>
+
+      <SettingsSection
+        title={t("settings.general.notifSection", "Notifications")}
+        description={t("settings.general.notifDesc", "Manage what notifications you receive.")}
+      >
+        <SettingsRow
+          label={t("settings.general.enableNotif", "Enable Notifications")}
+          sublabel={t("settings.general.enableNotifDesc", "Master toggle for all notifications")}
+        >
+          <Toggle
+            checked={notif.master}
+            onChange={handleNotifChange("master")}
+            aria-label={t("settings.general.enableNotif", "Enable Notifications")}
+          />
+        </SettingsRow>
+        {notif.master && (
+          <>
+            <SettingsRow
+              label={t("settings.general.followedScholars", "Followed Scholars")}
+              sublabel={t(
+                "settings.general.followedScholarsDesc",
+                "Notify when a followed scholar posts",
+              )}
+            >
+              <Toggle
+                checked={notif.scholars}
+                onChange={handleNotifChange("scholars")}
+                aria-label={t("settings.general.followedScholars", "Notify for Followed Scholars")}
+              />
+            </SettingsRow>
+            <SettingsRow
+              label={t("settings.general.newLectures", "New Lectures")}
+              sublabel={t(
+                "settings.general.newLecturesDesc",
+                "Notify when new lectures are published",
+              )}
+            >
+              <Toggle
+                checked={notif.lectures}
+                onChange={handleNotifChange("lectures")}
+                aria-label={t("settings.general.newLectures", "Notify for New Lectures")}
+              />
+            </SettingsRow>
+          </>
+        )}
+      </SettingsSection>
     </ScreenView>
   );
 }

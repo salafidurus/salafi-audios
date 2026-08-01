@@ -1,21 +1,25 @@
-import { vi, describe, it, expect, beforeEach, type Mocked } from "vitest";
-import { DurusAudioService } from "./audio.service";
+import { httpClient } from "@sd/core-contracts";
+import { vi, describe, it, expect, beforeEach } from "bun:test";
+
 import type { PlaybackEngine, PlaybackEngineEvents } from "../engine/playback.engine";
-import { usePlaybackStore } from "../store/playback.store";
-import { useProgressStore } from "../progress/progress.store";
 import type { Track } from "../types/track.types";
+
+import { useProgressStore } from "../progress/progress.store";
+import { syncProgressToBackend } from "../progress/progress.sync";
+import { usePlaybackStore } from "../store/playback.store";
+import { DurusAudioService } from "./audio.service";
 
 // Mock progress sync module to avoid network triggers in tests
 vi.mock("../progress/progress.sync", () => ({
-  syncProgressToBackend: vi.fn(),
-  syncLocalToServer: vi.fn(),
-  saveListing: vi.fn(),
-  unsaveListing: vi.fn(),
+  syncProgressToBackend: vi.fn<() => void>(),
+  syncLocalToServer: vi.fn<() => void>(),
+  saveListing: vi.fn<() => void>(),
+  unsaveListing: vi.fn<() => void>(),
 }));
 
 // Mock httpClient used for lazy stream URL resolution
 vi.mock("@sd/core-contracts", () => ({
-  httpClient: vi.fn(),
+  httpClient: vi.fn<() => Promise<{ url: string }>>(),
   endpoints: {
     audio: {
       listings: {
@@ -25,12 +29,9 @@ vi.mock("@sd/core-contracts", () => ({
   },
 }));
 
-import { syncProgressToBackend } from "../progress/progress.sync";
-import { httpClient } from "@sd/core-contracts";
-
 describe("DurusAudioService", () => {
   let service: DurusAudioService;
-  let mockEngine: Mocked<PlaybackEngine>;
+  let mockEngine: PlaybackEngine;
   let engineEvents: PlaybackEngineEvents;
 
   const mockTrack: Track = {
@@ -41,24 +42,41 @@ describe("DurusAudioService", () => {
     durationSeconds: 1800,
   };
 
+  const mockTrack2: Track = {
+    id: "l2",
+    title: "Lecture 2",
+    artist: "Scholar 1",
+    url: "https://stream2.mp3",
+    durationSeconds: 1200,
+  };
+
+  const mockTrack3: Track = {
+    id: "l3",
+    title: "Lecture 3",
+    artist: "Scholar 1",
+    url: "https://stream3.mp3",
+    durationSeconds: 900,
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     usePlaybackStore.getState().actions.stop();
-    vi.mocked(httpClient).mockResolvedValue({ url: "https://resolved.stream.mp3" });
+    useProgressStore.setState({ progressMap: {}, savedMap: {}, lastSyncedAt: null });
+    (httpClient as any).mockResolvedValue({ url: "https://resolved.stream.mp3" });
 
     mockEngine = {
-      setup: vi.fn().mockResolvedValue(undefined),
-      load: vi.fn().mockResolvedValue(undefined),
-      play: vi.fn().mockResolvedValue(undefined),
-      pause: vi.fn().mockResolvedValue(undefined),
-      seek: vi.fn().mockResolvedValue(undefined),
-      setSpeed: vi.fn().mockResolvedValue(undefined),
-      stop: vi.fn().mockResolvedValue(undefined),
-      destroy: vi.fn().mockResolvedValue(undefined),
-      setEvents: vi.fn().mockImplementation((ev) => {
+      setup: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      load: vi.fn<(track: Track) => Promise<void>>().mockResolvedValue(undefined),
+      play: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      pause: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      seek: vi.fn<(seconds: number) => Promise<void>>().mockResolvedValue(undefined),
+      setSpeed: vi.fn<(speed: number) => Promise<void>>().mockResolvedValue(undefined),
+      stop: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      destroy: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      setEvents: vi.fn<(events: PlaybackEngineEvents) => void>().mockImplementation((ev) => {
         engineEvents = ev;
       }),
-    } as unknown as Mocked<PlaybackEngine>;
+    } as unknown as PlaybackEngine;
 
     service = new DurusAudioService(mockEngine);
   });
@@ -67,6 +85,21 @@ describe("DurusAudioService", () => {
     expect(mockEngine.setEvents).toHaveBeenCalled();
     expect(engineEvents.onPositionChange).toBeDefined();
     expect(engineEvents.onTrackEnd).toBeDefined();
+    expect(engineEvents.onSkipPrevious).toBeDefined();
+    expect(engineEvents.onSkipNext).toBeDefined();
+  });
+
+  it("should route the engine's onSkipPrevious/onSkipNext to skipToPrevious/skipToNext", async () => {
+    await service.playListing(mockTrack, [mockTrack, mockTrack2]);
+    vi.clearAllMocks();
+
+    engineEvents.onSkipNext!();
+    await Promise.resolve();
+    expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack2);
+
+    engineEvents.onSkipPrevious!();
+    await Promise.resolve();
+    expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack);
   });
 
   it("should play listing and load in engine", async () => {
@@ -141,7 +174,7 @@ describe("DurusAudioService", () => {
 
   it("should lazily resolve stream URL when track.url is empty", async () => {
     const stubTrack: Track = { ...mockTrack, url: "" };
-    vi.mocked(httpClient).mockResolvedValue({ url: "https://fresh-signed.mp3" });
+    (httpClient as any).mockResolvedValue({ url: "https://fresh-signed.mp3" });
 
     await service.playListing(stubTrack);
 
@@ -160,5 +193,113 @@ describe("DurusAudioService", () => {
 
     expect(httpClient).not.toHaveBeenCalled();
     expect(mockEngine.load).toHaveBeenCalledWith(localTrack);
+  });
+
+  it("should advance through the full queue across multiple skipToNext calls", async () => {
+    await service.playListing(mockTrack, [mockTrack, mockTrack2, mockTrack3]);
+
+    await service.skipToNext();
+    expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack2);
+
+    await service.skipToNext();
+    expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack3);
+
+    // No more tracks — should stop rather than reload track1.
+    await service.skipToNext();
+    expect(mockEngine.stop).toHaveBeenCalled();
+    expect(usePlaybackStore.getState().currentTrack).toBeNull();
+  });
+
+  it("should sync queue and current index into usePlaybackStore when playing a listing", async () => {
+    await service.playListing(mockTrack, [mockTrack, mockTrack2, mockTrack3]);
+
+    expect(usePlaybackStore.getState().queue).toEqual([mockTrack, mockTrack2, mockTrack3]);
+    expect(usePlaybackStore.getState().currentIndex).toBe(0);
+
+    await service.skipToNext();
+    expect(usePlaybackStore.getState().currentIndex).toBe(1);
+  });
+
+  it("should go to the previous track when near the start of the current track", async () => {
+    await service.playListing(mockTrack, [mockTrack, mockTrack2]);
+    await service.skipToNext();
+    usePlaybackStore.getState().actions.setPosition(1);
+
+    await service.skipToPrevious();
+
+    expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack);
+    expect(usePlaybackStore.getState().currentIndex).toBe(0);
+  });
+
+  it("should restart the current track instead of skipping back once past the threshold", async () => {
+    await service.playListing(mockTrack, [mockTrack, mockTrack2]);
+    await service.skipToNext();
+    vi.clearAllMocks();
+    usePlaybackStore.getState().actions.setPosition(10);
+
+    await service.skipToPrevious();
+
+    expect(mockEngine.seek).toHaveBeenCalledWith(0);
+    expect(mockEngine.load).not.toHaveBeenCalled();
+  });
+
+  it("should restart from 0 when skipping previous with no earlier track", async () => {
+    await service.playListing(mockTrack);
+    usePlaybackStore.getState().actions.setPosition(1);
+
+    await service.skipToPrevious();
+
+    expect(mockEngine.seek).toHaveBeenCalledWith(0);
+    expect(mockEngine.load).toHaveBeenCalledTimes(1);
+  });
+
+  it("should seek to a previously saved, non-completed position when playing a listing", async () => {
+    useProgressStore.getState().actions.setProgress(mockTrack.id, 120, 1800);
+
+    await service.playListing(mockTrack);
+
+    expect(mockEngine.seek).toHaveBeenCalledWith(120);
+  });
+
+  it("should not resume when the saved progress is already completed", async () => {
+    useProgressStore.getState().actions.setProgress(mockTrack.id, 120, 1800);
+    useProgressStore.getState().actions.markCompleted(mockTrack.id);
+
+    await service.playListing(mockTrack);
+
+    expect(mockEngine.seek).not.toHaveBeenCalled();
+  });
+
+  it("should skip resume when fromStart is requested", async () => {
+    useProgressStore.getState().actions.setProgress(mockTrack.id, 120, 1800);
+
+    await service.playListing(mockTrack, undefined, { fromStart: true });
+
+    expect(mockEngine.seek).not.toHaveBeenCalled();
+  });
+
+  it("should prefetch the next track's stream URL in the background", async () => {
+    const stubTrack2: Track = { ...mockTrack2, url: "" };
+    (httpClient as any).mockImplementation(({ url }: { url: string }) =>
+      Promise.resolve({ url: `https://resolved${url}` }),
+    );
+
+    await service.playListing(mockTrack, [mockTrack, stubTrack2]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(httpClient).toHaveBeenCalledWith({
+      url: "/audio/listings/l2/stream",
+      method: "GET",
+    });
+
+    // The prefetched URL should already be resolved by the time we skip to it,
+    // so skipToNext's own resolveStreamUrl call is skipped.
+    (httpClient as any).mockClear();
+    await service.skipToNext();
+    expect(httpClient).not.toHaveBeenCalled();
+    expect(mockEngine.load).toHaveBeenLastCalledWith({
+      ...stubTrack2,
+      url: "https://resolved/audio/listings/l2/stream",
+    });
   });
 });

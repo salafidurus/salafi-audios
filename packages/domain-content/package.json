@@ -8,20 +8,26 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "lint": "oxlint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:cov": "vitest run --coverage",
-    "test:prepush": "vitest run --changed=origin/main"
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:cov": "bun test --coverage",
+    "test:prepush": "bun test"
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
     "@sd/core-i18n": "workspace:*",
-    "@sd/domain-audio": "workspace:*",
-    "@tanstack/react-query": "catalog:"
+    "@sd/domain-audio": "workspace:*"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@happy-dom/global-registrator": "catalog:",
+    "@testing-library/react": "catalog:",
+    "i18next": "catalog:"
+  },
   "peerDependencies": {
-    "react": "^19.0.0"
+    "@tanstack/react-query": "catalog:",
+    "react": "^19.0.0",
+    "react-i18next": "catalog:"
   }
 }

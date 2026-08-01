@@ -1,5 +1,6 @@
-import { create } from "zustand";
 import { httpClient } from "@sd/core-contracts";
+import { create } from "zustand";
+
 import type { OutboxEntry } from "../types";
 
 type OutboxState = {

@@ -1,12 +1,33 @@
-import React from "react";
-import { render, screen } from "@testing-library/react-native";
 import { useAccountProfile } from "@sd/domain-account";
-import { AccountScreen } from "./account.screen";
+import { render, screen } from "@testing-library/react-native";
+import React from "react";
+import { useUnistyles } from "react-native-unistyles";
+
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+
+import { AccountScreen } from "./account.screen";
 
 jest.mock("@sd/domain-account", () => ({
   useAccountProfile: jest.fn(),
 }));
+
+jest.mock("lucide-react-native", () => ({
+  ChevronRight: "ChevronRight",
+  ChevronLeft: "ChevronLeft",
+}));
+
+jest.mock("react-native-unistyles", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { lightNativeTheme } = require("../../../core/styles/theme");
+  return {
+    StyleSheet: {
+      create: (styles: unknown) =>
+        typeof styles === "function" ? (styles as any)(lightNativeTheme, {}) : styles,
+      configure: () => undefined,
+    },
+    useUnistyles: jest.fn(() => ({ theme: lightNativeTheme, rt: {} })),
+  };
+});
 
 jest.mock("@/features/admin/hooks/use-admin-permissions", () => ({
   useAdminPermissions: jest.fn(),
@@ -18,19 +39,43 @@ jest.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 
-jest.mock("@/features/i18n", () => {
+jest.mock("@/core/auth/use-auth", () => ({
+  useAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false, user: undefined })),
+}));
+
+jest.mock("@/features/settings/components/language-switch/language-switch", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { Text } = require("react-native");
   return {
     LanguageSwitch: () => React.createElement(Text, null, "LanguageSwitch"),
+  };
+});
+
+jest.mock("@/features/settings/components/content-language-toggle/content-language-toggle", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require("react");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { Text } = require("react-native");
+  return {
     ContentLanguageToggle: () => React.createElement(Text, null, "ContentLanguageToggle"),
   };
 });
 
 const mockedUseAccountProfile = jest.mocked(useAccountProfile) as any;
 const mockedUseAdminPermissions = jest.mocked(useAdminPermissions);
+const mockedUseUnistyles = jest.mocked(useUnistyles);
+
+const authenticatedProfile = {
+  id: "user-1",
+  email: "user@example.com",
+  displayName: "Test User",
+  role: "user" as const,
+  emailVerified: true,
+  createdAt: "2026-04-11T00:00:00.000Z",
+  updatedAt: "2026-04-11T00:00:00.000Z",
+};
 
 describe("AccountScreen", () => {
   beforeEach(() => {
@@ -45,6 +90,45 @@ describe("AccountScreen", () => {
       hasPermission: jest.fn(() => false),
       isLoading: false,
     });
+    const { lightNativeTheme } = require("../../../core/styles/theme");
+    mockedUseUnistyles.mockReturnValue({ theme: lightNativeTheme, rt: {} } as any);
+  });
+
+  it("renders ChevronRight disclosure icons when the layout direction is ltr", async () => {
+    mockedUseAccountProfile.mockReturnValue({
+      data: authenticatedProfile,
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<AccountScreen />);
+
+    const icons = screen.getAllByTestId("account-disclosure-icon");
+    expect(icons.length).toBeGreaterThan(0);
+    for (const icon of icons) {
+      expect((icon.children[0] as { type: string }).type).toBe("ChevronRight");
+    }
+  });
+
+  it("renders ChevronLeft disclosure icons when the layout direction is rtl", async () => {
+    mockedUseAccountProfile.mockReturnValue({
+      data: authenticatedProfile,
+      isFetching: false,
+      error: null,
+    });
+    const { lightNativeTheme } = require("../../../core/styles/theme");
+    mockedUseUnistyles.mockReturnValue({
+      theme: { ...lightNativeTheme, direction: "rtl" },
+      rt: {},
+    } as any);
+
+    await render(<AccountScreen />);
+
+    const icons = screen.getAllByTestId("account-disclosure-icon");
+    expect(icons.length).toBeGreaterThan(0);
+    for (const icon of icons) {
+      expect((icon.children[0] as { type: string }).type).toBe("ChevronLeft");
+    }
   });
 
   it("renders sign-in prompt and legal when unauthenticated (no profile)", async () => {
@@ -92,7 +176,6 @@ describe("AccountScreen", () => {
 
     await render(<AccountScreen />);
 
-    expect(screen.getByText("Account")).toBeTruthy();
     expect(screen.getByText("Test User")).toBeTruthy();
     expect(screen.getByText("user@example.com")).toBeTruthy();
     expect(screen.getByText("Edit Profile")).toBeTruthy();
@@ -120,14 +203,11 @@ describe("AccountScreen", () => {
     mockedUseAdminPermissions.mockReturnValue({
       permissions: [
         {
-          permission: "manage:content",
-          grantedAt: "2026-01-01",
-          userId: "user-1",
-          grantedById: null,
+          permission: "USERS_VIEW",
         },
       ],
       hasAnyPermission: true,
-      hasPermission: jest.fn((perm) => perm === "manage:content"),
+      hasPermission: jest.fn((perm) => perm === "USERS_VIEW"),
       isLoading: false,
     });
 

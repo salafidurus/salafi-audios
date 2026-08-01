@@ -1,10 +1,11 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": ["./tsconfig.json", "../../tsconfig.strict.json"],
   "compilerOptions": {
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "declarationMap": false,
+    "declarationMap": true,
+    "sourceMap": false,
     "outDir": "dist",
     "stripInternal": true,
     "skipLibCheck": true

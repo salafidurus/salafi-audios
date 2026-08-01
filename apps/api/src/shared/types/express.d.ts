@@ -8,7 +8,7 @@ declare global {
         email: string;
         emailVerified: boolean;
         image?: string | null;
-        role: string;
+        roles: string[];
         banned?: boolean | null;
         banReason?: string | null;
         banExpires?: Date | null;

@@ -1,12 +1,14 @@
+import { describe, it, expect } from "bun:test";
+
 import { buildSectionTabPath } from "./get-current-section";
 
 describe("buildSectionTabPath", () => {
-  it("collapses default feed tab to /feed", () => {
-    expect(buildSectionTabPath("feed")).toBe("/feed");
-    expect(buildSectionTabPath("feed", "popular")).toBe("/feed");
+  it("collapses default explore tab to /explore", () => {
+    expect(buildSectionTabPath("explore")).toBe("/explore");
+    expect(buildSectionTabPath("explore", "recent")).toBe("/explore");
   });
-  it("appends non-default feed tab", () => {
-    expect(buildSectionTabPath("feed", "recent")).toBe("/feed/recent");
+  it("appends non-default explore tab", () => {
+    expect(buildSectionTabPath("explore", "scholar")).toBe("/explore/scholar");
   });
   it("collapses default library tab to /library", () => {
     expect(buildSectionTabPath("library")).toBe("/library");
@@ -21,15 +23,5 @@ describe("buildSectionTabPath", () => {
   });
   it("appends non-default settings tab", () => {
     expect(buildSectionTabPath("settings", "profile")).toBe("/settings/profile");
-  });
-  it("collapses default live tab (ongoing) to /live", () => {
-    expect(buildSectionTabPath("live")).toBe("/live");
-    expect(buildSectionTabPath("live", "ongoing")).toBe("/live");
-  });
-  it("appends non-default live tab (scheduled)", () => {
-    expect(buildSectionTabPath("live", "scheduled")).toBe("/live/scheduled");
-  });
-  it("appends non-default live tab (ended)", () => {
-    expect(buildSectionTabPath("live", "ended")).toBe("/live/ended");
   });
 });

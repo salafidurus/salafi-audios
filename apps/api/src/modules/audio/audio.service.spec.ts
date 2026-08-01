@@ -1,4 +1,5 @@
-import { vi, type Mocked } from 'vitest';
+import type { Mocked } from '../../test/setup';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
@@ -33,12 +34,21 @@ describe('AudioService', () => {
         {
           provide: AudioRepository,
           useValue: {
-            getUserProgress: vi.fn(),
-            upsertProgress: vi.fn(),
-            bulkSync: vi.fn(),
-            findListingById: vi.fn(),
-            findPrimaryAsset: vi.fn(),
-            findFirstAsset: vi.fn(),
+            getUserProgress: vi.fn<(userId: string, since?: Date) => Promise<any>>(),
+            upsertProgress:
+              vi.fn<
+                (
+                  userId: string,
+                  listingId: string,
+                  positionSeconds: number,
+                  _durationSeconds?: number,
+                  isCompleted?: boolean,
+                ) => Promise<void>
+              >(),
+            bulkSync: vi.fn<(userId: string, items: any[]) => Promise<void>>(),
+            findListingById: vi.fn<(id: string) => Promise<any>>(),
+            findPrimaryAsset: vi.fn<(listingId: string) => Promise<any>>(),
+            findFirstAsset: vi.fn<(listingId: string) => Promise<any>>(),
           } satisfies Partial<Mocked<AudioRepository>>,
         },
       ],

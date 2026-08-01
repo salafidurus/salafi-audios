@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
-import { getTurboVersion, validateEnvironment } from "./turbo.mjs";
 import fs from "node:fs";
-import path from "node:path";
 import { tmpdir } from "node:os";
+import path from "node:path";
+
+import { getTurboVersion, validateEnvironment } from "./turbo.mjs";
 
 describe("turbo utility", () => {
   let tmpPath;

@@ -1,5 +1,5 @@
-import * as SecureStore from "expo-secure-store";
 import { resolveLocale, type Locale } from "@sd/core-i18n";
+import * as SecureStore from "expo-secure-store";
 
 const KEY = "locale";
 

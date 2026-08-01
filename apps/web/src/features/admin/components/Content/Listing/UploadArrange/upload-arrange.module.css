@@ -1,0 +1,401 @@
+/* ─── Upload tab ─────────────────────────────────────────────────────────── */
+
+.linkSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-sm);
+  margin-top: var(--space-component-gap-md);
+}
+
+.linkRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+}
+
+.linkRow > :first-child {
+  flex: 1;
+}
+
+.linkActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-scale-sm);
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  padding: var(--space-component-panel-padding);
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-component-card);
+  background-color: var(--surface-subtle);
+  cursor: pointer;
+  gap: var(--space-scale-xs);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.dropzone:hover {
+  border-color: var(--border-primary);
+  background-color: var(--surface-hover);
+}
+
+.dragActive {
+  border-color: var(--border-primary-strong);
+  background-color: var(--surface-selected);
+}
+
+.dropzoneIcon {
+  color: var(--content-muted);
+}
+
+.dropzoneText {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  color: var(--content-default);
+}
+
+.fileInput {
+  display: none;
+}
+
+.fileList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-sm);
+  margin-top: var(--space-component-gap-md);
+}
+
+.fileRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+  padding: var(--space-scale-sm) var(--space-scale-md);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-scale-md);
+  background-color: var(--surface-canvas);
+}
+
+.fileRowError {
+  border-color: var(--state-danger-border);
+  background-color: var(--state-danger-surface);
+}
+
+.orderBadge {
+  min-width: 2rem;
+  text-align: center;
+  padding: 2px var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+  background-color: var(--surface-selected);
+  color: var(--content-primary);
+  font-family: var(--typo-label-sm-font-family);
+  font-size: var(--typo-label-sm-font-size);
+  font-weight: var(--typo-label-sm-font-weight);
+}
+
+.orderBadgeMuted {
+  background-color: var(--surface-subtle);
+  color: var(--content-muted);
+}
+
+.fileTitleInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.fileMeta {
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+  white-space: nowrap;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--content-muted);
+  cursor: pointer;
+  padding: var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+}
+
+.iconButton:hover {
+  color: var(--state-danger);
+  background-color: var(--surface-hover);
+}
+
+/* ─── Arrange tab ────────────────────────────────────────────────────────── */
+
+.arrangeStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}
+
+.moduleSection {
+  /* Left accent strip instead of full border box — removes the nested surface layers */
+  border-left: 3px solid var(--border-primary);
+  padding-left: var(--space-scale-md);
+  padding-top: var(--space-scale-xs);
+  padding-bottom: var(--space-scale-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-sm);
+}
+
+.moduleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-scale-sm);
+}
+
+.moduleTitle {
+  font-family: var(--typo-label-lg-font-family);
+  font-size: var(--typo-label-lg-font-size);
+  font-weight: var(--typo-label-lg-font-weight);
+  color: var(--content-default);
+}
+
+.moduleSlug {
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+}
+
+.existingLesson {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+  padding: var(--space-scale-xs) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--content-muted);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.stagedItem {
+  padding: var(--space-scale-sm) var(--space-scale-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-sm);
+  cursor: grab;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.stagedItemConflict {
+  border-color: var(--state-danger-border);
+  background-color: var(--state-danger-surface);
+}
+
+.stagedItemHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+}
+
+.dragHandle {
+  color: var(--content-muted);
+  flex-shrink: 0;
+}
+
+.stagedItemTitle {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  color: var(--content-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggestionChip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-scale-sm);
+  padding: var(--space-scale-xs) var(--space-scale-md);
+  border-radius: var(--radius-scale-sm);
+  background-color: var(--surface-selected);
+  color: var(--content-primary);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-scale-sm) var(--space-component-gap-md);
+}
+
+@media (max-width: 640px) {
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.conflictText {
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  color: var(--state-danger-content);
+}
+
+.addModuleRow {
+  display: flex;
+  gap: var(--space-scale-sm);
+  align-items: center;
+}
+
+.addModuleRow > button {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Bulk action buttons toolbar */
+.bulkActions {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-scale-sm);
+  align-items: center;
+}
+
+/* Collapse/expand toggle button for module accordion */
+.collapseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--content-muted);
+  cursor: pointer;
+  padding: var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+  flex-shrink: 0;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.collapseButton:hover {
+  color: var(--content-primary);
+  background-color: var(--surface-hover);
+}
+
+.collapseButtonOpen {
+  transform: rotate(90deg);
+  color: var(--content-primary);
+}
+
+/* Container for the lesson list within a module */
+.moduleLessonsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  padding-top: var(--space-scale-xs);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Container for the module's own detail fields (slug, status, etc.) */
+.moduleDetailsSection {
+  padding: var(--space-scale-sm) 0;
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.emptyHint {
+  padding: var(--space-component-panel-padding);
+  text-align: center;
+  color: var(--content-tertiary);
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+}
+
+/* ─── Review tab ─────────────────────────────────────────────────────────── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-sm);
+}
+
+.sectionTitle {
+  font-family: var(--typo-label-lg-font-family);
+  font-size: var(--typo-label-lg-font-size);
+  font-weight: var(--typo-label-lg-font-weight);
+  color: var(--content-default);
+  margin: 0;
+}
+
+.reviewGroup {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-scale-md);
+  padding: var(--space-scale-xs) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.reviewLabel {
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-label-md-font-size);
+  color: var(--content-muted);
+}
+
+.reviewValue {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-default);
+  text-align: end;
+  overflow-wrap: anywhere;
+}
+
+.progressTrack {
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-scale-sm);
+  background-color: var(--surface-subtle);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--radius-scale-sm);
+  background-color: var(--border-primary);
+  transition: width 0.2s ease;
+}
+
+.progressFillError {
+  background-color: var(--state-danger);
+}
+
+.reviewRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  padding: var(--space-scale-sm) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.reviewRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-scale-md);
+}
+
+.statusIconSuccess {
+  color: var(--state-success);
+  flex-shrink: 0;
+}
+
+.statusIconError {
+  color: var(--state-danger);
+  flex-shrink: 0;
+}

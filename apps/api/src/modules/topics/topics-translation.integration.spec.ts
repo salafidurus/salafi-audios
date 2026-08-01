@@ -1,69 +1,72 @@
-import { vi } from 'vitest';
-import { ForbiddenException, INestApplication } from '@nestjs/common';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
+import { CacheModule } from '@nestjs/cache-manager';
 import request from 'supertest';
-import { AuthGuard } from '../auth/auth.guard';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
+import { createTestApp } from '../../test/create-test-app';
+import { AuthGuard } from '../../core/auth/auth.guard';
+import { PermissionGuard } from '../../core/auth/permission.guard';
 import { TopicsController } from './topics.controller';
 import { TopicsTranslationsController } from './topics-translations.controller';
 import { TopicsService } from './topics.service';
+import { PrismaService } from '../../core/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
-vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn<any>() } };
+vi.mock('../../core/auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
-const draftTranslation = {
+const mockPrisma = {
+  userPermission: {
+    findMany: vi.fn<any>().mockResolvedValue([]),
+    findUnique: vi.fn<any>().mockResolvedValue(null),
+  },
+  userRoleAssignment: {
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
+    findUnique: vi.fn<any>().mockResolvedValue(null),
+  },
+};
+
+const mockTranslation = {
   locale: 'ar',
-  status: 'draft',
   fields: { name: 'موضوع عربي' },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
 
-const publishedTranslation = { ...draftTranslation, status: 'published' };
-
 const mockTopicsService = {
-  list: vi.fn().mockResolvedValue([]),
-  getBySlug: vi.fn(),
-  upsert: vi.fn(),
-  listChildren: vi.fn().mockResolvedValue([]),
-  listLectures: vi.fn().mockResolvedValue([]),
-  remove: vi.fn(),
-  listTranslations: vi.fn().mockResolvedValue([]),
-  upsertTranslation: vi.fn().mockResolvedValue(draftTranslation),
-  updateTranslation: vi.fn().mockResolvedValue(draftTranslation),
-  publishTranslation: vi.fn().mockResolvedValue(publishedTranslation),
-  unpublishTranslation: vi.fn().mockResolvedValue(draftTranslation),
+  list: vi.fn<any>().mockResolvedValue([]),
+  getBySlug: vi.fn<any>(),
+  upsert: vi.fn<any>(),
+  listChildren: vi.fn<any>().mockResolvedValue([]),
+  listLectures: vi.fn<any>().mockResolvedValue([]),
+  remove: vi.fn<any>(),
+  listTranslations: vi.fn<any>().mockResolvedValue([]),
+  upsertTranslation: vi.fn<any>().mockResolvedValue(mockTranslation),
+  updateTranslation: vi.fn<any>().mockResolvedValue(mockTranslation),
 };
 
-async function buildApp(overrideGuard?: () => boolean | never): Promise<INestApplication> {
+async function buildApp(): Promise<NestFastifyApplication> {
   const builder = Test.createTestingModule({
+    imports: [CacheModule.register({ isGlobal: true, ttl: 0 })],
     controllers: [TopicsController, TopicsTranslationsController],
     providers: [
       { provide: APP_GUARD, useClass: AuthGuard },
+      { provide: APP_GUARD, useClass: PermissionGuard },
       { provide: TopicsService, useValue: mockTopicsService },
+      { provide: PrismaService, useValue: mockPrisma },
     ],
-  })
-    .overrideGuard(AdminPermissionGuard)
-    .useValue({
-      canActivate: overrideGuard ?? (() => true),
-    });
+  });
 
-  const module = await builder.compile();
-  const app = module.createNestApplication();
-  await app.init();
-  return app;
+  return createTestApp(builder);
 }
 
 describe('TopicsTranslationsController — auth boundaries', () => {
-  let app: INestApplication;
+  let app: NestFastifyApplication;
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
     vi.clearAllMocks();
-    mockTopicsService.upsertTranslation.mockResolvedValue(draftTranslation);
-    mockTopicsService.publishTranslation.mockResolvedValue(publishedTranslation);
-    mockTopicsService.unpublishTranslation.mockResolvedValue(draftTranslation);
+    mockTopicsService.upsertTranslation.mockResolvedValue(mockTranslation);
     app = await buildApp();
   });
 
@@ -75,67 +78,66 @@ describe('TopicsTranslationsController — auth boundaries', () => {
         user: { id: 'u1', role: 'admin' },
         session: {},
       });
+      // Mock userPermission.findUnique to return permissions for admin
+      mockPrisma.userPermission.findUnique.mockImplementation(async (args: any) => {
+        const { where } = args;
+        const { userId, permission } = where.userId_permission;
+        if (
+          userId === 'u1' &&
+          ['TRANSLATIONS_VIEW', 'TRANSLATIONS_CREATE', 'TRANSLATIONS_EDIT'].includes(permission)
+        ) {
+          return { userId, permission, grantedAt: new Date() };
+        }
+        return null;
+      });
     });
 
-    it('POST /topics/:id/translations creates a draft translation', async () => {
+    it('POST /topics/:id/translations creates a translation', async () => {
       const res = await request(app.getHttpServer())
         .post('/topics/t1/translations')
         .send({ locale: 'ar', name: 'موضوع عربي' })
         .expect(201);
-      expect(res.body.status).toBe('draft');
-    });
-
-    it('POST /topics/:id/translations/:locale/publish publishes the translation', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/topics/t1/translations/ar/publish')
-        .expect(201);
-      expect(res.body.status).toBe('published');
-    });
-
-    it('POST /topics/:id/translations/:locale/unpublish unpublishes the translation', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/topics/t1/translations/ar/unpublish')
-        .expect(201);
-      expect(res.body.status).toBe('draft');
+      expect(res.body.locale).toBe('ar');
     });
 
     it('GET /topics/:id/translations lists translations', async () => {
-      mockTopicsService.listTranslations.mockResolvedValue([draftTranslation]);
+      mockTopicsService.listTranslations.mockResolvedValue([mockTranslation]);
       const res = await request(app.getHttpServer()).get('/topics/t1/translations').expect(200);
       expect(Array.isArray(res.body)).toBe(true);
     });
   });
 
   describe('unauthenticated requests', () => {
-    it('POST /topics/:id/translations returns 401 without a session', () => {
+    it('POST /topics/:id/translations returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post('/topics/t1/translations')
-        .send({ locale: 'ar', name: 'موضوع عربي' })
-        .expect(401);
+        .send({ locale: 'ar', name: 'موضوع عربي' });
+      expect(response.status).toBe(401);
     });
   });
 
   describe('missing manage:content permission', () => {
-    let forbiddenApp: INestApplication;
+    let forbiddenApp: NestFastifyApplication;
 
     beforeEach(async () => {
       mockAuth.api.getSession.mockResolvedValue({
         user: { id: 'u1', role: 'user' },
         session: {},
       });
-      forbiddenApp = await buildApp(() => {
-        throw new ForbiddenException('Missing permission: manage:content');
-      });
+      // Reset userPermission.findUnique to return null for all queries
+      // This ensures PermissionGuard will throw ForbiddenException
+      mockPrisma.userPermission.findUnique.mockResolvedValue(null);
+      forbiddenApp = await buildApp();
     });
 
     afterEach(() => forbiddenApp.close());
 
-    it('POST /topics/:id/translations returns 403', () => {
-      return request(forbiddenApp.getHttpServer())
+    it('POST /topics/:id/translations returns 403', async () => {
+      const response = await request(forbiddenApp.getHttpServer())
         .post('/topics/t1/translations')
-        .send({ locale: 'ar', name: 'موضوع عربي' })
-        .expect(403);
+        .send({ locale: 'ar', name: 'موضوع عربي' });
+      expect(response.status).toBe(403);
     });
   });
 });

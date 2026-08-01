@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
+  testMatch: "**/*.e2e.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 2,
@@ -12,7 +13,7 @@ export default defineConfig({
     timeout: 15_000,
   },
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:3008",
     trace: "on-first-retry",
     actionTimeout: 20_000,
     navigationTimeout: 45_000,
@@ -22,9 +23,9 @@ export default defineConfig({
   webServer: {
     command:
       process.env.PW_SKIP_WEB_BUILD === "1"
-        ? "bun run start -p 3000"
-        : "bun run build && bun run start -p 3000",
-    url: "http://localhost:3000",
+        ? "bun --bun next start --port 3008"
+        : "bun run build && bun --bun next start --port 3008",
+    url: "http://localhost:3008",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
@@ -34,7 +35,6 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        ...(process.env.CI ? {} : { channel: "chrome" }),
       },
     },
     // Add later if you want:

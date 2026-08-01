@@ -1,12 +1,20 @@
 "use client";
 
-import { Responsive } from "@/shared/components/Responsive";
-import { AdminStatsDesktopScreen } from "./admin-stats.screen.desktop";
-import { AdminStatsMobileScreen } from "./admin-stats.screen.mobile";
+import { useTranslation } from "@/core/i18n/use-translation";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
-const MOBILE = <AdminStatsMobileScreen />;
-const DESKTOP = <AdminStatsDesktopScreen />;
+import styles from "./admin-stats.screen.module.css";
 
 export function AdminStatsScreen() {
-  return <Responsive mobile={MOBILE} desktop={DESKTOP} />;
+  const { t } = useTranslation();
+
+  return (
+    <ScreenView>
+      <PageHeader title={t("admin.stats.title", "Admin Stats")} />
+      <p className={styles.description}>
+        {t("admin.stats.desc", "Platform statistics and analytics will appear here.")}
+      </p>
+    </ScreenView>
+  );
 }

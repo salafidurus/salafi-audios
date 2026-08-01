@@ -1,15 +1,22 @@
+import type {
+  Permission,
+  UserPermissionDto,
+  UserRoleAssignmentDto,
+  UserRole,
+  AdminUserListDto,
+  AdminTopicDetailDto,
+  CreateTopicWithTranslationsDto,
+  UpdateTopicWithTranslationsDto,
+  ScholarFormDataDto,
+  ScholarTitle,
+} from "@sd/core-contracts";
+
 import { httpClient, endpoints } from "@sd/core-contracts";
-import type { AdminPermission, AdminUserListDto } from "@sd/core-contracts";
 
 // --- Permissions ---
 
 export type AdminPermissionsListResponse = {
-  permissions: Array<{
-    userId: string;
-    permission: AdminPermission;
-    grantedAt: string;
-    grantedById: string | null;
-  }>;
+  permissions: UserPermissionDto[];
 };
 
 export function fetchUserPermissions(userId: string) {
@@ -19,7 +26,7 @@ export function fetchUserPermissions(userId: string) {
   });
 }
 
-export function grantPermission(userId: string, permission: AdminPermission) {
+export function grantPermission(userId: string, permission: Permission) {
   return httpClient<AdminPermissionsListResponse>({
     url: endpoints.admin.permissions.grant(userId),
     method: "POST",
@@ -31,6 +38,36 @@ export function revokePermission(userId: string, permission: string) {
   return httpClient<AdminPermissionsListResponse>({
     url: endpoints.admin.permissions.revoke(userId, permission),
     method: "DELETE",
+    body: {},
+  });
+}
+
+// --- Roles ---
+
+export type AdminRolesListResponse = {
+  roles: UserRoleAssignmentDto[];
+};
+
+export function fetchUserRoles(userId: string) {
+  return httpClient<AdminRolesListResponse>({
+    url: endpoints.admin.roles.grant(userId),
+    method: "GET",
+  });
+}
+
+export function grantRole(userId: string, role: UserRole) {
+  return httpClient<AdminRolesListResponse>({
+    url: endpoints.admin.roles.grant(userId),
+    method: "POST",
+    body: { role },
+  });
+}
+
+export function revokeRole(userId: string, role: UserRole) {
+  return httpClient<AdminRolesListResponse>({
+    url: endpoints.admin.roles.revoke(userId, role),
+    method: "DELETE",
+    body: {},
   });
 }
 
@@ -41,9 +78,15 @@ export type AdminScholarInput = {
   slug: string;
   bio?: string;
   imageUrl?: string;
-  isKibar?: boolean;
-  isFeatured?: boolean;
   isActive?: boolean;
+  country?: string;
+  mainLanguage?: "en" | "ar";
+  title?: ScholarTitle;
+  orderIndex?: number;
+  socialTwitter?: string;
+  socialTelegram?: string;
+  socialYoutube?: string;
+  socialWebsite?: string;
 };
 
 export function createScholar(data: AdminScholarInput) {
@@ -55,10 +98,20 @@ export function createScholar(data: AdminScholarInput) {
 }
 
 export function updateScholar(id: string, data: Partial<AdminScholarInput>) {
+  const body = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => v !== undefined && v !== ""),
+  );
   return httpClient<unknown>({
     url: endpoints.admin.scholars.update(id),
     method: "PATCH",
-    body: data,
+    body,
+  });
+}
+
+export function fetchScholarFormData(id: string) {
+  return httpClient<ScholarFormDataDto>({
+    url: endpoints.admin.scholars.formData(id),
+    method: "GET",
   });
 }
 
@@ -66,8 +119,7 @@ export function updateScholar(id: string, data: Partial<AdminScholarInput>) {
 
 export type AdminTopicInput = {
   slug: string;
-  name: string;
-  parentSlug?: string;
+  name: { en: string; ar?: string };
 };
 
 export function createTopic(data: AdminTopicInput) {
@@ -93,23 +145,45 @@ export function deleteTopic(slug: string) {
   });
 }
 
-// --- Users ---
+// --- Topics — combined with translations ---
 
-export function fetchAdminUsers(q?: string) {
-  const url = endpoints.admin.users.list;
-  const query = q ? `?q=${encodeURIComponent(q)}` : "";
-  return httpClient<AdminUserListDto>({
-    url: `${url}${query}`,
+export function fetchAdminTopic(slug: string) {
+  return httpClient<AdminTopicDetailDto>({
+    url: endpoints.admin.topics.detail(slug),
     method: "GET",
   });
 }
 
-// --- Live ---
+export function createTopicWithTranslations(data: CreateTopicWithTranslationsDto) {
+  return httpClient<AdminTopicDetailDto>({
+    url: endpoints.admin.topics.create,
+    method: "POST",
+    body: data,
+  });
+}
 
-export function updateLiveSessionStatus(id: string, status: string) {
-  return httpClient<unknown>({
-    url: endpoints.admin.live.updateStatus(id),
-    method: "PATCH",
-    body: { status },
+export function updateTopicWithTranslations(slug: string, data: UpdateTopicWithTranslationsDto) {
+  return httpClient<AdminTopicDetailDto>({
+    url: endpoints.admin.topics.update(slug),
+    method: "PUT",
+    body: data,
+  });
+}
+
+// --- Users ---
+
+export function fetchAdminUsers(params?: { q?: string; role?: string }) {
+  const url = endpoints.admin.users.list;
+  const query = new URLSearchParams();
+  if (params?.q) {
+    query.append("q", params.q);
+  }
+  if (params?.role) {
+    query.append("role", params.role);
+  }
+  const queryString = query.toString();
+  return httpClient<AdminUserListDto>({
+    url: queryString ? `${url}?${queryString}` : url,
+    method: "GET",
   });
 }

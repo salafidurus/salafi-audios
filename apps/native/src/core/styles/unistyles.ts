@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native-unistyles";
+
 import { lightNativeTheme, darkNativeTheme } from "./theme";
 
 const breakpoints = {

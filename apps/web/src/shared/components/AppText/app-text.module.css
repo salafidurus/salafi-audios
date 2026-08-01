@@ -4,7 +4,7 @@
   line-height: var(--typo-display-lg-line-height);
   font-weight: var(--typo-display-lg-font-weight);
   letter-spacing: var(--typo-display-lg-letter-spacing);
-  color: var(--content-primary);
+  color: var(--content-strong);
 }
 
 .displayMd {
@@ -13,7 +13,7 @@
   line-height: var(--typo-display-md-line-height);
   font-weight: var(--typo-display-md-font-weight);
   letter-spacing: var(--typo-display-md-letter-spacing);
-  color: var(--content-primary);
+  color: var(--content-strong);
 }
 
 .titleLg {
@@ -22,7 +22,7 @@
   line-height: var(--typo-title-lg-line-height);
   font-weight: var(--typo-title-lg-font-weight);
   letter-spacing: var(--typo-title-lg-letter-spacing);
-  color: var(--content-primary);
+  color: var(--content-strong);
 }
 
 .titleMd {
@@ -31,7 +31,7 @@
   line-height: var(--typo-title-md-line-height);
   font-weight: var(--typo-title-md-font-weight);
   letter-spacing: var(--typo-title-md-letter-spacing);
-  color: var(--content-primary);
+  color: var(--content-strong);
 }
 
 .bodyLg {
@@ -40,7 +40,7 @@
   line-height: var(--typo-body-lg-line-height);
   font-weight: var(--typo-body-lg-font-weight);
   letter-spacing: var(--typo-body-lg-letter-spacing);
-  color: var(--content-primary);
+  color: var(--content-strong);
 }
 
 .bodyMd {
@@ -49,7 +49,7 @@
   line-height: var(--typo-body-md-line-height);
   font-weight: var(--typo-body-md-font-weight);
   letter-spacing: var(--typo-body-md-letter-spacing);
-  color: var(--content-primary);
+  color: var(--content-strong);
 }
 
 .bodySm {
@@ -58,7 +58,7 @@
   line-height: var(--typo-body-sm-line-height);
   font-weight: var(--typo-body-sm-font-weight);
   letter-spacing: var(--typo-body-sm-letter-spacing);
-  color: var(--content-primary);
+  color: var(--content-muted);
 }
 
 .labelMd {
@@ -67,7 +67,7 @@
   line-height: var(--typo-label-md-line-height);
   font-weight: var(--typo-label-md-font-weight);
   letter-spacing: var(--typo-label-md-letter-spacing);
-  color: var(--content-primary);
+  color: var(--content-muted);
 }
 
 .caption {
@@ -76,7 +76,7 @@
   line-height: var(--typo-caption-line-height);
   font-weight: var(--typo-caption-font-weight);
   letter-spacing: var(--typo-caption-letter-spacing);
-  color: var(--content-primary);
+  color: var(--content-muted);
 }
 
 .xs {
@@ -85,5 +85,21 @@
   line-height: var(--typo-xs-line-height);
   font-weight: var(--typo-xs-font-weight);
   letter-spacing: var(--typo-xs-letter-spacing);
-  color: var(--content-primary);
+  color: var(--content-muted);
+}
+
+.colorPrimary {
+  color: var(--content-strong);
+}
+
+.colorSecondary {
+  color: var(--content-muted);
+}
+
+.colorMuted {
+  color: var(--content-muted);
+}
+
+.colorInherit {
+  color: inherit;
 }

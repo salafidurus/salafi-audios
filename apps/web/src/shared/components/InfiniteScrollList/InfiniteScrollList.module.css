@@ -1,0 +1,46 @@
+.virtualContainer {
+  position: relative;
+  overflow-y: auto;
+}
+
+.sentinel {
+  height: 1px;
+  margin-top: 1rem;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
+}
+
+.loadingMore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  border-top: 1px solid var(--color-border);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--color-error);
+  font-size: var(--font-size-body);
+}

@@ -1,5 +1,10 @@
-import { httpClient, endpoints } from "@sd/core-contracts";
-import type { ProgressSyncDto, SavedSyncDto } from "@sd/core-contracts";
+import {
+  httpClient,
+  endpoints,
+  type AudioProgressDto,
+  type ProgressSyncItemDto,
+} from "@sd/core-contracts";
+
 import { useProgressStore } from "./progress.store";
 
 let syncTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -10,22 +15,24 @@ const pendingUpdates = new Map<
   { listingId: string; positionSeconds: number; durationSeconds: number }
 >();
 
-function flushPending() {
+async function flushPending(): Promise<void> {
   const updates = Array.from(pendingUpdates.values());
   pendingUpdates.clear();
 
-  for (const update of updates) {
-    httpClient({
-      url: endpoints.audio.progress.update(update.listingId),
-      method: "PUT",
-      body: {
-        positionSeconds: update.positionSeconds,
-        durationSeconds: update.durationSeconds,
-      },
-    }).catch(() => {
-      pendingUpdates.set(update.listingId, update);
-    });
-  }
+  await Promise.all(
+    updates.map((update) =>
+      httpClient({
+        url: endpoints.audio.progress.update(update.listingId),
+        method: "PUT",
+        body: {
+          positionSeconds: update.positionSeconds,
+          durationSeconds: update.durationSeconds,
+        },
+      }).catch(() => {
+        pendingUpdates.set(update.listingId, update);
+      }),
+    ),
+  );
 }
 
 /**
@@ -41,68 +48,49 @@ export function syncProgressToBackend(update: {
   pendingUpdates.set(update.listingId, update);
 
   if (syncTimeout) clearTimeout(syncTimeout);
-  syncTimeout = setTimeout(flushPending, SYNC_DEBOUNCE_MS);
+  syncTimeout = setTimeout(() => {
+    void flushPending();
+  }, SYNC_DEBOUNCE_MS);
 }
 
 /**
- * Bulk-sync all local progress and saved listings to the server.
- * Sends progress entries to POST /audio/progress/sync and
- * saved listing IDs to POST /me/library/saved/sync.
+ * Immediately flushes any pending debounced progress updates, bypassing the
+ * debounce timer. Intended for app-background/tab-close hooks, wired at the
+ * app layer (this package has no lifecycle-event access of its own).
  */
-export async function syncLocalToServer(): Promise<void> {
-  const state = useProgressStore.getState();
-
-  const progressEntries = Object.values(state.progressMap);
-  const savedIds = state.actions.getSavedIds();
-
-  const promises: Promise<unknown>[] = [];
-
-  if (progressEntries.length > 0) {
-    const body: ProgressSyncDto = {
-      items: progressEntries.map((p) => ({
-        listingId: p.listingId,
-        positionSeconds: p.positionSeconds,
-        durationSeconds: p.durationSeconds,
-        completedAt: p.completedAt,
-        updatedAt: p.updatedAt,
-      })),
-    };
-    promises.push(httpClient({ url: endpoints.audio.progress.sync, method: "POST", body }));
+export function flushPendingProgress(): Promise<void> {
+  if (syncTimeout) {
+    clearTimeout(syncTimeout);
+    syncTimeout = null;
   }
-
-  if (savedIds.length > 0) {
-    const body: SavedSyncDto = { listingIds: savedIds };
-    promises.push(httpClient({ url: endpoints.library.syncSaved, method: "POST", body }));
-  }
-
-  await Promise.all(promises);
+  return flushPending();
 }
 
 /**
- * Save a listing locally and sync to backend.
+ * Fetches the user's progress from the server and merges it into
+ * `useProgressStore`. Uses the store's own `lastSyncedAt` as a delta cursor
+ * after the first call, so repeated calls within a session only pull changes.
  */
-export function saveListing(listingId: string) {
-  const { actions } = useProgressStore.getState();
-  actions.addSaved(listingId);
-  httpClient({
-    url: endpoints.library.saveListing(listingId),
-    method: "POST",
-  }).catch(() => {
-    // Keep local state; will sync on next bulk sync
+export async function hydrateProgressFromServer(): Promise<void> {
+  const since = useProgressStore.getState().lastSyncedAt ?? undefined;
+
+  const entries = await httpClient<AudioProgressDto[]>({
+    url: endpoints.audio.progress.get,
+    method: "GET",
+    params: since ? { since } : undefined,
   });
+
+  useProgressStore.getState().actions.loadProgress(entries);
+  useProgressStore.getState().actions.setLastSyncedAt(new Date().toISOString());
 }
 
-/**
- * Unsave a listing locally and sync to backend.
- */
-export function unsaveListing(listingId: string) {
-  const { actions } = useProgressStore.getState();
-  actions.removeSaved(listingId);
-  httpClient({
-    url: endpoints.library.saveListing(listingId),
-    method: "DELETE",
-  }).catch(() => {
-    // Re-add on failure; will correct on next sync
-    actions.addSaved(listingId);
+/** Bulk-syncs a batch of progress entries to the server in one request. */
+export async function bulkSyncProgress(items: ProgressSyncItemDto[]): Promise<void> {
+  if (items.length === 0) return;
+
+  await httpClient({
+    url: endpoints.audio.progress.sync,
+    method: "POST",
+    body: { items },
   });
 }

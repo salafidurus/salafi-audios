@@ -20,6 +20,37 @@
   --typo-display-lg-font-family: var(--typo-display-lg-font-family);
 }
 
+/* =============================================
+   Screen Width System
+   =============================================
+   Content screens: explore, library, legal, live, search
+   Form screens: auth, settings, profile
+   ============================================= */
+:root {
+  /* Mobile header height */
+  --mobile-header-height: 3.5rem;
+
+  /* Content screen widths (70%/90%/100%) */
+  --content-width-desktop: 70%;
+  --content-width-tablet: 90%;
+  --content-width-mobile: 100%;
+  --content-max-width: 1400px;
+}
+
+/*
+  Font aliases — resolved to the correct font family based on locale.
+  :root:lang(ar) overrides the variables when Arabic is the active language.
+  GeistMono (--font-mono) is shared across both locales.
+*/
+:root {
+  --font-display: var(--font-display-en), serif;
+  --font-body: var(--font-body-en), sans-serif;
+}
+:root:lang(ar) {
+  --font-display: var(--font-display-ar), serif;
+  --font-body: var(--font-body-ar), sans-serif;
+}
+
 html,
 body {
   height: 100%;
@@ -49,13 +80,14 @@ body {
   overflow: hidden;
 }
 
-.appShell {
+/* Consent-required layout (sidebar + main content) */
+.appConsentShell {
   display: flex;
   flex: 1;
   min-height: 0;
 }
 
-.appMain {
+.appConsentMain {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -67,7 +99,7 @@ body {
   box-sizing: border-box;
 }
 
-.appContent {
+.appConsentContent {
   flex: 1;
   min-height: 0;
   overflow-x: clip;
@@ -76,14 +108,62 @@ body {
   flex-direction: column;
 }
 
-@media (max-width: 900px) {
-  .appShell {
+/* No-consent layout (two-column grid with sidebar nav) */
+.appNoConsentShell {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: var(--space-component-gap-xl);
+  align-items: stretch;
+  padding: var(--space-layout-page-y) var(--space-layout-page-x);
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.appNoConsentContent {
+  grid-column: 1;
+  min-height: 0;
+  overflow-x: clip;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.appNoConsentContent::-webkit-scrollbar {
+  display: none;
+}
+
+/* Responsive: hide sidebar on tablet and below */
+@media (max-width: 1200px) {
+  .appNoConsentShell {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablet: collapsed sidebar (641px - 900px) */
+@media (min-width: 641px) and (max-width: 900px) {
+  .appConsentShell {
+    flex-direction: row;
+  }
+
+  .appConsentMain {
+    padding-inline-start: var(--sidebar-width, 4.5rem);
+    padding-bottom: 0;
+  }
+}
+
+/* Mobile: header at top, drawer navigation (<= 640px) */
+@media (max-width: 640px) {
+  .appConsentShell {
     flex-direction: column;
   }
 
-  .appMain {
+  .appConsentMain {
     padding-inline-start: 0;
-    padding-bottom: var(--bottom-tab-height, 4.25rem);
+    padding-top: calc(var(--mobile-header-height) + env(safe-area-inset-top));
+    padding-bottom: 0;
   }
 }
 

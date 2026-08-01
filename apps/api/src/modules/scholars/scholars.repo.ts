@@ -1,6 +1,6 @@
-import { PrismaService } from '../../shared/db/prisma.service';
+import { PrismaService } from '../../core/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Status, Locale as DbLocale } from '@sd/core-db';
+import { Status, Locale as DbLocale, Prisma } from '@sd/core-db';
 import type {
   ScholarListItemDto,
   ScholarDetailDto,
@@ -8,30 +8,41 @@ import type {
   ScholarContentItemDto,
   ScholarTopicsDto,
   TranslationViewDto,
+  AdminScholarListItemDto,
   Locale,
 } from '@sd/core-contracts';
 import type { CreateScholarDto } from './dto/create-scholar.dto';
 import type { UpdateScholarDto } from './dto/update-scholar.dto';
 import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
-import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
+import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
+import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
+import { decodeCursor, buildPaginatedResult } from '../../shared/utils/pagination';
 
 @Injectable()
 export class ScholarsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(): Promise<{ scholars: ScholarListItemDto[] }> {
+  async list(
+    cursor?: string,
+  ): Promise<{ scholars: ScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
     const locale = getRequestLocale();
+    const pageSize = 20;
+    const take = pageSize + 1;
+    const decodedCursor = decodeCursor(cursor);
+
     const records = await this.prisma.scholar.findMany({
       where: { isActive: true },
-      orderBy: { name: 'asc' },
+      take,
+      ...(decodedCursor ? { cursor: { id: decodedCursor }, skip: 1 } : {}),
+      orderBy: [{ title: 'asc' }, { orderIndex: 'asc' }],
       select: {
         id: true,
         slug: true,
         name: true,
         imageUrl: true,
         mainLanguage: true,
-        isKibar: true,
+        title: true,
         translations: {
           where: { locale, status: 'published' },
           select: { name: true },
@@ -66,12 +77,13 @@ export class ScholarsRepository {
         mainLanguage: r.mainLanguage ?? undefined,
         originalLanguage: resolved.originalLanguage,
         original: resolved.original ? { name: resolved.original.name } : undefined,
-        isKibar: r.isKibar,
+        title: r.title ?? undefined,
         lectureCount: r._count.listings,
       };
     });
 
-    return { scholars };
+    const result = buildPaginatedResult(scholars, pageSize);
+    return { scholars: result.items, nextCursor: result.nextCursor, hasMore: result.hasMore };
   }
 
   async findBySlug(slug: string): Promise<
@@ -94,7 +106,6 @@ export class ScholarsRepository {
         mainLanguage: true,
         imageUrl: true,
         isActive: true,
-        isKibar: true,
         socialTwitter: true,
         socialTelegram: true,
         socialYoutube: true,
@@ -145,7 +156,7 @@ export class ScholarsRepository {
       slug: record.slug,
       name: resolved.fields.name,
       bio: resolved.fields.bio ?? undefined,
-      country: record.country ?? undefined,
+      country: (record.country ?? undefined) as ScholarDetailDto['country'],
       mainLanguage: record.mainLanguage ?? undefined,
       originalLanguage: resolved.originalLanguage,
       original: resolved.original
@@ -156,7 +167,6 @@ export class ScholarsRepository {
         : undefined,
       imageUrl: record.imageUrl ?? undefined,
       isActive: record.isActive,
-      isKibar: record.isKibar,
       socialTwitter: record.socialTwitter ?? undefined,
       socialTelegram: record.socialTelegram ?? undefined,
       socialYoutube: record.socialYoutube ?? undefined,
@@ -173,7 +183,7 @@ export class ScholarsRepository {
     const locale = getRequestLocale();
     const scholar = await this.prisma.scholar.findFirst({
       where: { slug, isActive: true },
-      select: { id: true },
+      select: { id: true, imageUrl: true },
     });
 
     if (!scholar) return null;
@@ -213,7 +223,7 @@ export class ScholarsRepository {
         publishedTranslation: r.translations[0] ?? null,
       });
 
-      const lectureCount = r.format === 'single' ? undefined : (r.publishedLectureCount ?? 0);
+      const lectureCount = r.format === 'single' ? 1 : (r.publishedLectureCount ?? 0);
 
       const durationSeconds =
         r.format === 'single'
@@ -229,6 +239,7 @@ export class ScholarsRepository {
         type: r.format as 'collection' | 'series' | 'single',
         recencyAt,
         coverImageUrl: r.coverImageUrl ?? undefined,
+        scholarImageUrl: scholar.imageUrl ?? undefined,
         lectureCount,
         durationSeconds,
         originalLanguage: resolved.originalLanguage,
@@ -245,7 +256,7 @@ export class ScholarsRepository {
     const locale = getRequestLocale();
     const scholar = await this.prisma.scholar.findFirst({
       where: { slug, isActive: true },
-      select: { id: true },
+      select: { id: true, imageUrl: true },
     });
 
     if (!scholar) return null;
@@ -260,13 +271,12 @@ export class ScholarsRepository {
         },
       },
       select: {
-        topicId: true,
         topic: {
           select: {
             id: true,
             name: true,
             translations: {
-              where: { locale: locale as DbLocale, status: 'published' },
+              where: { locale: locale as DbLocale },
               select: { name: true },
               take: 1,
             },
@@ -312,7 +322,7 @@ export class ScholarsRepository {
         publishedTranslation: r.translations[0] ?? null,
       });
 
-      const lectureCount = r.format === 'single' ? undefined : (r.publishedLectureCount ?? 0);
+      const lectureCount = r.format === 'single' ? 1 : (r.publishedLectureCount ?? 0);
 
       const durationSeconds =
         r.format === 'single'
@@ -321,7 +331,7 @@ export class ScholarsRepository {
 
       const recencyAt = (r.publishedAt ?? r.createdAt).toISOString();
 
-      const bucket = ensureTopic(row.topicId, topicName);
+      const bucket = ensureTopic(row.topic.id, topicName);
       bucket.items.push({
         id: r.id,
         slug: r.slug,
@@ -329,6 +339,7 @@ export class ScholarsRepository {
         type: r.format as 'collection' | 'series' | 'single',
         recencyAt,
         coverImageUrl: r.coverImageUrl ?? undefined,
+        scholarImageUrl: scholar.imageUrl ?? undefined,
         lectureCount,
         durationSeconds,
         originalLanguage: resolved.originalLanguage,
@@ -346,39 +357,271 @@ export class ScholarsRepository {
     return { topics };
   }
 
+  async getFormData(scholarId: string) {
+    const scholar = await this.prisma.scholar.findUnique({
+      where: { id: scholarId },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        bio: true,
+        imageUrl: true,
+        country: true,
+        mainLanguage: true,
+        isActive: true,
+        title: true,
+        orderIndex: true,
+        socialTwitter: true,
+        socialTelegram: true,
+        socialYoutube: true,
+        socialWebsite: true,
+        createdAt: true,
+        updatedAt: true,
+        translations: {
+          select: {
+            locale: true,
+            status: true,
+            name: true,
+            bio: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+
+    if (!scholar) return null;
+
+    return {
+      scholar: {
+        id: scholar.id,
+        name: scholar.name,
+        slug: scholar.slug,
+        bio: scholar.bio ?? undefined,
+        imageUrl: scholar.imageUrl ?? undefined,
+        country: (scholar.country ?? undefined) as any,
+        mainLanguage: scholar.mainLanguage ?? undefined,
+        isActive: scholar.isActive,
+        title: scholar.title ?? undefined,
+        orderIndex: scholar.orderIndex,
+        socialTwitter: scholar.socialTwitter ?? undefined,
+        socialTelegram: scholar.socialTelegram ?? undefined,
+        socialYoutube: scholar.socialYoutube ?? undefined,
+        socialWebsite: scholar.socialWebsite ?? undefined,
+        createdAt: scholar.createdAt.toISOString(),
+        updatedAt: scholar.updatedAt?.toISOString(),
+      },
+      translations: scholar.translations.map((t) => ({
+        locale: t.locale,
+        status: t.status,
+        fields: {
+          name: t.name,
+          bio: t.bio ?? null,
+        },
+        createdAt: t.createdAt.toISOString(),
+        updatedAt: t.updatedAt.toISOString(),
+      })),
+    };
+  }
+
   async findById(id: string) {
     return this.prisma.scholar.findUnique({
       where: { id },
     });
   }
 
-  async create(dto: CreateScholarDto) {
-    return this.prisma.scholar.create({
-      data: {
-        name: dto.name,
-        slug: dto.slug,
-        bio: dto.bio,
-        imageUrl: dto.imageUrl,
-        isKibar: dto.isKibar ?? false,
-        isFeatured: dto.isFeatured ?? false,
-        isActive: dto.isActive ?? true,
+  async adminList(
+    cursor?: string,
+    search?: string,
+  ): Promise<{ items: AdminScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
+    const locale = getRequestLocale();
+    const pageSize = 50;
+    const take = pageSize + 1;
+
+    const where: Prisma.ScholarWhereInput = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' as const } },
+            {
+              translations: { some: { name: { contains: search, mode: 'insensitive' as const } } },
+            },
+          ],
+        }
+      : {};
+
+    const records = await this.prisma.scholar.findMany({
+      where,
+      take,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+      orderBy: { name: 'asc' },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        bio: true,
+        country: true,
+        mainLanguage: true,
+        imageUrl: true,
+        isActive: true,
+        title: true,
+        orderIndex: true,
+        socialTwitter: true,
+        socialTelegram: true,
+        socialYoutube: true,
+        socialWebsite: true,
+        createdAt: true,
+        updatedAt: true,
+        translations: {
+          select: { locale: true, name: true, bio: true, status: true },
+          orderBy: { locale: 'asc' },
+        },
       },
+    });
+
+    const hasMore = records.length > pageSize;
+    const items: AdminScholarListItemDto[] = (hasMore ? records.slice(0, pageSize) : records).map(
+      (r) => {
+        const published = r.translations.find(
+          (t) => t.locale === locale && t.status === 'published',
+        );
+        const resolved = resolveContentTranslation({
+          base: { name: r.name, bio: r.bio ?? undefined },
+          originalLanguage: r.mainLanguage,
+          targetLocale: locale,
+          publishedTranslation: published
+            ? { name: published.name, bio: published.bio ?? undefined }
+            : null,
+        }).fields;
+
+        return {
+          id: r.id,
+          slug: r.slug,
+          name: resolved.name,
+          bio: resolved.bio,
+          country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
+          mainLanguage: r.mainLanguage ?? undefined,
+          imageUrl: r.imageUrl ?? undefined,
+          isActive: r.isActive,
+          title: r.title ?? undefined,
+          orderIndex: r.orderIndex,
+          socialTwitter: r.socialTwitter ?? undefined,
+          socialTelegram: r.socialTelegram ?? undefined,
+          socialYoutube: r.socialYoutube ?? undefined,
+          socialWebsite: r.socialWebsite ?? undefined,
+          createdAt: r.createdAt.toISOString(),
+          updatedAt: r.updatedAt?.toISOString(),
+          translations: r.translations.map((t) => ({
+            locale: t.locale,
+            name: t.name,
+            status: t.status === 'published' ? ('published' as const) : ('draft' as const),
+          })),
+        };
+      },
+    );
+
+    const nextCursor = hasMore ? items[items.length - 1]?.id : undefined;
+
+    return { items, nextCursor, hasMore };
+  }
+
+  async create(dto: CreateScholarDto) {
+    return this.prisma.$transaction(async (tx) => {
+      const scholar = await tx.scholar.create({
+        data: {
+          name: dto.name,
+          slug: dto.slug,
+          bio: dto.bio,
+          imageUrl: dto.imageUrl,
+          imageKey: dto.imageKey,
+          isActive: dto.isActive ?? true,
+          title: dto.title,
+          orderIndex: dto.orderIndex ?? 999,
+          country: dto.country,
+          mainLanguage: dto.mainLanguage,
+          socialTwitter: dto.socialTwitter,
+          socialTelegram: dto.socialTelegram,
+          socialYoutube: dto.socialYoutube,
+          socialWebsite: dto.socialWebsite,
+        },
+      });
+
+      await syncMainLanguageTranslation({
+        upsert: (locale, fields) =>
+          this.upsertMainScholarTranslation(tx, scholar.id, locale, fields),
+        newLocale: dto.mainLanguage ?? 'ar',
+        newFields: { name: dto.name, bio: dto.bio ?? null },
+      });
+
+      return scholar;
     });
   }
 
   async update(id: string, dto: UpdateScholarDto) {
-    return this.prisma.scholar.update({
-      where: { id },
-      data: {
-        ...(dto.name !== undefined && { name: dto.name }),
-        ...(dto.slug !== undefined && { slug: dto.slug }),
-        ...(dto.bio !== undefined && { bio: dto.bio }),
-        ...(dto.imageUrl !== undefined && { imageUrl: dto.imageUrl }),
-        ...(dto.isKibar !== undefined && { isKibar: dto.isKibar }),
-        ...(dto.isFeatured !== undefined && { isFeatured: dto.isFeatured }),
-        ...(dto.isActive !== undefined && { isActive: dto.isActive }),
-        updatedAt: new Date(),
+    return this.prisma.$transaction(async (tx) => {
+      const hasTranslatableChange =
+        dto.name !== undefined || dto.bio !== undefined || dto.mainLanguage !== undefined;
+      const original = hasTranslatableChange
+        ? await tx.scholar.findUnique({
+            where: { id },
+            select: { mainLanguage: true, name: true, bio: true },
+          })
+        : null;
+
+      // Update scholar fields if provided
+      const updateData: Record<string, any> = {};
+      if (dto.name !== undefined) updateData.name = dto.name;
+      if (dto.bio !== undefined) updateData.bio = dto.bio;
+      if (dto.imageUrl !== undefined) updateData.imageUrl = dto.imageUrl;
+      if (dto.imageKey !== undefined) updateData.imageKey = dto.imageKey;
+      if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
+      if (dto.country !== undefined) updateData.country = dto.country;
+      if (dto.mainLanguage !== undefined) updateData.mainLanguage = dto.mainLanguage;
+      if (dto.title !== undefined) updateData.title = dto.title;
+      if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
+      if (dto.socialTwitter !== undefined) updateData.socialTwitter = dto.socialTwitter;
+      if (dto.socialTelegram !== undefined) updateData.socialTelegram = dto.socialTelegram;
+      if (dto.socialYoutube !== undefined) updateData.socialYoutube = dto.socialYoutube;
+      if (dto.socialWebsite !== undefined) updateData.socialWebsite = dto.socialWebsite;
+      updateData.updatedAt = new Date();
+
+      const scholar = await tx.scholar.update({
+        where: { id },
+        data: updateData,
+      });
+
+      if (hasTranslatableChange && original) {
+        await syncMainLanguageTranslation({
+          upsert: (locale, fields) => this.upsertMainScholarTranslation(tx, id, locale, fields),
+          oldLocale: original.mainLanguage,
+          oldFields: { name: original.name, bio: original.bio },
+          newLocale: dto.mainLanguage ?? original.mainLanguage,
+          newFields: {
+            name: dto.name ?? original.name,
+            bio: dto.bio !== undefined ? dto.bio : original.bio,
+          },
+        });
+      }
+
+      return scholar;
+    });
+  }
+
+  private upsertMainScholarTranslation(
+    tx: Prisma.TransactionClient,
+    scholarId: string,
+    locale: Locale,
+    fields: { name: string; bio?: string | null },
+  ) {
+    return tx.scholarTranslation.upsert({
+      where: { scholarId_locale: { scholarId, locale } },
+      create: {
+        scholarId,
+        locale,
+        name: fields.name,
+        bio: fields.bio ?? null,
+        status: 'published',
       },
+      update: { name: fields.name, bio: fields.bio ?? null, status: 'published' },
     });
   }
 
