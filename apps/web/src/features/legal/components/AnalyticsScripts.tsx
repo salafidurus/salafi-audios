@@ -2,19 +2,14 @@
 
 import Script from "next/script";
 
+import { isDev } from "@/core/config/env";
+
 import { useCookieConsent } from "../hooks/use-cookie-consent";
 
-interface AnalyticsScriptsProps {
-  apiBaseUrl?: string;
-}
-
-export function AnalyticsScripts({ apiBaseUrl }: AnalyticsScriptsProps) {
+export function AnalyticsScripts() {
   const { hasAccepted } = useCookieConsent();
 
-  const shouldLoadAnalytics =
-    process.env.NODE_ENV === "production" && !apiBaseUrl?.includes("localhost");
-
-  if (!hasAccepted || !shouldLoadAnalytics) {
+  if (!hasAccepted || isDev) {
     return null;
   }
 

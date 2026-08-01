@@ -17,6 +17,8 @@ export type ContentListProps = {
   scholarSlug?: string;
   seriesId?: string;
   seriesTitle?: string;
+  /** Item id to scroll to and briefly highlight on mount (e.g. a lesson linked via URL anchor). */
+  highlightItemId?: string;
 };
 
 export function ContentList({
@@ -26,6 +28,7 @@ export function ContentList({
   scholarSlug,
   seriesId,
   seriesTitle,
+  highlightItemId,
 }: ContentListProps) {
   const contents: ListingContentsDto =
     format === "series" ? { format: "series", items } : { format: "single", items };
@@ -49,6 +52,7 @@ export function ContentList({
             seriesId={seriesId}
             seriesTitle={seriesTitle}
             allTracksInContext={allTracksInContext}
+            highlightItemId={highlightItemId}
           />
         )}
       />

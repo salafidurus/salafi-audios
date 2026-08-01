@@ -5,13 +5,14 @@ import type { PlaybackEngine, PlaybackEngineEvents } from "../engine/playback.en
 import type { Track } from "../types/track.types";
 
 import { useProgressStore } from "../progress/progress.store";
-import { syncProgressToBackend } from "../progress/progress.sync";
+import { syncProgressToBackend, flushPendingProgress } from "../progress/progress.sync";
 import { usePlaybackStore } from "../store/playback.store";
 import { DurusAudioService } from "./audio.service";
 
 // Mock progress sync module to avoid network triggers in tests
 vi.mock("../progress/progress.sync", () => ({
   syncProgressToBackend: vi.fn<() => void>(),
+  flushPendingProgress: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
   syncLocalToServer: vi.fn<() => void>(),
   saveListing: vi.fn<() => void>(),
   unsaveListing: vi.fn<() => void>(),
@@ -156,6 +157,20 @@ describe("DurusAudioService", () => {
     });
   });
 
+  it("prefers the track's slug over its uuid id when syncing a position change", () => {
+    const slugTrack: Track = { ...mockTrack, slug: "tafsir-al-fatiha" };
+    usePlaybackStore.getState().actions.setCurrentTrack(slugTrack);
+    usePlaybackStore.getState().actions.setDuration(1800);
+
+    engineEvents.onPositionChange!(90);
+
+    expect(syncProgressToBackend).toHaveBeenCalledWith(
+      expect.objectContaining({ listingId: "tafsir-al-fatiha" }),
+    );
+    // The live progress store still keys by the stable uuid id, unaffected.
+    expect(useProgressStore.getState().progressMap[slugTrack.id]).toBeDefined();
+  });
+
   it("should mark listing completed on track end and stop if no next track", async () => {
     await service.playListing(mockTrack);
     await engineEvents.onTrackEnd!();
@@ -163,6 +178,26 @@ describe("DurusAudioService", () => {
     expect(useProgressStore.getState().progressMap[mockTrack.id]?.completedAt).toBeDefined();
     expect(usePlaybackStore.getState().currentTrack).toBeNull();
     expect(usePlaybackStore.getState().status).toBe("idle");
+  });
+
+  it("should immediately flush completion to the server on track end, bypassing the sync debounce", async () => {
+    await service.playListing(mockTrack);
+    await engineEvents.onTrackEnd!();
+
+    expect(syncProgressToBackend).toHaveBeenCalledWith(
+      expect.objectContaining({ listingId: mockTrack.id }),
+    );
+    expect(flushPendingProgress).toHaveBeenCalled();
+  });
+
+  it("prefers the track's slug over its uuid id when flushing completion on track end", async () => {
+    const slugTrack: Track = { ...mockTrack, slug: "tafsir-al-fatiha" };
+    await service.playListing(slugTrack);
+    await engineEvents.onTrackEnd!();
+
+    expect(syncProgressToBackend).toHaveBeenCalledWith(
+      expect.objectContaining({ listingId: "tafsir-al-fatiha" }),
+    );
   });
 
   it("should load engine with existing url when track.url is non-empty and not a local file", async () => {
@@ -184,6 +219,18 @@ describe("DurusAudioService", () => {
     });
     expect(mockEngine.load).toHaveBeenCalledWith({ ...stubTrack, url: "https://fresh-signed.mp3" });
     expect(mockEngine.play).toHaveBeenCalled();
+  });
+
+  it("prefers the track's slug over its uuid id when lazily resolving a stream URL", async () => {
+    const stubTrack: Track = { ...mockTrack, slug: "tafsir-al-fatiha", url: "" };
+    (httpClient as any).mockResolvedValue({ url: "https://fresh-signed.mp3" });
+
+    await service.playListing(stubTrack);
+
+    expect(httpClient).toHaveBeenCalledWith({
+      url: "/audio/listings/tafsir-al-fatiha/stream",
+      method: "GET",
+    });
   });
 
   it("should pass local file:// URI through to engine without resolving", async () => {

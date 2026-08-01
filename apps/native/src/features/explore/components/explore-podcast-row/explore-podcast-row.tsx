@@ -61,7 +61,7 @@ export function ExplorePodcastRow({
     if (item.kind !== "single") {
       try {
         const contents = await httpClient<ListingContentsDto>({
-          url: endpoints.listings.contents(item.id),
+          url: endpoints.listings.contents(item.slug),
           method: "GET",
         });
         const queue = buildTrackQueue(

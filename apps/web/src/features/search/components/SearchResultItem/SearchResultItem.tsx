@@ -43,7 +43,7 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
   const isDesktop = useIsDesktop();
   const { isMobile } = useResponsive();
   const { addToast } = useToast();
-  const { play, isLoading } = usePlayListing(item.id, {
+  const { play, isLoading } = usePlayListing(item.slug, {
     onError: (message) => addToast(message, "error"),
   });
   const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);

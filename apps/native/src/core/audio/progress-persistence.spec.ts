@@ -1,12 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { httpClient } from "@sd/core-contracts";
-import { syncProgressToBackend, useProgressStore } from "@sd/domain-audio";
+import { flushPendingProgress, syncProgressToBackend, useProgressStore } from "@sd/domain-audio";
 import { AppState } from "react-native";
 
 import { initProgressPersistence } from "./progress-persistence";
 
 jest.mock("@sd/core-contracts", () => ({
-  httpClient: jest.fn().mockResolvedValue([]),
+  httpClient: jest.fn(),
   endpoints: {
     audio: {
       progress: {
@@ -14,6 +14,9 @@ jest.mock("@sd/core-contracts", () => ({
         sync: "/audio/progress/sync",
         update: (listingId: string) => `/audio/progress/${listingId}`,
       },
+    },
+    library: {
+      saved: "/me/library/saved",
     },
   },
 }));
@@ -25,9 +28,14 @@ function storageKey(userId: string) {
   return `sd:progress-cache:v1:${userId}`;
 }
 
+function defaultHttpClientMock(opts: { url: string }) {
+  if (opts.url === "/me/library/saved") return Promise.resolve({ items: [], hasMore: false });
+  return Promise.resolve([]);
+}
+
 beforeEach(async () => {
   jest.clearAllMocks();
-  mockedHttpClient.mockResolvedValue([]);
+  mockedHttpClient.mockImplementation(defaultHttpClientMock as any);
   await AsyncStorage.clear();
   useProgressStore.setState({ progressMap: {}, savedMap: {}, lastSyncedAt: null });
 });
@@ -84,6 +92,17 @@ describe("initProgressPersistence", () => {
     cleanup();
   });
 
+  it("fetches the server's saved-listings list once on init", () => {
+    const cleanup = initProgressPersistence(USER_ID);
+
+    expect(mockedHttpClient).toHaveBeenCalledWith({
+      url: "/me/library/saved",
+      method: "GET",
+      params: undefined,
+    });
+    cleanup();
+  });
+
   it("persists store changes to the per-user cache after the throttle window", async () => {
     const cleanup = initProgressPersistence(USER_ID, { persistThrottleMs: 10 });
 
@@ -125,6 +144,34 @@ describe("initProgressPersistence", () => {
     cleanup();
 
     expect(removeSpy).toHaveBeenCalled();
+    jest.restoreAllMocks();
+  });
+
+  it("calls onFlushed once a debounced progress sync actually reaches the server", async () => {
+    const addListenerSpy = jest.spyOn(AppState, "addEventListener");
+    const onFlushed = jest.fn();
+    const cleanup = initProgressPersistence(USER_ID, { onFlushed });
+
+    syncProgressToBackend({ listingId: "l5", positionSeconds: 3, durationSeconds: 100 });
+    const onChange = addListenerSpy.mock.calls.find((call) => call[0] === "change")?.[1];
+    onChange?.("background");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(onFlushed).toHaveBeenCalledTimes(1);
+    cleanup();
+    addListenerSpy.mockRestore();
+  });
+
+  it("stops calling onFlushed after cleanup", async () => {
+    jest.spyOn(AppState, "addEventListener").mockReturnValue({ remove: jest.fn() } as any);
+    const onFlushed = jest.fn();
+    const cleanup = initProgressPersistence(USER_ID, { onFlushed });
+    cleanup();
+
+    syncProgressToBackend({ listingId: "l6", positionSeconds: 3, durationSeconds: 100 });
+    await flushPendingProgress();
+
+    expect(onFlushed).not.toHaveBeenCalled();
     jest.restoreAllMocks();
   });
 });

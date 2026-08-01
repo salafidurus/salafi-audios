@@ -18,13 +18,16 @@ export class AudioService {
     durationSeconds?: number,
     isCompleted?: boolean,
   ): Promise<void> {
-    await this.repo.upsertProgress(
+    const found = await this.repo.upsertProgress(
       userId,
       listingId,
       positionSeconds,
       durationSeconds,
       isCompleted,
     );
+    if (!found) {
+      throw new NotFoundException(`Listing ${listingId} not found`);
+    }
   }
 
   async bulkSync(userId: string, items: ProgressSyncItemDto[]): Promise<void> {
@@ -38,10 +41,11 @@ export class AudioService {
       throw new NotFoundException(`Listing with ID ${listingId} not found`);
     }
 
-    let asset = await this.repo.findPrimaryAsset(listingId);
+    // Use the resolved id from here on — `listingId` may have been a slug.
+    let asset = await this.repo.findPrimaryAsset(listing.id);
 
     if (!asset) {
-      asset = await this.repo.findFirstAsset(listingId);
+      asset = await this.repo.findFirstAsset(listing.id);
     }
 
     if (!asset) {

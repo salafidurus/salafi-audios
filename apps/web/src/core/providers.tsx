@@ -3,7 +3,12 @@
 import type { Locale } from "@sd/core-contracts";
 
 import { initApiClient, setLocaleProvider, setUnauthorizedHandler } from "@sd/core-api";
-import { createQueryClient, shouldPersistQuery, DEFAULT_MAX_AGE } from "@sd/core-contracts";
+import {
+  createQueryClient,
+  shouldPersistQuery,
+  queryKeys,
+  DEFAULT_MAX_AGE,
+} from "@sd/core-contracts";
 import { localeToDir } from "@sd/core-i18n";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { useEffect, useState, type ReactNode } from "react";
@@ -39,7 +44,11 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   // configureApiClient() has been called, and effects fire in declaration order.
   useEffect(() => {
     if (!isAuthenticated || !user?.id) return;
-    return initProgressPersistence(user.id);
+    return initProgressPersistence(user.id, {
+      onFlushed: () => {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.library.all });
+      },
+    });
   }, [isAuthenticated, user?.id]);
 
   // Sync i18n with cookie after hydration. The root layout is static so it

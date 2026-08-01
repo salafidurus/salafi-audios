@@ -3,6 +3,8 @@
 import {
   flushPendingProgress,
   hydrateProgressFromServer,
+  hydrateSavedFromServer,
+  onProgressFlushed,
   useProgressStore,
   type ListingProgress,
 } from "@sd/domain-audio";
@@ -45,7 +47,7 @@ function writeCachedProgress(userId: string, entries: ListingProgress[]): void {
  */
 export function initProgressPersistence(
   userId: string,
-  options: { persistThrottleMs?: number } = {},
+  options: { persistThrottleMs?: number; onFlushed?: () => void } = {},
 ): () => void {
   const persistThrottleMs = options.persistThrottleMs ?? DEFAULT_PERSIST_THROTTLE_MS;
 
@@ -55,6 +57,7 @@ export function initProgressPersistence(
   }
 
   void hydrateProgressFromServer();
+  void hydrateSavedFromServer();
 
   let writeTimeout: ReturnType<typeof setTimeout> | null = null;
   const unsubscribe = useProgressStore.subscribe(() => {
@@ -64,6 +67,8 @@ export function initProgressPersistence(
       writeCachedProgress(userId, Object.values(useProgressStore.getState().progressMap));
     }, persistThrottleMs);
   });
+
+  const unsubscribeFlushed = options.onFlushed ? onProgressFlushed(options.onFlushed) : undefined;
 
   const flush = () => {
     void flushPendingProgress();
@@ -77,6 +82,7 @@ export function initProgressPersistence(
 
   return () => {
     unsubscribe();
+    unsubscribeFlushed?.();
     if (writeTimeout) clearTimeout(writeTimeout);
     document.removeEventListener("visibilitychange", handleVisibilityChange);
     window.removeEventListener("beforeunload", flush);

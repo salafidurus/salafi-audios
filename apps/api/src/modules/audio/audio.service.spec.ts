@@ -43,7 +43,7 @@ describe('AudioService', () => {
                   positionSeconds: number,
                   _durationSeconds?: number,
                   isCompleted?: boolean,
-                ) => Promise<void>
+                ) => Promise<boolean>
               >(),
             bulkSync: vi.fn<(userId: string, items: any[]) => Promise<void>>(),
             findListingById: vi.fn<(id: string) => Promise<any>>(),
@@ -85,11 +85,19 @@ describe('AudioService', () => {
 
   describe('upsertProgress', () => {
     it('should call repo with all provided params', async () => {
-      repo.upsertProgress.mockResolvedValue(undefined);
+      repo.upsertProgress.mockResolvedValue(true);
 
       await service.upsertProgress('user1', 'listing1', 300, 1800, false);
 
       expect(repo.upsertProgress).toHaveBeenCalledWith('user1', 'listing1', 300, 1800, false);
+    });
+
+    it('should throw NotFoundException when the listing id/slug cannot be resolved', async () => {
+      repo.upsertProgress.mockResolvedValue(false);
+
+      await expect(service.upsertProgress('user1', 'missing-slug', 300)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -168,6 +176,21 @@ describe('AudioService', () => {
       repo.findFirstAsset.mockResolvedValue(null);
 
       await expect(service.resolveStreamUrl('l1')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should look up assets by the resolved listing id, not the raw slug param', async () => {
+      repo.findListingById.mockResolvedValue({ id: 'l1', durationSeconds: 1200 } as any);
+      repo.findPrimaryAsset.mockResolvedValue({
+        url: 'https://primary.mp3',
+        durationSeconds: 1200,
+        format: 'mp3',
+        isPrimary: true,
+      } as any);
+
+      await service.resolveStreamUrl('tafsir-al-fatiha');
+
+      expect(repo.findListingById).toHaveBeenCalledWith('tafsir-al-fatiha');
+      expect(repo.findPrimaryAsset).toHaveBeenCalledWith('l1');
     });
   });
 });

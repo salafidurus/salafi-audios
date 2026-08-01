@@ -11,6 +11,7 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
+import { contentItemAnchorId } from "../../../utils/content-item-anchor-id";
 import styles from "./ContentListItem.module.css";
 
 function formatDuration(seconds?: number): string {
@@ -33,6 +34,8 @@ export type ContentListItemProps = {
   moduleTitle?: string;
   collectionId?: string;
   allTracksInContext?: Track[];
+  /** When this matches `item.id`, the row gets an anchor id and a brief highlight animation. */
+  highlightItemId?: string;
 };
 
 export function ContentListItem({
@@ -45,6 +48,7 @@ export function ContentListItem({
   moduleTitle,
   collectionId,
   allTracksInContext,
+  highlightItemId,
 }: ContentListItemProps) {
   const formattedScholarName = useFormattedScholarName(scholarName, scholarSlug);
   const { isPlaying, currentTrack } = useAudio();
@@ -91,8 +95,16 @@ export function ContentListItem({
     await audioService.playListing(track, queueContext);
   };
 
+  const isHighlighted = highlightItemId === item.id;
+
   return (
-    <List.Item interactive onClick={() => void handlePlayClick()} className={styles.container}>
+    <List.Item
+      interactive
+      onClick={() => void handlePlayClick()}
+      id={contentItemAnchorId(item.id)}
+      highlighted={isHighlighted}
+      className={`${styles.container} ${isHighlighted ? styles.highlighted : ""}`}
+    >
       <div className={styles.contentCol}>
         <div className={styles.titleRow}>
           <span className={styles.titleText}>

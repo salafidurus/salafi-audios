@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { LibraryPageDto, RecentProgressDto } from '@sd/core-contracts';
 import { LibraryRepository } from './library.repo';
 
@@ -26,11 +26,17 @@ export class LibraryService {
   }
 
   async saveListing(userId: string, listingId: string): Promise<void> {
-    await this.repo.saveLecture(userId, listingId);
+    const found = await this.repo.saveLecture(userId, listingId);
+    if (!found) {
+      throw new NotFoundException(`Listing ${listingId} not found`);
+    }
   }
 
   async unsaveListing(userId: string, listingId: string): Promise<void> {
-    await this.repo.unsaveLecture(userId, listingId);
+    const found = await this.repo.unsaveLecture(userId, listingId);
+    if (!found) {
+      throw new NotFoundException(`Listing ${listingId} not found`);
+    }
   }
 
   async bulkSave(userId: string, listingIds: string[]): Promise<void> {

@@ -67,4 +67,22 @@ describe("ContentListItem", () => {
     expect(track.seriesTitle).toBe("Series 1");
     expect(track.moduleId).toBeNull();
   });
+
+  it("exposes an anchor id for the row so a parent page can scroll to it", () => {
+    render(<ContentListItem item={item} scholarName="Ibn Baz" />);
+
+    expect(document.getElementById("content-item-lesson-1")).not.toBeNull();
+  });
+
+  it("marks the row highlighted when highlightItemId matches this item", () => {
+    render(<ContentListItem item={item} scholarName="Ibn Baz" highlightItemId="lesson-1" />);
+
+    expect(document.getElementById("content-item-lesson-1")?.dataset.highlighted).toBe("true");
+  });
+
+  it("does not mark the row highlighted when highlightItemId points elsewhere", () => {
+    render(<ContentListItem item={item} scholarName="Ibn Baz" highlightItemId="other-lesson" />);
+
+    expect(document.getElementById("content-item-lesson-1")?.dataset.highlighted).toBeUndefined();
+  });
 });

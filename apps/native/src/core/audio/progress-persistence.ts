@@ -2,6 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   flushPendingProgress,
   hydrateProgressFromServer,
+  hydrateSavedFromServer,
+  onProgressFlushed,
   useProgressStore,
   type ListingProgress,
 } from "@sd/domain-audio";
@@ -44,7 +46,7 @@ async function writeCachedProgress(userId: string, entries: ListingProgress[]): 
  */
 export function initProgressPersistence(
   userId: string,
-  options: { persistThrottleMs?: number } = {},
+  options: { persistThrottleMs?: number; onFlushed?: () => void } = {},
 ): () => void {
   const persistThrottleMs = options.persistThrottleMs ?? DEFAULT_PERSIST_THROTTLE_MS;
   let cancelled = false;
@@ -55,6 +57,7 @@ export function initProgressPersistence(
   });
 
   void hydrateProgressFromServer();
+  void hydrateSavedFromServer();
 
   let writeTimeout: ReturnType<typeof setTimeout> | null = null;
   const unsubscribe = useProgressStore.subscribe(() => {
@@ -64,6 +67,8 @@ export function initProgressPersistence(
       void writeCachedProgress(userId, Object.values(useProgressStore.getState().progressMap));
     }, persistThrottleMs);
   });
+
+  const unsubscribeFlushed = options.onFlushed ? onProgressFlushed(options.onFlushed) : undefined;
 
   const handleAppStateChange = (nextState: AppStateStatus) => {
     if (nextState === "background" || nextState === "inactive") {
@@ -75,6 +80,7 @@ export function initProgressPersistence(
   return () => {
     cancelled = true;
     unsubscribe();
+    unsubscribeFlushed?.();
     if (writeTimeout) clearTimeout(writeTimeout);
     subscription.remove();
   };
