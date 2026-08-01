@@ -2,7 +2,7 @@ import type { Track } from "@sd/domain-audio";
 
 import { pickContentField } from "@sd/core-i18n";
 import { useAudio, useProgressStore, buildTrackQueue } from "@sd/domain-audio";
-import { useListingDetail, useListingContents } from "@sd/domain-content";
+import { useListingDetail, useListingContents, useToggleSaved } from "@sd/domain-content";
 import { router, useLocalSearchParams } from "expo-router";
 import { Play, Pause, Bookmark } from "lucide-react-native";
 import { useEffect } from "react";
@@ -41,6 +41,7 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const isSaved = useProgressStore((s) => (lecture ? s.actions.isSaved(lecture.id) : false));
   const addSaved = useProgressStore((s) => s.actions.addSaved);
   const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+  const toggleSaved = useToggleSaved();
 
   // Slugs are flat and don't encode nesting, so a Lesson/Module's own slug
   // resolves to itself — redirect to the top-level page it belongs under,
@@ -161,11 +162,26 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   };
 
   const handleSave = () => {
-    if (isSaved) {
-      removeSaved(lecture.id);
-    } else {
+    const nextSaved = !isSaved;
+    // Optimistic local update for instant button state; rolled back if the server call fails.
+    if (nextSaved) {
       addSaved(lecture.id);
+    } else {
+      removeSaved(lecture.id);
     }
+
+    toggleSaved.mutate(
+      { listingId: lecture.id, saved: nextSaved },
+      {
+        onError: () => {
+          if (nextSaved) {
+            removeSaved(lecture.id);
+          } else {
+            addSaved(lecture.id);
+          }
+        },
+      },
+    );
   };
 
   return (

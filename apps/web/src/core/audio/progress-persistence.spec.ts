@@ -6,7 +6,7 @@ import { describe, it, expect, beforeEach, vi } from "bun:test";
 import { initProgressPersistence } from "./progress-persistence";
 
 vi.mock("@sd/core-contracts", () => ({
-  httpClient: vi.fn<() => Promise<any>>().mockResolvedValue([]),
+  httpClient: vi.fn<(opts: { url: string }) => Promise<any>>(),
   endpoints: {
     audio: {
       progress: {
@@ -15,14 +15,22 @@ vi.mock("@sd/core-contracts", () => ({
         update: (listingId: string) => `/audio/progress/${listingId}`,
       },
     },
+    library: {
+      saved: "/me/library/saved",
+    },
   },
 }));
 
 const USER_ID = "user-1";
 
+function defaultHttpClientMock(opts: { url: string }) {
+  if (opts.url === "/me/library/saved") return Promise.resolve({ items: [], hasMore: false });
+  return Promise.resolve([]);
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
-  (httpClient as any).mockResolvedValue([]);
+  (httpClient as any).mockImplementation(defaultHttpClientMock);
   window.localStorage.clear();
   useProgressStore.setState({ progressMap: {}, savedMap: {}, lastSyncedAt: null });
 });
@@ -71,6 +79,17 @@ describe("initProgressPersistence", () => {
 
     expect(httpClient).toHaveBeenCalledWith({
       url: "/audio/progress",
+      method: "GET",
+      params: undefined,
+    });
+    cleanup();
+  });
+
+  it("fetches the server's saved-listings list once on init", () => {
+    const cleanup = initProgressPersistence(USER_ID);
+
+    expect(httpClient).toHaveBeenCalledWith({
+      url: "/me/library/saved",
       method: "GET",
       params: undefined,
     });

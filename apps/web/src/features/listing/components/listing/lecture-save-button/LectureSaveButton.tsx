@@ -1,6 +1,7 @@
 "use client";
 
 import { useProgressStore } from "@sd/domain-audio";
+import { useToggleSaved } from "@sd/domain-content";
 import React, { useState } from "react";
 
 import { useAuth } from "@/core/auth";
@@ -19,6 +20,7 @@ export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
   const isSaved = useProgressStore((s) => s.actions.isSaved(lectureId));
   const addSaved = useProgressStore((s) => s.actions.addSaved);
   const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+  const toggleSaved = useToggleSaved();
 
   const handleClick = () => {
     if (!isAuthenticated) {
@@ -26,11 +28,26 @@ export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
       return;
     }
 
-    if (isSaved) {
-      removeSaved(lectureId);
-    } else {
+    const nextSaved = !isSaved;
+    // Optimistic local update for instant button state; rolled back if the server call fails.
+    if (nextSaved) {
       addSaved(lectureId);
+    } else {
+      removeSaved(lectureId);
     }
+
+    toggleSaved.mutate(
+      { listingId: lectureId, saved: nextSaved },
+      {
+        onError: () => {
+          if (nextSaved) {
+            removeSaved(lectureId);
+          } else {
+            addSaved(lectureId);
+          }
+        },
+      },
+    );
   };
 
   return (

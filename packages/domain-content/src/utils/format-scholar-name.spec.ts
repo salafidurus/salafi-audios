@@ -14,10 +14,16 @@ import {
 
 // Register happy-dom globals before tests run — this package has no
 // app-level test harness (unlike apps/web), so the couple of hook tests
-// here set it up inline.
+// here set it up inline. Guarded because bun runs every *.spec.ts* file in
+// this package in one process, and another spec file may have already
+// registered it.
 const { GlobalRegistrator } = require("@happy-dom/global-registrator");
 
-GlobalRegistrator.register();
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another spec file in this run.
+}
 
 const englishT = (key: string) =>
   ({

@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   flushPendingProgress,
   hydrateProgressFromServer,
+  hydrateSavedFromServer,
   useProgressStore,
   type ListingProgress,
 } from "@sd/domain-audio";
@@ -55,6 +56,7 @@ export function initProgressPersistence(
   });
 
   void hydrateProgressFromServer();
+  void hydrateSavedFromServer();
 
   let writeTimeout: ReturnType<typeof setTimeout> | null = null;
   const unsubscribe = useProgressStore.subscribe(() => {

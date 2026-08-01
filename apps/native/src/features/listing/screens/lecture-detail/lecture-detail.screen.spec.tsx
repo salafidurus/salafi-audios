@@ -6,6 +6,10 @@ import { LectureDetailScreen } from "./lecture-detail.screen";
 
 const mockRouterReplace = jest.fn();
 const mockUseLocalSearchParams = jest.fn(() => ({ slug: "lecture-1" }) as Record<string, string>);
+const mockToggleSavedMutate = jest.fn();
+const mockIsSaved = jest.fn(() => false);
+const mockAddSaved = jest.fn();
+const mockRemoveSaved = jest.fn();
 
 jest.mock("expo-router", () => ({
   router: { replace: (...args: unknown[]) => mockRouterReplace(...args) },
@@ -39,6 +43,7 @@ jest.mock("react-native-unistyles", () => {
 jest.mock("@sd/domain-content", () => ({
   useListingDetail: jest.fn(),
   useListingContents: jest.fn(() => ({ data: undefined })),
+  useToggleSaved: jest.fn(() => ({ mutate: mockToggleSavedMutate })),
 }));
 
 jest.mock("@sd/domain-audio", () => {
@@ -52,13 +57,15 @@ jest.mock("@sd/domain-audio", () => {
       pause: jest.fn(),
       resume: jest.fn(),
     })),
-    useProgressStore: jest.fn(() => ({
-      actions: {
-        isSaved: jest.fn(() => false),
-        addSaved: jest.fn(),
-        removeSaved: jest.fn(),
-      },
-    })),
+    useProgressStore: jest.fn((selector: (state: unknown) => unknown) =>
+      selector({
+        actions: {
+          isSaved: mockIsSaved,
+          addSaved: mockAddSaved,
+          removeSaved: mockRemoveSaved,
+        },
+      }),
+    ),
   };
 });
 
@@ -129,6 +136,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockedUseListingContents.mockReturnValue({ data: undefined });
   mockUseLocalSearchParams.mockReturnValue({ slug: "lecture-1" });
+  mockIsSaved.mockReturnValue(false);
 });
 
 describe("LectureDetailScreen", () => {
@@ -300,5 +308,56 @@ describe("LectureDetailScreen", () => {
 
     expect(screen.getByText("Explanation of Tawheed")).toBeTruthy();
     expect(screen.getByText("Contents anchor:lesson-2")).toBeTruthy();
+  });
+
+  const singleLecture = {
+    id: "lecture-1",
+    slug: "lecture-1",
+    title: "An Example Lecture",
+    format: "single" as const,
+    scholar: { id: "scholar-1", slug: "ibn-baz", name: "Ibn Baz" },
+    topics: [],
+    primaryAudioAsset: null,
+    seriesContext: null,
+    rootListing: null,
+  };
+
+  it("persists the save via the toggle-saved mutation", async () => {
+    mockedUseListingDetail.mockReturnValue({ data: singleLecture, isFetching: false, error: null });
+
+    await render(<LectureDetailScreen slug="lecture-1" />);
+    await fireEvent.press(screen.getByText("Save"));
+
+    expect(mockAddSaved).toHaveBeenCalledWith("lecture-1");
+    expect(mockToggleSavedMutate).toHaveBeenCalledWith(
+      { listingId: "lecture-1", saved: true },
+      expect.objectContaining({ onError: expect.any(Function) }),
+    );
+  });
+
+  it("rolls back the optimistic save if the mutation fails", async () => {
+    mockedUseListingDetail.mockReturnValue({ data: singleLecture, isFetching: false, error: null });
+
+    await render(<LectureDetailScreen slug="lecture-1" />);
+    await fireEvent.press(screen.getByText("Save"));
+
+    const [, { onError }] = mockToggleSavedMutate.mock.calls[0];
+    onError();
+
+    expect(mockRemoveSaved).toHaveBeenCalledWith("lecture-1");
+  });
+
+  it("persists the unsave via the toggle-saved mutation", async () => {
+    mockIsSaved.mockReturnValue(true);
+    mockedUseListingDetail.mockReturnValue({ data: singleLecture, isFetching: false, error: null });
+
+    await render(<LectureDetailScreen slug="lecture-1" />);
+    await fireEvent.press(screen.getByText("Saved"));
+
+    expect(mockRemoveSaved).toHaveBeenCalledWith("lecture-1");
+    expect(mockToggleSavedMutate).toHaveBeenCalledWith(
+      { listingId: "lecture-1", saved: false },
+      expect.objectContaining({ onError: expect.any(Function) }),
+    );
   });
 });

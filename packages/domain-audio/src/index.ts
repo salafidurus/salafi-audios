@@ -10,6 +10,7 @@ export {
   syncProgressToBackend,
   flushPendingProgress,
   hydrateProgressFromServer,
+  hydrateSavedFromServer,
   bulkSyncProgress,
 } from "./progress/progress.sync";
 export { usePlaybackStore } from "./store/playback.store";

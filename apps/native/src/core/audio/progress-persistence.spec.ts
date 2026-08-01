@@ -6,7 +6,7 @@ import { AppState } from "react-native";
 import { initProgressPersistence } from "./progress-persistence";
 
 jest.mock("@sd/core-contracts", () => ({
-  httpClient: jest.fn().mockResolvedValue([]),
+  httpClient: jest.fn(),
   endpoints: {
     audio: {
       progress: {
@@ -14,6 +14,9 @@ jest.mock("@sd/core-contracts", () => ({
         sync: "/audio/progress/sync",
         update: (listingId: string) => `/audio/progress/${listingId}`,
       },
+    },
+    library: {
+      saved: "/me/library/saved",
     },
   },
 }));
@@ -25,9 +28,14 @@ function storageKey(userId: string) {
   return `sd:progress-cache:v1:${userId}`;
 }
 
+function defaultHttpClientMock(opts: { url: string }) {
+  if (opts.url === "/me/library/saved") return Promise.resolve({ items: [], hasMore: false });
+  return Promise.resolve([]);
+}
+
 beforeEach(async () => {
   jest.clearAllMocks();
-  mockedHttpClient.mockResolvedValue([]);
+  mockedHttpClient.mockImplementation(defaultHttpClientMock as any);
   await AsyncStorage.clear();
   useProgressStore.setState({ progressMap: {}, savedMap: {}, lastSyncedAt: null });
 });
@@ -78,6 +86,17 @@ describe("initProgressPersistence", () => {
 
     expect(mockedHttpClient).toHaveBeenCalledWith({
       url: "/audio/progress",
+      method: "GET",
+      params: undefined,
+    });
+    cleanup();
+  });
+
+  it("fetches the server's saved-listings list once on init", () => {
+    const cleanup = initProgressPersistence(USER_ID);
+
+    expect(mockedHttpClient).toHaveBeenCalledWith({
+      url: "/me/library/saved",
       method: "GET",
       params: undefined,
     });

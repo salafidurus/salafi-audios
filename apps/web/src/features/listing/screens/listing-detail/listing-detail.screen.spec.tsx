@@ -8,6 +8,7 @@ vi.mock("@sd/domain-content", () => ({
   useListingDetail: vi.fn(),
   useListingContents: vi.fn(),
   useLastPlayedLesson: vi.fn(),
+  useToggleSaved: vi.fn().mockReturnValue({ mutate: vi.fn() }),
 }));
 
 const mockRouterReplace = vi.fn();
