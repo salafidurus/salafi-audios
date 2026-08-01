@@ -31,6 +31,11 @@ vi.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: () => false,
 }));
 
+const mockMutate = vi.fn();
+vi.mock("@sd/domain-content", () => ({
+  useToggleSaved: () => ({ mutate: mockMutate }),
+}));
+
 const baseItem: FeedContentItemDto = {
   kind: "single",
   id: "lec-1",
@@ -123,6 +128,39 @@ describe("FeedListRow", () => {
     render(<FeedListRow item={baseItem} />);
     const unsaveBtn = screen.getByRole("button", { name: "Remove from saved" });
     fireEvent.click(unsaveBtn);
+    expect(useProgressStore.getState().actions.isSaved("lec-1")).toBe(false);
+  });
+
+  it("persists the save via the toggle-saved mutation, keyed by slug", () => {
+    render(<FeedListRow item={baseItem} />);
+    const saveBtn = screen.getByRole("button", { name: "Save lecture" });
+    fireEvent.click(saveBtn);
+    expect(mockMutate).toHaveBeenCalledWith(
+      { listingId: "importance-of-sunnah", saved: true },
+      expect.objectContaining({ onError: expect.any(Function) }),
+    );
+  });
+
+  it("persists the unsave via the toggle-saved mutation", () => {
+    useProgressStore.getState().actions.addSaved("lec-1");
+    render(<FeedListRow item={baseItem} />);
+    const unsaveBtn = screen.getByRole("button", { name: "Remove from saved" });
+    fireEvent.click(unsaveBtn);
+    expect(mockMutate).toHaveBeenCalledWith(
+      { listingId: "importance-of-sunnah", saved: false },
+      expect.objectContaining({ onError: expect.any(Function) }),
+    );
+  });
+
+  it("rolls back the optimistic save if the mutation fails", () => {
+    render(<FeedListRow item={baseItem} />);
+    const saveBtn = screen.getByRole("button", { name: "Save lecture" });
+    fireEvent.click(saveBtn);
+    expect(useProgressStore.getState().actions.isSaved("lec-1")).toBe(true);
+
+    const [, { onError }] = mockMutate.mock.calls[0]!;
+    onError();
+
     expect(useProgressStore.getState().actions.isSaved("lec-1")).toBe(false);
   });
 
