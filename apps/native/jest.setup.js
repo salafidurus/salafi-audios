@@ -55,6 +55,10 @@ jest.mock("expo-secure-store", () => ({
   isAvailableAsync: jest.fn(() => Promise.resolve(true)),
 }));
 
+jest.mock("@react-native-async-storage/async-storage", () =>
+  require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
+);
+
 const mockQueryClientInstance = {
   invalidateQueries: jest.fn().mockResolvedValue(undefined),
   clear: jest.fn(),

@@ -1,8 +1,8 @@
 import type { Track } from "@sd/domain-audio";
 
 import { pickContentField } from "@sd/core-i18n";
-import { useAudio, useProgressStore } from "@sd/domain-audio";
-import { useListingDetail } from "@sd/domain-content";
+import { useAudio, useProgressStore, buildTrackQueue } from "@sd/domain-audio";
+import { useListingDetail, useListingContents } from "@sd/domain-content";
 import { Play, Pause, Bookmark } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -25,6 +25,7 @@ export type LectureDetailScreenProps = {
 export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { theme } = useUnistyles();
   const { data: lecture, isFetching } = useListingDetail(slug);
+  const { data: seriesContents } = useListingContents(lecture?.seriesContext?.seriesId ?? "");
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
 
@@ -64,6 +65,29 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
         await audioService.resume();
       }
       return;
+    }
+
+    // When the immediate parent's contents have loaded, play the full
+    // ordered queue for that Series/Module so Next/auto-advance continue
+    // through it — not just this one lesson.
+    if (lecture.seriesContext && seriesContents) {
+      const queue = buildTrackQueue(
+        {
+          id: lecture.seriesContext.seriesId,
+          title: lecture.seriesContext.seriesTitle,
+          format: seriesContents.format,
+          scholarName: lecture.scholar.name,
+          scholarSlug: lecture.scholar.slug,
+          artworkUrl: lecture.scholar.imageUrl ?? undefined,
+        },
+        seriesContents,
+        { startAtId: lecture.id },
+      );
+      const track = queue.find((t) => t.id === lecture.id);
+      if (track) {
+        await audioService.playListing(track, queue);
+        return;
+      }
     }
 
     const track: Track = {

@@ -28,6 +28,8 @@ export class DurusAudioService {
       onPositionChange: (pos) => this.onPositionChange(pos),
       onDurationChange: (dur) => usePlaybackStore.getState().actions.setDuration(dur),
       onError: (err) => usePlaybackStore.getState().actions.setError(err),
+      onSkipPrevious: () => this.skipToPrevious(),
+      onSkipNext: () => this.skipToNext(),
     });
   }
 

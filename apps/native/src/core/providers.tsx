@@ -16,7 +16,9 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { initProgressPersistence } from "./audio/progress-persistence";
 import { authClient } from "./auth/auth-client";
+import { useAuth } from "./auth/use-auth";
 import { getApiBaseUrl } from "./config/runtime-env";
 import { i18n, initI18n } from "./i18n/i18n";
 import { initIntegrations } from "./integrations";
@@ -72,6 +74,7 @@ type Props = {
 export function Providers({ children }: Props) {
   const [i18nReady, setI18nReady] = useState(false);
   const router = useRouter();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     initIntegrations();
@@ -104,6 +107,13 @@ export function Providers({ children }: Props) {
         });
     });
   }, [router]);
+
+  // Must run after the initApiClient effect above — httpClient throws until
+  // configureApiClient() has been called, and effects fire in declaration order.
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    return initProgressPersistence(user.id);
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
     void initI18n()

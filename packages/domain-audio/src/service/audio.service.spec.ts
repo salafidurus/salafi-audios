@@ -85,6 +85,21 @@ describe("DurusAudioService", () => {
     expect(mockEngine.setEvents).toHaveBeenCalled();
     expect(engineEvents.onPositionChange).toBeDefined();
     expect(engineEvents.onTrackEnd).toBeDefined();
+    expect(engineEvents.onSkipPrevious).toBeDefined();
+    expect(engineEvents.onSkipNext).toBeDefined();
+  });
+
+  it("should route the engine's onSkipPrevious/onSkipNext to skipToPrevious/skipToNext", async () => {
+    await service.playListing(mockTrack, [mockTrack, mockTrack2]);
+    vi.clearAllMocks();
+
+    engineEvents.onSkipNext!();
+    await Promise.resolve();
+    expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack2);
+
+    engineEvents.onSkipPrevious!();
+    await Promise.resolve();
+    expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack);
   });
 
   it("should play listing and load in engine", async () => {

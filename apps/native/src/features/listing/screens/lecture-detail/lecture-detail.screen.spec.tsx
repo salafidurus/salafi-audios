@@ -1,5 +1,5 @@
-import { useListingDetail } from "@sd/domain-content";
-import { render, screen } from "@testing-library/react-native";
+import { useListingDetail, useListingContents } from "@sd/domain-content";
+import { render, screen, fireEvent } from "@testing-library/react-native";
 import React from "react";
 
 import { LectureDetailScreen } from "./lecture-detail.screen";
@@ -20,24 +20,29 @@ jest.mock("react-native-unistyles", () => {
 
 jest.mock("@sd/domain-content", () => ({
   useListingDetail: jest.fn(),
+  useListingContents: jest.fn(() => ({ data: undefined })),
 }));
 
-jest.mock("@sd/domain-audio", () => ({
-  useAudio: jest.fn(() => ({
-    isPlaying: false,
-    currentTrack: null,
-    playListing: jest.fn(),
-    pause: jest.fn(),
-    resume: jest.fn(),
-  })),
-  useProgressStore: jest.fn(() => ({
-    actions: {
-      isSaved: jest.fn(() => false),
-      addSaved: jest.fn(),
-      removeSaved: jest.fn(),
-    },
-  })),
-}));
+jest.mock("@sd/domain-audio", () => {
+  const actual = jest.requireActual("@sd/domain-audio");
+  return {
+    ...actual,
+    useAudio: jest.fn(() => ({
+      isPlaying: false,
+      currentTrack: null,
+      playListing: jest.fn(),
+      pause: jest.fn(),
+      resume: jest.fn(),
+    })),
+    useProgressStore: jest.fn(() => ({
+      actions: {
+        isSaved: jest.fn(() => false),
+        addSaved: jest.fn(),
+        removeSaved: jest.fn(),
+      },
+    })),
+  };
+});
 
 jest.mock("@/features/audio", () => ({
   audioService: {
@@ -98,6 +103,14 @@ jest.mock("@/features/listing/components/series-context-bar/series-context-bar",
 }));
 
 const mockedUseListingDetail = jest.mocked(useListingDetail) as any;
+const mockedUseListingContents = jest.mocked(useListingContents) as any;
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { audioService } = require("@/features/audio");
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockedUseListingContents.mockReturnValue({ data: undefined });
+});
 
 describe("LectureDetailScreen", () => {
   it("renders a loading state while lecture detail is fetching", async () => {
@@ -163,5 +176,58 @@ describe("LectureDetailScreen", () => {
     expect(screen.getByText("Topics:2")).toBeTruthy();
     expect(screen.getByText("Useful lecture description.")).toBeTruthy();
     expect(screen.getByText("Series:Important Series")).toBeTruthy();
+  }, 15000);
+
+  it("plays the full ordered series queue, not just this one lesson, when the series' contents have loaded", async () => {
+    mockedUseListingDetail.mockReturnValue({
+      data: {
+        id: "lesson-1",
+        slug: "lesson-1",
+        title: "Lesson 1",
+        format: "single",
+        language: "en",
+        durationSeconds: 600,
+        publishedAt: "2026-04-11T00:00:00.000Z",
+        scholar: { id: "scholar-1", slug: "ibn-baz", name: "Ibn Baz", imageUrl: undefined },
+        topics: [],
+        primaryAudioAsset: { id: "asset-1", url: "https://s/lesson-1.mp3" },
+        seriesContext: {
+          seriesId: "series-1",
+          seriesSlug: "series",
+          seriesTitle: "Important Series",
+        },
+      },
+      isFetching: false,
+      error: null,
+    });
+    mockedUseListingContents.mockReturnValue({
+      data: {
+        format: "series",
+        items: [
+          {
+            id: "lesson-1",
+            slug: "lesson-1",
+            title: "Lesson 1",
+            orderIndex: 0,
+            primaryAudioAsset: { id: "asset-1", url: "https://s/lesson-1.mp3" },
+          },
+          {
+            id: "lesson-2",
+            slug: "lesson-2",
+            title: "Lesson 2",
+            orderIndex: 1,
+            primaryAudioAsset: { id: "asset-2", url: "https://s/lesson-2.mp3" },
+          },
+        ],
+      },
+    });
+
+    await render(<LectureDetailScreen slug="lesson-1" />);
+    await fireEvent.press(screen.getByText("Play"));
+
+    expect(audioService.playListing).toHaveBeenCalledTimes(1);
+    const [playedTrack, playedQueue] = audioService.playListing.mock.calls[0];
+    expect(playedTrack.id).toBe("lesson-1");
+    expect(playedQueue.map((t: { id: string }) => t.id)).toEqual(["lesson-1", "lesson-2"]);
   }, 15000);
 });

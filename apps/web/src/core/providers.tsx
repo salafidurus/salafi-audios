@@ -10,8 +10,10 @@ import { useEffect, useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 
 import { authClient } from "@/core/auth/auth-client";
+import { useAuth } from "@/core/auth/use-auth";
 import { ToastContainer } from "@/core/toast";
 
+import { initProgressPersistence } from "./audio/progress-persistence";
 import { createI18n } from "./i18n/i18n";
 import { createIdbPersister, purgeQueryCacheDb } from "./persister";
 
@@ -26,11 +28,19 @@ type Props = {
 
 export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   const [i18n] = useState(() => createI18n(initialLocale));
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     initApiClient(apiBaseUrl ? { baseUrl: apiBaseUrl } : undefined);
     setLocaleProvider(() => i18n.language);
   }, [apiBaseUrl, i18n]);
+
+  // Must run after the initApiClient effect above — httpClient throws until
+  // configureApiClient() has been called, and effects fire in declaration order.
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    return initProgressPersistence(user.id);
+  }, [isAuthenticated, user?.id]);
 
   // Sync i18n with cookie after hydration. The root layout is static so it
   // always passes "en" as the default. The inline script in layout.tsx sets

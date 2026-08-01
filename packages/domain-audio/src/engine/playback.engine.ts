@@ -7,6 +7,10 @@ export type PlaybackEngineEvents = {
   onPositionChange?: (positionSeconds: number) => void;
   onDurationChange?: (durationSeconds: number) => void;
   onError?: (error: string) => void;
+  /** OS/browser-level "previous track" command (lock screen, media keys, MediaSession). */
+  onSkipPrevious?: () => void;
+  /** OS/browser-level "next track" command (lock screen, media keys, MediaSession). */
+  onSkipNext?: () => void;
 };
 
 export interface PlaybackEngine {

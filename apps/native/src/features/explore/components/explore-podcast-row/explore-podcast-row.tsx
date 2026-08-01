@@ -1,9 +1,10 @@
 import type { MenuAction } from "@expo/ui/community/menu";
-import type { FeedContentItemDto } from "@sd/core-contracts";
+import type { FeedContentItemDto, ListingContentsDto } from "@sd/core-contracts";
 import type { Track } from "@sd/domain-audio";
 
+import { httpClient, endpoints } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
-import { useAudio, useProgressStore, useListingProgress } from "@sd/domain-audio";
+import { useAudio, useProgressStore, useListingProgress, buildTrackQueue } from "@sd/domain-audio";
 import { useFormattedScholarName } from "@sd/domain-content";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -35,7 +36,10 @@ export function ExplorePodcastRow({
   const { progressPercent } = useListingProgress(item.id);
 
   const { isPlaying, currentTrack } = useAudio();
-  const isCurrentTrack = currentTrack?.id === item.id;
+  const isCurrentTrack =
+    currentTrack?.id === item.id ||
+    currentTrack?.seriesId === item.id ||
+    currentTrack?.collectionId === item.id;
 
   const isSaved = useProgressStore((s) => s.actions.isSaved(item.id));
   const addSaved = useProgressStore((s) => s.actions.addSaved);
@@ -49,6 +53,36 @@ export function ExplorePodcastRow({
         await audioService.resume();
       }
       return;
+    }
+
+    // A Series/Collection row has no audio asset of its own — fetch its
+    // contents on tap and play the full ordered queue starting at the first
+    // lesson, instead of mis-tracking progress against the row's own id.
+    if (item.kind !== "single") {
+      try {
+        const contents = await httpClient<ListingContentsDto>({
+          url: endpoints.listings.contents(item.id),
+          method: "GET",
+        });
+        const queue = buildTrackQueue(
+          {
+            id: item.id,
+            title,
+            format: item.kind,
+            scholarName,
+            scholarSlug: item.scholarSlug,
+            artworkUrl: item.thumbnailUrl ?? undefined,
+          },
+          contents,
+        );
+        const firstTrack = queue[0];
+        if (firstTrack) {
+          await audioService.playListing(firstTrack, queue);
+          return;
+        }
+      } catch {
+        // Fall through to the single-track fallback below.
+      }
     }
 
     const track: Track = {
