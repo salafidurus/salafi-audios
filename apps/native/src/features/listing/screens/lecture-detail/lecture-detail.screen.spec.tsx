@@ -4,6 +4,24 @@ import React from "react";
 
 import { LectureDetailScreen } from "./lecture-detail.screen";
 
+const mockRouterReplace = jest.fn();
+const mockUseLocalSearchParams = jest.fn(() => ({ slug: "lecture-1" }) as Record<string, string>);
+
+jest.mock("expo-router", () => ({
+  router: { replace: (...args: unknown[]) => mockRouterReplace(...args) },
+  useLocalSearchParams: () => mockUseLocalSearchParams(),
+}));
+
+jest.mock("@/features/listing/components/listing-content-view/listing-content-view", () => ({
+  ListingContentView: ({ highlightItemId }: { highlightItemId?: string }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ReactM = require("react");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Text } = require("react-native");
+    return ReactM.createElement(Text, null, `Contents anchor:${highlightItemId ?? "none"}`);
+  },
+}));
+
 jest.mock("react-native-unistyles", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { lightNativeTheme } = require("@/core/styles/theme");
@@ -110,6 +128,7 @@ const { audioService } = require("@/features/audio");
 beforeEach(() => {
   jest.clearAllMocks();
   mockedUseListingContents.mockReturnValue({ data: undefined });
+  mockUseLocalSearchParams.mockReturnValue({ slug: "lecture-1" });
 });
 
 describe("LectureDetailScreen", () => {
@@ -230,4 +249,56 @@ describe("LectureDetailScreen", () => {
     expect(playedTrack.id).toBe("lesson-1");
     expect(playedQueue.map((t: { id: string }) => t.id)).toEqual(["lesson-1", "lesson-2"]);
   }, 15000);
+
+  it("redirects to the root listing, anchored to itself, when the resolved listing is nested", async () => {
+    mockedUseListingDetail.mockReturnValue({
+      data: {
+        id: "lesson-1",
+        slug: "lesson-1",
+        title: "Lesson 1",
+        format: "single",
+        scholar: { id: "scholar-1", slug: "ibn-baz", name: "Ibn Baz" },
+        topics: [],
+        primaryAudioAsset: null,
+        seriesContext: null,
+        rootListing: { id: "series-1", slug: "explanation-of-tawheed", title: "Explanation" },
+      },
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<LectureDetailScreen slug="lesson-1" />);
+
+    expect(mockRouterReplace).toHaveBeenCalledWith(
+      "/listings/explanation-of-tawheed?anchor=lesson-1",
+    );
+    expect(screen.getByText("Loading lecture…")).toBeTruthy();
+  });
+
+  it("renders the lesson list for a top-level series, passing the anchor query param through", async () => {
+    mockUseLocalSearchParams.mockReturnValue({ slug: "series-1", anchor: "lesson-2" });
+    mockedUseListingDetail.mockReturnValue({
+      data: {
+        id: "series-1",
+        slug: "series-1",
+        title: "Explanation of Tawheed",
+        format: "series",
+        scholar: { id: "scholar-1", slug: "ibn-baz", name: "Ibn Baz" },
+        topics: [],
+        primaryAudioAsset: null,
+        seriesContext: null,
+        rootListing: null,
+      },
+      isFetching: false,
+      error: null,
+    });
+    mockedUseListingContents.mockReturnValue({
+      data: { format: "series", items: [] },
+    });
+
+    await render(<LectureDetailScreen slug="series-1" />);
+
+    expect(screen.getByText("Explanation of Tawheed")).toBeTruthy();
+    expect(screen.getByText("Contents anchor:lesson-2")).toBeTruthy();
+  });
 });
