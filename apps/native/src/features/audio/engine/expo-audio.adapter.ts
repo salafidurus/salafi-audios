@@ -1,24 +1,42 @@
 import type { PlaybackEngine, PlaybackEngineEvents, Track, PlaybackStatus } from "@sd/domain-audio";
 import type { AudioPlayer, AudioStatus } from "expo-audio";
 
-import { createAudioPlayer } from "expo-audio";
+import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
 
 export class ExpoAudioAdapter implements PlaybackEngine {
   private player: AudioPlayer | null = null;
   private events: PlaybackEngineEvents = {};
   private listeners: { remove: () => void }[] = [];
   private hasEnded = false;
+  private audioModeConfigured = false;
 
   async setup(): Promise<void> {
-    // No-op for expo-audio, player is created lazily per track
+    if (this.audioModeConfigured) return;
+    this.audioModeConfigured = true;
+    // doNotMix is required for lock-screen controls to associate with this
+    // player (see setActiveForLockScreen); shouldPlayInBackground also keeps
+    // Android alive past the ~3min OS limit once lock-screen controls are active.
+    await setAudioModeAsync({
+      shouldPlayInBackground: true,
+      playsInSilentMode: true,
+      interruptionMode: "doNotMix",
+      allowsRecording: false,
+      shouldRouteThroughEarpiece: false,
+    });
   }
 
   async load(track: Track): Promise<void> {
+    await this.setup();
     this.cleanup();
     this.hasEnded = false;
 
     const player = createAudioPlayer({ uri: track.url }, { updateInterval: 500 });
     this.player = player;
+    player.setActiveForLockScreen(
+      true,
+      { title: track.title, artist: track.artist, artworkUrl: track.artworkUrl },
+      { showSeekBackward: true, showSeekForward: true },
+    );
 
     // Bind event listeners
     const statusListener = player.addListener("playbackStatusUpdate", (status: AudioStatus) => {
@@ -84,6 +102,7 @@ export class ExpoAudioAdapter implements PlaybackEngine {
     if (this.player) {
       this.player.pause();
       await this.player.seekTo(0);
+      this.player.clearLockScreenControls();
     }
   }
 
@@ -102,6 +121,7 @@ export class ExpoAudioAdapter implements PlaybackEngine {
     this.listeners = [];
 
     if (this.player) {
+      this.player.clearLockScreenControls();
       this.player.remove();
       this.player = null;
     }
