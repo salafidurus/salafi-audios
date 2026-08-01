@@ -77,11 +77,6 @@ export function Providers({ children }: Props) {
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.id) return;
-    return initProgressPersistence(user.id);
-  }, [isAuthenticated, user?.id]);
-
-  useEffect(() => {
     initIntegrations();
 
     const baseUrl = getApiBaseUrl();
@@ -112,6 +107,13 @@ export function Providers({ children }: Props) {
         });
     });
   }, [router]);
+
+  // Must run after the initApiClient effect above — httpClient throws until
+  // configureApiClient() has been called, and effects fire in declaration order.
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    return initProgressPersistence(user.id);
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
     void initI18n()

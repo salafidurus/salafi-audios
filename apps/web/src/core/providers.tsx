@@ -31,14 +31,16 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.id) return;
-    return initProgressPersistence(user.id);
-  }, [isAuthenticated, user?.id]);
-
-  useEffect(() => {
     initApiClient(apiBaseUrl ? { baseUrl: apiBaseUrl } : undefined);
     setLocaleProvider(() => i18n.language);
   }, [apiBaseUrl, i18n]);
+
+  // Must run after the initApiClient effect above — httpClient throws until
+  // configureApiClient() has been called, and effects fire in declaration order.
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    return initProgressPersistence(user.id);
+  }, [isAuthenticated, user?.id]);
 
   // Sync i18n with cookie after hydration. The root layout is static so it
   // always passes "en" as the default. The inline script in layout.tsx sets
