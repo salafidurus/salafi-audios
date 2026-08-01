@@ -124,9 +124,9 @@ describe('Public API (e2e)', () => {
   });
 
   describe('Listings', () => {
-    it('GET /listings/{valid-id} returns full listing', async () => {
+    it('GET /listings/{valid-slug} returns full listing', async () => {
       const res = await request(app.getHttpServer())
-        .get(`/listings/${TEST_LISTING_ID}`)
+        .get(`/listings/${TEST_LISTING_SLUG}`)
         .expect(200);
 
       expect(res.body).toHaveProperty('id', TEST_LISTING_ID);
