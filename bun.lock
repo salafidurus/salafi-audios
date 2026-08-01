@@ -281,6 +281,13 @@
         "tsup": "catalog:",
       },
     },
+    "packages/core-sync": {
+      "name": "@sd/core-sync",
+      "version": "0.0.0",
+      "dependencies": {
+        "zustand": "catalog:",
+      },
+    },
     "packages/design-tokens": {
       "name": "@sd/design-tokens",
       "version": "0.0.0",
@@ -1468,6 +1475,8 @@
     "@sd/core-db": ["@sd/core-db@workspace:packages/core-db"],
 
     "@sd/core-i18n": ["@sd/core-i18n@workspace:packages/core-i18n"],
+
+    "@sd/core-sync": ["@sd/core-sync@workspace:packages/core-sync"],
 
     "@sd/design-tokens": ["@sd/design-tokens@workspace:packages/design-tokens"],
 
