@@ -1,9 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { LibraryRepository } from './library.repo';
 
-const UUID = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
-
-describe('LibraryRepository — save/unsave by slug or uuid', () => {
+describe('LibraryRepository — save/unsave by slug', () => {
   let repo: LibraryRepository;
   let prisma: any;
 
@@ -36,17 +34,6 @@ describe('LibraryRepository — save/unsave by slug or uuid', () => {
         update: {},
       });
       expect(result).toBe(true);
-    });
-
-    it('uses a uuid directly without a slug lookup', async () => {
-      await repo.saveLecture('user1', UUID);
-
-      expect(prisma.listing.findFirst).not.toHaveBeenCalled();
-      expect(prisma.favoriteListing.upsert).toHaveBeenCalledWith({
-        where: { userId_listingId: { userId: 'user1', listingId: UUID } },
-        create: { userId: 'user1', listingId: UUID },
-        update: {},
-      });
     });
 
     it('returns false and does not upsert when the slug cannot be resolved', async () => {

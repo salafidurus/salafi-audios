@@ -83,7 +83,7 @@ describe("HomeScreen", () => {
     expect(card).toBeTruthy();
     fireEvent.click(card);
 
-    expect(mockOnContinueListening).toHaveBeenCalledWith("lecture-123");
+    expect(mockOnContinueListening).toHaveBeenCalledWith("tauheed-explained");
   });
 
   it("hides continue listening section when recentProgress is null", () => {

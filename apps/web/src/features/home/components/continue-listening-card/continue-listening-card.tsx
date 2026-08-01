@@ -37,7 +37,7 @@ export function ContinueListeningCard({
       <button
         type="button"
         data-testid="continue-listening-card"
-        onClick={() => onContinueListening?.(recentProgress.lectureId)}
+        onClick={() => onContinueListening?.(recentProgress.lectureSlug)}
         className={styles.continueCard}
       >
         <div className={styles.continueHeader}>

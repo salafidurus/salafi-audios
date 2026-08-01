@@ -22,25 +22,13 @@ describe('ListingRepository — findRelated', () => {
     repo = new ListingRepository(prisma);
   });
 
-  it('resolves the listing by slug, not just uuid', async () => {
+  it('resolves the listing strictly by slug', async () => {
     prisma.listing.findFirst.mockResolvedValue(baseListing);
 
     await repo.findRelated('tafsir-al-fatiha');
 
     expect(prisma.listing.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ slug: 'tafsir-al-fatiha' }) }),
-    );
-  });
-
-  it('resolves the listing by uuid directly', async () => {
-    prisma.listing.findFirst.mockResolvedValue(baseListing);
-
-    await repo.findRelated('3fa85f64-5717-4562-b3fc-2c963f66afa6');
-
-    expect(prisma.listing.findFirst).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({ id: '3fa85f64-5717-4562-b3fc-2c963f66afa6' }),
-      }),
     );
   });
 

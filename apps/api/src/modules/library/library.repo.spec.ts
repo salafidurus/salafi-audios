@@ -53,7 +53,7 @@ describe('LibraryRepository — rollup to top-level listings', () => {
       },
     };
     listingRepo = {
-      getProgressSummary: vi.fn<any>(),
+      getProgressSummaryByListingId: vi.fn<any>(),
     };
 
     repo = new LibraryRepository(prisma, listingRepo);
@@ -76,7 +76,7 @@ describe('LibraryRepository — rollup to top-level listings', () => {
         listing: { parentId: 'series-1', parent: null },
       },
     ]);
-    listingRepo.getProgressSummary.mockResolvedValue({
+    listingRepo.getProgressSummaryByListingId.mockResolvedValue({
       listingId: 'series-1',
       format: 'series',
       totalCount: 3,
@@ -88,8 +88,8 @@ describe('LibraryRepository — rollup to top-level listings', () => {
 
     const result = await repo.findInProgress('user1');
 
-    expect(listingRepo.getProgressSummary).toHaveBeenCalledTimes(1);
-    expect(listingRepo.getProgressSummary).toHaveBeenCalledWith('series-1', 'user1');
+    expect(listingRepo.getProgressSummaryByListingId).toHaveBeenCalledTimes(1);
+    expect(listingRepo.getProgressSummaryByListingId).toHaveBeenCalledWith('series-1', 'user1');
     expect(result.items).toHaveLength(1);
     expect(result.items[0]).toMatchObject({
       listingId: 'series-1',
@@ -110,7 +110,7 @@ describe('LibraryRepository — rollup to top-level listings', () => {
         listing: { parentId: 'module-1', parent: { parentId: 'collection-1' } },
       },
     ]);
-    listingRepo.getProgressSummary.mockResolvedValue({
+    listingRepo.getProgressSummaryByListingId.mockResolvedValue({
       listingId: 'collection-1',
       format: 'collection',
       totalCount: 10,
@@ -122,7 +122,7 @@ describe('LibraryRepository — rollup to top-level listings', () => {
 
     const result = await repo.findInProgress('user1');
 
-    expect(listingRepo.getProgressSummary).toHaveBeenCalledWith('collection-1', 'user1');
+    expect(listingRepo.getProgressSummaryByListingId).toHaveBeenCalledWith('collection-1', 'user1');
     expect(result.items[0]?.listingId).toBe('collection-1');
   });
 
@@ -136,7 +136,7 @@ describe('LibraryRepository — rollup to top-level listings', () => {
         listing: { parentId: null, parent: null },
       },
     ]);
-    listingRepo.getProgressSummary.mockResolvedValue({
+    listingRepo.getProgressSummaryByListingId.mockResolvedValue({
       listingId: 'single-1',
       format: 'single',
       totalCount: 1,
@@ -173,7 +173,7 @@ describe('LibraryRepository — rollup to top-level listings', () => {
         listing: { parentId: 'series-1', parent: null },
       },
     ]);
-    listingRepo.getProgressSummary.mockResolvedValue({
+    listingRepo.getProgressSummaryByListingId.mockResolvedValue({
       listingId: 'series-1',
       format: 'series',
       totalCount: 2,
@@ -207,7 +207,7 @@ describe('LibraryRepository — rollup to top-level listings', () => {
         listing: { parentId: 'series-1', parent: null },
       },
     ]);
-    listingRepo.getProgressSummary.mockResolvedValue({
+    listingRepo.getProgressSummaryByListingId.mockResolvedValue({
       listingId: 'series-1',
       format: 'series',
       totalCount: 2,

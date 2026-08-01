@@ -9,7 +9,6 @@ import type {
 import { PrismaService } from '../../core/db/prisma.service';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
-import { isListingUuid } from '../../shared/utils/listing-identifier';
 import { ListingRepository } from '../listing/listing.repo';
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -110,9 +109,9 @@ export class LibraryRepository {
    * Lesson/Module rows `UserListingProgress` is keyed on — a series with
    * progress on 3 lessons is one series entry, not three. This groups a
    * user's leaf-level progress by top-level ancestor, resolves each group's
-   * lesson-count rollup via `ListingRepository.getProgressSummary` (the same
-   * aggregation the listing detail page uses), and buckets by whether that
-   * rollup is fully completed.
+   * lesson-count rollup via `ListingRepository.getProgressSummaryByListingId`
+   * (the same aggregation the listing detail page uses), and buckets by
+   * whether that rollup is fully completed.
    */
   private async findRolledUpProgress(
     userId: string,
@@ -147,7 +146,9 @@ export class LibraryRepository {
 
     const topLevelIds = Array.from(groups.keys());
     const summaries = await Promise.all(
-      topLevelIds.map((topLevelId) => this.listingRepo.getProgressSummary(topLevelId, userId)),
+      topLevelIds.map((topLevelId) =>
+        this.listingRepo.getProgressSummaryByListingId(topLevelId, userId),
+      ),
     );
 
     const bucketed: {
@@ -237,9 +238,9 @@ export class LibraryRepository {
     return { items, nextCursor };
   }
 
-  /** Returns false when `idOrSlug` doesn't resolve to a real Listing (no row written). */
-  async saveLecture(userId: string, idOrSlug: string): Promise<boolean> {
-    const listingId = await this.resolveListingId(idOrSlug);
+  /** Returns false when `slug` doesn't resolve to a real Listing (no row written). */
+  async saveLecture(userId: string, slug: string): Promise<boolean> {
+    const listingId = await this.resolveListingId(slug);
     if (!listingId) return false;
 
     await this.prisma.favoriteListing.upsert({
@@ -250,9 +251,9 @@ export class LibraryRepository {
     return true;
   }
 
-  /** Returns false when `idOrSlug` doesn't resolve to a real Listing (no row deleted). */
-  async unsaveLecture(userId: string, idOrSlug: string): Promise<boolean> {
-    const listingId = await this.resolveListingId(idOrSlug);
+  /** Returns false when `slug` doesn't resolve to a real Listing (no row deleted). */
+  async unsaveLecture(userId: string, slug: string): Promise<boolean> {
+    const listingId = await this.resolveListingId(slug);
     if (!listingId) return false;
 
     await this.prisma.favoriteListing.deleteMany({
@@ -261,10 +262,9 @@ export class LibraryRepository {
     return true;
   }
 
-  private async resolveListingId(idOrSlug: string): Promise<string | null> {
-    if (isListingUuid(idOrSlug)) return idOrSlug;
+  private async resolveListingId(slug: string): Promise<string | null> {
     const listing = await this.prisma.listing.findFirst({
-      where: { slug: idOrSlug },
+      where: { slug },
       select: { id: true },
     });
     return listing?.id ?? null;

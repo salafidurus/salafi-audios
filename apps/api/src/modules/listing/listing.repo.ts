@@ -32,7 +32,6 @@ import type {
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
-import { isListingUuid } from '../../shared/utils/listing-identifier';
 
 @Injectable()
 export class ListingRepository {
@@ -40,11 +39,10 @@ export class ListingRepository {
 
   async findDetailById(id: string): Promise<ListingDetailDto | null> {
     const locale = getRequestLocale();
-    const isUuid = isListingUuid(id);
 
     const listing = await this.prisma.listing.findFirst({
       where: {
-        ...(isUuid ? { id } : { slug: id }),
+        slug: id,
         deletedAt: null,
         status: Status.published,
         scholar: { isActive: true },
@@ -266,11 +264,10 @@ export class ListingRepository {
 
   async findContentsById(id: string): Promise<ListingContentsDto | null> {
     const locale = getRequestLocale();
-    const isUuid = isListingUuid(id);
 
     const listing = await this.prisma.listing.findFirst({
       where: {
-        ...(isUuid ? { id } : { slug: id }),
+        slug: id,
         deletedAt: null,
         status: Status.published,
         scholar: { isActive: true },
@@ -459,11 +456,9 @@ export class ListingRepository {
   }
 
   async findLastPlayedLesson(id: string, userId: string): Promise<LastPlayedLessonDto | null> {
-    const isUuid = isListingUuid(id);
-
     const targetListing = await this.prisma.listing.findFirst({
       where: {
-        ...(isUuid ? { id } : { slug: id }),
+        slug: id,
         deletedAt: null,
       },
       select: { id: true },
@@ -508,31 +503,54 @@ export class ListingRepository {
    * Computed on demand from `UserListingProgress` — not separately stored, so it
    * always reflects the current set of published children.
    */
-  async getProgressSummary(id: string, userId: string): Promise<ListingProgressSummaryDto | null> {
-    const isUuid = isListingUuid(id);
-
+  /** Public/HTTP path — client always supplies the slug. */
+  async getProgressSummary(
+    slug: string,
+    userId: string,
+  ): Promise<ListingProgressSummaryDto | null> {
     const listing = await this.prisma.listing.findFirst({
-      where: {
-        ...(isUuid ? { id } : { slug: id }),
-        deletedAt: null,
-      },
+      where: { slug, deletedAt: null },
       select: { id: true, format: true },
     });
-
     if (!listing) return null;
 
-    const actualId = listing.id;
+    return this.computeProgressSummary(listing.id, listing.format, userId);
+  }
 
-    if (listing.format === 'single') {
+  /**
+   * For callers that already hold a resolved Listing uuid — e.g.
+   * LibraryRepository's rollup, which derives a top-level ancestor id by
+   * walking `parentId` chains on raw progress rows, never a client-supplied
+   * slug. Skips the slug lookup `getProgressSummary` does above.
+   */
+  async getProgressSummaryByListingId(
+    id: string,
+    userId: string,
+  ): Promise<ListingProgressSummaryDto | null> {
+    const listing = await this.prisma.listing.findFirst({
+      where: { id, deletedAt: null },
+      select: { id: true, format: true },
+    });
+    if (!listing) return null;
+
+    return this.computeProgressSummary(listing.id, listing.format, userId);
+  }
+
+  private async computeProgressSummary(
+    actualId: string,
+    format: ListingProgressSummaryDto['format'],
+    userId: string,
+  ): Promise<ListingProgressSummaryDto> {
+    if (format === 'single') {
       const progress = await this.prisma.userListingProgress.findUnique({
         where: { userId_listingId: { userId, listingId: actualId } },
         select: { isCompleted: true },
       });
-      return this.toProgressSummary(actualId, listing.format, 1, progress?.isCompleted ? 1 : 0);
+      return this.toProgressSummary(actualId, format, 1, progress?.isCompleted ? 1 : 0);
     }
 
     const [row] =
-      listing.format === 'series'
+      format === 'series'
         ? await this.prisma.$queryRaw<{ total: number; completed: number }[]>`
             SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
             FROM "Listing" l
@@ -553,7 +571,7 @@ export class ListingRepository {
               AND m."status" = 'published'
           `;
 
-    return this.toProgressSummary(actualId, listing.format, row?.total ?? 0, row?.completed ?? 0);
+    return this.toProgressSummary(actualId, format, row?.total ?? 0, row?.completed ?? 0);
   }
 
   private toProgressSummary(
@@ -574,9 +592,8 @@ export class ListingRepository {
 
   async findRelated(id: string, limit = 6): Promise<RelatedListingDto[]> {
     const locale = getRequestLocale();
-    const isUuid = isListingUuid(id);
     const listing = await this.prisma.listing.findFirst({
-      where: { ...(isUuid ? { id } : { slug: id }), deletedAt: null },
+      where: { slug: id, deletedAt: null },
       select: {
         id: true,
         scholarId: true,

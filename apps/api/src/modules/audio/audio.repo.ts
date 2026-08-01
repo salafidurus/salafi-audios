@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../core/db/prisma.service';
 import { Status } from '@sd/core-db';
 import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
-import { isListingUuid } from '../../shared/utils/listing-identifier';
 
 const COMPLETION_PERCENT_THRESHOLD = 0.95;
 const COMPLETION_TAIL_SECONDS = 30;
@@ -55,16 +54,16 @@ export class AudioRepository {
     }));
   }
 
-  /** Returns false when `idOrSlug` doesn't resolve to a real Listing (no row written). */
+  /** Returns false when `slug` doesn't resolve to a real Listing (no row written). */
   async upsertProgress(
     userId: string,
-    idOrSlug: string,
+    slug: string,
     positionSeconds: number,
     _durationSeconds?: number,
     isCompleted?: boolean,
   ): Promise<boolean> {
     const listing = await this.prisma.listing.findFirst({
-      where: isListingUuid(idOrSlug) ? { id: idOrSlug } : { slug: idOrSlug },
+      where: { slug },
       select: { id: true, durationSeconds: true },
     });
     if (!listing) return false;
@@ -142,9 +141,9 @@ export class AudioRepository {
     await this.prisma.$transaction(operations);
   }
 
-  async findListingById(idOrSlug: string) {
+  async findListingById(slug: string) {
     return this.prisma.listing.findFirst({
-      where: isListingUuid(idOrSlug) ? { id: idOrSlug } : { slug: idOrSlug },
+      where: { slug },
       select: { id: true, durationSeconds: true }, // Only fetch fields needed for stream response
     });
   }

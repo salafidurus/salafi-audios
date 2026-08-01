@@ -1,8 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { AudioRepository, isPositionCompleted } from './audio.repo';
 
-const UUID = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
-
 describe('isPositionCompleted', () => {
   it('returns false when duration is missing or zero', () => {
     expect(isPositionCompleted(100, undefined)).toBe(false);
@@ -58,13 +56,13 @@ describe('AudioRepository', () => {
 
   describe('upsertProgress', () => {
     it("derives isCompleted from the listing's own stored duration when the client omits it", async () => {
-      prisma.listing.findFirst.mockResolvedValue({ id: UUID, durationSeconds: 100 });
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
       prisma.userListingProgress.findUnique.mockResolvedValue(null);
 
-      await repo.upsertProgress('user1', UUID, 95, undefined, undefined);
+      await repo.upsertProgress('user1', 'tafsir-al-fatiha', 95, undefined, undefined);
 
       expect(prisma.listing.findFirst).toHaveBeenCalledWith({
-        where: { id: UUID },
+        where: { slug: 'tafsir-al-fatiha' },
         select: { id: true, durationSeconds: true },
       });
       const upsertArgs = prisma.userListingProgress.upsert.mock.calls[0][0];
@@ -72,7 +70,7 @@ describe('AudioRepository', () => {
       expect(upsertArgs.update.isCompleted).toBe(true);
     });
 
-    it('resolves the listing by slug when the param is not a uuid, and upserts using the resolved id', async () => {
+    it('resolves the listing by slug and upserts using the resolved id', async () => {
       prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
       prisma.userListingProgress.findUnique.mockResolvedValue(null);
 
@@ -91,18 +89,6 @@ describe('AudioRepository', () => {
         userId_listingId: { userId: 'user1', listingId: 'listing1' },
       });
       expect(upsertArgs.create.listingId).toBe('listing1');
-    });
-
-    it('resolves a uuid param directly by id, without a slug lookup', async () => {
-      prisma.listing.findFirst.mockResolvedValue({ id: UUID, durationSeconds: 100 });
-      prisma.userListingProgress.findUnique.mockResolvedValue(null);
-
-      await repo.upsertProgress('user1', UUID, 10, undefined, undefined);
-
-      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
-        where: { id: UUID },
-        select: { id: true, durationSeconds: true },
-      });
     });
 
     it('returns false and does not upsert when the listing cannot be resolved', async () => {
@@ -209,24 +195,13 @@ describe('AudioRepository', () => {
   });
 
   describe('findListingById', () => {
-    it('resolves by slug when the param is not a uuid', async () => {
+    it('resolves strictly by slug', async () => {
       prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
 
       await repo.findListingById('tafsir-al-fatiha');
 
       expect(prisma.listing.findFirst).toHaveBeenCalledWith({
         where: { slug: 'tafsir-al-fatiha' },
-        select: { id: true, durationSeconds: true },
-      });
-    });
-
-    it('resolves by id directly when the param is a uuid', async () => {
-      prisma.listing.findFirst.mockResolvedValue({ id: UUID, durationSeconds: 100 });
-
-      await repo.findListingById(UUID);
-
-      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
-        where: { id: UUID },
         select: { id: true, durationSeconds: true },
       });
     });

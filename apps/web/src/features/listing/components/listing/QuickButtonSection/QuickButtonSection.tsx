@@ -24,7 +24,7 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
   const formatScholarName = useFormatScholarName();
   const { isAuthenticated } = useAuth();
   const { isPlaying, currentTrack } = useAudio();
-  const { data: lastPlayed } = useLastPlayedLesson(listing.id, isAuthenticated);
+  const { data: lastPlayed } = useLastPlayedLesson(listing.slug, isAuthenticated);
 
   // Check progress: for single, check store directly; for series/collection, check lastPlayed or store
   const singleProgress = useProgressStore((s) => s.progressMap[listing.id]);
