@@ -1,7 +1,7 @@
 "use client";
 
 import { getSubnavLabel } from "@sd/core-i18n";
-import { useAdminPermissions } from "@sd/domain-account";
+import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,11 +28,10 @@ export function TopSubnavTabs() {
   const { t } = useTranslation();
   const isHydrated = useIsHydrated();
   const { isAuthenticated } = useAuth();
-  const { data: adminPermissionsData } = useAdminPermissions({ isAuthenticated });
+  const { ability } = useAbility({ isAuthenticated });
 
   const section = getCurrentSection(pathname);
-  const hasAdminAccess =
-    adminPermissionsData && (adminPermissionsData.permissions ?? []).length > 0;
+  const hasAdminAccess = hasAnyAdminAccess(ability);
 
   const isAdminSection = section === "adminContents";
 

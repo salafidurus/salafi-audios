@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Patch, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { RequiresPermission } from '../../core/auth/decorators';
+import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
+import { resolveListingTranslation } from '../../core/auth/policy-resolvers';
 import { ListingService } from './listing.service';
 import { SaveListingTranslationDto } from './dto/save-listing-translation.dto';
 
@@ -13,21 +13,21 @@ export class ListingTranslationsController {
   constructor(private readonly service: ListingService) {}
 
   @Get(':id/translations')
-  @RequiresPermission(Permissions.TRANSLATIONS_VIEW)
+  @CheckPolicy('read', 'Translation', resolveListingTranslation())
   @ApiOperation({ summary: 'List translations for a listing' })
   listTranslations(@Param('id') id: string) {
     return this.service.listTranslations(id);
   }
 
   @Post(':id/translations')
-  @RequiresPermission(Permissions.TRANSLATIONS_CREATE)
+  @CheckPolicy('create', 'Translation', resolveListingTranslation())
   @ApiOperation({ summary: 'Upsert a listing translation' })
   upsertTranslation(@Param('id') id: string, @Body() dto: SaveListingTranslationDto) {
     return this.service.upsertTranslation(id, dto);
   }
 
   @Patch(':id/translations/:locale')
-  @RequiresPermission(Permissions.TRANSLATIONS_EDIT)
+  @CheckPolicy('update', 'Translation', resolveListingTranslation())
   @ApiOperation({ summary: 'Partially update a listing translation' })
   updateTranslation(
     @Param('id') id: string,
@@ -38,14 +38,14 @@ export class ListingTranslationsController {
   }
 
   @Post(':id/translations/:locale/publish')
-  @RequiresPermission(Permissions.TRANSLATIONS_PUBLISH)
+  @CheckPolicy('publish', 'Translation', resolveListingTranslation())
   @ApiOperation({ summary: 'Publish a listing translation' })
   publishTranslation(@Param('id') id: string, @Param('locale') locale: string) {
     return this.service.publishTranslation(id, locale);
   }
 
   @Post(':id/translations/:locale/unpublish')
-  @RequiresPermission(Permissions.TRANSLATIONS_PUBLISH)
+  @CheckPolicy('publish', 'Translation', resolveListingTranslation())
   @ApiOperation({ summary: 'Unpublish a listing translation' })
   unpublishTranslation(@Param('id') id: string, @Param('locale') locale: string) {
     return this.service.unpublishTranslation(id, locale);

@@ -45,6 +45,9 @@ describe('AccountService', () => {
         emailVerified: true,
         roles: ['listener'],
         permissions: [],
+        scholarLinks: [],
+        translatorRoles: [],
+        rules: [],
         createdAt: '2024-01-01T00:00:00.000Z',
         updatedAt: '2024-06-01T00:00:00.000Z',
       });
@@ -89,6 +92,28 @@ describe('AccountService', () => {
         emailVerified: false,
       });
       expect(result.emailVerified).toBe(false);
+    });
+
+    it('packs a rule for each granted permission', () => {
+      const result = service.getProfile({ ...mockUser, permissions: ['SCHOLARS_VIEW'] });
+      expect(result.rules.length).toBeGreaterThan(0);
+    });
+
+    it('passes scholarLinks and translatorRoles through unchanged', () => {
+      const result = service.getProfile({
+        ...mockUser,
+        scholarLinks: [{ scholarId: 'scholar-1', permissionType: 'OWN_CONTENT' }],
+        translatorRoles: [{ scholarId: null, locale: 'ar', canPublish: true }],
+      });
+      expect(result.scholarLinks).toEqual([
+        { scholarId: 'scholar-1', permissionType: 'OWN_CONTENT' },
+      ]);
+      expect(result.translatorRoles).toEqual([{ scholarId: null, locale: 'ar', canPublish: true }]);
+    });
+
+    it('produces an empty rules array for a user with no permissions/roles/scopes', () => {
+      const result = service.getProfile(mockUser);
+      expect(result.rules).toEqual([]);
     });
   });
 

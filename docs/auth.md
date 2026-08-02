@@ -270,8 +270,10 @@ then configure cookies accordingly.
 ## Adding a protected endpoint
 
 - API routes are protected by default via the global `AuthGuard`. Mark a route
-  `@Public()` to opt out. Use `@Roles(...)` for role-gated routes and
-  `@CurrentUser()` to read the authenticated user.
+  `@Public()` to opt out. Use `@CheckPolicy(action, subjectType, resolver?)`
+  for authorization-gated routes (backed by the CASL ability built in
+  `apps/api/src/core/auth/ability/ability.factory.ts` and enforced by
+  `PolicyGuard`) and `@CurrentUser()` to read the authenticated user.
 - Client data calls made through `@sd/core-api` automatically carry the right
   credential — no per-call auth wiring is needed.
 

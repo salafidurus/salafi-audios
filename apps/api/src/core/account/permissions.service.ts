@@ -1,5 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import type { Permission, ScholarPermissionType, UserRole } from '@sd/core-contracts';
+import type {
+  Permission,
+  ScholarPermissionType,
+  UserRole,
+  UserScholarRoleDto,
+  UserTranslatorRoleDto,
+} from '@sd/core-contracts';
 import { ROLE_DEFAULT_PERMISSIONS } from '@sd/core-contracts';
 import { PermissionsRepository } from './permissions.repository';
 import type { Locale } from '@sd/core-db';
@@ -125,42 +131,43 @@ export class PermissionsService {
   }
 
   /**
-   * Link a user to a scholar with a specific permission type
-   * Automatically grants editing permissions if permissionType is OWN_CONTENT
+   * Resolve a scholar's slug (the external API identifier, per this
+   * project's convention) to its internal database id.
+   */
+  private async resolveScholarId(scholarSlug: string): Promise<string> {
+    const scholar = await this.repository.findScholarBySlug(scholarSlug);
+    if (!scholar) {
+      throw new BadRequestException(`Scholar not found: ${scholarSlug}`);
+    }
+    return scholar.id;
+  }
+
+  private async resolveScholarIdOrNull(scholarSlug: string | null): Promise<string | null> {
+    if (scholarSlug === null) return null;
+    return this.resolveScholarId(scholarSlug);
+  }
+
+  /**
+   * Link a user to a scholar with a specific permission type.
+   * Scoped access is derived live by the CASL ability factory from this row
+   * — no global permissions are materialized as a side effect.
    */
   async linkUserToScholar(
     userId: string,
-    scholarId: string,
+    scholarSlug: string,
     permissionType: ScholarPermissionType,
     createdBy: string,
   ): Promise<void> {
-    // Verify scholar exists
-    const scholar = await this.repository.scholarExists(scholarId);
+    const scholarId = await this.resolveScholarId(scholarSlug);
 
-    if (!scholar) {
-      throw new BadRequestException(`Scholar not found: ${scholarId}`);
-    }
-
-    // Check if link already exists
     const existingLink = await this.repository.findScholarLink(userId, scholarId, permissionType);
-
     if (existingLink) {
       throw new BadRequestException(
         `User already linked to scholar with permission type: ${permissionType}`,
       );
     }
 
-    // Create the link
     await this.repository.createScholarLink(userId, scholarId, permissionType, createdBy);
-
-    // Auto-grant editing permissions for own content
-    if (permissionType === 'OWN_CONTENT') {
-      await this.grantPermissionToUser(userId, 'SCHOLARS_EDIT', createdBy, true);
-      await this.grantPermissionToUser(userId, 'LISTINGS_CREATE', createdBy, true);
-      await this.grantPermissionToUser(userId, 'LISTINGS_EDIT', createdBy, true);
-      await this.grantPermissionToUser(userId, 'LISTINGS_PUBLISH', createdBy, true);
-      await this.grantPermissionToUser(userId, 'MEDIA_UPLOAD', createdBy, true);
-    }
   }
 
   /**
@@ -168,9 +175,10 @@ export class PermissionsService {
    */
   async unlinkUserFromScholar(
     userId: string,
-    scholarId: string,
+    scholarSlug: string,
     permissionType: ScholarPermissionType,
   ): Promise<void> {
+    const scholarId = await this.resolveScholarId(scholarSlug);
     const link = await this.repository.findScholarLink(userId, scholarId, permissionType);
 
     if (!link) {
@@ -181,48 +189,41 @@ export class PermissionsService {
   }
 
   /**
-   * Grant translator access to a language
-   * Automatically grants translation permissions if not already granted
+   * Grant translator access to a locale, optionally scoped to one scholar
+   * (null scholarSlug = all scholars). Scoped access is derived live by the
+   * CASL ability factory — no global permissions are materialized.
    */
   async grantTranslatorLanguage(
     userId: string,
+    scholarSlug: string | null,
     locale: Locale,
     canPublish: boolean,
     createdBy: string,
   ): Promise<void> {
-    // Check if translator role already assigned
-    const existingRole = await this.repository.findTranslatorRole(userId, locale);
+    const scholarId = await this.resolveScholarIdOrNull(scholarSlug);
 
+    const existingRole = await this.repository.findTranslatorRoleByScope(userId, scholarId, locale);
     if (existingRole) {
       throw new BadRequestException(`User already has translator access for language: ${locale}`);
     }
 
-    // Create the translator role
-    await this.repository.createTranslatorRole(userId, locale, canPublish, createdBy);
-
-    // Auto-grant translation permissions
-    const permissions: Permission[] = [
-      'TRANSLATIONS_VIEW',
-      'TRANSLATIONS_CREATE',
-      'TRANSLATIONS_EDIT',
-    ];
-
-    if (canPublish) {
-      permissions.push('TRANSLATIONS_PUBLISH');
-    }
-
-    await Promise.all(
-      permissions.map((permission) =>
-        this.grantPermissionToUser(userId, permission, createdBy, true),
-      ),
-    );
+    await this.repository.createTranslatorRole(userId, scholarId, locale, canPublish, createdBy);
   }
 
   /**
-   * Revoke translator access to a language
+   * Revoke translator access to a locale within a scope
    */
-  async revokeTranslatorLanguage(userId: string, locale: Locale): Promise<void> {
-    const translatorRole = await this.repository.findTranslatorRole(userId, locale);
+  async revokeTranslatorLanguage(
+    userId: string,
+    scholarSlug: string | null,
+    locale: Locale,
+  ): Promise<void> {
+    const scholarId = await this.resolveScholarIdOrNull(scholarSlug);
+    const translatorRole = await this.repository.findTranslatorRoleByScope(
+      userId,
+      scholarId,
+      locale,
+    );
 
     if (!translatorRole) {
       throw new BadRequestException(`User does not have translator access for language: ${locale}`);
@@ -232,33 +233,63 @@ export class PermissionsService {
   }
 
   /**
-   * Update translator publish permissions for a language
+   * Update the publish flag for an existing translator grant within a scope
    */
   async updateTranslatorPublishPermission(
     userId: string,
+    scholarSlug: string | null,
     locale: Locale,
     canPublish: boolean,
   ): Promise<void> {
-    const translatorRole = await this.repository.findTranslatorRole(userId, locale);
+    const scholarId = await this.resolveScholarIdOrNull(scholarSlug);
+    const translatorRole = await this.repository.findTranslatorRoleByScope(
+      userId,
+      scholarId,
+      locale,
+    );
 
     if (!translatorRole) {
       throw new BadRequestException(`User does not have translator access for language: ${locale}`);
     }
 
-    // Update the can_publish flag
     await this.repository.updateTranslatorPublishPermission(translatorRole.id, canPublish);
+  }
 
-    // Update permissions based on publish flag
-    const hasPublishPermission = await this.repository.findUserPermission(
-      userId,
-      'TRANSLATIONS_PUBLISH',
+  /**
+   * Grant/revoke a set of locales for a user within a scholar scope in one
+   * batch — the admin UI grants "translate {en, ar}" as a single action
+   * rather than one call per locale. Diffs the requested set against
+   * existing rows: creates missing, deletes removed, updates canPublish on
+   * whatever remains in the set.
+   */
+  async syncTranslatorLocales(
+    userId: string,
+    scholarSlug: string | null,
+    locales: Locale[],
+    canPublish: boolean,
+    createdBy: string,
+  ): Promise<void> {
+    const scholarId = await this.resolveScholarIdOrNull(scholarSlug);
+    const existing = await this.repository.getTranslatorRolesByScope(userId, scholarId);
+
+    const requestedLocales = new Set(locales);
+    const existingByLocale = new Map(existing.map((role) => [role.locale, role]));
+
+    const toCreate = locales.filter((locale) => !existingByLocale.has(locale));
+    const toDelete = existing.filter((role) => !requestedLocales.has(role.locale));
+    const toUpdate = existing.filter(
+      (role) => requestedLocales.has(role.locale) && role.canPublish !== canPublish,
     );
 
-    if (canPublish && !hasPublishPermission) {
-      await this.grantPermissionToUser(userId, 'TRANSLATIONS_PUBLISH', userId, true);
-    } else if (!canPublish && hasPublishPermission) {
-      await this.revokePermissionFromUser(userId, 'TRANSLATIONS_PUBLISH');
-    }
+    await Promise.all([
+      ...toCreate.map((locale) =>
+        this.repository.createTranslatorRole(userId, scholarId, locale, canPublish, createdBy),
+      ),
+      ...toDelete.map((role) => this.repository.deleteTranslatorRole(role.id)),
+      ...toUpdate.map((role) =>
+        this.repository.updateTranslatorPublishPermission(role.id, canPublish),
+      ),
+    ]);
   }
 
   /**
@@ -343,34 +374,6 @@ export class PermissionsService {
   }
 
   /**
-   * Get current user's permissions with role and permission details
-   * Used by the /me endpoint to return the current user's permission state
-   * Includes superadmin bypass: if user has superadmin role, return all permissions
-   *
-   * @param userId - User ID
-   * @returns Object with permissions array (Permission enum values) and roles array
-   */
-  async getMyPermissions(userId: string) {
-    const [permissions, roles] = await Promise.all([
-      this.repository.findPermissionStringsByUserId(userId),
-      this.repository.getUserRoles(userId),
-    ]);
-
-    const isSuperadmin = roles.includes('superadmin');
-    if (isSuperadmin) {
-      return {
-        permissions: [...ROLE_DEFAULT_PERMISSIONS.superadmin],
-        roles,
-      };
-    }
-
-    return {
-      permissions,
-      roles,
-    };
-  }
-
-  /**
    * Get detailed permission information for a user (with full audit trail)
    * Used by admin endpoints to show user permissions with timestamps and who granted them
    *
@@ -407,5 +410,40 @@ export class PermissionsService {
         grantedBy: r.grantedBy,
       })),
     };
+  }
+
+  /**
+   * List a user's scholar-scoped role grants (for the admin scoped-grant UI)
+   */
+  async listScholarRoles(userId: string): Promise<UserScholarRoleDto[]> {
+    const roles = await this.repository.getScholarsByUser(userId);
+    return roles.map((r) => ({
+      id: r.id,
+      userId: r.userId,
+      scholarId: r.scholarId,
+      scholarSlug: r.scholar.slug,
+      scholarName: r.scholar.name,
+      permissionType: r.permissionType,
+      createdAt: r.createdAt.toISOString(),
+      createdBy: r.createdBy,
+    }));
+  }
+
+  /**
+   * List a user's translator-scoped role grants (for the admin scoped-grant UI)
+   */
+  async listTranslatorRoles(userId: string): Promise<UserTranslatorRoleDto[]> {
+    const roles = await this.repository.getTranslatorLanguages(userId);
+    return roles.map((r) => ({
+      id: r.id,
+      userId: r.userId,
+      scholarId: r.scholarId,
+      scholarSlug: r.scholar?.slug ?? null,
+      scholarName: r.scholar?.name ?? null,
+      locale: r.locale,
+      canPublish: r.canPublish,
+      createdAt: r.createdAt.toISOString(),
+      createdBy: r.createdBy,
+    }));
   }
 }

@@ -1,11 +1,12 @@
-import { useAdminPermissions } from "@sd/domain-account";
+import { createMongoAbility } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, type Mock } from "bun:test";
 
 import { AdminPermissionsScreen } from "./admin-permissions.screen";
 
 vi.mock("@sd/domain-account", () => ({
-  useAdminPermissions: vi.fn(),
+  useAbility: vi.fn(),
 }));
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: () => ({ isMobile: false }),
@@ -20,9 +21,9 @@ vi.mock("@/features/admin/components/RevokePermissionConfirmModal", () => ({
 }));
 
 describe("AdminPermissionsScreen", () => {
-  it("hides the lookup form when user lacks USERS_GRANT_PERMISSIONS", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["USERS_VIEW"] },
+  it("hides the lookup form when the user cannot grant permissions", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "User" }]),
     });
 
     render(<AdminPermissionsScreen />);
@@ -30,9 +31,9 @@ describe("AdminPermissionsScreen", () => {
     expect(screen.queryByPlaceholderText(/user id/i)).not.toBeInTheDocument();
   });
 
-  it("shows the lookup form when user has USERS_GRANT_PERMISSIONS", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["USERS_GRANT_PERMISSIONS"] },
+  it("shows the lookup form when the user can grant permissions", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "grant", subject: "UserPermission" }]),
     });
 
     render(<AdminPermissionsScreen />);

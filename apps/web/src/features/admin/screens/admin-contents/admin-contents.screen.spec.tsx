@@ -1,5 +1,6 @@
+import { createMongoAbility } from "@casl/ability";
 import { useApiQuery } from "@sd/core-contracts";
-import { useAdminPermissions } from "@sd/domain-account";
+import { useAbility } from "@sd/domain-account";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
@@ -9,7 +10,7 @@ import React from "react";
 import { AdminContentsScreen } from "./admin-contents.screen";
 
 vi.mock("@sd/domain-account", () => ({
-  useAdminPermissions: vi.fn(),
+  useAbility: vi.fn(),
 }));
 vi.mock("@sd/core-contracts", () => {
   // Import the real module to preserve all exports
@@ -39,15 +40,18 @@ describe("AdminContentsScreen — topics tab permission gates", () => {
     });
     (usePathname as Mock<any>).mockReturnValue("/admin/contents");
     (useApiQuery as Mock<any>).mockReturnValue({ data: [], refetch: vi.fn() });
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "manage", subject: "all" }]),
+    });
   });
 
   const renderWithProviders = (component: React.ReactElement) => {
     return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
   };
 
-  it("hides Add Topic button when user lacks TOPICS_CREATE", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["LISTINGS_VIEW"] },
+  it("hides Add Topic button when user cannot create topics", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Listing" }]),
     });
 
     renderWithProviders(<AdminContentsScreen />);
@@ -55,9 +59,9 @@ describe("AdminContentsScreen — topics tab permission gates", () => {
     expect(screen.queryByText("Add Topic")).not.toBeInTheDocument();
   });
 
-  it("shows Add Topic button when user has TOPICS_CREATE", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["TOPICS_CREATE"] },
+  it("shows Add Topic button when user can create topics", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "create", subject: "Topic" }]),
     });
 
     renderWithProviders(<AdminContentsScreen />);

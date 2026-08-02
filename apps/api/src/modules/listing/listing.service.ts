@@ -69,6 +69,7 @@ export class ListingService {
     scholarId?: string;
     status?: string;
     search?: string;
+    accessibleScholarIds?: string[];
   }): Promise<AdminListingListDto> {
     return this.repo.listAdmin(params);
   }

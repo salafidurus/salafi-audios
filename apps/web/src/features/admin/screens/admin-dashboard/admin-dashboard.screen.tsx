@@ -1,8 +1,8 @@
 "use client";
 
-import type { AdminPermission } from "@sd/core-contracts";
+import type { AppActions, AppSubjectType } from "@sd/core-contracts";
 
-import { useAdminPermissions } from "@sd/domain-account";
+import { useAbility } from "@sd/domain-account";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -18,14 +18,15 @@ type AdminSection = {
   description: string;
   descriptionMobile: string;
   href: string;
-  permission: AdminPermission;
+  action: AppActions;
+  subject: AppSubjectType;
 };
 
 export function AdminDashboardScreen() {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();
   const { isAuthenticated } = useAuth();
-  const { data, isFetching } = useAdminPermissions({ isAuthenticated });
+  const { ability, isLoading } = useAbility({ isAuthenticated });
 
   const adminSections: AdminSection[] = [
     {
@@ -36,7 +37,8 @@ export function AdminDashboardScreen() {
       ),
       descriptionMobile: t("admin.dashboard.scholarsDescMobile", "Manage scholars"),
       href: "/admin/scholars",
-      permission: "SCHOLARS_VIEW" as const,
+      action: "read",
+      subject: "Scholar",
     },
     {
       title: t("navigation.admin.contents", "Contents"),
@@ -46,18 +48,20 @@ export function AdminDashboardScreen() {
       ),
       descriptionMobile: t("admin.dashboard.contentsDescMobile", "Manage content"),
       href: "/admin/contents",
-      permission: "LISTINGS_VIEW" as const,
+      action: "read",
+      subject: "Listing",
     },
     {
       title: t("navigation.admin.users", "Users"),
       description: t("admin.dashboard.usersDesc", "Manage admin users and permissions"),
       descriptionMobile: t("admin.dashboard.usersDescMobile", "Manage users"),
       href: "/admin/users",
-      permission: "USERS_VIEW" as const,
+      action: "read",
+      subject: "User",
     },
   ];
 
-  if (isFetching) {
+  if (isLoading) {
     return (
       <ScreenView>
         <PageHeader
@@ -72,8 +76,7 @@ export function AdminDashboardScreen() {
     );
   }
 
-  const permissions = data?.permissions ?? [];
-  const visibleSections = adminSections.filter((s) => permissions.includes(s.permission));
+  const visibleSections = adminSections.filter((s) => ability.can(s.action, s.subject));
 
   return (
     <ScreenView>

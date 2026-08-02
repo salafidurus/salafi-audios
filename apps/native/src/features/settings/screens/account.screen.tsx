@@ -1,11 +1,10 @@
-import { useAccountProfile } from "@sd/domain-account";
+import { hasAnyAdminAccess, useAbility, useAccountProfile } from "@sd/domain-account";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { AppText } from "@/shared/components/AppText/AppText";
 
 import { ContentLanguageToggle } from "../components/content-language-toggle/content-language-toggle";
@@ -31,7 +30,8 @@ export function AccountScreen({
   const { isAuthenticated } = useAuth();
   const { data: profile, isFetching } = useAccountProfile({ enabled: isAuthenticated });
   const { t } = useTranslation();
-  const { hasAnyPermission } = useAdminPermissions();
+  const { ability } = useAbility({ isAuthenticated });
+  const hasAnyPermission = hasAnyAdminAccess(ability);
   const { theme } = useUnistyles();
   const DisclosureIcon = theme.direction === "rtl" ? ChevronLeft : ChevronRight;
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { ADMIN_PERMISSIONS, type AdminPermission } from "@sd/core-contracts";
+import { PERMISSIONS_ARRAY, type Permission } from "@sd/core-contracts";
+import { useAbility } from "@sd/domain-account";
 import { useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -10,7 +11,6 @@ import {
   revokePermission,
   type AdminPermissionsListResponse,
 } from "@/features/admin/api/admin.api";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { RevokePermissionConfirmModal } from "@/features/admin/components/RevokePermissionConfirmModal";
 import { Button } from "@/shared/components/Button";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -22,6 +22,7 @@ import styles from "./admin-permissions.screen.module.css";
 export function AdminPermissionsScreen() {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
+  const { ability } = useAbility();
   const [userId, setUserId] = useState("");
   const [userPerms, setUserPerms] = useState<AdminPermissionsListResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,7 +44,7 @@ export function AdminPermissionsScreen() {
     }
   };
 
-  const handleGrant = async (permission: AdminPermission) => {
+  const handleGrant = async (permission: Permission) => {
     setLoading(true);
     try {
       const data = await grantPermission(userId.trim(), permission);
@@ -96,127 +97,133 @@ export function AdminPermissionsScreen() {
         }
       />
 
-      <PermissionGate requires="USERS_GRANT_PERMISSIONS">
-        <div className={styles.lookupSection}>
-          <input
-            aria-label={t("admin.permissions.userIdLabel", "User ID")}
-            placeholder={t("admin.permissions.userIdPlaceholder", "User ID")}
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleLookup()}
-            className={styles.input}
-          />
-          <Button variant="primary" onClick={handleLookup} disabled={loading}>
-            {loading
-              ? !isMobile
-                ? t("admin.permissions.saving", "Loading…")
-                : "…"
-              : t("admin.permissions.lookup", "Lookup")}
-          </Button>
-        </div>
+      {ability.can("grant", "UserPermission") && (
+        <>
+          <div className={styles.lookupSection}>
+            <input
+              aria-label={t("admin.permissions.userIdLabel", "User ID")}
+              placeholder={t("admin.permissions.userIdPlaceholder", "User ID")}
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleLookup()}
+              className={styles.input}
+            />
+            <Button variant="primary" onClick={handleLookup} disabled={loading}>
+              {loading
+                ? !isMobile
+                  ? t("admin.permissions.saving", "Loading…")
+                  : "…"
+                : t("admin.permissions.lookup", "Lookup")}
+            </Button>
+          </div>
 
-        {userPerms && !isMobile && (
-          <h2 className={styles.sectionTitle}>
-            {t("admin.permissions.userPermissionsHeader", {
-              defaultValue: "Permissions for {{userId}}",
-              userId,
-            })}
-          </h2>
-        )}
+          {userPerms && !isMobile && (
+            <h2 className={styles.sectionTitle}>
+              {t("admin.permissions.userPermissionsHeader", {
+                defaultValue: "Permissions for {{userId}}",
+                userId,
+              })}
+            </h2>
+          )}
 
-        {userPerms && !isMobile ? (
-          <table className={styles.table}>
-            <thead className={styles.tableHeader}>
-              <tr>
-                <th className={styles.tableHead}>
-                  {t("admin.permissions.permissionTableHeader", "Permission")}
-                </th>
-                <th className={styles.tableHead}>
-                  {t("admin.permissions.statusTableHeader", "Status")}
-                </th>
-                <th className={styles.tableHead}>
-                  {t("admin.permissions.actionTableHeader", "Action")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {ADMIN_PERMISSIONS.map((perm) => {
+          {userPerms && !isMobile ? (
+            <table className={styles.table}>
+              <thead className={styles.tableHeader}>
+                <tr>
+                  <th className={styles.tableHead}>
+                    {t("admin.permissions.permissionTableHeader", "Permission")}
+                  </th>
+                  <th className={styles.tableHead}>
+                    {t("admin.permissions.statusTableHeader", "Status")}
+                  </th>
+                  <th className={styles.tableHead}>
+                    {t("admin.permissions.actionTableHeader", "Action")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {PERMISSIONS_ARRAY.map((perm) => {
+                  const hasIt = currentPermissions.includes(perm);
+                  return (
+                    <tr key={perm} className={styles.tableRow}>
+                      <td className={`${styles.tableCell} ${styles.cellMonospace}`}>{perm}</td>
+                      <td className={styles.tableCell}>
+                        <span
+                          className={`${styles.statusBadge} ${
+                            hasIt ? styles.statusGranted : styles.statusNotGranted
+                          }`}
+                        >
+                          {hasIt
+                            ? t("admin.permissions.granted", "Granted")
+                            : t("admin.permissions.notGranted", "Not granted")}
+                        </span>
+                      </td>
+                      <td className={styles.tableCell}>
+                        {hasIt ? (
+                          <Button
+                            variant="danger"
+                            onClick={() => handleRevokeClick(perm)}
+                            disabled={loading}
+                          >
+                            {t("admin.permissions.revoke", "Revoke")}
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="primary"
+                            onClick={() => handleGrant(perm)}
+                            disabled={loading}
+                          >
+                            {t("admin.permissions.grant", "Grant")}
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : userPerms ? (
+            <>
+              {PERMISSIONS_ARRAY.map((perm) => {
                 const hasIt = currentPermissions.includes(perm);
                 return (
-                  <tr key={perm} className={styles.tableRow}>
-                    <td className={`${styles.tableCell} ${styles.cellMonospace}`}>{perm}</td>
-                    <td className={styles.tableCell}>
-                      <span
-                        className={`${styles.statusBadge} ${
+                  <div key={perm} className={styles.permissionCard}>
+                    <div className={styles.permissionInfo}>
+                      <div className={styles.permissionName}>{perm}</div>
+                      <div
+                        className={`${styles.permissionStatus} ${
                           hasIt ? styles.statusGranted : styles.statusNotGranted
                         }`}
                       >
                         {hasIt
                           ? t("admin.permissions.granted", "Granted")
                           : t("admin.permissions.notGranted", "Not granted")}
-                      </span>
-                    </td>
-                    <td className={styles.tableCell}>
-                      {hasIt ? (
-                        <Button
-                          variant="danger"
-                          onClick={() => handleRevokeClick(perm)}
-                          disabled={loading}
-                        >
-                          {t("admin.permissions.revoke", "Revoke")}
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="primary"
-                          onClick={() => handleGrant(perm)}
-                          disabled={loading}
-                        >
-                          {t("admin.permissions.grant", "Grant")}
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
+                      </div>
+                    </div>
+                    {hasIt ? (
+                      <Button
+                        variant="danger"
+                        onClick={() => handleRevokeClick(perm)}
+                        disabled={loading}
+                      >
+                        {t("admin.permissions.revoke", "Revoke")}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="primary"
+                        onClick={() => handleGrant(perm)}
+                        disabled={loading}
+                      >
+                        {t("admin.permissions.grant", "Grant")}
+                      </Button>
+                    )}
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
-        ) : userPerms ? (
-          <>
-            {ADMIN_PERMISSIONS.map((perm) => {
-              const hasIt = currentPermissions.includes(perm);
-              return (
-                <div key={perm} className={styles.permissionCard}>
-                  <div className={styles.permissionInfo}>
-                    <div className={styles.permissionName}>{perm}</div>
-                    <div
-                      className={`${styles.permissionStatus} ${
-                        hasIt ? styles.statusGranted : styles.statusNotGranted
-                      }`}
-                    >
-                      {hasIt
-                        ? t("admin.permissions.granted", "Granted")
-                        : t("admin.permissions.notGranted", "Not granted")}
-                    </div>
-                  </div>
-                  {hasIt ? (
-                    <Button
-                      variant="danger"
-                      onClick={() => handleRevokeClick(perm)}
-                      disabled={loading}
-                    >
-                      {t("admin.permissions.revoke", "Revoke")}
-                    </Button>
-                  ) : (
-                    <Button variant="primary" onClick={() => handleGrant(perm)} disabled={loading}>
-                      {t("admin.permissions.grant", "Grant")}
-                    </Button>
-                  )}
-                </div>
-              );
-            })}
-          </>
-        ) : null}
-      </PermissionGate>
+            </>
+          ) : null}
+        </>
+      )}
     </ScreenView>
   );
 }

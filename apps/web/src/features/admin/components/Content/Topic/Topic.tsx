@@ -1,10 +1,10 @@
 import type { TopicDetailDto } from "@sd/core-contracts";
 
 import { getLocalizedName } from "@sd/core-i18n";
+import { useAbility } from "@sd/domain-account";
 import { Pencil, Trash2, Languages } from "lucide-react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
@@ -22,6 +22,7 @@ interface TopicProps {
 export function Topic({ topic, onEdit, onDelete, onTranslate }: TopicProps) {
   const { isMobile } = useResponsive();
   const { i18n, t } = useTranslation();
+  const { ability } = useAbility();
   const displayName = getLocalizedName(topic.name, i18n.language);
 
   return (
@@ -37,7 +38,7 @@ export function Topic({ topic, onEdit, onDelete, onTranslate }: TopicProps) {
         />
       </div>
       <List.Item.Actions>
-        <PermissionGate requires="TOPICS_EDIT">
+        {ability.can("update", "Topic") && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
@@ -48,8 +49,8 @@ export function Topic({ topic, onEdit, onDelete, onTranslate }: TopicProps) {
           >
             {isMobile && t("common.edit", "Edit")}
           </Button>
-        </PermissionGate>
-        <PermissionGate requires="TRANSLATIONS_VIEW">
+        )}
+        {ability.can("read", "Translation") && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
@@ -60,8 +61,8 @@ export function Topic({ topic, onEdit, onDelete, onTranslate }: TopicProps) {
           >
             {isMobile && t("admin.translations.button", "Translations")}
           </Button>
-        </PermissionGate>
-        <PermissionGate requires="TOPICS_DELETE">
+        )}
+        {ability.can("delete", "Topic") && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
@@ -72,7 +73,7 @@ export function Topic({ topic, onEdit, onDelete, onTranslate }: TopicProps) {
           >
             {isMobile && t("common.delete", "Delete")}
           </Button>
-        </PermissionGate>
+        )}
       </List.Item.Actions>
     </List.Item>
   );

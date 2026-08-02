@@ -47,6 +47,7 @@
     "test:cov": "bun test --coverage"
   },
   "dependencies": {
+    "@casl/ability": "catalog:",
     "@tanstack/react-query": "catalog:",
     "react": "catalog:",
     "zod": "catalog:"

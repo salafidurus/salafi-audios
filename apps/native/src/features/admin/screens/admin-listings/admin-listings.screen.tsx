@@ -1,12 +1,14 @@
 import type { MenuAction } from "@expo/ui/community/menu";
-import type { AdminListingListItemDto } from "@sd/core-contracts";
+import type { AdminListingListItemDto, AppAbility } from "@sd/core-contracts";
 
+import { useAbility } from "@sd/domain-account";
 import { useFormattedScholarName } from "@sd/domain-content";
 import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
@@ -24,20 +26,30 @@ type AdminListingRowProps = {
   item: AdminListingListItemDto;
   isSelected: boolean;
   hideBorder: boolean;
+  actions: MenuAction[];
   onPress: () => void;
   onAction: (action: string) => void;
 };
 
-const ADMIN_LISTING_ROW_ACTIONS: MenuAction[] = [
-  { id: "edit", title: "Edit" },
-  { id: "publish", title: "Publish" },
-  { id: "archive", title: "Archive" },
-];
+/**
+ * The list endpoint already scope-filters rows server-side, and
+ * AdminListingListItemDto carries scholarSlug (not scholarId), so these are
+ * bare ability checks rather than scholarId-conditioned ones — same
+ * trade-off web's admin Listing.tsx made in Stage 8.
+ */
+function getVisibleRowActions(ability: AppAbility): MenuAction[] {
+  const actions: MenuAction[] = [];
+  if (ability.can("update", "Listing")) actions.push({ id: "edit", title: "Edit" });
+  if (ability.can("publish", "Listing")) actions.push({ id: "publish", title: "Publish" });
+  if (ability.can("archive", "Listing")) actions.push({ id: "archive", title: "Archive" });
+  return actions;
+}
 
 function AdminListingRow({
   item,
   isSelected,
   hideBorder,
+  actions,
   onPress,
   onAction,
 }: AdminListingRowProps) {
@@ -56,13 +68,15 @@ function AdminListingRow({
           {scholarName} · {item.status}
         </AppText>
       </View>
-      <List.Item.Actions actions={ADMIN_LISTING_ROW_ACTIONS} onAction={onAction} />
+      <List.Item.Actions actions={actions} onAction={onAction} />
     </List.Item>
   );
 }
 
 export function AdminListingsScreen() {
   const { theme } = useUnistyles();
+  const { isAuthenticated } = useAuth();
+  const { ability } = useAbility({ isAuthenticated });
   const { data, isLoading, refetch } = useAdminListings();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isBulkLoading, setIsBulkLoading] = useState(false);
@@ -70,6 +84,10 @@ export function AdminListingsScreen() {
   const [editingListingId, setEditingListingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const listings = filterListings(data?.items ?? [], searchQuery);
+  const rowActions = getVisibleRowActions(ability);
+  const canUpload = ability.can("upload", "Media");
+  const canPublish = ability.can("publish", "Listing");
+  const canArchive = ability.can("archive", "Listing");
 
   const headerSearchOptions = {
     headerSearchBarOptions: {
@@ -136,11 +154,13 @@ export function AdminListingsScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <AppText variant="titleLg">Listings</AppText>
-          <Pressable onPress={() => setShowUploader(true)} style={styles.uploadBtn}>
-            <AppText variant="labelMd" style={styles.uploadBtnText}>
-              + Upload
-            </AppText>
-          </Pressable>
+          {canUpload ? (
+            <Pressable onPress={() => setShowUploader(true)} style={styles.uploadBtn}>
+              <AppText variant="labelMd" style={styles.uploadBtnText}>
+                + Upload
+              </AppText>
+            </Pressable>
+          ) : null}
         </View>
 
         {isLoading ? (
@@ -155,6 +175,7 @@ export function AdminListingsScreen() {
                 item={item}
                 isSelected={selectedIds.has(item.id)}
                 hideBorder={index === listings.length - 1}
+                actions={rowActions}
                 onPress={() => handleRowPress(item.id)}
                 onAction={(action) => void handleRowAction(item.id, action)}
               />
@@ -167,6 +188,8 @@ export function AdminListingsScreen() {
         selectedCount={selectedIds.size}
         onPublish={() => handleBulkAction("publish")}
         onArchive={() => handleBulkAction("archive")}
+        canPublish={canPublish}
+        canArchive={canArchive}
         isLoading={isBulkLoading}
       />
 

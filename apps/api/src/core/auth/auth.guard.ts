@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { fromNodeHeaders } from 'better-auth/node';
 import { PrismaService } from '../db/prisma.service';
-import { IS_PUBLIC_KEY, ROLES_KEY } from './decorators';
+import { IS_PUBLIC_KEY } from './decorators';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -39,15 +39,12 @@ export class AuthGuard implements CanActivate {
       if (!expired) throw new ForbiddenException('Account is banned');
     }
 
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
     const sessionUser = session.user as {
       id: string;
       roles?: string[];
       permissions?: string[];
+      scholarLinks?: { scholarId: string; permissionType: string }[];
+      translatorRoles?: { scholarId: string | null; locale: string; canPublish: boolean }[];
       banned?: boolean | null;
       banExpires?: Date | string | null;
     };
@@ -65,19 +62,47 @@ export class AuthGuard implements CanActivate {
       }
     }
 
-    // If specific roles are required via @Roles decorator, check if user has one of them
-    if (requiredRoles?.length) {
-      const roleSet = new Set(roles);
-      if (!requiredRoles.some((r) => roleSet.has(r as string))) {
-        throw new UnauthorizedException();
-      }
+    let permissions: string[] = sessionUser.permissions || [];
+    if (!permissions.length) {
+      const userPermissions = await this.prisma.userPermission.findMany({
+        where: { userId: sessionUser.id },
+        select: { permission: true },
+      });
+      permissions = userPermissions.map((p) => p.permission);
+    }
+
+    let scholarLinks = sessionUser.scholarLinks || [];
+    if (!scholarLinks.length) {
+      const userScholarRoles = await this.prisma.userScholarRole.findMany({
+        where: { userId: sessionUser.id },
+        select: { scholarId: true, permissionType: true },
+      });
+      scholarLinks = userScholarRoles.map((s) => ({
+        scholarId: s.scholarId,
+        permissionType: s.permissionType,
+      }));
+    }
+
+    let translatorRoles = sessionUser.translatorRoles || [];
+    if (!translatorRoles.length) {
+      const userTranslatorRoles = await this.prisma.userTranslatorRole.findMany({
+        where: { userId: sessionUser.id },
+        select: { scholarId: true, locale: true, canPublish: true },
+      });
+      translatorRoles = userTranslatorRoles.map((t) => ({
+        scholarId: t.scholarId,
+        locale: t.locale,
+        canPublish: t.canPublish,
+      }));
     }
 
     // Attach user info to request (for use by controllers and other services)
     (request as any).user = {
       ...session.user,
       roles,
-      permissions: sessionUser.permissions || [],
+      permissions,
+      scholarLinks,
+      translatorRoles,
     };
     return true;
   }

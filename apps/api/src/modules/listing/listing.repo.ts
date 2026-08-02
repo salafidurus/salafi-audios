@@ -802,15 +802,31 @@ export class ListingRepository {
     scholarId?: string;
     status?: string;
     search?: string;
+    accessibleScholarIds?: string[];
   }): Promise<AdminListingListDto> {
     const locale = getRequestLocale();
     const pageSize = 50;
     const take = pageSize + 1;
 
+    // Intersect the caller-requested scholarId filter (if any) with what
+    // their ability actually allows (if scoped) — a scoped editor filtering
+    // by a scholarId outside their access sees no rows, not another
+    // scholar's rows.
+    let scholarIdFilter: Prisma.ListingWhereInput['scholarId'];
+    if (params.accessibleScholarIds) {
+      scholarIdFilter = params.scholarId
+        ? params.accessibleScholarIds.includes(params.scholarId)
+          ? params.scholarId
+          : { in: [] }
+        : { in: params.accessibleScholarIds };
+    } else if (params.scholarId) {
+      scholarIdFilter = params.scholarId;
+    }
+
     const where: Prisma.ListingWhereInput = {
       deletedAt: null,
       parentId: null,
-      ...(params.scholarId ? { scholarId: params.scholarId } : {}),
+      ...(scholarIdFilter ? { scholarId: scholarIdFilter } : {}),
       ...(params.status ? { status: params.status as Status } : {}),
       ...(params.search
         ? {

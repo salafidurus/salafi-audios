@@ -11,7 +11,7 @@ import { AppThrottlerModule } from './core/security/throttler.module';
 
 import { AuthModule } from './core/auth/auth.module';
 import { AuthGuard } from './core/auth/auth.guard';
-import { PermissionGuard } from './core/auth/permission.guard';
+import { PolicyGuard } from './core/auth/policy.guard';
 import { AccountModule } from './core/account/account.module';
 import { SitemapModule } from './core/sitemap/sitemap.module';
 
@@ -54,7 +54,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     ThrottlerGuard,
     { provide: APP_GUARD, useExisting: ThrottlerGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
-    { provide: APP_GUARD, useClass: PermissionGuard },
+    { provide: APP_GUARD, useClass: PolicyGuard },
     { provide: APP_INTERCEPTOR, useClass: LocaleInterceptor },
   ],
 })

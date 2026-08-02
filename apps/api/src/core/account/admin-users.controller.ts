@@ -1,9 +1,8 @@
 import { Controller, Get, Query, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { RequiresPermission } from '../auth/decorators';
+import { CheckPolicy } from '../auth/decorators/check-policy.decorator';
 import { PermissionsService } from './permissions.service';
-import { Permissions } from '@sd/core-contracts';
 import type { AdminPermissionsListDto, AdminUserListDto } from '@sd/core-contracts';
 
 /**
@@ -11,6 +10,7 @@ import type { AdminPermissionsListDto, AdminUserListDto } from '@sd/core-contrac
  *
  * Handles user listing and read-only operations.
  * Role and permission management endpoints have been migrated to PermissionsController.
+ * User administration itself is never scholar/locale-scoped.
  */
 @ApiTags('Admin Users')
 @ApiCommonErrors()
@@ -19,7 +19,7 @@ export class AdminUsersController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Get()
-  @RequiresPermission(Permissions.USERS_VIEW)
+  @CheckPolicy('read', 'User')
   @ApiOperation({
     summary: 'List all users with their admin permissions and roles',
   })
@@ -32,7 +32,7 @@ export class AdminUsersController {
   }
 
   @Get(':userId/permissions')
-  @RequiresPermission(Permissions.USERS_VIEW)
+  @CheckPolicy('read', 'User')
   @ApiOperation({ summary: 'Get permissions for a user (read-only)' })
   async getPermissions(@Param('userId') userId: string): Promise<AdminPermissionsListDto> {
     return this.permissionsService.getPermissions(userId);
