@@ -219,19 +219,14 @@ export {
   ProgressSyncDtoSchema,
 } from "../types/audio.types";
 export {
-  type AdminPermission,
-  AdminPermissionSchema,
   type AdminPermissionDto,
   AdminPermissionDtoSchema,
   type AdminPermissionsListDto,
   AdminPermissionsListDtoSchema,
-  type GrantPermissionDto,
-  GrantPermissionDtoSchema,
   type AdminUserListItemDto,
   AdminUserListItemDtoSchema,
   type AdminUserListDto,
   AdminUserListDtoSchema,
-  ADMIN_PERMISSIONS,
 } from "./admin.types";
 export {
   type ScholarChipDto,

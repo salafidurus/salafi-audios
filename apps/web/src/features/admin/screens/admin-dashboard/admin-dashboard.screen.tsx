@@ -1,6 +1,6 @@
 "use client";
 
-import type { AdminPermission } from "@sd/core-contracts";
+import type { Permission } from "@sd/core-contracts";
 
 import { useAdminPermissions } from "@sd/domain-account";
 
@@ -18,7 +18,7 @@ type AdminSection = {
   description: string;
   descriptionMobile: string;
   href: string;
-  permission: AdminPermission;
+  permission: Permission;
 };
 
 export function AdminDashboardScreen() {

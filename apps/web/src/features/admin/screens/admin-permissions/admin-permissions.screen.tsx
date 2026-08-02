@@ -1,6 +1,6 @@
 "use client";
 
-import { ADMIN_PERMISSIONS, type AdminPermission } from "@sd/core-contracts";
+import { PERMISSIONS_ARRAY, type Permission } from "@sd/core-contracts";
 import { useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -43,7 +43,7 @@ export function AdminPermissionsScreen() {
     }
   };
 
-  const handleGrant = async (permission: AdminPermission) => {
+  const handleGrant = async (permission: Permission) => {
     setLoading(true);
     try {
       const data = await grantPermission(userId.trim(), permission);
@@ -140,7 +140,7 @@ export function AdminPermissionsScreen() {
               </tr>
             </thead>
             <tbody>
-              {ADMIN_PERMISSIONS.map((perm) => {
+              {PERMISSIONS_ARRAY.map((perm) => {
                 const hasIt = currentPermissions.includes(perm);
                 return (
                   <tr key={perm} className={styles.tableRow}>
@@ -182,7 +182,7 @@ export function AdminPermissionsScreen() {
           </table>
         ) : userPerms ? (
           <>
-            {ADMIN_PERMISSIONS.map((perm) => {
+            {PERMISSIONS_ARRAY.map((perm) => {
               const hasIt = currentPermissions.includes(perm);
               return (
                 <div key={perm} className={styles.permissionCard}>

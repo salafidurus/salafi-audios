@@ -1,4 +1,4 @@
-import type { AdminPermission } from "@sd/core-contracts";
+import type { Permission } from "@sd/core-contracts";
 import type { ReactNode } from "react";
 
 import { ShieldOff } from "lucide-react";
@@ -9,7 +9,7 @@ import { PermissionBadge } from "../permission-badge/permission-badge";
 import styles from "./permission-details.module.css";
 
 type PermissionDetailsProps = {
-  permissions: { permission: AdminPermission }[];
+  permissions: { permission: Permission }[];
 };
 
 const GROUPS = [

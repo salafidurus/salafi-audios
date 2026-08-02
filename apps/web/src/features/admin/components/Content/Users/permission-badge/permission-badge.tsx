@@ -1,4 +1,4 @@
-import type { AdminPermission } from "@sd/core-contracts";
+import type { Permission } from "@sd/core-contracts";
 import type { ReactNode } from "react";
 
 import { Shield } from "lucide-react";
@@ -9,7 +9,7 @@ import { PERMISSION_LABELS, PERMISSION_DESCRIPTIONS } from "@/features/admin/con
 import styles from "./permission-badge.module.css";
 
 type PermissionBadgeProps = {
-  permission: AdminPermission;
+  permission: Permission;
 };
 
 export function PermissionBadge({ permission }: PermissionBadgeProps): ReactNode {

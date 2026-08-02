@@ -1,6 +1,6 @@
 "use client";
 
-import { routes, type AdminPermission, type UserRole } from "@sd/core-contracts";
+import { routes, type Permission, type UserRole } from "@sd/core-contracts";
 import { useAdminPermissions } from "@sd/domain-account";
 import clsx from "clsx";
 import {
@@ -43,7 +43,7 @@ type AdminNavItem = {
   Icon: LucideIcon;
   href: string;
   activeMatch: string;
-  requiredPermission?: AdminPermission;
+  requiredPermission?: Permission;
 };
 
 function getAdminNavItems(t: (key: string, fallback: string) => string): AdminNavItem[] {
@@ -127,7 +127,7 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
 
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
 
-  const adminPermissions: AdminPermission[] = adminPermissionsData?.permissions ?? [];
+  const adminPermissions: Permission[] = adminPermissionsData?.permissions ?? [];
   const adminRoles: UserRole[] = adminPermissionsData?.roles ?? [];
   const hasAdminRole = adminRoles.some((role) => ["admin", "superadmin"].includes(role));
   const hasAdminAccess = isAuthenticated && (adminPermissions.length > 0 || hasAdminRole);

@@ -1,8 +1,8 @@
-import type { AdminPermission, UserRole } from "@sd/core-contracts";
+import type { Permission, UserRole } from "@sd/core-contracts";
 
 import { useAccountProfile } from "../../account.api";
 
-type MyPermissionsDto = { permissions: AdminPermission[]; roles: UserRole[] };
+type MyPermissionsDto = { permissions: Permission[]; roles: UserRole[] };
 
 export interface UseAdminPermissionsOptions {
   isAuthenticated?: boolean;
@@ -27,7 +27,7 @@ export function useAdminPermissions(options?: UseAdminPermissionsOptions) {
   const data: MyPermissionsDto | undefined =
     profile && queryEnabled
       ? {
-          permissions: (profile.permissions || []) as AdminPermission[],
+          permissions: (profile.permissions || []) as Permission[],
           roles: (profile.roles || []) as UserRole[],
         }
       : undefined;

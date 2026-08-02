@@ -1,13 +1,13 @@
 "use client";
 
-import type { AdminPermission } from "@sd/core-contracts";
+import type { Permission } from "@sd/core-contracts";
 
 import { useAdminPermissions } from "@sd/domain-account";
 
 import { useAuth } from "@/core/auth/use-auth";
 
 type Props = {
-  requires: AdminPermission;
+  requires: Permission;
   children: React.ReactNode;
   fallback?: React.ReactNode;
 };
