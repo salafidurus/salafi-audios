@@ -8,6 +8,8 @@ import { useState, useCallback, type ReactNode, useMemo } from "react";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { PermissionsDialog } from "@/features/admin/components/Content/Users/PermissionsDialog";
 import { RoleDialog } from "@/features/admin/components/Content/Users/RoleDialog";
+import { ScholarRolesDialog } from "@/features/admin/components/Content/Users/ScholarRolesDialog";
+import { TranslatorRolesDialog } from "@/features/admin/components/Content/Users/TranslatorRolesDialog";
 import { UserItem } from "@/features/admin/components/Content/Users/user-item";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -28,6 +30,13 @@ export function AdminUsersScreen(): ReactNode {
   const [role, setRole] = useState("");
   const [permUser, setPermUser] = useState<{ id: string; name: string } | null>(null);
   const [roleUser, setRoleUser] = useState<{ id: string; name: string } | null>(null);
+  const [scholarRolesUser, setScholarRolesUser] = useState<{ id: string; name: string } | null>(
+    null,
+  );
+  const [translatorRolesUser, setTranslatorRolesUser] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const roleChips = useMemo(
     () => [
@@ -55,6 +64,14 @@ export function AdminUsersScreen(): ReactNode {
   }, [queryClient]);
 
   const handleRolesChange = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
+  }, [queryClient]);
+
+  const handleScholarRolesChange = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
+  }, [queryClient]);
+
+  const handleTranslatorRolesChange = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
   }, [queryClient]);
 
@@ -100,6 +117,10 @@ export function AdminUsersScreen(): ReactNode {
                   user={user}
                   onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
                   onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
+                  onManageScholarRoles={() => setScholarRolesUser({ id: user.id, name: user.name })}
+                  onManageTranslatorRoles={() =>
+                    setTranslatorRolesUser({ id: user.id, name: user.name })
+                  }
                 />
               )}
               emptyMessage={
@@ -131,6 +152,26 @@ export function AdminUsersScreen(): ReactNode {
           userName={roleUser.name}
           onClose={() => setRoleUser(null)}
           onRolesChange={handleRolesChange}
+        />
+      )}
+
+      {scholarRolesUser && (
+        <ScholarRolesDialog
+          isOpen
+          userId={scholarRolesUser.id}
+          userName={scholarRolesUser.name}
+          onClose={() => setScholarRolesUser(null)}
+          onScholarRolesChange={handleScholarRolesChange}
+        />
+      )}
+
+      {translatorRolesUser && (
+        <TranslatorRolesDialog
+          isOpen
+          userId={translatorRolesUser.id}
+          userName={translatorRolesUser.name}
+          onClose={() => setTranslatorRolesUser(null)}
+          onTranslatorRolesChange={handleTranslatorRolesChange}
         />
       )}
     </ScreenView>
