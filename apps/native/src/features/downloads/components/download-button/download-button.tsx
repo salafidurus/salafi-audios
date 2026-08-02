@@ -8,9 +8,11 @@ type DownloadButtonProps = {
   audioUrl: string;
 };
 
-export function DownloadButton({ lectureId }: DownloadButtonProps) {
-  const { status, isDownloaded, isDownloading, startDownload, removeDownload } =
-    useDownload(lectureId);
+export function DownloadButton({ lectureId, audioUrl }: DownloadButtonProps) {
+  const { status, isDownloaded, isDownloading, startDownload, removeDownload } = useDownload(
+    lectureId,
+    audioUrl,
+  );
   const { theme } = useUnistyles();
 
   if (isDownloaded) {
@@ -37,7 +39,6 @@ export function DownloadButton({ lectureId }: DownloadButtonProps) {
   return (
     <Pressable
       onPress={startDownload}
-      disabled={status === "error"}
       style={[styles.pill, styles.downloadPill]}
       accessibilityLabel="Download lecture"
     >

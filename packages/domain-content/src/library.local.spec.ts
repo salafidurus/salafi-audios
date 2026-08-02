@@ -69,30 +69,33 @@ describe("localProgressItems", () => {
 });
 
 describe("localSavedItems", () => {
-  it("returns empty array for empty saved map", () => {
-    expect(localSavedItems({})).toEqual([]);
+  it("returns empty array for no saved entries", () => {
+    expect(localSavedItems([])).toEqual([]);
   });
 
-  it("converts saved map entries to LibraryItemDto", () => {
-    const result = localSavedItems({ lec1: "2024-01-01T00:00:00Z" });
+  it("converts saved entries to LibraryItemDto", () => {
+    const result = localSavedItems([
+      { id: "lec1", updatedAt: "2024-01-01T00:00:00Z", savedAt: "2024-01-01T00:00:00Z" },
+    ]);
     expect(result).toHaveLength(1);
     expect(result[0]!.listingId).toBe("lec1");
     expect(result[0]!.savedAt).toBe("2024-01-01T00:00:00Z");
   });
 
   it("sorts by savedAt descending (newest first)", () => {
-    const savedMap = {
-      lec1: "2024-01-01T00:00:00Z",
-      lec2: "2024-02-01T00:00:00Z",
-    };
-    const result = localSavedItems(savedMap);
+    const entries = [
+      { id: "lec1", updatedAt: "2024-01-01T00:00:00Z", savedAt: "2024-01-01T00:00:00Z" },
+      { id: "lec2", updatedAt: "2024-02-01T00:00:00Z", savedAt: "2024-02-01T00:00:00Z" },
+    ];
+    const result = localSavedItems(entries);
     expect(result[0]!.listingId).toBe("lec2");
     expect(result[1]!.listingId).toBe("lec1");
   });
 
   it("maps to LibraryItemDto shape", () => {
-    const savedMap = { lec1: "2024-01-15T12:00:00Z" };
-    const [item] = localSavedItems(savedMap);
+    const [item] = localSavedItems([
+      { id: "lec1", updatedAt: "2024-01-15T12:00:00Z", savedAt: "2024-01-15T12:00:00Z" },
+    ]);
     expect(item).toMatchObject({
       id: "lec1",
       listingId: "lec1",
@@ -101,6 +104,11 @@ describe("localSavedItems", () => {
       scholarSlug: "",
       scholarName: "",
     });
+  });
+
+  it("excludes a tombstoned entry with no savedAt (defensive — callers should already filter via getActive)", () => {
+    const result = localSavedItems([{ id: "lec1", updatedAt: "2024-01-01T00:00:00Z" }]);
+    expect(result).toEqual([]);
   });
 });
 

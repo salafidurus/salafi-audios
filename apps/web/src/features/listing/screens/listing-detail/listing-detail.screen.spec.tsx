@@ -8,7 +8,9 @@ vi.mock("@sd/domain-content", () => ({
   useListingDetail: vi.fn(),
   useListingContents: vi.fn(),
   useLastPlayedLesson: vi.fn(),
-  useToggleSaved: vi.fn().mockReturnValue({ mutate: vi.fn() }),
+  useIsSaved: vi.fn().mockReturnValue(false),
+  markSaved: vi.fn(),
+  markUnsaved: vi.fn(),
 }));
 
 vi.mock("@/core/auth", () => ({
@@ -18,7 +20,7 @@ vi.mock("@/core/auth", () => ({
 vi.mock("@sd/domain-audio", () => ({
   useAudio: vi.fn().mockReturnValue({ isPlaying: false, currentTrack: null }),
   useProgressStore: vi.fn((selector) =>
-    selector({ progressMap: {}, savedMap: {}, actions: { isSaved: () => false } }),
+    selector({ progressMap: {}, actions: { isSaved: () => false } }),
   ),
 }));
 

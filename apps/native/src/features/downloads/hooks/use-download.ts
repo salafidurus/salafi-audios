@@ -1,27 +1,28 @@
 import { useCallback, useMemo } from "react";
 
-import type { DownloadStatus } from "../types";
-
+import { downloadLecture, removeLecture } from "../engine/download.engine";
 import { useDownloadsStore } from "../store/downloads.store";
 
-export function useDownload(lectureId: string) {
-  const download = useDownloadsStore((s) => s.downloads[lectureId]);
-  const actions = useDownloadsStore((s) => s.actions);
+/** UI-only status — "idle" means no registry row exists yet for this listing. */
+export type UiDownloadStatus = "idle" | "pending" | "downloading" | "paused" | "complete" | "error";
 
-  const status: DownloadStatus = download?.status ?? "idle";
-  const progress = download?.progress ?? 0;
-  const localUri = download?.localUri;
+export function useDownload(lectureId: string, audioUrl?: string) {
+  const row = useDownloadsStore((s) => s.downloads[lectureId]);
+
+  const status: UiDownloadStatus = row?.status ?? "idle";
+  const progress = row && row.bytesTotal > 0 ? (row.bytesDownloaded / row.bytesTotal) * 100 : 0;
+  const localUri = row?.localUri ?? undefined;
   const isDownloaded = status === "complete";
   const isDownloading = status === "downloading" || status === "pending";
 
   const startDownload = useCallback(() => {
-    actions.startDownload(lectureId);
-    // Actual download engine call would be triggered here
-  }, [lectureId, actions]);
+    if (!audioUrl) return;
+    void downloadLecture(lectureId, audioUrl);
+  }, [lectureId, audioUrl]);
 
   const removeDownload = useCallback(() => {
-    actions.removeDownload(lectureId);
-  }, [lectureId, actions]);
+    void removeLecture(lectureId);
+  }, [lectureId]);
 
   return useMemo(
     () => ({

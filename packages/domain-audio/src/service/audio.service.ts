@@ -21,7 +21,16 @@ const SKIP_PREVIOUS_RESTART_THRESHOLD_SECONDS = 3;
 export class DurusAudioService {
   private readonly queueManager = new QueueManager();
 
-  constructor(private readonly engine: PlaybackEngine) {
+  /**
+   * @param localUriResolver Optional hook checked before any remote
+   * resolution — if it resolves to a `file://` uri, that's used and no
+   * network call is made. Native supplies one backed by the downloads
+   * registry; web omits it (no offline downloads concept there).
+   */
+  constructor(
+    private readonly engine: PlaybackEngine,
+    private readonly localUriResolver?: (track: Track) => Promise<string | undefined>,
+  ) {
     this.engine.setEvents({
       onTrackEnd: () => this.onTrackEnd(),
       onStatusChange: (status) => usePlaybackStore.getState().actions.setStatus(status),
@@ -117,21 +126,30 @@ export class DurusAudioService {
   }
 
   /**
-   * Resolves a fresh signed stream URL for the given track.
+   * Resolves a playable URL for the given track, preferring a local
+   * downloaded file over any network round-trip.
    *
-   * Local file URIs (file://) are passed through unchanged. Remote URLs that
-   * are present are also trusted as-is (they were just-resolved by the caller).
-   * An empty URL indicates a lazy stub for series continuation — in this case
-   * the service fetches a fresh signed URL from the backend.
+   * A track already resolved to a `file://` uri is passed through unchanged.
+   * Otherwise `localUriResolver` (if supplied) is checked first — a resolved
+   * local file wins even over an existing remote URL, since local playback
+   * is always preferable when available. Failing that, an existing remote
+   * URL is trusted as-is (already resolved by the caller). An empty URL
+   * indicates a lazy stub for series continuation — the service then fetches
+   * a fresh signed URL from the backend.
    */
   private async resolveStreamUrl(track: Track): Promise<Track> {
-    if (track.url && !track.url.startsWith("file://")) {
-      // Already has a usable remote URL — no need to re-resolve.
+    if (track.url.startsWith("file://")) {
+      // Already resolved to a local file elsewhere — pass through unchanged.
       return track;
     }
 
-    if (track.url.startsWith("file://")) {
-      // Local file — pass through unchanged.
+    const localUri = await this.localUriResolver?.(track);
+    if (localUri) {
+      return { ...track, url: localUri };
+    }
+
+    if (track.url) {
+      // Already has a usable remote URL — no need to re-resolve.
       return track;
     }
 

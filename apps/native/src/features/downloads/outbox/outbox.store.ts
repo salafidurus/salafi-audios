@@ -1,76 +1,12 @@
-import { httpClient } from "@sd/core-contracts";
-import { create } from "zustand";
+import { createOutboxStore, type Outbox } from "@sd/core-sync";
 
-import type { OutboxEntry } from "../types";
+import { createSqliteKvAdapter } from "../../../core/sync/sqlite-kv-adapter";
 
-type OutboxState = {
-  entries: OutboxEntry[];
-  isDraining: boolean;
-  actions: {
-    enqueue: (type: string, payload: unknown) => void;
-    drain: () => Promise<void>;
-    remove: (id: string) => void;
-    clear: () => void;
-  };
-};
-
-let idCounter = 0;
-
-export const useOutboxStore = create<OutboxState>((set, get) => ({
-  entries: [],
-  isDraining: false,
-
-  actions: {
-    enqueue: (type, payload) =>
-      set((state) => ({
-        entries: [
-          ...state.entries,
-          {
-            id: `outbox-${Date.now()}-${idCounter++}`,
-            type,
-            payload,
-            createdAt: Date.now(),
-            retries: 0,
-          },
-        ],
-      })),
-
-    drain: async () => {
-      const state = get();
-      if (state.isDraining || state.entries.length === 0) return;
-
-      set({ isDraining: true });
-
-      const toProcess = [...state.entries];
-
-      await Promise.all(
-        toProcess.map(async (entry) => {
-          try {
-            await httpClient({
-              url: `/outbox/${entry.type}`,
-              method: "POST",
-              body: entry.payload,
-            });
-            get().actions.remove(entry.id);
-          } catch {
-            // Increment retry count, keep in queue
-            set((s) => ({
-              entries: s.entries.map((e) =>
-                e.id === entry.id ? { ...e, retries: e.retries + 1 } : e,
-              ),
-            }));
-          }
-        }),
-      );
-
-      set({ isDraining: false });
-    },
-
-    remove: (id) =>
-      set((state) => ({
-        entries: state.entries.filter((e) => e.id !== id),
-      })),
-
-    clear: () => set({ entries: [] }),
-  },
-}));
+/**
+ * Downloads outbox: queues offline-initiated download intent (start a
+ * download while offline, actually fetch when connectivity returns) and
+ * download-removal follow-through. Device-scoped rather than per-user like
+ * progress/saved's outboxes — the local download registry itself isn't
+ * user-scoped either, so there's no cross-user leakage concern here.
+ */
+export const downloadsOutbox: Outbox = createOutboxStore(createSqliteKvAdapter(), "downloads");

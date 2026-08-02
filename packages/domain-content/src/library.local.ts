@@ -1,7 +1,7 @@
 import type { LibraryItemDto } from "@sd/core-contracts";
 import type { ListingProgress } from "@sd/domain-audio";
 
-type SavedMap = Record<string, string>;
+import type { SavedEntry } from "./saved/saved.store";
 
 export function localProgressItems(progressMap: Record<string, ListingProgress>): LibraryItemDto[] {
   return Object.values(progressMap)
@@ -20,18 +20,19 @@ export function localProgressItems(progressMap: Record<string, ListingProgress>)
     }));
 }
 
-export function localSavedItems(savedMap: SavedMap): LibraryItemDto[] {
-  return Object.entries(savedMap)
-    .sort((a, b) => new Date(b[1]).getTime() - new Date(a[1]).getTime())
-    .map(([listingId, savedAt]) => ({
-      id: listingId,
-      listingId,
-      listingTitle: listingId,
-      listingSlug: listingId,
+export function localSavedItems(entries: SavedEntry[]): LibraryItemDto[] {
+  return entries
+    .filter((entry): entry is SavedEntry & { savedAt: string } => !!entry.savedAt)
+    .sort((a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime())
+    .map((entry) => ({
+      id: entry.id,
+      listingId: entry.id,
+      listingTitle: entry.id,
+      listingSlug: entry.id,
       scholarId: "",
       scholarSlug: "",
       scholarName: "",
-      savedAt,
+      savedAt: entry.savedAt,
     }));
 }
 

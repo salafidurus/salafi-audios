@@ -17,6 +17,9 @@ vi.mock("@sd/core-contracts", () => ({
     },
     library: {
       saved: "/me/library/saved",
+      savedDelta: "/me/library/saved/delta",
+      savedSync: "/me/library/saved/sync",
+      saveListing: (listingId: string) => `/me/library/save/${listingId}`,
     },
   },
 }));
@@ -24,7 +27,7 @@ vi.mock("@sd/core-contracts", () => ({
 const USER_ID = "user-1";
 
 function defaultHttpClientMock(opts: { url: string }) {
-  if (opts.url === "/me/library/saved") return Promise.resolve({ items: [], hasMore: false });
+  if (opts.url === "/me/library/saved/delta") return Promise.resolve([]);
   return Promise.resolve([]);
 }
 
@@ -32,7 +35,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   (httpClient as any).mockImplementation(defaultHttpClientMock);
   window.localStorage.clear();
-  useProgressStore.setState({ progressMap: {}, savedMap: {}, lastSyncedAt: null });
+  useProgressStore.setState({ progressMap: {}, lastSyncedAt: null });
 });
 
 describe("initProgressPersistence", () => {
@@ -85,13 +88,63 @@ describe("initProgressPersistence", () => {
     cleanup();
   });
 
-  it("fetches the server's saved-listings list once on init", () => {
+  it("fetches the server's saved-listings delta once on init", () => {
     const cleanup = initProgressPersistence(USER_ID);
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/me/library/saved",
+      url: "/me/library/saved/delta",
       method: "GET",
       params: undefined,
+    });
+    cleanup();
+  });
+
+  it("retries a progress push left queued in localStorage from a previous session", async () => {
+    window.localStorage.setItem(
+      `sd:outbox:progress:${USER_ID}`,
+      JSON.stringify([
+        {
+          id: "outbox-1",
+          type: "progress-update",
+          payload: { listingId: "l9", positionSeconds: 30, durationSeconds: 200 },
+          createdAt: Date.now(),
+          retries: 0,
+        },
+      ]),
+    );
+
+    const cleanup = initProgressPersistence(USER_ID);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(httpClient).toHaveBeenCalledWith({
+      url: "/audio/progress/l9",
+      method: "PUT",
+      body: { positionSeconds: 30, durationSeconds: 200 },
+    });
+    cleanup();
+  });
+
+  it("does not retry a push queued under a different user's outbox key", async () => {
+    window.localStorage.setItem(
+      `sd:outbox:progress:other-user`,
+      JSON.stringify([
+        {
+          id: "outbox-1",
+          type: "progress-update",
+          payload: { listingId: "l9", positionSeconds: 30, durationSeconds: 200 },
+          createdAt: Date.now(),
+          retries: 0,
+        },
+      ]),
+    );
+
+    const cleanup = initProgressPersistence(USER_ID);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(httpClient).not.toHaveBeenCalledWith({
+      url: "/audio/progress/l9",
+      method: "PUT",
+      body: { positionSeconds: 30, durationSeconds: 200 },
     });
     cleanup();
   });

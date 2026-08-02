@@ -8,15 +8,7 @@ import { useAuth } from "@/core/auth/use-auth";
 
 import { LibrarySavedScreen } from "./library-saved.screen";
 
-const mockAddSaved = jest.fn();
-const mockRemoveSaved = jest.fn();
-const mockMutate = jest.fn();
-
-jest.mock("@sd/domain-audio", () => ({
-  useProgressStore: jest.fn((selector: (state: unknown) => unknown) =>
-    selector({ actions: { addSaved: mockAddSaved, removeSaved: mockRemoveSaved } }),
-  ),
-}));
+const mockMarkUnsaved = jest.fn();
 
 jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -29,7 +21,7 @@ jest.mock("react-native-safe-area-context", () => ({
 
 jest.mock("@sd/domain-content", () => ({
   useLibrarySavedScreen: jest.fn(),
-  useToggleSaved: jest.fn(() => ({ mutate: mockMutate })),
+  markUnsaved: (...args: unknown[]) => mockMarkUnsaved(...args),
   getLibraryItemPercent: (item: LibraryItemDto) => {
     if (item.totalLeafCount && item.totalLeafCount > 0) {
       return Math.round(((item.completedLeafCount ?? 0) / item.totalLeafCount) * 100);
@@ -99,36 +91,12 @@ describe("LibrarySavedScreen", () => {
     expect(onNavigateToListing).toHaveBeenCalledWith("library-lecture");
   });
 
-  it("removes a lecture from saved via the row's long-press action", async () => {
+  it("calls markUnsaved with listingId and slug via the row's long-press action", async () => {
     mockedUseLibrarySavedScreen.mockReturnValue(buildSavedState([savedItem]));
 
     await render(<LibrarySavedScreen />);
     await fireEvent.press(screen.getByTestId("library-saved-row-item-1-action-remove"));
 
-    expect(mockRemoveSaved).toHaveBeenCalledWith("lecture-1");
-  });
-
-  it("persists the removal via the toggle-saved mutation, keyed by slug", async () => {
-    mockedUseLibrarySavedScreen.mockReturnValue(buildSavedState([savedItem]));
-
-    await render(<LibrarySavedScreen />);
-    await fireEvent.press(screen.getByTestId("library-saved-row-item-1-action-remove"));
-
-    expect(mockMutate).toHaveBeenCalledWith(
-      { listingId: "library-lecture", saved: false },
-      expect.objectContaining({ onError: expect.any(Function) }),
-    );
-  });
-
-  it("rolls back the optimistic removal if the mutation fails", async () => {
-    mockedUseLibrarySavedScreen.mockReturnValue(buildSavedState([savedItem]));
-
-    await render(<LibrarySavedScreen />);
-    await fireEvent.press(screen.getByTestId("library-saved-row-item-1-action-remove"));
-
-    const [, { onError }] = mockMutate.mock.calls[0]!;
-    onError();
-
-    expect(mockAddSaved).toHaveBeenCalledWith("lecture-1");
+    expect(mockMarkUnsaved).toHaveBeenCalledWith("lecture-1", "library-lecture");
   });
 });

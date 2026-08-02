@@ -4,8 +4,8 @@ import type { Track } from "@sd/domain-audio";
 
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
-import { useAudio, useProgressStore, useListingProgress, buildTrackQueue } from "@sd/domain-audio";
-import { useFormattedScholarName, useToggleSaved } from "@sd/domain-content";
+import { useAudio, useListingProgress, buildTrackQueue } from "@sd/domain-audio";
+import { useFormattedScholarName, useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -41,10 +41,7 @@ export function ExplorePodcastRow({
     currentTrack?.seriesId === item.id ||
     currentTrack?.collectionId === item.id;
 
-  const isSaved = useProgressStore((s) => s.actions.isSaved(item.id));
-  const addSaved = useProgressStore((s) => s.actions.addSaved);
-  const removeSaved = useProgressStore((s) => s.actions.removeSaved);
-  const toggleSaved = useToggleSaved();
+  const isSaved = useIsSaved(item.id);
 
   const handlePlay = async () => {
     if (isCurrentTrack) {
@@ -110,25 +107,11 @@ export function ExplorePodcastRow({
   };
 
   const handleSave = () => {
-    const nextSaved = !isSaved;
-    if (nextSaved) {
-      addSaved(item.id);
+    if (isSaved) {
+      markUnsaved(item.id, item.slug);
     } else {
-      removeSaved(item.id);
+      markSaved(item.id, item.slug);
     }
-
-    toggleSaved.mutate(
-      { listingId: item.slug, saved: nextSaved },
-      {
-        onError: () => {
-          if (nextSaved) {
-            removeSaved(item.id);
-          } else {
-            addSaved(item.id);
-          }
-        },
-      },
-    );
   };
 
   const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";

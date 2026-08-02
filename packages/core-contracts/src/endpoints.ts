@@ -21,6 +21,8 @@ export const endpoints = {
   },
   library: {
     saved: "/me/library/saved",
+    savedDelta: "/me/library/saved/delta",
+    savedSync: "/me/library/saved/sync",
     completed: "/me/library/completed",
     progress: "/me/library/progress",
     recentProgress: "/me/library/recent-progress",

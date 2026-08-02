@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react-nativ
 import React from "react";
 
 import { changeLocale } from "@/core/i18n/i18n";
-import { persister } from "@/core/query-client";
 
 import { LanguageSwitch } from "./language-switch";
 
@@ -21,10 +20,6 @@ jest.mock("@/core/i18n/use-translation", () => ({
 
 jest.mock("@/core/i18n/i18n", () => ({
   changeLocale: jest.fn().mockResolvedValue(undefined),
-}));
-
-jest.mock("@/core/query-client", () => ({
-  persister: { removeClient: jest.fn().mockResolvedValue(undefined) },
 }));
 
 jest.mock("react-native-unistyles", () => ({
@@ -100,7 +95,6 @@ describe("LanguageSwitch", () => {
 
     await waitFor(() => expect(changeLocale).toHaveBeenCalledWith("ar"));
     expect(mockQueryClient.clear).toHaveBeenCalled();
-    expect(persister.removeClient).toHaveBeenCalled();
     expect(mockQueryClient.invalidateQueries).toHaveBeenCalled();
   });
 });

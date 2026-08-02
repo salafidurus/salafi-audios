@@ -8,6 +8,8 @@ import { EaseView } from "react-native-ease";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { audioService } from "@/features/audio";
+import { DownloadButton } from "@/features/downloads/components/download-button/download-button";
+import { DownloadProgress } from "@/features/downloads/components/download-progress/download-progress";
 import { AppText } from "@/shared/components/AppText/AppText";
 
 function formatDuration(seconds?: number): string {
@@ -78,7 +80,11 @@ export function LessonRow({ item, queue, highlighted = false, onLayout }: Lesson
                 <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
               </View>
             ) : null}
+            <DownloadProgress lectureId={item.id} />
           </View>
+          {item.primaryAudioAsset?.url ? (
+            <DownloadButton lectureId={item.id} audioUrl={item.primaryAudioAsset.url} />
+          ) : null}
           <View style={styles.playButton}>
             {isCurrentlyPlaying ? (
               <Pause size={18} color={theme.colors.content.strong} />

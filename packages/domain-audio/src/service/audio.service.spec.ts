@@ -62,7 +62,7 @@ describe("DurusAudioService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     usePlaybackStore.getState().actions.stop();
-    useProgressStore.setState({ progressMap: {}, savedMap: {}, lastSyncedAt: null });
+    useProgressStore.setState({ progressMap: {}, lastSyncedAt: null });
     (httpClient as any).mockResolvedValue({ url: "https://resolved.stream.mp3" });
 
     mockEngine = {
@@ -95,10 +95,14 @@ describe("DurusAudioService", () => {
     vi.clearAllMocks();
 
     engineEvents.onSkipNext!();
+    // Two ticks: resolveStreamUrl's optional `await this.localUriResolver?.(track)`
+    // still yields a microtask even when no resolver is configured.
+    await Promise.resolve();
     await Promise.resolve();
     expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack2);
 
     engineEvents.onSkipPrevious!();
+    await Promise.resolve();
     await Promise.resolve();
     expect(mockEngine.load).toHaveBeenLastCalledWith(mockTrack);
   });
@@ -240,6 +244,71 @@ describe("DurusAudioService", () => {
 
     expect(httpClient).not.toHaveBeenCalled();
     expect(mockEngine.load).toHaveBeenCalledWith(localTrack);
+  });
+
+  describe("localUriResolver", () => {
+    it("prefers a resolved local file over the track's existing remote url", async () => {
+      const resolver = vi.fn<(track: Track) => Promise<string | undefined>>();
+      resolver.mockResolvedValue("file:///downloads/l1.mp3");
+      const localService = new DurusAudioService(mockEngine, resolver);
+
+      await localService.playListing(mockTrack);
+
+      expect(resolver).toHaveBeenCalledWith(mockTrack);
+      expect(httpClient).not.toHaveBeenCalled();
+      expect(mockEngine.load).toHaveBeenCalledWith({
+        ...mockTrack,
+        url: "file:///downloads/l1.mp3",
+      });
+    });
+
+    it("falls back to the existing remote url when the resolver finds nothing local", async () => {
+      const resolver = vi.fn<(track: Track) => Promise<string | undefined>>();
+      resolver.mockResolvedValue(undefined);
+      const localService = new DurusAudioService(mockEngine, resolver);
+
+      await localService.playListing(mockTrack);
+
+      expect(resolver).toHaveBeenCalledWith(mockTrack);
+      expect(httpClient).not.toHaveBeenCalled();
+      expect(mockEngine.load).toHaveBeenCalledWith(mockTrack);
+    });
+
+    it("falls back to lazily fetching a signed url when the resolver finds nothing local and the track has no url", async () => {
+      const stubTrack: Track = { ...mockTrack, url: "" };
+      const resolver = vi.fn<(track: Track) => Promise<string | undefined>>();
+      resolver.mockResolvedValue(undefined);
+      (httpClient as any).mockResolvedValue({ url: "https://fresh-signed.mp3" });
+      const localService = new DurusAudioService(mockEngine, resolver);
+
+      await localService.playListing(stubTrack);
+
+      expect(httpClient).toHaveBeenCalledWith({
+        url: "/audio/listings/l1/stream",
+        method: "GET",
+      });
+      expect(mockEngine.load).toHaveBeenCalledWith({
+        ...stubTrack,
+        url: "https://fresh-signed.mp3",
+      });
+    });
+
+    it("does not call the resolver for a track already resolved to a local file:// uri", async () => {
+      const localTrack: Track = { ...mockTrack, url: "file:///sdcard/lecture.mp3" };
+      const resolver = vi.fn<(track: Track) => Promise<string | undefined>>();
+      const localService = new DurusAudioService(mockEngine, resolver);
+
+      await localService.playListing(localTrack);
+
+      expect(resolver).not.toHaveBeenCalled();
+      expect(mockEngine.load).toHaveBeenCalledWith(localTrack);
+    });
+
+    it("is never called when omitted (web has no downloads concept)", async () => {
+      await service.playListing(mockTrack);
+
+      expect(mockEngine.load).toHaveBeenCalledWith(mockTrack);
+    });
   });
 
   it("should advance through the full queue across multiple skipToNext calls", async () => {

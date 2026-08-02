@@ -5,6 +5,8 @@ import type {
   LibraryItemDto,
   RecentProgressDto,
   ListingProgressSummaryDto,
+  SavedDeltaItemDto,
+  SavedSyncItemDto,
 } from '@sd/core-contracts';
 import { PrismaService } from '../../core/db/prisma.service';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
@@ -217,7 +219,7 @@ export class LibraryRepository {
     const locale = getRequestLocale();
 
     const records = await this.prisma.favoriteListing.findMany({
-      where: { userId },
+      where: { userId, deletedAt: null },
       orderBy: { createdAt: 'desc' },
       take,
       ...(cursor
@@ -238,6 +240,30 @@ export class LibraryRepository {
     return { items, nextCursor };
   }
 
+  /**
+   * Rows updated since `since` (exclusive), including tombstoned (`deletedAt`
+   * set) ones — mirrors `AudioRepository.getUserProgress`'s delta convention,
+   * but must NOT filter out tombstones the way `findSaved` does, since a
+   * client needs to see removals to reconcile its local saved list.
+   */
+  async findSavedDelta(userId: string, since?: Date): Promise<SavedDeltaItemDto[]> {
+    const records = await this.prisma.favoriteListing.findMany({
+      where: {
+        userId,
+        ...(since ? { updatedAt: { gt: since } } : {}),
+      },
+      orderBy: { updatedAt: 'desc' },
+      select: { listingId: true, updatedAt: true, deletedAt: true, createdAt: true },
+    });
+
+    return records.map((record) => ({
+      listingId: record.listingId,
+      updatedAt: record.updatedAt.toISOString(),
+      deletedAt: record.deletedAt ? record.deletedAt.toISOString() : undefined,
+      savedAt: record.deletedAt ? undefined : record.createdAt.toISOString(),
+    }));
+  }
+
   /** Returns false when `slug` doesn't resolve to a real Listing (no row written). */
   async saveLecture(userId: string, slug: string): Promise<boolean> {
     const listingId = await this.resolveListingId(slug);
@@ -245,19 +271,28 @@ export class LibraryRepository {
 
     await this.prisma.favoriteListing.upsert({
       where: { userId_listingId: { userId, listingId } },
-      create: { userId, listingId },
-      update: {},
+      // Clears any prior tombstone (unsave then save again) and bumps updatedAt
+      // on both branches so this write always wins its own LWW comparison.
+      create: { userId, listingId, deletedAt: null },
+      update: { deletedAt: null, updatedAt: new Date() },
     });
     return true;
   }
 
-  /** Returns false when `slug` doesn't resolve to a real Listing (no row deleted). */
+  /**
+   * Soft-deletes (tombstones) rather than physically deleting, so the removal
+   * survives to be seen by `findSavedDelta` — a hard delete would make the row
+   * silently vanish from a `since` query with no trace for other devices to
+   * reconcile. Returns false when `slug` doesn't resolve to a real Listing (no
+   * row touched); a no-op (0 rows matched) when the listing was never saved.
+   */
   async unsaveLecture(userId: string, slug: string): Promise<boolean> {
     const listingId = await this.resolveListingId(slug);
     if (!listingId) return false;
 
-    await this.prisma.favoriteListing.deleteMany({
+    await this.prisma.favoriteListing.updateMany({
       where: { userId, listingId },
+      data: { deletedAt: new Date(), updatedAt: new Date() },
     });
     return true;
   }
@@ -270,16 +305,38 @@ export class LibraryRepository {
     return listing?.id ?? null;
   }
 
-  async bulkSave(userId: string, listingIds: string[]): Promise<void> {
-    if (listingIds.length === 0) return;
+  /**
+   * Raw-SQL upsert per item, LWW on `updatedAt` — mirrors
+   * `AudioRepository.bulkSync`'s pattern, but plain LWW rather than monotonic:
+   * unlike progress's `isCompleted`, a later unsave must be able to override
+   * an earlier save and vice versa, so `deletedAt` and `updatedAt` are decided
+   * together by whichever write is newer, not OR-guarded.
+   */
+  async bulkSync(userId: string, items: SavedSyncItemDto[]): Promise<void> {
+    if (items.length === 0) return;
 
-    const operations = listingIds.map((listingId) =>
-      this.prisma.favoriteListing.upsert({
-        where: { userId_listingId: { userId, listingId } },
-        create: { userId, listingId },
-        update: {},
-      }),
-    );
+    const operations = items.map((item) => {
+      const clientUpdatedAt = new Date(item.updatedAt);
+      const deletedAt = item.saved ? null : clientUpdatedAt;
+
+      return this.prisma.$executeRaw`
+        INSERT INTO "FavoriteListing" ("userId", "listingId", "createdAt", "updatedAt", "deletedAt")
+        VALUES (${userId}, ${item.listingId}::uuid, ${clientUpdatedAt}, ${clientUpdatedAt}, ${deletedAt})
+        ON CONFLICT ("userId", "listingId")
+        DO UPDATE SET
+          "updatedAt" = CASE
+            WHEN "FavoriteListing"."updatedAt" > ${clientUpdatedAt}
+            THEN "FavoriteListing"."updatedAt"
+            ELSE ${clientUpdatedAt}
+          END,
+          "deletedAt" = CASE
+            WHEN "FavoriteListing"."updatedAt" > ${clientUpdatedAt}
+            THEN "FavoriteListing"."deletedAt"
+            ELSE ${deletedAt}
+          END
+      `;
+    });
+
     await this.prisma.$transaction(operations);
   }
 

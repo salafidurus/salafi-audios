@@ -10,8 +10,8 @@ This directory contains the authoritative documentation for Salafi Durus.
 | 02    | Model & Ingestion   | COMPLETE    | Schema, Prisma, ingestion pipeline                         |
 | 03    | Read-Only Catalog   | PARTIAL     | Web routes complete; mobile catalog detail screens missing |
 | 04    | Auth & User State   | PARTIAL     | Auth live; account, library, feed screens implemented      |
-| 05    | Playback & Progress | NOT STARTED | Audio player, progress tracking                            |
-| 06    | Offline & Downloads | NOT STARTED | Offline playback, outbox sync                              |
+| 05    | Playback & Progress | COMPLETE    | Audio player, local-first progress tracking (web + mobile) |
+| 06    | Offline & Downloads | COMPLETE    | Offline audio downloads, outbox sync (mobile)              |
 | 07    | Admin & Uploads     | NOT STARTED | Admin workflows, moderation                                |
 | 08    | Polish & Analytics  | NOT STARTED | UX polish, analytics integration                           |
 
@@ -47,17 +47,17 @@ This directory contains the authoritative documentation for Salafi Durus.
 
 ### Mobile (apps/native)
 
-| Feature           | Status      | MVP      | Notes                                                |
-| ----------------- | ----------- | -------- | ---------------------------------------------------- |
-| Search            | IMPLEMENTED | CRITICAL | Home + active results                                |
-| Feed              | IMPLEMENTED | CRITICAL | Recent + following feeds                             |
-| Library           | IMPLEMENTED | CRITICAL | Saved and completed lists                            |
-| Account           | IMPLEMENTED | CRITICAL | Profile and settings                                 |
-| Catalog browsing  | MISSING     | CRITICAL | Detail screens (scholar/listing) not yet implemented |
-| Audio playback    | NOT STARTED | CRITICAL | Planned for Phase 05                                 |
-| Progress tracking | NOT STARTED | CRITICAL | Planned for Phase 05                                 |
-| Offline sync      | NOT STARTED | CRITICAL | Phase 06                                             |
-| Downloads         | NOT STARTED | CRITICAL | Phase 06                                             |
+| Feature           | Status      | MVP      | Notes                                                      |
+| ----------------- | ----------- | -------- | ---------------------------------------------------------- |
+| Search            | IMPLEMENTED | CRITICAL | Home + active results                                      |
+| Feed              | IMPLEMENTED | CRITICAL | Recent + following feeds                                   |
+| Library           | IMPLEMENTED | CRITICAL | Saved and completed lists                                  |
+| Account           | IMPLEMENTED | CRITICAL | Profile and settings                                       |
+| Catalog browsing  | IMPLEMENTED | CRITICAL | Scholar/listing detail screens                             |
+| Audio playback    | IMPLEMENTED | CRITICAL | `@sd/domain-audio`, prefers local downloads over streaming |
+| Progress tracking | IMPLEMENTED | CRITICAL | Local-first, synced via `@sd/core-sync`                    |
+| Offline sync      | IMPLEMENTED | CRITICAL | Persisted outbox, AppState/reconnect drain triggers        |
+| Downloads         | IMPLEMENTED | CRITICAL | `expo-file-system` + SQLite registry                       |
 
 ### Current Mobile Runtime Guardrail
 

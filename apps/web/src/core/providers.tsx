@@ -3,14 +3,9 @@
 import type { Locale } from "@sd/core-contracts";
 
 import { initApiClient, setLocaleProvider, setUnauthorizedHandler } from "@sd/core-api";
-import {
-  createQueryClient,
-  shouldPersistQuery,
-  queryKeys,
-  DEFAULT_MAX_AGE,
-} from "@sd/core-contracts";
+import { createQueryClient, queryKeys } from "@sd/core-contracts";
 import { localeToDir } from "@sd/core-i18n";
-import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 
@@ -20,10 +15,8 @@ import { ToastContainer } from "@/core/toast";
 
 import { initProgressPersistence } from "./audio/progress-persistence";
 import { createI18n } from "./i18n/i18n";
-import { createIdbPersister, purgeQueryCacheDb } from "./persister";
 
 const queryClient = createQueryClient();
-const persister = createIdbPersister();
 
 type Props = {
   children: ReactNode;
@@ -79,9 +72,8 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
 
   useEffect(() => {
     setUnauthorizedHandler(() => {
-      authClient.signOut().then(async () => {
+      authClient.signOut().then(() => {
         queryClient.clear();
-        await purgeQueryCacheDb();
         if (
           typeof window !== "undefined" &&
           window.location &&
@@ -95,20 +87,10 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <PersistQueryClientProvider
-        client={queryClient}
-        persistOptions={{
-          persister,
-          maxAge: DEFAULT_MAX_AGE,
-          dehydrateOptions: {
-            shouldDehydrateQuery: (query: any) =>
-              query.state.status === "success" && shouldPersistQuery(query.queryKey),
-          },
-        }}
-      >
+      <QueryClientProvider client={queryClient}>
         {children}
         <ToastContainer />
-      </PersistQueryClientProvider>
+      </QueryClientProvider>
     </I18nextProvider>
   );
 }

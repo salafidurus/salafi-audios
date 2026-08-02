@@ -1,14 +1,17 @@
-import { useProgressStore } from "@sd/domain-audio";
 import { useMemo } from "react";
 
 import { useLibrarySaved } from "./library.api";
 import { localSavedItems } from "./library.local";
+import { useSavedStore } from "./saved/saved.store";
 
 export function useLibrarySavedScreen(isAuthenticated = false) {
   const { data, isFetching, error } = useLibrarySaved(undefined, isAuthenticated);
-  const savedMap = useProgressStore((s) => s.savedMap);
+  const entities = useSavedStore((s) => s.entities);
 
-  const localItems = useMemo(() => localSavedItems(savedMap), [savedMap]);
+  const localItems = useMemo(
+    () => localSavedItems(Object.values(entities).filter((entry) => !entry.deletedAt)),
+    [entities],
+  );
 
   if (!isAuthenticated) {
     return {
