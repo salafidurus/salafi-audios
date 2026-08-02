@@ -126,6 +126,8 @@ export const UserScholarRoleDtoSchema = z.object({
   id: z.string(),
   userId: z.string(),
   scholarId: z.string(),
+  scholarSlug: z.string(),
+  scholarName: z.string(),
   permissionType: ScholarPermissionTypeEnum,
   createdAt: z.string(),
   createdBy: z.string().nullable(),
@@ -135,6 +137,9 @@ export type UserScholarRoleDto = z.infer<typeof UserScholarRoleDtoSchema>;
 export const UserTranslatorRoleDtoSchema = z.object({
   id: z.string(),
   userId: z.string(),
+  scholarId: z.string().nullable(),
+  scholarSlug: z.string().nullable(),
+  scholarName: z.string().nullable(),
   locale: LocaleSchema,
   canPublish: z.boolean(),
   createdAt: z.string(),
@@ -155,19 +160,27 @@ export const GrantRoleRequestSchema = z.object({
 });
 export type GrantRoleRequest = z.infer<typeof GrantRoleRequestSchema>;
 
-export const AssignScholarRequestSchema = z.object({
-  userId: z.string(),
-  scholarId: z.string(),
+// Scholar/translator scoped-role grants identify the scholar by slug, matching
+// this project's convention for scholar/listing/topic URLs (never raw id).
+export const GrantScholarRoleRequestSchema = z.object({
+  scholarSlug: z.string(),
   permissionType: ScholarPermissionTypeEnum,
 });
-export type AssignScholarRequest = z.infer<typeof AssignScholarRequestSchema>;
+export type GrantScholarRoleRequest = z.infer<typeof GrantScholarRoleRequestSchema>;
 
-export const AssignTranslatorLanguageRequestSchema = z.object({
-  userId: z.string(),
-  locale: LocaleSchema,
+export const SyncTranslatorLocalesRequestSchema = z.object({
+  // null = all scholars.
+  scholarSlug: z.string().nullable(),
+  locales: z.array(LocaleSchema),
   canPublish: z.boolean().default(false),
 });
-export type AssignTranslatorLanguageRequest = z.infer<typeof AssignTranslatorLanguageRequestSchema>;
+export type SyncTranslatorLocalesRequest = z.infer<typeof SyncTranslatorLocalesRequestSchema>;
+
+export const UpdateTranslatorPublishRequestSchema = z.object({
+  scholarSlug: z.string().nullable().optional(),
+  canPublish: z.boolean(),
+});
+export type UpdateTranslatorPublishRequest = z.infer<typeof UpdateTranslatorPublishRequestSchema>;
 
 // Permission groups for role-based defaults
 export const PERMISSION_GROUPS = {

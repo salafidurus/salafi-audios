@@ -152,24 +152,31 @@ export class PermissionsRepository {
   async getScholarsByUser(userId: string) {
     return this.prisma.userScholarRole.findMany({
       where: { userId },
+      include: { scholar: { select: { slug: true, name: true } } },
     });
   }
 
   // ========== UserTranslatorRole Operations (Language Scoping) ==========
 
-  async findTranslatorRole(userId: string, locale: Locale) {
-    return this.prisma.userTranslatorRole.findUnique({
-      where: {
-        userId_locale: {
-          userId,
-          locale,
-        },
-      },
+  // scholarId is nullable (null = all scholars); Postgres treats NULL as
+  // distinct in unique indexes, so this uses findFirst with an explicit
+  // where clause rather than relying on the compound unique index for the
+  // null case.
+  async findTranslatorRoleByScope(userId: string, scholarId: string | null, locale: Locale) {
+    return this.prisma.userTranslatorRole.findFirst({
+      where: { userId, scholarId, locale },
+    });
+  }
+
+  async getTranslatorRolesByScope(userId: string, scholarId: string | null) {
+    return this.prisma.userTranslatorRole.findMany({
+      where: { userId, scholarId },
     });
   }
 
   async createTranslatorRole(
     userId: string,
+    scholarId: string | null,
     locale: Locale,
     canPublish: boolean,
     createdBy: string,
@@ -177,6 +184,7 @@ export class PermissionsRepository {
     return this.prisma.userTranslatorRole.create({
       data: {
         userId,
+        scholarId,
         locale,
         canPublish,
         createdBy,
@@ -198,26 +206,27 @@ export class PermissionsRepository {
   }
 
   async canTranslateToLocale(userId: string, locale: Locale): Promise<boolean> {
-    const translatorRole = await this.findTranslatorRole(userId, locale);
+    const translatorRole = await this.findTranslatorRoleByScope(userId, null, locale);
     return !!translatorRole;
   }
 
   async canPublishTranslations(userId: string, locale: Locale): Promise<boolean> {
-    const translatorRole = await this.findTranslatorRole(userId, locale);
+    const translatorRole = await this.findTranslatorRoleByScope(userId, null, locale);
     return translatorRole?.canPublish ?? false;
   }
 
   async getTranslatorLanguages(userId: string) {
     return this.prisma.userTranslatorRole.findMany({
       where: { userId },
+      include: { scholar: { select: { slug: true, name: true } } },
     });
   }
 
   // ========== Verification Operations ==========
 
-  async scholarExists(scholarId: string) {
+  async findScholarBySlug(slug: string) {
     return this.prisma.scholar.findUnique({
-      where: { id: scholarId },
+      where: { slug },
     });
   }
 

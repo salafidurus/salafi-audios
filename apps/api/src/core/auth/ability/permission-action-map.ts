@@ -3,7 +3,7 @@ import type { AppActions, AppSubjectType } from './ability.types';
 
 export type PermissionActionMapping = {
   action: AppActions | AppActions[];
-  subject: AppSubjectType;
+  subject: AppSubjectType | AppSubjectType[];
 };
 
 /**
@@ -43,6 +43,11 @@ export const PERMISSION_ACTION_MAP: Record<Permission, PermissionActionMapping> 
   USERS_EDIT: { action: 'update', subject: 'User' },
   USERS_DELETE: { action: 'delete', subject: 'User' },
   USERS_GRANT_PERMISSIONS: { action: 'grant', subject: 'UserPermission' },
-  // Also used for granting scholar/translator scoped roles (see Stage 3).
-  USERS_GRANT_ROLES: { action: 'grant', subject: 'UserRoleAssignment' },
+  // Also grants scholar/translator scoped-role management (Stage 3's new
+  // grant endpoints) — granting roles and granting scoped access are the
+  // same admin capability in this taxonomy.
+  USERS_GRANT_ROLES: {
+    action: 'grant',
+    subject: ['UserRoleAssignment', 'UserScholarRole', 'UserTranslatorRole'],
+  },
 };

@@ -32,15 +32,18 @@ describe('defineAbilityFor', () => {
   describe('global permission → action/subject mapping', () => {
     for (const [permission, mapping] of Object.entries(PERMISSION_ACTION_MAP)) {
       const actions = Array.isArray(mapping.action) ? mapping.action : [mapping.action];
+      const subjects = Array.isArray(mapping.subject) ? mapping.subject : [mapping.subject];
       for (const action of actions) {
-        it(`${permission} grants unconditioned ${action} on ${mapping.subject}`, () => {
-          const ability = defineAbilityFor(baseInput({ permissions: [permission] }));
-          expect(ability.can(action, mapping.subject)).toBe(true);
-          // Unconditioned means it must also match any instance of that subject.
-          expect(ability.can(action, subject(mapping.subject, { id: 'x', scholarId: 'x' }))).toBe(
-            true,
-          );
-        });
+        for (const subjectType of subjects) {
+          it(`${permission} grants unconditioned ${action} on ${subjectType}`, () => {
+            const ability = defineAbilityFor(baseInput({ permissions: [permission] }));
+            expect(ability.can(action, subjectType)).toBe(true);
+            // Unconditioned means it must also match any instance of that subject.
+            expect(ability.can(action, subject(subjectType, { id: 'x', scholarId: 'x' }))).toBe(
+              true,
+            );
+          });
+        }
       }
     }
 
