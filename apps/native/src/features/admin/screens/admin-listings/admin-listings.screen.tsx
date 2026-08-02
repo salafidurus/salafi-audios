@@ -86,6 +86,8 @@ export function AdminListingsScreen() {
   const listings = filterListings(data?.items ?? [], searchQuery);
   const rowActions = getVisibleRowActions(ability);
   const canUpload = ability.can("upload", "Media");
+  const canPublish = ability.can("publish", "Listing");
+  const canArchive = ability.can("archive", "Listing");
 
   const headerSearchOptions = {
     headerSearchBarOptions: {
@@ -186,6 +188,8 @@ export function AdminListingsScreen() {
         selectedCount={selectedIds.size}
         onPublish={() => handleBulkAction("publish")}
         onArchive={() => handleBulkAction("archive")}
+        canPublish={canPublish}
+        canArchive={canArchive}
         isLoading={isBulkLoading}
       />
 
