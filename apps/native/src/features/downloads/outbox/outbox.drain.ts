@@ -1,19 +1,20 @@
-import { useOutboxStore } from "./outbox.store";
+import { drainOutbox, type DrainResult } from "@sd/core-sync";
+
+import { downloadsOutbox } from "./outbox.store";
+
+export type DownloadMutationHandler = (type: string, payload: unknown) => Promise<void>;
 
 /**
- * Drain the outbox: attempt to send all queued mutations to backend.
- * Call this on app foreground or network reconnect.
+ * Drains the downloads outbox: attempts to run every queued mutation via
+ * `handler`, keyed by entry type. Call on app foreground or network
+ * reconnect — the underlying `isDraining` guard makes concurrent calls from
+ * both triggers a safe no-op (no duplicate drains if both fire together).
  */
-export async function drainOutbox(): Promise<void> {
-  const { actions } = useOutboxStore.getState();
-  await actions.drain();
+export function drainDownloadsOutbox(handler: DownloadMutationHandler): Promise<DrainResult> {
+  return drainOutbox(downloadsOutbox, (entry) => handler(entry.type, entry.payload));
 }
 
-/**
- * Enqueue a mutation for later sync.
- * Use when the device may be offline.
- */
-export function enqueueOutboxMutation(type: string, payload: unknown): void {
-  const { actions } = useOutboxStore.getState();
-  actions.enqueue(type, payload);
+/** Enqueue a mutation for later sync — use when the device may be offline. */
+export function enqueueDownloadMutation(type: string, payload: unknown): void {
+  downloadsOutbox.useOutboxStore.getState().actions.enqueue(type, payload);
 }

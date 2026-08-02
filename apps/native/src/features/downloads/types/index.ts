@@ -9,11 +9,3 @@ export type DownloadItem = {
   startedAt?: number;
   completedAt?: number;
 };
-
-export type OutboxEntry = {
-  id: string;
-  type: string;
-  payload: unknown;
-  createdAt: number;
-  retries: number;
-};
