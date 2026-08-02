@@ -10,11 +10,15 @@ import { useFonts } from "expo-font";
 import { type Href, useRouter } from "expo-router";
 import { type ReactNode, useEffect, useState } from "react";
 import { I18nextProvider } from "react-i18next";
-import { LogBox, View } from "react-native";
+import { AppState, type AppStateStatus, LogBox, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
+import { handleDownloadOutboxEntry } from "@/features/downloads/engine/download.engine";
+import { drainDownloadsOutbox } from "@/features/downloads/outbox/outbox.drain";
+import { useDownloadsStore } from "@/features/downloads/store/downloads.store";
 
 import { initProgressPersistence } from "./audio/progress-persistence";
 import { authClient } from "./auth/auth-client";
@@ -22,6 +26,7 @@ import { useAuth } from "./auth/use-auth";
 import { getApiBaseUrl } from "./config/runtime-env";
 import { i18n, initI18n } from "./i18n/i18n";
 import { initIntegrations } from "./integrations";
+import { onNetworkReconnect } from "./network/network-status";
 import { queryClient, persister } from "./query-client";
 import { syncTypographyToLocale } from "./styles/theme/typography-sync";
 
@@ -118,6 +123,29 @@ export function Providers({ children }: Props) {
       },
     });
   }, [isAuthenticated, user?.id]);
+
+  // Downloads are device-scoped (not per-user), so this runs once regardless
+  // of auth state: hydrate the read-cache from the SQLite registry, then wire
+  // both drain triggers for the persisted outbox (offline-initiated download
+  // intent, retried once connectivity/foreground returns).
+  useEffect(() => {
+    void useDownloadsStore.getState().actions.hydrate();
+
+    const drain = () => {
+      void drainDownloadsOutbox(handleDownloadOutboxEntry);
+    };
+
+    const unsubscribeNetwork = onNetworkReconnect(drain);
+    const handleAppStateChange = (nextState: AppStateStatus) => {
+      if (nextState === "active") drain();
+    };
+    const subscription = AppState.addEventListener("change", handleAppStateChange);
+
+    return () => {
+      unsubscribeNetwork();
+      subscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     void initI18n()

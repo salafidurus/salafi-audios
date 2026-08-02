@@ -1,10 +1,34 @@
+import { downloadsOutbox } from "../outbox/outbox.store";
 import { useDownloadsStore } from "../store/downloads.store";
-import { downloadLecture, getLocalAudioUri, removeLecture } from "./download.engine";
+import {
+  downloadLecture,
+  getLocalAudioUri,
+  handleDownloadOutboxEntry,
+  removeLecture,
+} from "./download.engine";
 
 const mockDownloadAsync = jest.fn();
 let capturedOnProgress: ((p: { bytesWritten: number; totalBytes: number }) => void) | undefined;
 let capturedUrl: string | undefined;
 let capturedDestination: unknown;
+
+jest.mock("expo-sqlite", () => {
+  const store = new Map<string, string>();
+  return {
+    __store: store,
+    openDatabaseAsync: jest.fn(async () => ({
+      execAsync: jest.fn(async () => {}),
+      runAsync: jest.fn(async (sql: string, key: string, value?: string) => {
+        if (sql.startsWith("INSERT")) store.set(key, value as string);
+        else if (sql.startsWith("DELETE")) store.delete(key);
+      }),
+      getFirstAsync: jest.fn(async (_sql: string, key: string) => {
+        const value = store.get(key);
+        return value === undefined ? null : { value };
+      }),
+    })),
+  };
+});
 
 jest.mock("expo-file-system", () => {
   class FakeFile {
@@ -57,9 +81,11 @@ describe("download.engine", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useDownloadsStore.setState({ downloads: {} });
+    downloadsOutbox.useOutboxStore.setState({ entries: [] });
     (
       jest.requireMock("../registry/downloads.db") as { __rows: Map<string, unknown> }
     ).__rows.clear();
+    (jest.requireMock("expo-sqlite") as { __store: Map<string, string> }).__store.clear();
     capturedOnProgress = undefined;
   });
 
@@ -116,6 +142,45 @@ describe("download.engine", () => {
     await downloadLecture("l1", "https://s/l1.mp3");
 
     expect(useDownloadsStore.getState().downloads.l1?.status).toBe("error");
+  });
+
+  it("queues a start-download outbox entry when the download fails, for retry on reconnect", async () => {
+    mockDownloadAsync.mockRejectedValue(new Error("network down"));
+
+    await downloadLecture("l1", "https://s/l1.mp3");
+
+    expect(downloadsOutbox.useOutboxStore.getState().entries).toEqual([
+      expect.objectContaining({
+        type: "start-download",
+        payload: { lectureId: "l1", audioUrl: "https://s/l1.mp3" },
+      }),
+    ]);
+  });
+
+  it("does not queue an outbox entry when the download succeeds", async () => {
+    mockDownloadAsync.mockResolvedValue({ uri: "file:///lectures/l1.mp3" });
+
+    await downloadLecture("l1", "https://s/l1.mp3");
+
+    expect(downloadsOutbox.useOutboxStore.getState().entries).toEqual([]);
+  });
+
+  describe("handleDownloadOutboxEntry", () => {
+    it("dispatches a start-download entry to downloadLecture", async () => {
+      mockDownloadAsync.mockResolvedValue({ uri: "file:///lectures/l1.mp3" });
+
+      await handleDownloadOutboxEntry("start-download", {
+        lectureId: "l1",
+        audioUrl: "https://s/l1.mp3",
+      });
+
+      expect(useDownloadsStore.getState().downloads.l1?.status).toBe("complete");
+    });
+
+    it("ignores an unknown entry type", async () => {
+      await expect(handleDownloadOutboxEntry("unknown-type", {})).resolves.toBeUndefined();
+      expect(mockDownloadAsync).not.toHaveBeenCalled();
+    });
   });
 
   describe("getLocalAudioUri", () => {

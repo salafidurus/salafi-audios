@@ -1,5 +1,6 @@
 import { DownloadTask, Directory, File, Paths } from "expo-file-system";
 
+import { enqueueDownloadMutation } from "../outbox/outbox.drain";
 import { getDownload } from "../registry/downloads.db";
 import { useDownloadsStore } from "../store/downloads.store";
 
@@ -59,6 +60,9 @@ export async function downloadLecture(lectureId: string, audioUrl: string): Prom
     }
   } catch {
     await actions.upsert({ listingId: lectureId, status: "error" });
+    // Queued for automatic retry on the next foreground/reconnect drain —
+    // the user doesn't have to remember to manually tap Retry.
+    enqueueDownloadMutation("start-download", { lectureId, audioUrl });
   } finally {
     activeTasks.delete(lectureId);
   }
@@ -87,4 +91,13 @@ export async function removeLecture(lectureId: string): Promise<void> {
 export async function getLocalAudioUri(lectureId: string): Promise<string | undefined> {
   const row = await getDownload(lectureId);
   return row?.status === "complete" && row.localUri ? row.localUri : undefined;
+}
+
+/** Dispatches a queued downloads-outbox entry by type. Passed to
+ * `drainDownloadsOutbox` from the app-foreground/network-reconnect triggers. */
+export async function handleDownloadOutboxEntry(type: string, payload: unknown): Promise<void> {
+  if (type === "start-download") {
+    const { lectureId, audioUrl } = payload as { lectureId: string; audioUrl: string };
+    await downloadLecture(lectureId, audioUrl);
+  }
 }
