@@ -1,7 +1,7 @@
 import { DownloadTask, Directory, File, Paths } from "expo-file-system";
 
 import { enqueueDownloadMutation } from "@/features/downloads/outbox/outbox.drain";
-import { getDownload } from "@/features/downloads/registry/downloads.db";
+import { getDownload } from "@/features/downloads/registry/downloads.registry";
 import { useDownloadsStore } from "@/features/downloads/store/downloads.store";
 
 /** Tracks in-flight tasks for this process only — not restored across app

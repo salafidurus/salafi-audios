@@ -64,7 +64,7 @@ jest.mock("expo-file-system", () => {
   };
 });
 
-jest.mock("@/features/downloads/registry/downloads.db", () => {
+jest.mock("@/features/downloads/registry/downloads.registry", () => {
   const rows = new Map<string, any>();
   return {
     __rows: rows,
@@ -84,7 +84,7 @@ describe("download.engine", () => {
     useDownloadsStore.setState({ downloads: {} });
     downloadsOutbox.useOutboxStore.setState({ entries: [] });
     (
-      jest.requireMock("@/features/downloads/registry/downloads.db") as {
+      jest.requireMock("@/features/downloads/registry/downloads.registry") as {
         __rows: Map<string, unknown>;
       }
     ).__rows.clear();
@@ -192,14 +192,18 @@ describe("download.engine", () => {
     });
 
     it("returns undefined when the download isn't complete yet", async () => {
-      const { upsertDownload } = jest.requireMock("@/features/downloads/registry/downloads.db");
+      const { upsertDownload } = jest.requireMock(
+        "@/features/downloads/registry/downloads.registry",
+      );
       await upsertDownload({ listingId: "l1", status: "downloading", localUri: null });
 
       expect(await getLocalAudioUri("l1")).toBeUndefined();
     });
 
     it("returns the local uri once complete", async () => {
-      const { upsertDownload } = jest.requireMock("@/features/downloads/registry/downloads.db");
+      const { upsertDownload } = jest.requireMock(
+        "@/features/downloads/registry/downloads.registry",
+      );
       await upsertDownload({
         listingId: "l1",
         status: "complete",

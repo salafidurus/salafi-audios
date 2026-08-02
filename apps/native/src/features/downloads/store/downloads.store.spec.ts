@@ -1,6 +1,6 @@
 import { useDownloadsStore } from "./downloads.store";
 
-jest.mock("../registry/downloads.db", () => {
+jest.mock("../registry/downloads.registry", () => {
   const rows = new Map<string, any>();
   return {
     __rows: rows,
@@ -26,7 +26,7 @@ describe("useDownloadsStore", () => {
   beforeEach(() => {
     useDownloadsStore.setState({ downloads: {} });
     (
-      jest.requireMock("../registry/downloads.db") as { __rows: Map<string, unknown> }
+      jest.requireMock("../registry/downloads.registry") as { __rows: Map<string, unknown> }
     ).__rows.clear();
   });
 
@@ -35,7 +35,7 @@ describe("useDownloadsStore", () => {
   });
 
   it("hydrate loads every row from the registry into state", async () => {
-    const { upsertDownload } = jest.requireMock("../registry/downloads.db");
+    const { upsertDownload } = jest.requireMock("../registry/downloads.registry");
     await upsertDownload({ listingId: "l1", url: "https://s/l1.mp3", status: "complete" });
 
     await useDownloadsStore.getState().actions.hydrate();

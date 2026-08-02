@@ -5,7 +5,7 @@ import {
   removeDownload as removeDownloadRow,
   upsertDownload as upsertDownloadRow,
   type DownloadRow,
-} from "@/features/downloads/registry/downloads.db";
+} from "@/features/downloads/registry/downloads.registry";
 
 type UpsertInput = Partial<Omit<DownloadRow, "listingId" | "createdAt" | "updatedAt">> & {
   listingId: string;
@@ -27,7 +27,7 @@ type DownloadsState = {
  * Reactive read-cache over the SQLite downloads registry. Previously this
  * store was the only source of truth and was purely in-memory (lost on
  * every app restart); it's now a cache that writes through `upsert`/`remove`
- * to `registry/downloads.db.ts`, which is what actually survives a restart.
+ * to `registry/downloads.registry.ts`, which is what actually survives a restart.
  */
 export const useDownloadsStore = create<DownloadsState>((set, get) => ({
   downloads: {},
