@@ -1,50 +1,90 @@
-import { endpoints } from "@sd/core-contracts";
+import { DownloadTask, Directory, File, Paths } from "expo-file-system";
 
+import { getDownload } from "../registry/downloads.db";
 import { useDownloadsStore } from "../store/downloads.store";
 
-/**
- * Native download engine stub.
- *
- * Full implementation requires expo-file-system for streaming
- * downloads to local storage. This provides the interface contract.
- */
+/** Tracks in-flight tasks for this process only — not restored across app
+ * restarts (expo-file-system doesn't restore JS task instances either). */
+const activeTasks = new Map<string, DownloadTask>();
 
+// expo-file-system@57's File/Directory extend a native-module base class whose
+// `uri`/`exists`/`create`/`delete` members exist at runtime (per the package's
+// own docs/source) but aren't visible through its shipped .d.ts inheritance —
+// a real upstream typing gap, not something these types should ever lack.
+type FileWithFsOps = File & { uri: string; delete(): void };
+type DirectoryWithFsOps = Directory & {
+  exists: boolean;
+  create(options?: { intermediates?: boolean }): void;
+};
+
+function destinationFor(lectureId: string): File {
+  const dir = new Directory(Paths.document, "lectures") as DirectoryWithFsOps;
+  if (!dir.exists) {
+    dir.create({ intermediates: true });
+  }
+  return new File(dir, `${lectureId}.mp3`);
+}
+
+/** Downloads a lecture's audio to local storage, tracking progress/status
+ * through the downloads store (which writes through to the SQLite registry,
+ * so it survives an app restart even though the native task itself does not). */
 export async function downloadLecture(lectureId: string, audioUrl: string): Promise<void> {
   const { actions } = useDownloadsStore.getState();
-  actions.startDownload(lectureId);
+
+  await actions.upsert({
+    listingId: lectureId,
+    url: audioUrl,
+    status: "downloading",
+    bytesTotal: 0,
+    bytesDownloaded: 0,
+  });
+
+  const destination = destinationFor(lectureId);
+  const task = new DownloadTask(audioUrl, destination, {
+    onProgress: (progress) => {
+      void actions.upsert({
+        listingId: lectureId,
+        bytesTotal: progress.totalBytes,
+        bytesDownloaded: progress.bytesWritten,
+        status: "downloading",
+      });
+    },
+  });
+  activeTasks.set(lectureId, task);
 
   try {
-    // In production: use expo-file-system to download
-    // const localUri = FileSystem.documentDirectory + `lectures/${lectureId}.mp3`;
-    // const downloadResumable = FileSystem.createDownloadResumable(
-    //   audioUrl, localUri, {},
-    //   (progress) => {
-    //     const pct = (progress.totalBytesWritten / progress.totalBytesExpectedToWrite) * 100;
-    //     actions.setProgress(lectureId, pct);
-    //   }
-    // );
-    // const result = await downloadResumable.downloadAsync();
-
-    // Stub: simulate download completion
-    actions.setProgress(lectureId, 50);
-
-    // Get presigned URL if needed (stub — audioUrl used directly until expo-file-system implemented)
-    void (audioUrl || endpoints.listings.detail(lectureId));
-
-    // Mark complete (in production, use actual file URI)
-    const localUri = `file:///lectures/${lectureId}.mp3`;
-    actions.setComplete(lectureId, localUri);
-  } catch (err) {
-    actions.setError(lectureId, err instanceof Error ? err.message : "Download failed");
+    const file = (await task.downloadAsync()) as FileWithFsOps | null;
+    if (file) {
+      await actions.upsert({ listingId: lectureId, status: "complete", localUri: file.uri });
+    }
+  } catch {
+    await actions.upsert({ listingId: lectureId, status: "error" });
+  } finally {
+    activeTasks.delete(lectureId);
   }
 }
 
-/**
- * Get local file URI for a downloaded lecture,
- * or undefined if not downloaded. Used by domain-playback
- * to prefer local files over streaming.
- */
-export function getLocalAudioUri(lectureId: string): string | undefined {
-  const dl = useDownloadsStore.getState().actions.getDownload(lectureId);
-  return dl?.status === "complete" ? dl.localUri : undefined;
+/** Cancels an in-flight task (if any), deletes the local file (if any), and
+ * removes the registry row. */
+export async function removeLecture(lectureId: string): Promise<void> {
+  activeTasks.get(lectureId)?.cancel();
+  activeTasks.delete(lectureId);
+
+  const row = await getDownload(lectureId);
+  if (row?.localUri) {
+    try {
+      (new File(row.localUri) as FileWithFsOps).delete();
+    } catch {
+      // Best-effort — still remove the row below regardless.
+    }
+  }
+
+  await useDownloadsStore.getState().actions.remove(lectureId);
+}
+
+/** Local file uri for a downloaded lecture, or undefined if not (fully)
+ * downloaded. Used by `DurusAudioService` to prefer local files over streaming. */
+export async function getLocalAudioUri(lectureId: string): Promise<string | undefined> {
+  const row = await getDownload(lectureId);
+  return row?.status === "complete" && row.localUri ? row.localUri : undefined;
 }

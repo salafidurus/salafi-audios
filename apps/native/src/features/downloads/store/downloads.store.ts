@@ -1,84 +1,61 @@
 import { create } from "zustand";
 
-import type { DownloadItem } from "../types";
+import {
+  getAllDownloads,
+  removeDownload as removeDownloadRow,
+  upsertDownload as upsertDownloadRow,
+  type DownloadRow,
+} from "../registry/downloads.db";
+
+type UpsertInput = Partial<Omit<DownloadRow, "listingId" | "createdAt" | "updatedAt">> & {
+  listingId: string;
+};
 
 type DownloadsState = {
-  downloads: Record<string, DownloadItem>;
+  downloads: Record<string, DownloadRow>;
   actions: {
-    startDownload: (lectureId: string) => void;
-    setProgress: (lectureId: string, progress: number) => void;
-    setComplete: (lectureId: string, localUri: string) => void;
-    setError: (lectureId: string, error: string) => void;
-    removeDownload: (lectureId: string) => void;
-    getDownload: (lectureId: string) => DownloadItem | undefined;
+    /** Loads every row from the SQLite registry into this read-cache. Call once at startup. */
+    hydrate: () => Promise<void>;
+    /** Writes through to the registry, then updates this read-cache reactively. */
+    upsert: (row: UpsertInput) => Promise<void>;
+    remove: (listingId: string) => Promise<void>;
+    getDownload: (listingId: string) => DownloadRow | undefined;
   };
 };
 
+/**
+ * Reactive read-cache over the SQLite downloads registry. Previously this
+ * store was the only source of truth and was purely in-memory (lost on
+ * every app restart); it's now a cache that writes through `upsert`/`remove`
+ * to `registry/downloads.db.ts`, which is what actually survives a restart.
+ */
 export const useDownloadsStore = create<DownloadsState>((set, get) => ({
   downloads: {},
 
   actions: {
-    startDownload: (lectureId) =>
+    hydrate: async () => {
+      const rows = await getAllDownloads();
+      set({ downloads: Object.fromEntries(rows.map((row) => [row.listingId, row])) });
+    },
+
+    upsert: async (row) => {
+      await upsertDownloadRow(row);
       set((state) => ({
         downloads: {
           ...state.downloads,
-          [lectureId]: {
-            lectureId,
-            status: "pending",
-            progress: 0,
-            startedAt: Date.now(),
-          },
+          [row.listingId]: { ...state.downloads[row.listingId], ...row } as DownloadRow,
         },
-      })),
+      }));
+    },
 
-    setProgress: (lectureId, progress) =>
+    remove: async (listingId) => {
+      await removeDownloadRow(listingId);
       set((state) => {
-        const dl = state.downloads[lectureId];
-        if (!dl) return state;
-        return {
-          downloads: {
-            ...state.downloads,
-            [lectureId]: { ...dl, status: "downloading", progress },
-          },
-        };
-      }),
-
-    setComplete: (lectureId, localUri) =>
-      set((state) => {
-        const dl = state.downloads[lectureId];
-        if (!dl) return state;
-        return {
-          downloads: {
-            ...state.downloads,
-            [lectureId]: {
-              ...dl,
-              status: "complete",
-              progress: 100,
-              localUri,
-              completedAt: Date.now(),
-            },
-          },
-        };
-      }),
-
-    setError: (lectureId, error) =>
-      set((state) => {
-        const dl = state.downloads[lectureId];
-        if (!dl) return state;
-        return {
-          downloads: {
-            ...state.downloads,
-            [lectureId]: { ...dl, status: "error", error },
-          },
-        };
-      }),
-
-    removeDownload: (lectureId) =>
-      set((state) => {
-        const { [lectureId]: _, ...rest } = state.downloads;
+        const { [listingId]: _removed, ...rest } = state.downloads;
         return { downloads: rest };
-      }),
+      });
+    },
 
-    getDownload: (lectureId) => get().downloads[lectureId],
+    getDownload: (listingId) => get().downloads[listingId],
   },
 }));
