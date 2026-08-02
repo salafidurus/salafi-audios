@@ -3,7 +3,7 @@ import { useAbility } from "@sd/domain-account";
 import { render, screen } from "@testing-library/react-native";
 import React from "react";
 
-import AdminLayout from "./_layout";
+import AdminLayout from "../../app/(tabs)/admin/_layout";
 
 jest.mock("@sd/domain-account", () => ({
   useAbility: jest.fn(),
@@ -22,7 +22,7 @@ jest.mock("@/core/i18n/use-translation", () => ({
 
 jest.mock("react-native-unistyles", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { lightNativeTheme } = require("../../../core/styles/theme");
+  const { lightNativeTheme } = require("../../core/styles/theme");
   return {
     StyleSheet: {
       create: (styles: unknown) =>
