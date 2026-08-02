@@ -5,7 +5,7 @@ import {
   removeDownload as removeDownloadRow,
   upsertDownload as upsertDownloadRow,
   type DownloadRow,
-} from "../registry/downloads.db";
+} from "@/features/downloads/registry/downloads.db";
 
 type UpsertInput = Partial<Omit<DownloadRow, "listingId" | "createdAt" | "updatedAt">> & {
   listingId: string;
