@@ -79,6 +79,7 @@ export function ContentListItem({
 
     const track: Track = {
       id: item.id,
+      slug: item.slug,
       title: item.title,
       artist: formattedScholarName,
       url: item.primaryAudioAsset?.url ?? "",

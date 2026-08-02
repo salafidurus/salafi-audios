@@ -363,6 +363,21 @@ describe("LectureDetailScreen", () => {
     expect(mockMarkSaved).toHaveBeenCalledWith("uuid-1", "tafsir-al-fatiha");
   });
 
+  it("tags the standalone track with its own slug — progress sync resolves strictly by slug, not uuid", async () => {
+    mockedUseListingDetail.mockReturnValue({
+      data: { ...singleLecture, id: "uuid-1", slug: "tafsir-al-fatiha" },
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<LectureDetailScreen slug="tafsir-al-fatiha" />);
+    await fireEvent.press(screen.getByText("Play"));
+
+    expect(audioService.playListing).toHaveBeenCalledTimes(1);
+    const [playedTrack] = audioService.playListing.mock.calls[0];
+    expect(playedTrack).toMatchObject({ id: "uuid-1", slug: "tafsir-al-fatiha" });
+  });
+
   it("wires the lecture's id and audio url through to DownloadButton and DownloadProgress", async () => {
     mockedUseListingDetail.mockReturnValue({
       data: {

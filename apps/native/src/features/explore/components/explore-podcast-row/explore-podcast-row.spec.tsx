@@ -222,6 +222,17 @@ describe("ExplorePodcastRow", () => {
     );
   });
 
+  it("tags the single-track fallback with its own slug — progress sync resolves strictly by slug, not uuid", async () => {
+    const audioMock = jest.requireMock("@/features/audio").audioService;
+    await render(<ExplorePodcastRow item={baseItem} />);
+    await fireEvent.press(screen.getByTestId("podcast-row"));
+
+    expect(audioMock.playListing).toHaveBeenCalledWith(
+      expect.objectContaining({ id: baseItem.id, slug: baseItem.slug }),
+      expect.anything(),
+    );
+  });
+
   it("does not fetch contents for a single-format row", async () => {
     const httpClientMock = jest.requireMock("@sd/core-contracts").httpClient;
 

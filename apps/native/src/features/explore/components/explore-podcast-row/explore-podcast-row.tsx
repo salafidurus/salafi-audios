@@ -85,6 +85,7 @@ export function ExplorePodcastRow({
 
     const track: Track = {
       id: item.id,
+      slug: item.slug,
       title,
       artist: scholarName,
       scholarSlug: item.scholarSlug,

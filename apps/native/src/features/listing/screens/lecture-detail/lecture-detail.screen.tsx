@@ -153,6 +153,7 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
 
     const track: Track = {
       id: lecture.id,
+      slug: lecture.slug,
       title,
       artist: lecture.scholar.name,
       scholarSlug: lecture.scholar.slug,
