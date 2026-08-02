@@ -17,6 +17,15 @@ const mockPrisma = {
   userRoleAssignment: {
     findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
   },
+  userPermission: {
+    findMany: vi.fn<any>().mockResolvedValue([]),
+  },
+  userScholarRole: {
+    findMany: vi.fn<any>().mockResolvedValue([]),
+  },
+  userTranslatorRole: {
+    findMany: vi.fn<any>().mockResolvedValue([]),
+  },
 };
 
 const mockAudioService = {

@@ -1,5 +1,13 @@
 # PBAC Migration - Permission-Based Access Control
 
+> **SUPERSEDED**: PBAC (`PermissionGuard`/`@RequiresPermission`/flat permission-string checks)
+> was fully replaced by attribute-based access control (CASL) on branch `f/abac-migration`.
+> `PermissionGuard`, `RequiresPermission`, and the flat-check frontend hooks described below
+> no longer exist. Current enforcement is `PolicyGuard`/`@CheckPolicy` built on
+> `apps/api/src/core/auth/ability/ability.factory.ts`, with `UserScholarRole`/`UserTranslatorRole`
+> now reachable (not dead code) and genuinely two-axis (scholar × locale) scoped. This file is
+> kept as historical record of the preceding RBAC→PBAC migration only.
+
 ## Overview
 
 Comprehensive migration from role-based access control (RBAC) to permission-based access control (PBAC) with role presets, multi-role support, and sophisticated scoping.

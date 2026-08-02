@@ -1,6 +1,7 @@
 "use client";
 
 import { queryKeys, type TopicDetailDto } from "@sd/core-contracts";
+import { useAbility } from "@sd/domain-account";
 import { useAdminTopicsList } from "@sd/domain-content";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
@@ -11,7 +12,6 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { Content } from "@/features/admin/components/Content";
 import { ListingsContent } from "@/features/admin/components/Content/Listing";
 import { TopicsContent } from "@/features/admin/components/Content/Topic";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -29,6 +29,7 @@ export function AdminContentsScreen() {
   const { isMobile } = useResponsive();
   const pathname = usePathname();
   const { t } = useTranslation();
+  const { ability } = useAbility();
   const queryClient = useQueryClient();
   const {
     query: searchQuery,
@@ -79,33 +80,31 @@ export function AdminContentsScreen() {
                     : t("admin.contents.listingManagement", "Listing Management")
               }
               actions={
-                activeTab === "topics" ? (
-                  <PermissionGate requires="TOPICS_CREATE">
-                    <Button
-                      variant="primary"
-                      size={!isMobile ? "md" : "sm"}
-                      icon={<Plus size={!isMobile ? 18 : 16} />}
-                      onClick={handleOpenAddTopic}
-                    >
-                      {!isMobile
-                        ? t("admin.contents.addTopic", "Add Topic")
-                        : t("admin.contents.addTopicMobile", "Topic")}
-                    </Button>
-                  </PermissionGate>
-                ) : (
-                  <PermissionGate requires="LISTINGS_CREATE">
-                    <Button
-                      variant="primary"
-                      size={!isMobile ? "md" : "sm"}
-                      icon={<Plus size={!isMobile ? 18 : 16} />}
-                      onClick={handleOpenAddListing}
-                    >
-                      {!isMobile
-                        ? t("admin.contents.addListing", "Add Listing")
-                        : t("admin.contents.addListingMobile", "Listing")}
-                    </Button>
-                  </PermissionGate>
-                )
+                activeTab === "topics"
+                  ? ability.can("create", "Topic") && (
+                      <Button
+                        variant="primary"
+                        size={!isMobile ? "md" : "sm"}
+                        icon={<Plus size={!isMobile ? 18 : 16} />}
+                        onClick={handleOpenAddTopic}
+                      >
+                        {!isMobile
+                          ? t("admin.contents.addTopic", "Add Topic")
+                          : t("admin.contents.addTopicMobile", "Topic")}
+                      </Button>
+                    )
+                  : ability.can("create", "Listing") && (
+                      <Button
+                        variant="primary"
+                        size={!isMobile ? "md" : "sm"}
+                        icon={<Plus size={!isMobile ? 18 : 16} />}
+                        onClick={handleOpenAddListing}
+                      >
+                        {!isMobile
+                          ? t("admin.contents.addListing", "Add Listing")
+                          : t("admin.contents.addListingMobile", "Listing")}
+                      </Button>
+                    )
               }
             />
 

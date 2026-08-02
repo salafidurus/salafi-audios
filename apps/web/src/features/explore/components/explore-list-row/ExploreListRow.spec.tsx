@@ -1,7 +1,7 @@
 import type { FeedContentItemDto } from "@sd/core-contracts";
 
 import { useAudio, useProgressStore } from "@sd/domain-audio";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
 
@@ -19,21 +19,37 @@ vi.mock("@sd/domain-audio", () => {
   };
 });
 
+const mockPlay = vi.fn();
+const mockUsePlayListing = vi.fn((..._args: unknown[]) => ({
+  play: mockPlay,
+  isLoading: false,
+  error: null,
+}));
+
 vi.mock("@/features/audio", () => ({
   audioService: {
     playListing: vi.fn(),
     pause: vi.fn(),
     resume: vi.fn(),
   },
+  usePlayListing: (...args: unknown[]) => mockUsePlayListing(...args),
+}));
+
+vi.mock("@/core/toast", () => ({
+  useToast: () => ({ addToast: vi.fn() }),
 }));
 
 vi.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: () => false,
 }));
 
-const mockMutate = vi.fn();
+const mockUseIsSaved = vi.fn(() => false);
+const mockMarkSaved = vi.fn();
+const mockMarkUnsaved = vi.fn();
 vi.mock("@sd/domain-content", () => ({
-  useToggleSaved: () => ({ mutate: mockMutate }),
+  useIsSaved: () => mockUseIsSaved(),
+  markSaved: (...args: unknown[]) => mockMarkSaved(...args),
+  markUnsaved: (...args: unknown[]) => mockMarkUnsaved(...args),
 }));
 
 const baseItem: FeedContentItemDto = {
@@ -53,8 +69,10 @@ const progressInitialState = useProgressStore.getState();
 describe("FeedListRow", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUsePlayListing.mockReturnValue({ play: mockPlay, isLoading: false, error: null });
     (useAudio as Mock<any>).mockReturnValue({ isPlaying: false, currentTrack: null });
     useProgressStore.setState(progressInitialState, true);
+    mockUseIsSaved.mockReturnValue(false);
   });
 
   it("renders item metadata successfully (fallback initial avatar)", () => {
@@ -76,22 +94,23 @@ describe("FeedListRow", () => {
     expect(img.getAttribute("src")).toContain("uthaymeen.jpg");
   });
 
-  it("calls audioService.playLecture on play button click", () => {
+  it("wires the item's ref (id/slug/format) into usePlayListing and plays on click", async () => {
     render(<FeedListRow item={baseItem} />);
+
+    expect(mockUsePlayListing).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "lec-1",
+        slug: "importance-of-sunnah",
+        format: "single",
+        scholarSlug: "ibn-uthaymeen",
+      }),
+      expect.anything(),
+    );
+
     const playBtn = screen.getByRole("button", { name: "Play lecture" });
     fireEvent.click(playBtn);
 
-    const expectedTrack = {
-      id: "lec-1",
-      title: "Importance of Sunnah",
-      artist: "Ibn Uthaymeen",
-      url: "",
-      durationSeconds: 1800,
-      artworkUrl: undefined,
-      seriesId: null,
-      seriesTitle: null,
-    };
-    expect(audioService.playListing).toHaveBeenCalledWith(expectedTrack, [expectedTrack]);
+    await waitFor(() => expect(mockPlay).toHaveBeenCalled());
   });
 
   it("calls audioService.pause on active playing track play button click", () => {
@@ -116,52 +135,43 @@ describe("FeedListRow", () => {
     expect(audioService.resume).toHaveBeenCalled();
   });
 
-  it("calls addSaved when bookmark button clicked and not saved", () => {
+  it("treats a currently playing lesson from this series as this row's current track", () => {
+    const seriesItem = { ...baseItem, kind: "series" as const, id: "series-1" };
+    (useAudio as Mock<any>).mockReturnValue({
+      isPlaying: true,
+      currentTrack: { id: "lesson-1", seriesId: "series-1" },
+    });
+    render(<FeedListRow item={seriesItem} />);
+    const pauseBtn = screen.getByRole("button", { name: "Pause lecture" });
+    fireEvent.click(pauseBtn);
+    expect(audioService.pause).toHaveBeenCalled();
+  });
+
+  it("treats a currently playing lesson from this collection as this row's current track", () => {
+    const collectionItem = { ...baseItem, kind: "collection" as const, id: "collection-1" };
+    (useAudio as Mock<any>).mockReturnValue({
+      isPlaying: true,
+      currentTrack: { id: "lesson-1", collectionId: "collection-1" },
+    });
+    render(<FeedListRow item={collectionItem} />);
+    const pauseBtn = screen.getByRole("button", { name: "Pause lecture" });
+    fireEvent.click(pauseBtn);
+    expect(audioService.pause).toHaveBeenCalled();
+  });
+
+  it("calls markSaved with id and slug when bookmark button clicked and not saved", () => {
     render(<FeedListRow item={baseItem} />);
     const saveBtn = screen.getByRole("button", { name: "Save lecture" });
     fireEvent.click(saveBtn);
-    expect(useProgressStore.getState().actions.isSaved("lec-1")).toBe(true);
+    expect(mockMarkSaved).toHaveBeenCalledWith("lec-1", "importance-of-sunnah");
   });
 
-  it("calls removeSaved when bookmark button clicked and already saved", () => {
-    useProgressStore.getState().actions.addSaved("lec-1");
+  it("calls markUnsaved with id and slug when bookmark button clicked and already saved", () => {
+    mockUseIsSaved.mockReturnValue(true);
     render(<FeedListRow item={baseItem} />);
     const unsaveBtn = screen.getByRole("button", { name: "Remove from saved" });
     fireEvent.click(unsaveBtn);
-    expect(useProgressStore.getState().actions.isSaved("lec-1")).toBe(false);
-  });
-
-  it("persists the save via the toggle-saved mutation, keyed by slug", () => {
-    render(<FeedListRow item={baseItem} />);
-    const saveBtn = screen.getByRole("button", { name: "Save lecture" });
-    fireEvent.click(saveBtn);
-    expect(mockMutate).toHaveBeenCalledWith(
-      { listingId: "importance-of-sunnah", saved: true },
-      expect.objectContaining({ onError: expect.any(Function) }),
-    );
-  });
-
-  it("persists the unsave via the toggle-saved mutation", () => {
-    useProgressStore.getState().actions.addSaved("lec-1");
-    render(<FeedListRow item={baseItem} />);
-    const unsaveBtn = screen.getByRole("button", { name: "Remove from saved" });
-    fireEvent.click(unsaveBtn);
-    expect(mockMutate).toHaveBeenCalledWith(
-      { listingId: "importance-of-sunnah", saved: false },
-      expect.objectContaining({ onError: expect.any(Function) }),
-    );
-  });
-
-  it("rolls back the optimistic save if the mutation fails", () => {
-    render(<FeedListRow item={baseItem} />);
-    const saveBtn = screen.getByRole("button", { name: "Save lecture" });
-    fireEvent.click(saveBtn);
-    expect(useProgressStore.getState().actions.isSaved("lec-1")).toBe(true);
-
-    const [, { onError }] = mockMutate.mock.calls[0]!;
-    onError();
-
-    expect(useProgressStore.getState().actions.isSaved("lec-1")).toBe(false);
+    expect(mockMarkUnsaved).toHaveBeenCalledWith("lec-1", "importance-of-sunnah");
   });
 
   it("triggers onPress prop when row is clicked", () => {

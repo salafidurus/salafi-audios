@@ -20,6 +20,23 @@ jest.mock("@/features/audio", () => ({
   },
 }));
 
+const mockDownloadButton = jest.fn((_props: unknown) => null);
+const mockDownloadProgress = jest.fn((_props: unknown) => null);
+
+jest.mock("@/features/downloads/components/download-button/download-button", () => ({
+  DownloadButton: (props: unknown) => {
+    mockDownloadButton(props);
+    return null;
+  },
+}));
+
+jest.mock("@/features/downloads/components/download-progress/download-progress", () => ({
+  DownloadProgress: (props: unknown) => {
+    mockDownloadProgress(props);
+    return null;
+  },
+}));
+
 const mockUseAudio = jest.fn(() => ({ isPlaying: false, currentTrack: null as Track | null }));
 const mockUseListingProgress = jest.fn(() => ({ progressPercent: 0, isCompleted: false }));
 
@@ -87,5 +104,16 @@ describe("LessonRow", () => {
       nativeEvent: { layout: { y: 120, x: 0, width: 100, height: 50 } },
     });
     expect(onLayout).toHaveBeenCalledWith("lesson-1", 120);
+  });
+
+  it("wires the lesson's id and audio url through to DownloadButton and DownloadProgress", async () => {
+    await render(<LessonRow item={item} queue={[track]} />);
+
+    expect(mockDownloadButton).toHaveBeenCalledWith(
+      expect.objectContaining({ lectureId: "lesson-1", audioUrl: "https://s/lesson-1.mp3" }),
+    );
+    expect(mockDownloadProgress).toHaveBeenCalledWith(
+      expect.objectContaining({ lectureId: "lesson-1" }),
+    );
   });
 });

@@ -1,3 +1,5 @@
+import { createMongoAbility } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react-native";
 import React from "react";
 
@@ -7,6 +9,12 @@ import { AdminListingsScreen } from "./admin-listings.screen";
 
 jest.mock("expo-router", () => ({
   Stack: { Screen: () => null },
+}));
+jest.mock("@sd/domain-account", () => ({
+  useAbility: jest.fn(),
+}));
+jest.mock("@/core/auth/use-auth", () => ({
+  useAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false, user: undefined })),
 }));
 jest.mock("../../hooks/use-admin-listings", () => ({
   useAdminListings: jest.fn(),
@@ -45,8 +53,20 @@ jest.mock("@sd/domain-content", () => ({
 
 const mockUseAdminListings = useAdminListings as jest.Mock;
 const mockBulkListingAction = bulkListingAction as jest.Mock;
+const mockedUseAbility = jest.mocked(useAbility) as any;
+
+const FULL_LISTING_ABILITY = createMongoAbility([
+  { action: "update", subject: "Listing" },
+  { action: "publish", subject: "Listing" },
+  { action: "archive", subject: "Listing" },
+  { action: "upload", subject: "Media" },
+]);
 
 describe("AdminListingsScreen", () => {
+  beforeEach(() => {
+    mockedUseAbility.mockReturnValue({ ability: FULL_LISTING_ABILITY, isLoading: false });
+  });
+
   it("renders loading state when loading", async () => {
     mockUseAdminListings.mockReturnValue({
       data: undefined,
@@ -159,5 +179,55 @@ describe("AdminListingsScreen", () => {
       expect(mockBulkListingAction).toHaveBeenCalledWith({ action: "archive", ids: ["lst-1"] }),
     );
     await waitFor(() => expect(refetch).toHaveBeenCalled());
+  });
+
+  it("shows the Upload button when the ability grants media upload", async () => {
+    mockUseAdminListings.mockReturnValue({
+      data: { items: [], total: 0, page: 1 },
+      isLoading: false,
+      refetch: jest.fn(),
+    });
+
+    await render(<AdminListingsScreen />);
+
+    expect(screen.getByText("+ Upload")).toBeTruthy();
+  });
+
+  it("hides the Upload button when the ability does not grant media upload", async () => {
+    mockedUseAbility.mockReturnValue({
+      ability: createMongoAbility([{ action: "update", subject: "Listing" }]),
+      isLoading: false,
+    });
+    mockUseAdminListings.mockReturnValue({
+      data: { items: [], total: 0, page: 1 },
+      isLoading: false,
+      refetch: jest.fn(),
+    });
+
+    await render(<AdminListingsScreen />);
+
+    expect(screen.queryByText("+ Upload")).toBeNull();
+  });
+
+  it("only offers the row actions the ability grants", async () => {
+    mockedUseAbility.mockReturnValue({
+      ability: createMongoAbility([{ action: "update", subject: "Listing" }]),
+      isLoading: false,
+    });
+    mockUseAdminListings.mockReturnValue({
+      data: {
+        items: [{ id: "lst-1", title: "Listing One", scholarName: "Scholar A", status: "draft" }],
+        total: 1,
+        page: 1,
+      },
+      isLoading: false,
+      refetch: jest.fn(),
+    });
+
+    await render(<AdminListingsScreen />);
+
+    expect(screen.getByTestId("admin-listing-row-lst-1-action-edit")).toBeTruthy();
+    expect(screen.queryByTestId("admin-listing-row-lst-1-action-publish")).toBeNull();
+    expect(screen.queryByTestId("admin-listing-row-lst-1-action-archive")).toBeNull();
   });
 });

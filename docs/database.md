@@ -77,12 +77,18 @@ Client persistence improves continuity but never becomes authoritative.
 - **Counter Sync**: Listings maintain denormalized `publishedLectureCount` and `publishedDurationSeconds` synchronized inside a database transaction during repository writes.
 - **Trigram Search**: The database uses the PostgreSQL `pg_trgm` extension. The `Listing` model contains a GIN index on the `title` field for fuzzy searches.
 
-## 9. Privacy and Hard Deletions
+## 9. Soft-Delete Tombstones for Delta Sync
 
-- GDPR compliance is backend-enforced. When a user requests hard deletion, executing `DELETE /account` cascades and purges all personal rows (`Session`, `Account`, `AdminPermission`, `UserListingProgress`, `FavoriteListing`) using `onDelete: Cascade` rules, while decoupled listing audit columns preserve catalog integrity.
+- `FavoriteListing` (saved/library) carries an app-settable `updatedAt` and a `deletedAt` tombstone, the same shape as `UserListingProgress`. Unsaving sets `deletedAt`/`updatedAt` instead of deleting the row; re-saving clears `deletedAt` and bumps `updatedAt`. This lets offline clients delta-sync via `?since=` and reconcile removals — a hard delete would be invisible to a client that was offline when it happened.
+- Conflict resolution on both tables is last-write-wins by `updatedAt`, applied via a raw `INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...` upsert (see `AudioRepository.bulkSync` / `LibraryRepository.bulkSync`). Progress additionally merges `isCompleted` monotonically; saved/library uses plain LWW since a later unsave must be able to override an earlier save and vice versa. See [mobile.md](./mobile.md#6-sync-architecture) for the client-side half of this.
+- Every read path over these tables filters `deletedAt: null`.
 
-## 10. Admin Roles and Permissions
+## 10. Privacy and Hard Deletions
 
-- Promoting a user to admin and granting the `AdminPermission` capabilities is documented in
+- GDPR compliance is backend-enforced. When a user requests hard deletion, executing `DELETE /account` cascades and purges all personal rows (`Session`, `Account`, `UserRoleAssignment`, `UserPermission`, `UserScholarRole`, `UserTranslatorRole`, `UserListingProgress`, `FavoriteListing`) using `onDelete: Cascade` rules, while decoupled listing audit columns preserve catalog integrity. This physically removes the rows regardless of any `deletedAt` tombstone state — the soft-delete convention above is for normal unsave/sync, not a substitute for GDPR erasure.
+
+## 11. Admin Roles and Permissions
+
+- Roles, global permissions, and scholar/translator scoped grants (`UserRoleAssignment`, `UserPermission`, `UserScholarRole`, `UserTranslatorRole`) are combined into a CASL ability server-side (`apps/api/src/core/auth/ability/ability.factory.ts`) and enforced per-request by `PolicyGuard`. Promoting a user to admin and granting capabilities is documented in
   [admin-management.md](./admin-management.md) — covers the automated `grant:role`
   script, manual SQL, and Prisma Studio.

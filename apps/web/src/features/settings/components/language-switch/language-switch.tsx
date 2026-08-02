@@ -41,7 +41,11 @@ export function LanguageSwitch({ direction = "down", collapsed = false }: Langua
     }
     await i18n.changeLanguage(locale as Locale);
     setLocaleCookie(locale as Locale);
-    await queryClient.invalidateQueries();
+    // Content queries carry the locale via Accept-Language. A refetch here
+    // would still use the OLD locale and get thrown away by router.refresh()
+    // anyway, so clear the cache synchronously instead of invalidating +
+    // awaiting a wasted round-trip — mirrors the sign-out cache clear.
+    queryClient.clear();
     refresh();
   };
 

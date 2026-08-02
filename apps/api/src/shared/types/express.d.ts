@@ -1,3 +1,8 @@
+import type {
+  ScholarLinkAttribute,
+  TranslatorRoleAttribute,
+} from '../../core/auth/ability/ability.types';
+
 declare global {
   namespace Express {
     interface Request {
@@ -9,6 +14,9 @@ declare global {
         emailVerified: boolean;
         image?: string | null;
         roles: string[];
+        permissions: string[];
+        scholarLinks: ScholarLinkAttribute[];
+        translatorRoles: TranslatorRoleAttribute[];
         banned?: boolean | null;
         banReason?: string | null;
         banExpires?: Date | null;

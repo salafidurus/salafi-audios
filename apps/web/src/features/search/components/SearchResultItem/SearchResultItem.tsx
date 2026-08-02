@@ -43,9 +43,18 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
   const isDesktop = useIsDesktop();
   const { isMobile } = useResponsive();
   const { addToast } = useToast();
-  const { play, isLoading } = usePlayListing(item.slug, {
-    onError: (message) => addToast(message, "error"),
-  });
+  const { play, isLoading } = usePlayListing(
+    {
+      id: item.id,
+      slug: item.slug,
+      title: item.title,
+      format: item.format,
+      scholarName: item.scholarName,
+      scholarSlug: item.scholarSlug,
+      artworkUrl: item.imageUrl,
+    },
+    { onError: (message) => addToast(message, "error") },
+  );
   const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
 
   const handlePlayClick = async (e: React.MouseEvent<HTMLButtonElement>) => {

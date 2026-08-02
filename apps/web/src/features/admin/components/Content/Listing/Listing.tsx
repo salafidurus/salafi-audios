@@ -1,10 +1,10 @@
 import type { AdminListingListItemDto } from "@sd/core-contracts";
 
+import { useAbility } from "@sd/domain-account";
 import { Pencil, Upload, Languages, Headphones } from "lucide-react";
 import Image from "next/image";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
@@ -23,7 +23,11 @@ interface ListingProps {
 export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps) {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
+  const { ability } = useAbility();
   const formattedScholarName = useFormattedScholarName(listing.scholarName, listing.scholarSlug);
+  // Bare (unconditioned) checks: the list itself is already scope-filtered
+  // server-side (a scholar-scoped editor only ever fetches their own
+  // scholars' listings), so any row rendered here is already in scope.
 
   const statusText = t(`admin.contents.listing.${listing.status}`, listing.status);
   const coverImage = listing.coverUrl || listing.thumbnailUrl;
@@ -58,7 +62,7 @@ export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps
         </div>
       </div>
       <List.Item.Actions>
-        <PermissionGate requires="LISTINGS_EDIT">
+        {ability.can("update", "Listing") && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
@@ -69,8 +73,8 @@ export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps
           >
             {isMobile && t("common.edit", "Edit")}
           </Button>
-        </PermissionGate>
-        <PermissionGate requires="TRANSLATIONS_VIEW">
+        )}
+        {ability.can("read", "Translation") && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
@@ -81,8 +85,8 @@ export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps
           >
             {isMobile && t("admin.translations.button", "Translations")}
           </Button>
-        </PermissionGate>
-        <PermissionGate requires="MEDIA_UPLOAD">
+        )}
+        {ability.can("upload", "Media") && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
@@ -93,7 +97,7 @@ export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps
           >
             {isMobile && t("common.upload", "Upload")}
           </Button>
-        </PermissionGate>
+        )}
       </List.Item.Actions>
     </List.Item>
   );

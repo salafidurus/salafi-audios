@@ -1,9 +1,25 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { httpClient } from "@sd/core-contracts";
 import { flushPendingProgress, syncProgressToBackend, useProgressStore } from "@sd/domain-audio";
+import { hydrateSavedFromServer } from "@sd/domain-content";
 import { AppState } from "react-native";
 
 import { initProgressPersistence } from "./progress-persistence";
+
+// Mocked (not just @sd/core-contracts) because @sd/domain-content's package
+// root re-exports unrelated hooks/utils with their own module-level side
+// effects (e.g. a fallback QueryClient instantiation) that don't play well
+// with this file's minimal jest environment — same convention already used
+// by other native specs that touch @sd/domain-content (e.g.
+// library-saved.screen.spec.tsx). Saved-sync's real behavior is covered by
+// @sd/domain-content's own saved.sync.spec.ts.
+jest.mock("@sd/domain-content", () => ({
+  initSavedSync: jest.fn(async () => {}),
+  drainPendingSaved: jest.fn(async () => {}),
+  hydrateSavedFromServer: jest.fn(async () => {}),
+  flushPendingSaved: jest.fn(async () => {}),
+  onSavedFlushed: jest.fn(() => () => {}),
+}));
 
 jest.mock("@sd/core-contracts", () => ({
   httpClient: jest.fn(),
@@ -15,11 +31,26 @@ jest.mock("@sd/core-contracts", () => ({
         update: (listingId: string) => `/audio/progress/${listingId}`,
       },
     },
-    library: {
-      saved: "/me/library/saved",
-    },
   },
 }));
+
+jest.mock("expo-sqlite", () => {
+  const store = new Map<string, string>();
+  return {
+    __store: store,
+    openDatabaseAsync: jest.fn(async () => ({
+      execAsync: jest.fn(async () => {}),
+      runAsync: jest.fn(async (sql: string, key: string, value?: string) => {
+        if (sql.startsWith("INSERT")) store.set(key, value as string);
+        else if (sql.startsWith("DELETE")) store.delete(key);
+      }),
+      getFirstAsync: jest.fn(async (_sql: string, key: string) => {
+        const value = store.get(key);
+        return value === undefined ? null : { value };
+      }),
+    })),
+  };
+});
 
 const mockedHttpClient = jest.mocked(httpClient);
 const USER_ID = "user-1";
@@ -28,8 +59,7 @@ function storageKey(userId: string) {
   return `sd:progress-cache:v1:${userId}`;
 }
 
-function defaultHttpClientMock(opts: { url: string }) {
-  if (opts.url === "/me/library/saved") return Promise.resolve({ items: [], hasMore: false });
+function defaultHttpClientMock() {
   return Promise.resolve([]);
 }
 
@@ -37,7 +67,8 @@ beforeEach(async () => {
   jest.clearAllMocks();
   mockedHttpClient.mockImplementation(defaultHttpClientMock as any);
   await AsyncStorage.clear();
-  useProgressStore.setState({ progressMap: {}, savedMap: {}, lastSyncedAt: null });
+  (jest.requireMock("expo-sqlite") as { __store: Map<string, string> }).__store.clear();
+  useProgressStore.setState({ progressMap: {}, lastSyncedAt: null });
 });
 
 describe("initProgressPersistence", () => {
@@ -92,13 +123,61 @@ describe("initProgressPersistence", () => {
     cleanup();
   });
 
-  it("fetches the server's saved-listings list once on init", () => {
+  it("hydrates saved/library state from the server once on init", () => {
     const cleanup = initProgressPersistence(USER_ID);
 
+    expect(hydrateSavedFromServer).toHaveBeenCalledTimes(1);
+    cleanup();
+  });
+
+  it("retries a progress push left queued in SQLite from a previous session", async () => {
+    const { __store } = jest.requireMock("expo-sqlite") as { __store: Map<string, string> };
+    __store.set(
+      `sd:outbox:progress:${USER_ID}`,
+      JSON.stringify([
+        {
+          id: "outbox-1",
+          type: "progress-update",
+          payload: { listingId: "l9", positionSeconds: 30, durationSeconds: 200 },
+          createdAt: Date.now(),
+          retries: 0,
+        },
+      ]),
+    );
+
+    const cleanup = initProgressPersistence(USER_ID);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     expect(mockedHttpClient).toHaveBeenCalledWith({
-      url: "/me/library/saved",
-      method: "GET",
-      params: undefined,
+      url: "/audio/progress/l9",
+      method: "PUT",
+      body: { positionSeconds: 30, durationSeconds: 200 },
+    });
+    cleanup();
+  });
+
+  it("does not retry a push queued under a different user's outbox key", async () => {
+    const { __store } = jest.requireMock("expo-sqlite") as { __store: Map<string, string> };
+    __store.set(
+      `sd:outbox:progress:other-user`,
+      JSON.stringify([
+        {
+          id: "outbox-1",
+          type: "progress-update",
+          payload: { listingId: "l9", positionSeconds: 30, durationSeconds: 200 },
+          createdAt: Date.now(),
+          retries: 0,
+        },
+      ]),
+    );
+
+    const cleanup = initProgressPersistence(USER_ID);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(mockedHttpClient).not.toHaveBeenCalledWith({
+      url: "/audio/progress/l9",
+      method: "PUT",
+      body: { positionSeconds: 30, durationSeconds: 200 },
     });
     cleanup();
   });

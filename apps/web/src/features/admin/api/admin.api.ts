@@ -9,6 +9,10 @@ import type {
   UpdateTopicWithTranslationsDto,
   ScholarFormDataDto,
   ScholarTitle,
+  UserScholarRoleDto,
+  UserTranslatorRoleDto,
+  ScholarPermissionType,
+  Locale,
 } from "@sd/core-contracts";
 
 import { httpClient, endpoints } from "@sd/core-contracts";
@@ -68,6 +72,82 @@ export function revokeRole(userId: string, role: UserRole) {
     url: endpoints.admin.roles.revoke(userId, role),
     method: "DELETE",
     body: {},
+  });
+}
+
+// --- Scholar-scoped roles (identified by scholar slug, not id) ---
+
+export type AdminScholarRolesListResponse = {
+  scholarRoles: UserScholarRoleDto[];
+};
+
+export function fetchUserScholarRoles(userId: string) {
+  return httpClient<AdminScholarRolesListResponse>({
+    url: endpoints.admin.scholarRoles.list(userId),
+    method: "GET",
+  });
+}
+
+export function grantScholarRole(
+  userId: string,
+  scholarSlug: string,
+  permissionType: ScholarPermissionType,
+) {
+  return httpClient<{ success: boolean; message: string }>({
+    url: endpoints.admin.scholarRoles.grant(userId),
+    method: "POST",
+    body: { scholarSlug, permissionType },
+  });
+}
+
+export function revokeScholarRole(
+  userId: string,
+  scholarSlug: string,
+  permissionType: ScholarPermissionType,
+) {
+  return httpClient<{ success: boolean; message: string }>({
+    url: endpoints.admin.scholarRoles.revoke(userId, scholarSlug, permissionType),
+    method: "DELETE",
+    body: {},
+  });
+}
+
+// --- Translator-scoped roles (locale set, optionally scoped to one scholar) ---
+
+export type AdminTranslatorRolesListResponse = {
+  translatorRoles: UserTranslatorRoleDto[];
+};
+
+export function fetchUserTranslatorRoles(userId: string) {
+  return httpClient<AdminTranslatorRolesListResponse>({
+    url: endpoints.admin.translatorRoles.list(userId),
+    method: "GET",
+  });
+}
+
+export function syncTranslatorRoles(
+  userId: string,
+  scholarSlug: string | null,
+  locales: Locale[],
+  canPublish: boolean,
+) {
+  return httpClient<{ success: boolean; message: string }>({
+    url: endpoints.admin.translatorRoles.sync(userId),
+    method: "PUT",
+    body: { scholarSlug, locales, canPublish },
+  });
+}
+
+export function updateTranslatorPublish(
+  userId: string,
+  locale: Locale,
+  canPublish: boolean,
+  scholarSlug?: string | null,
+) {
+  return httpClient<{ success: boolean; message: string }>({
+    url: endpoints.admin.translatorRoles.updatePublish(userId, locale),
+    method: "PATCH",
+    body: { scholarSlug, canPublish },
   });
 }
 

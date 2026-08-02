@@ -130,8 +130,12 @@ export {
   LibraryItemDtoSchema,
   type LibraryPageDto,
   LibraryPageDtoSchema,
+  type SavedSyncItemDto,
+  SavedSyncItemDtoSchema,
   type SavedSyncDto,
   SavedSyncDtoSchema,
+  type SavedDeltaItemDto,
+  SavedDeltaItemDtoSchema,
   type UserProfileDto,
   UserProfileDtoSchema,
   type StreamResponseDto,
@@ -142,19 +146,14 @@ export {
   ProgressSyncItemDtoSchema,
   type ProgressSyncDto,
   ProgressSyncDtoSchema,
-  type AdminPermission,
-  AdminPermissionSchema,
   type AdminPermissionDto,
   AdminPermissionDtoSchema,
   type AdminPermissionsListDto,
   AdminPermissionsListDtoSchema,
-  type GrantPermissionDto,
-  GrantPermissionDtoSchema,
   type AdminUserListItemDto,
   AdminUserListItemDtoSchema,
   type AdminUserListDto,
   AdminUserListDtoSchema,
-  ADMIN_PERMISSIONS,
   // New permission types
   type Permission,
   PermissionEnum,
@@ -180,10 +179,12 @@ export {
   GrantPermissionRequestSchema,
   type GrantRoleRequest,
   GrantRoleRequestSchema,
-  type AssignScholarRequest,
-  AssignScholarRequestSchema,
-  type AssignTranslatorLanguageRequest,
-  AssignTranslatorLanguageRequestSchema,
+  type GrantScholarRoleRequest,
+  GrantScholarRoleRequestSchema,
+  type SyncTranslatorLocalesRequest,
+  SyncTranslatorLocalesRequestSchema,
+  type UpdateTranslatorPublishRequest,
+  UpdateTranslatorPublishRequestSchema,
   type ScholarChipDto,
   ScholarChipDtoSchema,
   type ContentSuggestionDto,
@@ -269,6 +270,14 @@ export {
   UpdateLocaleDtoSchema,
   type SearchQueryDto,
   SearchQueryDtoSchema,
+  type AppActions,
+  type AppSubjectType,
+  type ScholarSubject,
+  type ListingSubject,
+  type TranslationSubject,
+  type MediaSubject,
+  type AppSubjects,
+  type AppAbility,
 } from "./types";
 
 // Export route constants
@@ -286,11 +295,5 @@ export {
 } from "./navigation";
 
 // Export query utilities (client, keys, hooks)
-export {
-  createQueryClient,
-  queryKeys,
-  shouldPersistQuery,
-  getMaxAge,
-  DEFAULT_MAX_AGE,
-} from "./query";
+export { createQueryClient, queryKeys } from "./query";
 export { useApiQuery, initApiClient } from "./query/hooks";

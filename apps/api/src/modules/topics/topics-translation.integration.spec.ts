@@ -6,7 +6,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import request from 'supertest';
 import { createTestApp } from '../../test/create-test-app';
 import { AuthGuard } from '../../core/auth/auth.guard';
-import { PermissionGuard } from '../../core/auth/permission.guard';
+import { PolicyGuard } from '../../core/auth/policy.guard';
 import { TopicsController } from './topics.controller';
 import { TopicsTranslationsController } from './topics-translations.controller';
 import { TopicsService } from './topics.service';
@@ -23,6 +23,12 @@ const mockPrisma = {
   userRoleAssignment: {
     findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
     findUnique: vi.fn<any>().mockResolvedValue(null),
+  },
+  userScholarRole: {
+    findMany: vi.fn<any>().mockResolvedValue([]),
+  },
+  userTranslatorRole: {
+    findMany: vi.fn<any>().mockResolvedValue([]),
   },
 };
 
@@ -51,7 +57,7 @@ async function buildApp(): Promise<NestFastifyApplication> {
     controllers: [TopicsController, TopicsTranslationsController],
     providers: [
       { provide: APP_GUARD, useClass: AuthGuard },
-      { provide: APP_GUARD, useClass: PermissionGuard },
+      { provide: APP_GUARD, useClass: PolicyGuard },
       { provide: TopicsService, useValue: mockTopicsService },
       { provide: PrismaService, useValue: mockPrisma },
     ],
@@ -78,18 +84,13 @@ describe('TopicsTranslationsController — auth boundaries', () => {
         user: { id: 'u1', role: 'admin' },
         session: {},
       });
-      // Mock userPermission.findUnique to return permissions for admin
-      mockPrisma.userPermission.findUnique.mockImplementation(async (args: any) => {
-        const { where } = args;
-        const { userId, permission } = where.userId_permission;
-        if (
-          userId === 'u1' &&
-          ['TRANSLATIONS_VIEW', 'TRANSLATIONS_CREATE', 'TRANSLATIONS_EDIT'].includes(permission)
-        ) {
-          return { userId, permission, grantedAt: new Date() };
-        }
-        return null;
-      });
+      // AuthGuard backfills request.user.permissions via findMany when the
+      // session doesn't carry them — PolicyGuard's ability check reads that.
+      mockPrisma.userPermission.findMany.mockResolvedValue(
+        ['TRANSLATIONS_VIEW', 'TRANSLATIONS_CREATE', 'TRANSLATIONS_EDIT'].map((permission) => ({
+          permission,
+        })),
+      );
     });
 
     it('POST /topics/:id/translations creates a translation', async () => {
@@ -125,9 +126,8 @@ describe('TopicsTranslationsController — auth boundaries', () => {
         user: { id: 'u1', role: 'user' },
         session: {},
       });
-      // Reset userPermission.findUnique to return null for all queries
-      // This ensures PermissionGuard will throw ForbiddenException
-      mockPrisma.userPermission.findUnique.mockResolvedValue(null);
+      // No permissions backfilled — PolicyGuard's ability check should deny.
+      mockPrisma.userPermission.findMany.mockResolvedValue([]);
       forbiddenApp = await buildApp();
     });
 

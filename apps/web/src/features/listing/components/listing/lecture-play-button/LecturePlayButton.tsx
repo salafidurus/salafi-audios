@@ -64,6 +64,7 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
 
     const track: Track = {
       id: lecture.id,
+      slug: lecture.slug,
       title: lecture.title,
       artist: scholarName,
       url: asset.url,

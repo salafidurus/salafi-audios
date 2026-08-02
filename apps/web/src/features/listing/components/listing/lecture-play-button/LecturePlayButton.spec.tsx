@@ -71,6 +71,7 @@ describe("LecturePlayButton", () => {
     fireEvent.click(screen.getByText("▶ Play Lecture"));
     const expectedTrack = {
       id: "lec-1",
+      slug: "test-lecture",
       title: "Test Lecture",
       artist: "Ibn Baz",
       url: "https://example.com/audio.mp3",

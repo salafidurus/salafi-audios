@@ -20,9 +20,11 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@casl/ability": "catalog:",
     "@sd/core-api": "workspace:*",
     "@sd/core-contracts": "workspace:*",
     "@sd/core-i18n": "workspace:*",
+    "@sd/core-sync": "workspace:*",
     "@sd/design-tokens": "workspace:*",
     "@sd/domain-account": "workspace:*",
     "@sd/domain-audio": "workspace:*",
@@ -30,12 +32,10 @@
     "@sd/domain-search": "workspace:*",
     "@sd/utils-error": "workspace:*",
     "@tanstack/react-query": "catalog:",
-    "@tanstack/react-query-persist-client": "catalog:",
     "better-auth": "catalog:",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",
     "i18next": "catalog:",
-    "idb": "^8",
     "lucide-react": "^1.21.0",
     "next": "16.2.7",
     "react": "catalog:",
@@ -53,7 +53,6 @@
     "@types/react": "catalog:",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.2",
-    "fake-indexeddb": "^6.2.2",
     "playwright": "^1.62.0",
     "tailwindcss": "^4"
   }

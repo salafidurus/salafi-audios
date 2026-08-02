@@ -68,6 +68,15 @@ describe("ContentListItem", () => {
     expect(track.moduleId).toBeNull();
   });
 
+  it("tags the track with its own slug — the progress-sync PUT resolves strictly by slug, not uuid", () => {
+    render(<ContentListItem item={item} scholarName="Ibn Baz" />);
+
+    fireEvent.click(screen.getByText("Play"));
+
+    const [track] = (audioService.playListing as any).mock.calls[0];
+    expect(track.slug).toBe("lesson-1");
+  });
+
   it("exposes an anchor id for the row so a parent page can scroll to it", () => {
     render(<ContentListItem item={item} scholarName="Ibn Baz" />);
 

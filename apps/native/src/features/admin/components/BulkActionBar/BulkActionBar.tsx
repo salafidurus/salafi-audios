@@ -5,6 +5,8 @@ type BulkActionBarProps = {
   selectedCount: number;
   onPublish: () => void;
   onArchive: () => void;
+  canPublish: boolean;
+  canArchive: boolean;
   isLoading?: boolean;
 };
 
@@ -12,18 +14,25 @@ export function BulkActionBar({
   selectedCount,
   onPublish,
   onArchive,
+  canPublish,
+  canArchive,
   isLoading,
 }: BulkActionBarProps) {
   if (selectedCount === 0) return null;
+  if (!canPublish && !canArchive) return null;
   return (
     <View style={styles.container}>
       <Text style={styles.countText}>{selectedCount} selected</Text>
-      <Pressable onPress={onPublish} disabled={isLoading} style={styles.publishBtn}>
-        <Text style={[styles.btnText, styles.publishBtnText]}>Publish</Text>
-      </Pressable>
-      <Pressable onPress={onArchive} disabled={isLoading} style={styles.archiveBtn}>
-        <Text style={[styles.btnText, styles.archiveBtnText]}>Archive</Text>
-      </Pressable>
+      {canPublish ? (
+        <Pressable onPress={onPublish} disabled={isLoading} style={styles.publishBtn}>
+          <Text style={[styles.btnText, styles.publishBtnText]}>Publish</Text>
+        </Pressable>
+      ) : null}
+      {canArchive ? (
+        <Pressable onPress={onArchive} disabled={isLoading} style={styles.archiveBtn}>
+          <Text style={[styles.btnText, styles.archiveBtnText]}>Archive</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }

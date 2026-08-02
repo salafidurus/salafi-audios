@@ -1,12 +1,35 @@
+import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
 import { Stack } from "expo-router";
 import { useUnistyles } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { getTabStackScreenOptions } from "@/features/navigation/utils/stack-header-options";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 
 export default function AdminLayout() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
+  const { isAuthenticated } = useAuth();
+  const { ability, isLoading } = useAbility({ isAuthenticated });
+
+  if (isLoading) {
+    return (
+      <EmptyState
+        variant="loading"
+        message={t("admin.checkingPermissions", "Checking permissions…")}
+      />
+    );
+  }
+
+  if (!hasAnyAdminAccess(ability)) {
+    return (
+      <EmptyState
+        variant="error"
+        message={t("admin.accessDenied", "You do not have admin permissions.")}
+      />
+    );
+  }
 
   return (
     <Stack screenOptions={getTabStackScreenOptions(theme)}>

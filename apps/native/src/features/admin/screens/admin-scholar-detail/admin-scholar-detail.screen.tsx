@@ -1,11 +1,14 @@
 import type { ScholarDetailDto, AdminListingListItemDto } from "@sd/core-contracts";
 
+import { subject } from "@casl/ability";
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
+import { useAbility } from "@sd/domain-account";
 import { useMemo, useReducer } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
 import { DraggableList, type RenderItemParams } from "@/shared/components/DraggableList";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { MarqueeText } from "@/shared/components/MarqueeText";
@@ -81,35 +84,42 @@ function SectionHeader({
   isExpanded,
   onToggle,
   onAdd,
+  canAdd,
 }: {
   title: string;
   isExpanded: boolean;
   onToggle: () => void;
   onAdd: () => void;
+  canAdd: boolean;
 }) {
   return (
     <Pressable onPress={onToggle} style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{title}</Text>
-      <Pressable
-        onPress={(e) => {
-          e.stopPropagation();
-          onAdd();
-        }}
-        style={styles.addBtn}
-      >
-        <Text style={styles.addBtnText}>+ Add</Text>
-      </Pressable>
+      {canAdd ? (
+        <Pressable
+          onPress={(e) => {
+            e.stopPropagation();
+            onAdd();
+          }}
+          style={styles.addBtn}
+        >
+          <Text style={styles.addBtnText}>+ Add</Text>
+        </Pressable>
+      ) : null}
       <Text style={styles.chevron}>{isExpanded ? "▲" : "▼"}</Text>
     </Pressable>
   );
 }
 
 export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScreenProps) {
+  const { isAuthenticated } = useAuth();
+  const { ability } = useAbility({ isAuthenticated });
   const { data: scholar } = useApiQuery<ScholarDetailDto>(["scholars", scholarSlug], () =>
     httpClient<ScholarDetailDto>({ url: endpoints.scholars.detail(scholarSlug), method: "GET" }),
   );
 
   const scholarId = scholar?.id ?? "";
+  const canAdd = ability.can("create", subject("Listing", { scholarId }));
 
   const { data: seriesList, refetch: refetchSeries } = useAdminSeries(scholarId);
   const { data: collectionList, refetch: refetchCollections } = useAdminCollections(scholarId);
@@ -189,6 +199,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
           isExpanded={seriesExpanded}
           onToggle={() => dispatch({ seriesExpanded: !seriesExpanded })}
           onAdd={() => dispatch({ showSeriesSheet: true })}
+          canAdd={canAdd}
         />
         {seriesExpanded &&
           (displaySeries.length === 0 ? (
@@ -211,6 +222,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
           isExpanded={collectionsExpanded}
           onToggle={() => dispatch({ collectionsExpanded: !collectionsExpanded })}
           onAdd={() => dispatch({ showCollectionSheet: true })}
+          canAdd={canAdd}
         />
         {collectionsExpanded &&
           (displayCollections.length === 0 ? (

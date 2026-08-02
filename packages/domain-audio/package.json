@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
+    "@sd/core-sync": "workspace:*",
     "zustand": "catalog:"
   },
   "devDependencies": {},
