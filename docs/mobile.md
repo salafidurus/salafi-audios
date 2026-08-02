@@ -22,7 +22,7 @@ The mobile app (`apps/native`) is the listening-first client. It prioritizes con
 
 ## 3. Current Implementation State
 
-Current mobile work is centered on search and auth flows. Offline sync, downloads, and canonical playback/progress systems are still planned rather than complete.
+Mobile has search, auth, catalog browsing, audio playback with progress tracking, saved/library, offline audio downloads, and local-first sync all implemented. See §6 for the sync architecture and §7 for playback/downloads specifics.
 
 The navigation surface has been reworked into a tabs-owned structure:
 
@@ -46,37 +46,42 @@ Offline support is a product requirement, but the architecture must be described
 - Offline mode never grants editorial or administrative capability.
 - Synchronization is reconciliation, not peer authority.
 
-## 5. Target Offline Data Model
+## 5. Offline Data Model
 
-When offline support is implemented, mobile data falls into three categories:
+Mobile data falls into three categories:
 
-1. **Offline-readable**: downloaded audio and cached metadata.
-2. **Offline-writable**: personal intent such as progress and favorites, queued for later sync.
+1. **Offline-readable**: downloaded audio (`apps/native/src/features/downloads/`) and in-memory catalog/browse data (no longer persisted — see §6).
+2. **Offline-writable**: personal intent — progress and saved/library — recorded locally first and queued for sync via `@sd/core-sync`.
 3. **Offline-only**: temporary UI state and device-local preferences.
 
-## 6. Target Sync Architecture
+Catalog/search/browse data is network-first and in-memory only (`QueryClientProvider`, no persister) — it is not available offline. Only progress, saved/library, and downloaded audio survive an app restart without connectivity.
 
-The intended sync model is an outbox-based design:
+## 6. Sync Architecture
 
-- user intent is queued locally,
-- sync runs opportunistically when connectivity returns,
-- entries are retried safely,
-- backend rules resolve conflicts deterministically,
-- local state reconciles to backend truth after confirmation.
+`@sd/core-sync` is the shared local-first primitive, used by `@sd/domain-audio` (progress) and `@sd/domain-content` (saved/library) — the same logic on both web and native, differing only in which `StorageAdapter` each app injects (`apps/web/src/core/sync/local-storage-adapter.ts` wraps `localStorage`; `apps/native/src/core/sync/sqlite-kv-adapter.ts` wraps a dedicated `expo-sqlite` `kv_store` table in `sd-sync.db`).
 
-This is the intended architecture for Phase 06, not a statement that it is already complete today.
+- **Local writes are immediate and optimistic.** A save/unsave or a progress tick updates the local entity store (Zustand, keyed by id) before any network call.
+- **Debounced background sync.** Changes are batched and pushed after a short debounce rather than on every write.
+- **Persisted outbox.** Pending pushes are queued in a `createOutboxStore` instance backed by the platform's `StorageAdapter`, so a failed push (offline, crash, force-quit) survives and is retried on the next flush — not lost like an in-memory retry queue would be.
+- **Outbox is namespaced per user** (`progress:${userId}`, `saved:${userId}`) so switching accounts on the same device never leaks or retries another user's queued writes.
+- **Conflict resolution is last-write-wins by `updatedAt`**, mirroring the server's own `bulkSync` SQL (`INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...`). Progress additionally merges `isCompleted` monotonically (a completion can't be un-completed by an older write); saved/library uses plain LWW on a `deletedAt` tombstone, since a later unsave must be able to override an earlier save and vice versa.
+- **Delta hydration** pulls only what changed since the last sync via `?since=` on both the progress and saved/library endpoints.
+- **Drain triggers (native only):** `AppState` foreground and `expo-network` reconnect (`apps/native/src/core/network/network-status.ts`), wired in `apps/native/src/core/providers.tsx`. Web has no network-status listener — nothing on web currently needs one, since the debounced flush already covers the tab-stays-open case.
 
-## 7. Playback and Continuity
+This is the implemented architecture, not a target — backend rules still resolve conflicts deterministically and clients still record intent rather than authority, matching §4.
 
-- Playback continuity may use local persistence for resume behavior.
-- Progress synchronization should be throttled and idempotent once implemented.
-- Cross-device consistency is eventual rather than real-time.
+## 7. Playback, Progress, and Offline Downloads
+
+- `DurusAudioService` (`@sd/domain-audio`) resolves a track's playable URL by checking, in order: an already-resolved `file://` URI, an injected `localUriResolver` (native only, backed by the downloads registry), an existing remote URL, or a lazily-fetched signed stream URL. A downloaded lecture is preferred over streaming automatically — no separate "play offline" mode.
+- Progress is throttled/debounced and idempotent, synced through the `@sd/core-sync` engine described in §6.
+- Cross-device consistency is eventual, reconciled via last-write-wins on `updatedAt`.
+- Downloads use `expo-file-system`'s `DownloadTask` API and a dedicated `expo-sqlite` registry (`sd-downloads.db`, table `downloads`) — genuinely relational/queryable, so it does not go through `@sd/core-sync`'s KV `StorageAdapter`. `apps/native/src/features/downloads/store/downloads.store.ts` is a Zustand read-cache hydrated from this registry on launch, so download state survives an app restart even though the in-flight native task itself does not. Removal and offline-initiated download retries go through the same downloads-namespaced outbox, device-scoped (not per-user, since downloaded files are shared across whoever is signed in on that device).
 
 ## 8. Mobile-Specific Constraints
 
-- The mobile app may cache and persist aggressively for usability.
+- Persistence is narrow and repository-owned (progress, saved/library, downloads) — not a blanket cache. Catalog/browse data is network-first and in-memory only.
 - It must not duplicate backend policy.
-- It must not invent alternative sync semantics outside the documented outbox model.
+- It must not invent alternative sync semantics outside the documented outbox model (§6).
 
 ## 9. Navigation Surface
 

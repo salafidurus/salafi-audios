@@ -75,6 +75,14 @@ Authentication and authorization are centralized in the backend.
 - Permissions endpoints are mapped as a nested sub-resource under the User resource space at `/admin/users/:userId/permissions`.
 - Read and write permission endpoints standardize on returning string arrays (`string[]`) of permission names.
 - GDPR account deletions are resolved via `DELETE /account` and administrative user deletion endpoints.
+- Personal sync state exposes matched bulk-push/delta-pull pairs per resource: `POST /audio/progress/sync` + `GET /audio/progress?since=` for progress, `POST /me/library/saved/sync` + `GET /me/library/saved/delta?since=` for saved/library. Both bulk-push bodies use a unified `{ items: [...] }` shape (one endpoint per resource, not split save/unsave or start/stop calls) so the client-side sync engine (`@sd/core-sync`) can treat every resource the same way.
+
+### Sync and Conflict Resolution
+
+- Clients record intent locally first (`@sd/core-sync`'s entity store + persisted outbox — see [mobile.md](./mobile.md#6-sync-architecture)) and push it via debounced bulk-sync calls; the backend is always the conflict-resolution authority, never the client.
+- Conflicts resolve by **last-write-wins on `updatedAt`**, implemented as a raw `INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...` upsert (see `AudioRepository.bulkSync`, `LibraryRepository.bulkSync`). This is the house convention for every future sync resource.
+- Progress additionally merges `isCompleted` **monotonically** — an older write can never un-complete a lesson. Saved/library uses **plain** LWW on a `deletedAt` tombstone instead, since a later unsave must be able to override an earlier save (and vice versa); see [database.md](./database.md#9-soft-delete-tombstones-for-delta-sync).
+- Delta-pull endpoints (`?since=`) return tombstoned/removed rows too, so an offline client can reconcile deletions instead of only ever accumulating state.
 
 ## 6. Media and Analytics Through the API
 
