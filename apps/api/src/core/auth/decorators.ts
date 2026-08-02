@@ -8,8 +8,6 @@ export const ROLES_KEY = 'roles';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
 
-export { RequiresPermission, REQUIRES_PERMISSION_KEY } from './requires-permission.decorator';
-
 export const CurrentUser = createParamDecorator((_: unknown, ctx: ExecutionContext) => {
   const request = ctx.switchToHttp().getRequest<Request>();
   return request.user;

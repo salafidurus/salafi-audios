@@ -21,8 +21,7 @@ export class PolicyGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
-    // Routes without @CheckPolicy are guarded only by AuthGuard (or a
-    // still-migrating @RequiresPermission, enforced by PermissionGuard).
+    // Routes without @CheckPolicy are guarded only by AuthGuard.
     if (!metadata) return true;
 
     const request = context.switchToHttp().getRequest<Request>();
