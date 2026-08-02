@@ -1,14 +1,23 @@
 "use client";
 
-import type { Track } from "@sd/domain-audio";
+import type { ListingContentsDto, ListingFormat } from "@sd/core-contracts";
 
-import { useListingDetail } from "@sd/domain-content";
+import { endpoints, httpClient } from "@sd/core-contracts";
+import { buildTrackQueue } from "@sd/domain-audio";
 import { sanitizeError } from "@sd/utils-error";
 import { useCallback, useState } from "react";
 
-import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
-
 import { audioService } from "../audio-service";
+
+export type PlayListingRef = {
+  id: string;
+  slug: string;
+  title: string;
+  format: ListingFormat;
+  scholarName: string;
+  scholarSlug?: string;
+  artworkUrl?: string;
+};
 
 export type UsePlayListingOptions = {
   /**
@@ -19,58 +28,51 @@ export type UsePlayListingOptions = {
 };
 
 /**
- * Hook to play a listing by ID.
- * Fetches the full listing detail and initiates playback via the audio service.
+ * Hook to play a listing by ref (id/slug/format).
  *
- * @param listingId - The ID of the listing to play (in format "prefix:id")
- * @param options - Configuration options including error callback
- * @returns Object with play function, loading state, and error state
+ * Fetches the listing's contents (its own audio for a single, or its ordered
+ * lessons/modules for a series/collection) and starts playback with the full
+ * queue — so series/collection results resume auto-advance, matching how the
+ * listing detail page's own Play button behaves, instead of trying to stream
+ * a container listing directly (which has no audio of its own).
  */
-export function usePlayListing(listingId: string | null, options?: UsePlayListingOptions) {
+export function usePlayListing(ref: PlayListingRef | null, options?: UsePlayListingOptions) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const formatScholarName = useFormatScholarName();
-
-  // Extract actual ID if it's in "prefix:id" format
-  const actualId = listingId ? listingId.split(":")[1] || listingId : null;
-
-  // Fetch the full listing detail to get the stream URL
-  const { data: listingDetail, isLoading: isDetailLoading } = useListingDetail(actualId || "");
 
   const play = useCallback(async () => {
-    if (!listingDetail) {
-      const errorMsg = "Unable to load audio. Please try again.";
-      setError(errorMsg);
-      options?.onError?.(errorMsg);
-      return;
-    }
-
-    if (!listingDetail.primaryAudioAsset?.url) {
-      const errorMsg = "No audio available for this lecture.";
-      setError(errorMsg);
-      options?.onError?.(errorMsg);
-      return;
-    }
+    if (!ref) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      // Construct Track object from listing detail
-      const track: Track = {
-        id: listingDetail.id,
-        title: listingDetail.title,
-        artist: formatScholarName(listingDetail.scholar),
-        url: listingDetail.primaryAudioAsset.url,
-        durationSeconds:
-          listingDetail.durationSeconds || listingDetail.primaryAudioAsset.durationSeconds || 0,
-        artworkUrl: listingDetail.scholar.imageUrl,
-        seriesId: listingDetail.seriesContext?.seriesId,
-        seriesTitle: listingDetail.seriesContext?.seriesTitle,
-      };
+      const contents = await httpClient<ListingContentsDto>({
+        url: endpoints.listings.contents(ref.slug),
+        method: "GET",
+      });
 
-      // Play the track using the audio service
-      await audioService.playListing(track);
+      const queue = buildTrackQueue(
+        {
+          id: ref.id,
+          title: ref.title,
+          format: ref.format,
+          scholarName: ref.scholarName,
+          scholarSlug: ref.scholarSlug,
+          artworkUrl: ref.artworkUrl,
+        },
+        contents,
+      );
+
+      const [firstTrack] = queue;
+      if (!firstTrack) {
+        const errorMsg = "No audio available for this lecture.";
+        setError(errorMsg);
+        options?.onError?.(errorMsg);
+        return;
+      }
+
+      await audioService.playListing(firstTrack, queue);
     } catch (err) {
       const sanitized = sanitizeError(err);
       setError(sanitized);
@@ -79,11 +81,11 @@ export function usePlayListing(listingId: string | null, options?: UsePlayListin
     } finally {
       setIsLoading(false);
     }
-  }, [listingDetail, options, formatScholarName]);
+  }, [ref, options]);
 
   return {
     play,
-    isLoading: isLoading || isDetailLoading,
+    isLoading,
     error,
   };
 }
