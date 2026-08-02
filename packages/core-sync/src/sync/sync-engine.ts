@@ -60,26 +60,37 @@ export function createSyncEngine<T extends SyncableEntity>(
       timeout = null;
     }
 
+    // Retry anything left over from a previous failed flush/session first, so a
+    // failure is picked up again on the very next flush rather than requiring a
+    // separate explicit `drainPending()` call.
+    const drainResult = await drainOutbox(outbox, (entry) => pushOne(entry.payload as T));
+
     const ids = Array.from(pendingIds);
     pendingIds.clear();
-    if (ids.length === 0) return;
 
-    await Promise.all(
-      ids.map(async (id) => {
-        const entity = store.getState().actions.get(id);
-        if (!entity) return;
+    let attempted = drainResult.succeeded + drainResult.failed > 0;
 
-        try {
-          await pushOne(entity);
-        } catch {
-          // Persist for retry so this write survives an app restart/crash — this is
-          // the fix for the historical "in-memory pendingUpdates lost on reload" gap.
-          outbox.useOutboxStore.getState().actions.enqueue(entryType, entity);
-        }
-      }),
-    );
+    if (ids.length > 0) {
+      attempted = true;
+      await Promise.all(
+        ids.map(async (id) => {
+          const entity = store.getState().actions.get(id);
+          if (!entity) return;
 
-    for (const listener of flushListeners) listener();
+          try {
+            await pushOne(entity);
+          } catch {
+            // Persist for retry so this write survives an app restart/crash — this is
+            // the fix for the historical "in-memory pendingUpdates lost on reload" gap.
+            outbox.useOutboxStore.getState().actions.enqueue(entryType, entity);
+          }
+        }),
+      );
+    }
+
+    if (attempted) {
+      for (const listener of flushListeners) listener();
+    }
   }
 
   return {

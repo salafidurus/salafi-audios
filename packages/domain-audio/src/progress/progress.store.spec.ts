@@ -4,7 +4,7 @@ import { useProgressStore } from "./progress.store";
 
 describe("useProgressStore.actions.loadProgress", () => {
   beforeEach(() => {
-    useProgressStore.setState({ progressMap: {}, savedMap: {}, lastSyncedAt: null });
+    useProgressStore.setState({ progressMap: {}, lastSyncedAt: null });
   });
 
   it("inserts entries that have no local counterpart", () => {

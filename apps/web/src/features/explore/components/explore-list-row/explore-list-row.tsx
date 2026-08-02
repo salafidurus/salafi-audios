@@ -4,7 +4,7 @@ import type { FeedContentItemDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
 import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
-import { useToggleSaved } from "@sd/domain-content";
+import { useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
 import { Play, Pause, Bookmark } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -34,10 +34,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const { isPlaying, currentTrack } = useAudio();
   const isCurrentTrack = currentTrack?.id === item.id;
 
-  const isSaved = useProgressStore((s) => s.actions.isSaved(item.id));
-  const addSaved = useProgressStore((s) => s.actions.addSaved);
-  const removeSaved = useProgressStore((s) => s.actions.removeSaved);
-  const toggleSaved = useToggleSaved();
+  const isSaved = useIsSaved(item.id);
 
   const progress = useProgressStore((s) => s.progressMap[item.id]);
   const isInProgress = progress && progress.positionSeconds > 0 && !progress.completedAt;
@@ -74,25 +71,11 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const nextSaved = !isSaved;
-    if (nextSaved) {
-      addSaved(item.id);
+    if (isSaved) {
+      markUnsaved(item.id, item.slug);
     } else {
-      removeSaved(item.id);
+      markSaved(item.id, item.slug);
     }
-
-    toggleSaved.mutate(
-      { listingId: item.slug, saved: nextSaved },
-      {
-        onError: () => {
-          if (nextSaved) {
-            removeSaved(item.id);
-          } else {
-            addSaved(item.id);
-          }
-        },
-      },
-    );
   };
 
   const initial = scholarName ? scholarName.trim().charAt(0).toUpperCase() : "?";

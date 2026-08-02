@@ -157,6 +157,54 @@ describe("createSyncEngine", () => {
     expect((entries[0]?.payload as TestEntity | undefined)?.id).toBe("a");
   });
 
+  it("retries an entry queued by a previous failed flush on the very next flush call", async () => {
+    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    let pushCalls = 0;
+    let shouldFail = true;
+    const engine = createSyncEngine<TestEntity>({
+      store: useTestStore,
+      outbox,
+      entryType: "test-update",
+      pushOne: async () => {
+        pushCalls++;
+        if (shouldFail) throw new Error("network down");
+      },
+      pullSince: async () => [],
+    });
+
+    engine.scheduleSync({ id: "a", updatedAt: "2026-01-01T00:00:00.000Z", value: 1 });
+    await engine.flush();
+    expect(pushCalls).toBe(1);
+    expect(outbox.useOutboxStore.getState().entries).toHaveLength(1);
+
+    shouldFail = false;
+    await engine.flush();
+
+    expect(pushCalls).toBe(2);
+    expect(outbox.useOutboxStore.getState().entries).toEqual([]);
+  });
+
+  it("notifies onFlushed when a flush only retries queued outbox entries with nothing newly pending", async () => {
+    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const engine = createSyncEngine<TestEntity>({
+      store: useTestStore,
+      outbox,
+      entryType: "test-update",
+      pushOne: async () => {
+        throw new Error("network down");
+      },
+      pullSince: async () => [],
+    });
+    engine.scheduleSync({ id: "a", updatedAt: "2026-01-01T00:00:00.000Z", value: 1 });
+    await engine.flush(); // queues into the outbox
+
+    let notified = 0;
+    engine.onFlushed(() => notified++);
+    await engine.flush(); // nothing newly pending, but the outbox retry is still an attempt
+
+    expect(notified).toBe(1);
+  });
+
   it("hydrate pulls entities since the given cursor and merges them into the store via LWW", async () => {
     const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
     let requestedSince: string | undefined;

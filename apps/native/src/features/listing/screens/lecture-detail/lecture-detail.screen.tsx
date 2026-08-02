@@ -1,8 +1,14 @@
 import type { Track } from "@sd/domain-audio";
 
 import { pickContentField } from "@sd/core-i18n";
-import { useAudio, useProgressStore, buildTrackQueue } from "@sd/domain-audio";
-import { useListingDetail, useListingContents, useToggleSaved } from "@sd/domain-content";
+import { useAudio, buildTrackQueue } from "@sd/domain-audio";
+import {
+  useListingDetail,
+  useListingContents,
+  useIsSaved,
+  markSaved,
+  markUnsaved,
+} from "@sd/domain-content";
 import { router, useLocalSearchParams } from "expo-router";
 import { Play, Pause, Bookmark } from "lucide-react-native";
 import { useEffect } from "react";
@@ -38,10 +44,7 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { isPlaying, currentTrack } = useAudio();
   const isCurrentTrack = lecture ? currentTrack?.id === lecture.id : false;
 
-  const isSaved = useProgressStore((s) => (lecture ? s.actions.isSaved(lecture.id) : false));
-  const addSaved = useProgressStore((s) => s.actions.addSaved);
-  const removeSaved = useProgressStore((s) => s.actions.removeSaved);
-  const toggleSaved = useToggleSaved();
+  const isSaved = useIsSaved(lecture?.id ?? "");
 
   // Slugs are flat and don't encode nesting, so a Lesson/Module's own slug
   // resolves to itself — redirect to the top-level page it belongs under,
@@ -162,28 +165,11 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   };
 
   const handleSave = () => {
-    const nextSaved = !isSaved;
-    // Optimistic local update for instant button state; rolled back if the server call fails.
-    // Keyed by the stable uuid id (matches how saved state is hydrated from the server).
-    if (nextSaved) {
-      addSaved(lecture.id);
+    if (isSaved) {
+      markUnsaved(lecture.id, lecture.slug);
     } else {
-      removeSaved(lecture.id);
+      markSaved(lecture.id, lecture.slug);
     }
-
-    // Prefer the slug over the uuid id for the API call — reads far better in server logs/traces.
-    toggleSaved.mutate(
-      { listingId: lecture.slug ?? lecture.id, saved: nextSaved },
-      {
-        onError: () => {
-          if (nextSaved) {
-            removeSaved(lecture.id);
-          } else {
-            addSaved(lecture.id);
-          }
-        },
-      },
-    );
   };
 
   return (

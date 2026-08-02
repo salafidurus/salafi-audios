@@ -3,12 +3,18 @@ import {
   drainPendingProgress,
   flushPendingProgress,
   hydrateProgressFromServer,
-  hydrateSavedFromServer,
   initProgressSync,
   onProgressFlushed,
   useProgressStore,
   type ListingProgress,
 } from "@sd/domain-audio";
+import {
+  drainPendingSaved,
+  flushPendingSaved,
+  hydrateSavedFromServer,
+  initSavedSync,
+  onSavedFlushed,
+} from "@sd/domain-content";
 import { AppState, type AppStateStatus } from "react-native";
 
 import { createSqliteKvAdapter } from "../sync/sqlite-kv-adapter";
@@ -40,13 +46,13 @@ async function writeCachedProgress(userId: string, entries: ListingProgress[]): 
 }
 
 /**
- * Wires local, per-user progress persistence for the current app session:
- * hydrates from the local cache immediately (before the network round-trip
- * resolves), then from the server; persists store changes back to the cache
- * (throttled); and flushes any pending debounced sync when the app leaves
- * the foreground, since a force-quit would otherwise race the 5s debounce
- * timer in progress.sync.ts. Call once per authenticated session; returns a
- * cleanup function.
+ * Wires local, per-user local-first sync for the current app session — both
+ * progress and saved/library state: hydrates progress from the local cache
+ * immediately (before the network round-trip resolves), then both from the
+ * server; persists progress store changes back to the cache (throttled); and
+ * flushes any pending debounced sync (both progress and saved) when the app
+ * leaves the foreground, since a force-quit would otherwise race the debounce
+ * timers. Call once per authenticated session; returns a cleanup function.
  */
 export function initProgressPersistence(
   userId: string,
@@ -61,6 +67,7 @@ export function initProgressPersistence(
   });
 
   void initProgressSync(createSqliteKvAdapter(), userId).then(() => drainPendingProgress());
+  void initSavedSync(createSqliteKvAdapter(), userId).then(() => drainPendingSaved());
   void hydrateProgressFromServer();
   void hydrateSavedFromServer();
 
@@ -73,11 +80,15 @@ export function initProgressPersistence(
     }, persistThrottleMs);
   });
 
-  const unsubscribeFlushed = options.onFlushed ? onProgressFlushed(options.onFlushed) : undefined;
+  const unsubscribeProgressFlushed = options.onFlushed
+    ? onProgressFlushed(options.onFlushed)
+    : undefined;
+  const unsubscribeSavedFlushed = options.onFlushed ? onSavedFlushed(options.onFlushed) : undefined;
 
   const handleAppStateChange = (nextState: AppStateStatus) => {
     if (nextState === "background" || nextState === "inactive") {
       void flushPendingProgress();
+      void flushPendingSaved();
     }
   };
   const subscription = AppState.addEventListener("change", handleAppStateChange);
@@ -85,7 +96,8 @@ export function initProgressPersistence(
   return () => {
     cancelled = true;
     unsubscribe();
-    unsubscribeFlushed?.();
+    unsubscribeProgressFlushed?.();
+    unsubscribeSavedFlushed?.();
     if (writeTimeout) clearTimeout(writeTimeout);
     subscription.remove();
   };

@@ -62,7 +62,7 @@ describe("DurusAudioService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     usePlaybackStore.getState().actions.stop();
-    useProgressStore.setState({ progressMap: {}, savedMap: {}, lastSyncedAt: null });
+    useProgressStore.setState({ progressMap: {}, lastSyncedAt: null });
     (httpClient as any).mockResolvedValue({ url: "https://resolved.stream.mp3" });
 
     mockEngine = {

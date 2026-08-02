@@ -10,7 +10,6 @@ export {
   syncProgressToBackend,
   flushPendingProgress,
   hydrateProgressFromServer,
-  hydrateSavedFromServer,
   onProgressFlushed,
   bulkSyncProgress,
   initProgressSync,

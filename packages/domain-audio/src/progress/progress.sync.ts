@@ -3,7 +3,6 @@ import {
   endpoints,
   type AudioProgressDto,
   type ProgressSyncItemDto,
-  type LibraryPageDto,
 } from "@sd/core-contracts";
 import { createOutboxStore, drainOutbox, type StorageAdapter } from "@sd/core-sync";
 
@@ -176,36 +175,6 @@ export async function hydrateProgressFromServer(): Promise<void> {
 
   useProgressStore.getState().actions.loadProgress(entries);
   useProgressStore.getState().actions.setLastSyncedAt(new Date().toISOString());
-}
-
-const MAX_SAVED_HYDRATION_PAGES = 20;
-
-/**
- * Fetches the user's full saved-listings list from the server and loads it
- * into `useProgressStore.savedMap`, so the saved heart/button reflects
- * server truth everywhere a listing is rendered, not just on the
- * `/library/saved` screen (which queries the same endpoint independently).
- */
-export async function hydrateSavedFromServer(): Promise<void> {
-  const entries: { listingId: string; savedAt: string }[] = [];
-  let cursor: string | undefined;
-
-  for (let page = 0; page < MAX_SAVED_HYDRATION_PAGES; page++) {
-    const response = await httpClient<LibraryPageDto>({
-      url: endpoints.library.saved,
-      method: "GET",
-      params: cursor ? { cursor } : undefined,
-    });
-
-    for (const item of response.items) {
-      if (item.savedAt) entries.push({ listingId: item.listingId, savedAt: item.savedAt });
-    }
-
-    if (!response.hasMore || !response.nextCursor) break;
-    cursor = response.nextCursor;
-  }
-
-  useProgressStore.getState().actions.loadSaved(entries);
 }
 
 /** Bulk-syncs a batch of progress entries to the server in one request. */

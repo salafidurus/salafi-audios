@@ -1,7 +1,6 @@
 "use client";
 
-import { useProgressStore } from "@sd/domain-audio";
-import { useToggleSaved } from "@sd/domain-content";
+import { useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
 import React, { useState } from "react";
 
 import { useAuth } from "@/core/auth";
@@ -12,17 +11,14 @@ import styles from "./LectureSaveButton.module.css";
 
 export type LectureSaveButtonProps = {
   lectureId: string;
-  /** Preferred over `lectureId` for the API call — reads far better in server logs/traces. */
+  /** Required for the save/unsave push to resolve server-side (it resolves by slug, not id). */
   lectureSlug?: string;
 };
 
 export function LectureSaveButton({ lectureId, lectureSlug }: LectureSaveButtonProps) {
   const { isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const isSaved = useProgressStore((s) => s.actions.isSaved(lectureId));
-  const addSaved = useProgressStore((s) => s.actions.addSaved);
-  const removeSaved = useProgressStore((s) => s.actions.removeSaved);
-  const toggleSaved = useToggleSaved();
+  const isSaved = useIsSaved(lectureId);
 
   const handleClick = () => {
     if (!isAuthenticated) {
@@ -30,27 +26,13 @@ export function LectureSaveButton({ lectureId, lectureSlug }: LectureSaveButtonP
       return;
     }
 
-    const nextSaved = !isSaved;
-    // Optimistic local update for instant button state; rolled back if the server call fails.
-    // Keyed by the stable uuid id (matches how saved state is hydrated from the server).
-    if (nextSaved) {
-      addSaved(lectureId);
+    // Local-first: optimistic instantly, debounced push with persisted-outbox
+    // retry on failure — no manual rollback needed here anymore.
+    if (isSaved) {
+      markUnsaved(lectureId, lectureSlug);
     } else {
-      removeSaved(lectureId);
+      markSaved(lectureId, lectureSlug);
     }
-
-    toggleSaved.mutate(
-      { listingId: lectureSlug ?? lectureId, saved: nextSaved },
-      {
-        onError: () => {
-          if (nextSaved) {
-            removeSaved(lectureId);
-          } else {
-            addSaved(lectureId);
-          }
-        },
-      },
-    );
   };
 
   return (

@@ -17,6 +17,9 @@ vi.mock("@sd/core-contracts", () => ({
     },
     library: {
       saved: "/me/library/saved",
+      savedDelta: "/me/library/saved/delta",
+      savedSync: "/me/library/saved/sync",
+      saveListing: (listingId: string) => `/me/library/save/${listingId}`,
     },
   },
 }));
@@ -24,7 +27,7 @@ vi.mock("@sd/core-contracts", () => ({
 const USER_ID = "user-1";
 
 function defaultHttpClientMock(opts: { url: string }) {
-  if (opts.url === "/me/library/saved") return Promise.resolve({ items: [], hasMore: false });
+  if (opts.url === "/me/library/saved/delta") return Promise.resolve([]);
   return Promise.resolve([]);
 }
 
@@ -32,7 +35,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   (httpClient as any).mockImplementation(defaultHttpClientMock);
   window.localStorage.clear();
-  useProgressStore.setState({ progressMap: {}, savedMap: {}, lastSyncedAt: null });
+  useProgressStore.setState({ progressMap: {}, lastSyncedAt: null });
 });
 
 describe("initProgressPersistence", () => {
@@ -85,11 +88,11 @@ describe("initProgressPersistence", () => {
     cleanup();
   });
 
-  it("fetches the server's saved-listings list once on init", () => {
+  it("fetches the server's saved-listings delta once on init", () => {
     const cleanup = initProgressPersistence(USER_ID);
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/me/library/saved",
+      url: "/me/library/saved/delta",
       method: "GET",
       params: undefined,
     });
