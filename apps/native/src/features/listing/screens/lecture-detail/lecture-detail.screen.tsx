@@ -17,6 +17,8 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { audioService } from "@/features/audio";
+import { DownloadButton } from "@/features/downloads/components/download-button/download-button";
+import { DownloadProgress } from "@/features/downloads/components/download-progress/download-progress";
 import { LectureMeta } from "@/features/listing/components/lecture-meta/lecture-meta";
 import { ListingContentView } from "@/features/listing/components/listing-content-view/listing-content-view";
 import { SeriesContextBar } from "@/features/listing/components/series-context-bar/series-context-bar";
@@ -211,6 +213,12 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
             />
           </View>
         </View>
+
+        <DownloadProgress lectureId={lecture.id} />
+
+        {lecture.primaryAudioAsset?.url ? (
+          <DownloadButton lectureId={lecture.id} audioUrl={lecture.primaryAudioAsset.url} />
+        ) : null}
 
         <TopicChips topics={lecture.topics} />
 

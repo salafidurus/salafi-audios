@@ -69,6 +69,23 @@ jest.mock("@/features/audio", () => ({
   },
 }));
 
+const mockDownloadButton = jest.fn((_props: unknown) => null);
+const mockDownloadProgress = jest.fn((_props: unknown) => null);
+
+jest.mock("@/features/downloads/components/download-button/download-button", () => ({
+  DownloadButton: (props: unknown) => {
+    mockDownloadButton(props);
+    return null;
+  },
+}));
+
+jest.mock("@/features/downloads/components/download-progress/download-progress", () => ({
+  DownloadProgress: (props: unknown) => {
+    mockDownloadProgress(props);
+    return null;
+  },
+}));
+
 jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
   ScreenView: ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -344,5 +361,33 @@ describe("LectureDetailScreen", () => {
     await fireEvent.press(screen.getByText("Save"));
 
     expect(mockMarkSaved).toHaveBeenCalledWith("uuid-1", "tafsir-al-fatiha");
+  });
+
+  it("wires the lecture's id and audio url through to DownloadButton and DownloadProgress", async () => {
+    mockedUseListingDetail.mockReturnValue({
+      data: {
+        ...singleLecture,
+        primaryAudioAsset: { id: "asset-1", url: "https://s/lecture-1.mp3" },
+      },
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<LectureDetailScreen slug="lecture-1" />);
+
+    expect(mockDownloadButton).toHaveBeenCalledWith(
+      expect.objectContaining({ lectureId: "lecture-1", audioUrl: "https://s/lecture-1.mp3" }),
+    );
+    expect(mockDownloadProgress).toHaveBeenCalledWith(
+      expect.objectContaining({ lectureId: "lecture-1" }),
+    );
+  });
+
+  it("omits DownloadButton when the lecture has no audio asset", async () => {
+    mockedUseListingDetail.mockReturnValue({ data: singleLecture, isFetching: false, error: null });
+
+    await render(<LectureDetailScreen slug="lecture-1" />);
+
+    expect(mockDownloadButton).not.toHaveBeenCalled();
   });
 });
