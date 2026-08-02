@@ -324,7 +324,6 @@
         "@sd/core-i18n": "workspace:*",
         "@sd/core-sync": "workspace:*",
         "@sd/domain-audio": "workspace:*",
-        "zustand": "catalog:",
       },
       "devDependencies": {
         "@happy-dom/global-registrator": "catalog:",
