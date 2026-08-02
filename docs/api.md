@@ -64,9 +64,10 @@ Authentication and authorization are centralized in the backend.
 
 ### Authorization
 
-- Roles are explicit and backend-enforced via the `UserRole` enum (`user`, `admin`, `editor`, `superadmin`).
+- Attribute-based access control (CASL): each request's roles, global permissions, and scholar/translator scoped grants are combined into an ability (`apps/api/src/core/auth/ability/ability.factory.ts`) and checked per-route by `PolicyGuard` via `@CheckPolicy(action, subjectType, resolver?)`.
 - Authorization is checked for every protected action, not inferred from the UI.
-- Scoped editor permissions must be evaluated dynamically against the targeted Listing or Scholar context.
+- Scoped editor and translator permissions are evaluated dynamically against the targeted Listing/Scholar/Translation context (e.g. `scholarId`, `locale`), not just a flat role/permission name.
+- Web and native ship the same packed ability rules to clients for convenience-only UI gating (`useAbility()`/`ability.can()` from `@sd/domain-account`) — the backend re-checks every request regardless of what the client shows.
 - Offline state or cached client data never grants authority.
 
 ### Route Mappings & Resource Namespaces
