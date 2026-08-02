@@ -1,16 +1,18 @@
+import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { Platform } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
-import { RouteAccessGuard } from "@/core/auth";
+import { RouteAccessGuard, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { BottomAccessoryInnerContent } from "@/features/navigation";
 
 export default function TabsLayout() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
-  const { hasAnyPermission } = useAdminPermissions();
+  const { isAuthenticated } = useAuth();
+  const { ability } = useAbility({ isAuthenticated });
+  const hasAnyPermission = hasAnyAdminAccess(ability);
 
   return (
     <RouteAccessGuard>

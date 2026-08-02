@@ -97,6 +97,7 @@
       "dependencies": {
         "@babel/runtime": "catalog:",
         "@better-auth/expo": "catalog:",
+        "@casl/ability": "catalog:",
         "@expo/dom-webview": "~57.0.1",
         "@expo/metro-runtime": "~57.0.8",
         "@expo/ui": "~57.0.8",
