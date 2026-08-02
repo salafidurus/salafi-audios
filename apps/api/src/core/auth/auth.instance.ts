@@ -75,11 +75,34 @@ function createAuthInstance(config: ConfigService) {
           permissions = userPerms.map((p) => p.permission as string);
         }
 
+        const userScholarRoles = await prismaInstance.userScholarRole.findMany({
+          where: { userId: user.id },
+          select: { scholarId: true, permissionType: true },
+        });
+        const scholarLinks = userScholarRoles.map((s) => ({
+          scholarId: s.scholarId,
+          permissionType: s.permissionType as string,
+        }));
+
+        const userTranslatorRoles = await prismaInstance.userTranslatorRole.findMany({
+          where: { userId: user.id },
+          select: { locale: true, canPublish: true },
+        });
+        // scholarId is added to UserTranslatorRole in Stage 3; until then every
+        // grant applies across all scholars.
+        const translatorRoles = userTranslatorRoles.map((t) => ({
+          scholarId: null as string | null,
+          locale: t.locale as string,
+          canPublish: t.canPublish,
+        }));
+
         return {
           user: {
             ...user,
             roles,
             permissions,
+            scholarLinks,
+            translatorRoles,
           },
           session,
         };

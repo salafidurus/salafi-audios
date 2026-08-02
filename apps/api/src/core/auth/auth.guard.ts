@@ -48,6 +48,8 @@ export class AuthGuard implements CanActivate {
       id: string;
       roles?: string[];
       permissions?: string[];
+      scholarLinks?: { scholarId: string; permissionType: string }[];
+      translatorRoles?: { scholarId: string | null; locale: string; canPublish: boolean }[];
       banned?: boolean | null;
       banExpires?: Date | string | null;
     };
@@ -73,11 +75,49 @@ export class AuthGuard implements CanActivate {
       }
     }
 
+    let permissions: string[] = sessionUser.permissions || [];
+    if (!permissions.length) {
+      const userPermissions = await this.prisma.userPermission.findMany({
+        where: { userId: sessionUser.id },
+        select: { permission: true },
+      });
+      permissions = userPermissions.map((p) => p.permission);
+    }
+
+    let scholarLinks = sessionUser.scholarLinks || [];
+    if (!scholarLinks.length) {
+      const userScholarRoles = await this.prisma.userScholarRole.findMany({
+        where: { userId: sessionUser.id },
+        select: { scholarId: true, permissionType: true },
+      });
+      scholarLinks = userScholarRoles.map((s) => ({
+        scholarId: s.scholarId,
+        permissionType: s.permissionType,
+      }));
+    }
+
+    let translatorRoles = sessionUser.translatorRoles || [];
+    if (!translatorRoles.length) {
+      const userTranslatorRoles = await this.prisma.userTranslatorRole.findMany({
+        where: { userId: sessionUser.id },
+        select: { locale: true, canPublish: true },
+      });
+      // scholarId is added to UserTranslatorRole in Stage 3; until then every
+      // grant applies across all scholars.
+      translatorRoles = userTranslatorRoles.map((t) => ({
+        scholarId: null,
+        locale: t.locale,
+        canPublish: t.canPublish,
+      }));
+    }
+
     // Attach user info to request (for use by controllers and other services)
     (request as any).user = {
       ...session.user,
       roles,
-      permissions: sessionUser.permissions || [],
+      permissions,
+      scholarLinks,
+      translatorRoles,
     };
     return true;
   }

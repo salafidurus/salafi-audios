@@ -12,6 +12,7 @@ import { AppThrottlerModule } from './core/security/throttler.module';
 import { AuthModule } from './core/auth/auth.module';
 import { AuthGuard } from './core/auth/auth.guard';
 import { PermissionGuard } from './core/auth/permission.guard';
+import { PolicyGuard } from './core/auth/policy.guard';
 import { AccountModule } from './core/account/account.module';
 import { SitemapModule } from './core/sitemap/sitemap.module';
 
@@ -54,7 +55,12 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     ThrottlerGuard,
     { provide: APP_GUARD, useExisting: ThrottlerGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
+    // TODO(abac-migration): PermissionGuard is being replaced by PolicyGuard.
+    // Both run during the migration — each is a no-op when its own metadata
+    // (@RequiresPermission vs @CheckPolicy) is absent from the route. Remove
+    // PermissionGuard once every controller uses @CheckPolicy (Stage 4).
     { provide: APP_GUARD, useClass: PermissionGuard },
+    { provide: APP_GUARD, useClass: PolicyGuard },
     { provide: APP_INTERCEPTOR, useClass: LocaleInterceptor },
   ],
 })
