@@ -426,6 +426,8 @@
     "revoke": "إلغاء دور {{role}}"
   },
   "admin": {
+    "checkingPermissions": "جارٍ التحقق من الصلاحيات…",
+    "accessDenied": "ليس لديك أي صلاحيات إدارة.",
     "dashboard": {
       "title": "لوحة تحكم الإدارة",
       "titleMobile": "إدارة",
