@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 
-import { downloadLecture, removeLecture } from "../engine/download.engine";
-import { useDownloadsStore } from "../store/downloads.store";
+import { downloadLecture, removeLecture } from "@/features/downloads/engine/download.engine";
+import { useDownloadsStore } from "@/features/downloads/store/downloads.store";
 
 /** UI-only status — "idle" means no registry row exists yet for this listing. */
 export type UiDownloadStatus = "idle" | "pending" | "downloading" | "paused" | "complete" | "error";

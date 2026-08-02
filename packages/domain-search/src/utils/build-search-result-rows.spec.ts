@@ -81,4 +81,16 @@ describe("buildSearchResultRows", () => {
     };
     expect(buildSearchResultRows(data)[0]!.scholarSlug).toBe("ibn-baz");
   });
+
+  it("tags each row with its listing format by bucket — needed to build the right play queue", () => {
+    const data: SearchCatalogResultsDto = {
+      collections: [makeItem({ id: "c1" })],
+      series: [makeItem({ id: "s1" })],
+      singles: [makeItem({ id: "l1" })],
+    };
+    const rows = buildSearchResultRows(data);
+    expect(rows.find((r) => r.id === "c1")!.format).toBe("collection");
+    expect(rows.find((r) => r.id === "s1")!.format).toBe("series");
+    expect(rows.find((r) => r.id === "l1")!.format).toBe("single");
+  });
 });

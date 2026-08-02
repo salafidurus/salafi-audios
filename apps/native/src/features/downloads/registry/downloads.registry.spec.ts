@@ -1,4 +1,4 @@
-import { upsertDownload, getDownload, getAllDownloads, removeDownload } from "./downloads.db";
+import { upsertDownload, getDownload, getAllDownloads, removeDownload } from "./downloads.registry";
 
 jest.mock("expo-sqlite", () => {
   const rows = new Map<string, Record<string, unknown>>();
@@ -42,7 +42,7 @@ jest.mock("expo-sqlite", () => {
   };
 });
 
-describe("downloads.db registry", () => {
+describe("downloads.registry", () => {
   beforeEach(() => {
     (jest.requireMock("expo-sqlite") as { __rows: Map<string, unknown> }).__rows.clear();
   });

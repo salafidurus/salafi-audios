@@ -1,6 +1,6 @@
 import { createOutboxStore, type Outbox } from "@sd/core-sync";
 
-import { createSqliteKvAdapter } from "../../../core/sync/sqlite-kv-adapter";
+import { createSqliteKvAdapter } from "@/core/sync/sqlite-kv-adapter";
 
 /**
  * Downloads outbox: queues offline-initiated download intent (start a
