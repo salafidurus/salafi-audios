@@ -2,8 +2,10 @@
 
 import type { Locale } from "@sd/core-contracts";
 
+import { subject } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import {
   getFieldValue,
   isLocaleDirty,
@@ -48,9 +50,16 @@ export function TranslationLocaleFields({
   onPublishToggle,
 }: TranslationLocaleFieldsProps) {
   const { t } = useTranslation();
+  const { ability } = useAbility();
   const { label, dot } = statusInfo(state, locale, config.supportsPublish, t);
   const dotClass = STATUS_DOT_CLASS[dot];
   const dirty = isLocaleDirty(state, locale);
+  // Locale-scoped: a translator granted only `ar` won't see Publish on other
+  // locale tabs. Not scholar-scoped here — this component is shared across
+  // listing/scholar/topic translation targets and only listing's scholarId
+  // would require a deeper refactor to thread through; the backend still
+  // enforces the full {scholarId, locale} condition regardless.
+  const canPublishLocale = ability.can("publish", subject("Translation", { locale }));
   const canPublish = !dirty && !!state.initial[locale];
   const isPublished = state.translationStatus[locale] === "published";
 
@@ -61,26 +70,24 @@ export function TranslationLocaleFields({
           <span className={`${styles.statusDot} ${dotClass}`} />
           {label}
         </span>
-        {config.supportsPublish && (
-          <PermissionGate requires="TRANSLATIONS_PUBLISH">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={!canPublish || state.saving}
-              loading={state.saving}
-              title={
-                dirty
-                  ? t("admin.translations.saveBeforePublish", "Save before publishing")
-                  : undefined
-              }
-              onClick={() => onPublishToggle(locale)}
-            >
-              {isPublished
-                ? t("admin.translations.unpublish", "Unpublish")
-                : t("admin.translations.publish", "Publish")}
-            </Button>
-          </PermissionGate>
+        {config.supportsPublish && canPublishLocale && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={!canPublish || state.saving}
+            loading={state.saving}
+            title={
+              dirty
+                ? t("admin.translations.saveBeforePublish", "Save before publishing")
+                : undefined
+            }
+            onClick={() => onPublishToggle(locale)}
+          >
+            {isPublished
+              ? t("admin.translations.unpublish", "Unpublish")
+              : t("admin.translations.publish", "Publish")}
+          </Button>
         )}
       </div>
 

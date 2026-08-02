@@ -2,13 +2,13 @@
 
 import { queryKeys } from "@sd/core-contracts";
 import { type AdminScholarListItemDto } from "@sd/core-contracts";
+import { useAbility } from "@sd/domain-account";
 import { useInfiniteAdminScholars } from "@sd/domain-content";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Scholar } from "@/features/admin/components/Scholar";
 import {
   TranslationModal,
@@ -28,6 +28,7 @@ import styles from "./admin-scholars.screen.module.css";
 
 export function AdminScholarsScreen() {
   const isDesktop = useIsDesktop();
+  const { ability } = useAbility();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
@@ -74,7 +75,7 @@ export function AdminScholarsScreen() {
                   : t("navigation.admin.scholars", "Scholars")
               }
               actions={
-                <PermissionGate requires="SCHOLARS_CREATE">
+                ability.can("create", "Scholar") && (
                   <Button
                     variant="primary"
                     size={isDesktop ? "md" : "sm"}
@@ -85,7 +86,7 @@ export function AdminScholarsScreen() {
                       ? t("admin.scholars.addScholar", "Add Scholar")
                       : t("common.add", "Add")}
                   </Button>
-                </PermissionGate>
+                )
               }
             />
 

@@ -1,14 +1,14 @@
 "use client";
 
-import { useAdminPermissions } from "@sd/domain-account";
+import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
 
 import { useAuth } from "@/core/auth/use-auth";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-  const { data, isFetching } = useAdminPermissions({ isAuthenticated });
+  const { ability, isLoading } = useAbility({ isAuthenticated });
 
-  if (isFetching) {
+  if (isLoading) {
     return (
       <div style={{ padding: 32, textAlign: "center" }}>
         <p>Checking permissions…</p>
@@ -16,8 +16,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  const permissions = data?.permissions ?? [];
-  if (permissions.length === 0) {
+  if (!hasAnyAdminAccess(ability)) {
     return (
       <div style={{ padding: 32, textAlign: "center" }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Access Denied</h1>

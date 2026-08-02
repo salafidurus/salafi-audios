@@ -1,10 +1,10 @@
 import type { AdminUserListItemDto } from "@sd/core-contracts";
 import type { ReactNode } from "react";
 
-import { ShieldCog, UserCog } from "lucide-react";
+import { useAbility } from "@sd/domain-account";
+import { BookUser, Languages, ShieldCog, UserCog } from "lucide-react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
 import { UserAvatar } from "@/shared/components/user-avatar";
@@ -18,11 +18,20 @@ export type UserItemProps = {
   user: AdminUserListItemDto;
   onManagePermissions?: () => void;
   onManageRoles?: () => void;
+  onManageScholarRoles?: () => void;
+  onManageTranslatorRoles?: () => void;
 };
 
-export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemProps): ReactNode {
+export function UserItem({
+  user,
+  onManagePermissions,
+  onManageRoles,
+  onManageScholarRoles,
+  onManageTranslatorRoles,
+}: UserItemProps): ReactNode {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
+  const { ability } = useAbility();
 
   return (
     <List.Item interactive>
@@ -37,7 +46,7 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
       </div>
 
       <List.Item.Actions orientation="horizontal" mobileOrientation="vertical">
-        <PermissionGate requires="USERS_GRANT_PERMISSIONS">
+        {ability.can("grant", "UserPermission") && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
@@ -48,8 +57,8 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
           >
             {isMobile && t("admin.permissions.managePermissionsBtnShort", "Permissions")}
           </Button>
-        </PermissionGate>
-        <PermissionGate requires="USERS_GRANT_ROLES">
+        )}
+        {ability.can("grant", "UserRoleAssignment") && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
@@ -60,7 +69,34 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
           >
             {isMobile && t("admin.permissions.manageRolesBtnShort", "Roles")}
           </Button>
-        </PermissionGate>
+        )}
+        {ability.can("grant", "UserScholarRole") && (
+          <Button
+            variant={isMobile ? "outline" : "ghost"}
+            size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
+            onClick={onManageScholarRoles}
+            icon={<BookUser size={16} />}
+            aria-label={t("admin.permissions.manageScholarAccessBtn", "Manage Scholar Access")}
+          >
+            {isMobile && t("admin.permissions.manageScholarAccessBtnShort", "Scholars")}
+          </Button>
+        )}
+        {ability.can("grant", "UserTranslatorRole") && (
+          <Button
+            variant={isMobile ? "outline" : "ghost"}
+            size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
+            onClick={onManageTranslatorRoles}
+            icon={<Languages size={16} />}
+            aria-label={t(
+              "admin.permissions.manageTranslatorLocalesBtn",
+              "Manage Translator Locales",
+            )}
+          >
+            {isMobile && t("admin.permissions.manageTranslatorLocalesBtnShort", "Locales")}
+          </Button>
+        )}
       </List.Item.Actions>
     </List.Item>
   );
