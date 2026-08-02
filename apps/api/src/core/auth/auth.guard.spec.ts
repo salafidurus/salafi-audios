@@ -100,32 +100,6 @@ describe('AuthGuard', () => {
     });
   });
 
-  it('throws 401 when user role does not match @Roles()', async () => {
-    const fakeUser = { id: 'u1', email: 'a@b.com' };
-    vi.spyOn(reflector, 'getAllAndOverride')
-      .mockReturnValueOnce(false) // isPublic
-      .mockReturnValueOnce(['admin']); // required roles
-    mockAuth.api.getSession.mockResolvedValue({ user: fakeUser, session: {} });
-    (mockPrisma.userRoleAssignment!.findMany as any).mockResolvedValue([{ role: 'listener' }]);
-    await expect(guard.canActivate(mockContext())).rejects.toThrow(UnauthorizedException);
-  });
-
-  it('allows user with matching role from @Roles()', async () => {
-    const fakeUser = { id: 'u1', email: 'a@b.com' };
-    vi.spyOn(reflector, 'getAllAndOverride')
-      .mockReturnValueOnce(false) // isPublic
-      .mockReturnValueOnce(['admin', 'editor']); // required roles
-    mockAuth.api.getSession.mockResolvedValue({ user: fakeUser, session: {} });
-    (mockPrisma.userRoleAssignment!.findMany as any).mockResolvedValue([{ role: 'editor' }]);
-    const req: Record<string, unknown> = { headers: {}, user: undefined };
-    const ctx = {
-      getHandler: () => ({}),
-      getClass: () => ({}),
-      switchToHttp: () => ({ getRequest: () => req }),
-    } as unknown as ExecutionContext;
-    await expect(guard.canActivate(ctx)).resolves.toBe(true);
-  });
-
   describe('ban enforcement', () => {
     it('throws 403 for a permanently banned user (banned: true, banExpires: null)', async () => {
       vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);

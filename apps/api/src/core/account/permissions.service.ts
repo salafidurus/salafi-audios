@@ -374,34 +374,6 @@ export class PermissionsService {
   }
 
   /**
-   * Get current user's permissions with role and permission details
-   * Used by the /me endpoint to return the current user's permission state
-   * Includes superadmin bypass: if user has superadmin role, return all permissions
-   *
-   * @param userId - User ID
-   * @returns Object with permissions array (Permission enum values) and roles array
-   */
-  async getMyPermissions(userId: string) {
-    const [permissions, roles] = await Promise.all([
-      this.repository.findPermissionStringsByUserId(userId),
-      this.repository.getUserRoles(userId),
-    ]);
-
-    const isSuperadmin = roles.includes('superadmin');
-    if (isSuperadmin) {
-      return {
-        permissions: [...ROLE_DEFAULT_PERMISSIONS.superadmin],
-        roles,
-      };
-    }
-
-    return {
-      permissions,
-      roles,
-    };
-  }
-
-  /**
    * Get detailed permission information for a user (with full audit trail)
    * Used by admin endpoints to show user permissions with timestamps and who granted them
    *

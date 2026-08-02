@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { fromNodeHeaders } from 'better-auth/node';
 import { PrismaService } from '../db/prisma.service';
-import { IS_PUBLIC_KEY, ROLES_KEY } from './decorators';
+import { IS_PUBLIC_KEY } from './decorators';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -39,11 +39,6 @@ export class AuthGuard implements CanActivate {
       if (!expired) throw new ForbiddenException('Account is banned');
     }
 
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
     const sessionUser = session.user as {
       id: string;
       roles?: string[];
@@ -64,14 +59,6 @@ export class AuthGuard implements CanActivate {
       roles = userRoles.map((r) => r.role);
       if (!roles.length) {
         roles = ['listener'];
-      }
-    }
-
-    // If specific roles are required via @Roles decorator, check if user has one of them
-    if (requiredRoles?.length) {
-      const roleSet = new Set(roles);
-      if (!requiredRoles.some((r) => roleSet.has(r as string))) {
-        throw new UnauthorizedException();
       }
     }
 

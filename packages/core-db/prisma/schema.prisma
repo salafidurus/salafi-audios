@@ -88,11 +88,6 @@ enum RecommendationRecurrence {
   yearly
 }
 
-enum ScholarRole {
-  scholar
-  scholar_editor
-}
-
 enum Locale {
   en
   ar

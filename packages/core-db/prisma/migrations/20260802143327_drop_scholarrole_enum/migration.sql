@@ -1,0 +1,3 @@
+-- DropEnum
+DROP TYPE "ScholarRole";
+

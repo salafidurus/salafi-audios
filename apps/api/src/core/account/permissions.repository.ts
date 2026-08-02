@@ -354,16 +354,6 @@ export class PermissionsRepository {
   }
 
   /**
-   * Check if a user has any permissions at all
-   */
-  async hasAnyPermission(userId: string): Promise<boolean> {
-    const count = await this.prisma.userPermission.count({
-      where: { userId },
-    });
-    return count > 0;
-  }
-
-  /**
    * Get detailed permission information for a user (includes grantedAt and grantedBy)
    * Used by admin endpoints to show full permission audit trail
    * Filters out stale/invalid permissions that don't match current Permission enum
