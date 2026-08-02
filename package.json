@@ -9,6 +9,7 @@
     ],
     "catalog": {
       "@better-auth/expo": "1.6.23",
+      "@casl/ability": "7.0.1",
       "@prisma/adapter-pg": "7.9.1",
       "@prisma/client": "7.9.1",
       "@tanstack/react-query": "^5.101.4",

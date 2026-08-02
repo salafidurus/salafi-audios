@@ -38,7 +38,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@better-auth/expo": "catalog:",
-        "@casl/ability": "7.0.1",
+        "@casl/ability": "catalog:",
         "@fastify/cookie": "^11.0.2",
         "@fastify/cors": "^11.2.0",
         "@fastify/helmet": "^13.0.2",
@@ -237,6 +237,7 @@
       "name": "@sd/core-contracts",
       "version": "0.0.0",
       "dependencies": {
+        "@casl/ability": "catalog:",
         "@tanstack/react-query": "catalog:",
         "react": "catalog:",
         "zod": "catalog:",
@@ -298,6 +299,7 @@
       "name": "@sd/domain-account",
       "version": "0.0.0",
       "dependencies": {
+        "@casl/ability": "catalog:",
         "@sd/core-contracts": "workspace:*",
       },
       "peerDependencies": {
@@ -365,6 +367,7 @@
     "@babel/core": "7.29.7",
     "@babel/runtime": "^7.29.7",
     "@better-auth/expo": "1.6.23",
+    "@casl/ability": "7.0.1",
     "@happy-dom/global-registrator": "^20.11.1",
     "@prisma/adapter-pg": "7.9.1",
     "@prisma/client": "7.9.1",

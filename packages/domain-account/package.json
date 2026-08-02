@@ -16,6 +16,7 @@
     "test:prepush": "bun test"
   },
   "dependencies": {
+    "@casl/ability": "catalog:",
     "@sd/core-contracts": "workspace:*"
   },
   "devDependencies": {},

@@ -270,6 +270,14 @@ export {
   UpdateLocaleDtoSchema,
   type SearchQueryDto,
   SearchQueryDtoSchema,
+  type AppActions,
+  type AppSubjectType,
+  type ScholarSubject,
+  type ListingSubject,
+  type TranslationSubject,
+  type MediaSubject,
+  type AppSubjects,
+  type AppAbility,
 } from "./types";
 
 // Export route constants

@@ -299,3 +299,13 @@ export {
   PERMISSION_LABELS,
   PERMISSION_DESCRIPTIONS,
 } from "../types/permissions.types";
+export {
+  type AppActions,
+  type AppSubjectType,
+  type ScholarSubject,
+  type ListingSubject,
+  type TranslationSubject,
+  type MediaSubject,
+  type AppSubjects,
+  type AppAbility,
+} from "../types/ability.types";
