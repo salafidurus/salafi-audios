@@ -1,4 +1,5 @@
 import type { MongoAbility } from '@casl/ability';
+import type { Locale } from '@sd/core-db';
 
 export type AppActions =
   | 'manage'
@@ -48,7 +49,7 @@ export type ScholarLinkAttribute = {
 
 export type TranslatorRoleAttribute = {
   scholarId: string | null;
-  locale: string;
+  locale: Locale;
   canPublish: boolean;
 };
 
