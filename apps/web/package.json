@@ -20,6 +20,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@casl/ability": "catalog:",
     "@sd/core-api": "workspace:*",
     "@sd/core-contracts": "workspace:*",
     "@sd/core-i18n": "workspace:*",

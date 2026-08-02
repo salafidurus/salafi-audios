@@ -5,7 +5,7 @@ import { packRules } from "@casl/ability/extra";
 import { describe, it, expect, vi, beforeEach } from "bun:test";
 
 import { useAccountProfile } from "../../account.api";
-import { buildAbilityFromRules, useAbility, useCan } from "./use-ability";
+import { buildAbilityFromRules, hasAnyAdminAccess, useAbility, useCan } from "./use-ability";
 
 vi.mock("../../account.api", () => ({
   useAccountProfile: vi.fn(),
@@ -107,5 +107,22 @@ describe("useCan", () => {
 
     expect(useCan("update", "Listing", { scholarId: "scholar-a" })).toBe(true);
     expect(useCan("update", "Listing", { scholarId: "scholar-b" })).toBe(false);
+  });
+});
+
+describe("hasAnyAdminAccess", () => {
+  it("is true when the ability has any rule at all", () => {
+    const ability = buildAbilityFromRules(packedRulesFor((can) => can("read", "Scholar")));
+    expect(hasAnyAdminAccess(ability)).toBe(true);
+  });
+
+  it("is true for superadmin's manage-all rule", () => {
+    const ability = buildAbilityFromRules(packedRulesFor((can) => can("manage", "all")));
+    expect(hasAnyAdminAccess(ability)).toBe(true);
+  });
+
+  it("is false for an ability with no rules", () => {
+    const ability = buildAbilityFromRules([]);
+    expect(hasAnyAdminAccess(ability)).toBe(false);
   });
 });
