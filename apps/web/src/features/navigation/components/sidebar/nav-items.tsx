@@ -1,7 +1,7 @@
 "use client";
 
-import { routes, type Permission, type UserRole } from "@sd/core-contracts";
-import { useAdminPermissions } from "@sd/domain-account";
+import { routes, type AppActions, type AppSubjectType } from "@sd/core-contracts";
+import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
 import clsx from "clsx";
 import {
   Cloud,
@@ -43,7 +43,8 @@ type AdminNavItem = {
   Icon: LucideIcon;
   href: string;
   activeMatch: string;
-  requiredPermission?: Permission;
+  requiredAction?: AppActions;
+  requiredSubject?: AppSubjectType;
 };
 
 function getAdminNavItems(t: (key: string, fallback: string) => string): AdminNavItem[] {
@@ -65,21 +66,24 @@ function getAdminNavItems(t: (key: string, fallback: string) => string): AdminNa
       Icon: Users,
       href: routes.admin.users,
       activeMatch: routes.admin.users,
-      requiredPermission: "USERS_VIEW",
+      requiredAction: "read",
+      requiredSubject: "User",
     },
     {
       label: t("navigation.admin.contents", "Contents"),
       Icon: FolderOpen,
       href: routes.admin.contents,
       activeMatch: routes.admin.contents,
-      requiredPermission: "LISTINGS_VIEW",
+      requiredAction: "read",
+      requiredSubject: "Listing",
     },
     {
       label: t("navigation.admin.scholars", "Scholars"),
       Icon: GraduationCap,
       href: routes.admin.scholars,
       activeMatch: routes.admin.scholars,
-      requiredPermission: "SCHOLARS_VIEW",
+      requiredAction: "read",
+      requiredSubject: "Scholar",
     },
   ];
 }
@@ -121,20 +125,18 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const { isAuthenticated, user, isLoading } = useAuth();
-  const { data: adminPermissionsData } = useAdminPermissions({ isAuthenticated });
+  const { ability } = useAbility({ isAuthenticated });
   const { isMobile, isTablet } = useResponsive();
   const showLanguageSwitch = isMobile || isTablet;
 
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
 
-  const adminPermissions: Permission[] = adminPermissionsData?.permissions ?? [];
-  const adminRoles: UserRole[] = adminPermissionsData?.roles ?? [];
-  const hasAdminRole = adminRoles.some((role) => ["admin", "superadmin"].includes(role));
-  const hasAdminAccess = isAuthenticated && (adminPermissions.length > 0 || hasAdminRole);
-  const adminPermissionsSet = new Set(adminPermissions);
+  const hasAdminAccess = isAuthenticated && hasAnyAdminAccess(ability);
   const visibleAdminNavItems = getAdminNavItems(t).filter(
     (item) =>
-      item.requiredPermission === undefined || adminPermissionsSet.has(item.requiredPermission),
+      item.requiredAction === undefined ||
+      item.requiredSubject === undefined ||
+      ability.can(item.requiredAction, item.requiredSubject),
   );
   const settingsHref = routes.settings.index;
 

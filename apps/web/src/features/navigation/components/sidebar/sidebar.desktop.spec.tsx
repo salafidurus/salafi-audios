@@ -1,4 +1,5 @@
-import { useAdminPermissions } from "@sd/domain-account";
+import { createMongoAbility } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { usePathname, useRouter } from "next/navigation";
@@ -24,7 +25,8 @@ vi.mock("@/core/auth", () => ({
 }));
 
 vi.mock("@sd/domain-account", () => ({
-  useAdminPermissions: vi.fn(),
+  useAbility: vi.fn(),
+  hasAnyAdminAccess: (ability: any) => ability.rules.length > 0,
 }));
 
 vi.mock("next/navigation", () => ({
@@ -56,9 +58,7 @@ describe("Sidebar component", () => {
       isLoading: false,
       user: null,
     });
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: undefined,
-    });
+    (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
 
     render(<Sidebar />);
 
@@ -75,9 +75,7 @@ describe("Sidebar component", () => {
       isLoading: false,
       user: null,
     });
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: undefined,
-    });
+    (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
 
     render(<Sidebar />);
 
@@ -91,8 +89,8 @@ describe("Sidebar component", () => {
       isLoading: false,
       user: { name: "Admin User", email: "admin@example.com" },
     });
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["SCHOLARS_VIEW"] },
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Scholar" }]),
     });
 
     render(<Sidebar />);
@@ -111,9 +109,7 @@ describe("Sidebar component", () => {
       isLoading: false,
       user: { name: "Test User", email: "test@example.com" },
     });
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: [] },
-    });
+    (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
 
     render(<Sidebar />);
 
@@ -129,9 +125,7 @@ describe("Sidebar component", () => {
       isLoading: false,
       user: { name: "Test User", email: "test@example.com" },
     });
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: [] },
-    });
+    (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
 
     render(<Sidebar />);
 

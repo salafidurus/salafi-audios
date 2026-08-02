@@ -1,4 +1,5 @@
-import { useAdminPermissions } from "@sd/domain-account";
+import { createMongoAbility } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, type Mock } from "bun:test";
 import { usePathname, useRouter } from "next/navigation";
@@ -22,7 +23,8 @@ vi.mock("@/core/auth", () => ({
 }));
 
 vi.mock("@sd/domain-account", () => ({
-  useAdminPermissions: vi.fn(),
+  useAbility: vi.fn(),
+  hasAnyAdminAccess: (ability: any) => ability.rules.length > 0,
 }));
 
 vi.mock("next/navigation", () => ({
@@ -50,7 +52,7 @@ function setup() {
   (usePathname as Mock<any>).mockReturnValue("/");
   (useRouter as Mock<any>).mockReturnValue({ push: vi.fn() });
   (useAuth as Mock<any>).mockReturnValue({ isAuthenticated: false, isLoading: false, user: null });
-  (useAdminPermissions as Mock<any>).mockReturnValue({ data: undefined });
+  (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
 }
 
 describe("NavItems > language switch visibility", () => {
