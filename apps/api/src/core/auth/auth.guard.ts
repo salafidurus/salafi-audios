@@ -100,12 +100,10 @@ export class AuthGuard implements CanActivate {
     if (!translatorRoles.length) {
       const userTranslatorRoles = await this.prisma.userTranslatorRole.findMany({
         where: { userId: sessionUser.id },
-        select: { locale: true, canPublish: true },
+        select: { scholarId: true, locale: true, canPublish: true },
       });
-      // scholarId is added to UserTranslatorRole in Stage 3; until then every
-      // grant applies across all scholars.
       translatorRoles = userTranslatorRoles.map((t) => ({
-        scholarId: null,
+        scholarId: t.scholarId,
         locale: t.locale,
         canPublish: t.canPublish,
       }));

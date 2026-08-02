@@ -86,12 +86,10 @@ function createAuthInstance(config: ConfigService) {
 
         const userTranslatorRoles = await prismaInstance.userTranslatorRole.findMany({
           where: { userId: user.id },
-          select: { locale: true, canPublish: true },
+          select: { scholarId: true, locale: true, canPublish: true },
         });
-        // scholarId is added to UserTranslatorRole in Stage 3; until then every
-        // grant applies across all scholars.
         const translatorRoles = userTranslatorRoles.map((t) => ({
-          scholarId: null as string | null,
+          scholarId: t.scholarId,
           locale: t.locale as string,
           canPublish: t.canPublish,
         }));

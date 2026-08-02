@@ -38,8 +38,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@better-auth/expo": "catalog:",
-        "@casl/ability": "catalog:",
-        "@casl/prisma": "^2.0.2",
+        "@casl/ability": "7.0.1",
         "@fastify/cookie": "^11.0.2",
         "@fastify/cors": "^11.2.0",
         "@fastify/helmet": "^13.0.2",
@@ -366,7 +365,6 @@
     "@babel/core": "7.29.7",
     "@babel/runtime": "^7.29.7",
     "@better-auth/expo": "1.6.23",
-    "@casl/ability": "7.0.1",
     "@happy-dom/global-registrator": "^20.11.1",
     "@prisma/adapter-pg": "7.9.1",
     "@prisma/client": "7.9.1",
@@ -607,8 +605,6 @@
     "@cacheable/utils": ["@cacheable/utils@2.5.0", "", { "dependencies": { "hashery": "^1.5.1", "keyv": "^5.6.0" } }, "sha512-buipgOVDkkPXNR5+xBpDw7Zk2n1EvU7qBJCNUcL7rhQ//kfpOXPAvQ511Os0vpLYJ1pZnvudNytkQt2hst3wqA=="],
 
     "@casl/ability": ["@casl/ability@7.0.1", "", { "dependencies": { "@ucast/mongo2js": "^2.0.0" } }, "sha512-krOW1zQGEie5lH6fpryrcsPvc5r2pe5Vn5xbthuzc5X9gwzHIyZgGGgw9dMoSLHXdjB4BIVxGG/HBkG+1NuyZQ=="],
-
-    "@casl/prisma": ["@casl/prisma@2.0.2", "", { "dependencies": { "@ucast/core": "^2.0.0", "@ucast/js": "^4.0.1" }, "peerDependencies": { "@casl/ability": "^7.0.0", "@prisma/client": "^4.16.0 || ^5.0.0 || ^6.0.0 || ^7.0.0" } }, "sha512-IYp9rABl8s9fF+4NubSahYMXqwLbmVCz8Hd9Xa4MbS6xMkSRTTa+tq9oKQFd/SJ6VoLe2oY+7Wg0eF9CjOCnYA=="],
 
     "@clack/core": ["@clack/core@0.4.2", "", { "dependencies": { "picocolors": "^1.0.0", "sisteransi": "^1.0.5" } }, "sha512-NYQfcEy8MWIxrT5Fj8nIVchfRFA26yYKJcvBS7WlUIlw2OmQOY9DhGGXMovyI5J5PpxrCPGkgUi207EBrjpBvg=="],
 

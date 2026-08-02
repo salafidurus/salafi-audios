@@ -433,21 +433,27 @@ export class ScholarsRepository {
   async adminList(
     cursor?: string,
     search?: string,
+    accessibleScholarIds?: string[],
   ): Promise<{ items: AdminScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
     const locale = getRequestLocale();
     const pageSize = 50;
     const take = pageSize + 1;
 
-    const where: Prisma.ScholarWhereInput = search
-      ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' as const } },
-            {
-              translations: { some: { name: { contains: search, mode: 'insensitive' as const } } },
-            },
-          ],
-        }
-      : {};
+    const where: Prisma.ScholarWhereInput = {
+      ...(search
+        ? {
+            OR: [
+              { name: { contains: search, mode: 'insensitive' as const } },
+              {
+                translations: {
+                  some: { name: { contains: search, mode: 'insensitive' as const } },
+                },
+              },
+            ],
+          }
+        : {}),
+      ...(accessibleScholarIds ? { id: { in: accessibleScholarIds } } : {}),
+    };
 
     const records = await this.prisma.scholar.findMany({
       where,

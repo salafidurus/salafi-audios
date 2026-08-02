@@ -11,11 +11,10 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { RequiresPermission, CurrentUser } from '../auth/decorators';
+import { CurrentUser } from '../auth/decorators';
 import { CheckPolicy } from '../auth/decorators/check-policy.decorator';
 import { PermissionsService } from './permissions.service';
 import {
-  Permissions,
   type UserRole,
   type GrantPermissionRequest,
   type GrantRoleRequest,
@@ -41,7 +40,7 @@ export class PermissionsController {
    */
 
   @Post(':userId/permissions')
-  @RequiresPermission(Permissions.USERS_GRANT_PERMISSIONS)
+  @CheckPolicy('grant', 'UserPermission')
   @ApiOperation({ summary: 'Grant a permission to a user' })
   async grantPermission(
     @Param('userId') userId: string,
@@ -65,7 +64,7 @@ export class PermissionsController {
   }
 
   @Delete(':userId/permissions/:permission')
-  @RequiresPermission(Permissions.USERS_GRANT_PERMISSIONS)
+  @CheckPolicy('grant', 'UserPermission')
   @ApiOperation({ summary: 'Revoke a permission from a user' })
   async revokePermission(
     @Param('userId') userId: string,
@@ -95,14 +94,14 @@ export class PermissionsController {
    */
 
   @Get(':userId/roles')
-  @RequiresPermission(Permissions.USERS_VIEW)
+  @CheckPolicy('read', 'User')
   @ApiOperation({ summary: 'Get roles for a user' })
   async getRoles(@Param('userId') userId: string): Promise<{ roles: UserRoleAssignmentDto[] }> {
     return this.permissionsService.getRoles(userId);
   }
 
   @Post(':userId/roles')
-  @RequiresPermission(Permissions.USERS_GRANT_ROLES)
+  @CheckPolicy('grant', 'UserRoleAssignment')
   @ApiOperation({ summary: 'Grant a role to a user with SuperAdmin protection' })
   async grantRole(
     @Param('userId') userId: string,
@@ -123,7 +122,7 @@ export class PermissionsController {
   }
 
   @Delete(':userId/roles/:role')
-  @RequiresPermission(Permissions.USERS_GRANT_ROLES)
+  @CheckPolicy('grant', 'UserRoleAssignment')
   @ApiOperation({ summary: 'Revoke a role from a user with SuperAdmin protection' })
   async revokeRole(
     @Param('userId') userId: string,
