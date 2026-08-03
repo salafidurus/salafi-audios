@@ -5,6 +5,10 @@ export {
   type AccessCapability,
   AccessGrantRequestSchema,
   type AccessGrantRequest,
+  UserAccessSnapshotSchema,
+  type UserAccessSnapshot,
+  ReplaceUserAccessRequestSchema,
+  type ReplaceUserAccessRequest,
 } from "./access.types";
 
 export {

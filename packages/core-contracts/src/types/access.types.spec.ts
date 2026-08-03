@@ -1,6 +1,10 @@
 import { describe, expect, it } from "bun:test";
 
-import { AccessGrantRequestSchema } from "./access.types";
+import {
+  AccessGrantRequestSchema,
+  ReplaceUserAccessRequestSchema,
+  UserAccessSnapshotSchema,
+} from "./access.types";
 
 describe("AccessGrantRequestSchema", () => {
   it("accepts a write grant scoped to more than one scholar", () => {
@@ -26,5 +30,27 @@ describe("AccessGrantRequestSchema", () => {
         scholarSlugs: ["ibn-taymiyyah"],
       }),
     ).toThrow();
+  });
+
+  it("accepts an aggregate access snapshot and versioned replacement", () => {
+    const grant = {
+      target: "listing",
+      capability: "write",
+      scholarSlugs: ["ibn-baz"],
+      locales: [],
+    };
+    expect(
+      UserAccessSnapshotSchema.parse({
+        userId: "user-1",
+        version: 3,
+        grants: [grant],
+        roles: ["Editor"],
+        isSuperadmin: false,
+        scholars: [{ slug: "ibn-baz", name: "Ibn Baz" }],
+      }).version,
+    ).toBe(3);
+    expect(
+      ReplaceUserAccessRequestSchema.parse({ version: 3, grants: [grant] }).grants,
+    ).toHaveLength(1);
   });
 });

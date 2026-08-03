@@ -33,3 +33,19 @@ export const AccessGrantRequestSchema = z
     }
   });
 export type AccessGrantRequest = z.infer<typeof AccessGrantRequestSchema>;
+
+export const UserAccessSnapshotSchema = z.object({
+  userId: z.string(),
+  version: z.number().int().nonnegative(),
+  grants: z.array(AccessGrantRequestSchema),
+  roles: z.array(z.string()),
+  isSuperadmin: z.boolean(),
+  scholars: z.array(z.object({ slug: z.string(), name: z.string() })),
+});
+export type UserAccessSnapshot = z.infer<typeof UserAccessSnapshotSchema>;
+
+export const ReplaceUserAccessRequestSchema = z.object({
+  version: z.number().int().nonnegative(),
+  grants: z.array(AccessGrantRequestSchema),
+});
+export type ReplaceUserAccessRequest = z.infer<typeof ReplaceUserAccessRequestSchema>;
