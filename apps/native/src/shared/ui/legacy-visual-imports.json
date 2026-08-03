@@ -1,5 +1,5 @@
 {
-  "violationCount": 90,
+  "violationCount": 89,
   "files": [
     "src/app/(tabs)/(explore)/index.tsx",
     "src/core/providers.tsx",
@@ -8,7 +8,6 @@
     "src/features/admin/components/CollectionSheet/CollectionSheet.tsx",
     "src/features/admin/components/ListingEditSheet/ListingEditSheet.tsx",
     "src/features/admin/components/SeriesSheet/SeriesSheet.tsx",
-    "src/features/admin/screens/admin-dashboard/admin-dashboard.screen.tsx",
     "src/features/admin/screens/admin-listings/admin-listings.screen.tsx",
     "src/features/admin/screens/admin-scholar-detail/admin-scholar-detail.screen.tsx",
     "src/features/admin/screens/admin-scholars/admin-scholars.screen.tsx",
