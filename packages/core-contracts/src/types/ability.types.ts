@@ -10,6 +10,8 @@ import type { MongoAbility } from "@casl/ability";
 export type AppActions =
   | "manage"
   | "read"
+  | "write"
+  | "translate"
   | "create"
   | "update"
   | "delete"
