@@ -1,9 +1,12 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Put, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../auth/decorators/check-policy.decorator';
 import { PermissionsService } from './permissions.service';
-import type { AdminPermissionsListDto, AdminUserListDto } from '@sd/core-contracts';
+import type { AdminUserListDto, UserAccessSnapshot } from '@sd/core-contracts';
+import { CurrentUser } from '../auth/decorators';
+import { AccessService } from './access.service';
+import { ReplaceUserAccessDto } from './dto/replace-user-access.dto';
 
 /**
  * AdminUsersController
@@ -16,7 +19,10 @@ import type { AdminPermissionsListDto, AdminUserListDto } from '@sd/core-contrac
 @ApiCommonErrors()
 @Controller('admin/users')
 export class AdminUsersController {
-  constructor(private readonly permissionsService: PermissionsService) {}
+  constructor(
+    private readonly permissionsService: PermissionsService,
+    private readonly accessService: AccessService,
+  ) {}
 
   @Get()
   @CheckPolicy('read', 'User')
@@ -31,10 +37,21 @@ export class AdminUsersController {
     return this.permissionsService.listUsers(query, role, cursor);
   }
 
-  @Get(':userId/permissions')
-  @CheckPolicy('read', 'User')
-  @ApiOperation({ summary: 'Get permissions for a user (read-only)' })
-  async getPermissions(@Param('userId') userId: string): Promise<AdminPermissionsListDto> {
-    return this.permissionsService.getPermissions(userId);
+  @Get(':userId/access')
+  @CheckPolicy('manage', 'UserAccess')
+  @ApiOperation({ summary: 'Get the aggregate access snapshot for a user' })
+  getAccess(@Param('userId') userId: string): Promise<UserAccessSnapshot> {
+    return this.accessService.snapshot(userId);
+  }
+
+  @Put(':userId/access')
+  @CheckPolicy('manage', 'UserAccess')
+  @ApiOperation({ summary: 'Replace a user access snapshot atomically' })
+  replaceAccess(
+    @Param('userId') userId: string,
+    @Body() body: ReplaceUserAccessDto,
+    @CurrentUser() user: { id: string },
+  ): Promise<UserAccessSnapshot> {
+    return this.accessService.replace(userId, body, user.id);
   }
 }

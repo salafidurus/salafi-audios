@@ -6,11 +6,12 @@ import { PermissionsController } from './permissions.controller';
 import { AdminUsersController } from './admin-users.controller';
 import { PermissionsService } from './permissions.service';
 import { PermissionsRepository } from './permissions.repository';
+import { AccessService } from './access.service';
 
 @Module({
   imports: [DbModule],
   controllers: [AccountController, PermissionsController, AdminUsersController],
-  providers: [AccountService, PermissionsService, PermissionsRepository],
+  providers: [AccountService, PermissionsService, PermissionsRepository, AccessService],
   exports: [PermissionsService],
 })
 export class AccountModule {}

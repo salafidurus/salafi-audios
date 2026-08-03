@@ -30,7 +30,8 @@ export type AppSubjectType =
   | "UserRoleAssignment"
   | "UserPermission"
   | "UserScholarRole"
-  | "UserTranslatorRole";
+  | "UserTranslatorRole"
+  | "UserAccess";
 
 // Minimal shapes for subjects that are ever checked with resource conditions
 // (scholarId/locale). Plain data shapes, not real domain classes — CASL only
