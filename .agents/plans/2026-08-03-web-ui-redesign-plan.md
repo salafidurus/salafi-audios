@@ -67,15 +67,17 @@ Foundational change first (theme layer), then its UI control (settings picker), 
 
 ## Stage 2: Settings appearance — accent theme picker
 
-- **Status**: Pending
+- **Status**: In Progress (picker implemented + wired, tests green; commit pending, manual smoke TBD)
 - **Goal**: Add the prototype's theme-card picker to Settings → Display, alongside the existing `system|light|dark` control. Persists via Stage 1's store.
 - **Files**:
   - `apps/web/src/features/settings/components/accent-theme-picker/AccentThemePicker.tsx` (new) + `AccentThemePicker.module.css` (new) + `AccentThemePicker.spec.tsx` (new).
   - `apps/web/src/features/settings/screens/settings-general.screen.tsx` — add a Display row for the picker.
   - `apps/web/src/features/settings/screens/settings-general.screen.spec.tsx` — extend assertions.
+  - `apps/web/src/features/settings/components/SettingsRow/SettingsRow.tsx` — `label` made optional (full-width rows need no label).
 - **Changes**:
-  - Card list (Manuscript / Midnight / Ember / Default) with live swatch previews, active ring, and checkmark — modeled on the prototype's `ThemeCard`, built with tokens and `@sd/design-tokens`-safe styles.
+  - Card list (Default / Manuscript / Midnight / Ember) with live swatch previews, active accent-colored ring, and checkmark — modeled on the prototype's `ThemeCard`, built with tokens (`--border-*`, `--surface-*`, radius/space tokens). Cards are `role="radio"` in a `radiogroup`; `value`/`onChange` are controlled props.
   - Interaction rule (document in code + copy): when a non-default accent is active it fully defines the palette, so the `system|light|dark` `SegmentedControl` is hidden (a helper note explains the accent supersedes mode). When accent is `default`, the mode control works exactly as today.
+  - `SettingsRow` `label` prop made optional (the `fullWidth` branch renders no label column).
   - New copy via i18n fallback strings (existing pattern); optionally add keys to `@sd/core-i18n` additively.
 - **Blockers**: Stage 1 must be complete (picker needs the store + attribute).
 - **Dependencies**: Stage 1.

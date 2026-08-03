@@ -2,10 +2,16 @@
 
 import { useState, useCallback, useEffect } from "react";
 
+import type { AccentThemeId } from "@/core/styles/theme";
 import type { ThemePreference } from "@/core/styles/ThemeSync";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import {
+  getAccentThemePreference,
+  setAccentThemePreference,
+} from "@/core/styles/theme/accent-theme";
 import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
+import { AccentThemePicker } from "@/features/settings/components/accent-theme-picker/AccentThemePicker";
 import { SegmentedControl } from "@/features/settings/components/SegmentedControl/SegmentedControl";
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
 import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
@@ -51,6 +57,7 @@ function loadThemePreference(): ThemePreference {
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
   const [themePreference, setThemePreference] = useState<ThemePreference>(loadThemePreference);
+  const [accentTheme, setAccentTheme] = useState<AccentThemeId>(getAccentThemePreference);
   const [notif, setNotif] = useState<NotificationState>(loadNotifState);
 
   const themeOptions: { value: ThemePreference; label: string }[] = [
@@ -63,6 +70,11 @@ export function SettingsGeneralScreen() {
     setThemePreference(value);
     localStorage.setItem(THEME_KEY, value);
     window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
+  }, []);
+
+  const handleAccentThemeChange = useCallback((value: AccentThemeId) => {
+    setAccentTheme(value);
+    setAccentThemePreference(value);
   }, []);
 
   useEffect(() => {
@@ -110,15 +122,35 @@ export function SettingsGeneralScreen() {
         title={t("settings.general.displaySection", "Display")}
         description={t("settings.general.displayDesc", "Choose a theme for the interface.")}
       >
-        <SettingsRow
-          label={t("settings.general.theme", "Theme")}
-          sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
-        >
-          <SegmentedControl
-            options={themeOptions}
-            value={themePreference}
-            onChange={handleThemeChange}
-            ariaLabel={t("settings.general.themeAria", "Theme preference")}
+        {accentTheme === "default" && (
+          <SettingsRow
+            label={t("settings.general.theme", "Theme")}
+            sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
+          >
+            <SegmentedControl
+              options={themeOptions}
+              value={themePreference}
+              onChange={handleThemeChange}
+              ariaLabel={t("settings.general.themeAria", "Theme preference")}
+            />
+          </SettingsRow>
+        )}
+        <SettingsRow fullWidth>
+          <AccentThemePicker
+            value={accentTheme}
+            onChange={handleAccentThemeChange}
+            title={t("settings.general.accentTheme", "Accent theme")}
+            description={
+              accentTheme === "default"
+                ? t(
+                    "settings.general.accentThemeDesc",
+                    "Pick a named palette and the whole app restyles instantly.",
+                  )
+                : t(
+                    "settings.general.accentThemeDescActive",
+                    "Named palettes replace light/dark mode. Choose Default to use it again.",
+                  )
+            }
           />
         </SettingsRow>
       </SettingsSection>
