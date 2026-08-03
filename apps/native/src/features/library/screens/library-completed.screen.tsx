@@ -1,80 +1,74 @@
+import { Column } from "@expo/ui";
+import { pickContentField } from "@sd/core-i18n";
 import { useLibraryCompletedScreen } from "@sd/domain-content";
-import { useCallback } from "react";
-import { ScrollView } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { LibraryItemRow } from "@/features/library/components/library-item-row/library-item-row";
-import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { List } from "@/shared/components/List";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { NativeList, NativeListItem, NativeScreenHost, NativeStateView } from "@/shared/ui";
 
 export type LibraryCompletedScreenProps = {
   onNavigateToListing?: (slug: string) => void;
 };
 
 export function LibraryCompletedScreen({ onNavigateToListing }: LibraryCompletedScreenProps) {
+  const { theme } = useUnistyles();
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useLibraryCompletedScreen(isAuthenticated);
   const { t } = useTranslation();
-
-  const handleItemPress = useCallback(
-    (slug: string) => {
-      onNavigateToListing?.(slug);
-    },
-    [onNavigateToListing],
-  );
-
-  if (isFetching && items.length === 0) {
-    return (
-      <ScreenView center>
-        <EmptyState message={t("common.loading", "Loading...")} variant="loading" />
-      </ScreenView>
-    );
-  }
-
-  if (items.length === 0) {
-    return (
-      <ScreenView center>
-        <EmptyState
-          message={t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
-          variant="empty"
-        />
-      </ScreenView>
-    );
-  }
+  const showOriginal = useShowOriginalContent();
 
   return (
-    <ScreenView>
-      <ScrollView contentContainerStyle={styles.listContent}>
-        <List>
-          {items.map((item, index) => (
-            <LibraryItemRow
-              key={item.id}
-              item={item}
-              variant="completed"
-              onPress={() => handleItemPress(item.listingSlug)}
-              hideBorder={index === items.length - 1}
-            />
-          ))}
-        </List>
-      </ScrollView>
-    </ScreenView>
+    <NativeScreenHost testID="library-completed-host">
+      <Column
+        spacing={theme.spacing.component.gapLg}
+        style={{ width: "100%", padding: theme.spacing.layout.pageX }}
+      >
+        {isFetching && items.length === 0 ? (
+          <NativeStateView kind="loading" title={t("common.loading", "Loading...")} />
+        ) : items.length === 0 ? (
+          <NativeStateView
+            kind="empty"
+            title={t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
+          />
+        ) : (
+          <NativeList testID="library-completed-list">
+            {items.map((item) => {
+              const title = pickContentField(
+                item.listingTitle,
+                item.originalListingTitle,
+                showOriginal,
+              );
+              const details = [
+                item.scholarName,
+                item.seriesTitle,
+                item.durationSeconds
+                  ? t("lecture.minutes", "{{count}} min", {
+                      count: Math.round(item.durationSeconds / 60),
+                    })
+                  : undefined,
+                item.completedAt
+                  ? t("library.completedOn", "Completed {{date}}", {
+                      date: new Date(item.completedAt).toLocaleDateString(),
+                    })
+                  : undefined,
+              ].filter(Boolean);
+
+              return (
+                <NativeListItem
+                  key={item.id}
+                  leadingIcon="success"
+                  onPress={() => onNavigateToListing?.(item.listingSlug)}
+                  supportingText={details.join(" · ")}
+                  testID={`library-completed-row-${item.id}`}
+                  title={title}
+                />
+              );
+            })}
+          </NativeList>
+        )}
+      </Column>
+    </NativeScreenHost>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  loadingText: {
-    color: theme.colors.content.default,
-  },
-  emptyText: {
-    color: theme.colors.content.muted,
-    textAlign: "center",
-  },
-  listContent: {
-    paddingHorizontal: theme.spacing.layout.pageX,
-    paddingVertical: theme.spacing.layout.pageY,
-    paddingBottom: theme.spacing.scale["2xl"],
-  },
-}));
