@@ -14,17 +14,6 @@ export type {
   AppAbility,
 } from '@sd/core-contracts';
 
-export type ScholarLinkAttribute = {
-  scholarId: string;
-  permissionType: 'OWN_CONTENT' | 'ASSIGNED_EDITOR';
-};
-
-export type TranslatorRoleAttribute = {
-  scholarId: string | null;
-  locale: Locale;
-  canPublish: boolean;
-};
-
 export type AccessGrantAttribute = {
   target: AccessTarget;
   capability: AccessCapability;
@@ -34,8 +23,5 @@ export type AccessGrantAttribute = {
 
 export type AbilityInput = {
   roles: string[];
-  permissions: string[];
-  scholarLinks: ScholarLinkAttribute[];
-  translatorRoles: TranslatorRoleAttribute[];
   accessGrants?: AccessGrantAttribute[];
 };

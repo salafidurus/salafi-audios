@@ -41,59 +41,17 @@ export class AuthGuard implements CanActivate {
 
     const sessionUser = session.user as {
       id: string;
-      roles?: string[];
-      permissions?: string[];
-      scholarLinks?: { scholarId: string; permissionType: string }[];
-      translatorRoles?: { scholarId: string | null; locale: string; canPublish: boolean }[];
       banned?: boolean | null;
       banExpires?: Date | string | null;
     };
 
-    let roles: string[] = sessionUser.roles || [];
-
+    const userRoles = await this.prisma.userRoleAssignment.findMany({
+      where: { userId: sessionUser.id },
+      select: { role: true },
+    });
+    const roles = userRoles.map((r) => r.role);
     if (!roles.length) {
-      const userRoles = await this.prisma.userRoleAssignment.findMany({
-        where: { userId: sessionUser.id },
-        select: { role: true },
-      });
-      roles = userRoles.map((r) => r.role);
-      if (!roles.length) {
-        roles = ['listener'];
-      }
-    }
-
-    let permissions: string[] = sessionUser.permissions || [];
-    if (!permissions.length) {
-      const userPermissions = await this.prisma.userPermission.findMany({
-        where: { userId: sessionUser.id },
-        select: { permission: true },
-      });
-      permissions = userPermissions.map((p) => p.permission);
-    }
-
-    let scholarLinks = sessionUser.scholarLinks || [];
-    if (!scholarLinks.length) {
-      const userScholarRoles = await this.prisma.userScholarRole.findMany({
-        where: { userId: sessionUser.id },
-        select: { scholarId: true, permissionType: true },
-      });
-      scholarLinks = userScholarRoles.map((s) => ({
-        scholarId: s.scholarId,
-        permissionType: s.permissionType,
-      }));
-    }
-
-    let translatorRoles = sessionUser.translatorRoles || [];
-    if (!translatorRoles.length) {
-      const userTranslatorRoles = await this.prisma.userTranslatorRole.findMany({
-        where: { userId: sessionUser.id },
-        select: { scholarId: true, locale: true, canPublish: true },
-      });
-      translatorRoles = userTranslatorRoles.map((t) => ({
-        scholarId: t.scholarId,
-        locale: t.locale,
-        canPublish: t.canPublish,
-      }));
+      roles.push('listener');
     }
 
     const accessGrants = await this.prisma.userAccessGrant.findMany({
@@ -105,9 +63,6 @@ export class AuthGuard implements CanActivate {
     (request as any).user = {
       ...session.user,
       roles,
-      permissions,
-      scholarLinks,
-      translatorRoles,
       accessGrants,
     };
     return true;

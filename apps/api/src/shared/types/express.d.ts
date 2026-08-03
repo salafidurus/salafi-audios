@@ -1,8 +1,4 @@
-import type {
-  ScholarLinkAttribute,
-  TranslatorRoleAttribute,
-  AccessGrantAttribute,
-} from '../../core/auth/ability/ability.types';
+import type { AccessGrantAttribute } from '../../core/auth/ability/ability.types';
 
 declare global {
   namespace Express {
@@ -15,9 +11,6 @@ declare global {
         emailVerified: boolean;
         image?: string | null;
         roles: string[];
-        permissions: string[];
-        scholarLinks: ScholarLinkAttribute[];
-        translatorRoles: TranslatorRoleAttribute[];
         accessGrants: AccessGrantAttribute[];
         banned?: boolean | null;
         banReason?: string | null;

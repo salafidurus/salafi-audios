@@ -29,24 +29,12 @@ describe('AuthGuard', () => {
       userRoleAssignment: {
         findMany: vi.fn<any>(),
       },
-      userPermission: {
-        findMany: vi.fn<any>().mockResolvedValue([]),
-      },
-      userScholarRole: {
-        findMany: vi.fn<any>().mockResolvedValue([]),
-      },
-      userTranslatorRole: {
-        findMany: vi.fn<any>().mockResolvedValue([]),
-      },
       userAccessGrant: {
         findMany: vi.fn<any>().mockResolvedValue([]),
       },
     } as unknown as Partial<PrismaService>;
     guard = new AuthGuard(reflector, mockPrisma as PrismaService);
     vi.clearAllMocks();
-    (mockPrisma.userPermission!.findMany as any).mockResolvedValue([]);
-    (mockPrisma.userScholarRole!.findMany as any).mockResolvedValue([]);
-    (mockPrisma.userTranslatorRole!.findMany as any).mockResolvedValue([]);
   });
 
   it('allows @Public() routes without a session', async () => {
@@ -76,9 +64,6 @@ describe('AuthGuard', () => {
     expect(req.user).toEqual({
       ...fakeUser,
       roles: ['listener'],
-      permissions: [],
-      scholarLinks: [],
-      translatorRoles: [],
       accessGrants: [],
     });
   });
@@ -98,9 +83,6 @@ describe('AuthGuard', () => {
     expect(req.user).toEqual({
       ...fakeUser,
       roles: ['listener'],
-      permissions: [],
-      scholarLinks: [],
-      translatorRoles: [],
       accessGrants: [],
     });
   });

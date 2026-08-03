@@ -1,7 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin, bearer, customSession } from 'better-auth/plugins';
-import { ROLE_DEFAULT_PERMISSIONS } from '@sd/core-contracts';
 import { expo } from '@better-auth/expo';
 import { PrismaClient } from '@sd/core-db';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -64,43 +63,10 @@ function createAuthInstance(config: ConfigService) {
           roles = ['listener'];
         }
 
-        let permissions: string[] = [];
-        if (roles.includes('superadmin')) {
-          permissions = [...ROLE_DEFAULT_PERMISSIONS.superadmin];
-        } else {
-          const userPerms = await prismaInstance.userPermission.findMany({
-            where: { userId: user.id },
-            select: { permission: true },
-          });
-          permissions = userPerms.map((p) => p.permission as string);
-        }
-
-        const userScholarRoles = await prismaInstance.userScholarRole.findMany({
-          where: { userId: user.id },
-          select: { scholarId: true, permissionType: true },
-        });
-        const scholarLinks = userScholarRoles.map((s) => ({
-          scholarId: s.scholarId,
-          permissionType: s.permissionType as string,
-        }));
-
-        const userTranslatorRoles = await prismaInstance.userTranslatorRole.findMany({
-          where: { userId: user.id },
-          select: { scholarId: true, locale: true, canPublish: true },
-        });
-        const translatorRoles = userTranslatorRoles.map((t) => ({
-          scholarId: t.scholarId,
-          locale: t.locale as string,
-          canPublish: t.canPublish,
-        }));
-
         return {
           user: {
             ...user,
             roles,
-            permissions,
-            scholarLinks,
-            translatorRoles,
           },
           session,
         };
