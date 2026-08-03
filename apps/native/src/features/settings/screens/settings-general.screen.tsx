@@ -1,15 +1,12 @@
-import { useState, useCallback } from "react";
-import { ScrollView } from "react-native";
-import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
+import { Column, Row, ScrollView, Switch } from "@expo/ui";
+import { useCallback, useState } from "react";
+import { UnistylesRuntime, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Toggle } from "@/shared/components/Toggle/Toggle";
+import { NativeScreenHost, NativeSegmentedControl, NativeText } from "@/shared/ui";
 
 import { ContentLanguageToggle } from "../components/content-language-toggle/content-language-toggle";
 import { LanguageSwitch } from "../components/language-switch/language-switch";
-import { SegmentedControl } from "../components/SegmentedControl/SegmentedControl";
-import { SettingsRow } from "../components/SettingsRow/SettingsRow";
-import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 
 type ThemePreference = "system" | "light" | "dark";
 
@@ -28,6 +25,7 @@ function getInitialTheme(): ThemePreference {
 
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
   const [themePreference, setThemePreference] = useState<ThemePreference>(getInitialTheme);
   const [notif, setNotif] = useState<NotificationState>({
     master: true,
@@ -59,88 +57,112 @@ export function SettingsGeneralScreen() {
   ];
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      {/* Language Section */}
-      <SettingsSection
-        title={t("settings.general.languageSection", "Language")}
-        description={t("settings.general.languageDesc", "Configure app and content language.")}
-      >
-        <SettingsRow
-          label={t("settings.general.appLanguage", "App Language")}
-          sublabel={t("settings.general.appLanguageDesc", "Interface language for the app")}
+    <NativeScreenHost testID="settings-general-host">
+      <ScrollView showsIndicators={false}>
+        <Column
+          spacing={theme.spacing.layout.sectionY}
+          style={{ padding: theme.spacing.layout.pageX }}
         >
-          <LanguageSwitch />
-        </SettingsRow>
-        <SettingsRow fullWidth hideBorder>
-          <ContentLanguageToggle />
-        </SettingsRow>
-      </SettingsSection>
-
-      {/* Display Section */}
-      <SettingsSection
-        title={t("settings.general.displaySection", "Display")}
-        description={t("settings.general.displayDesc", "Choose a theme for the interface.")}
-      >
-        <SettingsRow
-          label={t("settings.general.theme", "Theme")}
-          sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
-          stacked
-        >
-          <SegmentedControl
-            options={themeOptions}
-            value={themePreference}
-            onChange={handleThemeChange}
-            ariaLabel={t("settings.general.themeAria", "Theme preference")}
-          />
-        </SettingsRow>
-      </SettingsSection>
-
-      {/* Notifications Section */}
-      <SettingsSection
-        title={t("settings.general.notifSection", "Notifications")}
-        description={t("settings.general.notifDesc", "Manage what notifications you receive.")}
-      >
-        <SettingsRow
-          label={t("settings.general.enableNotif", "Enable Notifications")}
-          sublabel={t("settings.general.enableNotifDesc", "Master toggle for all notifications")}
-        >
-          <Toggle checked={notif.master} onChange={handleNotifChange("master")} />
-        </SettingsRow>
-        {notif.master && (
-          <>
-            <SettingsRow
-              label={t("settings.general.followedScholars", "Followed Scholars")}
-              sublabel={t(
-                "settings.general.followedScholarsDesc",
-                "Notify when a followed scholar posts",
-              )}
-            >
-              <Toggle checked={notif.scholars} onChange={handleNotifChange("scholars")} />
-            </SettingsRow>
-            <SettingsRow
-              label={t("settings.general.newLectures", "New Lectures")}
-              sublabel={t(
-                "settings.general.newLecturesDesc",
-                "Notify when new lectures are published",
-              )}
-              hideBorder
-            >
-              <Toggle checked={notif.lectures} onChange={handleNotifChange("lectures")} />
-            </SettingsRow>
-          </>
-        )}
-      </SettingsSection>
-    </ScrollView>
+          <Column spacing={theme.spacing.component.gapMd}>
+            <NativeText variant="titleMd" colorRole="strong">
+              {t("settings.general.languageSection", "Language")}
+            </NativeText>
+            <Row alignment="center" spacing={theme.spacing.component.gapMd}>
+              <Column spacing={theme.spacing.scale.xs}>
+                <NativeText variant="bodyMd" colorRole="strong">
+                  {t("settings.general.appLanguage", "App Language")}
+                </NativeText>
+                <NativeText variant="bodySm" colorRole="muted">
+                  {t("settings.general.appLanguageDesc", "Interface language for the app")}
+                </NativeText>
+              </Column>
+              <LanguageSwitch />
+            </Row>
+            <ContentLanguageToggle />
+          </Column>
+          <Column spacing={theme.spacing.component.gapMd}>
+            <NativeText variant="titleMd" colorRole="strong">
+              {t("settings.general.displaySection", "Display")}
+            </NativeText>
+            <NativeText variant="bodySm" colorRole="muted">
+              {t("settings.general.displayDesc", "Choose a theme for the interface.")}
+            </NativeText>
+            <NativeSegmentedControl
+              values={themeOptions.map((option) => option.label)}
+              value={
+                themeOptions.find((option) => option.value === themePreference)?.label ??
+                themeOptions[0]!.label
+              }
+              onValueChange={(label) =>
+                handleThemeChange(
+                  themeOptions.find((option) => option.label === label)?.value ?? "system",
+                )
+              }
+              testID="settings-theme-control"
+            />
+          </Column>
+          <Column spacing={theme.spacing.component.gapMd}>
+            <NativeText variant="titleMd" colorRole="strong">
+              {t("settings.general.notifSection", "Notifications")}
+            </NativeText>
+            <PreferenceSwitch
+              label={t("settings.general.enableNotif", "Enable Notifications")}
+              detail={t("settings.general.enableNotifDesc", "Master toggle for all notifications")}
+              value={notif.master}
+              onValueChange={handleNotifChange("master")}
+            />
+            {notif.master ? (
+              <>
+                <PreferenceSwitch
+                  label={t("settings.general.followedScholars", "Followed Scholars")}
+                  detail={t(
+                    "settings.general.followedScholarsDesc",
+                    "Notify when a followed scholar posts",
+                  )}
+                  value={notif.scholars}
+                  onValueChange={handleNotifChange("scholars")}
+                />
+                <PreferenceSwitch
+                  label={t("settings.general.newLectures", "New Lectures")}
+                  detail={t(
+                    "settings.general.newLecturesDesc",
+                    "Notify when new lectures are published",
+                  )}
+                  value={notif.lectures}
+                  onValueChange={handleNotifChange("lectures")}
+                />
+              </>
+            ) : null}
+          </Column>
+        </Column>
+      </ScrollView>
+    </NativeScreenHost>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
-  screen: {
-    flex: 1,
-    backgroundColor: theme.colors.surface.canvas,
-  },
-  content: {
-    paddingHorizontal: theme.spacing.layout.pageX,
-    paddingVertical: theme.spacing.layout.pageY,
-  },
-}));
+function PreferenceSwitch({
+  label,
+  detail,
+  value,
+  onValueChange,
+}: {
+  label: string;
+  detail: string;
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+}) {
+  const { theme } = useUnistyles();
+  return (
+    <Row alignment="center" spacing={theme.spacing.component.gapMd}>
+      <Column spacing={theme.spacing.scale.xs}>
+        <NativeText variant="bodyMd" colorRole="strong">
+          {label}
+        </NativeText>
+        <NativeText variant="bodySm" colorRole="muted">
+          {detail}
+        </NativeText>
+      </Column>
+      <Switch value={value} onValueChange={onValueChange} />
+    </Row>
+  );
+}
