@@ -83,11 +83,6 @@ export const queryKeys = {
   },
   admin: {
     all: ["admin"] as const,
-    permissions: {
-      all: () => [...queryKeys.admin.all, "permissions"] as const,
-      me: () => [...queryKeys.admin.all, "permissions", "me"] as const,
-      user: (userId: string) => [...queryKeys.admin.all, "permissions", userId] as const,
-    },
     users: {
       all: () => [...queryKeys.admin.all, "users"] as const,
       list: (query?: string, role?: string) =>
