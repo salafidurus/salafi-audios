@@ -149,7 +149,6 @@ export function AdminListingsScreen() {
       <Column
         spacing={theme.spacing.component.gapLg}
         style={{
-          width: "100%",
           padding: theme.spacing.layout.pageX,
         }}
       >

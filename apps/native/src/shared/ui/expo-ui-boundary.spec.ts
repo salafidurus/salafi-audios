@@ -90,6 +90,36 @@ function visualViolations(nativeRoot: string): Violation[] {
   });
 }
 
+function percentageDimensionViolations(nativeRoot: string): string[] {
+  const sourceRoot = path.join(nativeRoot, "src");
+
+  return sourceFiles(sourceRoot).flatMap((file) => {
+    const source = fs.readFileSync(file, "utf8");
+    const sourceFile = ts.createSourceFile(
+      file,
+      source,
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.TSX,
+    );
+    const usesExpoUiLayout = sourceFile.statements.some((statement) => {
+      if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) {
+        return false;
+      }
+      if (statement.moduleSpecifier.text !== "@expo/ui") return false;
+      const bindings = statement.importClause?.namedBindings;
+      if (!bindings || !ts.isNamedImports(bindings)) return false;
+      return bindings.elements.some((element) =>
+        ["Column", "RNHostView", "Row", "ScrollView"].includes(
+          element.propertyName?.text ?? element.name.text,
+        ),
+      );
+    });
+
+    return usesExpoUiLayout && /["']\d+%["']/.test(source) ? [path.relative(nativeRoot, file)] : [];
+  });
+}
+
 describe("Expo UI visual boundary", () => {
   const nativeRoot = process.cwd();
 
@@ -113,5 +143,9 @@ describe("Expo UI visual boundary", () => {
       expect(bridge.reason.length).toBeGreaterThan(20);
       expect(fs.existsSync(path.join(nativeRoot, bridge.file))).toBe(true);
     }
+  });
+
+  it("does not pass percentage dimensions to Expo UI layouts", () => {
+    expect(percentageDimensionViolations(process.cwd())).toEqual([]);
   });
 });

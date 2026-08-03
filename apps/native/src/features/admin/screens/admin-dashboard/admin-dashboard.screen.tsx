@@ -60,12 +60,11 @@ export function AdminDashboardScreen({
 
   return (
     <NativeScreenHost testID="admin-dashboard-host">
-      <ScrollView showsIndicators={false} style={{ width: "100%" }}>
+      <ScrollView showsIndicators={false}>
         <Column
           spacing={theme.spacing.component.gapLg}
           style={{
             padding: theme.spacing.layout.pageX,
-            width: "100%",
           }}
         >
           {isLoading ? (
@@ -77,13 +76,12 @@ export function AdminDashboardScreen({
             />
           ) : (
             visibleCards.map((card) => (
-              <Column key={card.key} spacing={theme.spacing.scale.xs} style={{ width: "100%" }}>
+              <Column key={card.key} spacing={theme.spacing.scale.xs}>
                 <NativeButton
                   label={card.title}
                   icon={card.icon}
                   onPress={card.onPress}
                   variant="surface"
-                  fullWidth
                   testID={`admin-dashboard-${card.key}`}
                 />
                 <NativeText variant="bodySm" colorRole="muted">

@@ -44,7 +44,6 @@ export function NativeFormField({
         placeholderTextColor={placeholderTextColor ?? theme.colors.content.muted}
         cursorColor={theme.colors.action.primary}
         style={{
-          width: "100%",
           paddingHorizontal: theme.spacing.scale.lg,
           paddingVertical: theme.spacing.scale.md,
           borderRadius: theme.radius.component.chip,
