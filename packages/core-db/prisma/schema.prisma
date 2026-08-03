@@ -70,6 +70,23 @@ enum ScholarPermissionType {
   ASSIGNED_EDITOR
 }
 
+enum AccessTarget {
+  scholar
+  listing
+  media
+  topic
+  translation
+  user
+}
+
+enum AccessCapability {
+  write
+  translate
+  publish
+  delete
+  manage
+}
+
 enum Status {
   draft
   review
@@ -140,10 +157,29 @@ model User {
   createdScholarRoles    UserScholarRole[]    @relation("createdByUser")
   translatorRoles        UserTranslatorRole[]
   createdTranslatorRoles UserTranslatorRole[] @relation("createdByUser")
+  accessGrants           UserAccessGrant[]
+  accessVersion          Int                  @default(0)
 
   // Content Management
   progress  UserListingProgress[]
   favorites FavoriteListing[]
+}
+
+model UserAccessGrant {
+  id         String           @id @default(cuid())
+  userId     String
+  target     AccessTarget
+  capability AccessCapability
+  scholarId  String?
+  locale     Locale?
+  grantedAt  DateTime         @default(now())
+  grantedBy  String?
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scholar Scholar? @relation(fields: [scholarId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([scholarId])
 }
 
 model UserRoleAssignment {
@@ -249,6 +285,7 @@ model Scholar {
   listings        Listing[]
   userRoles       UserScholarRole[]
   translatorRoles UserTranslatorRole[]
+  accessGrants    UserAccessGrant[]
   translations    ScholarTranslation[]
 
   @@unique([slug], map: "uq_scholar_slug")

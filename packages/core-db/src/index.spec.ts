@@ -33,6 +33,34 @@ describe("UserRole enum", () => {
   });
 });
 
+describe("aggregate access schema", () => {
+  it("defines canonical target and capability enums", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const schema = fs.readFileSync(path.resolve(__dirname, "../prisma/schema.prisma"), "utf-8");
+
+    expect(schema).toMatch(
+      /enum AccessTarget\s*{[\s\S]*scholar[\s\S]*listing[\s\S]*media[\s\S]*topic[\s\S]*translation[\s\S]*user[\s\S]*}/,
+    );
+    expect(schema).toMatch(
+      /enum AccessCapability\s*{[\s\S]*write[\s\S]*translate[\s\S]*publish[\s\S]*delete[\s\S]*manage[\s\S]*}/,
+    );
+  });
+
+  it("stores normalized grants and a version on User", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const schema = fs.readFileSync(path.resolve(__dirname, "../prisma/schema.prisma"), "utf-8");
+
+    expect(schema).toMatch(
+      /model UserAccessGrant\s*{[\s\S]*target\s+AccessTarget[\s\S]*capability\s+AccessCapability[\s\S]*scholarId\s+String\?[\s\S]*locale\s+Locale\?[\s\S]*}/,
+    );
+    const user = schema.match(/model User\s*{[\s\S]*?^}/m)?.[0];
+    expect(user).toMatch(/accessGrants\s+UserAccessGrant\[\]/);
+    expect(user).toMatch(/accessVersion\s+Int\s+@default\(0\)/);
+  });
+});
+
 // -- 2. User.banned default --------------------------------------------------
 
 describe("User.banned field", () => {
