@@ -1,7 +1,6 @@
-import type { AdminListingListItemDto, AppAbility } from "@sd/core-contracts";
+import type { AdminListingListItemDto } from "@sd/core-contracts";
 
 import { Column, RNHostView, Row } from "@expo/ui";
-import { MenuView, type MenuAction, type NativeActionEvent } from "@expo/ui/community/menu";
 import { useAbility } from "@sd/domain-account";
 import { useFormattedScholarName } from "@sd/domain-content";
 import { Stack } from "expo-router";
@@ -28,43 +27,20 @@ import { filterListings } from "./filter-listings";
 type AdminListingRowProps = {
   item: AdminListingListItemDto;
   isSelected: boolean;
-  actions: MenuAction[];
   onPress: () => void;
-  onAction: (action: string) => void;
 };
 
-/**
- * The list endpoint already scope-filters rows server-side, and
- * AdminListingListItemDto carries scholarSlug (not scholarId), so these are
- * bare ability checks rather than scholarId-conditioned ones — same
- * trade-off web's admin Listing.tsx made in Stage 8.
- */
-function getVisibleRowActions(ability: AppAbility): MenuAction[] {
-  const actions: MenuAction[] = [];
-  if (ability.can("update", "Listing")) actions.push({ id: "edit", title: "Edit" });
-  if (ability.can("publish", "Listing")) actions.push({ id: "publish", title: "Publish" });
-  if (ability.can("archive", "Listing")) actions.push({ id: "archive", title: "Archive" });
-  return actions;
-}
-
-function AdminListingRow({ item, isSelected, actions, onPress, onAction }: AdminListingRowProps) {
+function AdminListingRow({ item, isSelected, onPress }: AdminListingRowProps) {
   const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
 
   return (
-    <MenuView
-      testID={`admin-listing-row-${item.id}`}
-      actions={actions}
-      shouldOpenOnLongPress
-      onPressAction={(event: NativeActionEvent) => onAction(event.nativeEvent.event)}
-    >
-      <NativeListItem
-        title={item.title}
-        supportingText={`${scholarName} · ${item.status}`}
-        leadingIcon={isSelected ? "check" : "play"}
-        onPress={onPress}
-        testID={`admin-listing-row-${item.id}-trigger`}
-      />
-    </MenuView>
+    <NativeListItem
+      title={item.title}
+      supportingText={`${scholarName} · ${item.status}`}
+      leadingIcon={isSelected ? "check" : "play"}
+      onPress={onPress}
+      testID={`admin-listing-row-${item.id}-trigger`}
+    />
   );
 }
 
@@ -79,7 +55,6 @@ export function AdminListingsScreen() {
   const [editingListingId, setEditingListingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const listings = filterListings(data?.items ?? [], searchQuery);
-  const rowActions = getVisibleRowActions(ability);
   const canUpload = ability.can("upload", "Media");
   const canPublish = ability.can("publish", "Listing");
   const canArchive = ability.can("archive", "Listing");
@@ -128,21 +103,6 @@ export function AdminListingsScreen() {
     refetch();
   };
 
-  const handleRowAction = async (id: string, action: string) => {
-    if (action === "edit") {
-      setEditingListingId(id);
-      return;
-    }
-    if (action === "publish" || action === "archive") {
-      try {
-        await bulkListingAction({ action, ids: [id] });
-      } catch {
-        // Ignored for UX robustness
-      }
-      refetch();
-    }
-  };
-
   return (
     <NativeScreenHost testID="admin-listings-host">
       <Stack.Screen options={headerSearchOptions} />
@@ -173,9 +133,7 @@ export function AdminListingsScreen() {
                 key={item.id}
                 item={item}
                 isSelected={selectedIds.has(item.id)}
-                actions={rowActions}
                 onPress={() => handleRowPress(item.id)}
-                onAction={(action) => void handleRowAction(item.id, action)}
               />
             ))}
           </NativeList>
