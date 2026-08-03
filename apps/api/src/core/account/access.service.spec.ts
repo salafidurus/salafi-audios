@@ -83,4 +83,39 @@ describe('AccessService', () => {
 
     expect(transaction).toHaveBeenCalledTimes(1);
   });
+
+  it('keeps global and scholar-scoped grants separate', async () => {
+    const prisma = {
+      user: {
+        findUnique: vi.fn().mockResolvedValue({
+          accessVersion: 0,
+          roles: [],
+          accessGrants: [
+            {
+              target: 'listing',
+              capability: 'write',
+              scholarId: null,
+              scholar: null,
+              locale: null,
+            },
+            {
+              target: 'listing',
+              capability: 'write',
+              scholarId: 'scholar-a',
+              scholar: { slug: 'a' },
+              locale: null,
+            },
+          ],
+        }),
+      },
+      scholar: { findMany: vi.fn().mockResolvedValue([]) },
+    };
+
+    const result = await new AccessService(prisma as any).snapshot('user-1');
+
+    expect(result.grants).toEqual([
+      { target: 'listing', capability: 'write', scholarSlugs: [], locales: [] },
+      { target: 'listing', capability: 'write', scholarSlugs: ['a'], locales: [] },
+    ]);
+  });
 });

@@ -38,7 +38,7 @@ export class AccessService {
       }
     >();
     for (const grant of user.accessGrants) {
-      const key = `${grant.target}:${grant.capability}`;
+      const key = `${grant.target}:${grant.capability}:${grant.scholarId ? 'scoped' : 'global'}`;
       const current = grouped.get(key) ?? {
         target: grant.target,
         capability: grant.capability,
@@ -111,6 +111,14 @@ export class AccessService {
         })),
       );
     });
+    const uniqueRows = [
+      ...new Map(
+        rows.map((row) => [
+          `${row.target}:${row.capability}:${row.scholarId ?? ''}:${row.locale ?? ''}`,
+          row,
+        ]),
+      ).values(),
+    ];
 
     await this.prisma.$transaction(async (tx) => {
       const updated = await tx.user.updateMany({
@@ -119,7 +127,7 @@ export class AccessService {
       });
       if (updated.count !== 1) throw new ConflictException('Access changed; reload and try again');
       await tx.userAccessGrant.deleteMany({ where: { userId } });
-      if (rows.length) await tx.userAccessGrant.createMany({ data: rows as never });
+      if (uniqueRows.length) await tx.userAccessGrant.createMany({ data: uniqueRows as never });
     });
 
     return this.snapshot(userId);

@@ -32,6 +32,41 @@ describe("AccessGrantRequestSchema", () => {
     ).toThrow();
   });
 
+  it("rejects content capabilities that do not apply to the target", () => {
+    expect(() =>
+      AccessGrantRequestSchema.parse({
+        target: "topic",
+        capability: "translate",
+      }),
+    ).toThrow();
+    expect(() =>
+      AccessGrantRequestSchema.parse({
+        target: "translation",
+        capability: "write",
+        locales: ["ar"],
+      }),
+    ).toThrow();
+  });
+
+  it("requires locale scope for translation grants and rejects it elsewhere", () => {
+    expect(() =>
+      AccessGrantRequestSchema.parse({ target: "translation", capability: "translate" }),
+    ).toThrow();
+    expect(() =>
+      AccessGrantRequestSchema.parse({ target: "listing", capability: "write", locales: ["ar"] }),
+    ).toThrow();
+  });
+
+  it("allows user management only as a global manage grant", () => {
+    expect(AccessGrantRequestSchema.parse({ target: "user", capability: "manage" })).toMatchObject({
+      target: "user",
+      capability: "manage",
+      scholarSlugs: [],
+      locales: [],
+    });
+    expect(() => AccessGrantRequestSchema.parse({ target: "user", capability: "write" })).toThrow();
+  });
+
   it("accepts an aggregate access snapshot and versioned replacement", () => {
     const grant = {
       target: "listing",

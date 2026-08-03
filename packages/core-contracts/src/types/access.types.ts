@@ -31,6 +31,37 @@ export const AccessGrantRequestSchema = z
         message: "This target cannot be scholar-scoped",
       });
     }
+
+    const allowedCapabilities: Record<AccessTarget, AccessCapability[]> = {
+      scholar: ["write", "publish", "delete"],
+      listing: ["write", "publish", "delete"],
+      media: ["write", "delete"],
+      topic: ["write", "publish", "delete"],
+      translation: ["translate", "publish", "delete"],
+      user: ["manage"],
+    };
+    if (!allowedCapabilities[grant.target].includes(grant.capability)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["capability"],
+        message: "This capability cannot be granted for this target",
+      });
+    }
+
+    if (grant.target === "translation" && grant.locales.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["locales"],
+        message: "Translation grants require at least one locale",
+      });
+    }
+    if (grant.target !== "translation" && grant.locales.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["locales"],
+        message: "Locale scope is only valid for translation grants",
+      });
+    }
   });
 export type AccessGrantRequest = z.infer<typeof AccessGrantRequestSchema>;
 
