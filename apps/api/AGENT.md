@@ -24,6 +24,8 @@ This service is the authority for business rules, permissions, and state transit
 - Re-check authorization on each protected endpoint.
 - UI-level restrictions are never security controls.
 - Reject invalid/unauthorized requests before mutating state.
+- Catalog reads are public; backend policies protect write, translate, publish,
+  delete, and user-management actions through aggregate access grants.
 
 ## API design rules
 

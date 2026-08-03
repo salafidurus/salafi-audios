@@ -15,7 +15,7 @@ Salafi Durus separates authoritative relational state, media storage, analytics,
 
 - PostgreSQL is the authoritative database.
 - Prisma defines schema, migrations, and typed access.
-- The database stores metadata, relationships, publication state, permissions-related data, and media references.
+- The database stores metadata, relationships, publication state, aggregate access grants, and media references.
 
 ### Core Domain Shape
 
@@ -85,10 +85,12 @@ Client persistence improves continuity but never becomes authoritative.
 
 ## 10. Privacy and Hard Deletions
 
-- GDPR compliance is backend-enforced. When a user requests hard deletion, executing `DELETE /account` cascades and purges all personal rows (`Session`, `Account`, `UserRoleAssignment`, `UserPermission`, `UserScholarRole`, `UserTranslatorRole`, `UserListingProgress`, `FavoriteListing`) using `onDelete: Cascade` rules, while decoupled listing audit columns preserve catalog integrity. This physically removes the rows regardless of any `deletedAt` tombstone state — the soft-delete convention above is for normal unsave/sync, not a substitute for GDPR erasure.
+- GDPR compliance is backend-enforced. When a user requests hard deletion, executing `DELETE /account` cascades and purges all personal rows (`Session`, `Account`, `UserRoleAssignment`, `UserAccessGrant`, `UserListingProgress`, `FavoriteListing`) using `onDelete: Cascade` rules, while decoupled listing audit columns preserve catalog integrity. This physically removes the rows regardless of any `deletedAt` tombstone state — the soft-delete convention above is for normal unsave/sync, not a substitute for GDPR erasure.
 
 ## 11. Admin Roles and Permissions
 
-- Roles, global permissions, and scholar/translator scoped grants (`UserRoleAssignment`, `UserPermission`, `UserScholarRole`, `UserTranslatorRole`) are combined into a CASL ability server-side (`apps/api/src/core/auth/ability/ability.factory.ts`) and enforced per-request by `PolicyGuard`. Promoting a user to admin and granting capabilities is documented in
-  [admin-management.md](./admin-management.md) — covers the automated `grant:role`
-  script, manual SQL, and Prisma Studio.
+- System roles (`UserRoleAssignment`) and aggregate grants (`UserAccessGrant`) are
+  combined into a CASL ability server-side (`apps/api/src/core/auth/ability/ability.factory.ts`)
+  and enforced per-request by `PolicyGuard`. Granting access is documented in
+  [admin-management.md](./admin-management.md) and is handled by the
+  `grant:access` script or the unified admin access API.

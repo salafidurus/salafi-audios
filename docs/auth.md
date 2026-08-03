@@ -72,8 +72,12 @@ validates absolute `callbackURL` values against this combined list.
 
 `apps/api/src/core/auth/auth.guard.ts` is the global `AuthGuard`. For every
 non-`@Public()` route it calls `getAuth().api.getSession({ headers })`. This
-validates the session cookie, then enforces bans and roles and attaches
-`request.user`.
+validates the session cookie, enforces bans, loads system roles and fresh
+`UserAccessGrant` rows, and attaches them to `request.user`. `PolicyGuard`
+turns those roles and grants into a CASL ability for each protected mutation.
+
+Catalog reads are public; access grants are reserved for mutation capabilities:
+`write`, `translate`, `publish`, `delete`, and global user-management `manage`.
 
 ## OAuth flows
 
