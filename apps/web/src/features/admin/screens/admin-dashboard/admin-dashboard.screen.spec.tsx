@@ -21,7 +21,7 @@ describe("AdminDashboardScreen", () => {
     (useAuth as Mock<any>).mockReturnValue({ isAuthenticated: true });
   });
 
-  it("renders loading state when fetching permissions", () => {
+  it("renders loading state when fetching access", () => {
     (useAbility as Mock<any>).mockReturnValue({
       ability: createMongoAbility([]),
       isLoading: true,
@@ -31,7 +31,7 @@ describe("AdminDashboardScreen", () => {
     expect(screen.getByText("Loading…")).toBeInTheDocument();
   });
 
-  it("shows cards when user has only view-level permissions", () => {
+  it("shows cards when user has only view-level access", () => {
     (useAbility as Mock<any>).mockReturnValue({
       ability: createMongoAbility([
         { action: "read", subject: "Scholar" },
@@ -48,7 +48,7 @@ describe("AdminDashboardScreen", () => {
     expect(screen.getByRole("link", { name: /users/i })).toBeInTheDocument();
   });
 
-  it("renders sections based on user permissions", () => {
+  it("renders sections based on user access", () => {
     (useAbility as Mock<any>).mockReturnValue({
       ability: createMongoAbility([
         { action: "read", subject: "Scholar" },

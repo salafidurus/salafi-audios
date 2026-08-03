@@ -119,7 +119,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
   const { ability } = useAbility({ isAuthenticated });
   const { data: scholarsData } = useScholarsList();
   const scholars = (scholarsData?.scholars ?? []).filter((s) =>
-    ability.can("upload", subject("Media", { scholarId: s.id })),
+    ability.can("upload", subject("Media", { scholarSlug: s.slug })),
   );
   const [selectedScholarId, setSelectedScholarId] = useState<string | null>(null);
   const [queue, setQueue] = useState<UploadItem[]>([]);

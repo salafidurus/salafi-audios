@@ -15,6 +15,7 @@ import { createSeries, updateSeries } from "../../api/admin-scholars.api";
 type SeriesSheetProps = {
   isOpen: boolean;
   scholarId: string;
+  scholarSlug: string;
   series?: AdminListingDetailDto;
   onClose: () => void;
   onSaved: () => void;
@@ -32,7 +33,14 @@ function reduce(state: FormState, patch: Partial<FormState>): FormState {
   return { ...state, ...patch };
 }
 
-export function SeriesSheet({ isOpen, scholarId, series, onClose, onSaved }: SeriesSheetProps) {
+export function SeriesSheet({
+  isOpen,
+  scholarId,
+  scholarSlug,
+  series,
+  onClose,
+  onSaved,
+}: SeriesSheetProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
@@ -48,7 +56,7 @@ export function SeriesSheet({ isOpen, scholarId, series, onClose, onSaved }: Ser
   if (!isOpen) return null;
 
   const { title, description, language, isSaving, error } = state;
-  const canSave = ability.can(series ? "update" : "create", subject("Listing", { scholarId }));
+  const canSave = ability.can(series ? "update" : "create", subject("Listing", { scholarSlug }));
 
   const handleSave = async () => {
     if (!title.trim()) {

@@ -13,42 +13,41 @@ import { UpdateScholarTranslationDto } from './dto/update-scholar-translation.dt
 export class ScholarsTranslationsController {
   constructor(private readonly service: ScholarsService) {}
 
-  @Get(':id/translations')
-  @CheckPolicy('read', 'Translation', resolveScholarTranslation())
+  @Get(':slug/translations')
   @ApiOperation({ summary: 'List translations for a scholar' })
-  listTranslations(@Param('id') id: string) {
-    return this.service.listTranslations(id);
+  listTranslations(@Param('slug') slug: string) {
+    return this.service.listTranslations(slug);
   }
 
-  @Post(':id/translations')
-  @CheckPolicy('create', 'Translation', resolveScholarTranslation())
+  @Post(':slug/translations')
+  @CheckPolicy('translate', 'Translation', resolveScholarTranslation())
   @ApiOperation({ summary: 'Upsert a scholar translation' })
-  upsertTranslation(@Param('id') id: string, @Body() dto: SaveScholarTranslationDto) {
-    return this.service.upsertTranslation(id, dto);
+  upsertTranslation(@Param('slug') slug: string, @Body() dto: SaveScholarTranslationDto) {
+    return this.service.upsertTranslation(slug, dto);
   }
 
-  @Patch(':id/translations/:locale')
-  @CheckPolicy('update', 'Translation', resolveScholarTranslation())
+  @Patch(':slug/translations/:locale')
+  @CheckPolicy('translate', 'Translation', resolveScholarTranslation())
   @ApiOperation({ summary: 'Partially update a scholar translation' })
   updateTranslation(
-    @Param('id') id: string,
+    @Param('slug') slug: string,
     @Param('locale') locale: string,
     @Body() body: UpdateScholarTranslationDto,
   ) {
-    return this.service.updateTranslation(id, locale, body);
+    return this.service.updateTranslation(slug, locale, body);
   }
 
-  @Post(':id/translations/:locale/publish')
+  @Post(':slug/translations/:locale/publish')
   @CheckPolicy('publish', 'Translation', resolveScholarTranslation())
   @ApiOperation({ summary: 'Publish a scholar translation' })
-  publishTranslation(@Param('id') id: string, @Param('locale') locale: string) {
-    return this.service.publishTranslation(id, locale);
+  publishTranslation(@Param('slug') slug: string, @Param('locale') locale: string) {
+    return this.service.publishTranslation(slug, locale);
   }
 
-  @Post(':id/translations/:locale/unpublish')
+  @Post(':slug/translations/:locale/unpublish')
   @CheckPolicy('publish', 'Translation', resolveScholarTranslation())
   @ApiOperation({ summary: 'Unpublish a scholar translation' })
-  unpublishTranslation(@Param('id') id: string, @Param('locale') locale: string) {
-    return this.service.unpublishTranslation(id, locale);
+  unpublishTranslation(@Param('slug') slug: string, @Param('locale') locale: string) {
+    return this.service.unpublishTranslation(slug, locale);
   }
 }

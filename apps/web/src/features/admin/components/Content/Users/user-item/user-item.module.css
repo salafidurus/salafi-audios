@@ -29,3 +29,8 @@
   flex: 1;
   min-width: 0;
 }
+
+.accessRoles {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}

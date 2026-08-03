@@ -5,7 +5,7 @@ import type { UserProfileDto } from '@sd/core-contracts';
 import { AccountService } from './account.service';
 import { CurrentUser } from '../auth/decorators';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import type { ScholarLinkAttribute, TranslatorRoleAttribute } from '../auth/ability/ability.types';
+import type { AccessGrantAttribute } from '../auth/ability/ability.types';
 
 @ApiTags('Account')
 @ApiCommonErrors()
@@ -25,9 +25,7 @@ export class AccountController {
       image?: string | null;
       role: string;
       roles: string[];
-      permissions?: string[];
-      scholarLinks?: ScholarLinkAttribute[];
-      translatorRoles?: TranslatorRoleAttribute[];
+      accessGrants?: AccessGrantAttribute[];
       emailVerified: boolean;
       createdAt: Date;
       updatedAt: Date;

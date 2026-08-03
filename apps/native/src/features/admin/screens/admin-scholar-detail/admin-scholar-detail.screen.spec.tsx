@@ -60,7 +60,7 @@ describe("AdminScholarDetailScreen", () => {
     jest.clearAllMocks();
     mockedUseAbility.mockReturnValue({
       ability: createMongoAbility([
-        { action: "create", subject: "Listing", conditions: { scholarId: "s1" } },
+        { action: "create", subject: "Listing", conditions: { scholarSlug: "scholar-one" } },
       ]),
       isLoading: false,
     });
@@ -122,7 +122,7 @@ describe("AdminScholarDetailScreen", () => {
   it("hides both + Add buttons when the ability does not grant create for this scholar", async () => {
     mockedUseAbility.mockReturnValue({
       ability: createMongoAbility([
-        { action: "create", subject: "Listing", conditions: { scholarId: "some-other-scholar" } },
+        { action: "create", subject: "Listing", conditions: { scholarSlug: "some-other-scholar" } },
       ]),
       isLoading: false,
     });

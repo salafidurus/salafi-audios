@@ -1,153 +1,28 @@
 import type {
-  Permission,
-  UserPermissionDto,
-  UserRoleAssignmentDto,
-  UserRole,
   AdminUserListDto,
   AdminTopicDetailDto,
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
   ScholarFormDataDto,
   ScholarTitle,
-  UserScholarRoleDto,
-  UserTranslatorRoleDto,
-  ScholarPermissionType,
-  Locale,
+  ReplaceUserAccessRequest,
+  UserAccessSnapshot,
 } from "@sd/core-contracts";
 
 import { httpClient, endpoints } from "@sd/core-contracts";
 
-// --- Permissions ---
-
-export type AdminPermissionsListResponse = {
-  permissions: UserPermissionDto[];
-};
-
-export function fetchUserPermissions(userId: string) {
-  return httpClient<AdminPermissionsListResponse>({
-    url: endpoints.admin.permissions.list(userId),
+export function fetchUserAccess(userId: string) {
+  return httpClient<UserAccessSnapshot>({
+    url: endpoints.admin.users.access(userId),
     method: "GET",
   });
 }
 
-export function grantPermission(userId: string, permission: Permission) {
-  return httpClient<AdminPermissionsListResponse>({
-    url: endpoints.admin.permissions.grant(userId),
-    method: "POST",
-    body: { permission },
-  });
-}
-
-export function revokePermission(userId: string, permission: string) {
-  return httpClient<AdminPermissionsListResponse>({
-    url: endpoints.admin.permissions.revoke(userId, permission),
-    method: "DELETE",
-    body: {},
-  });
-}
-
-// --- Roles ---
-
-export type AdminRolesListResponse = {
-  roles: UserRoleAssignmentDto[];
-};
-
-export function fetchUserRoles(userId: string) {
-  return httpClient<AdminRolesListResponse>({
-    url: endpoints.admin.roles.grant(userId),
-    method: "GET",
-  });
-}
-
-export function grantRole(userId: string, role: UserRole) {
-  return httpClient<AdminRolesListResponse>({
-    url: endpoints.admin.roles.grant(userId),
-    method: "POST",
-    body: { role },
-  });
-}
-
-export function revokeRole(userId: string, role: UserRole) {
-  return httpClient<AdminRolesListResponse>({
-    url: endpoints.admin.roles.revoke(userId, role),
-    method: "DELETE",
-    body: {},
-  });
-}
-
-// --- Scholar-scoped roles (identified by scholar slug, not id) ---
-
-export type AdminScholarRolesListResponse = {
-  scholarRoles: UserScholarRoleDto[];
-};
-
-export function fetchUserScholarRoles(userId: string) {
-  return httpClient<AdminScholarRolesListResponse>({
-    url: endpoints.admin.scholarRoles.list(userId),
-    method: "GET",
-  });
-}
-
-export function grantScholarRole(
-  userId: string,
-  scholarSlug: string,
-  permissionType: ScholarPermissionType,
-) {
-  return httpClient<{ success: boolean; message: string }>({
-    url: endpoints.admin.scholarRoles.grant(userId),
-    method: "POST",
-    body: { scholarSlug, permissionType },
-  });
-}
-
-export function revokeScholarRole(
-  userId: string,
-  scholarSlug: string,
-  permissionType: ScholarPermissionType,
-) {
-  return httpClient<{ success: boolean; message: string }>({
-    url: endpoints.admin.scholarRoles.revoke(userId, scholarSlug, permissionType),
-    method: "DELETE",
-    body: {},
-  });
-}
-
-// --- Translator-scoped roles (locale set, optionally scoped to one scholar) ---
-
-export type AdminTranslatorRolesListResponse = {
-  translatorRoles: UserTranslatorRoleDto[];
-};
-
-export function fetchUserTranslatorRoles(userId: string) {
-  return httpClient<AdminTranslatorRolesListResponse>({
-    url: endpoints.admin.translatorRoles.list(userId),
-    method: "GET",
-  });
-}
-
-export function syncTranslatorRoles(
-  userId: string,
-  scholarSlug: string | null,
-  locales: Locale[],
-  canPublish: boolean,
-) {
-  return httpClient<{ success: boolean; message: string }>({
-    url: endpoints.admin.translatorRoles.sync(userId),
+export function replaceUserAccess(userId: string, body: ReplaceUserAccessRequest) {
+  return httpClient<UserAccessSnapshot>({
+    url: endpoints.admin.users.access(userId),
     method: "PUT",
-    body: { scholarSlug, locales, canPublish },
-  });
-}
-
-export function updateTranslatorPublish(
-  userId: string,
-  locale: Locale,
-  canPublish: boolean,
-  scholarSlug?: string | null,
-) {
-  return httpClient<{ success: boolean; message: string }>({
-    url: endpoints.admin.translatorRoles.updatePublish(userId, locale),
-    method: "PATCH",
-    body: { scholarSlug, canPublish },
+    body,
   });
 }
 

@@ -14,7 +14,7 @@ export function accessibleScopeIds(
   ability: AppAbility,
   action: AppActions,
   subjectType: AppSubjectType,
-  conditionKey: 'id' | 'scholarId' = 'scholarId',
+  conditionKey: 'slug' | 'scholarSlug' = 'scholarSlug',
 ): string[] | undefined {
   const rules = ability.rulesFor(action, subjectType);
   const ids = new Set<string>();

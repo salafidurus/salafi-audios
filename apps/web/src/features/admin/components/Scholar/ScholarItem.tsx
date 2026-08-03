@@ -126,7 +126,7 @@ export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) 
         </div>
       </div>
       <List.Item.Actions>
-        {ability.can("update", subject("Scholar", { id: scholar.id })) && (
+        {ability.can("update", subject("Scholar", { slug: scholar.slug })) && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
@@ -138,7 +138,7 @@ export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) 
             {isMobile && t("common.edit", "Edit")}
           </Button>
         )}
-        {ability.can("read", subject("Translation", { scholarId: scholar.id })) && (
+        {ability.can("read", subject("Translation", { scholarSlug: scholar.slug })) && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}

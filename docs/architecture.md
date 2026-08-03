@@ -6,7 +6,7 @@ Salafi Durus is a single system delivered through multiple clients around one au
 
 ### Core Components
 
-- **API (`apps/api`)**: authoritative backend for business rules, permissions, content lifecycle, and media coordination.
+- **API (`apps/api`)**: authoritative backend for business rules, access control, content lifecycle, and media coordination.
 - **Web (`apps/web`)**: public discovery surface plus authenticated editorial and account flows.
 - **Mobile (`apps/native`)**: listening-focused client with local-first sync and offline audio downloads.
 - **Database**: PostgreSQL via Prisma for authoritative relational state.

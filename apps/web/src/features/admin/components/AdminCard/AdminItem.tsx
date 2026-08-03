@@ -11,7 +11,7 @@ import { MarqueeText } from "@/shared/components/MarqueeText";
 import styles from "./admin-item.module.css";
 
 export interface AdminItemMetadataItem {
-  /** Metadata label (e.g., "Email", "Role", "Permissions") */
+  /** Metadata label (e.g., "Email", "Role", "Access") */
   label: string;
   /** Metadata value (can be string, number, or React element like badge) */
   value: React.ReactNode;

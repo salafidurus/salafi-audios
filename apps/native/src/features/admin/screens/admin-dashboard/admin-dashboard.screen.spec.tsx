@@ -50,7 +50,7 @@ describe("AdminDashboardScreen", () => {
     expect(screen.queryByText("Scholars")).toBeNull();
   });
 
-  it("renders neither card and a no-permissions message when the ability has no rules", async () => {
+  it("renders neither card and a no-access message when the ability has no rules", async () => {
     mockedUseAbility.mockReturnValue({
       ability: createMongoAbility([]),
       isLoading: false,
@@ -60,7 +60,7 @@ describe("AdminDashboardScreen", () => {
 
     expect(screen.queryByText("Listings")).toBeNull();
     expect(screen.queryByText("Scholars")).toBeNull();
-    expect(screen.getByText("You don't have any admin permissions.")).toBeTruthy();
+    expect(screen.getByText("You don't have any admin access.")).toBeTruthy();
   });
 
   it("renders a loading state while the ability is loading", async () => {

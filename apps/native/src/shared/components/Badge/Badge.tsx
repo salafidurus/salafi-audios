@@ -6,12 +6,6 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AppText } from "@/shared/components/AppText/AppText";
 
-type PermissionBadgeProps = {
-  variant: "permission";
-  permission: string;
-  icon?: ReactNode;
-};
-
 type RoleBadgeProps = {
   variant: "role";
   role: "admin" | "user";
@@ -23,7 +17,7 @@ type StatusBadgeProps = {
   color?: "primary" | "secondary" | "muted" | "success" | "warning";
 };
 
-export type BadgeProps = PermissionBadgeProps | RoleBadgeProps | StatusBadgeProps;
+export type BadgeProps = RoleBadgeProps | StatusBadgeProps;
 
 function getStatusStyleMap(): Record<string, ViewStyle> {
   return {
@@ -38,17 +32,6 @@ function getStatusStyleMap(): Record<string, ViewStyle> {
 export function Badge(props: BadgeProps): ReactNode {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
-
-  if (props.variant === "permission") {
-    return (
-      <View style={[styles.badge, styles.permissionBadge]}>
-        {props.icon}
-        <AppText variant="caption" style={styles.permissionText}>
-          {props.permission}
-        </AppText>
-      </View>
-    );
-  }
 
   if (props.variant === "role") {
     const isAdmin = props.role === "admin";
@@ -86,12 +69,6 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     gap: theme.spacing.scale.xs,
     alignSelf: "flex-start",
-  },
-  permissionBadge: {
-    backgroundColor: theme.colors.surface.hover,
-  },
-  permissionText: {
-    color: theme.colors.content.default,
   },
   adminBadge: {
     backgroundColor: theme.colors.action.primary,

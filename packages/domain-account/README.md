@@ -39,7 +39,7 @@ src/
 ## Known Constraints
 
 - **Auth is backend-authoritative.** The profile data returned here reflects what the
-  backend permits. Do not derive permissions or role checks from the client-side profile
+  backend permits. Do not derive access or role checks from the client-side profile
   object.
 - **No build step.** This package exports directly from `src/` (TypeScript source). Apps
   consume it via workspace resolution; no `dist/` is produced.

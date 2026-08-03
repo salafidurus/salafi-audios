@@ -27,32 +27,18 @@ const baseUser = {
   image: null,
   roles: [],
   createdAt: "2024-01-01T00:00:00.000Z",
-  permissions: [] as import("@sd/core-contracts").Permission[],
 };
 
 describe("UserItem", () => {
-  it("shows Manage Permissions button only when the user can grant UserPermission", () => {
+  it("shows one Manage Access button when the user can manage UserAccess", () => {
     (useAbility as Mock<any>).mockReturnValue({
-      ability: abilityWith((can) => can("grant", "UserPermission")),
+      ability: abilityWith((can) => can("manage", "UserAccess")),
       isLoading: false,
     });
 
-    render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
+    render(<UserItem user={baseUser} onManageAccess={vi.fn()} />);
 
-    expect(screen.getByRole("button", { name: "Manage Permissions" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Manage Roles" })).not.toBeInTheDocument();
-  });
-
-  it("shows Manage Roles button only when the user can grant UserRoleAssignment", () => {
-    (useAbility as Mock<any>).mockReturnValue({
-      ability: abilityWith((can) => can("grant", "UserRoleAssignment")),
-      isLoading: false,
-    });
-
-    render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
-
-    expect(screen.queryByRole("button", { name: "Manage Permissions" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Manage Roles" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Manage Access" })).toHaveLength(1);
   });
 
   it("hides every management button when the user has no grant capability", () => {
@@ -61,30 +47,8 @@ describe("UserItem", () => {
       isLoading: false,
     });
 
-    render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
+    render(<UserItem user={baseUser} onManageAccess={vi.fn()} />);
 
-    expect(screen.queryByRole("button", { name: "Manage Permissions" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Manage Roles" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Manage Scholar Access" })).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: "Manage Translator Locales" }),
-    ).not.toBeInTheDocument();
-  });
-
-  it("shows Manage Scholar Access and Manage Translator Locales when granted", () => {
-    (useAbility as Mock<any>).mockReturnValue({
-      ability: abilityWith((can) => {
-        can("grant", "UserScholarRole");
-        can("grant", "UserTranslatorRole");
-      }),
-      isLoading: false,
-    });
-
-    render(
-      <UserItem user={baseUser} onManageScholarRoles={vi.fn()} onManageTranslatorRoles={vi.fn()} />,
-    );
-
-    expect(screen.getByRole("button", { name: "Manage Scholar Access" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Manage Translator Locales" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Manage Access" })).not.toBeInTheDocument();
   });
 });

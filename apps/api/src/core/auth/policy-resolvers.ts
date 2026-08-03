@@ -2,13 +2,13 @@ import type { PolicyResourceResolver } from './decorators/check-policy.decorator
 
 /**
  * Shared @CheckPolicy resolvers. A resolver's only job is to produce the
- * resource conditions (e.g. { scholarId }) checked against the caller's
+ * resource conditions (e.g. { scholarSlug }) checked against the caller's
  * ability — existence/404 handling stays the service's responsibility.
  */
 
 /**
  * Forces a truly-unconditioned check for subjects that CAN have conditioned
- * rules elsewhere (Translation, via scholarLinks/translatorRoles) but must
+ * scoped grants elsewhere (for example, scholar/locale translation grants) but must
  * stay global-only on this route (e.g. topic translations aren't scholar-
  * owned). Without this, a bare subjectType check (no resolver at all) would
  * match ANY rule for that action+subject regardless of its conditions —
@@ -17,52 +17,85 @@ import type { PolicyResourceResolver } from './decorators/check-policy.decorator
  */
 export const resolveUnscoped: PolicyResourceResolver = () => ({});
 
-/** Scholar routes: the route param IS the resource's own id. */
+/** Scholar routes use the public slug as the resource identity. */
+export const resolveScholarParam =
+  (paramName = 'slug'): PolicyResourceResolver =>
+  (ctx) => ({ slug: ctx.params[paramName] });
+
+/** Legacy admin routes still expose an internal id until their route contract migrates. */
 export const resolveScholarIdParam =
   (paramName = 'id'): PolicyResourceResolver =>
-  (ctx) => ({ id: ctx.params[paramName] });
+  async (ctx, prisma) => {
+    const scholar = await prisma.scholar.findUnique({
+      where: { id: ctx.params[paramName] },
+      select: { slug: true },
+    });
+    return { slug: scholar?.slug };
+  };
 
-/** Listing routes: fetch the listing's owning scholarId from its id param. */
+/** Listing routes: fetch the listing's owning public scholar slug. */
+export const resolveListingScholar =
+  (paramName = 'slug'): PolicyResourceResolver =>
+  async (ctx, prisma) => {
+    const listing = await prisma.listing.findUnique({
+      where: { slug: ctx.params[paramName] },
+      select: { scholar: { select: { slug: true } } },
+    });
+    return { scholarSlug: listing?.scholar?.slug };
+  };
+
+/** Legacy admin routes still expose an internal id until their route contract migrates. */
 export const resolveListingScholarId =
   (paramName = 'id'): PolicyResourceResolver =>
   async (ctx, prisma) => {
     const listing = await prisma.listing.findUnique({
       where: { id: ctx.params[paramName] },
-      select: { scholarId: true },
+      select: { scholar: { select: { slug: true } } },
     });
-    return { scholarId: listing?.scholarId };
+    return { scholarSlug: listing?.scholar?.slug };
   };
 
 /** Listing creation: the target scholar comes from the request body. */
-export const resolveScholarIdFromBody =
+export const resolveScholarFromBody =
   (field = 'scholarId'): PolicyResourceResolver =>
-  (ctx) => ({ scholarId: (ctx.body as Record<string, unknown> | undefined)?.[field] });
+  (ctx) => {
+    const value = (ctx.body as Record<string, unknown> | undefined)?.[field];
+    if (typeof value !== 'string') return { scholarSlug: undefined };
+    return { scholarSlug: value };
+  };
+
+/** @deprecated Use resolveScholarFromBody; retained while DTO call sites migrate. */
+export const resolveScholarIdFromBody = resolveScholarFromBody;
 
 /**
- * Scholar-owned translation sub-resource routes (e.g. /scholars/:id/translations)
- * where the route param IS the scholar id — no DB fetch needed. `locale` is
+ * Scholar-owned translation sub-resource routes (e.g. /scholars/:slug/translations)
+ * where the route param is the scholar slug. `locale` is
  * only included in the checked condition when the route has one (list
  * routes don't target a single locale).
  */
 export const resolveScholarTranslation =
-  (paramName = 'id'): PolicyResourceResolver =>
+  (paramName = 'slug'): PolicyResourceResolver =>
   (ctx) => {
-    const scholarId = ctx.params[paramName];
-    return ctx.params.locale ? { scholarId, locale: ctx.params.locale } : { scholarId };
+    const bodyLocale = (ctx.body as Record<string, unknown> | undefined)?.locale;
+    const locale = ctx.params.locale ?? (typeof bodyLocale === 'string' ? bodyLocale : undefined);
+    const scholarSlug = ctx.params[paramName];
+    return locale ? { scholarSlug, locale } : { scholarSlug };
   };
 
 /**
- * Listing-owned translation sub-resource routes (e.g. /listings/:id/translations)
- * where the route param is the listing id — fetch its owning scholarId.
+ * Listing-owned translation sub-resource routes (e.g. /listings/:slug/translations)
+ * where the route param is the listing slug — fetch its owning scholar slug.
  */
 export const resolveListingTranslation =
-  (paramName = 'id'): PolicyResourceResolver =>
+  (paramName = 'slug'): PolicyResourceResolver =>
   async (ctx, prisma) => {
-    const listing = await prisma.listing.findUnique({
-      where: { id: ctx.params[paramName] },
-      select: { scholarId: true },
+    const listing = await prisma.listing.findFirst({
+      where: { slug: ctx.params[paramName] },
+      select: { scholar: { select: { slug: true } } },
     });
-    return ctx.params.locale
-      ? { scholarId: listing?.scholarId, locale: ctx.params.locale }
-      : { scholarId: listing?.scholarId };
+    const bodyLocale = (ctx.body as Record<string, unknown> | undefined)?.locale;
+    const locale = ctx.params.locale ?? (typeof bodyLocale === 'string' ? bodyLocale : undefined);
+    return locale
+      ? { scholarSlug: listing?.scholar?.slug, locale }
+      : { scholarSlug: listing?.scholar?.slug };
   };

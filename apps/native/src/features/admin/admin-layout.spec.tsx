@@ -42,12 +42,12 @@ jest.mock("expo-router", () => ({
 const mockedUseAbility = jest.mocked(useAbility) as any;
 
 describe("AdminLayout", () => {
-  it("shows a checking-permissions message while the ability is loading", async () => {
+  it("shows a checking-access message while the ability is loading", async () => {
     mockedUseAbility.mockReturnValue({ ability: createMongoAbility([]), isLoading: true });
 
     await render(<AdminLayout />);
 
-    expect(screen.getByText("Checking permissions…")).toBeTruthy();
+    expect(screen.getByText("Checking access…")).toBeTruthy();
   });
 
   it("shows Access Denied when the caller has no admin access", async () => {
@@ -55,7 +55,7 @@ describe("AdminLayout", () => {
 
     await render(<AdminLayout />);
 
-    expect(screen.getByText("You do not have admin permissions.")).toBeTruthy();
+    expect(screen.getByText("You do not have admin access.")).toBeTruthy();
   });
 
   it("renders the admin route stack when the caller has admin access", async () => {
@@ -66,7 +66,7 @@ describe("AdminLayout", () => {
 
     await render(<AdminLayout />);
 
-    expect(screen.queryByText("You do not have admin permissions.")).toBeNull();
-    expect(screen.queryByText("Checking permissions…")).toBeNull();
+    expect(screen.queryByText("You do not have admin access.")).toBeNull();
+    expect(screen.queryByText("Checking access…")).toBeNull();
   });
 });

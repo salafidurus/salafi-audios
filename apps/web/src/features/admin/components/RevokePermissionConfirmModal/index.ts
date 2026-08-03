@@ -1,1 +1,0 @@
-export { RevokePermissionConfirmModal } from "./RevokePermissionConfirmModal";

@@ -65,7 +65,7 @@ export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditShe
 
   const { listing, title, description, language, isSaving, error } = state;
   const canSave = listing
-    ? ability.can("update", subject("Listing", { scholarId: listing.scholarId }))
+    ? ability.can("update", subject("Listing", { scholarSlug: listing.scholarSlug }))
     : false;
 
   const handleSave = async () => {

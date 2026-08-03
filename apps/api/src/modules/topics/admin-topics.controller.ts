@@ -14,28 +14,27 @@ export class AdminTopicsController {
   constructor(private readonly service: TopicsService) {}
 
   @Get()
-  @CheckPolicy('read', 'Topic')
   @ApiOperation({ summary: 'List all topics' })
   list() {
     return this.service.list();
   }
 
   @Get(':slug')
-  @CheckPolicy('update', 'Topic')
+  @CheckPolicy('write', 'Topic')
   @ApiOperation({ summary: 'Get topic detail with translations' })
   getDetail(@Param('slug') slug: string) {
     return this.service.getAdminDetail(slug);
   }
 
   @Post()
-  @CheckPolicy('create', 'Topic')
+  @CheckPolicy('write', 'Topic')
   @ApiOperation({ summary: 'Create a topic with translations' })
   create(@Body() dto: CreateTopicDto) {
     return this.service.createWithTranslations(dto);
   }
 
   @Put(':slug')
-  @CheckPolicy('update', 'Topic')
+  @CheckPolicy('write', 'Topic')
   @ApiOperation({ summary: 'Update a topic with translations' })
   update(@Param('slug') slug: string, @Body() dto: UpdateTopicDto) {
     return this.service.updateWithTranslations(slug, dto);

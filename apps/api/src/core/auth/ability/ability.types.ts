@@ -1,4 +1,4 @@
-import type { Locale } from '@sd/core-db';
+import type { AccessCapability, AccessTarget, Locale } from '@sd/core-db';
 
 // The action/subject vocabulary is shared with the frontend ability hook
 // (packages/domain-account) via @sd/core-contracts — both sides must agree
@@ -14,20 +14,14 @@ export type {
   AppAbility,
 } from '@sd/core-contracts';
 
-export type ScholarLinkAttribute = {
-  scholarId: string;
-  permissionType: 'OWN_CONTENT' | 'ASSIGNED_EDITOR';
-};
-
-export type TranslatorRoleAttribute = {
-  scholarId: string | null;
-  locale: Locale;
-  canPublish: boolean;
+export type AccessGrantAttribute = {
+  target: AccessTarget;
+  capability: AccessCapability;
+  scholarSlug: string | null;
+  locale: Locale | null;
 };
 
 export type AbilityInput = {
   roles: string[];
-  permissions: string[];
-  scholarLinks: ScholarLinkAttribute[];
-  translatorRoles: TranslatorRoleAttribute[];
+  accessGrants?: AccessGrantAttribute[];
 };

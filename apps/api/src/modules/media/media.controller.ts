@@ -21,14 +21,14 @@ export class MediaController {
   constructor(private readonly service: MediaService) {}
 
   @Post('presigned-url')
-  @CheckPolicy('upload', 'Media')
+  @CheckPolicy('write', 'Media')
   @ApiOperation({ summary: 'Get a presigned R2 upload URL' })
   getPresignedUrl(@Body() dto: PresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
     return this.service.getPresignedUploadUrl(dto);
   }
 
   @Post('presign-batch')
-  @CheckPolicy('upload', 'Media')
+  @CheckPolicy('write', 'Media')
   @ApiOperation({ summary: 'Get presigned R2 upload URLs for a batch of audio files' })
   presignBatch(@Body() dto: BatchPresignAudioRequestDto): Promise<BatchPresignAudioResponseDto> {
     return this.service.getBatchAudioPresignedUrls(dto);

@@ -633,6 +633,11 @@ export class ScholarsRepository {
 
   // ─── Scholar translations ─────────────────────────────────────────────────
 
+  async findIdBySlug(slug: string): Promise<string | null> {
+    const scholar = await this.prisma.scholar.findUnique({ where: { slug }, select: { id: true } });
+    return scholar?.id ?? null;
+  }
+
   private mapScholarTranslation(t: {
     locale: string;
     status: string;

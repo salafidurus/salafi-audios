@@ -34,6 +34,10 @@ export class ConfigService {
     return this.env.DATABASE_URL;
   }
 
+  get PRISMA_LOG_QUERIES(): boolean {
+    return this.env.PRISMA_LOG_QUERIES;
+  }
+
   get ASSET_CDN_BASE_URL(): string | undefined {
     return this.env.ASSET_CDN_BASE_URL;
   }

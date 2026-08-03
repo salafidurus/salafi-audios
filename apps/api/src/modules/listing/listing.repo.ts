@@ -37,6 +37,11 @@ import { getRequestLocale } from '../../shared/i18n/locale-context';
 export class ListingRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findIdBySlug(slug: string): Promise<string | null> {
+    const listing = await this.prisma.listing.findUnique({ where: { slug }, select: { id: true } });
+    return listing?.id ?? null;
+  }
+
   async findDetailById(id: string): Promise<ListingDetailDto | null> {
     const locale = getRequestLocale();
 
@@ -939,7 +944,7 @@ export class ListingRepository {
         scholarId: true,
         parentId: true,
         coverImageUrl: true,
-        scholar: { select: { name: true } },
+        scholar: { select: { name: true, slug: true } },
         topics: { select: { topic: { select: { id: true } } } },
         audioAssets: {
           where: { isPrimary: true },
@@ -961,6 +966,7 @@ export class ListingRepository {
       orderIndex: listing.orderIndex ?? undefined,
       durationSeconds: listing.durationSeconds ?? undefined,
       scholarId: listing.scholarId,
+      scholarSlug: listing.scholar.slug,
       scholarName: listing.scholar.name,
       parentId: listing.parentId ?? undefined,
       topics: listing.topics.map((t) => t.topic.id),
@@ -998,7 +1004,7 @@ export class ListingRepository {
         scholarId: true,
         parentId: true,
         coverImageUrl: true,
-        scholar: { select: { name: true } },
+        scholar: { select: { name: true, slug: true } },
         topics: { select: { topic: { select: { id: true } } } },
         audioAssets: {
           where: { isPrimary: true },
@@ -1032,6 +1038,7 @@ export class ListingRepository {
         orderIndex: listing.orderIndex ?? undefined,
         durationSeconds: listing.durationSeconds ?? undefined,
         scholarId: listing.scholarId,
+        scholarSlug: listing.scholar.slug,
         scholarName: listing.scholar.name,
         parentId: listing.parentId ?? undefined,
         topics: listing.topics.map((t) => t.topic.id),
