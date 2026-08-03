@@ -51,10 +51,11 @@ const mockUseAdminListings = useAdminListings as jest.Mock;
 const mockedUseAbility = jest.mocked(useAbility) as any;
 
 const FULL_LISTING_ABILITY = createMongoAbility([
+  { action: "create", subject: "Listing" },
   { action: "update", subject: "Listing" },
   { action: "publish", subject: "Listing" },
   { action: "archive", subject: "Listing" },
-  { action: "upload", subject: "Media" },
+  { action: "read", subject: "Translation" },
 ]);
 
 describe("AdminListingsScreen", () => {
@@ -132,7 +133,32 @@ describe("AdminListingsScreen", () => {
     expect(screen.getByText("Shaykh Scholar A", { exact: false })).toBeTruthy();
   });
 
-  it("opens the edit sheet when the Compose list row is pressed", async () => {
+  it("opens the action sheet, then edits the selected listing", async () => {
+    mockUseAdminListings.mockReturnValue({
+      data: {
+        items: [{ id: "lst-1", title: "Listing One", scholarName: "Scholar A", status: "draft" }],
+        total: 1,
+        page: 1,
+      },
+      isLoading: false,
+      refetch: jest.fn(),
+    });
+
+    await render(<AdminListingsScreen />);
+    await fireEvent.press(screen.getByTestId("admin-listing-row-lst-1-trigger"));
+    expect(screen.getByTestId("admin-row-actions")).toBeTruthy();
+    expect(screen.getByText("Edit")).toBeTruthy();
+    expect(screen.getByText("Translate")).toBeTruthy();
+    await fireEvent.press(screen.getByText("Edit"));
+
+    expect(screen.getByText("editing:lst-1")).toBeTruthy();
+  });
+
+  it("only exposes row actions that the web action matrix permits", async () => {
+    mockedUseAbility.mockReturnValue({
+      ability: createMongoAbility([{ action: "update", subject: "Listing" }]),
+      isLoading: false,
+    });
     mockUseAdminListings.mockReturnValue({
       data: {
         items: [{ id: "lst-1", title: "Listing One", scholarName: "Scholar A", status: "draft" }],
@@ -146,10 +172,11 @@ describe("AdminListingsScreen", () => {
     await render(<AdminListingsScreen />);
     await fireEvent.press(screen.getByTestId("admin-listing-row-lst-1-trigger"));
 
-    expect(screen.getByText("editing:lst-1")).toBeTruthy();
+    expect(screen.getByText("Edit")).toBeTruthy();
+    expect(screen.queryByText("Translate")).toBeNull();
   });
 
-  it("shows the Upload button when the ability grants media upload", async () => {
+  it("shows the web-aligned listing header action when the ability grants listing creation", async () => {
     mockUseAdminListings.mockReturnValue({
       data: { items: [], total: 0, page: 1 },
       isLoading: false,
@@ -158,10 +185,11 @@ describe("AdminListingsScreen", () => {
 
     await render(<AdminListingsScreen />);
 
-    expect(screen.getByText("Upload")).toBeTruthy();
+    expect(screen.getByText("Add Listing")).toBeTruthy();
+    expect(screen.getByTestId("admin-listings-add-fab")).toBeTruthy();
   });
 
-  it("hides the Upload button when the ability does not grant media upload", async () => {
+  it("hides the listing header action when the ability does not grant listing creation", async () => {
     mockedUseAbility.mockReturnValue({
       ability: createMongoAbility([{ action: "update", subject: "Listing" }]),
       isLoading: false,
@@ -174,6 +202,6 @@ describe("AdminListingsScreen", () => {
 
     await render(<AdminListingsScreen />);
 
-    expect(screen.queryByText("+ Upload")).toBeNull();
+    expect(screen.queryByText("Add Listing")).toBeNull();
   });
 });

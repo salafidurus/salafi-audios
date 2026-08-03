@@ -44,6 +44,7 @@ describe("CollectionSheet", () => {
         onSaved={() => {}}
       />,
     );
+    expect(screen.getByTestId("collection-sheet")).toBeTruthy();
     expect(screen.getByText("New Collection")).toBeTruthy();
     expect(screen.getByText("Title", { exact: false })).toBeTruthy();
   });
@@ -73,7 +74,7 @@ describe("CollectionSheet", () => {
     expect(screen.getByText("Edit Collection")).toBeTruthy();
   });
 
-  it("renders nothing when closed", async () => {
+  it("keeps the Expo UI sheet dismissed when closed", async () => {
     await render(
       <CollectionSheet
         isOpen={false}
@@ -83,7 +84,7 @@ describe("CollectionSheet", () => {
         onSaved={() => {}}
       />,
     );
-    expect(screen.toJSON()).toBeNull();
+    expect(screen.getByTestId("collection-sheet").props.isPresented).toBe(false);
   });
 
   it("enables Save when the ability grants create for this scholar", async () => {
@@ -96,8 +97,9 @@ describe("CollectionSheet", () => {
         onSaved={() => {}}
       />,
     );
-    const saveButton = screen.getByText("Save").parent;
-    expect(saveButton?.props.accessibilityState?.disabled).toBeFalsy();
+    expect(screen.getByRole("button", { name: "Save" }).props.accessibilityState?.disabled).toBe(
+      false,
+    );
   });
 
   it("disables Save when the ability does not grant create for this scholar", async () => {
@@ -117,7 +119,8 @@ describe("CollectionSheet", () => {
         onSaved={() => {}}
       />,
     );
-    const saveButton = screen.getByText("Save").parent;
-    expect(saveButton?.props.accessibilityState?.disabled).toBe(true);
+    expect(screen.getByRole("button", { name: "Save" }).props.accessibilityState?.disabled).toBe(
+      true,
+    );
   });
 });

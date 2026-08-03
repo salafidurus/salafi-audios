@@ -216,30 +216,26 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
           ))}
       </Column>
 
-      <RNHostView matchContents>
-        <SeriesSheet
-          isOpen={state.showSeriesSheet}
-          scholarId={scholarId}
-          scholarSlug={scholarSlug}
-          onClose={() => dispatch({ showSeriesSheet: false })}
-          onSaved={() => {
-            dispatch({ showSeriesSheet: false, seriesOrder: null });
-            refetchSeries();
-          }}
-        />
-      </RNHostView>
-      <RNHostView matchContents>
-        <CollectionSheet
-          isOpen={state.showCollectionSheet}
-          scholarId={scholarId}
-          scholarSlug={scholarSlug}
-          onClose={() => dispatch({ showCollectionSheet: false })}
-          onSaved={() => {
-            dispatch({ showCollectionSheet: false, collectionOrder: null });
-            refetchCollections();
-          }}
-        />
-      </RNHostView>
+      <SeriesSheet
+        isOpen={state.showSeriesSheet}
+        scholarId={scholarId}
+        scholarSlug={scholarSlug}
+        onClose={() => dispatch({ showSeriesSheet: false })}
+        onSaved={() => {
+          dispatch({ showSeriesSheet: false, seriesOrder: null });
+          refetchSeries();
+        }}
+      />
+      <CollectionSheet
+        isOpen={state.showCollectionSheet}
+        scholarId={scholarId}
+        scholarSlug={scholarSlug}
+        onClose={() => dispatch({ showCollectionSheet: false })}
+        onSaved={() => {
+          dispatch({ showCollectionSheet: false, collectionOrder: null });
+          refetchCollections();
+        }}
+      />
     </NativeScreenHost>
   );
 }

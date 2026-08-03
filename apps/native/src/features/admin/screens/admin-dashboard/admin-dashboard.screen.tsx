@@ -6,7 +6,7 @@ import { useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { NativeButton, NativeScreenHost, NativeStateView, NativeText } from "@/shared/ui";
+import { NativeList, NativeListItem, NativeScreenHost, NativeStateView } from "@/shared/ui";
 
 type AdminDashboardScreenProps = {
   onNavigateToListings?: () => void;
@@ -75,20 +75,18 @@ export function AdminDashboardScreen({
               title={t("admin.dashboard.noAccess", "You don't have any admin access.")}
             />
           ) : (
-            visibleCards.map((card) => (
-              <Column key={card.key} spacing={theme.spacing.scale.xs}>
-                <NativeButton
-                  label={card.title}
-                  icon={card.icon}
+            <NativeList spacing={theme.spacing.component.gapSm}>
+              {visibleCards.map((card) => (
+                <NativeListItem
+                  key={card.key}
+                  title={card.title}
+                  supportingText={card.subtitle}
+                  leadingIcon={card.icon}
                   onPress={card.onPress}
-                  variant="surface"
                   testID={`admin-dashboard-${card.key}`}
                 />
-                <NativeText variant="bodySm" colorRole="muted">
-                  {card.subtitle}
-                </NativeText>
-              </Column>
-            ))
+              ))}
+            </NativeList>
           )}
         </Column>
       </ScrollView>
