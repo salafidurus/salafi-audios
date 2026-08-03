@@ -23,7 +23,7 @@ export function LibraryCompletedScreen({ onNavigateToListing }: LibraryCompleted
     <NativeScreenHost testID="library-completed-host">
       <Column
         spacing={theme.spacing.component.gapLg}
-        style={{ width: "100%", padding: theme.spacing.layout.pageX }}
+        style={{ padding: theme.spacing.layout.pageX }}
       >
         {isFetching && items.length === 0 ? (
           <NativeStateView kind="loading" title={t("common.loading", "Loading...")} />

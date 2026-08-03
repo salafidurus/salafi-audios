@@ -1,14 +1,9 @@
 {
-  "violationCount": 86,
+  "violationCount": 81,
   "files": [
     "src/app/(tabs)/(explore)/index.tsx",
     "src/core/providers.tsx",
-    "src/features/admin/components/AudioUploaderSheet/AudioUploaderSheet.tsx",
     "src/features/admin/components/BulkActionBar/BulkActionBar.tsx",
-    "src/features/admin/components/CollectionSheet/CollectionSheet.tsx",
-    "src/features/admin/components/ListingEditSheet/ListingEditSheet.tsx",
-    "src/features/admin/components/SeriesSheet/SeriesSheet.tsx",
-    "src/features/admin/screens/admin-scholar-detail/admin-scholar-detail.screen.tsx",
     "src/features/audio/components/mini-player-icon-button.tsx",
     "src/features/audio/components/mini-player.tsx",
     "src/features/audio/components/playback-controls.tsx",

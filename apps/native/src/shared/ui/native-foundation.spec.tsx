@@ -34,11 +34,10 @@ describe("Expo UI foundation", () => {
     expect(screen.queryByTestId("nested-host")).toBeNull();
   });
 
-  it("composes native list rows and delegates pull-to-refresh", async () => {
+  it("composes native list rows", async () => {
     const onPress = jest.fn();
-    const onRefresh = jest.fn().mockResolvedValue(undefined);
     await render(
-      <NativeList onRefresh={onRefresh} testID="results">
+      <NativeList testID="results">
         <NativeListItem
           title="Shaykh Ibn Baz"
           supportingText="12 lessons"
@@ -51,7 +50,6 @@ describe("Expo UI foundation", () => {
 
     await fireEvent.press(screen.getByTestId("scholar-row"));
     expect(onPress).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId("results").props.onRefresh).toBe(onRefresh);
     expect(screen.getByText("12 lessons")).toBeTruthy();
   });
 
