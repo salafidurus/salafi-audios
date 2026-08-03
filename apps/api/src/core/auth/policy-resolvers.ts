@@ -48,7 +48,9 @@ export const resolveScholarTranslation =
   (paramName = 'id'): PolicyResourceResolver =>
   (ctx) => {
     const scholarId = ctx.params[paramName];
-    return ctx.params.locale ? { scholarId, locale: ctx.params.locale } : { scholarId };
+    const bodyLocale = (ctx.body as Record<string, unknown> | undefined)?.locale;
+    const locale = ctx.params.locale ?? (typeof bodyLocale === 'string' ? bodyLocale : undefined);
+    return locale ? { scholarId, locale } : { scholarId };
   };
 
 /**
