@@ -47,28 +47,6 @@ export const endpoints = {
       list: "/admin/users",
       access: (userId: string) => `/admin/users/${userId}/access`,
     },
-    permissions: {
-      list: (userId: string) => `/admin/users/${userId}/permissions`,
-      grant: (userId: string) => `/admin/permissions/${userId}/permissions`,
-      revoke: (userId: string, permission: string) =>
-        `/admin/permissions/${userId}/permissions/${permission}`,
-    },
-    roles: {
-      grant: (userId: string) => `/admin/permissions/${userId}/roles`,
-      revoke: (userId: string, role: string) => `/admin/permissions/${userId}/roles/${role}`,
-    },
-    scholarRoles: {
-      list: (userId: string) => `/admin/permissions/${userId}/scholar-roles`,
-      grant: (userId: string) => `/admin/permissions/${userId}/scholar-roles`,
-      revoke: (userId: string, scholarSlug: string, permissionType: string) =>
-        `/admin/permissions/${userId}/scholar-roles/${scholarSlug}/${permissionType}`,
-    },
-    translatorRoles: {
-      list: (userId: string) => `/admin/permissions/${userId}/translator-roles`,
-      sync: (userId: string) => `/admin/permissions/${userId}/translator-roles`,
-      updatePublish: (userId: string, locale: string) =>
-        `/admin/permissions/${userId}/translator-roles/${locale}`,
-    },
     scholars: {
       list: "/admin/scholars",
       create: "/admin/scholars",
