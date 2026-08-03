@@ -123,6 +123,7 @@ describe('AccountService', () => {
         ...mockUser,
         name: 'New Name',
         roles: [{ role: 'listener' }],
+        accessGrants: [],
       };
       mockPrisma.user.update.mockResolvedValue(updatedUser);
 
@@ -131,7 +132,7 @@ describe('AccountService', () => {
       expect(mockPrisma.user.update).toHaveBeenCalledWith({
         where: { id: 'user-1' },
         data: { name: 'New Name' },
-        include: { roles: true },
+        include: { roles: true, accessGrants: true },
       });
       expect(result.displayName).toBe('New Name');
       expect(result.id).toBe('user-1');

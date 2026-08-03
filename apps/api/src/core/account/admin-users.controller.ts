@@ -11,9 +11,8 @@ import { ReplaceUserAccessDto } from './dto/replace-user-access.dto';
 /**
  * AdminUsersController
  *
- * Handles user listing and read-only operations.
- * Role and permission management endpoints have been migrated to PermissionsController.
- * User administration itself is never scholar/locale-scoped.
+ * Handles user listing and aggregate access management.
+ * User administration is global and requires the UserAccess capability.
  */
 @ApiTags('Admin Users')
 @ApiCommonErrors()
@@ -25,7 +24,7 @@ export class AdminUsersController {
   ) {}
 
   @Get()
-  @CheckPolicy('read', 'User')
+  @CheckPolicy('manage', 'UserAccess')
   @ApiOperation({
     summary: 'List all users with their admin permissions and roles',
   })

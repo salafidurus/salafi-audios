@@ -1,8 +1,18 @@
 import { describe, expect, it, vi } from 'bun:test';
 
 import { AdminUsersController } from './admin-users.controller';
+import { CHECK_POLICY_KEY } from '../auth/decorators/check-policy.decorator';
 
 describe('AdminUsersController aggregate access routes', () => {
+  it('requires user-access management to list users', () => {
+    expect(Reflect.getMetadata(CHECK_POLICY_KEY, AdminUsersController.prototype.listUsers)).toEqual(
+      {
+        action: 'manage',
+        subjectType: 'UserAccess',
+      },
+    );
+  });
+
   it('delegates access snapshot reads', async () => {
     const accessService = { snapshot: vi.fn().mockResolvedValue({ userId: 'u1' }) };
     const controller = new AdminUsersController({} as any, accessService as any);
