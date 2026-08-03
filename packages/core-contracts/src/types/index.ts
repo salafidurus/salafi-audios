@@ -1,4 +1,13 @@
 export {
+  AccessTargetEnum,
+  type AccessTarget,
+  AccessCapabilityEnum,
+  type AccessCapability,
+  AccessGrantRequestSchema,
+  type AccessGrantRequest,
+} from "./access.types";
+
+export {
   STATUS_VALUES,
   type StatusValue,
   StatusValueSchema,

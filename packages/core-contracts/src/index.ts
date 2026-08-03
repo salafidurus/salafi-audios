@@ -7,6 +7,15 @@ export { endpoints } from "./endpoints";
 
 // Export all shared types
 export {
+  AccessTargetEnum,
+  type AccessTarget,
+  AccessCapabilityEnum,
+  type AccessCapability,
+  AccessGrantRequestSchema,
+  type AccessGrantRequest,
+} from "./types/access.types";
+
+export {
   type StatusValue,
   StatusValueSchema,
   type PaginationParams,
