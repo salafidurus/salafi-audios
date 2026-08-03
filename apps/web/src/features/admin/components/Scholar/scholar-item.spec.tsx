@@ -42,7 +42,7 @@ describe("ScholarItem", () => {
   it("shows edit button when the user can update this scholar", () => {
     (useAbility as Mock<any>).mockReturnValue({
       ability: createMongoAbility([
-        { action: "update", subject: "Scholar", conditions: { id: "s1" } },
+        { action: "update", subject: "Scholar", conditions: { slug: "ibn-baz" } },
       ]),
     });
 
@@ -54,7 +54,7 @@ describe("ScholarItem", () => {
   it("hides edit button when the user can only update a different scholar (cross-scholar denial)", () => {
     (useAbility as Mock<any>).mockReturnValue({
       ability: createMongoAbility([
-        { action: "update", subject: "Scholar", conditions: { id: "some-other-scholar" } },
+        { action: "update", subject: "Scholar", conditions: { slug: "some-other-scholar" } },
       ]),
     });
 

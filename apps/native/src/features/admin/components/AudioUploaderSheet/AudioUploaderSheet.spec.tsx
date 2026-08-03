@@ -99,7 +99,7 @@ describe("AudioUploaderSheet", () => {
   it("only shows scholars the ability grants upload access to", async () => {
     mockedUseAbility.mockReturnValue({
       ability: createMongoAbility([
-        { action: "upload", subject: "Media", conditions: { scholarId: "sch-1" } },
+        { action: "upload", subject: "Media", conditions: { scholarSlug: "scholar-one" } },
       ]),
       isLoading: false,
     });

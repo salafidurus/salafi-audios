@@ -19,19 +19,9 @@ const mockPrisma = {
   userAccessGrant: {
     findMany: vi.fn<any>().mockResolvedValue([]),
   },
-  userPermission: {
-    findMany: vi.fn<any>().mockResolvedValue([]),
-    findUnique: vi.fn<any>().mockResolvedValue(null),
-  },
   userRoleAssignment: {
     findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
     findUnique: vi.fn<any>().mockResolvedValue(null),
-  },
-  userScholarRole: {
-    findMany: vi.fn<any>().mockResolvedValue([]),
-  },
-  userTranslatorRole: {
-    findMany: vi.fn<any>().mockResolvedValue([]),
   },
 };
 
@@ -99,7 +89,7 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
       ]);
     });
 
-    it('POST /scholars/:id/translations creates a draft translation', async () => {
+    it('POST /scholars/:slug/translations creates a draft translation', async () => {
       const res = await request(app.getHttpServer())
         .post('/scholars/s1/translations')
         .send({ locale: 'ar', name: 'ابن تيمية' })
@@ -107,21 +97,21 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
       expect(res.body.status).toBe('draft');
     });
 
-    it('POST /scholars/:id/translations/:locale/publish publishes the translation', async () => {
+    it('POST /scholars/:slug/translations/:locale/publish publishes the translation', async () => {
       const res = await request(app.getHttpServer())
         .post('/scholars/s1/translations/ar/publish')
         .expect(201);
       expect(res.body.status).toBe('published');
     });
 
-    it('POST /scholars/:id/translations/:locale/unpublish unpublishes the translation', async () => {
+    it('POST /scholars/:slug/translations/:locale/unpublish unpublishes the translation', async () => {
       const res = await request(app.getHttpServer())
         .post('/scholars/s1/translations/ar/unpublish')
         .expect(201);
       expect(res.body.status).toBe('draft');
     });
 
-    it('GET /scholars/:id/translations lists translations', async () => {
+    it('GET /scholars/:slug/translations lists translations', async () => {
       mockScholarsService.listTranslations.mockResolvedValue([draftTranslation]);
       const res = await request(app.getHttpServer()).get('/scholars/s1/translations').expect(200);
       expect(Array.isArray(res.body)).toBe(true);
@@ -146,7 +136,7 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
   });
 
   describe('unauthenticated requests', () => {
-    it('POST /scholars/:id/translations returns 401 without a session', async () => {
+    it('POST /scholars/:slug/translations returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
       const response = await request(app.getHttpServer())
         .post('/scholars/s1/translations')
@@ -169,7 +159,7 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
 
     afterEach(() => forbiddenApp.close());
 
-    it('POST /scholars/:id/translations returns 403', async () => {
+    it('POST /scholars/:slug/translations returns 403', async () => {
       const response = await request(forbiddenApp.getHttpServer())
         .post('/scholars/s1/translations')
         .send({ locale: 'ar', name: 'ابن تيمية' });

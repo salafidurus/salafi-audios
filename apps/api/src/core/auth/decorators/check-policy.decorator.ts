@@ -22,9 +22,9 @@ export type CheckPolicyMetadata = {
 };
 
 /**
- * Declares the CASL ability check a route requires. Replaces @RequiresPermission.
+ * Declares the CASL ability check a route requires.
  * When `resolve` is provided, its return value is passed as the resource
- * conditions checked against the subject type (e.g. { scholarId } for a Listing).
+ * conditions checked against the subject type (e.g. { scholarSlug } for a Listing).
  */
 export const CheckPolicy = (
   action: AppActions,

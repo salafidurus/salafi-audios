@@ -75,7 +75,7 @@ Authentication and authorization are centralized in the backend.
 
 - Public listing details are resolved by a globally unique slug at `GET /listings/:slug` for both web and mobile clients.
 - User access management is mapped as a unified sub-resource at `/admin/users/:userId/access`.
-- The access endpoint replaces the former split permission, scholar-role, and translator-role endpoints with a versioned aggregate snapshot and replacement operation.
+- The access endpoint replaces the former separate grant and role endpoints with a versioned aggregate snapshot and replacement operation.
 - GDPR account deletions are resolved via `DELETE /account` and administrative user deletion endpoints.
 - Personal sync state exposes matched bulk-push/delta-pull pairs per resource: `POST /audio/progress/sync` + `GET /audio/progress?since=` for progress, `POST /me/library/saved/sync` + `GET /me/library/saved/delta?since=` for saved/library. Both bulk-push bodies use a unified `{ items: [...] }` shape (one endpoint per resource, not split save/unsave or start/stop calls) so the client-side sync engine (`@sd/core-sync`) can treat every resource the same way.
 

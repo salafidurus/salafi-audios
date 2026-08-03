@@ -19,7 +19,7 @@ function packedRulesFor(build: (can: AbilityBuilder<AppAbility>["can"]) => void)
 }
 
 describe("buildAbilityFromRules", () => {
-  it("reconstructs an unconditioned global permission rule", () => {
+  it("reconstructs an unconditioned global access rule", () => {
     const rules = packedRulesFor((can) => can("update", "Scholar"));
     const ability = buildAbilityFromRules(rules);
 
@@ -28,11 +28,11 @@ describe("buildAbilityFromRules", () => {
   });
 
   it("reconstructs a scholar-scoped conditioned rule", () => {
-    const rules = packedRulesFor((can) => can("update", "Listing", { scholarId: "scholar-a" }));
+    const rules = packedRulesFor((can) => can("update", "Listing", { scholarSlug: "scholar-a" }));
     const ability = buildAbilityFromRules(rules);
 
-    expect(ability.can("update", subject("Listing", { scholarId: "scholar-a" }))).toBe(true);
-    expect(ability.can("update", subject("Listing", { scholarId: "scholar-b" }))).toBe(false);
+    expect(ability.can("update", subject("Listing", { scholarSlug: "scholar-a" }))).toBe(true);
+    expect(ability.can("update", subject("Listing", { scholarSlug: "scholar-b" }))).toBe(false);
   });
 
   it("reconstructs a locale-scoped conditioned rule", () => {
@@ -102,11 +102,11 @@ describe("useCan", () => {
   });
 
   it("checks a conditioned action/subject pair", () => {
-    const rules = packedRulesFor((can) => can("update", "Listing", { scholarId: "scholar-a" }));
+    const rules = packedRulesFor((can) => can("update", "Listing", { scholarSlug: "scholar-a" }));
     (useAccountProfile as any).mockReturnValue({ data: { rules }, isLoading: false, error: null });
 
-    expect(useCan("update", "Listing", { scholarId: "scholar-a" })).toBe(true);
-    expect(useCan("update", "Listing", { scholarId: "scholar-b" })).toBe(false);
+    expect(useCan("update", "Listing", { scholarSlug: "scholar-a" })).toBe(true);
+    expect(useCan("update", "Listing", { scholarSlug: "scholar-b" })).toBe(false);
   });
 });
 

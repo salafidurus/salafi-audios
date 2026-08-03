@@ -17,7 +17,7 @@ export type {
 export type AccessGrantAttribute = {
   target: AccessTarget;
   capability: AccessCapability;
-  scholarId: string | null;
+  scholarSlug: string | null;
   locale: Locale | null;
 };
 

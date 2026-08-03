@@ -93,7 +93,7 @@ describe('AuthGuard', () => {
     mockAuth.api.getSession.mockResolvedValue({ user: fakeUser, session: {} });
     (mockPrisma.userRoleAssignment!.findMany as any).mockResolvedValue([]);
     (mockPrisma.userAccessGrant!.findMany as any).mockResolvedValue([
-      { target: 'listing', capability: 'write', scholarId: 'scholar-a', locale: null },
+      { target: 'listing', capability: 'write', scholar: { slug: 'scholar-a' }, locale: null },
     ]);
     const req: Record<string, unknown> = { headers: {}, user: undefined };
     const ctx = {
@@ -106,10 +106,15 @@ describe('AuthGuard', () => {
 
     expect(mockPrisma.userAccessGrant!.findMany).toHaveBeenCalledWith({
       where: { userId: 'u1' },
-      select: { target: true, capability: true, scholarId: true, locale: true },
+      select: {
+        target: true,
+        capability: true,
+        locale: true,
+        scholar: { select: { slug: true } },
+      },
     });
     expect((req.user as any).accessGrants).toEqual([
-      { target: 'listing', capability: 'write', scholarId: 'scholar-a', locale: null },
+      { target: 'listing', capability: 'write', locale: null, scholarSlug: 'scholar-a' },
     ]);
   });
 

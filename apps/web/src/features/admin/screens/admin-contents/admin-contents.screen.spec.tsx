@@ -29,7 +29,7 @@ vi.mock("@/shared/components/InfiniteScrollList", () => ({
   InfiniteScrollList: () => <div data-testid="infinite-scroll-list" />,
 }));
 
-describe("AdminContentsScreen — topics tab permission gates", () => {
+describe("AdminContentsScreen — topics tab access gates", () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {

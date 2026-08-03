@@ -38,8 +38,7 @@ describe("UserItem", () => {
 
     render(<UserItem user={baseUser} onManageAccess={vi.fn()} />);
 
-    expect(screen.getByRole("button", { name: "Manage Access" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Manage Permissions" })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Manage Access" })).toHaveLength(1);
   });
 
   it("hides every management button when the user has no grant capability", () => {

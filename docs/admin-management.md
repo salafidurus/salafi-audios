@@ -88,7 +88,7 @@ bun run --filter @sd/core-db migrate:deploy
 The aggregate schema migration creates `UserAccessGrant` and `User.accessVersion`.
 The following data migration backfills supported write, translate, publish,
 delete, and user-management access from legacy rows while intentionally omitting
-legacy read permissions. Do not run an ad-hoc backfill script or edit applied
+legacy read access. Do not run an ad-hoc backfill script or edit applied
 migrations; use the checked-in Prisma migrations.
 
 ## Verification

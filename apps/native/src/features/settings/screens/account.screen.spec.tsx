@@ -180,7 +180,7 @@ describe("AccountScreen", () => {
     expect(screen.getByText("LanguageSwitch")).toBeTruthy();
   }, 15000);
 
-  it("renders Admin card when user has admin permissions", async () => {
+  it("renders Admin card when user has admin access", async () => {
     mockedUseAccountProfile.mockReturnValue({
       data: {
         id: "user-1",

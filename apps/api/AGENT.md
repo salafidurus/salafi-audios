@@ -1,6 +1,6 @@
 # AGENT.md - apps/api (Authoritative Backend)
 
-This service is the authority for business rules, permissions, and state transitions.
+This service is the authority for business rules, access control, and state transitions.
 
 ## Core responsibilities
 
@@ -48,7 +48,7 @@ This service is the authority for business rules, permissions, and state transit
 
 - Persist only authoritative state in relational DB.
 - Store media references/metadata, never blobs.
-- Keep replacement/upload actions explicit and permissioned.
+- Keep replacement/upload actions explicit and access-controlled.
 
 ## Testing expectations
 

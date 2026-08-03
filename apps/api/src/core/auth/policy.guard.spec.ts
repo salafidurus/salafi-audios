@@ -72,13 +72,13 @@ describe('PolicyGuard', () => {
     });
     const ctx = mockContext({
       user: baseUser({
-        accessGrants: [{ target: 'scholar', capability: 'write', scholarId: null, locale: null }],
+        accessGrants: [{ target: 'scholar', capability: 'write', scholarSlug: null, locale: null }],
       }),
     });
     await expect(guard.canActivate(ctx)).resolves.toBe(true);
   });
 
-  it('denies when the user lacks the required global permission', async () => {
+  it('denies when the user lacks the required global access', async () => {
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue({
       action: 'write',
       subjectType: 'Scholar',
@@ -88,7 +88,7 @@ describe('PolicyGuard', () => {
   });
 
   it('allows a scoped editor to act on their linked scholar via a resolver', async () => {
-    const resolve = vi.fn().mockReturnValue({ scholarId: 'scholar-a' });
+    const resolve = vi.fn().mockReturnValue({ scholarSlug: 'scholar-a' });
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue({
       action: 'write',
       subjectType: 'Listing',
@@ -97,7 +97,7 @@ describe('PolicyGuard', () => {
     const ctx = mockContext({
       user: baseUser({
         accessGrants: [
-          { target: 'listing', capability: 'write', scholarId: 'scholar-a', locale: null },
+          { target: 'listing', capability: 'write', scholarSlug: 'scholar-a', locale: null },
         ],
       }),
       params: { id: 'listing-1' },
@@ -107,7 +107,7 @@ describe('PolicyGuard', () => {
   });
 
   it('denies a scoped editor acting on a different scholar via a resolver', async () => {
-    const resolve = vi.fn().mockReturnValue({ scholarId: 'scholar-b' });
+    const resolve = vi.fn().mockReturnValue({ scholarSlug: 'scholar-b' });
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue({
       action: 'write',
       subjectType: 'Listing',
@@ -116,7 +116,7 @@ describe('PolicyGuard', () => {
     const ctx = mockContext({
       user: baseUser({
         accessGrants: [
-          { target: 'listing', capability: 'write', scholarId: 'scholar-a', locale: null },
+          { target: 'listing', capability: 'write', scholarSlug: 'scholar-a', locale: null },
         ],
       }),
       params: { id: 'listing-1' },
@@ -125,7 +125,7 @@ describe('PolicyGuard', () => {
   });
 
   it('supports an async resolver', async () => {
-    const resolve = vi.fn().mockResolvedValue({ scholarId: 'scholar-a' });
+    const resolve = vi.fn().mockResolvedValue({ scholarSlug: 'scholar-a' });
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue({
       action: 'write',
       subjectType: 'Listing',
@@ -134,7 +134,7 @@ describe('PolicyGuard', () => {
     const ctx = mockContext({
       user: baseUser({
         accessGrants: [
-          { target: 'listing', capability: 'write', scholarId: 'scholar-a', locale: null },
+          { target: 'listing', capability: 'write', scholarSlug: 'scholar-a', locale: null },
         ],
       }),
       params: { id: 'listing-1' },

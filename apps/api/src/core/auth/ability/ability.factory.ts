@@ -11,9 +11,9 @@ export function defineAbilityFor(user: AbilityInput): AppAbility {
 
   for (const grant of user.accessGrants ?? []) {
     const conditions: Record<string, string> = {};
-    if (grant.scholarId) conditions.scholarId = grant.scholarId;
+    if (grant.scholarSlug) conditions.scholarSlug = grant.scholarSlug;
     if (grant.locale) conditions.locale = grant.locale;
-    if (grant.target === 'scholar' && grant.scholarId) conditions.id = grant.scholarId;
+    if (grant.target === 'scholar' && grant.scholarSlug) conditions.slug = grant.scholarSlug;
 
     const subject =
       grant.target === 'user'

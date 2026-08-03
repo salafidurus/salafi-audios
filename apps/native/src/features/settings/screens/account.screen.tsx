@@ -31,7 +31,7 @@ export function AccountScreen({
   const { data: profile, isFetching } = useAccountProfile({ enabled: isAuthenticated });
   const { t } = useTranslation();
   const { ability } = useAbility({ isAuthenticated });
-  const hasAnyPermission = hasAnyAdminAccess(ability);
+  const hasAnyAccess = hasAnyAdminAccess(ability);
   const { theme } = useUnistyles();
   const DisclosureIcon = theme.direction === "rtl" ? ChevronLeft : ChevronRight;
 
@@ -66,7 +66,7 @@ export function AccountScreen({
 
           {/* Actions Section */}
           <SettingsSection title={t("account.actions", "Actions")}>
-            {hasAnyPermission && (
+            {hasAnyAccess && (
               <SettingsRow
                 label={t("admin.dashboard.titleMobile", "Admin")}
                 onPress={onNavigateToAdmin}

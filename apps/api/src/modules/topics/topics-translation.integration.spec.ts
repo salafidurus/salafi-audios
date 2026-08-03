@@ -19,19 +19,9 @@ const mockPrisma = {
   userAccessGrant: {
     findMany: vi.fn<any>().mockResolvedValue([]),
   },
-  userPermission: {
-    findMany: vi.fn<any>().mockResolvedValue([]),
-    findUnique: vi.fn<any>().mockResolvedValue(null),
-  },
   userRoleAssignment: {
     findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
     findUnique: vi.fn<any>().mockResolvedValue(null),
-  },
-  userScholarRole: {
-    findMany: vi.fn<any>().mockResolvedValue([]),
-  },
-  userTranslatorRole: {
-    findMany: vi.fn<any>().mockResolvedValue([]),
   },
 };
 

@@ -178,38 +178,48 @@ export class ListingService {
 
   // ─── Translations ─────────────────────────────────────────────────────────
 
-  listTranslations(listingId: string): Promise<TranslationViewDto[]> {
+  async listTranslations(listingSlug: string): Promise<TranslationViewDto[]> {
+    const listingId = await this.repo.findIdBySlug(listingSlug);
+    if (!listingId) throw new NotFoundException('Listing not found');
     return this.repo.listListingTranslations(listingId);
   }
 
   async upsertTranslation(
-    listingId: string,
+    listingSlug: string,
     dto: SaveListingTranslationDto,
   ): Promise<TranslationViewDto> {
+    const listingId = await this.repo.findIdBySlug(listingSlug);
+    if (!listingId) throw new NotFoundException('Listing not found');
     const result = await this.repo.upsertListingTranslation(listingId, dto);
-    await this.invalidateCache(listingId);
+    await this.invalidateCache(listingSlug);
     return result;
   }
 
   async updateTranslation(
-    listingId: string,
+    listingSlug: string,
     locale: string,
     fields: Partial<{ title: string; description: string | null }>,
   ): Promise<TranslationViewDto> {
+    const listingId = await this.repo.findIdBySlug(listingSlug);
+    if (!listingId) throw new NotFoundException('Listing not found');
     const result = await this.repo.updateListingTranslation(listingId, locale, fields);
-    await this.invalidateCache(listingId);
+    await this.invalidateCache(listingSlug);
     return result;
   }
 
-  async publishTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
+  async publishTranslation(listingSlug: string, locale: string): Promise<TranslationViewDto> {
+    const listingId = await this.repo.findIdBySlug(listingSlug);
+    if (!listingId) throw new NotFoundException('Listing not found');
     const result = await this.repo.publishListingTranslation(listingId, locale);
-    await this.invalidateCache(listingId);
+    await this.invalidateCache(listingSlug);
     return result;
   }
 
-  async unpublishTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
+  async unpublishTranslation(listingSlug: string, locale: string): Promise<TranslationViewDto> {
+    const listingId = await this.repo.findIdBySlug(listingSlug);
+    if (!listingId) throw new NotFoundException('Listing not found');
     const result = await this.repo.unpublishListingTranslation(listingId, locale);
-    await this.invalidateCache(listingId);
+    await this.invalidateCache(listingSlug);
     return result;
   }
 }

@@ -18,10 +18,10 @@ export function buildAbilityFromRules(rules: unknown[] | undefined): AppAbility 
 /**
  * Whether the caller has ANY admin capability at all — the single source
  * of truth for "should the Admin tab/section be visible", replacing the
- * three independent `permissions.length > 0` / role-string checks that used
+ * three independent access-grant / role-string checks that used
  * to live separately in web's nav-items, top-subnav-tabs, and admin layout
  * (and native's tab layout). An ability always has at least one rule if the
- * caller holds any global permission, scholar link, or translator role —
+ * caller holds any global access grant, scholar link, or translator role —
  * superadmin's `manage all` rule counts too.
  */
 export function hasAnyAdminAccess(ability: AppAbility): boolean {

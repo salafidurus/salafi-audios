@@ -50,7 +50,7 @@ export class AccountService {
     const user = await this.prisma.user.update({
       where: { id: userId },
       data: { name: displayName },
-      include: { roles: true, accessGrants: true },
+      include: { roles: true, accessGrants: { include: { scholar: { select: { slug: true } } } } },
     });
     return this.getProfile({
       id: user.id,
@@ -59,7 +59,10 @@ export class AccountService {
       image: user.image,
       emailVerified: user.emailVerified,
       roles: user.roles.map((r) => r.role),
-      accessGrants: user.accessGrants,
+      accessGrants: user.accessGrants.map(({ scholar, ...grant }) => ({
+        ...grant,
+        scholarSlug: scholar?.slug ?? null,
+      })),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });

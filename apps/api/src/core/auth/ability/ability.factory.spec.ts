@@ -23,55 +23,55 @@ describe('defineAbilityFor aggregate access', () => {
     const ability = defineAbilityFor(
       baseInput({
         accessGrants: [
-          { target: 'listing', capability: 'write', scholarId: 'a', locale: null },
-          { target: 'listing', capability: 'write', scholarId: 'b', locale: null },
+          { target: 'listing', capability: 'write', scholarSlug: 'a', locale: null },
+          { target: 'listing', capability: 'write', scholarSlug: 'b', locale: null },
         ],
       }),
     );
 
-    expect(ability.can('write', subject('Listing', { scholarId: 'a' }))).toBe(true);
-    expect(ability.can('create', subject('Listing', { scholarId: 'a' }))).toBe(true);
-    expect(ability.can('update', subject('Listing', { scholarId: 'a' }))).toBe(true);
-    expect(ability.can('write', subject('Listing', { scholarId: 'b' }))).toBe(true);
-    expect(ability.can('write', subject('Listing', { scholarId: 'c' }))).toBe(false);
-    expect(ability.can('delete', subject('Listing', { scholarId: 'a' }))).toBe(false);
+    expect(ability.can('write', subject('Listing', { scholarSlug: 'a' } as never))).toBe(true);
+    expect(ability.can('create', subject('Listing', { scholarSlug: 'a' } as never))).toBe(true);
+    expect(ability.can('update', subject('Listing', { scholarSlug: 'a' } as never))).toBe(true);
+    expect(ability.can('write', subject('Listing', { scholarSlug: 'b' } as never))).toBe(true);
+    expect(ability.can('write', subject('Listing', { scholarSlug: 'c' } as never))).toBe(false);
+    expect(ability.can('delete', subject('Listing', { scholarSlug: 'a' } as never))).toBe(false);
   });
 
   it('maps media write access to upload without granting delete', () => {
     const ability = defineAbilityFor(
       baseInput({
-        accessGrants: [{ target: 'media', capability: 'write', scholarId: 'a', locale: null }],
+        accessGrants: [{ target: 'media', capability: 'write', scholarSlug: 'a', locale: null }],
       }),
     );
 
-    expect(ability.can('upload', subject('Media', { scholarId: 'a' }))).toBe(true);
-    expect(ability.can('delete', subject('Media', { scholarId: 'a' }))).toBe(false);
+    expect(ability.can('upload', subject('Media', { scholarSlug: 'a' } as never))).toBe(true);
+    expect(ability.can('delete', subject('Media', { scholarSlug: 'a' } as never))).toBe(false);
   });
 
   it('supports translation scope by scholar and locale', () => {
     const ability = defineAbilityFor(
       baseInput({
         accessGrants: [
-          { target: 'translation', capability: 'translate', scholarId: 'a', locale: 'ar' },
+          { target: 'translation', capability: 'translate', scholarSlug: 'a', locale: 'ar' },
         ],
       }),
     );
 
-    expect(ability.can('translate', subject('Translation', { scholarId: 'a', locale: 'ar' }))).toBe(
-      true,
-    );
-    expect(ability.can('translate', subject('Translation', { scholarId: 'a', locale: 'en' }))).toBe(
-      false,
-    );
-    expect(ability.can('translate', subject('Translation', { scholarId: 'b', locale: 'ar' }))).toBe(
-      false,
-    );
+    expect(
+      ability.can('translate', subject('Translation', { scholarSlug: 'a', locale: 'ar' } as never)),
+    ).toBe(true);
+    expect(
+      ability.can('translate', subject('Translation', { scholarSlug: 'a', locale: 'en' } as never)),
+    ).toBe(false);
+    expect(
+      ability.can('translate', subject('Translation', { scholarSlug: 'b', locale: 'ar' } as never)),
+    ).toBe(false);
   });
 
   it('supports global user management without granting editorial capabilities', () => {
     const ability = defineAbilityFor(
       baseInput({
-        accessGrants: [{ target: 'user', capability: 'manage', scholarId: null, locale: null }],
+        accessGrants: [{ target: 'user', capability: 'manage', scholarSlug: null, locale: null }],
       }),
     );
 

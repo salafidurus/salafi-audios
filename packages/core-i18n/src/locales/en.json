@@ -426,19 +426,20 @@
     "revoke": "Revoke {{role}}"
   },
   "admin": {
-    "checkingPermissions": "Checking permissions…",
-    "accessDenied": "You do not have admin permissions.",
+    "checkingAccess": "Checking access…",
+    "accessDeniedTitle": "Access Denied",
+    "accessDenied": "You do not have admin access.",
     "dashboard": {
       "title": "Admin Dashboard",
       "titleMobile": "Admin",
       "loading": "Loading…",
-      "noPermissions": "You don't have any admin permissions.",
-      "noPermissionsMobile": "No admin permissions.",
+      "noAccess": "You don't have any admin access.",
+      "noAccessMobile": "No admin access.",
       "scholarsDesc": "Manage scholars, their profiles and visibility",
       "scholarsDescMobile": "Manage scholars",
       "contentsDesc": "Manage topics, lectures, and content hierarchy",
       "contentsDescMobile": "Manage content",
-      "usersDesc": "Manage admin users and permissions",
+      "usersDesc": "Manage admin users and access",
       "usersDescMobile": "Manage users"
     },
     "stats": {
@@ -487,31 +488,31 @@
       "searchNoMatch": "No users match your search.",
       "noUsersFound": "No users found."
     },
-    "permissions": {
-      "title": "Manage Permissions",
-      "titleMobile": "Permissions",
+    "access": {
+      "title": "Manage Access",
+      "titleMobile": "Access",
       "userIdLabel": "User ID",
       "userIdPlaceholder": "User ID",
       "lookup": "Lookup",
-      "userPermissionsHeader": "Permissions for {{userId}}",
-      "permissionTableHeader": "Permission",
+      "userAccessHeader": "Access for {{userId}}",
+      "accessTableHeader": "Access",
       "statusTableHeader": "Status",
       "actionTableHeader": "Action",
       "granted": "Granted",
       "notGranted": "Not granted",
       "revoke": "Revoke",
       "grant": "Grant",
-      "managePermissions": "Manage Permissions",
-      "managePermissionsBtn": "Manage Permissions",
-      "managePermissionsBtnShort": "Permissions",
+      "manageAccess": "Manage Access",
+      "manageAccessBtn": "Manage Access",
+      "manageAccessBtnShort": "Access",
       "manageRoles": "Manage Roles",
       "manageRolesBtn": "Manage Roles",
       "manageRolesBtnShort": "Roles",
       "saving": "Saving…",
       "done": "Done",
-      "loading": "Loading permissions…",
+      "loading": "Loading access…",
       "loadingRoles": "Loading roles…",
-      "noPermissions": "No permissions",
+      "noAccess": "No access",
       "groups": {
         "scholars": "Scholars",
         "listings": "Listings",
@@ -528,122 +529,7 @@
         "translations": "Translations Management",
         "media": "Media Management",
         "users": "User Management"
-      },
-      "items": {
-        "SCHOLARS_VIEW": {
-          "label": "View Scholars",
-          "desc": "View scholar profiles"
-        },
-        "SCHOLARS_CREATE": {
-          "label": "Create Scholars",
-          "desc": "Create new scholar profiles"
-        },
-        "SCHOLARS_EDIT": {
-          "label": "Manage Scholars",
-          "desc": "Add, edit, and remove scholar profiles"
-        },
-        "SCHOLARS_DELETE": {
-          "label": "Delete Scholars",
-          "desc": "Delete scholar profiles"
-        },
-        "SCHOLARS_PUBLISH": {
-          "label": "Publish Scholars",
-          "desc": "Publish scholar profiles"
-        },
-        "LISTINGS_VIEW": {
-          "label": "View Content",
-          "desc": "View content listings"
-        },
-        "LISTINGS_CREATE": {
-          "label": "Create Content",
-          "desc": "Create new content listings"
-        },
-        "LISTINGS_EDIT": {
-          "label": "Manage Content",
-          "desc": "Publish, archive, and manage lectures and series"
-        },
-        "LISTINGS_DELETE": {
-          "label": "Delete Content",
-          "desc": "Delete content listings"
-        },
-        "LISTINGS_PUBLISH": {
-          "label": "Publish Content",
-          "desc": "Publish content"
-        },
-        "TOPICS_VIEW": {
-          "label": "View Topics",
-          "desc": "View topics"
-        },
-        "TOPICS_CREATE": {
-          "label": "Create Topics",
-          "desc": "Create new topics"
-        },
-        "TOPICS_EDIT": {
-          "label": "Manage Topics",
-          "desc": "Create and organize topic categories"
-        },
-        "TOPICS_DELETE": {
-          "label": "Delete Topics",
-          "desc": "Delete topics"
-        },
-        "TOPICS_PUBLISH": {
-          "label": "Publish Topics",
-          "desc": "Publish topics"
-        },
-        "TRANSLATIONS_VIEW": {
-          "label": "View Translations",
-          "desc": "View translations"
-        },
-        "TRANSLATIONS_CREATE": {
-          "label": "Create Translations",
-          "desc": "Create translations"
-        },
-        "TRANSLATIONS_EDIT": {
-          "label": "Edit Translations",
-          "desc": "Edit translations"
-        },
-        "TRANSLATIONS_DELETE": {
-          "label": "Delete Translations",
-          "desc": "Delete translations"
-        },
-        "TRANSLATIONS_PUBLISH": {
-          "label": "Publish Translations",
-          "desc": "Publish translations"
-        },
-        "MEDIA_UPLOAD": {
-          "label": "Upload Media",
-          "desc": "Upload media files"
-        },
-        "MEDIA_DELETE": {
-          "label": "Delete Media",
-          "desc": "Delete media files"
-        },
-        "USERS_VIEW": {
-          "label": "View Users",
-          "desc": "View user accounts and their details"
-        },
-        "USERS_EDIT": {
-          "label": "Edit Users",
-          "desc": "Edit user accounts"
-        },
-        "USERS_DELETE": {
-          "label": "Delete Users",
-          "desc": "Delete user accounts"
-        },
-        "USERS_GRANT_PERMISSIONS": {
-          "label": "Manage Permissions",
-          "desc": "Grant and revoke user permissions"
-        },
-        "USERS_GRANT_ROLES": {
-          "label": "Manage Roles",
-          "desc": "Assign roles to users"
-        }
-      },
-      "revokeTitle": "Revoke Permission?",
-      "revoking": "Revoking…",
-      "revokeButton": "Revoke Permission",
-      "revokePrompt": "Are you sure you want to revoke {{permission}} from {{user}}?",
-      "revokeWarning": "This will remove their access to this functionality."
+      }
     },
     "contents": {
       "deleteTitle": "Delete Topic?",

@@ -46,7 +46,7 @@ Media is stored outside PostgreSQL, but its references are managed authoritative
 
 Uploads use a backend-authorized direct-to-storage flow:
 
-1. Client requests permission to upload.
+1. Client requests access to upload.
 2. Backend validates scope and returns a short-lived upload grant or presigned target.
 3. Client uploads directly to object storage.
 4. Backend finalizes and records the media reference.
@@ -87,7 +87,7 @@ Client persistence improves continuity but never becomes authoritative.
 
 - GDPR compliance is backend-enforced. When a user requests hard deletion, executing `DELETE /account` cascades and purges all personal rows (`Session`, `Account`, `UserRoleAssignment`, `UserAccessGrant`, `UserListingProgress`, `FavoriteListing`) using `onDelete: Cascade` rules, while decoupled listing audit columns preserve catalog integrity. This physically removes the rows regardless of any `deletedAt` tombstone state — the soft-delete convention above is for normal unsave/sync, not a substitute for GDPR erasure.
 
-## 11. Admin Roles and Permissions
+## 11. Admin Roles and Access
 
 - System roles (`UserRoleAssignment`) and aggregate grants (`UserAccessGrant`) are
   combined into a CASL ability server-side (`apps/api/src/core/auth/ability/ability.factory.ts`)

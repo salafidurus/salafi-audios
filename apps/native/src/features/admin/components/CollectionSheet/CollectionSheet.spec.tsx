@@ -27,8 +27,8 @@ describe("CollectionSheet", () => {
   beforeEach(() => {
     mockedUseAbility.mockReturnValue({
       ability: createMongoAbility([
-        { action: "create", subject: "Listing", conditions: { scholarId: "s1" } },
-        { action: "update", subject: "Listing", conditions: { scholarId: "s1" } },
+        { action: "create", subject: "Listing", conditions: { scholarSlug: "s1" } },
+        { action: "update", subject: "Listing", conditions: { scholarSlug: "s1" } },
       ]),
       isLoading: false,
     });
@@ -36,7 +36,13 @@ describe("CollectionSheet", () => {
 
   it("renders create form when no collection is provided", async () => {
     await render(
-      <CollectionSheet isOpen={true} scholarId="s1" onClose={() => {}} onSaved={() => {}} />,
+      <CollectionSheet
+        isOpen={true}
+        scholarId="s1"
+        scholarSlug="s1"
+        onClose={() => {}}
+        onSaved={() => {}}
+      />,
     );
     expect(screen.getByText("New Collection")).toBeTruthy();
     expect(screen.getByText("Title", { exact: false })).toBeTruthy();
@@ -47,12 +53,14 @@ describe("CollectionSheet", () => {
       <CollectionSheet
         isOpen={true}
         scholarId="s1"
+        scholarSlug="s1"
         collection={{
           id: "col1",
           title: "My Collection",
           format: "collection",
           status: "draft",
           scholarId: "s1",
+          scholarSlug: "s1",
           scholarName: "Scholar One",
           slug: "my-collection",
           topics: [],
@@ -67,14 +75,26 @@ describe("CollectionSheet", () => {
 
   it("renders nothing when closed", async () => {
     await render(
-      <CollectionSheet isOpen={false} scholarId="s1" onClose={() => {}} onSaved={() => {}} />,
+      <CollectionSheet
+        isOpen={false}
+        scholarId="s1"
+        scholarSlug="s1"
+        onClose={() => {}}
+        onSaved={() => {}}
+      />,
     );
     expect(screen.toJSON()).toBeNull();
   });
 
   it("enables Save when the ability grants create for this scholar", async () => {
     await render(
-      <CollectionSheet isOpen={true} scholarId="s1" onClose={() => {}} onSaved={() => {}} />,
+      <CollectionSheet
+        isOpen={true}
+        scholarId="s1"
+        scholarSlug="s1"
+        onClose={() => {}}
+        onSaved={() => {}}
+      />,
     );
     const saveButton = screen.getByText("Save").parent;
     expect(saveButton?.props.accessibilityState?.disabled).toBeFalsy();
@@ -83,13 +103,19 @@ describe("CollectionSheet", () => {
   it("disables Save when the ability does not grant create for this scholar", async () => {
     mockedUseAbility.mockReturnValue({
       ability: createMongoAbility([
-        { action: "create", subject: "Listing", conditions: { scholarId: "some-other-scholar" } },
+        { action: "create", subject: "Listing", conditions: { scholarSlug: "some-other-scholar" } },
       ]),
       isLoading: false,
     });
 
     await render(
-      <CollectionSheet isOpen={true} scholarId="s1" onClose={() => {}} onSaved={() => {}} />,
+      <CollectionSheet
+        isOpen={true}
+        scholarId="s1"
+        scholarSlug="s1"
+        onClose={() => {}}
+        onSaved={() => {}}
+      />,
     );
     const saveButton = screen.getByText("Save").parent;
     expect(saveButton?.props.accessibilityState?.disabled).toBe(true);

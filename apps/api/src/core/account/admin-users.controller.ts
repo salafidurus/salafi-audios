@@ -26,7 +26,7 @@ export class AdminUsersController {
   @Get()
   @CheckPolicy('manage', 'UserAccess')
   @ApiOperation({
-    summary: 'List all users with their admin permissions and roles',
+    summary: 'List all users with their admin access and roles',
   })
   async listUsers(
     @Query('q') query?: string,

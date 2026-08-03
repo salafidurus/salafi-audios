@@ -2,8 +2,8 @@ import { createE2eApp } from './helpers/create-e2e-app';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { PrismaService } from '../src/core/db/prisma.service';
-import { TestAuthFactory } from './helpers/test-auth.factory';
-import { Permission } from '@sd/core-db';
+import { TestAuthFactory, accessGrant } from './helpers/test-auth.factory';
+import { AccessCapability, AccessTarget } from '@sd/core-db';
 import { TEST_SCHOLAR_ID, seedTestData, cleanupE2ETestData } from './helpers/seed-test-data';
 
 process.env.DISABLE_THROTTLER = 'true';
@@ -55,8 +55,7 @@ describe('Arrange commit (e2e)', () => {
     }
 
     const auth = await authFactory.createAdminUser([
-      Permission.LISTINGS_CREATE,
-      Permission.LISTINGS_EDIT,
+      accessGrant(AccessTarget.listing, AccessCapability.write),
     ]);
     creatorHeaders = auth.headers;
   });
@@ -339,7 +338,7 @@ describe('Arrange commit (e2e)', () => {
   });
 
   it('rejects commits without listing write access', async () => {
-    const viewer = await authFactory.createAdminUser([Permission.LISTINGS_VIEW]);
+    const viewer = await authFactory.createAdminUser();
     await request(app.getHttpServer())
       .post(`/admin/listings/${SERIES_ID}/arrange-commit`)
       .set(viewer.headers)

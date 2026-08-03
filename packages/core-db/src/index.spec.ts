@@ -59,6 +59,24 @@ describe("aggregate access schema", () => {
     expect(user).toMatch(/accessGrants\s+UserAccessGrant\[\]/);
     expect(user).toMatch(/accessVersion\s+Int\s+@default\(0\)/);
   });
+
+  it("contains no legacy permission-based access structures", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const schema = fs.readFileSync(path.resolve(__dirname, "../prisma/schema.prisma"), "utf-8");
+
+    expect(schema).not.toMatch(/enum Permission\s*{/);
+    expect(schema).not.toMatch(/enum ScholarPermissionType\s*{/);
+    expect(schema).not.toMatch(/model UserPermission\s*{/);
+    expect(schema).not.toMatch(/model UserScholarRole\s*{/);
+    expect(schema).not.toMatch(/model UserTranslatorRole\s*{/);
+    expect(schema).not.toMatch(/\bpermissions\b|\bscholarRoles\b|\btranslatorRoles\b/);
+  });
+
+  it("does not export the legacy Permission enum", async () => {
+    const mod = await import("./index");
+    expect(mod).not.toHaveProperty("Permission");
+  });
 });
 
 // -- 2. User.banned default --------------------------------------------------

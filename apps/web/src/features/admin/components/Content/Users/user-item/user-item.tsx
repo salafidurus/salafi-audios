@@ -45,9 +45,9 @@ export function UserItem({ user, onManageAccess }: UserItemProps): ReactNode {
             fullWidth={isMobile}
             onClick={onManageAccess}
             icon={<ShieldCog size={16} />}
-            aria-label={t("admin.permissions.manageAccessBtn", "Manage Access")}
+            aria-label={t("admin.access.manageAccessBtn", "Manage Access")}
           >
-            {isMobile && t("admin.permissions.manageAccessBtnShort", "Access")}
+            {isMobile && t("admin.access.manageAccessBtnShort", "Access")}
           </Button>
         )}
       </List.Item.Actions>

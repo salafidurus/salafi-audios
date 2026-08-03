@@ -15,6 +15,7 @@ import { createCollection, updateCollection } from "../../api/admin-scholars.api
 type CollectionSheetProps = {
   isOpen: boolean;
   scholarId: string;
+  scholarSlug: string;
   collection?: AdminListingDetailDto;
   onClose: () => void;
   onSaved: () => void;
@@ -35,6 +36,7 @@ function reduce(state: FormState, patch: Partial<FormState>): FormState {
 export function CollectionSheet({
   isOpen,
   scholarId,
+  scholarSlug,
   collection,
   onClose,
   onSaved,
@@ -54,7 +56,10 @@ export function CollectionSheet({
   if (!isOpen) return null;
 
   const { title, description, language, isSaving, error } = state;
-  const canSave = ability.can(collection ? "update" : "create", subject("Listing", { scholarId }));
+  const canSave = ability.can(
+    collection ? "update" : "create",
+    subject("Listing", { scholarSlug }),
+  );
 
   const handleSave = async () => {
     if (!title.trim()) {

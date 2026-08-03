@@ -26,6 +26,7 @@ jest.mock("@/features/admin/api/admin-listings.api", () => ({
     status: "draft",
     audioKey: "audio/test.mp3",
     scholarId: "sch-1",
+    scholarSlug: "scholar-one",
   }),
   updateListing: jest.fn(),
 }));
@@ -36,7 +37,7 @@ describe("ListingEditSheet", () => {
   beforeEach(() => {
     mockedUseAbility.mockReturnValue({
       ability: createMongoAbility([
-        { action: "update", subject: "Listing", conditions: { scholarId: "sch-1" } },
+        { action: "update", subject: "Listing", conditions: { scholarSlug: "scholar-one" } },
       ]),
       isLoading: false,
     });
@@ -65,7 +66,7 @@ describe("ListingEditSheet", () => {
   it("disables Save when the ability does not grant update for this listing's scholar", async () => {
     mockedUseAbility.mockReturnValue({
       ability: createMongoAbility([
-        { action: "update", subject: "Listing", conditions: { scholarId: "some-other-scholar" } },
+        { action: "update", subject: "Listing", conditions: { scholarSlug: "some-other-scholar" } },
       ]),
       isLoading: false,
     });

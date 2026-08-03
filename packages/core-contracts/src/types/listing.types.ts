@@ -175,6 +175,7 @@ export const AdminListingDetailDtoSchema = z.object({
   orderIndex: z.number().optional(),
   durationSeconds: z.number().optional(),
   scholarId: z.string(),
+  scholarSlug: z.string(),
   scholarName: z.string(),
   parentId: z.string().optional(),
   topics: z.array(z.string()),
