@@ -94,6 +94,23 @@ describe("AdminListingsScreen", () => {
     expect(screen.getByText("Scholar A", { exact: false })).toBeTruthy();
   });
 
+  it("uses the shared Expo UI host and native listing row trigger", async () => {
+    mockUseAdminListings.mockReturnValue({
+      data: {
+        items: [{ id: "lst-1", title: "Listing One", scholarName: "Scholar A", status: "draft" }],
+        total: 1,
+        page: 1,
+      },
+      isLoading: false,
+      refetch: jest.fn(),
+    });
+
+    await render(<AdminListingsScreen />);
+
+    expect(screen.getByTestId("admin-listings-host")).toBeTruthy();
+    expect(screen.getByTestId("admin-listing-row-lst-1-trigger")).toBeTruthy();
+  });
+
   it("renders the scholar name with honorific title when available", async () => {
     mockUseFormattedScholarName.mockReturnValueOnce("Shaykh Scholar A");
     mockUseAdminListings.mockReturnValue({
@@ -190,7 +207,7 @@ describe("AdminListingsScreen", () => {
 
     await render(<AdminListingsScreen />);
 
-    expect(screen.getByText("+ Upload")).toBeTruthy();
+    expect(screen.getByText("Upload")).toBeTruthy();
   });
 
   it("hides the Upload button when the ability does not grant media upload", async () => {
