@@ -1,5 +1,5 @@
 {
-  "violationCount": 88,
+  "violationCount": 86,
   "files": [
     "src/app/(tabs)/(explore)/index.tsx",
     "src/core/providers.tsx",
@@ -9,7 +9,6 @@
     "src/features/admin/components/ListingEditSheet/ListingEditSheet.tsx",
     "src/features/admin/components/SeriesSheet/SeriesSheet.tsx",
     "src/features/admin/screens/admin-scholar-detail/admin-scholar-detail.screen.tsx",
-    "src/features/admin/screens/admin-scholars/admin-scholars.screen.tsx",
     "src/features/audio/components/mini-player-icon-button.tsx",
     "src/features/audio/components/mini-player.tsx",
     "src/features/audio/components/playback-controls.tsx",
@@ -25,7 +24,6 @@
     "src/features/explore/screens/explore-recent.screen.tsx",
     "src/features/explore/screens/explore-scholar.screen.tsx",
     "src/features/library/components/library-item-row/library-item-row.tsx",
-    "src/features/library/screens/library-completed.screen.tsx",
     "src/features/library/screens/library-saved.screen.tsx",
     "src/features/library/screens/library.screen.tsx",
     "src/features/listing/components/lecture-meta/lecture-meta.tsx",

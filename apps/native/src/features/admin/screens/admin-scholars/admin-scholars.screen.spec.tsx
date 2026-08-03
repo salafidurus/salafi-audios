@@ -1,5 +1,5 @@
 import { useApiQuery } from "@sd/core-contracts";
-import { render, screen } from "@testing-library/react-native";
+import { fireEvent, render, screen } from "@testing-library/react-native";
 import React from "react";
 
 import { AdminScholarsScreen } from "./admin-scholars.screen";
@@ -44,10 +44,23 @@ describe("AdminScholarsScreen", () => {
     });
 
     await render(<AdminScholarsScreen onNavigateToScholar={() => {}} />);
-    expect(screen.getByText("Scholars")).toBeTruthy();
     expect(screen.getByText("Scholar One")).toBeTruthy();
     expect(screen.getByText("scholar-one", { exact: false })).toBeTruthy();
     expect(screen.getByText("Scholar Two")).toBeTruthy();
     expect(screen.getByText("scholar-two", { exact: false })).toBeTruthy();
+  });
+
+  it("uses the Expo UI screen host and navigates from a native scholar row", async () => {
+    mockUseApiQuery.mockReturnValue({
+      data: [{ id: "s1", name: "Scholar One", slug: "scholar-one" }],
+      isLoading: false,
+    });
+    const onNavigateToScholar = jest.fn();
+
+    await render(<AdminScholarsScreen onNavigateToScholar={onNavigateToScholar} />);
+
+    expect(screen.getByTestId("admin-scholars-host")).toBeTruthy();
+    await fireEvent.press(screen.getByTestId("admin-scholar-row-s1"));
+    expect(onNavigateToScholar).toHaveBeenCalledWith("scholar-one");
   });
 });
