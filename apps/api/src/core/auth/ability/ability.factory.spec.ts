@@ -29,6 +29,49 @@ describe('defineAbilityFor', () => {
     });
   });
 
+  describe('aggregate access grants', () => {
+    it('grants write only for the selected scholars', () => {
+      const ability = defineAbilityFor(
+        baseInput({
+          accessGrants: [
+            { target: 'listing', capability: 'write', scholarId: 'scholar-a', locale: null },
+            { target: 'listing', capability: 'write', scholarId: 'scholar-b', locale: null },
+          ],
+        }),
+      );
+
+      expect(ability.can('write', subject('Listing', { scholarId: 'scholar-a' }))).toBe(true);
+      expect(ability.can('write', subject('Listing', { scholarId: 'scholar-b' }))).toBe(true);
+      expect(ability.can('write', subject('Listing', { scholarId: 'scholar-c' }))).toBe(false);
+      expect(ability.can('publish', subject('Listing', { scholarId: 'scholar-a' }))).toBe(false);
+    });
+
+    it('applies translation access to both locale and scholar scope', () => {
+      const ability = defineAbilityFor(
+        baseInput({
+          accessGrants: [
+            {
+              target: 'translation',
+              capability: 'translate',
+              scholarId: 'scholar-a',
+              locale: 'ar',
+            },
+          ],
+        }),
+      );
+
+      expect(
+        ability.can('translate', subject('Translation', { scholarId: 'scholar-a', locale: 'ar' })),
+      ).toBe(true);
+      expect(
+        ability.can('translate', subject('Translation', { scholarId: 'scholar-a', locale: 'en' })),
+      ).toBe(false);
+      expect(
+        ability.can('translate', subject('Translation', { scholarId: 'scholar-b', locale: 'ar' })),
+      ).toBe(false);
+    });
+  });
+
   describe('global permission → action/subject mapping', () => {
     for (const [permission, mapping] of Object.entries(PERMISSION_ACTION_MAP)) {
       const actions = Array.isArray(mapping.action) ? mapping.action : [mapping.action];

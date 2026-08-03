@@ -10,6 +10,23 @@ export function defineAbilityFor(user: AbilityInput): AppAbility {
     return build();
   }
 
+  for (const grant of user.accessGrants ?? []) {
+    const conditions: Record<string, string> = {};
+    if (grant.scholarId) conditions.scholarId = grant.scholarId;
+    if (grant.locale) conditions.locale = grant.locale;
+    if (grant.target === 'scholar' && grant.scholarId) conditions.id = grant.scholarId;
+
+    const subject =
+      grant.target === 'user'
+        ? 'UserAccess'
+        : `${grant.target.charAt(0).toUpperCase()}${grant.target.slice(1)}`;
+    can(
+      grant.capability as never,
+      subject as never,
+      Object.keys(conditions).length ? (conditions as never) : undefined,
+    );
+  }
+
   for (const permission of user.permissions) {
     const mapping = PERMISSION_ACTION_MAP[permission as keyof typeof PERMISSION_ACTION_MAP];
     if (!mapping) continue;
