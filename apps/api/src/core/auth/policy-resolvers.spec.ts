@@ -25,4 +25,17 @@ describe('slug-based policy resolvers', () => {
     expect(resource).toEqual({ scholarSlug: 'sheikh-example', locale: 'en' });
     expect(resource).not.toHaveProperty('scholarId');
   });
+
+  it('includes the body locale for listing translation creation', async () => {
+    const resource = await resolveListingTranslation()(
+      { params: { slug: 'lecture-example' }, body: { locale: 'en' }, query: {} },
+      {
+        listing: {
+          findFirst: async () => ({ scholar: { slug: 'sheikh-example' } }),
+        },
+      } as never,
+    );
+
+    expect(resource).toEqual({ scholarSlug: 'sheikh-example', locale: 'en' });
+  });
 });

@@ -4,6 +4,7 @@ import { PrismaClient } from '@sd/core-db';
 import { ConfigService } from '../config/config.service';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PinoLogger } from 'nestjs-pino';
+import { getPrismaLogLevels } from './prisma-log-levels';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
@@ -23,7 +24,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     const adapter = new PrismaPg({ connectionString });
     super({
       adapter,
-      log: ['query', 'warn', 'error'],
+      log: getPrismaLogLevels(
+        config?.PRISMA_LOG_QUERIES ?? process.env['PRISMA_LOG_QUERIES'] === 'true',
+      ),
     });
     this.logger?.setContext(PrismaService.name);
   }

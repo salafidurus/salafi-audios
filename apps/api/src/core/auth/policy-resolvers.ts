@@ -93,7 +93,9 @@ export const resolveListingTranslation =
       where: { slug: ctx.params[paramName] },
       select: { scholar: { select: { slug: true } } },
     });
-    return ctx.params.locale
-      ? { scholarSlug: listing?.scholar?.slug, locale: ctx.params.locale }
+    const bodyLocale = (ctx.body as Record<string, unknown> | undefined)?.locale;
+    const locale = ctx.params.locale ?? (typeof bodyLocale === 'string' ? bodyLocale : undefined);
+    return locale
+      ? { scholarSlug: listing?.scholar?.slug, locale }
       : { scholarSlug: listing?.scholar?.slug };
   };

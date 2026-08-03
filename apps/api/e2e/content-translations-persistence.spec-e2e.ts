@@ -8,6 +8,7 @@ import {
   TEST_SCHOLAR_ID,
   TEST_SCHOLAR_SLUG,
   TEST_LISTING_ID,
+  TEST_LISTING_SLUG,
   seedTestData,
   cleanupE2ETestData,
 } from './helpers/seed-test-data';
@@ -483,13 +484,21 @@ describe('Content translations persistence (e2e)', () => {
         .expect(201);
       listingId = createRes.body.id;
 
+      const createdListing = await prisma.listing.findUnique({
+        where: { slug: listingSlug },
+        select: { scholar: { select: { slug: true } } },
+      });
+      expect(createdListing?.scholar?.slug).toBe(TEST_SCHOLAR_SLUG);
+      const listingScholarSlug = createdListing?.scholar?.slug;
+      if (!listingScholarSlug) throw new Error('Created listing has no scholar slug');
+
       const translateAuth = await authFactory.createAdminUser([
         accessGrant(AccessTarget.translation, AccessCapability.translate, {
-          scholarSlug: TEST_SCHOLAR_SLUG,
+          scholarSlug: listingScholarSlug,
           locale: 'en',
         }),
         accessGrant(AccessTarget.translation, AccessCapability.publish, {
-          scholarSlug: TEST_SCHOLAR_SLUG,
+          scholarSlug: listingScholarSlug,
           locale: 'en',
         }),
       ]);
