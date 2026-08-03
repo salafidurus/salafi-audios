@@ -16,6 +16,9 @@ const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../../core/auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
+  userAccessGrant: {
+    findMany: vi.fn<any>().mockResolvedValue([]),
+  },
   userPermission: {
     findMany: vi.fn<any>().mockResolvedValue([]),
     findUnique: vi.fn<any>().mockResolvedValue(null),
@@ -84,22 +87,16 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
 
   afterEach(() => app.close());
 
-  describe('authenticated admin with manage:content permission', () => {
+  describe('authenticated admin with scholar translation access', () => {
     beforeEach(() => {
       mockAuth.api.getSession.mockResolvedValue({
         user: { id: 'u1', role: 'admin' },
         session: {},
       });
-      // AuthGuard backfills request.user.permissions via findMany when the
-      // session doesn't carry them — PolicyGuard's ability check reads that.
-      mockPrisma.userPermission.findMany.mockResolvedValue(
-        [
-          'TRANSLATIONS_VIEW',
-          'TRANSLATIONS_CREATE',
-          'TRANSLATIONS_EDIT',
-          'TRANSLATIONS_PUBLISH',
-        ].map((permission) => ({ permission })),
-      );
+      mockPrisma.userAccessGrant.findMany.mockResolvedValue([
+        { target: 'translation', capability: 'translate', scholarId: 's1', locale: 'ar' },
+        { target: 'translation', capability: 'publish', scholarId: 's1', locale: 'ar' },
+      ]);
     });
 
     it('POST /scholars/:id/translations creates a draft translation', async () => {
@@ -158,7 +155,7 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
     });
   });
 
-  describe('missing manage:content permission', () => {
+  describe('missing scholar translation access', () => {
     let forbiddenApp: NestFastifyApplication;
 
     beforeEach(async () => {
@@ -166,8 +163,7 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
         user: { id: 'u1', role: 'user' },
         session: {},
       });
-      // No permissions backfilled — PolicyGuard's ability check should deny.
-      mockPrisma.userPermission.findMany.mockResolvedValue([]);
+      mockPrisma.userAccessGrant.findMany.mockResolvedValue([]);
       forbiddenApp = await buildApp();
     });
 
