@@ -14,21 +14,20 @@ export class TopicsTranslationsController {
   constructor(private readonly service: TopicsService) {}
 
   @Get(':id/translations')
-  @CheckPolicy('read', 'Translation', resolveUnscoped)
   @ApiOperation({ summary: 'List translations for a topic' })
   listTranslations(@Param('id') id: string) {
     return this.service.listTranslations(id);
   }
 
   @Post(':id/translations')
-  @CheckPolicy('create', 'Translation', resolveUnscoped)
+  @CheckPolicy('translate', 'Translation', resolveUnscoped)
   @ApiOperation({ summary: 'Upsert a topic translation' })
   upsertTranslation(@Param('id') id: string, @Body() dto: SaveTopicTranslationDto) {
     return this.service.upsertTranslation(id, dto);
   }
 
   @Patch(':id/translations/:locale')
-  @CheckPolicy('update', 'Translation', resolveUnscoped)
+  @CheckPolicy('translate', 'Translation', resolveUnscoped)
   @ApiOperation({ summary: 'Partially update a topic translation' })
   updateTranslation(
     @Param('id') id: string,

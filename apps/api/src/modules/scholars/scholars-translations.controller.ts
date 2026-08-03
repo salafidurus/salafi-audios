@@ -14,21 +14,20 @@ export class ScholarsTranslationsController {
   constructor(private readonly service: ScholarsService) {}
 
   @Get(':id/translations')
-  @CheckPolicy('read', 'Translation', resolveScholarTranslation())
   @ApiOperation({ summary: 'List translations for a scholar' })
   listTranslations(@Param('id') id: string) {
     return this.service.listTranslations(id);
   }
 
   @Post(':id/translations')
-  @CheckPolicy('create', 'Translation', resolveScholarTranslation())
+  @CheckPolicy('translate', 'Translation', resolveScholarTranslation())
   @ApiOperation({ summary: 'Upsert a scholar translation' })
   upsertTranslation(@Param('id') id: string, @Body() dto: SaveScholarTranslationDto) {
     return this.service.upsertTranslation(id, dto);
   }
 
   @Patch(':id/translations/:locale')
-  @CheckPolicy('update', 'Translation', resolveScholarTranslation())
+  @CheckPolicy('translate', 'Translation', resolveScholarTranslation())
   @ApiOperation({ summary: 'Partially update a scholar translation' })
   updateTranslation(
     @Param('id') id: string,
