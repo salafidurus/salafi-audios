@@ -13,9 +13,26 @@ import type {
   UserTranslatorRoleDto,
   ScholarPermissionType,
   Locale,
+  ReplaceUserAccessRequest,
+  UserAccessSnapshot,
 } from "@sd/core-contracts";
 
 import { httpClient, endpoints } from "@sd/core-contracts";
+
+export function fetchUserAccess(userId: string) {
+  return httpClient<UserAccessSnapshot>({
+    url: endpoints.admin.users.access(userId),
+    method: "GET",
+  });
+}
+
+export function replaceUserAccess(userId: string, body: ReplaceUserAccessRequest) {
+  return httpClient<UserAccessSnapshot>({
+    url: endpoints.admin.users.access(userId),
+    method: "PUT",
+    body,
+  });
+}
 
 // --- Permissions ---
 
