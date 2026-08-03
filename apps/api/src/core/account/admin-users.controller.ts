@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Put, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../auth/decorators/check-policy.decorator';
-import { PermissionsService } from './permissions.service';
+import { UserDirectoryService } from './user-directory.service';
 import type { AdminUserListDto, UserAccessSnapshot } from '@sd/core-contracts';
 import { CurrentUser } from '../auth/decorators';
 import { AccessService } from './access.service';
@@ -19,7 +19,7 @@ import { ReplaceUserAccessDto } from './dto/replace-user-access.dto';
 @Controller('admin/users')
 export class AdminUsersController {
   constructor(
-    private readonly permissionsService: PermissionsService,
+    private readonly userDirectoryService: UserDirectoryService,
     private readonly accessService: AccessService,
   ) {}
 
@@ -33,7 +33,7 @@ export class AdminUsersController {
     @Query('role') role?: string,
     @Query('cursor') cursor?: string,
   ): Promise<AdminUserListDto> {
-    return this.permissionsService.listUsers(query, role, cursor);
+    return this.userDirectoryService.listUsers(query, role, cursor);
   }
 
   @Get(':userId/access')

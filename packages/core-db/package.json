@@ -40,8 +40,6 @@
     "prisma:reset": "prisma migrate reset --force",
     "migrate:create-only": "bun ./scripts/migrate-with-auto-name.js",
     "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
-    "grant:role": "bun ./scripts/grant-role.js",
-    "grant:permission": "bun ./scripts/grant-permission.js",
     "build": "bun run prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && bun ./scripts/copy-generated-to-dist.js && tsc -p tsconfig.build.json",
     "dev": "bun run build"
   },

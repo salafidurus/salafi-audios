@@ -30,8 +30,6 @@ src/
 └── generated/prisma/   # Generated client (do NOT hand-edit)
 scripts/
 ├── copy-generated-to-dist.js
-├── grant-role.js
-├── grant-permission.js
 └── migrate-with-auto-name.js
 ```
 
