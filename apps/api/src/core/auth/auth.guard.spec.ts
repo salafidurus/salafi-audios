@@ -38,6 +38,9 @@ describe('AuthGuard', () => {
       userTranslatorRole: {
         findMany: vi.fn<any>().mockResolvedValue([]),
       },
+      userAccessGrant: {
+        findMany: vi.fn<any>().mockResolvedValue([]),
+      },
     } as unknown as Partial<PrismaService>;
     guard = new AuthGuard(reflector, mockPrisma as PrismaService);
     vi.clearAllMocks();
@@ -76,6 +79,7 @@ describe('AuthGuard', () => {
       permissions: [],
       scholarLinks: [],
       translatorRoles: [],
+      accessGrants: [],
     });
   });
 
@@ -97,7 +101,34 @@ describe('AuthGuard', () => {
       permissions: [],
       scholarLinks: [],
       translatorRoles: [],
+      accessGrants: [],
     });
+  });
+
+  it('loads aggregate grants fresh instead of trusting session claims', async () => {
+    const fakeUser = { id: 'u1', email: 'a@b.com', accessGrants: [{ target: 'listing' }] };
+    vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+    mockAuth.api.getSession.mockResolvedValue({ user: fakeUser, session: {} });
+    (mockPrisma.userRoleAssignment!.findMany as any).mockResolvedValue([]);
+    (mockPrisma.userAccessGrant!.findMany as any).mockResolvedValue([
+      { target: 'listing', capability: 'write', scholarId: 'scholar-a', locale: null },
+    ]);
+    const req: Record<string, unknown> = { headers: {}, user: undefined };
+    const ctx = {
+      getHandler: () => ({}),
+      getClass: () => ({}),
+      switchToHttp: () => ({ getRequest: () => req }),
+    } as unknown as ExecutionContext;
+
+    await guard.canActivate(ctx);
+
+    expect(mockPrisma.userAccessGrant!.findMany).toHaveBeenCalledWith({
+      where: { userId: 'u1' },
+      select: { target: true, capability: true, scholarId: true, locale: true },
+    });
+    expect((req.user as any).accessGrants).toEqual([
+      { target: 'listing', capability: 'write', scholarId: 'scholar-a', locale: null },
+    ]);
   });
 
   describe('ban enforcement', () => {

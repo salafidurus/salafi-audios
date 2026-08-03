@@ -96,6 +96,11 @@ export class AuthGuard implements CanActivate {
       }));
     }
 
+    const accessGrants = await this.prisma.userAccessGrant.findMany({
+      where: { userId: sessionUser.id },
+      select: { target: true, capability: true, scholarId: true, locale: true },
+    });
+
     // Attach user info to request (for use by controllers and other services)
     (request as any).user = {
       ...session.user,
@@ -103,6 +108,7 @@ export class AuthGuard implements CanActivate {
       permissions,
       scholarLinks,
       translatorRoles,
+      accessGrants,
     };
     return true;
   }

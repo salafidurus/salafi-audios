@@ -1,6 +1,7 @@
 import type {
   ScholarLinkAttribute,
   TranslatorRoleAttribute,
+  AccessGrantAttribute,
 } from '../../core/auth/ability/ability.types';
 
 declare global {
@@ -17,6 +18,7 @@ declare global {
         permissions: string[];
         scholarLinks: ScholarLinkAttribute[];
         translatorRoles: TranslatorRoleAttribute[];
+        accessGrants: AccessGrantAttribute[];
         banned?: boolean | null;
         banReason?: string | null;
         banExpires?: Date | null;
