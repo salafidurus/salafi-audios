@@ -1,9 +1,10 @@
-import { Column, Row, ScrollView, Switch } from "@expo/ui";
+import { Column, Picker, Row, ScrollView, Switch } from "@expo/ui";
+import { fillMaxWidth, weight } from "@expo/ui/jetpack-compose/modifiers";
 import { useCallback, useState } from "react";
 import { UnistylesRuntime, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { NativeScreenHost, NativeSegmentedControl, NativeText } from "@/shared/ui";
+import { NativeScreenHost, NativeText } from "@/shared/ui";
 
 import { ContentLanguageToggle } from "../components/content-language-toggle/content-language-toggle";
 import { LanguageSwitch } from "../components/language-switch/language-switch";
@@ -55,19 +56,26 @@ export function SettingsGeneralScreen() {
     { value: "light", label: t("settings.general.themeOptions.light", "Light") },
     { value: "dark", label: t("settings.general.themeOptions.dark", "Dark") },
   ];
+  // Compose layouts wrap their children by default. Explicitly filling the
+  // available width keeps settings rows aligned on Android without sending a
+  // Compose-only modifier to SwiftUI.
+  const fullWidthModifiers = process.env.EXPO_OS === "android" ? [fillMaxWidth()] : [];
+  const flexibleTextModifiers = process.env.EXPO_OS === "android" ? [weight(1)] : [];
 
   return (
     <NativeScreenHost testID="settings-general-host">
-      <ScrollView showsIndicators={false}>
+      <ScrollView modifiers={fullWidthModifiers} showsIndicators={false}>
         <Column
+          modifiers={fullWidthModifiers}
           spacing={theme.spacing.layout.sectionY}
           style={{ padding: theme.spacing.layout.pageX }}
         >
-          <Column spacing={theme.spacing.component.gapMd}>
-            <NativeText variant="titleMd" colorRole="strong">
-              {t("settings.general.languageSection", "Language")}
-            </NativeText>
-            <Row alignment="center" spacing={theme.spacing.component.gapMd}>
+          <SettingsSection
+            title={t("settings.general.languageSection", "Language")}
+            modifiers={fullWidthModifiers}
+            theme={theme}
+          >
+            <Column modifiers={fullWidthModifiers} spacing={theme.spacing.component.gapSm}>
               <Column spacing={theme.spacing.scale.xs}>
                 <NativeText variant="bodyMd" colorRole="strong">
                   {t("settings.general.appLanguage", "App Language")}
@@ -77,39 +85,39 @@ export function SettingsGeneralScreen() {
                 </NativeText>
               </Column>
               <LanguageSwitch />
-            </Row>
+            </Column>
             <ContentLanguageToggle />
-          </Column>
-          <Column spacing={theme.spacing.component.gapMd}>
-            <NativeText variant="titleMd" colorRole="strong">
-              {t("settings.general.displaySection", "Display")}
-            </NativeText>
+          </SettingsSection>
+          <SettingsSection
+            title={t("settings.general.displaySection", "Display")}
+            modifiers={fullWidthModifiers}
+            theme={theme}
+          >
             <NativeText variant="bodySm" colorRole="muted">
               {t("settings.general.displayDesc", "Choose a theme for the interface.")}
             </NativeText>
-            <NativeSegmentedControl
-              values={themeOptions.map((option) => option.label)}
-              value={
-                themeOptions.find((option) => option.value === themePreference)?.label ??
-                themeOptions[0]!.label
-              }
-              onValueChange={(label) =>
-                handleThemeChange(
-                  themeOptions.find((option) => option.label === label)?.value ?? "system",
-                )
-              }
+            <Picker
+              selectedValue={themePreference}
+              onValueChange={(value) => handleThemeChange(value as ThemePreference)}
               testID="settings-theme-control"
-            />
-          </Column>
-          <Column spacing={theme.spacing.component.gapMd}>
-            <NativeText variant="titleMd" colorRole="strong">
-              {t("settings.general.notifSection", "Notifications")}
-            </NativeText>
+            >
+              {themeOptions.map((option) => (
+                <Picker.Item key={option.value} label={option.label} value={option.value} />
+              ))}
+            </Picker>
+          </SettingsSection>
+          <SettingsSection
+            title={t("settings.general.notifSection", "Notifications")}
+            modifiers={fullWidthModifiers}
+            theme={theme}
+          >
             <PreferenceSwitch
               label={t("settings.general.enableNotif", "Enable Notifications")}
               detail={t("settings.general.enableNotifDesc", "Master toggle for all notifications")}
               value={notif.master}
               onValueChange={handleNotifChange("master")}
+              flexibleTextModifiers={flexibleTextModifiers}
+              fullWidthModifiers={fullWidthModifiers}
             />
             {notif.master ? (
               <>
@@ -121,6 +129,8 @@ export function SettingsGeneralScreen() {
                   )}
                   value={notif.scholars}
                   onValueChange={handleNotifChange("scholars")}
+                  flexibleTextModifiers={flexibleTextModifiers}
+                  fullWidthModifiers={fullWidthModifiers}
                 />
                 <PreferenceSwitch
                   label={t("settings.general.newLectures", "New Lectures")}
@@ -130,10 +140,12 @@ export function SettingsGeneralScreen() {
                   )}
                   value={notif.lectures}
                   onValueChange={handleNotifChange("lectures")}
+                  flexibleTextModifiers={flexibleTextModifiers}
+                  fullWidthModifiers={fullWidthModifiers}
                 />
               </>
             ) : null}
-          </Column>
+          </SettingsSection>
         </Column>
       </ScrollView>
     </NativeScreenHost>
@@ -145,16 +157,20 @@ function PreferenceSwitch({
   detail,
   value,
   onValueChange,
+  flexibleTextModifiers,
+  fullWidthModifiers,
 }: {
   label: string;
   detail: string;
   value: boolean;
   onValueChange: (value: boolean) => void;
+  flexibleTextModifiers: ReturnType<typeof weight>[];
+  fullWidthModifiers: ReturnType<typeof fillMaxWidth>[];
 }) {
   const { theme } = useUnistyles();
   return (
-    <Row alignment="center" spacing={theme.spacing.component.gapMd}>
-      <Column spacing={theme.spacing.scale.xs}>
+    <Row alignment="center" modifiers={fullWidthModifiers} spacing={theme.spacing.component.gapMd}>
+      <Column modifiers={flexibleTextModifiers} spacing={theme.spacing.scale.xs}>
         <NativeText variant="bodyMd" colorRole="strong">
           {label}
         </NativeText>
@@ -164,5 +180,38 @@ function PreferenceSwitch({
       </Column>
       <Switch value={value} onValueChange={onValueChange} />
     </Row>
+  );
+}
+
+function SettingsSection({
+  title,
+  children,
+  modifiers,
+  theme,
+}: {
+  title: string;
+  children: React.ReactNode;
+  modifiers: ReturnType<typeof fillMaxWidth>[];
+  theme: ReturnType<typeof useUnistyles>["theme"];
+}) {
+  return (
+    <Column modifiers={modifiers} spacing={theme.spacing.component.gapSm}>
+      <NativeText variant="titleMd" colorRole="strong">
+        {title}
+      </NativeText>
+      <Column
+        modifiers={modifiers}
+        spacing={theme.spacing.component.gapMd}
+        style={{
+          backgroundColor: theme.colors.surface.default,
+          borderColor: theme.colors.border.subtle,
+          borderRadius: theme.radius.component.card,
+          borderWidth: 1,
+          padding: theme.spacing.component.cardPadding,
+        }}
+      >
+        {children}
+      </Column>
+    </Column>
   );
 }

@@ -61,7 +61,7 @@ export function SignInScreen({
                 buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
                 buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
                 cornerRadius={theme.radius.component.chip}
-                style={{ width: "100%", height: 48 }}
+                style={{ alignSelf: "stretch", height: 48 }}
                 onPress={onSignInWithApple}
               />
             </RNHostView>

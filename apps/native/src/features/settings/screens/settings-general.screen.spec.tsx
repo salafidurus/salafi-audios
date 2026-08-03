@@ -15,6 +15,24 @@ jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({ t: (_key: string, fallback: string) => fallback }),
 }));
 
+jest.mock("@expo/ui", () => {
+  const { Text, View } = require("react-native");
+  const Container = ({ children, testID }: { children?: React.ReactNode; testID?: string }) => (
+    <View testID={testID}>{children}</View>
+  );
+  const Picker = Object.assign(Container, { Item: () => null });
+
+  return {
+    Column: Container,
+    Host: Container,
+    Picker,
+    Row: Container,
+    ScrollView: Container,
+    Switch: Container,
+    Text,
+  };
+});
+
 jest.mock("../components/language-switch/language-switch", () => ({
   LanguageSwitch: () => null,
 }));
