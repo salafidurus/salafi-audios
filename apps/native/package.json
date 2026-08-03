@@ -30,6 +30,7 @@
     "@better-auth/expo": "catalog:",
     "@casl/ability": "catalog:",
     "@expo/dom-webview": "~57.0.1",
+    "@expo/material-symbols": "^0.1.1",
     "@expo/metro-runtime": "~57.0.8",
     "@expo/ui": "~57.0.8",
     "@expo/vector-icons": "^15.0.3",

@@ -5,6 +5,7 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    "\\.xml$": "<rootDir>/test/xml-asset-mock.js",
   },
   transformIgnorePatterns: [
     "node_modules/(?!(?:.bun/)?((jest-)?react-native|@react-native(-community)?|@react-native/.*|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*))",
