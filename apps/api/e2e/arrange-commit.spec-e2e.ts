@@ -338,8 +338,8 @@ describe('Arrange commit (e2e)', () => {
       .expect(400);
   });
 
-  it('rejects commits without LISTINGS_CREATE permission', async () => {
-    const viewer = await authFactory.createAdminUser([Permission.LISTINGS_EDIT]);
+  it('rejects commits without listing write access', async () => {
+    const viewer = await authFactory.createAdminUser([Permission.LISTINGS_VIEW]);
     await request(app.getHttpServer())
       .post(`/admin/listings/${SERIES_ID}/arrange-commit`)
       .set(viewer.headers)
