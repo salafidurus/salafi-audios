@@ -13,7 +13,10 @@ describe('UserDirectoryService', () => {
             email: 'one@example.com',
             image: null,
             roles: [{ role: 'listener' }],
-            permissions: [],
+            accessGrants: [
+              { target: 'listing', capability: 'write' },
+              { target: 'translation', capability: 'translate' },
+            ],
             createdAt: new Date('2026-01-01'),
           },
         ],
@@ -27,8 +30,7 @@ describe('UserDirectoryService', () => {
     expect(repository.listUsers).toHaveBeenCalledWith('one', undefined, undefined);
     expect(result.users[0]).toMatchObject({
       id: 'u1',
-      roles: ['listener'],
-      permissions: [],
+      roles: ['Editor', 'Translator'],
       createdAt: '2026-01-01T00:00:00.000Z',
     });
   });

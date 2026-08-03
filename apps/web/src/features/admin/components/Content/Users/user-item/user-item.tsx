@@ -11,7 +11,6 @@ import { UserAvatar } from "@/shared/components/user-avatar";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 
 import { MetaDetails } from "./meta-details";
-import { PermissionDetails } from "./permission-details";
 import styles from "./user-item.module.css";
 
 export type UserItemProps = {
@@ -32,7 +31,9 @@ export function UserItem({ user, onManageAccess }: UserItemProps): ReactNode {
         </div>
         <div className={styles.contentBody}>
           <MetaDetails user={user} />
-          <PermissionDetails permissions={user.permissions.map((p) => ({ permission: p }))} />
+          <div className={styles.accessRoles}>
+            {user.roles.length > 0 ? user.roles.join(", ") : "No access grants"}
+          </div>
         </div>
       </div>
 

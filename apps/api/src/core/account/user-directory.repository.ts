@@ -27,8 +27,8 @@ export class UserDirectoryRepository {
       take: pageSize + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       include: {
-        permissions: { select: { permission: true } },
         roles: { select: { role: true } },
+        accessGrants: { select: { target: true, capability: true } },
       },
       orderBy: { createdAt: 'desc' },
     });

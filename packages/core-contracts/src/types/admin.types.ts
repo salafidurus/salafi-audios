@@ -22,7 +22,6 @@ export const AdminUserListItemDtoSchema = z.object({
   image: z.string().nullable(),
   roles: z.array(z.string()),
   createdAt: z.string(),
-  permissions: z.array(PermissionEnum),
 });
 export type AdminUserListItemDto = z.infer<typeof AdminUserListItemDtoSchema>;
 

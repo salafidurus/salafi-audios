@@ -27,7 +27,6 @@ const baseUser = {
   image: null,
   roles: [],
   createdAt: "2024-01-01T00:00:00.000Z",
-  permissions: [] as import("@sd/core-contracts").Permission[],
 };
 
 describe("UserItem", () => {
