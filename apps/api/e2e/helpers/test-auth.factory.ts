@@ -3,6 +3,9 @@ import { AccessCapability, AccessTarget, UserRole } from '@sd/core-db';
 import type { Locale } from '@sd/core-db';
 import { createId } from '@paralleldrive/cuid2';
 
+const E2E_USER_EMAIL_PREFIX = 'e2e-test-';
+const E2E_USER_EMAIL_DOMAIN = '@salafidurus.com';
+
 export type AccessGrantSeed = {
   target: AccessTarget;
   capability: AccessCapability;
@@ -162,8 +165,18 @@ export class TestAuthFactory {
   }
 
   async cleanup(): Promise<void> {
-    if (this.createdUserIds.size === 0) return;
-    const ids = Array.from(this.createdUserIds);
+    const staleUsers = await this.prisma.user.findMany({
+      where: {
+        email: {
+          startsWith: E2E_USER_EMAIL_PREFIX,
+          endsWith: E2E_USER_EMAIL_DOMAIN,
+        },
+      },
+      select: { id: true },
+    });
+    const ids = [...new Set([...this.createdUserIds, ...staleUsers.map((user) => user.id)])];
+    if (ids.length === 0) return;
+
     await this.prisma.user.deleteMany({
       where: { id: { in: ids } },
     });
