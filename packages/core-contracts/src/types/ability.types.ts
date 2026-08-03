@@ -27,10 +27,6 @@ export type AppSubjectType =
   | "Topic"
   | "Media"
   | "User"
-  | "UserRoleAssignment"
-  | "UserPermission"
-  | "UserScholarRole"
-  | "UserTranslatorRole"
   | "UserAccess";
 
 // Minimal shapes for subjects that are ever checked with resource conditions
