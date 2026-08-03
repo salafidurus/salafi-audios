@@ -30,9 +30,22 @@ describe('defineAbilityFor aggregate access', () => {
     );
 
     expect(ability.can('write', subject('Listing', { scholarId: 'a' }))).toBe(true);
+    expect(ability.can('create', subject('Listing', { scholarId: 'a' }))).toBe(true);
+    expect(ability.can('update', subject('Listing', { scholarId: 'a' }))).toBe(true);
     expect(ability.can('write', subject('Listing', { scholarId: 'b' }))).toBe(true);
     expect(ability.can('write', subject('Listing', { scholarId: 'c' }))).toBe(false);
     expect(ability.can('delete', subject('Listing', { scholarId: 'a' }))).toBe(false);
+  });
+
+  it('maps media write access to upload without granting delete', () => {
+    const ability = defineAbilityFor(
+      baseInput({
+        accessGrants: [{ target: 'media', capability: 'write', scholarId: 'a', locale: null }],
+      }),
+    );
+
+    expect(ability.can('upload', subject('Media', { scholarId: 'a' }))).toBe(true);
+    expect(ability.can('delete', subject('Media', { scholarId: 'a' }))).toBe(false);
   });
 
   it('supports translation scope by scholar and locale', () => {

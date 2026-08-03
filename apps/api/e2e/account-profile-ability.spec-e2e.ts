@@ -5,7 +5,7 @@ import { subject, createMongoAbility } from '@casl/ability';
 import { unpackRules } from '@casl/ability/extra';
 import { PrismaService } from '../src/core/db/prisma.service';
 import { TestAuthFactory } from './helpers/test-auth.factory';
-import { Permission } from '@sd/core-db';
+import { AccessCapability, AccessTarget } from '@sd/core-db';
 import { defineAbilityFor } from '../src/core/auth/ability/ability.factory';
 import type { AppAbility } from '../src/core/auth/ability/ability.types';
 import { TEST_SCHOLAR_ID, seedTestData, cleanupE2ETestData } from './helpers/seed-test-data';
@@ -37,7 +37,18 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
   });
 
   it('unpacked client ability matches the server ability for a global-permission user', async () => {
-    const auth = await authFactory.createAdminUser([Permission.SCHOLARS_EDIT]);
+    const auth = await authFactory.createUser();
+    const accessGrants = [
+      {
+        target: AccessTarget.scholar,
+        capability: AccessCapability.write,
+        scholarId: null,
+        locale: null,
+      },
+    ];
+    await prisma.userAccessGrant.createMany({
+      data: accessGrants.map((grant) => ({ ...grant, userId: auth.user.id })),
+    });
 
     const res = await request(app.getHttpServer())
       .get('/account/profile')
@@ -45,10 +56,8 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
       .expect(200);
 
     const serverAbility = defineAbilityFor({
-      roles: res.body.roles,
-      permissions: res.body.permissions,
-      scholarLinks: res.body.scholarLinks,
-      translatorRoles: res.body.translatorRoles,
+      roles: ['listener'],
+      accessGrants,
     });
     const clientAbility = createMongoAbility(unpackRules(res.body.rules)) as AppAbility;
 
@@ -59,7 +68,18 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
   });
 
   it('unpacked client ability matches the server ability for a scholar-scoped editor', async () => {
-    const auth = await authFactory.createScholarScopedUser(TEST_SCHOLAR_ID, 'OWN_CONTENT');
+    const auth = await authFactory.createUser();
+    const accessGrants = [
+      {
+        target: AccessTarget.listing,
+        capability: AccessCapability.write,
+        scholarId: TEST_SCHOLAR_ID,
+        locale: null,
+      },
+    ];
+    await prisma.userAccessGrant.createMany({
+      data: accessGrants.map((grant) => ({ ...grant, userId: auth.user.id })),
+    });
 
     const res = await request(app.getHttpServer())
       .get('/account/profile')
@@ -67,10 +87,8 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
       .expect(200);
 
     const serverAbility = defineAbilityFor({
-      roles: res.body.roles,
-      permissions: res.body.permissions,
-      scholarLinks: res.body.scholarLinks,
-      translatorRoles: res.body.translatorRoles,
+      roles: ['listener'],
+      accessGrants,
     });
     const clientAbility = createMongoAbility(unpackRules(res.body.rules)) as AppAbility;
 
@@ -86,7 +104,18 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
   });
 
   it('unpacked client ability matches the server ability for a locale-scoped translator', async () => {
-    const auth = await authFactory.createTranslatorScopedUser(['ar'], { canPublish: true });
+    const auth = await authFactory.createUser();
+    const accessGrants = [
+      {
+        target: AccessTarget.translation,
+        capability: AccessCapability.publish,
+        scholarId: null,
+        locale: 'ar' as const,
+      },
+    ];
+    await prisma.userAccessGrant.createMany({
+      data: accessGrants.map((grant) => ({ ...grant, userId: auth.user.id })),
+    });
 
     const res = await request(app.getHttpServer())
       .get('/account/profile')
@@ -94,10 +123,8 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
       .expect(200);
 
     const serverAbility = defineAbilityFor({
-      roles: res.body.roles,
-      permissions: res.body.permissions,
-      scholarLinks: res.body.scholarLinks,
-      translatorRoles: res.body.translatorRoles,
+      roles: ['listener'],
+      accessGrants,
     });
     const clientAbility = createMongoAbility(unpackRules(res.body.rules)) as AppAbility;
 
