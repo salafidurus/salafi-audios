@@ -83,7 +83,7 @@ describe("Sidebar component", () => {
     expect(screen.queryByText("ADMIN")).not.toBeInTheDocument();
   });
 
-  it("shows only the nav items matching the user's specific admin permissions", () => {
+  it("shows editorial navigation for aggregate access without treating read as a grant", () => {
     (useAuth as Mock<any>).mockReturnValue({
       isAuthenticated: true,
       isLoading: false,
@@ -100,7 +100,7 @@ describe("Sidebar component", () => {
     expect(screen.getByText("Stats")).toBeInTheDocument();
     expect(screen.getByText("Scholars")).toBeInTheDocument();
     expect(screen.queryByText("Users")).not.toBeInTheDocument();
-    expect(screen.queryByText("Contents")).not.toBeInTheDocument();
+    expect(screen.getByText("Contents")).toBeInTheDocument();
   });
 
   it("renders profile details and Sign Out when authenticated (non-admin)", () => {

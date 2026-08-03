@@ -66,24 +66,20 @@ function getAdminNavItems(t: (key: string, fallback: string) => string): AdminNa
       Icon: Users,
       href: routes.admin.users,
       activeMatch: routes.admin.users,
-      requiredAction: "read",
-      requiredSubject: "User",
+      requiredAction: "manage",
+      requiredSubject: "UserAccess",
     },
     {
       label: t("navigation.admin.contents", "Contents"),
       Icon: FolderOpen,
       href: routes.admin.contents,
       activeMatch: routes.admin.contents,
-      requiredAction: "read",
-      requiredSubject: "Listing",
     },
     {
       label: t("navigation.admin.scholars", "Scholars"),
       Icon: GraduationCap,
       href: routes.admin.scholars,
       activeMatch: routes.admin.scholars,
-      requiredAction: "read",
-      requiredSubject: "Scholar",
     },
   ];
 }
