@@ -5,11 +5,12 @@ import React from "react";
 import { PlaybackControls } from "./playback-controls";
 
 jest.mock("@/shared/ui", () => {
-  const { Text } = require("react-native");
+  const { Text, View } = require("react-native");
   return {
     NativeText: ({ children, testID }: { children?: string | number; testID?: string }) => (
       <Text testID={testID}>{children}</Text>
     ),
+    NativeBridgeHost: ({ children }: { children: React.ReactNode }) => <View>{children}</View>,
   };
 });
 

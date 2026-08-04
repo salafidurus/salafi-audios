@@ -2,7 +2,7 @@ import { ActivityIndicator, View, Pressable } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useDownload } from "@/features/downloads/hooks/use-download";
-import { NativeText } from "@/shared/ui";
+import { NativeBridgeHost, NativeText } from "@/shared/ui";
 
 type DownloadButtonProps = {
   lectureId: string;
@@ -23,9 +23,11 @@ export function DownloadButton({ lectureId, audioUrl }: DownloadButtonProps) {
         style={[styles.pill, styles.downloadedPill]}
         accessibilityLabel="Remove download"
       >
-        <NativeText variant="caption" colorRole="success">
-          ✓ Downloaded
-        </NativeText>
+        <NativeBridgeHost>
+          <NativeText variant="caption" colorRole="success">
+            ✓ Downloaded
+          </NativeText>
+        </NativeBridgeHost>
       </Pressable>
     );
   }
@@ -34,9 +36,11 @@ export function DownloadButton({ lectureId, audioUrl }: DownloadButtonProps) {
     return (
       <View style={[styles.pill, styles.downloadingPill]}>
         <ActivityIndicator size="small" color={theme.colors.action.primary} />
-        <NativeText variant="caption" colorRole="primary">
-          Downloading
-        </NativeText>
+        <NativeBridgeHost>
+          <NativeText variant="caption" colorRole="primary">
+            Downloading
+          </NativeText>
+        </NativeBridgeHost>
       </View>
     );
   }
@@ -47,9 +51,11 @@ export function DownloadButton({ lectureId, audioUrl }: DownloadButtonProps) {
       style={[styles.pill, styles.downloadPill]}
       accessibilityLabel="Download lecture"
     >
-      <NativeText variant="caption" colorRole="default">
-        {status === "error" ? "⚠ Retry" : "↓ Download"}
-      </NativeText>
+      <NativeBridgeHost>
+        <NativeText variant="caption" colorRole="default">
+          {status === "error" ? "⚠ Retry" : "↓ Download"}
+        </NativeText>
+      </NativeBridgeHost>
     </Pressable>
   );
 }

@@ -24,4 +24,14 @@ export const APPROVED_NATIVE_BRIDGES: readonly ApprovedNativeBridge[] = [
     reason:
       "The package-owned native bottom-accessory module exposes a React Native mounting boundary.",
   },
+  {
+    file: "src/features/audio/components/playback-controls.tsx",
+    reason:
+      "PlaybackControls mixes RN Pressable/View controls with NativeText (Compose TextView) for speed and skip labels — NativeBridgeHost inlines the Compose boundary.",
+  },
+  {
+    file: "src/features/downloads/components/download-button/download-button.tsx",
+    reason:
+      "DownloadButton pill uses RN Pressable/View for touch handling with NativeText (Compose TextView) for status labels — NativeBridgeHost inlines the Compose boundary.",
+  },
 ] as const;

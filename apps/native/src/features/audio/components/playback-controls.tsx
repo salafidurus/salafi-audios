@@ -4,7 +4,7 @@ import React from "react";
 import { View, Pressable } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { NativeText } from "@/shared/ui";
+import { NativeBridgeHost, NativeText } from "@/shared/ui";
 
 import { audioService } from "../audio-service";
 
@@ -60,9 +60,11 @@ export function PlaybackControls() {
   return (
     <View style={styles.container}>
       <Pressable onPress={handleCycleSpeed} style={styles.speedButton}>
-        <NativeText variant="caption" colorRole="muted" textStyle={{ fontWeight: "700" }}>
-          {`${speed.toFixed(2)}x`}
-        </NativeText>
+        <NativeBridgeHost>
+          <NativeText variant="caption" colorRole="muted" textStyle={{ fontWeight: "700" }}>
+            {`${speed.toFixed(2)}x`}
+          </NativeText>
+        </NativeBridgeHost>
       </Pressable>
 
       <View style={styles.centerControls}>
@@ -76,11 +78,11 @@ export function PlaybackControls() {
 
         <Pressable onPress={handleSkipBackward} style={styles.controlButton}>
           {RotateCcwIcon}
-          <View style={styles.skipLabel}>
+          <NativeBridgeHost style={styles.skipLabel}>
             <NativeText variant="caption" colorRole="strong">
               30
             </NativeText>
-          </View>
+          </NativeBridgeHost>
         </Pressable>
 
         <Pressable onPress={handlePlayPause} style={styles.playButton}>
@@ -89,11 +91,11 @@ export function PlaybackControls() {
 
         <Pressable onPress={handleSkipForward} style={styles.controlButton}>
           {RotateCwIcon}
-          <View style={styles.skipLabel}>
+          <NativeBridgeHost style={styles.skipLabel}>
             <NativeText variant="caption" colorRole="strong">
               30
             </NativeText>
-          </View>
+          </NativeBridgeHost>
         </Pressable>
 
         <Pressable
@@ -144,9 +146,6 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
   },
   skipLabel: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: theme.colors.content.strong,
     position: "absolute",
     top: 9,
   },
