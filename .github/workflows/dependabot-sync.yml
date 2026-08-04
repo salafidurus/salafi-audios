@@ -1,0 +1,70 @@
+name: Dependabot Sync
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: dependabot-sync-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: startsWith(github.event.pull_request.head.ref, 'dependabot/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+
+      - name: Determine changed files
+        id: files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr diff "$PR_NUMBER" --name-only > /tmp/pr-files.txt
+          if ! grep -qvE '^\.github\/' /tmp/pr-files.txt; then
+            echo "needs-update=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "needs-update=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Normalize catalog + regenerate lockfile
+        if: steps.files.outputs.needs-update == 'true'
+        run: |
+          bun run catalog fix
+          bun install
+
+      - name: Stage + commit scoped changes
+        id: commit
+        if: steps.files.outputs.needs-update == 'true'
+        run: |
+          git add -- '**/package.json' 'bun.lock' 'catalog.config.json'
+          if git diff --cached --quiet; then
+            echo "No package/lock/config changes to commit — nothing to do"
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+          else
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config user.name "github-actions[bot]"
+            git commit -m "chore(deps): align catalog + regenerate bun.lock for dependabot"
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Push back to PR branch
+        if: steps.files.outputs.needs-update == 'true' && steps.commit.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SALAFIDURUS_PR_WRITE }}
+        run: |
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:refs/heads/${{ github.event.pull_request.head.ref }}"
