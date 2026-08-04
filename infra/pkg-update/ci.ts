@@ -2,6 +2,8 @@ import { spawnSync } from "child_process";
 import { existsSync, mkdirSync, rmSync } from "fs";
 import { resolve } from "path";
 
+import type { UpdateCandidate } from "./utils/ui";
+
 import { runCatalogFix } from "../catalog/scanner/fix";
 import { applyUpdate } from "./apply";
 import { checkAll } from "./check";
@@ -15,7 +17,7 @@ import {
 } from "./utils/cache";
 import { buildChangelogSection } from "./utils/changelog";
 import { retry, type RetryOptions } from "./utils/retry";
-import { categorizeBump, type UpdateCandidate } from "./utils/ui";
+import { categorizeBump, isNewer } from "./utils/semver";
 
 const __ciMain = import.meta.path.replace(/\\/g, "/") === process.argv[1]?.replace(/\\/g, "/");
 
@@ -55,6 +57,166 @@ function exec(
     stderr: result.stderr?.trim() ?? "",
     status: result.status,
   };
+}
+
+type ExecFn = (cmd: string, args: string[], opts?: { cwd?: string }) => ReturnType<typeof exec>;
+
+interface HeldProposal {
+  closedPr: number;
+  versions: Record<string, string>;
+}
+
+export interface HeldGroup {
+  group: string;
+  pr: number;
+  packages: string[];
+}
+
+async function hasOpenPr(branch: string, execFn: ExecFn = exec): Promise<boolean> {
+  const result = execFn("gh", [
+    "pr",
+    "list",
+    "--head",
+    branch,
+    "--state",
+    "open",
+    "--json",
+    "number",
+    "-q",
+    ".[0].number",
+  ]);
+  return result.stdout.length > 0;
+}
+
+async function latestClosedPr(branch: string, execFn: ExecFn = exec): Promise<number | null> {
+  const result = execFn("gh", [
+    "pr",
+    "list",
+    "--head",
+    branch,
+    "--state",
+    "closed",
+    "--json",
+    "number,state,closedAt",
+  ]);
+  if (!result.stdout) return null;
+  const prs = JSON.parse(result.stdout) as {
+    number: number;
+    state: string;
+    closedAt: string | null;
+  }[];
+  const closed = prs
+    .filter((p) => p.state === "CLOSED")
+    .sort((a, b) => (b.closedAt ?? "").localeCompare(a.closedAt ?? ""));
+  return closed[0]?.number ?? null;
+}
+
+export async function getHeldProposal(
+  branch: string,
+  execFn: ExecFn = exec,
+): Promise<HeldProposal | null> {
+  if (await hasOpenPr(branch, execFn)) return null;
+  const closedPr = await latestClosedPr(branch, execFn);
+  if (closedPr === null) return null;
+  if (!(await remoteBranchExists(branch, execFn))) return null;
+
+  const fetchResult = execFn("git", ["fetch", "origin", branch]);
+  if (fetchResult.status !== 0) return null;
+  const show = execFn("git", ["show", "FETCH_HEAD:package.json"]);
+  if (show.status !== 0 || !show.stdout) return null;
+
+  let pkg: { workspaces?: { catalog?: Record<string, string> } };
+  try {
+    pkg = JSON.parse(show.stdout);
+  } catch {
+    return null;
+  }
+  const versions: Record<string, string> = {};
+  for (const [name, v] of Object.entries(pkg.workspaces?.catalog ?? {})) {
+    versions[name] = v.replace(/^[\^~>=<]+\s*/, "");
+  }
+  return { closedPr, versions };
+}
+
+function getHeldGroupVersion(proposal: HeldProposal, list: UpdateCandidate[]): string | null {
+  const proposed = list
+    .map((c) => proposal.versions[c.packageName])
+    .filter((v): v is string => v !== undefined);
+  if (proposed.length === 0) return null;
+  return proposed.reduce((a, b) => (isNewer(a, b) ? a : b));
+}
+
+export async function suppressHeldCandidates(
+  candidates: UpdateCandidate[],
+  execFn: ExecFn = exec,
+): Promise<{ remaining: UpdateCandidate[]; held: HeldGroup[] }> {
+  const byGroup = new Map<string, UpdateCandidate[]>();
+  for (const c of candidates) {
+    const group = c.group ?? "ungrouped";
+    byGroup.set(group, [...(byGroup.get(group) ?? []), c]);
+  }
+
+  const remaining: UpdateCandidate[] = [];
+  const held: HeldGroup[] = [];
+  const versionLocked = new Set(config.versionLocked);
+
+  const groupsIter = Array.from(byGroup.entries());
+  const proposals = await Promise.all(
+    groupsIter.map(([group]) => getHeldProposal(branchName(group), execFn)),
+  );
+
+  for (let i = 0; i < groupsIter.length; i++) {
+    const [group, list] = groupsIter[i]!;
+    const proposal = proposals[i];
+
+    if (!proposal) {
+      remaining.push(...list);
+      continue;
+    }
+
+    const heldVersion = getHeldGroupVersion(proposal, list);
+    if (heldVersion === null) {
+      remaining.push(...list);
+      continue;
+    }
+
+    const target = list.reduce(
+      (best, c) => (isNewer(c.latestVersion, best) ? c.latestVersion : best),
+      heldVersion,
+    );
+
+    if (versionLocked.has(group)) {
+      if (!isNewer(target, heldVersion)) {
+        console.log(
+          `[${group}] held by closed PR #${proposal.closedPr} (version-locked; awaiting newer than ${heldVersion})`,
+        );
+        held.push({ group, pr: proposal.closedPr, packages: list.map((c) => c.packageName) });
+        continue;
+      }
+      remaining.push(...list);
+      continue;
+    }
+
+    const kept: UpdateCandidate[] = [];
+    const dropped: string[] = [];
+    for (const c of list) {
+      const proposed = proposal.versions[c.packageName];
+      if (proposed !== undefined && !isNewer(c.latestVersion, proposed)) {
+        dropped.push(c.packageName);
+      } else {
+        kept.push(c);
+      }
+    }
+    if (dropped.length > 0) {
+      console.log(
+        `[${group}] held by closed PR #${proposal.closedPr} (proposed ${dropped.join(", ")})`,
+      );
+      held.push({ group, pr: proposal.closedPr, packages: dropped });
+    }
+    remaining.push(...kept);
+  }
+
+  return { remaining, held };
 }
 
 export function getGroupOrder(): string[] {
@@ -128,8 +290,11 @@ async function isPrMergeable(prNumber: number): Promise<boolean> {
   return result.stdout === "MERGEABLE";
 }
 
-async function remoteBranchExists(branch: string): Promise<boolean> {
-  const result = exec("git", ["ls-remote", "--heads", "origin", branch]);
+async function remoteBranchExists(
+  branch: string,
+  execFn: (cmd: string, args: string[], opts?: { cwd?: string }) => ReturnType<typeof exec> = exec,
+): Promise<boolean> {
+  const result = execFn("git", ["ls-remote", "--heads", "origin", branch]);
   return result.stdout.length > 0;
 }
 
@@ -457,8 +622,9 @@ export async function runCi(rootDir: string, options: CiOptions = {}): Promise<C
   const retryOpts = options.retry ?? { retries: 3, minTimeout: 1000 };
 
   const cache = readCache(rootDir);
-  const candidates = await retry(() => checkAll(rootDir, config), retryOpts);
-  const allBatches = groupCandidates(candidates);
+  const all = await retry(() => checkAll(rootDir, config), retryOpts);
+  const { remaining, held } = await suppressHeldCandidates(all);
+  const allBatches = groupCandidates(remaining);
 
   const batchesToProcess: GroupBatch[] = [];
   for (const batch of allBatches) {
@@ -473,6 +639,15 @@ export async function runCi(rootDir: string, options: CiOptions = {}): Promise<C
     } else {
       batchesToProcess.push(batch);
     }
+  }
+
+  for (const h of held) {
+    summaries.push({
+      groupName: h.group,
+      branch: branchName(h.group),
+      prNumber: null,
+      skipped: true,
+    });
   }
 
   if (batchesToProcess.length > 0) {

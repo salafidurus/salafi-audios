@@ -23,6 +23,7 @@ mock.module("./utils/npm", () => ({
       prisma: "7.4.1",
       typescript: "5.6.3",
       "@babel/runtime": "7.25.0",
+      "@babel/core": "8.0.1",
     };
     return Promise.resolve(versions[name] ?? null);
   }),
@@ -157,6 +158,59 @@ describe("checkCatalog", () => {
     expect(ts.group).toBe("typescript");
     const babel = result.find((c) => c.packageName === "@babel/runtime")!;
     expect(babel.group).toBe("@babel/runtime");
+  });
+});
+
+describe("updateTypes cap", () => {
+  const capCfg: PkupdateConfig = {
+    groups: {
+      babel: { patterns: ["@babel/core", "@babel/runtime"], updateTypes: ["minor", "patch"] },
+      nestjs: { patterns: ["@nestjs/*"] },
+      typescript: { patterns: ["typescript"], updateTypes: ["minor", "patch"] },
+    },
+    skip: [],
+    never: [],
+    versionLocked: [],
+    bun: { enabled: false },
+    expo: { enabled: false },
+  };
+
+  it("excludes a major bump when the group cap allows only minor/patch", async () => {
+    const dir = createTempPkg({ workspaces: { catalog: { "@babel/core": "7.29.7" } } });
+    const result = await checkCatalog(dir, capCfg);
+    expect(result).toHaveLength(0);
+  });
+
+  it("includes a patch bump when the group cap allows minor/patch", async () => {
+    const dir = createTempPkg({ workspaces: { catalog: { "@babel/core": "8.0.0" } } });
+    const result = await checkCatalog(dir, capCfg);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.group).toBe("babel");
+  });
+
+  it("does not apply the cap to groups without updateTypes", async () => {
+    const dir = createTempPkg({ workspaces: { catalog: { "@nestjs/core": "10.0.0" } } });
+    const result = await checkCatalog(dir, capCfg);
+    expect(result).toHaveLength(1);
+  });
+
+  it("groups @babel/runtime under babel via the runtime config", async () => {
+    const dir = createTempPkg({ workspaces: { catalog: { "@babel/runtime": "7.24.0" } } });
+    const result = await checkCatalog(dir, config);
+    expect(result[0]!.group).toBe("babel");
+  });
+
+  it("excludes a typescript major bump via the runtime config", async () => {
+    const dir = createTempPkg({ workspaces: { catalog: { typescript: "4.0.0" } } });
+    const result = await checkCatalog(dir, config);
+    expect(result).toHaveLength(0);
+  });
+
+  it("includes a typescript minor bump when the cap allows minor/patch", async () => {
+    const dir = createTempPkg({ workspaces: { catalog: { typescript: "5.5.0" } } });
+    const result = await checkCatalog(dir, config);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.group).toBe("typescript");
   });
 });
 
