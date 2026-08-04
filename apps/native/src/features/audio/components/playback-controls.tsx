@@ -1,10 +1,8 @@
 import { useAudio, useQueue } from "@sd/domain-audio";
 import { Play, Pause, RotateCw, RotateCcw, SkipBack, SkipForward } from "lucide-react-native";
 import React from "react";
-import { View, Pressable } from "react-native";
+import { View, Pressable, Text } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-
-import { NativeText } from "@/shared/ui";
 
 import { audioService } from "../audio-service";
 
@@ -60,9 +58,7 @@ export function PlaybackControls() {
   return (
     <View style={styles.container}>
       <Pressable onPress={handleCycleSpeed} style={styles.speedButton}>
-        <NativeText variant="caption" colorRole="muted" textStyle={{ fontWeight: "700" }}>
-          {`${speed.toFixed(2)}x`}
-        </NativeText>
+        <Text style={styles.speedText}>{speed.toFixed(2)}x</Text>
       </Pressable>
 
       <View style={styles.centerControls}>
@@ -76,11 +72,7 @@ export function PlaybackControls() {
 
         <Pressable onPress={handleSkipBackward} style={styles.controlButton}>
           {RotateCcwIcon}
-          <View style={styles.skipLabel}>
-            <NativeText variant="caption" colorRole="strong">
-              30
-            </NativeText>
-          </View>
+          <Text style={styles.skipLabel}>30</Text>
         </Pressable>
 
         <Pressable onPress={handlePlayPause} style={styles.playButton}>
@@ -89,11 +81,7 @@ export function PlaybackControls() {
 
         <Pressable onPress={handleSkipForward} style={styles.controlButton}>
           {RotateCwIcon}
-          <View style={styles.skipLabel}>
-            <NativeText variant="caption" colorRole="strong">
-              30
-            </NativeText>
-          </View>
+          <Text style={styles.skipLabel}>30</Text>
         </Pressable>
 
         <Pressable

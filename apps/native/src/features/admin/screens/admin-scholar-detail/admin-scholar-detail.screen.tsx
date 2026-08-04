@@ -1,21 +1,22 @@
-import type { AdminListingListItemDto, ScholarDetailDto } from "@sd/core-contracts";
+import type { ScholarDetailDto, AdminListingListItemDto } from "@sd/core-contracts";
 
 import { subject } from "@casl/ability";
-import { Column, RNHostView, Row } from "@expo/ui";
-import { endpoints, httpClient, useApiQuery } from "@sd/core-contracts";
+import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 import { useAbility } from "@sd/domain-account";
-import { Stack } from "expo-router";
-import { useReducer } from "react";
-import { useUnistyles } from "react-native-unistyles";
+import { useMemo, useReducer } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { StyleSheet } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
-import { DraggableList, DraggableListRow } from "@/shared/components/DraggableList";
-import { NativeButton, NativeScreenHost, NativeStateView, NativeText } from "@/shared/ui";
+import { DraggableList, type RenderItemParams } from "@/shared/components/DraggableList";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 
-import { updateCollection, updateSeries } from "../../api/admin-scholars.api";
+import { updateSeries, updateCollection } from "../../api/admin-scholars.api";
 import { CollectionSheet } from "../../components/CollectionSheet/CollectionSheet";
 import { SeriesSheet } from "../../components/SeriesSheet/SeriesSheet";
-import { useAdminCollections, useAdminSeries } from "../../hooks/use-admin-scholars";
+import { useAdminSeries, useAdminCollections } from "../../hooks/use-admin-scholars";
 
 type AdminScholarDetailScreenProps = {
   scholarSlug: string;
@@ -34,6 +35,50 @@ function reduce(state: ScreenState, patch: Partial<ScreenState>): ScreenState {
   return { ...state, ...patch };
 }
 
+function SeriesItem({
+  item,
+  drag,
+  isActive,
+}: {
+  item: AdminListingListItemDto;
+  drag: () => void;
+  isActive: boolean;
+}) {
+  const itemStyle = useMemo(
+    () => [styles.listItem, isActive ? styles.listItemActive : null],
+    [isActive],
+  );
+  return (
+    <Pressable onLongPress={drag} style={itemStyle}>
+      <MarqueeText text={item.title} style={styles.listItemTitle} />
+      <Text style={styles.listItemSubtitle}>
+        {item.format} · {item.status}
+      </Text>
+    </Pressable>
+  );
+}
+
+function CollectionItem({
+  item,
+  drag,
+  isActive,
+}: {
+  item: AdminListingListItemDto;
+  drag: () => void;
+  isActive: boolean;
+}) {
+  const itemStyle = useMemo(
+    () => [styles.listItem, isActive ? styles.listItemActive : null],
+    [isActive],
+  );
+  return (
+    <Pressable onLongPress={drag} style={itemStyle}>
+      <MarqueeText text={item.title} style={styles.listItemTitle} />
+      <Text style={styles.listItemSubtitle}>{item.status}</Text>
+    </Pressable>
+  );
+}
+
 function SectionHeader({
   title,
   isExpanded,
@@ -47,35 +92,26 @@ function SectionHeader({
   onAdd: () => void;
   canAdd: boolean;
 }) {
-  const { theme } = useUnistyles();
-
   return (
-    <Row alignment="center" spacing={theme.spacing.component.gapSm}>
-      <NativeText variant="titleMd" colorRole="strong">
-        {title}
-      </NativeText>
-      <NativeButton
-        label={isExpanded ? "Hide" : "Show"}
-        onPress={onToggle}
-        size="sm"
-        testID={`admin-scholar-${title.toLowerCase()}-toggle`}
-        variant="ghost"
-      />
+    <Pressable onPress={onToggle} style={styles.sectionHeader}>
+      <Text style={styles.sectionTitle}>{title}</Text>
       {canAdd ? (
-        <NativeButton
-          label="Add"
-          icon="add"
-          onPress={onAdd}
-          size="sm"
-          testID={`admin-scholar-${title.toLowerCase()}-add`}
-        />
+        <Pressable
+          onPress={(e) => {
+            e.stopPropagation();
+            onAdd();
+          }}
+          style={styles.addBtn}
+        >
+          <Text style={styles.addBtnText}>+ Add</Text>
+        </Pressable>
       ) : null}
-    </Row>
+      <Text style={styles.chevron}>{isExpanded ? "▲" : "▼"}</Text>
+    </Pressable>
   );
 }
 
 export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScreenProps) {
-  const { theme } = useUnistyles();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
   const { data: scholar } = useApiQuery<ScholarDetailDto>(["scholars", scholarSlug], () =>
@@ -97,8 +133,17 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     collectionOrder: null,
   });
 
-  const displaySeries = state.seriesOrder ?? seriesList ?? [];
-  const displayCollections = state.collectionOrder ?? collectionList ?? [];
+  const {
+    seriesExpanded,
+    collectionsExpanded,
+    showSeriesSheet,
+    showCollectionSheet,
+    seriesOrder,
+    collectionOrder,
+  } = state;
+
+  const displaySeries = seriesOrder ?? seriesList ?? [];
+  const displayCollections = collectionOrder ?? collectionList ?? [];
 
   const handleSeriesDragEnd = async ({
     data,
@@ -108,12 +153,12 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     from: number;
     to: number;
   }) => {
-    const previousOrder = state.seriesOrder ?? seriesList ?? [];
+    const prevOrder = seriesOrder ?? seriesList ?? [];
     dispatch({ seriesOrder: data });
     try {
       await updateSeries(data[to]!.id, { orderIndex: to });
     } catch {
-      dispatch({ seriesOrder: previousOrder });
+      dispatch({ seriesOrder: prevOrder });
     }
   };
 
@@ -125,117 +170,174 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     from: number;
     to: number;
   }) => {
-    const previousOrder = state.collectionOrder ?? collectionList ?? [];
+    const prevOrder = collectionOrder ?? collectionList ?? [];
     dispatch({ collectionOrder: data });
     try {
       await updateCollection(data[to]!.id, { orderIndex: to });
     } catch {
-      dispatch({ collectionOrder: previousOrder });
+      dispatch({ collectionOrder: prevOrder });
     }
   };
 
   if (!scholar) {
     return (
-      <NativeScreenHost testID="admin-scholar-detail-host">
-        <Column style={{ padding: theme.spacing.layout.pageX }}>
-          <NativeStateView kind="loading" title="Loading scholar…" />
-        </Column>
-      </NativeScreenHost>
+      <View style={styles.loadingContainer}>
+        <EmptyState message="Loading scholar…" variant="loading" />
+      </View>
     );
   }
 
   return (
-    <NativeScreenHost testID="admin-scholar-detail-host">
-      <Stack.Screen options={{ title: scholar.name }} />
-      <Column
-        spacing={theme.spacing.component.gapLg}
-        style={{ padding: theme.spacing.layout.pageX }}
-      >
-        <NativeText colorRole="muted" variant="bodySm">
-          {`@${scholar.slug}`}
-        </NativeText>
+    <GestureHandlerRootView style={styles.root}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.scholarName}>{scholar.name}</Text>
+        <Text style={styles.scholarSlug}>@{scholar.slug}</Text>
 
+        {/* Series section */}
         <SectionHeader
           title="Series"
-          isExpanded={state.seriesExpanded}
-          onToggle={() => dispatch({ seriesExpanded: !state.seriesExpanded })}
+          isExpanded={seriesExpanded}
+          onToggle={() => dispatch({ seriesExpanded: !seriesExpanded })}
           onAdd={() => dispatch({ showSeriesSheet: true })}
           canAdd={canAdd}
         />
-        {state.seriesExpanded &&
+        {seriesExpanded &&
           (displaySeries.length === 0 ? (
-            <NativeStateView kind="empty" title="No series added yet." />
+            <EmptyState message="No series added yet." variant="empty" />
           ) : (
-            <RNHostView matchContents>
-              <DraggableList
-                data={displaySeries}
-                keyExtractor={(item) => item.id}
-                onDragEnd={handleSeriesDragEnd}
-                scrollEnabled={false}
-                renderItem={({ item, drag, isActive }) => (
-                  <DraggableListRow
-                    drag={drag}
-                    isActive={isActive}
-                    supportingText={[item.format, item.status].filter(Boolean).join(" · ")}
-                    testID={`admin-scholar-series-row-${item.id}`}
-                    title={item.title}
-                  />
-                )}
-              />
-            </RNHostView>
+            <DraggableList
+              data={displaySeries}
+              keyExtractor={(item) => item.id}
+              onDragEnd={handleSeriesDragEnd}
+              scrollEnabled={false}
+              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
+                <SeriesItem item={item} drag={drag} isActive={isActive} />
+              )}
+            />
           ))}
 
+        {/* Collections section */}
         <SectionHeader
           title="Collections"
-          isExpanded={state.collectionsExpanded}
-          onToggle={() => dispatch({ collectionsExpanded: !state.collectionsExpanded })}
+          isExpanded={collectionsExpanded}
+          onToggle={() => dispatch({ collectionsExpanded: !collectionsExpanded })}
           onAdd={() => dispatch({ showCollectionSheet: true })}
           canAdd={canAdd}
         />
-        {state.collectionsExpanded &&
+        {collectionsExpanded &&
           (displayCollections.length === 0 ? (
-            <NativeStateView kind="empty" title="No collections added yet." />
+            <EmptyState message="No collections added yet." variant="empty" />
           ) : (
-            <RNHostView matchContents>
-              <DraggableList
-                data={displayCollections}
-                keyExtractor={(item) => item.id}
-                onDragEnd={handleCollectionDragEnd}
-                scrollEnabled={false}
-                renderItem={({ item, drag, isActive }) => (
-                  <DraggableListRow
-                    drag={drag}
-                    isActive={isActive}
-                    supportingText={item.status}
-                    testID={`admin-scholar-collection-row-${item.id}`}
-                    title={item.title}
-                  />
-                )}
-              />
-            </RNHostView>
+            <DraggableList
+              data={displayCollections}
+              keyExtractor={(item) => item.id}
+              onDragEnd={handleCollectionDragEnd}
+              scrollEnabled={false}
+              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
+                <CollectionItem item={item} drag={drag} isActive={isActive} />
+              )}
+            />
           ))}
-      </Column>
 
-      <SeriesSheet
-        isOpen={state.showSeriesSheet}
-        scholarId={scholarId}
-        scholarSlug={scholarSlug}
-        onClose={() => dispatch({ showSeriesSheet: false })}
-        onSaved={() => {
-          dispatch({ showSeriesSheet: false, seriesOrder: null });
-          refetchSeries();
-        }}
-      />
-      <CollectionSheet
-        isOpen={state.showCollectionSheet}
-        scholarId={scholarId}
-        scholarSlug={scholarSlug}
-        onClose={() => dispatch({ showCollectionSheet: false })}
-        onSaved={() => {
-          dispatch({ showCollectionSheet: false, collectionOrder: null });
-          refetchCollections();
-        }}
-      />
-    </NativeScreenHost>
+        <SeriesSheet
+          isOpen={showSeriesSheet}
+          scholarId={scholarId}
+          scholarSlug={scholarSlug}
+          onClose={() => dispatch({ showSeriesSheet: false })}
+          onSaved={() => {
+            dispatch({ showSeriesSheet: false, seriesOrder: null });
+            refetchSeries();
+          }}
+        />
+        <CollectionSheet
+          isOpen={showCollectionSheet}
+          scholarId={scholarId}
+          scholarSlug={scholarSlug}
+          onClose={() => dispatch({ showCollectionSheet: false })}
+          onSaved={() => {
+            dispatch({ showCollectionSheet: false, collectionOrder: null });
+            refetchCollections();
+          }}
+        />
+      </ScrollView>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  root: {
+    flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
+  },
+  scrollContent: {
+    padding: theme.spacing.scale.lg,
+    paddingBottom: theme.spacing.scale["4xl"],
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  scholarName: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: theme.spacing.scale.xs,
+    color: theme.colors.content.strong,
+  },
+  scholarSlug: {
+    fontSize: 13,
+    color: theme.colors.content.muted,
+    marginBottom: theme.spacing.scale["2xl"],
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: theme.spacing.scale.md,
+    borderBottomWidth: theme.border.width.default,
+    borderColor: theme.colors.border.subtle,
+    marginBottom: theme.spacing.scale.sm,
+  },
+  sectionTitle: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.content.strong,
+  },
+  addBtn: {
+    paddingHorizontal: theme.spacing.scale.sm,
+    paddingVertical: theme.spacing.scale.xs,
+    backgroundColor: theme.colors.action.primary,
+    borderRadius: theme.radius.scale.sm,
+    marginEnd: theme.spacing.scale.sm,
+  },
+  addBtnText: {
+    color: theme.colors.content.onPrimary,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  chevron: {
+    color: theme.colors.content.muted,
+  },
+  listItem: {
+    padding: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.border.subtle,
+    borderRadius: theme.radius.scale.sm,
+    marginBottom: theme.spacing.scale.sm,
+    backgroundColor: theme.colors.surface.default,
+    opacity: 1,
+  },
+  listItemActive: {
+    borderColor: theme.colors.action.primary,
+    backgroundColor: theme.colors.surface.primarySubtle,
+    opacity: 0.9,
+  },
+  listItemTitle: {
+    fontWeight: "600",
+    color: theme.colors.content.strong,
+  },
+  listItemSubtitle: {
+    fontSize: 12,
+    color: theme.colors.content.muted,
+  },
+}));

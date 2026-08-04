@@ -1,14 +1,14 @@
 import type { AdminListingDetailDto } from "@sd/core-contracts";
 
 import { subject } from "@casl/ability";
-import { BottomSheet, Column, Row, ScrollView } from "@expo/ui";
 import { useAbility } from "@sd/domain-account";
 import { useReducer } from "react";
-import { useUnistyles } from "react-native-unistyles";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { NativeButton, NativeFormField, NativeText } from "@/shared/ui";
+import { TextInput } from "@/shared/components/TextInput/TextInput";
 
 import { createSeries, updateSeries } from "../../api/admin-scholars.api";
 
@@ -53,6 +53,8 @@ export function SeriesSheet({
     error: null,
   });
 
+  if (!isOpen) return null;
+
   const { title, description, language, isSaving, error } = state;
   const canSave = ability.can(series ? "update" : "create", subject("Listing", { scholarSlug }));
 
@@ -61,93 +63,138 @@ export function SeriesSheet({
       dispatch({ error: t("admin.seriesEdit.titleRequired", "Title is required") });
       return;
     }
-
     dispatch({ isSaving: true, error: null });
     try {
       if (series) {
         await updateSeries(series.id, {
           title,
           description: description || undefined,
-          language: (language || undefined) as never,
+          language: (language || undefined) as any,
         });
       } else {
-        await createSeries({ scholarId, title, format: "series" });
+        await createSeries({
+          scholarId,
+          title,
+          format: "series",
+        });
       }
       onSaved();
-    } catch (saveError) {
-      dispatch({ error: (saveError as Error).message });
+    } catch (e) {
+      dispatch({ error: (e as Error).message });
     } finally {
       dispatch({ isSaving: false });
     }
   };
 
-  const titleLabel = series
-    ? t("admin.seriesEdit.editTitle", "Edit Series")
-    : t("admin.seriesEdit.newTitle", "New Series");
-
   return (
-    <BottomSheet
-      isPresented={isOpen}
-      onDismiss={onClose}
-      showDragIndicator
-      snapPoints={["full"]}
-      testID="series-sheet"
-    >
-      <ScrollView showsIndicators={false}>
-        <Column
-          spacing={theme.spacing.component.gapLg}
-          style={{ padding: theme.spacing.component.panelPadding }}
-        >
-          <Column spacing={theme.spacing.scale.xs}>
-            <NativeText variant="titleLg" colorRole="strong">
-              {titleLabel}
-            </NativeText>
-            <NativeText variant="bodySm" colorRole="muted">
-              Organize a sequence of recordings for this scholar.
-            </NativeText>
-          </Column>
-
-          <Column spacing={theme.spacing.component.gapMd}>
-            <NativeFormField
-              label={t("admin.seriesEdit.titleLabel", "Title *")}
-              value={title}
-              onChangeText={(nextTitle) => dispatch({ title: nextTitle })}
-              testID="series-sheet-title"
-            />
-            <NativeFormField
-              label={t("admin.seriesEdit.descriptionLabel", "Description")}
-              value={description}
-              onChangeText={(nextDescription) => dispatch({ description: nextDescription })}
-              multiline
-              numberOfLines={3}
-              testID="series-sheet-description"
-            />
-            <NativeFormField
-              label={t("admin.seriesEdit.languageLabel", "Language")}
-              value={language}
-              onChangeText={(nextLanguage) => dispatch({ language: nextLanguage })}
-              placeholder="e.g. ar, en"
-              testID="series-sheet-language"
-            />
-            {error ? (
-              <NativeText variant="bodySm" colorRole="danger">
-                {error}
-              </NativeText>
-            ) : null}
-          </Column>
-
-          <Row alignment="end" spacing={theme.spacing.component.gapSm}>
-            <NativeButton label={t("common.cancel", "Cancel")} variant="ghost" onPress={onClose} />
-            <NativeButton
-              label={t("common.save", "Save")}
-              icon="success"
-              loading={isSaving}
-              disabled={isSaving || !canSave}
-              onPress={() => void handleSave()}
-            />
-          </Row>
-        </Column>
+    <View style={styles.container}>
+      <Text style={styles.title}>
+        {series
+          ? t("admin.seriesEdit.editTitle", "Edit Series")
+          : t("admin.seriesEdit.newTitle", "New Series")}
+      </Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Text style={styles.label}>{t("admin.seriesEdit.titleLabel", "Title *")}</Text>
+        <TextInput
+          value={title}
+          onChangeText={(v) => dispatch({ title: v })}
+          style={styles.input}
+        />
+        <Text style={styles.label}>{t("admin.seriesEdit.descriptionLabel", "Description")}</Text>
+        <TextInput
+          value={description}
+          onChangeText={(v) => dispatch({ description: v })}
+          multiline
+          numberOfLines={3}
+          style={styles.input}
+        />
+        <Text style={styles.label}>{t("admin.seriesEdit.languageLabel", "Language")}</Text>
+        <TextInput
+          value={language}
+          onChangeText={(v) => dispatch({ language: v })}
+          placeholder="e.g. ar, en"
+          placeholderTextColor={theme.colors.content.muted}
+          style={styles.input}
+        />
+        {error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>
-    </BottomSheet>
+      <View style={styles.buttonRow}>
+        <Pressable onPress={handleSave} disabled={isSaving || !canSave} style={styles.saveBtn}>
+          {isSaving ? (
+            <ActivityIndicator color={theme.colors.content.onPrimary} />
+          ) : (
+            <Text style={styles.saveBtnText}>{t("common.save", "Save")}</Text>
+          )}
+        </Pressable>
+        <Pressable onPress={onClose} style={styles.cancelBtn}>
+          <Text style={styles.cancelBtnText}>{t("common.cancel", "Cancel")}</Text>
+        </Pressable>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  container: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: theme.colors.surface.elevated,
+    borderTopLeftRadius: theme.radius.scale.lg,
+    borderTopRightRadius: theme.radius.scale.lg,
+    padding: theme.spacing.scale.lg,
+    maxHeight: "80%",
+  },
+  title: {
+    fontSize: 17,
+    fontWeight: "600",
+    marginBottom: theme.spacing.scale.lg,
+    color: theme.colors.content.strong,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: theme.spacing.scale.xs,
+    color: theme.colors.content.default,
+  },
+  input: {
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.border.default,
+    borderRadius: theme.radius.scale.sm,
+    paddingVertical: theme.spacing.scale.sm,
+    paddingHorizontal: theme.spacing.scale.md,
+    marginBottom: theme.spacing.scale.md,
+    color: theme.colors.content.default,
+  },
+  errorText: {
+    color: theme.colors.state.danger,
+    marginBottom: theme.spacing.scale.sm,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    gap: theme.spacing.scale.sm,
+    marginTop: theme.spacing.scale.md,
+  },
+  saveBtn: {
+    flex: 1,
+    padding: theme.spacing.scale.md,
+    backgroundColor: theme.colors.action.primary,
+    borderRadius: theme.radius.scale.sm,
+    alignItems: "center",
+  },
+  saveBtnText: {
+    color: theme.colors.content.onPrimary,
+    fontWeight: "600",
+  },
+  cancelBtn: {
+    padding: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.border.default,
+    borderRadius: theme.radius.scale.sm,
+    alignItems: "center",
+  },
+  cancelBtnText: {
+    color: theme.colors.content.default,
+  },
+}));

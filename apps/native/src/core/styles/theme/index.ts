@@ -10,7 +10,6 @@ import { spacingNative, type SpacingNative } from "./spacing";
 import { typographyNative, type TypographyNative } from "./typography";
 
 export type AppThemeNative = {
-  mode: "light" | "dark";
   colors: AppColors;
   recipes: AccentRecipesNative;
   spacing: SpacingNative;
@@ -25,7 +24,6 @@ export const createThemeNative = (mode: "light" | "dark"): AppThemeNative => {
   const colors = createColors(mode);
 
   return {
-    mode,
     colors,
     recipes: createAccentRecipesNative(colors, colors.border.focus),
     spacing: spacingNative,
