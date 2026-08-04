@@ -1,13 +1,16 @@
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
-import { Column } from "@expo/ui";
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 import { Stack } from "expo-router";
 import { useState } from "react";
-import { useUnistyles } from "react-native-unistyles";
+import { ScrollView, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { NativeList, NativeListItem, NativeScreenHost, NativeStateView } from "@/shared/ui";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
+import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 
 import { filterScholars } from "./filter-scholars";
 
@@ -34,33 +37,63 @@ export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreen
   };
 
   return (
-    <NativeScreenHost testID="admin-scholars-host">
+    <View style={styles.container}>
       <Stack.Screen options={headerSearchOptions} />
-      <Column
-        spacing={theme.spacing.component.gapLg}
-        style={{
-          width: "100%",
-          padding: theme.spacing.layout.pageX,
-        }}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <AppText variant="titleLg">Scholars</AppText>
+        </View>
         {isLoading ? (
-          <NativeStateView kind="loading" title="Loading…" />
+          <EmptyState message="Loading…" variant="loading" />
         ) : scholars.length === 0 ? (
-          <NativeStateView kind="empty" title="No scholars found." />
+          <EmptyState message="No scholars found." variant="empty" />
         ) : (
-          <NativeList testID="admin-scholars-list">
-            {scholars.map((item) => (
-              <NativeListItem
+          <List>
+            {scholars.map((item, index) => (
+              <List.Item
                 key={item.id}
                 onPress={() => onNavigateToScholar(item.slug)}
-                title={item.name}
-                supportingText={`@${item.slug}`}
-                testID={`admin-scholar-row-${item.id}`}
-              />
+                hideBorder={index === scholars.length - 1}
+              >
+                <View style={styles.rowContent}>
+                  <MarqueeText text={item.name} variant="bodyMd" style={styles.rowName} />
+                  <AppText variant="caption" style={styles.rowSlug}>
+                    @{item.slug}
+                  </AppText>
+                </View>
+              </List.Item>
             ))}
-          </NativeList>
+          </List>
         )}
-      </Column>
-    </NativeScreenHost>
+      </ScrollView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
+  },
+  scrollContent: {
+    padding: theme.spacing.scale.md,
+  },
+  header: {
+    paddingVertical: theme.spacing.scale.md,
+  },
+  loadingText: {
+    textAlign: "center",
+    marginTop: theme.spacing.scale["3xl"],
+    color: theme.colors.content.muted,
+  },
+  rowContent: {
+    gap: theme.spacing.scale.xs,
+  },
+  rowName: {
+    fontWeight: "600",
+    color: theme.colors.content.strong,
+  },
+  rowSlug: {
+    color: theme.colors.content.muted,
+  },
+}));
