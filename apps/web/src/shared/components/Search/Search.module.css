@@ -162,9 +162,9 @@ button.barInputWrapper:focus-visible {
 }
 
 .filterChip.selected {
-  background-color: var(--input-surface-focus);
-  border-color: var(--input-border-focus);
-  color: var(--content-primary);
+  background-color: var(--surface-selected);
+  border-color: var(--border-primary);
+  color: var(--content-strong);
 }
 
 .filterChip.selected:active {

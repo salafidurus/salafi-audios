@@ -111,11 +111,11 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
 
       <List.Item.Actions>
         <Button
-          variant={!isMobile ? "ghost" : "outline"}
+          variant="primary"
           size={!isMobile ? "icon" : "sm"}
           fullWidth={isMobile}
           aria-label={`Play ${item.title}`}
-          icon={<Play size={16} fill="currentColor" style={{ color: "var(--content-primary)" }} />}
+          icon={<Play size={16} fill="currentColor" />}
           onClick={handlePlayClick}
           disabled={isLoading}
         >
