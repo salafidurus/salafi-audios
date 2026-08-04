@@ -5,6 +5,7 @@ import type { UpdateCandidate } from "./utils/ui";
 
 import { config, type PkupdateConfig } from "./pkg-update.config";
 import { fetchLatestVersion } from "./utils/npm";
+import { isNewer } from "./utils/semver";
 
 export function filterByGroups(depName: string, groups: PkupdateConfig["groups"]): string | null {
   for (const [groupName, group] of Object.entries(groups)) {
@@ -26,16 +27,6 @@ export function dedupeCandidates(candidates: UpdateCandidate[]): UpdateCandidate
     }
   }
   return Array.from(map.values());
-}
-
-function isNewer(a: string, b: string): boolean {
-  const aParts = a.split(".").map(Number);
-  const bParts = b.split(".").map(Number);
-  for (let i = 0; i < 3; i++) {
-    if ((aParts[i] ?? 0) > (bParts[i] ?? 0)) return true;
-    if ((aParts[i] ?? 0) < (bParts[i] ?? 0)) return false;
-  }
-  return false;
 }
 
 function readJson(path: string): Record<string, unknown> {

@@ -2,6 +2,8 @@ import { spawnSync } from "child_process";
 import { existsSync, mkdirSync, rmSync } from "fs";
 import { resolve } from "path";
 
+import type { UpdateCandidate } from "./utils/ui";
+
 import { runCatalogFix } from "../catalog/scanner/fix";
 import { applyUpdate } from "./apply";
 import { checkAll } from "./check";
@@ -15,7 +17,7 @@ import {
 } from "./utils/cache";
 import { buildChangelogSection } from "./utils/changelog";
 import { retry, type RetryOptions } from "./utils/retry";
-import { categorizeBump, type UpdateCandidate } from "./utils/ui";
+import { categorizeBump } from "./utils/semver";
 
 const __ciMain = import.meta.path.replace(/\\/g, "/") === process.argv[1]?.replace(/\\/g, "/");
 

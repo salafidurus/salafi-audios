@@ -1,26 +1,14 @@
 import { confirm, multiselect, note, outro } from "@clack/prompts";
 import color from "picocolors";
 
+import { categorizeBump } from "./semver";
+
 export interface UpdateCandidate {
   type: "catalog" | "bun" | "expo";
   packageName: string;
   currentVersion: string;
   latestVersion: string;
   group?: string;
-}
-
-export function categorizeBump(
-  current: string,
-  latest: string,
-): "major" | "minor" | "patch" | null {
-  const stripRange = (v: string) => v.replace(/^[\^~>=<]+\s*/, "");
-  const cur = stripRange(current).split(".").map(Number);
-  const lat = stripRange(latest).split(".").map(Number);
-  if (cur.length < 2 || lat.length < 2) return null;
-  if (cur[0]! < lat[0]!) return "major";
-  if (cur[0]! === lat[0]! && cur[1]! < lat[1]!) return "minor";
-  if (cur[0]! === lat[0]! && cur[1]! === lat[1]! && cur[2]! < lat[2]!) return "patch";
-  return null;
 }
 
 export function formatVersionDiff(current: string, latest: string): string {
