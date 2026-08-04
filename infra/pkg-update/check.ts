@@ -5,7 +5,7 @@ import type { UpdateCandidate } from "./utils/ui";
 
 import { config, type PkupdateConfig } from "./pkg-update.config";
 import { fetchLatestVersion } from "./utils/npm";
-import { isNewer } from "./utils/semver";
+import { categorizeBump, isNewer } from "./utils/semver";
 
 export function filterByGroups(depName: string, groups: PkupdateConfig["groups"]): string | null {
   for (const [groupName, group] of Object.entries(groups)) {
@@ -69,6 +69,11 @@ export async function checkCatalog(
 
   const versions = await Promise.all(entries.map(([pkg]) => fetchLatestVersion(pkg)));
 
+  const updateTypeSets = new Map<string, ReadonlySet<string> | undefined>();
+  for (const [name, g] of Object.entries(cfg.groups)) {
+    updateTypeSets.set(name, g.updateTypes ? new Set(g.updateTypes) : undefined);
+  }
+
   const results: UpdateCandidate[] = [];
   for (let i = 0; i < entries.length; i++) {
     const [pkg, version] = entries[i]!;
@@ -79,6 +84,11 @@ export async function checkCatalog(
     if (latest === raw) continue;
 
     const group = filterByGroups(pkg, cfg.groups);
+    const allowed = group ? updateTypeSets.get(group) : undefined;
+    if (allowed) {
+      const bump = categorizeBump(raw, latest);
+      if (bump && !allowed.has(bump)) continue;
+    }
     const isNever = matchesNever(pkg, cfg.never);
     results.push({
       type: "catalog",

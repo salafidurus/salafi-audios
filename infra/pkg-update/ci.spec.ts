@@ -83,18 +83,28 @@ describe("groupCandidates", () => {
 
   it("includes dynamic groups (e.g. never packages) after known groups", () => {
     const a = makeCandidate({ group: "ungrouped" });
-    const b = makeCandidate({ group: "typescript" });
+    const b = makeCandidate({ group: "dynamic-pkg" });
     const c = makeCandidate({ group: "vitest" });
 
     const batches = groupCandidates([a, b, c]);
     const names = batches.map((b) => b.groupName);
 
-    expect(names).toContain("typescript");
-    const tsIdx = names.indexOf("typescript");
+    expect(names).toContain("dynamic-pkg");
+    const dynIdx = names.indexOf("dynamic-pkg");
     const ungroupedIdx = names.indexOf("ungrouped");
     const vitestIdx = names.indexOf("vitest");
-    expect(vitestIdx).toBeLessThan(tsIdx);
-    expect(ungroupedIdx).toBeLessThan(tsIdx);
+    expect(vitestIdx).toBeLessThan(dynIdx);
+    expect(ungroupedIdx).toBeLessThan(dynIdx);
+  });
+
+  it("sorts configured groups alphabetically, including typescript", () => {
+    const a = makeCandidate({ group: "typescript" });
+    const b = makeCandidate({ group: "vitest" });
+
+    const batches = groupCandidates([a, b]);
+    const names = batches.map((x) => x.groupName);
+
+    expect(names.indexOf("typescript")).toBeLessThan(names.indexOf("vitest"));
   });
 });
 

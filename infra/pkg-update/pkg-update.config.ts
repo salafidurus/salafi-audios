@@ -1,5 +1,5 @@
 export interface PkupdateConfig {
-  groups: Record<string, { patterns: string[] }>;
+  groups: Record<string, { patterns: string[]; updateTypes?: ("major" | "minor" | "patch")[] }>;
   skip: string[];
   never: string[];
   versionLocked: string[];
@@ -18,6 +18,11 @@ export const config: PkupdateConfig = {
     "better-auth": { patterns: ["better-auth", "@better-auth/*"] },
     turbo: { patterns: ["turbo"] },
     testing: { patterns: ["@testing-library/*"] },
+    typescript: { patterns: ["typescript"], updateTypes: ["minor", "patch"] },
+    babel: {
+      patterns: ["@babel/core", "@babel/runtime"],
+      updateTypes: ["minor", "patch"],
+    },
     expo: {
       patterns: [
         "expo",
@@ -38,7 +43,7 @@ export const config: PkupdateConfig = {
     },
   },
   skip: [],
-  never: ["typescript", "@babel/runtime"],
+  never: ["typescript"],
   versionLocked: ["better-auth", "prisma"],
   bun: { enabled: true },
   expo: { enabled: true },
