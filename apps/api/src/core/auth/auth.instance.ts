@@ -1,9 +1,9 @@
+import { expo } from '@better-auth/expo';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '@sd/core-db';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin, bearer, customSession } from 'better-auth/plugins';
-import { expo } from '@better-auth/expo';
-import { PrismaClient } from '@sd/core-db';
-import { PrismaPg } from '@prisma/adapter-pg';
 import type { ConfigService } from '../config/config.service';
 
 let prisma: PrismaClient | undefined;
@@ -77,18 +77,23 @@ function createAuthInstance(config: ConfigService) {
     session: {
       expiresIn: 60 * 60 * 24 * 7, // 7 days
       updateAge: 60 * 60 * 24, // Refresh if > 1 day old
+      // sameSite: "none", // Allow cross-site cookies for native apps
     },
 
     advanced: {
       // Cross-subdomain cookie sharing: allows session from api.* to be sent
       // to web app (for OAuth callbacks)
       crossSubDomainCookies: {
-        enabled: config.NODE_ENV !== 'development',
+        enabled: true,
         domain: config.COOKIE_DOMAIN,
       },
       // HTTPS-only cookies in production (XSS + MITM mitigation)
       useSecureCookies: config.NODE_ENV === 'production',
-      // HttpOnly, SameSite=Lax are already defaults
+      // Allow cross-site cookies in dev (localhost:3000 -> localhost:4000)
+      defaultCookieAttributes: {
+        sameSite: config.NODE_ENV === 'production' ? 'lax' : 'none',
+        secure: config.NODE_ENV === 'production',
+      },
     },
   });
 }
