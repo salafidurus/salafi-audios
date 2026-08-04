@@ -12,13 +12,19 @@
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
+  border: 3px solid var(--border-secondary);
+  box-shadow: 0 4px 24px color-mix(in srgb, var(--accent-primary-subtle-surface) 70%, transparent);
 }
 
 .avatarFallback {
   width: 112px;
   height: 112px;
   border-radius: 50%;
-  background-color: var(--surface-primary-subtle);
+  background: linear-gradient(
+    135deg,
+    var(--surface-subtle),
+    var(--accent-primary-subtle-surface)
+  );
   color: var(--content-primary-strong);
   display: flex;
   align-items: center;
@@ -27,6 +33,7 @@
   font-size: 38px;
   font-weight: 600;
   flex-shrink: 0;
+  border: 3px solid var(--border-secondary);
 }
 
 .infoColumn {
@@ -83,9 +90,9 @@
 }
 
 .socialLink:hover {
-  color: var(--content-default);
-  border-color: var(--border-default);
-  background-color: var(--surface-hover);
+  color: var(--content-primary-strong);
+  border-color: var(--border-primary);
+  background-color: var(--surface-selected);
 }
 
 @media (max-width: 640px) {
