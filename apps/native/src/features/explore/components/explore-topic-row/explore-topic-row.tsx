@@ -4,13 +4,12 @@ import type { ListRenderItemInfo } from "react-native";
 import { pickContentField } from "@sd/core-i18n";
 import { useFormattedScholarName } from "@sd/domain-content";
 import { useCallback } from "react";
-import { FlatList, Pressable, View } from "react-native";
+import { View, Text, FlatList, Pressable } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { MarqueeText } from "@/shared/components/MarqueeText";
-import { NativeText } from "@/shared/ui";
 
 export type ExploreTopicRowProps = {
   topicName: string;
@@ -32,14 +31,12 @@ function TopicCard({ item, showOriginal, onItemPress }: TopicCardProps) {
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
       onPress={() => onItemPress?.(item.slug)}
     >
-      <NativeText variant="titleMd" colorRole="strong" numberOfLines={2}>
+      <Text style={styles.title} numberOfLines={2}>
         {title}
-      </NativeText>
+      </Text>
       <MarqueeText text={scholarName} variant="caption" style={styles.scholar} />
       {item.durationSeconds ? (
-        <NativeText variant="caption" colorRole="muted">
-          {`${String(Math.floor(item.durationSeconds / 60))}m`}
-        </NativeText>
+        <Text style={styles.duration}>{Math.floor(item.durationSeconds / 60)}m</Text>
       ) : null}
     </Pressable>
   );
@@ -60,9 +57,9 @@ export function ExploreTopicRow({ topicName, items, onItemPress }: ExploreTopicR
 
   return (
     <View style={styles.container}>
-      <NativeText variant="titleMd" colorRole="strong">
+      <Text style={styles.heading}>
         {t("feed.newInTopic", "New in {{topic}}", { topic: topicName })}
-      </NativeText>
+      </Text>
       <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -77,8 +74,14 @@ export function ExploreTopicRow({ topicName, items, onItemPress }: ExploreTopicR
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    gap: theme.spacing.scale.sm,
     marginBottom: theme.spacing.scale.lg,
+  },
+  heading: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: theme.spacing.scale.md,
+    marginStart: theme.spacing.scale.sm,
+    color: theme.colors.content.strong,
   },
   listContent: {
     paddingHorizontal: theme.spacing.scale.sm,
@@ -91,12 +94,23 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.colors.border.default,
     borderRadius: theme.radius.component.panel,
     backgroundColor: theme.colors.surface.default,
-    gap: theme.spacing.scale.xs,
   },
   cardPressed: {
     backgroundColor: theme.colors.surface.subtle,
   },
+  title: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginBottom: theme.spacing.scale.xs,
+    lineHeight: 20,
+    color: theme.colors.content.strong,
+  },
   scholar: {
+    fontSize: 12,
+    color: theme.colors.content.muted,
+    marginBottom: theme.spacing.scale.xs,
+  },
+  duration: {
     fontSize: 12,
     color: theme.colors.content.muted,
   },
