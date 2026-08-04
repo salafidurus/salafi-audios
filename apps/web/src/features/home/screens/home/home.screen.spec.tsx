@@ -11,6 +11,10 @@ vi.mock("@sd/domain-search", () => ({
   useTopicsList: () => ({ data: [] }),
 }));
 
+vi.mock("@sd/domain-content", () => ({
+  useInfiniteScholarsList: () => ({ data: undefined }),
+}));
+
 describe("HomeScreen", () => {
   const mockOnOpenSearch = vi.fn();
   const mockOnContinueListening = vi.fn();
