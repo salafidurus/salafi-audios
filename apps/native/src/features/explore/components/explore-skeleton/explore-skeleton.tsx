@@ -1,5 +1,5 @@
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Column } from "@expo/ui";
+import { useUnistyles } from "react-native-unistyles";
 
 export type ExploreSkeletonProps = {
   /** Number of placeholder cards to render. */
@@ -7,45 +7,45 @@ export type ExploreSkeletonProps = {
 };
 
 export function ExploreSkeleton({ count = 6 }: ExploreSkeletonProps) {
+  const { theme } = useUnistyles();
+
   return (
-    <View style={styles.container}>
+    <Column spacing={theme.spacing.scale.sm} style={{ padding: theme.spacing.scale.sm }}>
       {Array.from({ length: count }).map((_, i) => (
-        <View key={`explore-skeleton-${i}`} style={styles.card}>
-          <View style={[styles.line, styles.lineTitle]} />
-          <View style={[styles.line, styles.lineMeta]} />
-          <View style={[styles.line, styles.lineSub]} />
-        </View>
+        <Column
+          key={`explore-skeleton-${i}`}
+          spacing={theme.spacing.scale.sm}
+          style={{
+            padding: theme.spacing.scale.md,
+            borderWidth: theme.border.width.default,
+            borderColor: theme.colors.border.subtle,
+            borderRadius: theme.radius.component.panelSm,
+            backgroundColor: theme.colors.surface.default,
+          }}
+        >
+          <Column
+            style={{
+              height: 16,
+              borderRadius: theme.radius.scale.xs,
+              backgroundColor: theme.colors.surface.subtle,
+            }}
+          />
+          <Column
+            style={{
+              height: 12,
+              borderRadius: theme.radius.scale.xs,
+              backgroundColor: theme.colors.surface.subtle,
+            }}
+          />
+          <Column
+            style={{
+              height: 12,
+              borderRadius: theme.radius.scale.xs,
+              backgroundColor: theme.colors.surface.subtle,
+            }}
+          />
+        </Column>
       ))}
-    </View>
+    </Column>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  container: {
-    padding: theme.spacing.scale.sm,
-    gap: theme.spacing.scale.sm,
-  },
-  card: {
-    padding: theme.spacing.scale.md,
-    gap: theme.spacing.scale.sm,
-    borderWidth: theme.border.width.default,
-    borderColor: theme.colors.border.subtle,
-    borderRadius: theme.radius.component.panelSm,
-    backgroundColor: theme.colors.surface.default,
-  },
-  line: {
-    height: 12,
-    borderRadius: theme.radius.scale.xs,
-    backgroundColor: theme.colors.surface.subtle,
-  },
-  lineTitle: {
-    height: 16,
-    width: "80%",
-  },
-  lineMeta: {
-    width: "55%",
-  },
-  lineSub: {
-    width: "35%",
-  },
-}));

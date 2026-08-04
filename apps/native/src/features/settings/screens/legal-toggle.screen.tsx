@@ -1,8 +1,11 @@
-import React, { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Column, ScrollView } from "@expo/ui";
+import { useState } from "react";
+import { useUnistyles } from "react-native-unistyles";
 
-// Terms of Use content
+import { NativeScreenHost, NativeText } from "@/shared/ui";
+
+import { SegmentedControl } from "../components/SegmentedControl/SegmentedControl";
+
 const TERMS_SECTIONS = [
   {
     heading: "Acceptance of Terms",
@@ -26,7 +29,6 @@ const TERMS_SECTIONS = [
   },
 ];
 
-// Privacy Policy content
 const PRIVACY_SECTIONS = [
   {
     heading: "Information We Collect",
@@ -48,108 +50,44 @@ const PRIVACY_SECTIONS = [
 
 type LegalTab = "terms" | "privacy";
 
+const TAB_OPTIONS: { value: LegalTab; label: string }[] = [
+  { value: "terms", label: "Terms of Use" },
+  { value: "privacy", label: "Privacy Policy" },
+];
+
 export function LegalToggleScreen() {
+  const { theme } = useUnistyles();
   const [activeTab, setActiveTab] = useState<LegalTab>("terms");
-  const styles = StyleSheet.create((theme) => ({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.surface.canvas,
-    },
-    controlContainer: {
-      padding: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.subtle,
-    },
-    segmentedControl: {
-      height: 32,
-    },
-    tabsContainer: {
-      flexDirection: "row",
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.subtle,
-    },
-    tabButton: {
-      flex: 1,
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      alignItems: "center",
-      justifyContent: "center",
-      borderBottomWidth: 2,
-      borderBottomColor: "transparent",
-    },
-    tabButtonActive: {
-      borderBottomColor: theme.colors.action.primary,
-    },
-    tabText: {
-      fontSize: 14,
-      fontWeight: "500",
-      color: theme.colors.content.muted,
-    },
-    tabTextActive: {
-      color: theme.colors.action.primary,
-    },
-    screen: {
-      flex: 1,
-    },
-    content: {
-      padding: theme.spacing.scale.lg,
-    },
-    title: {
-      fontSize: 22,
-      fontWeight: "700",
-      marginBottom: theme.spacing.scale.lg,
-      color: theme.colors.content.strong,
-    },
-    section: {
-      marginBottom: 20,
-    },
-    sectionHeading: {
-      fontSize: 17,
-      fontWeight: "600",
-      marginBottom: 6,
-      color: theme.colors.content.strong,
-    },
-    body: {
-      color: theme.colors.content.subtle,
-      lineHeight: 22,
-    },
-  }));
 
   const sections = activeTab === "terms" ? TERMS_SECTIONS : PRIVACY_SECTIONS;
   const title = activeTab === "terms" ? "Terms of Use" : "Privacy Policy";
 
   return (
-    <View style={styles.container}>
-      {/* Text tabs for both platforms */}
-      <View style={styles.tabsContainer}>
-        <View style={[styles.tabButton, activeTab === "terms" && styles.tabButtonActive]}>
-          <Text
-            style={[styles.tabText, activeTab === "terms" && styles.tabTextActive]}
-            onPress={() => setActiveTab("terms")}
-          >
-            Terms
-          </Text>
-        </View>
-        <View style={[styles.tabButton, activeTab === "privacy" && styles.tabButtonActive]}>
-          <Text
-            style={[styles.tabText, activeTab === "privacy" && styles.tabTextActive]}
-            onPress={() => setActiveTab("privacy")}
-          >
-            Privacy
-          </Text>
-        </View>
-      </View>
-
-      {/* Content */}
-      <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-        <Text style={styles.title}>{title}</Text>
-        {sections.map((section) => (
-          <View key={section.heading} style={styles.section}>
-            <Text style={styles.sectionHeading}>{section.heading}</Text>
-            <Text style={styles.body}>{section.body}</Text>
-          </View>
-        ))}
+    <NativeScreenHost testID="legal-toggle-screen-host">
+      <ScrollView showsIndicators={false}>
+        <Column
+          spacing={theme.spacing.scale.lg}
+          style={{
+            paddingHorizontal: theme.spacing.layout.pageX,
+            paddingVertical: theme.spacing.layout.pageY,
+          }}
+        >
+          <SegmentedControl options={TAB_OPTIONS} value={activeTab} onChange={setActiveTab} />
+          <NativeText variant="titleLg" colorRole="strong">
+            {title}
+          </NativeText>
+          {sections.map((section) => (
+            <Column key={section.heading} spacing={theme.spacing.scale.xs}>
+              <NativeText variant="titleMd" colorRole="strong">
+                {section.heading}
+              </NativeText>
+              <NativeText variant="bodyMd" colorRole="subtle">
+                {section.body}
+              </NativeText>
+            </Column>
+          ))}
+        </Column>
       </ScrollView>
-    </View>
+    </NativeScreenHost>
   );
 }

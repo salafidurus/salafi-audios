@@ -1,16 +1,15 @@
+import { Column, ScrollView } from "@expo/ui";
 import { useProgressStore } from "@sd/domain-audio";
 import { useLibraryProgressScreen } from "@sd/domain-content";
 import React, { useCallback } from "react";
-import { ScrollView } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { useUnistyles } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { LibraryItemRow } from "@/features/library/components/library-item-row/library-item-row";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-
-import { useAuth } from "../../../core/auth/use-auth";
-import { useTranslation } from "../../../core/i18n/use-translation";
+import { NativeScreenHost } from "@/shared/ui";
 
 export type LibraryScreenProps = {
   onNavigateToListing?: (slug: string) => void;
@@ -19,6 +18,7 @@ export type LibraryScreenProps = {
 export function LibraryScreen({ onNavigateToListing }: LibraryScreenProps) {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
   const { items, isFetching } = useLibraryProgressScreen(isAuthenticated);
   const markCompleted = useProgressStore((s) => s.actions.markCompleted);
 
@@ -31,68 +31,62 @@ export function LibraryScreen({ onNavigateToListing }: LibraryScreenProps) {
 
   if (isFetching && items.length === 0) {
     return (
-      <ScreenView center>
+      <NativeScreenHost
+        testID="library-screen-host"
+        style={{ justifyContent: "center", alignItems: "center" }}
+      >
         <EmptyState
           message={t("library.loadingSection", "Loading {{section}}…", {
             section: t("library.inProgress", "In Progress"),
           })}
           variant="loading"
         />
-      </ScreenView>
+      </NativeScreenHost>
     );
   }
 
   if (items.length === 0) {
     return (
-      <ScreenView center>
+      <NativeScreenHost
+        testID="library-screen-host"
+        style={{ justifyContent: "center", alignItems: "center" }}
+      >
         <EmptyState
           message={t("library.emptyProgress", "No lectures in progress.")}
           variant="empty"
         />
-      </ScreenView>
+      </NativeScreenHost>
     );
   }
 
   return (
-    <ScreenView>
-      <ScrollView contentContainerStyle={styles.listContent}>
-        <List>
-          {items.map((item, index) => (
-            <LibraryItemRow
-              key={item.id}
-              item={item}
-              variant="progress"
-              testID={`library-progress-row-${item.id}`}
-              onPress={() => handleItemPress(item.listingSlug)}
-              hideBorder={index === items.length - 1}
-              actions={[
-                { id: "complete", title: t("library.markAsCompleted", "Mark as Completed") },
-              ]}
-              onAction={() => markCompleted(item.listingId)}
-            />
-          ))}
-        </List>
+    <NativeScreenHost testID="library-screen-host">
+      <ScrollView showsIndicators={false}>
+        <Column
+          style={{
+            paddingHorizontal: theme.spacing.layout.pageX,
+            paddingVertical: theme.spacing.layout.pageY,
+            paddingBottom: theme.spacing.scale["2xl"],
+          }}
+        >
+          <List>
+            {items.map((item, index) => (
+              <LibraryItemRow
+                key={item.id}
+                item={item}
+                variant="progress"
+                testID={`library-progress-row-${item.id}`}
+                onPress={() => handleItemPress(item.listingSlug)}
+                hideBorder={index === items.length - 1}
+                actions={[
+                  { id: "complete", title: t("library.markAsCompleted", "Mark as Completed") },
+                ]}
+                onAction={() => markCompleted(item.listingId)}
+              />
+            ))}
+          </List>
+        </Column>
       </ScrollView>
-    </ScreenView>
+    </NativeScreenHost>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  loadingText: {
-    color: theme.colors.content.default,
-  },
-  emptyText: {
-    color: theme.colors.content.muted,
-    textAlign: "center",
-  },
-  emptyContainer: {
-    padding: theme.spacing.scale.lg,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  listContent: {
-    paddingHorizontal: theme.spacing.layout.pageX,
-    paddingVertical: theme.spacing.layout.pageY,
-    paddingBottom: theme.spacing.scale["2xl"],
-  },
-}));

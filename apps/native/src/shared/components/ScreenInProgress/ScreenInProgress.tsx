@@ -1,5 +1,4 @@
-import { Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { NativeText } from "@/shared/ui/native-text";
 
 import { ScreenView } from "../ScreenView/ScreenView";
 
@@ -14,28 +13,12 @@ export function ScreenInProgress({
 }: ScreenInProgressProps) {
   return (
     <ScreenView center>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{description}</Text>
+      <NativeText variant="titleLg" colorRole="primary">
+        {title}
+      </NativeText>
+      <NativeText variant="bodySm" colorRole="default">
+        {description}
+      </NativeText>
     </ScreenView>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  title: {
-    fontFamily: theme.typography.titleLg.fontFamily,
-    fontSize: theme.typography.titleLg.fontSize,
-    lineHeight: theme.typography.titleLg.lineHeight,
-    letterSpacing: theme.typography.titleLg.letterSpacing,
-    color: theme.colors.content.primary,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontFamily: theme.typography.bodySm.fontFamily,
-    fontSize: theme.typography.bodySm.fontSize,
-    lineHeight: theme.typography.bodySm.lineHeight,
-    letterSpacing: theme.typography.bodySm.letterSpacing,
-    color: theme.colors.content.default,
-    textAlign: "center",
-    marginTop: theme.spacing.component.gapSm,
-  },
-}));

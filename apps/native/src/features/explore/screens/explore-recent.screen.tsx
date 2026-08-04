@@ -1,17 +1,16 @@
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
-import type { ListRenderItemInfo } from "react-native";
 
+import { Column, ScrollView } from "@expo/ui";
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
 import { Stack } from "expo-router";
-import { useCallback, useState } from "react";
-import { FlatList, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useState } from "react";
+import { useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import { List } from "@/shared/components/List";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { NativeScreenHost } from "@/shared/ui";
 
 import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
 import { ExploreScholarRow } from "../components/explore-scholar-row/explore-scholar-row";
@@ -69,9 +68,9 @@ function renderFeedItem(
   return null;
 }
 
-function getItemKey(item: GroupedFeedItem, index: number): string {
-  if (item.kind === "scholar_row") return `scholar-row-${index}`;
-  if (item.kind === "topic_row") return `topic-row-${index}`;
+function getFeedItemKey(item: GroupedFeedItem): string {
+  if (item.kind === "scholar_row") return "scholar-row";
+  if (item.kind === "topic_row") return `topic-row-${item.topicName}`;
   return item.id;
 }
 
@@ -82,8 +81,7 @@ export function ExploreRecentScreen({
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const [searchQuery, setSearchQuery] = useState("");
-  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
-    useExploreRecentScreen();
+  const { data, isFetching, isError, refetch } = useExploreRecentScreen();
   const rawItems = data?.pages.flatMap((p) => p.items) ?? [];
 
   const filteredRawItems = searchQuery.trim()
@@ -103,7 +101,6 @@ export function ExploreRecentScreen({
       })
     : rawItems;
 
-  // Group sequential podcast items into a single container
   const items: GroupedFeedItem[] = [];
   let currentGroup: FeedContentItemDto[] = [];
 
@@ -131,12 +128,6 @@ export function ExploreRecentScreen({
     });
   }
 
-  const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<GroupedFeedItem>) =>
-      renderFeedItem(item, onNavigateToListing, onNavigateToScholar),
-    [onNavigateToListing, onNavigateToScholar],
-  );
-
   const headerSearchOptions = {
     headerSearchBarOptions: {
       placeholder: t("explore.searchRecent", "Search recent audios..."),
@@ -148,58 +139,48 @@ export function ExploreRecentScreen({
 
   if (isError && items.length === 0) {
     return (
-      <ScreenView center>
+      <NativeScreenHost style={{ justifyContent: "center", alignItems: "center" }}>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView
           message={getErrorStateText("feed", t)}
           onRetry={() => refetch()}
           retryLabel={t("feed.retry", "Try Again")}
         />
-      </ScreenView>
+      </NativeScreenHost>
     );
   }
 
   if (isFetching && items.length === 0) {
     return (
-      <View style={styles.screen}>
+      <NativeScreenHost testID="explore-recent-host">
         <Stack.Screen options={headerSearchOptions} />
         <ExploreSkeleton />
-      </View>
+      </NativeScreenHost>
     );
   }
 
   if (items.length === 0) {
     return (
-      <ScreenView center>
+      <NativeScreenHost style={{ justifyContent: "center", alignItems: "center" }}>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView message={getEmptyStateText("feed", t)} />
-      </ScreenView>
+      </NativeScreenHost>
     );
   }
 
   return (
-    <View style={styles.screen}>
+    <NativeScreenHost testID="explore-recent-host">
       <Stack.Screen options={headerSearchOptions} />
-      <FlatList
-        data={items}
-        keyExtractor={getItemKey}
-        renderItem={renderItem}
-        onEndReached={() => hasNextPage && fetchNextPage()}
-        onEndReachedThreshold={0.5}
-        contentContainerStyle={styles.listContent}
-        ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
-      />
-    </View>
+      <ScrollView showsIndicators={false}>
+        <Column spacing={theme.spacing.scale.md} style={{ padding: theme.spacing.scale.md }}>
+          {items.map((item) => (
+            <Column key={getFeedItemKey(item)}>
+              {renderFeedItem(item, onNavigateToListing, onNavigateToScholar)}
+            </Column>
+          ))}
+          {isFetching ? <ExploreLoadingFooter /> : null}
+        </Column>
+      </ScrollView>
+    </NativeScreenHost>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  screen: {
-    flex: 1,
-    backgroundColor: theme.colors.surface.canvas,
-  },
-  listContent: {
-    padding: theme.spacing.scale.md,
-    gap: theme.spacing.scale.md,
-  },
-}));

@@ -46,10 +46,6 @@ export type ButtonProps = {
   testID?: string;
 };
 
-// Material3's `colors` prop is the documented mechanism for overriding a
-// button's fill/content color without fighting its default chrome — unlike
-// SwiftUI's buttonStyle, it doesn't also own padding/shape, so layering a
-// border modifier on top doesn't double up the way it did on iOS.
 const VARIANT_COMPONENT: Record<
   ButtonVariant,
   typeof FilledButton | typeof OutlinedButton | typeof TextButton
@@ -136,7 +132,7 @@ export function Button({
 }
 
 const base = {
-  stretch: { width: "100%" } as ViewStyle,
+  stretch: { alignSelf: "stretch" } as ViewStyle,
 };
 
 const VALID_FONT_WEIGHTS = new Set<TextFontWeight>([

@@ -1,9 +1,9 @@
 import type { ReactElement, ReactNode } from "react";
 
+import { Column, RNHostView } from "@expo/ui";
 import { MenuView, type NativeActionEvent } from "@expo/ui/community/menu";
 import { Children, isValidElement } from "react";
-import { Pressable, type ViewStyle, type StyleProp } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { ListItemActions, type ListItemActionsProps } from "./ListItemActions";
 
@@ -12,7 +12,6 @@ export type ListItemProps = {
   onPress?: () => void;
   interactive?: boolean;
   hideBorder?: boolean;
-  style?: StyleProp<ViewStyle>;
   testID?: string;
 };
 
@@ -20,35 +19,20 @@ function isActionsElement(child: ReactNode): child is ReactElement<ListItemActio
   return isValidElement(child) && child.type === ListItemActions;
 }
 
-export function ListItem({
-  children,
-  onPress,
-  interactive = false,
-  hideBorder = false,
-  style,
-  testID,
-}: ListItemProps) {
-  const isClickable = Boolean(onPress);
-  const isInteractive = isClickable || interactive;
-
+export function ListItem({ children, hideBorder = false, testID }: ListItemProps) {
+  const { theme } = useUnistyles();
   const elements = Children.toArray(children);
   const actionsElement = elements.find(isActionsElement);
   const content = elements.filter((child) => child !== actionsElement);
 
   const row = (
-    <Pressable
-      onPress={onPress}
-      disabled={!isClickable}
+    <Column
       testID={testID}
-      style={({ pressed }) => [
-        styles.item,
-        hideBorder && styles.noBorder,
-        pressed && isInteractive && styles.pressed,
-        style,
-      ]}
+      spacing={theme.spacing.component.gapSm}
+      style={Object.assign({}, styles.item, hideBorder ? styles.noBorder : undefined)}
     >
       {content}
-    </Pressable>
+    </Column>
   );
 
   if (!actionsElement) return row;
@@ -62,7 +46,7 @@ export function ListItem({
       shouldOpenOnLongPress
       onPressAction={(event: NativeActionEvent) => onAction(event.nativeEvent.event)}
     >
-      {row}
+      <RNHostView>{row}</RNHostView>
     </MenuView>
   );
 }
@@ -74,12 +58,8 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.scale.lg,
     borderBottomWidth: theme.border.width.default,
     borderBottomColor: theme.colors.border.subtle,
-    flexDirection: "column",
   },
   noBorder: {
     borderBottomWidth: 0,
-  },
-  pressed: {
-    backgroundColor: theme.colors.surface.hover,
   },
 }));

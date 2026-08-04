@@ -1,7 +1,8 @@
-import { Pressable, View, type TextStyle } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Column } from "@expo/ui";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { NativeButton } from "@/shared/ui/native-button";
+import { NativeText } from "@/shared/ui/native-text";
 
 export type EmptyStateVariant = "empty" | "loading" | "error";
 
@@ -10,80 +11,63 @@ export type EmptyStateProps = {
   variant?: EmptyStateVariant;
   onRetry?: () => void;
   retryLabel?: string;
+  testID?: string;
 };
-
-function getTextStyleMap(): Record<EmptyStateVariant, TextStyle> {
-  return {
-    empty: styles.text_empty,
-    loading: styles.text_loading,
-    error: styles.text_error,
-  };
-}
 
 export function EmptyState({
   message,
   variant = "empty",
   onRetry,
   retryLabel = "Try Again",
+  testID,
 }: EmptyStateProps) {
+  const { theme } = useUnistyles();
+  const colorRole = variant === "error" ? "danger" : variant === "loading" ? "muted" : "subtle";
+
   return (
-    <View style={[styles.emptyState, styles[variant]]}>
-      <AppText variant="bodyMd" style={getTextStyleMap()[variant]}>
+    <Column
+      testID={testID}
+      alignment="center"
+      spacing={theme.spacing.component.gapMd}
+      style={Object.assign({}, styles.container, getVariantStyle(variant, theme))}
+    >
+      <NativeText variant="bodyMd" colorRole={colorRole}>
         {message}
-      </AppText>
+      </NativeText>
       {onRetry ? (
-        <Pressable onPress={onRetry} style={styles.retryButton}>
-          <AppText variant="labelMd" style={styles.retryLabel}>
-            {retryLabel}
-          </AppText>
-        </Pressable>
+        <NativeButton label={retryLabel} variant="outline" size="sm" onPress={onRetry} />
       ) : null}
-    </View>
+    </Column>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  emptyState: {
+  container: {
     paddingVertical: theme.spacing.scale.xl,
     paddingHorizontal: theme.spacing.scale.lg,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: theme.spacing.scale.md,
-  },
-  empty: {
-    backgroundColor: theme.colors.surface.default,
-    borderWidth: theme.border.width.default,
-    borderColor: theme.colors.border.subtle,
-    borderRadius: theme.radius.component.card,
-  },
-  loading: {},
-  error: {
-    backgroundColor: theme.colors.state.dangerSurface,
-    borderWidth: theme.border.width.default,
-    borderColor: theme.colors.state.dangerBorder,
-    borderRadius: theme.radius.component.card,
-  },
-  text_empty: {
-    color: theme.colors.content.muted,
-    textAlign: "center",
-  },
-  text_loading: {
-    color: theme.colors.content.subtle,
-    textAlign: "center",
-  },
-  text_error: {
-    color: theme.colors.state.dangerContent,
-    textAlign: "center",
-  },
-  retryButton: {
-    paddingHorizontal: theme.spacing.scale.xl,
-    paddingVertical: theme.spacing.scale.sm,
-    borderWidth: theme.border.width.default,
-    borderColor: theme.colors.action.primary,
-    borderRadius: theme.radius.scale.sm,
-  },
-  retryLabel: {
-    color: theme.colors.action.primary,
-    fontWeight: "600",
   },
 }));
+
+type Theme = ReturnType<typeof useUnistyles>["theme"];
+
+function getVariantStyle(variant: EmptyStateVariant, theme: Theme) {
+  switch (variant) {
+    case "empty":
+      return {
+        backgroundColor: theme.colors.surface.default,
+        borderWidth: theme.border.width.default,
+        borderColor: theme.colors.border.subtle,
+        borderRadius: theme.radius.component.card,
+      };
+    case "error":
+      return {
+        backgroundColor: theme.colors.state.dangerSurface,
+        borderWidth: theme.border.width.default,
+        borderColor: theme.colors.state.dangerBorder,
+        borderRadius: theme.radius.component.card,
+      };
+    case "loading":
+    default:
+      return undefined;
+  }
+}

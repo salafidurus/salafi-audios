@@ -49,8 +49,6 @@ export function Button({
   const isDisabled = disabled || loading;
   const t = getButtonTokens(variant, size, theme);
 
-  // "plain" has no built-in chrome — "filled"/"bordered" would paint their own
-  // background/padding on top of (not instead of) the modifiers below.
   const modifiers: ModifierConfig[] = [
     buttonStyle("plain"),
     padding({ horizontal: t.paddingHorizontal }),
@@ -90,7 +88,7 @@ export function Button({
 }
 
 const base = {
-  stretch: { width: "100%" } as ViewStyle,
+  stretch: { alignSelf: "stretch" } as ViewStyle,
 };
 
 const FONT_WEIGHT_MAP: Record<

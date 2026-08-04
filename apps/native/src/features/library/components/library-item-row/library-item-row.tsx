@@ -1,17 +1,16 @@
 import type { MenuAction } from "@expo/ui/community/menu";
 import type { LibraryItemDto } from "@sd/core-contracts";
 
+import { Column, Row } from "@expo/ui";
 import { pickContentField } from "@sd/core-i18n";
 import { getLibraryItemPercent } from "@sd/domain-content";
-import { Bookmark, Clock, CheckCircle } from "lucide-react-native";
-import { View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { NativeIcon, NativeProgress, NativeText } from "@/shared/ui";
 
 export type LibraryItemRowProps = {
   item: LibraryItemDto;
@@ -29,32 +28,20 @@ type LibraryItemIconProps = {
 };
 
 function LibraryItemIcon({ variant }: LibraryItemIconProps) {
-  const { theme } = useUnistyles();
-  const iconProps = { size: 20, color: theme.colors.content.muted };
-  const icon = (() => {
+  const iconName = (() => {
     switch (variant) {
       case "saved":
-        return <Bookmark {...iconProps} />;
+        return "bookmark" as const;
       case "progress":
-        return <Clock {...iconProps} />;
+        return "clock" as const;
       case "completed":
-        return <CheckCircle {...iconProps} />;
+        return "check" as const;
     }
   })();
 
   const testID = `library-item-icon-${variant}`;
 
-  return <View testID={testID}>{icon}</View>;
-}
-
-function ProgressBarFill({ percent }: { percent: number }) {
-  return (
-    <View style={styles.progressTrack} testID="library-progress-bar">
-      <View
-        style={[styles.progressFill, { width: `${Math.min(percent, 100)}%` as unknown as number }]}
-      />
-    </View>
-  );
+  return <NativeIcon testID={testID} name={iconName} size={20} colorRole="muted" />;
 }
 
 export function LibraryItemRow({
@@ -68,25 +55,25 @@ export function LibraryItemRow({
 }: LibraryItemRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
   const lectureTitle = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
   const progress = getLibraryItemPercent(item);
 
   return (
     <List.Item onPress={onPress} hideBorder={hideBorder} testID={testID}>
-      <View style={styles.rowContent}>
-        <View style={styles.iconContainer}>
+      <Row alignment="center" spacing={theme.spacing.scale.md}>
+        <Column>
           <LibraryItemIcon variant={variant} />
-        </View>
-        <View style={styles.content}>
-          <AppText variant="bodyMd" numberOfLines={2}>
+        </Column>
+        <Column spacing={theme.spacing.scale.xs}>
+          <NativeText variant="bodyMd" colorRole="strong" numberOfLines={2}>
             {lectureTitle}
-          </AppText>
+          </NativeText>
           <MarqueeText
             text={`${item.scholarName}${item.seriesTitle ? ` · ${item.seriesTitle}` : ""}`}
             variant="caption"
-            style={styles.subtitle}
           />
-          <AppText variant="xs" style={styles.meta}>
+          <NativeText variant="caption" colorRole="muted">
             {item.durationSeconds
               ? t("lecture.minutes", "{{count}} min", {
                   count: Math.round(item.durationSeconds / 60),
@@ -105,47 +92,15 @@ export function LibraryItemRow({
                   date: new Date(item.completedAt).toLocaleDateString(),
                 })}`
               : ""}
-          </AppText>
+          </NativeText>
           {variant === "progress" && progress !== null ? (
-            <ProgressBarFill percent={progress} />
+            <NativeProgress value={progress / 100} variant="linear" testID="library-progress-bar" />
           ) : null}
-        </View>
-      </View>
+        </Column>
+      </Row>
       {actions?.length && onAction ? (
         <List.Item.Actions actions={actions} onAction={onAction} />
       ) : null}
     </List.Item>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  rowContent: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: theme.spacing.scale.md,
-  },
-  iconContainer: {
-    paddingTop: theme.spacing.scale.xs,
-  },
-  content: {
-    flex: 1,
-    gap: theme.spacing.scale.xs,
-  },
-  subtitle: {
-    color: theme.colors.content.muted,
-  },
-  meta: {
-    color: theme.colors.content.muted,
-  },
-  progressTrack: {
-    height: 3,
-    backgroundColor: theme.colors.surface.subtle,
-    borderRadius: theme.radius.scale.full,
-    marginTop: theme.spacing.scale.xs,
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: theme.colors.content.strong,
-    borderRadius: theme.radius.scale.full,
-  },
-}));

@@ -1,7 +1,9 @@
-import { Text, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Column } from "@expo/ui";
+import { useUnistyles } from "react-native-unistyles";
 
-import { Button } from "../Button/Button";
+import { NativeButton } from "@/shared/ui/native-button";
+import { NativeText } from "@/shared/ui/native-text";
+
 import { ScreenView } from "../ScreenView/ScreenView";
 
 export type NotFoundStateProps = {
@@ -9,6 +11,7 @@ export type NotFoundStateProps = {
   description?: string;
   actionLabel?: string;
   onPress: () => void;
+  testID?: string;
 };
 
 export function NotFoundState({
@@ -16,45 +19,23 @@ export function NotFoundState({
   description = "The desired screen doesn't exist or may have moved.",
   actionLabel = "Return to home screen",
   onPress,
+  testID,
 }: NotFoundStateProps) {
+  const { theme } = useUnistyles();
+
   return (
-    <ScreenView center contentStyle={styles.content}>
-      <View style={styles.group}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{description}</Text>
-      </View>
-      <View style={styles.group}>
-        <Button
-          variant="primary"
-          size="md"
-          label={actionLabel}
-          onPress={onPress}
-          style={styles.button}
-        />
-      </View>
+    <ScreenView center testID={testID}>
+      <Column alignment="center" spacing={theme.spacing.component.gapXl}>
+        <Column alignment="center" spacing={theme.spacing.component.gapSm}>
+          <NativeText variant="displayMd" colorRole="strong">
+            {title}
+          </NativeText>
+          <NativeText variant="bodyMd" colorRole="muted">
+            {description}
+          </NativeText>
+        </Column>
+        <NativeButton label={actionLabel} variant="primary" size="md" onPress={onPress} />
+      </Column>
     </ScreenView>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  content: {
-    gap: theme.spacing.component.gapXl,
-  },
-  group: {
-    alignItems: "center",
-    gap: theme.spacing.component.gapSm,
-  },
-  title: {
-    ...theme.typography.displayMd,
-    color: theme.colors.content.strong,
-    textAlign: "center",
-  },
-  subtitle: {
-    ...theme.typography.bodyMd,
-    color: theme.colors.content.muted,
-    textAlign: "center",
-  },
-  button: {
-    alignSelf: "center",
-  },
-}));

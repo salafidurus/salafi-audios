@@ -1,26 +1,18 @@
-import type { TypographyVariant } from "@sd/design-tokens";
+import type { UniversalTextStyle } from "@expo/ui";
+import type { StyleProp, TextStyle } from "react-native";
 
-import { Text, type TextProps } from "react-native";
-import { useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native";
 
-export type AppTextProps = {
-  variant: TypographyVariant;
-  children: React.ReactNode;
-  style?: TextProps["style"];
-  numberOfLines?: number;
-  onLayout?: TextProps["onLayout"];
+import { NativeText, type NativeTextProps } from "@/shared/ui/native-text";
+
+export type AppTextProps = Omit<NativeTextProps, "style"> & {
+  style?: StyleProp<TextStyle> | UniversalTextStyle;
 };
 
-export function AppText({ variant, children, style, numberOfLines, onLayout }: AppTextProps) {
-  const { theme } = useUnistyles();
+export function AppText({ colorRole = "strong", style, ...props }: AppTextProps) {
+  const flattenedStyle = (style ? StyleSheet.flatten(style) : undefined) as
+    | UniversalTextStyle
+    | undefined;
 
-  return (
-    <Text
-      style={[{ color: theme.colors.content.strong, ...theme.typography[variant] }, style]}
-      numberOfLines={numberOfLines}
-      onLayout={onLayout}
-    >
-      {children}
-    </Text>
-  );
+  return <NativeText colorRole={colorRole} {...props} textStyle={flattenedStyle} />;
 }

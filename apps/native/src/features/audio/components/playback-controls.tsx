@@ -1,8 +1,10 @@
 import { useAudio, useQueue } from "@sd/domain-audio";
 import { Play, Pause, RotateCw, RotateCcw, SkipBack, SkipForward } from "lucide-react-native";
 import React from "react";
-import { View, Pressable, Text } from "react-native";
+import { View, Pressable } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
+import { NativeBridgeHost, NativeText } from "@/shared/ui";
 
 import { audioService } from "../audio-service";
 
@@ -58,7 +60,11 @@ export function PlaybackControls() {
   return (
     <View style={styles.container}>
       <Pressable onPress={handleCycleSpeed} style={styles.speedButton}>
-        <Text style={styles.speedText}>{speed.toFixed(2)}x</Text>
+        <NativeBridgeHost>
+          <NativeText variant="caption" colorRole="muted" textStyle={{ fontWeight: "700" }}>
+            {`${speed.toFixed(2)}x`}
+          </NativeText>
+        </NativeBridgeHost>
       </Pressable>
 
       <View style={styles.centerControls}>
@@ -72,7 +78,11 @@ export function PlaybackControls() {
 
         <Pressable onPress={handleSkipBackward} style={styles.controlButton}>
           {RotateCcwIcon}
-          <Text style={styles.skipLabel}>30</Text>
+          <NativeBridgeHost style={styles.skipLabel}>
+            <NativeText variant="caption" colorRole="strong">
+              30
+            </NativeText>
+          </NativeBridgeHost>
         </Pressable>
 
         <Pressable onPress={handlePlayPause} style={styles.playButton}>
@@ -81,7 +91,11 @@ export function PlaybackControls() {
 
         <Pressable onPress={handleSkipForward} style={styles.controlButton}>
           {RotateCwIcon}
-          <Text style={styles.skipLabel}>30</Text>
+          <NativeBridgeHost style={styles.skipLabel}>
+            <NativeText variant="caption" colorRole="strong">
+              30
+            </NativeText>
+          </NativeBridgeHost>
         </Pressable>
 
         <Pressable
@@ -132,9 +146,6 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
   },
   skipLabel: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: theme.colors.content.strong,
     position: "absolute",
     top: 9,
   },

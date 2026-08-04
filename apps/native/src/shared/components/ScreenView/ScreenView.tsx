@@ -1,6 +1,8 @@
-import { View, type ViewStyle } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { ViewStyle } from "react-native";
+
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
+import { NativeScreenHost } from "@/shared/ui/native-ui-host";
 
 export interface ScreenViewProps {
   children: React.ReactNode;
@@ -8,29 +10,24 @@ export interface ScreenViewProps {
   contentStyle?: ViewStyle;
   center?: boolean;
   backgroundVariant?: "canvas" | "primaryWash" | "secondaryWash" | "mixedWash";
+  testID?: string;
 }
 
 export function ScreenView({
   children,
   style,
-  contentStyle,
-  center,
   backgroundVariant = "canvas",
+  testID,
 }: ScreenViewProps) {
-  const insets = useSafeAreaInsets();
   const { theme } = useUnistyles();
 
   return (
-    <View
-      style={[
-        styles.container,
-        getBackgroundVariant(backgroundVariant, theme),
-        { paddingTop: insets.top, paddingBottom: insets.bottom },
-        style,
-      ]}
+    <NativeScreenHost
+      testID={testID}
+      style={[styles.container, getBackgroundVariant(backgroundVariant, theme), style]}
     >
-      <View style={[styles.content, center && styles.center, contentStyle]}>{children}</View>
-    </View>
+      {children}
+    </NativeScreenHost>
   );
 }
 
@@ -39,13 +36,6 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     paddingHorizontal: theme.spacing.layout.pageX,
     backgroundColor: theme.colors.surface.canvas,
-  },
-  content: {
-    flex: 1,
-  },
-  center: {
-    justifyContent: "center",
-    alignItems: "center",
   },
 }));
 

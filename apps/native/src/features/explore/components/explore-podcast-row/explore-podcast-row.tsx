@@ -2,19 +2,19 @@ import type { MenuAction } from "@expo/ui/community/menu";
 import type { FeedContentItemDto, ListingContentsDto } from "@sd/core-contracts";
 import type { Track } from "@sd/domain-audio";
 
+import { Column, Row } from "@expo/ui";
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useAudio, useListingProgress, buildTrackQueue } from "@sd/domain-audio";
 import { useFormattedScholarName, useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { useUnistyles } from "react-native-unistyles";
 
 import { audioService } from "@/features/audio";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { NativeProgress, NativeText } from "@/shared/ui";
 
 export type ExplorePodcastRowProps = {
   item: FeedContentItemDto;
@@ -34,6 +34,7 @@ export function ExplorePodcastRow({
   const scholarName = item.scholarName;
   const displayScholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
   const { progressPercent } = useListingProgress(item.id);
+  const { theme } = useUnistyles();
 
   const { isPlaying, currentTrack } = useAudio();
   const isCurrentTrack =
@@ -53,9 +54,6 @@ export function ExplorePodcastRow({
       return;
     }
 
-    // A Series/Collection row has no audio asset of its own — fetch its
-    // contents on tap and play the full ordered queue starting at the first
-    // lesson, instead of mis-tracking progress against the row's own id.
     if (item.kind !== "single") {
       try {
         const contents = await httpClient<ListingContentsDto>({
@@ -130,57 +128,29 @@ export function ExplorePodcastRow({
 
   return (
     <List.Item onPress={handlePlay} hideBorder={hideBorder} testID="podcast-row-item">
-      <View style={styles.rowContent} testID="podcast-row">
+      <Row alignment="center" spacing={theme.spacing.scale.sm} testID="podcast-row">
         <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
-        <View style={styles.content}>
+        <Column spacing={theme.spacing.scale.xs}>
           <MarqueeText text={title} variant="titleMd" />
           <MarqueeText text={displayScholarName} variant="bodySm" />
-          <View style={styles.details}>
-            <AppText variant="xs" style={styles.metaText}>
+          <Row alignment="center" spacing={theme.spacing.scale.sm}>
+            <NativeText variant="caption" colorRole="subtle">
               {durationText}
-              {durationText && publishedDateText && " · "}
+              {durationText && publishedDateText ? " · " : ""}
               {publishedDateText}
-            </AppText>
-          </View>
+            </NativeText>
+          </Row>
           {progressPercent > 0 && progressPercent < 100 ? (
-            <View style={styles.progressTrack} testID="progress-bar-track">
-              <View style={[styles.progressBar, { width: `${Math.round(progressPercent)}%` }]} />
-            </View>
+            <NativeProgress
+              value={progressPercent / 100}
+              variant="linear"
+              testID="progress-bar-track"
+            />
           ) : null}
-        </View>
-      </View>
+        </Column>
+      </Row>
 
       <List.Item.Actions actions={actions} onAction={handleAction} />
     </List.Item>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  rowContent: {
-    flexDirection: "row",
-    gap: theme.spacing.scale.sm,
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    gap: theme.spacing.scale.xs,
-  },
-  details: {
-    flexDirection: "row",
-    gap: theme.spacing.scale.sm,
-  },
-  metaText: {
-    color: theme.colors.content.subtle,
-  },
-  progressTrack: {
-    height: 3,
-    borderRadius: theme.radius.scale.full,
-    backgroundColor: theme.colors.surface.subtle,
-    overflow: "hidden",
-  },
-  progressBar: {
-    height: "100%",
-    borderRadius: theme.radius.scale.full,
-    backgroundColor: theme.colors.content.strong,
-  },
-}));

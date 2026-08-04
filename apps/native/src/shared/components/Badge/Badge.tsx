@@ -1,33 +1,25 @@
 import type { ReactNode } from "react";
 
-import { View, type ViewStyle } from "react-native";
+import { Row } from "@expo/ui";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { AppText } from "@/shared/components/AppText/AppText";
+import { NativeText } from "@/shared/ui/native-text";
 
 type RoleBadgeProps = {
   variant: "role";
   role: "admin" | "user";
+  testID?: string;
 };
 
 type StatusBadgeProps = {
   variant: "status";
   status: string;
   color?: "primary" | "secondary" | "muted" | "success" | "warning";
+  testID?: string;
 };
 
 export type BadgeProps = RoleBadgeProps | StatusBadgeProps;
-
-function getStatusStyleMap(): Record<string, ViewStyle> {
-  return {
-    primary: styles.status_primary,
-    secondary: styles.status_secondary,
-    muted: styles.status_muted,
-    success: styles.status_success,
-    warning: styles.status_warning,
-  };
-}
 
 export function Badge(props: BadgeProps): ReactNode {
   const { t } = useTranslation();
@@ -37,14 +29,22 @@ export function Badge(props: BadgeProps): ReactNode {
     const isAdmin = props.role === "admin";
     const localizedRole = t(`role.${props.role}`, props.role);
     return (
-      <View style={[styles.badge, isAdmin ? styles.adminBadge : styles.userBadge]}>
-        <AppText
+      <Row
+        testID={props.testID}
+        alignment="center"
+        spacing={theme.spacing.scale.xs}
+        style={Object.assign({}, styles.badge, isAdmin ? styles.adminBadge : styles.userBadge)}
+      >
+        <NativeText
           variant="caption"
-          style={{ color: isAdmin ? theme.colors.content.strong : theme.colors.content.default }}
+          colorRole={isAdmin ? "strong" : "default"}
+          textStyle={{
+            color: isAdmin ? theme.colors.content.strong : theme.colors.content.default,
+          }}
         >
           {localizedRole}
-        </AppText>
-      </View>
+        </NativeText>
+      </Row>
     );
   }
 
@@ -52,11 +52,16 @@ export function Badge(props: BadgeProps): ReactNode {
   const colorKey = props.color ?? "primary";
 
   return (
-    <View style={[styles.badge, getStatusStyleMap()[colorKey]]}>
-      <AppText variant="caption" style={styles.statusText}>
+    <Row
+      testID={props.testID}
+      alignment="center"
+      spacing={theme.spacing.scale.xs}
+      style={Object.assign({}, styles.badge, getStatusStyleMap(theme)[colorKey])}
+    >
+      <NativeText variant="caption" colorRole="strong">
         {props.status}
-      </AppText>
-    </View>
+      </NativeText>
+    </Row>
   );
 }
 
@@ -65,10 +70,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: 2,
     paddingHorizontal: theme.spacing.scale.sm,
     borderRadius: theme.radius.scale.xs,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.scale.xs,
-    alignSelf: "flex-start",
   },
   adminBadge: {
     backgroundColor: theme.colors.action.primary,
@@ -76,22 +77,16 @@ const styles = StyleSheet.create((theme) => ({
   userBadge: {
     backgroundColor: theme.colors.surface.hover,
   },
-  statusText: {
-    color: theme.colors.content.strong,
-  },
-  status_primary: {
-    backgroundColor: theme.colors.action.primary,
-  },
-  status_secondary: {
-    backgroundColor: theme.colors.surface.hover,
-  },
-  status_muted: {
-    backgroundColor: theme.colors.surface.subtle,
-  },
-  status_success: {
-    backgroundColor: theme.colors.state.success,
-  },
-  status_warning: {
-    backgroundColor: theme.colors.state.dangerSurface,
-  },
 }));
+
+type Theme = ReturnType<typeof useUnistyles>["theme"];
+
+function getStatusStyleMap(theme: Theme) {
+  return {
+    primary: { backgroundColor: theme.colors.action.primary },
+    secondary: { backgroundColor: theme.colors.surface.hover },
+    muted: { backgroundColor: theme.colors.surface.subtle },
+    success: { backgroundColor: theme.colors.state.success },
+    warning: { backgroundColor: theme.colors.state.dangerSurface },
+  };
+}

@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 
-import { Image } from "expo-image";
-import { View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Column } from "@expo/ui";
+import { useUnistyles } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { NativeImage } from "@/shared/ui/native-image";
+import { NativeText } from "@/shared/ui/native-text";
 
 type UserAvatarProps = {
   image?: string | null;
@@ -27,26 +27,28 @@ export function UserAvatar({
   if (fill) {
     if (image) {
       return (
-        <Image
+        <NativeImage
           source={{ uri: image }}
-          style={[styles.fillImage, { borderRadius }]}
+          bridgeStyle={{ borderRadius }}
+          style={{ flex: 1, borderRadius }}
           contentFit="cover"
           testID={testID}
         />
       );
     }
     return (
-      <View
-        style={[
-          styles.fillFallback,
-          { backgroundColor: theme.colors.surface.subtle, borderRadius },
-        ]}
+      <Column
+        alignment="center"
         testID={testID}
+        style={{
+          backgroundColor: theme.colors.surface.subtle,
+          borderRadius,
+        }}
       >
-        <AppText variant="titleMd" style={{ color: theme.colors.content.muted }}>
+        <NativeText variant="titleMd" colorRole="muted">
           {name?.charAt(0)?.toUpperCase() ?? "?"}
-        </AppText>
-      </View>
+        </NativeText>
+      </Column>
     );
   }
 
@@ -54,8 +56,9 @@ export function UserAvatar({
 
   if (image) {
     return (
-      <Image
+      <NativeImage
         source={{ uri: image }}
+        bridgeStyle={{ width: avatarSize, height: avatarSize, borderRadius }}
         style={{ width: avatarSize, height: avatarSize, borderRadius }}
         contentFit="cover"
         testID={testID}
@@ -64,41 +67,19 @@ export function UserAvatar({
   }
 
   return (
-    <View
+    <Column
       testID={testID}
-      style={[
-        styles.fallback,
-        {
-          width: avatarSize,
-          height: avatarSize,
-          borderRadius,
-          backgroundColor: theme.colors.surface.subtle,
-        },
-      ]}
+      alignment="center"
+      style={{
+        width: avatarSize,
+        height: avatarSize,
+        borderRadius,
+        backgroundColor: theme.colors.surface.subtle,
+      }}
     >
-      <AppText
-        variant="bodyLg"
-        style={{ color: theme.colors.content.muted, fontSize: avatarSize * 0.4 }}
-      >
+      <NativeText variant="bodyLg" colorRole="muted">
         {name?.charAt(0)?.toUpperCase() ?? "?"}
-      </AppText>
-    </View>
+      </NativeText>
+    </Column>
   );
 }
-
-const styles = StyleSheet.create(() => ({
-  fillImage: {
-    width: "100%",
-    height: "100%",
-  },
-  fillFallback: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  fallback: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-}));

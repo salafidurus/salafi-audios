@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
-import { View, Pressable } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Column, Row } from "@expo/ui";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { NativeText } from "@/shared/ui/native-text";
 
 export interface SettingsRowProps {
   label?: string;
@@ -14,6 +14,7 @@ export interface SettingsRowProps {
   stacked?: boolean;
   onPress?: () => void;
   hideBorder?: boolean;
+  testID?: string;
 }
 
 export function SettingsRow({
@@ -22,61 +23,68 @@ export function SettingsRow({
   children,
   fullWidth = false,
   stacked = false,
-  onPress,
   hideBorder = false,
+  testID,
 }: SettingsRowProps) {
-  const isClickable = Boolean(onPress);
+  const { theme } = useUnistyles();
 
   const labelGroup = (
-    <View style={styles.labelGroup}>
-      {label && (
-        <AppText variant="bodyMd" style={styles.label}>
+    <Column spacing={theme.spacing.scale.xs}>
+      {label ? (
+        <NativeText variant="bodyMd" colorRole="default" textStyle={styles.label}>
           {label}
-        </AppText>
-      )}
-      {sublabel && (
-        <AppText variant="caption" style={styles.sublabel}>
+        </NativeText>
+      ) : null}
+      {sublabel ? (
+        <NativeText variant="caption" colorRole="muted">
           {sublabel}
-        </AppText>
-      )}
-    </View>
+        </NativeText>
+      ) : null}
+    </Column>
   );
 
-  const content = fullWidth ? (
-    <View style={styles.fullWidthContent}>{children}</View>
-  ) : stacked ? (
-    <View style={styles.stackedContent} testID="settings-row-stacked-content">
-      {labelGroup}
-      {children && <View style={styles.stackedControl}>{children}</View>}
-    </View>
-  ) : (
-    <>
-      {labelGroup}
-      {children && <View style={styles.control}>{children}</View>}
-    </>
-  );
+  if (fullWidth) {
+    return (
+      <Row
+        testID={testID}
+        alignment="center"
+        style={Object.assign({}, styles.row, hideBorder ? styles.noBorder : undefined)}
+      >
+        <Column>{children}</Column>
+      </Row>
+    );
+  }
+
+  if (stacked) {
+    return (
+      <Row
+        testID={testID}
+        alignment="center"
+        style={Object.assign({}, styles.row, hideBorder ? styles.noBorder : undefined)}
+      >
+        <Column spacing={theme.spacing.scale.sm} testID="settings-row-stacked-content">
+          {labelGroup}
+          {children ? <Column>{children}</Column> : null}
+        </Column>
+      </Row>
+    );
+  }
 
   return (
-    <Pressable
-      onPress={onPress}
-      disabled={!isClickable}
-      style={({ pressed }) => [
-        styles.row,
-        hideBorder && styles.noBorder,
-        pressed && isClickable && styles.pressed,
-      ]}
+    <Row
+      testID={testID}
+      alignment="center"
+      spacing={theme.spacing.component.gapLg}
+      style={Object.assign({}, styles.row, hideBorder ? styles.noBorder : undefined)}
     >
-      {content}
-    </Pressable>
+      {labelGroup}
+      {children ? <Column>{children}</Column> : null}
+    </Row>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: theme.spacing.component.gapLg,
     paddingVertical: theme.spacing.scale.md,
     paddingHorizontal: theme.spacing.scale.lg,
     borderBottomWidth: theme.border.width.default,
@@ -87,34 +95,7 @@ const styles = StyleSheet.create((theme) => ({
   noBorder: {
     borderBottomWidth: 0,
   },
-  pressed: {
-    backgroundColor: theme.colors.surface.hover,
-  },
-  fullWidthContent: {
-    flex: 1,
-    width: "100%",
-  },
-  labelGroup: {
-    flex: 1,
-    gap: theme.spacing.scale.xs,
-  },
   label: {
     fontWeight: "500",
-    color: theme.colors.content.default,
-  },
-  sublabel: {
-    color: theme.colors.content.muted,
-  },
-  control: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  stackedContent: {
-    width: "100%",
-    gap: theme.spacing.scale.sm,
-  },
-  stackedControl: {
-    alignItems: "flex-start",
-    width: "100%",
   },
 }));

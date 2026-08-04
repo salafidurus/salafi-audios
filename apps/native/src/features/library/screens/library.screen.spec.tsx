@@ -54,6 +54,20 @@ jest.mock("../../../core/i18n/use-translation", () => ({
   }),
 }));
 
+jest.mock("@/shared/ui", () => {
+  const { View, Text } = require("react-native");
+  return {
+    NativeScreenHost: ({ children, testID }: { children: React.ReactNode; testID?: string }) => (
+      <View testID={testID}>{children}</View>
+    ),
+    NativeIcon: ({ testID }: { testID?: string }) => <View testID={testID} />,
+    NativeProgress: ({ testID }: { testID?: string }) => <View testID={testID} />,
+    NativeText: ({ children, testID }: { children?: React.ReactNode; testID?: string }) => (
+      <Text testID={testID}>{children}</Text>
+    ),
+  };
+});
+
 const mockedUseAuth = jest.mocked(useAuth);
 const mockedUseLibraryProgressScreen = jest.mocked(useLibraryProgressScreen);
 
@@ -89,6 +103,7 @@ describe("LibraryScreen", () => {
     await render(<LibraryScreen />);
 
     expect(screen.getByText("No lectures in progress.")).toBeTruthy();
+    expect(screen.getByTestId("library-screen-host")).toBeTruthy();
   });
 
   it("navigates to a lecture when an item is pressed", async () => {
