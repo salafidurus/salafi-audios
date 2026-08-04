@@ -1,4 +1,4 @@
-import { Column, Picker, Row, ScrollView, Switch } from "@expo/ui";
+import { Column, Row, ScrollView, Switch } from "@expo/ui";
 import { fillMaxWidth, weight } from "@expo/ui/jetpack-compose/modifiers";
 import { useCallback, useState } from "react";
 import { UnistylesRuntime, useUnistyles } from "react-native-unistyles";
@@ -8,6 +8,7 @@ import { NativeScreenHost, NativeText } from "@/shared/ui";
 
 import { ContentLanguageToggle } from "../components/content-language-toggle/content-language-toggle";
 import { LanguageSwitch } from "../components/language-switch/language-switch";
+import { SegmentedControl } from "../components/SegmentedControl/SegmentedControl";
 
 type ThemePreference = "system" | "light" | "dark";
 
@@ -96,15 +97,12 @@ export function SettingsGeneralScreen() {
             <NativeText variant="bodySm" colorRole="muted">
               {t("settings.general.displayDesc", "Choose a theme for the interface.")}
             </NativeText>
-            <Picker
-              selectedValue={themePreference}
-              onValueChange={(value) => handleThemeChange(value as ThemePreference)}
-              testID="settings-theme-control"
-            >
-              {themeOptions.map((option) => (
-                <Picker.Item key={option.value} label={option.label} value={option.value} />
-              ))}
-            </Picker>
+            <SegmentedControl
+              options={themeOptions}
+              value={themePreference}
+              onChange={handleThemeChange}
+              ariaLabel={t("settings.general.themeAria", "Theme preference")}
+            />
           </SettingsSection>
           <SettingsSection
             title={t("settings.general.notifSection", "Notifications")}

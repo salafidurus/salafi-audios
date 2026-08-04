@@ -41,15 +41,38 @@ jest.mock("../components/content-language-toggle/content-language-toggle", () =>
   ContentLanguageToggle: () => null,
 }));
 
+jest.mock("../components/SegmentedControl/SegmentedControl", () => ({
+  SegmentedControl: ({
+    options,
+    ariaLabel,
+  }: {
+    options: Array<{ label: string }>;
+    ariaLabel?: string;
+  }) => {
+    const { Text, View } = require("react-native");
+    return (
+      <View testID="theme-segmented-control" accessibilityLabel={ariaLabel}>
+        {options.map((opt) => (
+          <Text key={opt.label}>{opt.label}</Text>
+        ))}
+      </View>
+    );
+  },
+}));
+
 jest.mock("@/shared/ui", () => {
   const actual = jest.requireActual<typeof import("@/shared/ui")>("@/shared/ui");
   return { ...actual, NativeSegmentedControl: () => null };
 });
 
 describe("SettingsGeneralScreen", () => {
-  it("uses the shared Expo UI screen host", async () => {
+  it("uses the shared Expo UI screen host and SegmentedControl for theme preference", async () => {
     await render(<SettingsGeneralScreen />);
 
     expect(screen.getByTestId("settings-general-host")).toBeTruthy();
+    expect(screen.getByTestId("theme-segmented-control")).toBeTruthy();
+    expect(screen.getByText("System")).toBeTruthy();
+    expect(screen.getByText("Light")).toBeTruthy();
+    expect(screen.getByText("Dark")).toBeTruthy();
   });
 });
