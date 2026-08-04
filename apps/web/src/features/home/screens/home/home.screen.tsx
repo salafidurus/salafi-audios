@@ -1,6 +1,7 @@
 "use client";
 
 import { useContinueListening } from "@sd/domain-search";
+import { User } from "lucide-react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -23,6 +24,7 @@ export type HomeScreenProps = {
 export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProps) {
   const { recentProgress } = useContinueListening();
   const { t } = useTranslation();
+  const hasHistory = Boolean(recentProgress);
 
   return (
     <ScreenView
@@ -36,15 +38,27 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
       }}
       data-testid="home-screen-container"
     >
-      <HeroSection recentProgress={recentProgress} onResume={onContinueListening} />
-      <div className={styles.searchWrapper} data-testid="home-search-wrapper">
+      <div className={styles.topBar} data-testid="home-top-bar">
         <Search.Button
           label={t("home.searchLabel", "What do you want to listen to?")}
           onClick={onOpenSearch}
           inputWrapperClassName={styles.searchInputWrapper}
           placeholderClassName={styles.searchPlaceholder}
         />
+        <button
+          type="button"
+          className={styles.userButton}
+          aria-label={t("account.profile.title", "Account")}
+        >
+          <User size={16} />
+        </button>
       </div>
+
+      <HeroSection
+        recentProgress={recentProgress}
+        onResume={onContinueListening}
+        hasHistory={hasHistory}
+      />
       <CategoryChips />
       <ScholarMedallions />
       <RecentlyAddedSection />

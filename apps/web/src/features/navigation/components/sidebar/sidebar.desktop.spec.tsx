@@ -52,7 +52,7 @@ describe("Sidebar component", () => {
     process.env.NEXT_PUBLIC_WEB_URL = "http://localhost:3001";
   });
 
-  it("renders basic navigation links (Search, Explore, Library, Settings)", () => {
+  it("renders basic navigation links (Search, Scholars, Library, Settings)", () => {
     (useAuth as Mock<any>).mockReturnValue({
       isAuthenticated: false,
       isLoading: false,
@@ -62,9 +62,8 @@ describe("Sidebar component", () => {
 
     render(<Sidebar />);
 
-    // Basic nav checks
     expect(screen.getByText("Search")).toBeInTheDocument();
-    expect(screen.getByText("Explore")).toBeInTheDocument();
+    expect(screen.getByText("Scholars")).toBeInTheDocument();
     expect(screen.getByText("Library")).toBeInTheDocument();
     expect(screen.getByText("Settings")).toBeInTheDocument();
   });
@@ -96,9 +95,9 @@ describe("Sidebar component", () => {
     render(<Sidebar />);
 
     expect(screen.getByText("ADMIN")).toBeInTheDocument();
-    expect(screen.getByText("Home")).toBeInTheDocument();
+    expect(screen.getAllByText("Home").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Stats")).toBeInTheDocument();
-    expect(screen.getByText("Scholars")).toBeInTheDocument();
+    expect(screen.getAllByText("Scholars").length).toBeGreaterThanOrEqual(1);
     expect(screen.queryByText("Users")).not.toBeInTheDocument();
     expect(screen.getByText("Contents")).toBeInTheDocument();
   });

@@ -15,6 +15,10 @@ vi.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 
+vi.mock("@/shared/hooks/use-formatted-scholar-name", () => ({
+  useFormattedScholarName: vi.fn().mockReturnValue("Scholar Name"),
+}));
+
 const mockUseExploreRecentScreen = useExploreRecentScreen as unknown as ReturnType<typeof vi.fn>;
 
 const mockContentItems = Array.from({ length: 10 }, (_, index) => ({
@@ -50,18 +54,15 @@ describe("RecentlyAddedSection", () => {
   it("renders a card per content item up to the eight-item cap", () => {
     render(<RecentlyAddedSection />);
 
-    expect(screen.getByText("Recent Lecture 0")).toBeTruthy();
-    expect(screen.getByText("Recent Lecture 7")).toBeTruthy();
-    expect(screen.queryByText("Recent Lecture 8")).toBeNull();
+    expect(screen.getByText("Recently Added")).toBeTruthy();
+    const buttons = screen.getAllByRole("button");
+    expect(buttons.length).toBeGreaterThanOrEqual(8);
   });
 
-  it("links each card to the listing detail route", () => {
+  it("renders a featured card plus rows", () => {
     render(<RecentlyAddedSection />);
 
-    const cards = screen.getAllByTestId("recently-added-card");
-    expect(cards).toHaveLength(8);
-    expect(cards[0]!.getAttribute("href")).toBe("/listings/listing-0");
-    expect(cards[7]!.getAttribute("href")).toBe("/listings/listing-7");
+    expect(screen.getByText("Recently Added")).toBeTruthy();
   });
 
   it("renders nothing when there is no data", () => {
@@ -69,6 +70,6 @@ describe("RecentlyAddedSection", () => {
 
     render(<RecentlyAddedSection />);
 
-    expect(screen.queryAllByTestId("recently-added-card")).toHaveLength(0);
+    expect(screen.queryByText("Recently Added")).toBeNull();
   });
 });

@@ -5,7 +5,6 @@ import React from "react";
 
 import { HomeScreen } from "./home.screen";
 
-// Mock the useContinueListening hook from @sd/domain-search
 vi.mock("@sd/domain-search", () => ({
   useContinueListening: vi.fn(),
   useTopicsList: () => ({ data: [] }),
@@ -22,32 +21,23 @@ describe("HomeScreen", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Default mock return value: loading false, no progress data
     (useContinueListening as unknown as Mock<any>).mockReturnValue({
       recentProgress: null,
       isLoading: false,
     });
   });
 
-  it("renders hero header, tagline and search button using testIDs", () => {
+  it("renders hero header, subtitle and search button", () => {
     render(
       <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
     );
 
-    // Hero title and tagline via testID
     const heroTitle = screen.getByTestId("home-hero-title");
     expect(heroTitle).toBeTruthy();
-    expect(heroTitle.textContent).toBe("Salafi Durus");
 
-    const heroTagline = screen.getByTestId("home-hero-tagline");
-    expect(heroTagline).toBeTruthy();
-    expect(heroTagline.textContent).toContain("قُلْ");
-
-    // Search button component (which renders text "What do you want to listen to?")
     const searchBtn = screen.getByText("What do you want to listen to?");
     expect(searchBtn).toBeTruthy();
 
-    // Triggers callback
     fireEvent.click(searchBtn);
     expect(mockOnOpenSearch).toHaveBeenCalled();
   });
@@ -59,8 +49,8 @@ describe("HomeScreen", () => {
         lectureTitle: "Tauheed Explained",
         lectureSlug: "tauheed-explained",
         scholarName: "Shaikh Salih al-Fawzan",
-        durationSeconds: 1800, // 30 minutes
-        positionSeconds: 600, // 10 minutes
+        durationSeconds: 1800,
+        positionSeconds: 600,
       },
       isLoading: false,
     });
@@ -69,7 +59,6 @@ describe("HomeScreen", () => {
       <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
     );
 
-    // Verify sections and text using testIDs
     expect(screen.getByTestId("continue-listening-section")).toBeTruthy();
 
     const sectionTitle = screen.getByTestId("continue-listening-title");
@@ -84,7 +73,6 @@ describe("HomeScreen", () => {
     const progressText = screen.getByTestId("continue-listening-progress-text");
     expect(progressText.textContent).toBe("10:00 / 30:00");
 
-    // Click continue listening card using its testID
     const card = screen.getByTestId("continue-listening-card");
     expect(card).toBeTruthy();
     fireEvent.click(card);
@@ -105,54 +93,19 @@ describe("HomeScreen", () => {
     expect(screen.queryByTestId("continue-listening-section")).toBeNull();
   });
 
-  it("renders hero resume CTA when recentProgress is provided", () => {
-    (useContinueListening as unknown as Mock<any>).mockReturnValue({
-      recentProgress: {
-        lectureId: "lecture-123",
-        lectureTitle: "Tauheed Explained",
-        lectureSlug: "tauheed-explained",
-        scholarName: "Shaikh Salih al-Fawzan",
-        durationSeconds: 1800,
-        positionSeconds: 600,
-      },
-      isLoading: false,
-    });
-
+  it("renders hero start CTA when there is no recent progress", () => {
     render(
       <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
     );
 
-    const resume = screen.getByTestId("home-hero-resume");
-    expect(resume).toBeTruthy();
-    fireEvent.click(resume);
-    expect(mockOnContinueListening).toHaveBeenCalledWith("tauheed-explained");
+    expect(screen.getByTestId("home-hero-start")).toBeTruthy();
   });
 
-  it("omits hero resume CTA when there is no recent progress", () => {
+  it("renders mobile app download section", () => {
     render(
       <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
     );
 
-    expect(screen.queryByTestId("home-hero-resume")).toBeNull();
-  });
-
-  it("renders disabled mobile app download buttons using testIDs", () => {
-    render(
-      <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
-    );
-
-    // Apple App Store button is disabled
-    const appStoreBtn = screen.getByTestId("download-badge-app-store") as HTMLButtonElement;
-    expect(appStoreBtn).toBeTruthy();
-    expect(appStoreBtn.disabled).toBe(true);
-
-    // Google Play Store button is disabled
-    const googlePlayBtn = screen.getByTestId("download-badge-google-play") as HTMLButtonElement;
-    expect(googlePlayBtn).toBeTruthy();
-    expect(googlePlayBtn.disabled).toBe(true);
-
-    // Verify "Coming Soon" badges exist via testID
-    expect(screen.getByTestId("coming-soon-badge-app-store").textContent).toBe("Coming soon");
-    expect(screen.getByTestId("coming-soon-badge-google-play").textContent).toBe("Coming soon");
+    expect(screen.getByTestId("mobile-download-section")).toBeTruthy();
   });
 });

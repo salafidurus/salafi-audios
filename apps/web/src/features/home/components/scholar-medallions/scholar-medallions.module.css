@@ -1,7 +1,6 @@
 .section {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: var(--space-component-gap-lg);
   width: 100%;
 }
@@ -15,12 +14,17 @@
   line-height: var(--typo-title-md-line-height);
 }
 
-.grid {
+.scrollRow {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
   gap: var(--space-component-gap-lg);
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
   width: 100%;
+}
+
+.scrollRow::-webkit-scrollbar {
+  display: none;
 }
 
 .medallion {
@@ -28,7 +32,8 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-component-gap-sm);
-  width: 96px;
+  width: 108px;
+  flex-shrink: 0;
   text-decoration: none;
 }
 
@@ -44,31 +49,18 @@
 
 .name {
   font-size: var(--typo-body-sm-font-size);
-  font-weight: var(--typo-body-sm-font-weight);
-  font-family: var(--typo-body-sm-font-family);
-  line-height: var(--typo-body-sm-line-height);
-  color: var(--content-muted);
+  font-weight: 600;
+  color: var(--content-strong);
   text-align: center;
+  line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.medallion:hover .name {
-  color: var(--content-primary-strong);
-}
-
-@media (max-width: 640px) {
-  .grid {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding-bottom: 4px;
-  }
-
-  .grid::-webkit-scrollbar {
-    display: none;
-  }
+.count {
+  font-size: 11px;
+  color: var(--content-muted);
+  text-align: center;
 }

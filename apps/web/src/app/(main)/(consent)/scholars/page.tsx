@@ -1,10 +1,9 @@
-import { routes } from "@sd/core-contracts";
-import { permanentRedirect } from "next/navigation";
+import { ExploreScholarScreen } from "@/features/explore/screens/explore-scholar.screen";
 
 export const metadata = {
   title: "Scholars",
 };
 
 export default function ScholarsPage() {
-  permanentRedirect(routes.explore.scholar);
+  return <ExploreScholarScreen />;
 }

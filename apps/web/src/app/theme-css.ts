@@ -14,6 +14,7 @@ ${createThemeCssBlock(":root", lightWebTheme)}
 }
 ${createThemeCssBlock('[data-theme="dark"]', darkWebTheme)}
 ${createThemeCssBlock('[data-theme="light"]', lightWebTheme)}
+${createAccentThemeCssBlock('[data-accent-theme="parchment"]', accentWebThemes.parchment)}
 ${createAccentThemeCssBlock('[data-accent-theme="manuscript"]', accentWebThemes.manuscript)}
 ${createAccentThemeCssBlock('[data-accent-theme="midnight"]', accentWebThemes.midnight)}
 ${createAccentThemeCssBlock('[data-accent-theme="ember"]', accentWebThemes.ember)}

@@ -104,4 +104,14 @@ describe("theme css builders", () => {
     expect(manuscript).toContain("--surface-canvas: #0D1912;");
     expect(manuscript).toContain("--action-primary: #CBA135;");
   });
+
+  it("parchment is a light-mood palette with its own canvas and action tokens", () => {
+    const parchment = createAccentThemeCssBlock(
+      '[data-accent-theme="parchment"]',
+      accentWebThemes.parchment,
+    );
+    expect(parchment).toContain("--surface-canvas: #F7F2E7;");
+    expect(parchment).toContain("--action-primary: #B8872E;");
+    expect(parchment).toContain("--content-strong: #241C10;");
+  });
 });

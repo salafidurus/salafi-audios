@@ -37,6 +37,7 @@ describe("accent-theme preference store", () => {
 
   it("isAccentThemeId accepts only known ids", () => {
     expect(isAccentThemeId("default")).toBe(true);
+    expect(isAccentThemeId("parchment")).toBe(true);
     expect(isAccentThemeId("manuscript")).toBe(true);
     expect(isAccentThemeId("midnight")).toBe(true);
     expect(isAccentThemeId("ember")).toBe(true);

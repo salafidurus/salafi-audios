@@ -23,7 +23,7 @@ export function ScholarMedallions() {
   return (
     <section className={styles.section} aria-label={t("home.scholars.label", "Scholars")}>
       <h2 className={styles.sectionTitle}>{t("home.scholars.title", "Scholars")}</h2>
-      <div className={styles.grid}>
+      <div className={styles.scrollRow}>
         {scholars.slice(0, MAX_SCHOLARS).map((scholar) => (
           <Link
             key={scholar.id}
@@ -35,6 +35,7 @@ export function ScholarMedallions() {
               <UserAvatar image={scholar.imageUrl ?? null} name={scholar.name} size={64} />
             </span>
             <span className={styles.name}>{scholar.name}</span>
+            <span className={styles.count}>{scholar.lectureCount} lectures</span>
           </Link>
         ))}
       </div>

@@ -7,10 +7,11 @@ import { createColors, type AppColors } from "@sd/design-tokens";
  * required to restyle the app. `@sd/design-tokens` itself is never modified here.
  */
 
-export type AccentThemeId = "default" | "manuscript" | "midnight" | "ember";
+export type AccentThemeId = "default" | "parchment" | "manuscript" | "midnight" | "ember";
 
 export const ACCENT_THEME_IDS: readonly AccentThemeId[] = [
   "default",
+  "parchment",
   "manuscript",
   "midnight",
   "ember",
@@ -19,6 +20,8 @@ export const ACCENT_THEME_IDS: readonly AccentThemeId[] = [
 export interface AccentPalette {
   label: string;
   description: string;
+  /** Base color mode the palette is designed against (drives shadows + state colors). */
+  mode: "light" | "dark";
   /** [canvas, accent, secondary] — used by the settings picker preview. */
   swatches: [string, string, string];
   canvas: string;
@@ -37,9 +40,29 @@ export interface AccentPalette {
 }
 
 export const ACCENT_PALETTES: Record<Exclude<AccentThemeId, "default">, AccentPalette> = {
+  parchment: {
+    label: "Parchment",
+    description: "Ivory & antique gold",
+    mode: "light",
+    swatches: ["#F7F2E7", "#B8872E", "#2F6B54"],
+    canvas: "#F7F2E7",
+    surface: "#FFFFFF",
+    surfaceRaised: "#F1EAD9",
+    border: "#E3D9C2",
+    borderSoft: "#ECE3CE",
+    gold: "#B8872E",
+    goldBright: "#8A5A12",
+    onGold: "#2B1B06",
+    jade: "#2F6B54",
+    jadeDim: "#BFDCCB",
+    text: "#241C10",
+    textSoft: "#6B5F49",
+    textFaint: "#9C8B68",
+  },
   manuscript: {
     label: "Manuscript",
     description: "Ink-green & gold leaf",
+    mode: "dark",
     swatches: ["#0D1912", "#CBA135", "#4F9C82"],
     canvas: "#0D1912",
     surface: "#152420",
@@ -58,6 +81,7 @@ export const ACCENT_PALETTES: Record<Exclude<AccentThemeId, "default">, AccentPa
   midnight: {
     label: "Midnight",
     description: "Indigo dusk & amber",
+    mode: "dark",
     swatches: ["#0B0F1C", "#E0A458", "#6C7BC4"],
     canvas: "#0B0F1C",
     surface: "#131A2C",
@@ -76,6 +100,7 @@ export const ACCENT_PALETTES: Record<Exclude<AccentThemeId, "default">, AccentPa
   ember: {
     label: "Ember",
     description: "Warm charcoal & rust",
+    mode: "dark",
     swatches: ["#15130F", "#C1633D", "#B08D57"],
     canvas: "#15130F",
     surface: "#1E1B15",
@@ -114,13 +139,13 @@ const mixHex = (a: string, b: string, t: number): string => {
 };
 
 /**
- * Builds a complete AppColors for an accent theme. Accent palettes are
- * self-contained (dark-mood, matching the approved mock), so the light/dark mode
- * selector only affects the `default` theme. Success/danger state colors are
- * carried over from the base dark palette.
+ * Builds a complete AppColors for an accent theme. Each palette declares the base
+ * color mode it is designed against (`parchment` is light-mood; the others are
+ * dark-mood), so shadows and success/danger state colors are carried over from the
+ * matching base palette. The light/dark selector only affects the `default` theme.
  */
 export const buildAccentColors = (id: Exclude<AccentThemeId, "default">): AppColors => {
-  const base = createColors("dark");
+  const base = createColors(ACCENT_PALETTES[id].mode);
   const p = ACCENT_PALETTES[id];
 
   return {
