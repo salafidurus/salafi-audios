@@ -1,22 +1,19 @@
+import type { MenuAction } from "@expo/ui/community/menu";
 import type { AdminListingListItemDto, AppAbility } from "@sd/core-contracts";
 
-import { Column, RNHostView, Row } from "@expo/ui";
-import { MenuView, type MenuAction, type NativeActionEvent } from "@expo/ui/community/menu";
 import { useAbility } from "@sd/domain-account";
 import { useFormattedScholarName } from "@sd/domain-content";
 import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
-import { useUnistyles } from "react-native-unistyles";
+import { Pressable, ScrollView, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import {
-  NativeButton,
-  NativeList,
-  NativeListItem,
-  NativeScreenHost,
-  NativeStateView,
-} from "@/shared/ui";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
+import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 
 import { bulkListingAction } from "../../api/admin-listings.api";
 import { AudioUploaderSheet } from "../../components/AudioUploaderSheet/AudioUploaderSheet";
@@ -28,6 +25,7 @@ import { filterListings } from "./filter-listings";
 type AdminListingRowProps = {
   item: AdminListingListItemDto;
   isSelected: boolean;
+  hideBorder: boolean;
   actions: MenuAction[];
   onPress: () => void;
   onAction: (action: string) => void;
@@ -47,24 +45,31 @@ function getVisibleRowActions(ability: AppAbility): MenuAction[] {
   return actions;
 }
 
-function AdminListingRow({ item, isSelected, actions, onPress, onAction }: AdminListingRowProps) {
+function AdminListingRow({
+  item,
+  isSelected,
+  hideBorder,
+  actions,
+  onPress,
+  onAction,
+}: AdminListingRowProps) {
   const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
 
   return (
-    <MenuView
+    <List.Item
       testID={`admin-listing-row-${item.id}`}
-      actions={actions}
-      shouldOpenOnLongPress
-      onPressAction={(event: NativeActionEvent) => onAction(event.nativeEvent.event)}
+      onPress={onPress}
+      hideBorder={hideBorder}
+      style={isSelected ? styles.rowSelected : undefined}
     >
-      <NativeListItem
-        title={item.title}
-        supportingText={`${scholarName} · ${item.status}`}
-        leadingIcon={isSelected ? "check" : "play"}
-        onPress={onPress}
-        testID={`admin-listing-row-${item.id}-trigger`}
-      />
-    </MenuView>
+      <View style={styles.rowContent}>
+        <MarqueeText text={item.title} variant="bodyMd" style={styles.rowTitle} />
+        <AppText variant="caption" style={styles.rowMeta}>
+          {scholarName} · {item.status}
+        </AppText>
+      </View>
+      <List.Item.Actions actions={actions} onAction={onAction} />
+    </List.Item>
   );
 }
 
@@ -144,77 +149,112 @@ export function AdminListingsScreen() {
   };
 
   return (
-    <NativeScreenHost testID="admin-listings-host">
+    <View style={styles.screen}>
       <Stack.Screen options={headerSearchOptions} />
-      <Column
-        spacing={theme.spacing.component.gapLg}
-        style={{
-          width: "100%",
-          padding: theme.spacing.layout.pageX,
-        }}
-      >
-        {canUpload ? (
-          <Row alignment="end">
-            <NativeButton
-              label="Upload"
-              icon="add"
-              onPress={() => setShowUploader(true)}
-              testID="admin-listings-upload"
-            />
-          </Row>
-        ) : null}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <AppText variant="titleLg">Listings</AppText>
+          {canUpload ? (
+            <Pressable onPress={() => setShowUploader(true)} style={styles.uploadBtn}>
+              <AppText variant="labelMd" style={styles.uploadBtnText}>
+                + Upload
+              </AppText>
+            </Pressable>
+          ) : null}
+        </View>
+
         {isLoading ? (
-          <NativeStateView kind="loading" title="Loading…" />
+          <EmptyState message="Loading…" variant="loading" />
         ) : listings.length === 0 ? (
-          <NativeStateView kind="empty" title="No listings found." />
+          <EmptyState message="No listings found." variant="empty" />
         ) : (
-          <NativeList testID="admin-listings-list">
-            {listings.map((item) => (
+          <List>
+            {listings.map((item, index) => (
               <AdminListingRow
                 key={item.id}
                 item={item}
                 isSelected={selectedIds.has(item.id)}
+                hideBorder={index === listings.length - 1}
                 actions={rowActions}
                 onPress={() => handleRowPress(item.id)}
                 onAction={(action) => void handleRowAction(item.id, action)}
               />
             ))}
-          </NativeList>
+          </List>
         )}
-      </Column>
+      </ScrollView>
 
-      <RNHostView>
-        <BulkActionBar
-          selectedCount={selectedIds.size}
-          onPublish={() => handleBulkAction("publish")}
-          onArchive={() => handleBulkAction("archive")}
-          canPublish={canPublish}
-          canArchive={canArchive}
-          isLoading={isBulkLoading}
-        />
-      </RNHostView>
+      <BulkActionBar
+        selectedCount={selectedIds.size}
+        onPublish={() => handleBulkAction("publish")}
+        onArchive={() => handleBulkAction("archive")}
+        canPublish={canPublish}
+        canArchive={canArchive}
+        isLoading={isBulkLoading}
+      />
 
-      <RNHostView matchContents>
-        <AudioUploaderSheet
-          isOpen={showUploader}
-          onClose={() => setShowUploader(false)}
-          onUploadComplete={() => {
-            setShowUploader(false);
-            refetch();
-          }}
-        />
-      </RNHostView>
+      <AudioUploaderSheet
+        isOpen={showUploader}
+        onClose={() => setShowUploader(false)}
+        onUploadComplete={() => {
+          setShowUploader(false);
+          refetch();
+        }}
+      />
 
-      <RNHostView matchContents>
-        <ListingEditSheet
-          listingId={editingListingId}
-          onClose={() => setEditingListingId(null)}
-          onSaved={() => {
-            setEditingListingId(null);
-            refetch();
-          }}
-        />
-      </RNHostView>
-    </NativeScreenHost>
+      <ListingEditSheet
+        listingId={editingListingId}
+        onClose={() => setEditingListingId(null)}
+        onSaved={() => {
+          setEditingListingId(null);
+          refetch();
+        }}
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
+  },
+  scrollContent: {
+    padding: theme.spacing.scale.md,
+    paddingBottom: 80,
+  },
+  header: {
+    paddingVertical: theme.spacing.scale.md,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  uploadBtn: {
+    paddingVertical: theme.spacing.scale.sm,
+    paddingHorizontal: theme.spacing.scale.md,
+    backgroundColor: theme.colors.action.primary,
+    borderRadius: theme.radius.scale.sm,
+  },
+  uploadBtnText: {
+    color: theme.colors.content.onPrimary,
+    fontWeight: "600",
+  },
+  loadingText: {
+    textAlign: "center",
+    marginTop: theme.spacing.scale["3xl"],
+    color: theme.colors.content.muted,
+  },
+  rowContent: {
+    gap: theme.spacing.scale.xs,
+  },
+  rowSelected: {
+    backgroundColor: theme.colors.surface.primarySubtle,
+  },
+  rowTitle: {
+    fontWeight: "600",
+    color: theme.colors.content.strong,
+  },
+  rowMeta: {
+    color: theme.colors.content.muted,
+  },
+}));
