@@ -83,12 +83,18 @@ function createAuthInstance(config: ConfigService) {
       // Cross-subdomain cookie sharing: allows session from api.* to be sent
       // to web app (for OAuth callbacks)
       crossSubDomainCookies: {
-        enabled: config.NODE_ENV !== 'development',
+        enabled: true,
         domain: config.COOKIE_DOMAIN,
       },
       // HTTPS-only cookies in production (XSS + MITM mitigation)
       useSecureCookies: config.NODE_ENV === 'production',
-      // HttpOnly, SameSite=Lax are already defaults
+      // Allow cross-site cookies in dev (localhost:3000 -> localhost:4000).
+      // Chrome treats localhost as a secure context, so Secure cookies work
+      // over HTTP on localhost.
+      defaultCookieAttributes: {
+        sameSite: 'none',
+        secure: true,
+      },
     },
   });
 }
