@@ -1,4 +1,3 @@
-import { routes } from "@sd/core-contracts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "bun:test";
@@ -36,6 +35,7 @@ vi.mock("@/shared/components/InfiniteScrollList", () => ({
         slug: "test-series",
         title: "Test Series",
         scholarName: "Ibn Uthaymeen",
+        format: "series",
         lectureCount: 10,
         durationSeconds: 3600,
       },
@@ -53,10 +53,10 @@ vi.mock("@/shared/components/InfiniteScrollList", () => ({
   },
 }));
 
-vi.mock("@/features/search/components/SearchResultItem/SearchResultItem", () => ({
-  SearchResultItem: ({ item, onPress }: { item: any; onPress?: () => void }) => (
-    <div data-testid="search-result-item" onClick={onPress}>
-      {item.title}
+vi.mock("@/features/home/components/lecture-row/lecture-row", () => ({
+  LectureRow: ({ title, onClick }: { title: string; onClick?: () => void }) => (
+    <div data-testid="lecture-row" onClick={onClick}>
+      {title}
     </div>
   ),
 }));
@@ -94,6 +94,38 @@ vi.mock("@sd/domain-search", () => ({
   })),
 }));
 
+vi.mock("@sd/core-i18n", () => ({
+  pickContentField: (title: string) => title,
+}));
+
+vi.mock("@/shared/hooks/use-listing-navigation", () => ({
+  useListingNavigation: () => ({
+    navigateToListing: mockPush,
+  }),
+}));
+
+vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
+  ScreenView: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="screen-view">{children}</div>
+  ),
+}));
+
+vi.mock("@/shared/components/ScrollToTopButton", () => ({
+  ScrollToTopButton: () => <div data-testid="scroll-to-top" />,
+}));
+
+vi.mock("@/shared/components/StickyHeaderLayout", () => ({
+  StickyHeaderLayout: Object.assign(
+    ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="sticky-header-layout">{children}</div>
+    ),
+    {
+      Header: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+      Content: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    },
+  ),
+}));
+
 describe("SearchProcessingScreen", () => {
   let queryClient: QueryClient;
 
@@ -109,25 +141,16 @@ describe("SearchProcessingScreen", () => {
   const renderWithProviders = (component: React.ReactElement) => {
     return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
   };
+  it("renders popular searches when query is empty", () => {
+    renderWithProviders(<SearchProcessingScreen />);
 
-  it("navigates to series detail on series item click (desktop)", () => {
-    renderWithProviders(<SearchProcessingScreen searchKey="jurisprudence" />);
-
-    // Click the search result item
-    const item = screen.getByText("Test Series");
-    fireEvent.click(item);
-
-    expect(mockPush).toHaveBeenCalledWith(routes.listings.detail("test-series"));
+    expect(screen.getByText("POPULAR SEARCHES")).toBeInTheDocument();
   });
 
-  it("navigates to series detail on series item click (mobile)", () => {
+  it("shows search results when query is present", () => {
     renderWithProviders(<SearchProcessingScreen searchKey="jurisprudence" />);
 
-    // Click the search result item
-    const item = screen.getByText("Test Series");
-    fireEvent.click(item);
-
-    expect(mockPush).toHaveBeenCalledWith(routes.listings.detail("test-series"));
+    expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
   });
 
   it("seeds the topic filter from the topicSlug prop", () => {

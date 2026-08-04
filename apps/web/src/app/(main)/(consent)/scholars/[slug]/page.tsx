@@ -1,15 +1,18 @@
-// react-doctor-disable-next-line react-doctor/nextjs-missing-metadata
-"use client";
+import { Suspense } from "react";
 
-import { useParams } from "next/navigation";
+import ScholarDetailInner from "./scholar-detail-inner";
 
-import { ScholarDetailScreen } from "@/features/listing/screens/scholar-detail/scholar-detail.screen";
+export const metadata = {
+  title: "Scholar",
+  description: "View scholar profile and durus",
+};
 
 export default function ScholarPage() {
-  const params = useParams<{ slug: string }>();
   return (
     <main className="flex flex-1 min-h-full flex-col">
-      <ScholarDetailScreen slug={params.slug} />
+      <Suspense fallback={null}>
+        <ScholarDetailInner />
+      </Suspense>
     </main>
   );
 }

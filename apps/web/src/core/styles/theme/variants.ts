@@ -7,10 +7,9 @@ import { createColors, type AppColors } from "@sd/design-tokens";
  * required to restyle the app. `@sd/design-tokens` itself is never modified here.
  */
 
-export type AccentThemeId = "default" | "parchment" | "manuscript" | "midnight" | "ember";
+export type AccentThemeId = "parchment" | "manuscript" | "midnight" | "ember";
 
 export const ACCENT_THEME_IDS: readonly AccentThemeId[] = [
-  "default",
   "parchment",
   "manuscript",
   "midnight",
@@ -39,7 +38,7 @@ export interface AccentPalette {
   textFaint: string;
 }
 
-export const ACCENT_PALETTES: Record<Exclude<AccentThemeId, "default">, AccentPalette> = {
+export const ACCENT_PALETTES: Record<AccentThemeId, AccentPalette> = {
   parchment: {
     label: "Parchment",
     description: "Ivory & antique gold",
@@ -144,7 +143,7 @@ const mixHex = (a: string, b: string, t: number): string => {
  * dark-mood), so shadows and success/danger state colors are carried over from the
  * matching base palette. The light/dark selector only affects the `default` theme.
  */
-export const buildAccentColors = (id: Exclude<AccentThemeId, "default">): AppColors => {
+export const buildAccentColors = (id: AccentThemeId): AppColors => {
   const base = createColors(ACCENT_PALETTES[id].mode);
   const p = ACCENT_PALETTES[id];
 

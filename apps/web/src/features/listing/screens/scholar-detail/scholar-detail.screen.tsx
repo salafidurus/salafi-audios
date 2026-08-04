@@ -1,15 +1,19 @@
 "use client";
 
+import { pickContentField } from "@sd/core-i18n";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import { ChevronLeft } from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { ScholarContentList } from "@/features/listing/components/scholar/scholar-content-list/scholar-content-list";
+import { LectureRow } from "@/features/home/components/lecture-row/lecture-row";
 import { ScholarHeader } from "@/features/listing/components/scholar/scholar-header/scholar-header";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Search, type FilterChip } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 import styles from "./scholar-detail.screen.module.css";
 
@@ -17,8 +21,29 @@ export type ScholarDetailScreenProps = {
   slug: string;
 };
 
+function formatDuration(durationSeconds?: number): string {
+  if (!durationSeconds || durationSeconds <= 0) {
+    return "";
+  }
+  const hours = Math.floor(durationSeconds / 3600);
+  const minutes = Math.round((durationSeconds % 3600) / 60);
+  if (hours > 0) {
+    return `${hours}h ${String(minutes).padStart(2, "0")}m`;
+  }
+  if (minutes <= 0) {
+    return "";
+  }
+  return `${minutes}m`;
+}
+
+function handleBack() {
+  window.history.back();
+}
+
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { t } = useTranslation();
+  const showOriginal = useShowOriginalContent();
+  const { navigateToListing } = useListingNavigation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const headerContentRef = useRef<HTMLDivElement>(null);
@@ -27,7 +52,6 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { data: contentData } = useScholarContent(slug);
   const { data: topicsData } = useScholarTopics(slug);
 
-  // Measure sticky header height dynamically for scroll offset
   useEffect(() => {
     const el = headerContentRef.current;
     if (!el) return;
@@ -47,7 +71,6 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
     return () => observer.disconnect();
   }, [scholar, contentData, topicsData]);
 
-  // Topic filter chips derived from scholar topics
   const topicChips: FilterChip[] = useMemo(() => {
     if (!topicsData?.topics) return [];
     return topicsData.topics
@@ -61,6 +84,10 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
     } else {
       setSelectedTopicId((prev) => (prev === topicId ? null : topicId));
     }
+  };
+
+  const handleFollow = () => {
+    console.log(`Follow scholar: ${slug}`);
   };
 
   if (isFetchingScholar && !scholar) {
@@ -79,13 +106,33 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
     );
   }
 
+  let rawItems = contentData?.items ?? [];
+  if (selectedTopicId && topicsData?.topics) {
+    const topic = topicsData.topics.find((t) => t.topicId === selectedTopicId);
+    rawItems = topic?.items ?? [];
+  }
+
+  const query = searchQuery.trim().toLowerCase();
+  const filteredItems = rawItems.filter((item) => {
+    if (!query) return true;
+    const title = pickContentField(item.title, item.original?.title, showOriginal).toLowerCase();
+    return title.includes(query);
+  });
+
   return (
     <ScreenView>
       <StickyHeaderLayout>
         <StickyHeaderLayout.Header>
           <div ref={headerContentRef}>
-            <div className={styles.headerTopRow}>
-              <ScholarHeader scholar={scholar} />
+            <div className={styles.backBar}>
+              <button type="button" className={styles.backButton} onClick={handleBack}>
+                <ChevronLeft size={15} />
+                {t("scholars.backToScholars", "Back to Scholars")}
+              </button>
+            </div>
+
+            <div className={styles.headerContent}>
+              <ScholarHeader scholar={scholar} onFollow={handleFollow} />
             </div>
 
             <div className={styles.searchFilterWrapper}>
@@ -112,13 +159,26 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
         </StickyHeaderLayout.Header>
 
         <StickyHeaderLayout.Content>
-          <div className={styles.contentWrapper}>
-            <ScholarContentList
-              slug={slug}
-              searchQuery={searchQuery}
-              selectedTopicId={selectedTopicId}
-              scholarImageUrl={scholar.imageUrl ?? undefined}
-            />
+          <div className={styles.contentList}>
+            {filteredItems.length > 0 ? (
+              filteredItems.map((item) => (
+                <LectureRow
+                  key={item.id}
+                  title={pickContentField(item.title, item.original?.title, showOriginal)}
+                  category={item.type}
+                  scholarName={scholar.name}
+                  scholarSlug={scholar.slug}
+                  duration={formatDuration(item.durationSeconds)}
+                  totalLessons={item.lectureCount ?? 0}
+                  progress={0}
+                  onClick={() => navigateToListing(item.slug)}
+                />
+              ))
+            ) : (
+              <p className={styles.empty}>
+                {t("scholarContent.empty", "No published content found.")}
+              </p>
+            )}
           </div>
         </StickyHeaderLayout.Content>
       </StickyHeaderLayout>

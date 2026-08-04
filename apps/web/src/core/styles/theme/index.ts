@@ -21,22 +21,33 @@ export type AppThemeWeb = {
 };
 
 /**
- * Builds a web theme. When `variant` is a named accent theme the palette declares
- * its own base color mode (parchment is light-mood, the rest dark-mood), and the
- * `mode` selector only affects the `default` variant.
+ * Builds a web theme. Each accent theme palette declares its own base color
+ * mode (parchment is light-mood; the rest dark-mood). The `mode` parameter
+ * is only used for the light/dark base themes.
  */
-export const createThemeWeb = (
-  mode: "light" | "dark",
-  variant: AccentThemeId = "default",
-): AppThemeWeb => {
-  const isAccent = variant !== "default";
-  const colorMode: "light" | "dark" = isAccent ? ACCENT_PALETTES[variant].mode : mode;
-  const colors = isAccent ? buildAccentColors(variant) : createColors(mode);
-  const shadows = createShadowsWeb(colorMode);
+export const createThemeWeb = (mode: "light" | "dark", variant?: AccentThemeId): AppThemeWeb => {
+  if (variant) {
+    const colorMode: "light" | "dark" = ACCENT_PALETTES[variant].mode;
+    const colors = buildAccentColors(variant);
+    const shadows = createShadowsWeb(colorMode);
+
+    return {
+      colors,
+      recipes: createAccentRecipesWeb(colors, shadows.focus, colorMode),
+      spacing: spacingWeb,
+      radius: radiusWeb,
+      border: borderWeb,
+      shadows,
+      typography: typographyWeb,
+    };
+  }
+
+  const colors = createColors(mode);
+  const shadows = createShadowsWeb(mode);
 
   return {
     colors,
-    recipes: createAccentRecipesWeb(colors, shadows.focus, colorMode),
+    recipes: createAccentRecipesWeb(colors, shadows.focus, mode),
     spacing: spacingWeb,
     radius: radiusWeb,
     border: borderWeb,
@@ -48,7 +59,7 @@ export const createThemeWeb = (
 export const lightWebTheme = createThemeWeb("light");
 export const darkWebTheme = createThemeWeb("dark");
 
-export const accentWebThemes: Record<Exclude<AccentThemeId, "default">, AppThemeWeb> = {
+export const accentWebThemes: Record<AccentThemeId, AppThemeWeb> = {
   parchment: createThemeWeb("light", "parchment"),
   manuscript: createThemeWeb("dark", "manuscript"),
   midnight: createThemeWeb("dark", "midnight"),

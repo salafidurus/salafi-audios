@@ -14,9 +14,9 @@ describe("ThemeSync", () => {
     document.documentElement.removeAttribute("data-accent-theme");
   });
 
-  it("applies the default accent theme when none is stored", () => {
+  it("applies the system-based default accent theme when none is stored", () => {
     render(<ThemeSync />);
-    expect(document.documentElement).toHaveAttribute("data-accent-theme", "default");
+    expect(document.documentElement).toHaveAttribute("data-accent-theme", "parchment");
   });
 
   it("applies a stored accent theme on mount", () => {

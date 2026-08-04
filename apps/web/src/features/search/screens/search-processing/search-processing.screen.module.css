@@ -1,1 +1,46 @@
-/* Search processing screen styles - sticky header layout now in shared component */
+.popularSearches {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm);
+  padding: var(--space-scale-md) 0;
+}
+
+.popularLabel {
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 700;
+  color: var(--content-muted);
+  letter-spacing: 0.5px;
+}
+
+.popularChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-component-gap-sm);
+}
+
+.popularChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-scale-xs);
+  padding: var(--space-component-chip-y) var(--space-component-chip-x);
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-chip);
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-label-md-font-size);
+  line-height: var(--typo-label-md-line-height);
+  letter-spacing: var(--typo-label-md-letter-spacing);
+  font-weight: var(--typo-label-md-font-weight);
+  color: var(--content-muted);
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.popularChip:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border-primary);
+  color: var(--content-strong);
+}

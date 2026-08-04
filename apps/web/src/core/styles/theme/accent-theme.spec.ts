@@ -13,8 +13,8 @@ describe("accent-theme preference store", () => {
     window.localStorage.clear();
   });
 
-  it("defaults to the standard theme when nothing is stored", () => {
-    expect(getAccentThemePreference()).toBe("default");
+  it("defaults to system-based theme (parchment for light) when nothing is stored", () => {
+    expect(getAccentThemePreference()).toBe("parchment");
   });
 
   it("returns a stored valid accent id", () => {
@@ -22,9 +22,9 @@ describe("accent-theme preference store", () => {
     expect(getAccentThemePreference()).toBe("midnight");
   });
 
-  it("falls back to default for an unknown stored value", () => {
+  it("falls back to system-based theme for an unknown stored value", () => {
     window.localStorage.setItem(ACCENT_THEME_KEY, "neon");
-    expect(getAccentThemePreference()).toBe("default");
+    expect(getAccentThemePreference()).toBe("parchment");
   });
 
   it("persists the chosen id and dispatches a change event", () => {
@@ -36,7 +36,6 @@ describe("accent-theme preference store", () => {
   });
 
   it("isAccentThemeId accepts only known ids", () => {
-    expect(isAccentThemeId("default")).toBe(true);
     expect(isAccentThemeId("parchment")).toBe(true);
     expect(isAccentThemeId("manuscript")).toBe(true);
     expect(isAccentThemeId("midnight")).toBe(true);

@@ -9,18 +9,20 @@ type LectureRowProps = {
   scholarName: string;
   scholarSlug?: string;
   duration: string;
-  progress: number;
   totalLessons: number;
+  progress?: number;
   onClick?: () => void;
+  className?: string;
 };
 
 export function LectureRow({
   title,
   category,
   duration,
-  progress,
   totalLessons,
+  progress = 0,
   onClick,
+  className,
 }: LectureRowProps) {
   const done = Math.round(progress * totalLessons);
   const t = totalLessons;
@@ -29,20 +31,13 @@ export function LectureRow({
     <button
       type="button"
       onClick={onClick}
-      className={styles.row}
+      className={`${styles.row} ${className ?? ""}`}
       style={{
         background: "var(--surface-default)",
         border: "1px solid var(--border-default)",
       }}
     >
-      <span
-        className={styles.iconWrap}
-        style={{
-          background:
-            "linear-gradient(135deg, var(--content-secondary), var(--border-primary-strong))",
-          border: "1px solid color-mix(in srgb, var(--border-focus) 33%, transparent)",
-        }}
-      >
+      <span className={styles.iconWrap}>
         <BookOpen size={17} color="var(--content-primary-strong)" />
       </span>
       <span className={styles.info}>

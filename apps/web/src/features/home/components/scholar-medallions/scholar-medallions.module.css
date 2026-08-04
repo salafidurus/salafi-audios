@@ -38,7 +38,7 @@
 }
 
 .avatarWrap {
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-component-card);
   padding: 3px;
   background: linear-gradient(
     135deg,

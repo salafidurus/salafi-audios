@@ -156,12 +156,12 @@ describe("SettingsGeneralScreen", () => {
     expect(screen.queryByText("New Lectures")).not.toBeInTheDocument();
   });
 
-  it("renders the accent theme picker", () => {
+  it("renders the accent theme picker with system as default", () => {
     render(<SettingsGeneralScreen />);
-    expect(screen.getByTestId("accent-picker-value")).toBeInTheDocument();
+    expect(screen.getByTestId("accent-picker-value")).toHaveTextContent("system");
   });
 
-  it("shows the mode control while the accent theme is default", () => {
+  it("shows the mode control while the accent theme is system", () => {
     render(<SettingsGeneralScreen />);
     expect(screen.getByRole("button", { name: "Dark" })).toBeInTheDocument();
   });

@@ -2,12 +2,13 @@
 
 import { useState, useCallback, useEffect } from "react";
 
-import type { AccentThemeId } from "@/core/styles/theme";
 import type { ThemePreference } from "@/core/styles/ThemeSync";
+import type { AccentThemePickerValue } from "@/features/settings/components/accent-theme-picker/AccentThemePicker";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
-  getAccentThemePreference,
+  getDefaultAccentTheme,
+  isAccentThemeId,
   setAccentThemePreference,
 } from "@/core/styles/theme/accent-theme";
 import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
@@ -57,7 +58,12 @@ function loadThemePreference(): ThemePreference {
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
   const [themePreference, setThemePreference] = useState<ThemePreference>(loadThemePreference);
-  const [accentTheme, setAccentTheme] = useState<AccentThemeId>(getAccentThemePreference);
+  const [accentTheme, setAccentTheme] = useState<AccentThemePickerValue>(() => {
+    const stored =
+      typeof window !== "undefined" ? window.localStorage.getItem("accent-theme:v1") : null;
+    if (stored && isAccentThemeId(stored)) return stored;
+    return "system";
+  });
   const [notif, setNotif] = useState<NotificationState>(loadNotifState);
 
   const themeOptions: { value: ThemePreference; label: string }[] = [
@@ -72,9 +78,15 @@ export function SettingsGeneralScreen() {
     window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }, []);
 
-  const handleAccentThemeChange = useCallback((value: AccentThemeId) => {
+  const handleAccentThemeChange = useCallback((value: AccentThemePickerValue) => {
     setAccentTheme(value);
-    setAccentThemePreference(value);
+    if (value === "system") {
+      window.localStorage.removeItem("accent-theme:v1");
+      void getDefaultAccentTheme();
+      window.dispatchEvent(new Event("accent-theme-change"));
+    } else {
+      setAccentThemePreference(value);
+    }
   }, []);
 
   useEffect(() => {
@@ -122,7 +134,7 @@ export function SettingsGeneralScreen() {
         title={t("settings.general.displaySection", "Display")}
         description={t("settings.general.displayDesc", "Choose a theme for the interface.")}
       >
-        {accentTheme === "default" && (
+        {accentTheme === "system" && (
           <SettingsRow
             label={t("settings.general.theme", "Theme")}
             sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
@@ -141,14 +153,14 @@ export function SettingsGeneralScreen() {
             onChange={handleAccentThemeChange}
             title={t("settings.general.accentTheme", "Accent theme")}
             description={
-              accentTheme === "default"
+              accentTheme === "system"
                 ? t(
                     "settings.general.accentThemeDesc",
-                    "Pick a named palette and the whole app restyles instantly.",
+                    "System accent theme follows your OS preference.",
                   )
                 : t(
                     "settings.general.accentThemeDescActive",
-                    "Named palettes replace light/dark mode. Choose Default to use it again.",
+                    "Named palettes replace light/dark mode. Choose System to restore defaults.",
                   )
             }
           />

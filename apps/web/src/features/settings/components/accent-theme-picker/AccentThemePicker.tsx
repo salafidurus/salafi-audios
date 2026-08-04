@@ -8,18 +8,19 @@ import { ACCENT_PALETTES } from "@/core/styles/theme/variants";
 import styles from "./accent-theme-picker.module.css";
 
 interface AccentThemeOption {
-  id: AccentThemeId;
+  id: AccentThemeId | "system";
   name: string;
   description: string;
   swatches: [string, string, string];
   accent: string;
   onAccent: string;
+  isSystem?: boolean;
 }
 
-const DEFAULT_OPTION: AccentThemeOption = {
-  id: "default",
-  name: "Default",
-  description: "System light & dark",
+const SYSTEM_OPTION: Omit<AccentThemeOption, "id"> & { id: "system" } = {
+  id: "system",
+  name: "System",
+  description: "Follow your OS preference",
   swatches: [
     lightWebTheme.colors.surface.canvas,
     lightWebTheme.colors.action.primary,
@@ -27,12 +28,13 @@ const DEFAULT_OPTION: AccentThemeOption = {
   ],
   accent: lightWebTheme.colors.action.primary,
   onAccent: lightWebTheme.colors.content.onPrimary,
+  isSystem: true,
 };
 
 const ACCENT_OPTIONS: AccentThemeOption[] = [
-  DEFAULT_OPTION,
+  SYSTEM_OPTION,
   ...Object.entries(ACCENT_PALETTES).map(([id, palette]) => ({
-    id: id as Exclude<AccentThemeId, "default">,
+    id: id as AccentThemeId,
     name: palette.label,
     description: palette.description,
     swatches: palette.swatches,
@@ -41,9 +43,11 @@ const ACCENT_OPTIONS: AccentThemeOption[] = [
   })),
 ];
 
+export type AccentThemePickerValue = "system" | AccentThemeId;
+
 export interface AccentThemePickerProps {
-  value: AccentThemeId;
-  onChange: (id: AccentThemeId) => void;
+  value: AccentThemePickerValue;
+  onChange: (id: AccentThemePickerValue) => void;
   title?: string;
   description?: string;
 }

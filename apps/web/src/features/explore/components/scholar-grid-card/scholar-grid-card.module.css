@@ -1,0 +1,77 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-scale-sm);
+  padding: var(--space-component-gap-md);
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-panel);
+  cursor: pointer;
+  text-align: center;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-primary);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--accent-primary-subtle-surface) 60%, transparent);
+}
+
+.avatarRing {
+  border-radius: var(--radius-full);
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    var(--border-secondary),
+    color-mix(in srgb, var(--border-secondary) 30%, transparent)
+  );
+  margin-bottom: var(--space-scale-xs);
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background-color: var(--surface-hover);
+  overflow: hidden;
+  position: relative;
+  display: block;
+}
+
+.initials {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    135deg,
+    var(--surface-subtle),
+    var(--accent-primary-subtle-surface)
+  );
+  color: var(--content-primary-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.name {
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.meta {
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+  line-height: 1.4;
+}

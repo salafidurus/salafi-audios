@@ -5,15 +5,12 @@ import { useInfiniteScholarsList } from "@sd/domain-content";
 import { useRouter } from "next/navigation";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { ScholarListRow } from "@/features/listing/components/scholar/scholar-list-row/scholar-list-row";
-import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
-import { PageHeader } from "@/shared/components/PageHeader";
+import { ScholarGridCard } from "@/features/explore/components/scholar-grid-card/scholar-grid-card";
+import { ScholarGridSkeleton } from "@/features/explore/components/scholar-grid-skeleton/scholar-grid-skeleton";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { Search } from "@/shared/components/Search";
-import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { useDebouncedSearch } from "@/shared/hooks";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
 
 import styles from "./explore-scholar.screen.module.css";
 
@@ -22,7 +19,6 @@ export type ExploreScholarScreenProps = {
 };
 
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
-  const isDesktop = useIsDesktop();
   const { t } = useTranslation();
   const router = useRouter();
   const handleNavigateToScholar =
@@ -34,7 +30,7 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     debouncedQuery: debouncedSearch,
   } = useDebouncedSearch();
 
-  const { data, isFetching, hasNextPage, fetchNextPage } = useInfiniteScholarsList();
+  const { data, isFetching, isLoading, hasNextPage, fetchNextPage } = useInfiniteScholarsList();
 
   const allScholars = data?.pages.flatMap((p) => p.items) ?? [];
 
@@ -48,74 +44,50 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
 
   const title = t("explore.scholarsTitle", "Scholars");
 
-  if (isDesktop) {
-    return (
-      <ScreenView contentStyle={{ flex: 1 }}>
-        <StickyHeaderLayout>
-          <StickyHeaderLayout.Header>
-            <div className={styles.header}>
-              <PageHeader title={title} />
-              <Search.Bar
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder={t("scholarContent.searchScholars", "Search scholars...")}
-              />
-            </div>
-          </StickyHeaderLayout.Header>
-          <StickyHeaderLayout.Content>
-            <InfiniteScrollList
-              data={filteredScholars}
-              isLoading={isFetching && allScholars.length === 0}
-              hasMore={hasNextPage ?? false}
-              onLoadMore={() => fetchNextPage()}
-              isFetchingNextPage={isFetching && allScholars.length > 0}
-              renderItem={(scholar) => (
-                <ScholarListRow scholar={scholar} onPress={handleNavigateToScholar} />
-              )}
-              emptyMessage={
-                debouncedSearch
-                  ? t("scholarContent.searchNoMatch", "No scholars match your search.")
-                  : t("explore.noScholars", "No scholars available.")
-              }
-            />
-          </StickyHeaderLayout.Content>
-        </StickyHeaderLayout>
-        <ScrollToTopButton />
-      </ScreenView>
-    );
-  }
-
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
-      <StickyHeaderLayout>
-        <StickyHeaderLayout.Header>
-          <div className={styles.header}>
-            <PageHeader title={title} />
-            <Search.Bar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder={t("scholarContent.searchScholars", "Search scholars...")}
-            />
-          </div>
-        </StickyHeaderLayout.Header>
-        <StickyHeaderLayout.Content>
-          <InfiniteScrollList
-            data={filteredScholars}
-            isLoading={isFetching && allScholars.length === 0}
-            hasMore={hasNextPage ?? false}
-            onLoadMore={() => fetchNextPage()}
-            isFetchingNextPage={isFetching && allScholars.length > 0}
-            renderItem={(scholar) => (
-              <ScholarListRow scholar={scholar} onPress={handleNavigateToScholar} />
-            )}
-            emptyMessage={
-              debouncedSearch
-                ? t("scholarContent.searchNoMatch", "No scholars match your search.")
-                : t("explore.noScholars", "No scholars available.")
-            }
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>{title}</h1>
+        <div className={styles.searchWrapper}>
+          <Search.Bar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder={t("scholarContent.searchScholars", "Search scholars...")}
           />
-        </StickyHeaderLayout.Content>
-      </StickyHeaderLayout>
+        </div>
+      </div>
+
+      {filteredScholars.length > 0 ? (
+        <div className={styles.grid}>
+          {filteredScholars.map((scholar) => (
+            <ScholarGridCard key={scholar.id} scholar={scholar} onPress={handleNavigateToScholar} />
+          ))}
+        </div>
+      ) : isLoading || isFetching ? (
+        <div className={styles.grid}>
+          <ScholarGridSkeleton count={8} />
+        </div>
+      ) : (
+        <div className={styles.empty}>
+          {debouncedSearch
+            ? t("scholarContent.searchNoMatch", "No scholars match your search.")
+            : t("explore.noScholars", "No scholars available.")}
+        </div>
+      )}
+
+      {hasNextPage && (
+        <div className={styles.loadMoreWrapper}>
+          <button
+            type="button"
+            className={styles.loadMoreButton}
+            onClick={() => fetchNextPage()}
+            disabled={isFetching}
+          >
+            {isFetching ? t("common.loading", "Loading...") : t("common.loadMore", "Load more")}
+          </button>
+        </div>
+      )}
+
       <ScrollToTopButton />
     </ScreenView>
   );

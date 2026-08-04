@@ -5,9 +5,10 @@ import React from "react";
 import { AccentThemePicker } from "./AccentThemePicker";
 
 describe("AccentThemePicker", () => {
-  it("renders the default theme and all named accents", () => {
-    render(<AccentThemePicker value="default" onChange={vi.fn()} />);
-    expect(screen.getByRole("radio", { name: /Default/ })).toBeInTheDocument();
+  it("renders the system theme and all named accents", () => {
+    render(<AccentThemePicker value="system" onChange={vi.fn()} />);
+    expect(screen.getByRole("radio", { name: /System/ })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /Parchment/ })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Manuscript/ })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Midnight/ })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Ember/ })).toBeInTheDocument();
@@ -24,7 +25,7 @@ describe("AccentThemePicker", () => {
 
   it("calls onChange when a theme card is clicked", () => {
     const handleChange = vi.fn();
-    render(<AccentThemePicker value="default" onChange={handleChange} />);
+    render(<AccentThemePicker value="system" onChange={handleChange} />);
     fireEvent.click(screen.getByRole("radio", { name: /Ember/ }));
     expect(handleChange).toHaveBeenCalledWith("ember");
   });
@@ -32,7 +33,7 @@ describe("AccentThemePicker", () => {
   it("renders the optional title and description", () => {
     render(
       <AccentThemePicker
-        value="default"
+        value="system"
         onChange={vi.fn()}
         title="Accent theme"
         description="Pick a palette"

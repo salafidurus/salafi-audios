@@ -1,6 +1,7 @@
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "bun:test";
+import React from "react";
 
 import { ScholarDetailScreen } from "./scholar-detail.screen";
 
@@ -34,20 +35,42 @@ vi.mock("@/features/listing/components/scholar/scholar-header/scholar-header", (
   ),
 }));
 
-vi.mock("@/features/listing/components/scholar/scholar-content-list/scholar-content-list", () => ({
-  ScholarContentList: ({
-    slug,
-    searchQuery,
-    selectedTopicId,
-  }: {
-    slug: string;
-    searchQuery?: string;
-    selectedTopicId?: string | null;
-  }) => (
-    <div data-testid="scholar-content-list">
-      Content:{slug} | query:{searchQuery} | topic:{selectedTopicId ?? "none"}
-    </div>
+vi.mock("@/features/home/components/lecture-row/lecture-row", () => ({
+  LectureRow: ({ title }: { title: string }) => (
+    <div data-testid="lecture-row" data-title={title} />
   ),
+}));
+
+vi.mock("@/shared/components/Search", () => ({
+  Search: {
+    Bar: ({ placeholder, value, onChange }: any) => (
+      <input
+        data-testid="search-bar"
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+      />
+    ),
+    Filter: ({ selected, chips, onChipChange }: any) => (
+      <div data-testid="search-filter" data-selected={JSON.stringify(selected)}>
+        {chips.map((chip: any) => (
+          <button key={chip.id} data-chip-id={chip.id} onClick={() => onChipChange?.(chip.id)}>
+            {chip.label}
+          </button>
+        ))}
+      </div>
+    ),
+  },
+}));
+
+vi.mock("@/features/settings/content-preference", () => ({
+  useShowOriginalContent: () => false,
+}));
+
+vi.mock("@/shared/hooks/use-listing-navigation", () => ({
+  useListingNavigation: () => ({
+    navigateToListing: vi.fn(),
+  }),
 }));
 
 const mockDetail = useScholarDetail as any;
@@ -80,6 +103,29 @@ const mockTopicsData = {
   ],
 };
 
+const mockContentData = {
+  items: [
+    {
+      id: "l1",
+      slug: "l1",
+      title: "Tawheed",
+      type: "single",
+      recencyAt: "2024-01-01",
+      lectureCount: 5,
+      durationSeconds: 3600,
+    },
+    {
+      id: "l2",
+      slug: "l2",
+      title: "Salah",
+      type: "series",
+      recencyAt: "2024-01-02",
+      lectureCount: 10,
+      durationSeconds: 7200,
+    },
+  ],
+};
+
 beforeEach(() => {
   mockDetail.mockReturnValue({ data: undefined, isFetching: false } as ReturnType<
     typeof useScholarDetail
@@ -106,14 +152,16 @@ describe("ScholarDetailScreen", () => {
     expect(screen.getByText("Scholar not found")).toBeTruthy();
   });
 
-  it("renders header, search bar, and content list", () => {
+  it("renders header and content rows", () => {
     mockDetail.mockReturnValue({ data: mockScholar, isFetching: false } as ReturnType<
       typeof useScholarDetail
     >);
+    mockContent.mockReturnValue({ data: mockContentData, isFetching: false } as ReturnType<
+      typeof useScholarContent
+    >);
     render(<ScholarDetailScreen slug="ibn-baz" />);
     expect(screen.getByTestId("scholar-header")).toBeTruthy();
-    expect(screen.getByPlaceholderText("Search scholar content…")).toBeTruthy();
-    expect(screen.getByTestId("scholar-content-list")).toBeTruthy();
+    expect(screen.getAllByTestId("lecture-row")).toHaveLength(2);
   });
 
   it("renders topic filter chips when topic data is available", () => {
@@ -129,19 +177,25 @@ describe("ScholarDetailScreen", () => {
     expect(screen.getByText("Fiqh")).toBeTruthy();
   });
 
-  it("updates search query input and passes it to content list", () => {
+  it("updates search query and filters content rows", () => {
     mockDetail.mockReturnValue({ data: mockScholar, isFetching: false } as ReturnType<
       typeof useScholarDetail
+    >);
+    mockContent.mockReturnValue({ data: mockContentData, isFetching: false } as ReturnType<
+      typeof useScholarContent
     >);
     render(<ScholarDetailScreen slug="ibn-baz" />);
     const input = screen.getByPlaceholderText("Search scholar content…");
     fireEvent.change(input, { target: { value: "Tawheed" } });
-    expect(screen.getByText(/query:Tawheed/)).toBeTruthy();
+    expect(screen.getByText(/Tawheed/)).toBeTruthy();
   });
 
-  it("toggles topic chip selections and passes them to content list", () => {
+  it("toggles topic chip selections and filters content rows", () => {
     mockDetail.mockReturnValue({ data: mockScholar, isFetching: false } as ReturnType<
       typeof useScholarDetail
+    >);
+    mockContent.mockReturnValue({ data: mockContentData, isFetching: false } as ReturnType<
+      typeof useScholarContent
     >);
     mockTopics.mockReturnValue({ data: mockTopicsData, isFetching: false } as ReturnType<
       typeof useScholarTopics
@@ -150,6 +204,6 @@ describe("ScholarDetailScreen", () => {
 
     const aqeedahBtn = screen.getByText("Aqeedah");
     fireEvent.click(aqeedahBtn);
-    expect(screen.getByText(/topic:t1/)).toBeTruthy();
+    expect(screen.getAllByTestId("lecture-row")).toHaveLength(1);
   });
 });

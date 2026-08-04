@@ -2,7 +2,12 @@
 
 import { useEffect } from "react";
 
-import { ACCENT_THEME_CHANGE_EVENT, getAccentThemePreference } from "./theme/accent-theme";
+import {
+  ACCENT_THEME_CHANGE_EVENT,
+  getDefaultAccentTheme,
+  getAccentThemePreference,
+  isAccentThemeId,
+} from "./theme/accent-theme";
 
 export type ThemePreference = "system" | "light" | "dark";
 
@@ -15,7 +20,8 @@ function applyTheme(preference: ThemePreference, mediaQuery: MediaQueryList) {
 }
 
 function applyAccentTheme() {
-  document.documentElement.setAttribute("data-accent-theme", getAccentThemePreference());
+  const preference = getAccentThemePreference();
+  document.documentElement.setAttribute("data-accent-theme", preference);
 }
 
 export function ThemeSync() {
@@ -33,15 +39,29 @@ export function ThemeSync() {
     syncTheme();
     applyAccentTheme();
 
+    // Re-sync accent theme when OS preference changes (for system default)
+    const syncAccentTheme = () => {
+      const stored = window.localStorage.getItem("accent-theme:v1");
+      if (!isAccentThemeId(stored)) {
+        const newDefault = getDefaultAccentTheme();
+        document.documentElement.setAttribute("data-accent-theme", newDefault);
+      }
+    };
+
     // Re-sync when OS preference changes (only affects "system" mode)
-    mediaQuery.addEventListener("change", syncTheme);
+    const handleMediaChange = () => {
+      syncTheme();
+      syncAccentTheme();
+    };
+
+    mediaQuery.addEventListener("change", handleMediaChange);
 
     // Re-sync when the settings screen dispatches a theme-change event
     window.addEventListener(THEME_CHANGE_EVENT, syncTheme);
     window.addEventListener(ACCENT_THEME_CHANGE_EVENT, applyAccentTheme);
 
     return () => {
-      mediaQuery.removeEventListener("change", syncTheme);
+      mediaQuery.removeEventListener("change", handleMediaChange);
       window.removeEventListener(THEME_CHANGE_EVENT, syncTheme);
       window.removeEventListener(ACCENT_THEME_CHANGE_EVENT, applyAccentTheme);
     };

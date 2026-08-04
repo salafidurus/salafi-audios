@@ -1,18 +1,11 @@
-// react-doctor-disable-next-line react-doctor/nextjs-missing-metadata
-"use client";
-
-import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
-import { SearchProcessingScreen } from "@/features/search/screens/search-processing/search-processing.screen";
+import SearchPageInner from "./search-page-inner";
 
-function SearchPageInner() {
-  const searchParams = useSearchParams();
-  const searchKey = searchParams.get("searchKey") ?? undefined;
-  const topicSlug = searchParams.get("topic") ?? undefined;
-
-  return <SearchProcessingScreen searchKey={searchKey} topicSlug={topicSlug} />;
-}
+export const metadata = {
+  title: "Search",
+  description: "Search salafi durus by scholar, topic, or lecture",
+};
 
 export default function SearchPage() {
   return (

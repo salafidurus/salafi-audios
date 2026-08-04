@@ -6,12 +6,23 @@ export const ACCENT_THEME_CHANGE_EVENT = "accent-theme-change";
 export const isAccentThemeId = (value: unknown): value is AccentThemeId =>
   typeof value === "string" && (ACCENT_THEME_IDS as readonly string[]).includes(value);
 
+/** Returns the resolved accent theme for SSR (no window access). */
+export const getDefaultAccentTheme = (): AccentThemeId => {
+  if (typeof window === "undefined") {
+    return "parchment";
+  }
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "manuscript" : "parchment";
+};
+
 export const getAccentThemePreference = (): AccentThemeId => {
   if (typeof window === "undefined") {
-    return "default";
+    return "parchment";
   }
   const stored = window.localStorage.getItem(ACCENT_THEME_KEY);
-  return isAccentThemeId(stored) ? stored : "default";
+  if (isAccentThemeId(stored)) {
+    return stored;
+  }
+  return getDefaultAccentTheme();
 };
 
 export const setAccentThemePreference = (id: AccentThemeId): void => {
