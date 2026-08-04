@@ -8,6 +8,7 @@ import { LibraryItemRow } from "@/features/library/components/library-item-row/l
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { NativeScreenHost } from "@/shared/ui";
 
 import { useAuth } from "../../../core/auth/use-auth";
 import { useTranslation } from "../../../core/i18n/use-translation";
@@ -31,30 +32,34 @@ export function LibraryScreen({ onNavigateToListing }: LibraryScreenProps) {
 
   if (isFetching && items.length === 0) {
     return (
-      <ScreenView center>
-        <EmptyState
-          message={t("library.loadingSection", "Loading {{section}}…", {
-            section: t("library.inProgress", "In Progress"),
-          })}
-          variant="loading"
-        />
-      </ScreenView>
+      <NativeScreenHost testID="library-screen-host">
+        <ScreenView center>
+          <EmptyState
+            message={t("library.loadingSection", "Loading {{section}}…", {
+              section: t("library.inProgress", "In Progress"),
+            })}
+            variant="loading"
+          />
+        </ScreenView>
+      </NativeScreenHost>
     );
   }
 
   if (items.length === 0) {
     return (
-      <ScreenView center>
-        <EmptyState
-          message={t("library.emptyProgress", "No lectures in progress.")}
-          variant="empty"
-        />
-      </ScreenView>
+      <NativeScreenHost testID="library-screen-host">
+        <ScreenView center>
+          <EmptyState
+            message={t("library.emptyProgress", "No lectures in progress.")}
+            variant="empty"
+          />
+        </ScreenView>
+      </NativeScreenHost>
     );
   }
 
   return (
-    <ScreenView>
+    <NativeScreenHost testID="library-screen-host">
       <ScrollView contentContainerStyle={styles.listContent}>
         <List>
           {items.map((item, index) => (
@@ -73,7 +78,7 @@ export function LibraryScreen({ onNavigateToListing }: LibraryScreenProps) {
           ))}
         </List>
       </ScrollView>
-    </ScreenView>
+    </NativeScreenHost>
   );
 }
 
