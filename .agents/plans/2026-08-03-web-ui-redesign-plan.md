@@ -98,7 +98,7 @@ Foundational change first (theme layer), then its UI control (settings picker), 
 
 ## Stage 3: Chrome + shared design language refresh
 
-- **Status**: Pending
+- **Status**: In Progress (implementation done, tests green; commit pending, manual smoke TBD)
 - **Goal**: Apply the new design language to app chrome and shared primitives purely through the token variables and CSS Modules, so every screen inherits the refreshed look.
 - **Files** (CSS Modules only; behavior unchanged):
   - `apps/web/src/features/navigation/components/sidebar/*.module.css`, `mobile-header`, `sidebar-drawer` styles.
@@ -121,6 +121,30 @@ Foundational change first (theme layer), then its UI control (settings picker), 
   ```
   refactor(web): apply accent design language to chrome and shared components
   ```
+
+### Execution notes (recorded during implementation)
+
+- Emitted web-only `--badge-{success,warning,danger}-{surface,border,fg}` vars in
+  `theme/css.ts` (wiring the existing `recipes.badge` + a new web-only
+  `warning` variant via the `AccentRecipesWeb` type extension in `recipes.ts`).
+  Extended `css.spec.ts` assert list (TDD red → green).
+- Fixed orphan vars that referenced never-emitted tokens (silently unset today):
+  - `Badge.module.css` success/warning → `--badge-*`.
+  - `EmptyState.module.css` error → `--state-danger-*`.
+  - `modal.module.css` active tab → `--content-primary`; error tab →
+    `--state-danger-*`; loading overlay white → `color-mix(in srgb, var(--surface-canvas) 62%, transparent)`.
+  - `Search.module.css` placeholder → `--content-muted` (admin usages left
+    untouched by explicit user choice).
+- Chrome treatment (CSS-only; `--top-nav-height` JS untouched):
+  - `header.module.css` → frosted `--chrome-surface`/`--chrome-border` + blur.
+  - `sidebar.module.css` active rail `--border-primary` → `--border-focus`
+    (teal in default light/dark, gold in accent themes — keeps default
+    near-identical while giving the accent-first gold rail).
+  - `dropdown.module.css` selected item → `--surface-selected`.
+  - `playback-controls.tsx` play button → `var(--accent-primary-bg, var(--action-primary))`.
+  - Mini-player stays `position: sticky`; subnav underline, mobile-header
+    active button, progress bar already consume gold `--action-primary`.
+- Verification: web suite 615 pass / 0 fail, typecheck + lint clean.
 
 ---
 

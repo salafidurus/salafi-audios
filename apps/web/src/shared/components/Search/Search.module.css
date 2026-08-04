@@ -80,12 +80,12 @@ button.barInputWrapper:focus-visible {
 }
 
 .barInput::placeholder {
-  color: var(--content-tertiary);
+  color: var(--content-muted);
 }
 
 .barPlaceholder {
   flex: 1;
-  color: var(--content-tertiary);
+  color: var(--content-muted);
   font-size: 1rem;
   line-height: 1.5;
   text-align: start;

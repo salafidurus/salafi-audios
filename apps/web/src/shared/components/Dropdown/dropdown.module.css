@@ -171,13 +171,13 @@
 }
 
 .itemSelected {
-  background-color: var(--surface-primary-subtle);
+  background-color: var(--surface-selected);
   color: var(--content-primary-strong);
   font-weight: 500;
 }
 
 .itemSelected:hover {
-  background-color: var(--surface-primary-subtle);
+  background-color: var(--surface-selected);
 }
 
 .itemDisabled {

@@ -21,6 +21,15 @@ const COLOR_PROPS = [
   "--hover-accent-surface",
   "--screen-wash-mixed",
   "--state-success",
+  "--badge-success-surface",
+  "--badge-success-border",
+  "--badge-success-fg",
+  "--badge-warning-surface",
+  "--badge-warning-border",
+  "--badge-warning-fg",
+  "--badge-danger-surface",
+  "--badge-danger-border",
+  "--badge-danger-fg",
 ];
 
 const NON_COLOR_MARKERS = [

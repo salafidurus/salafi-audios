@@ -104,6 +104,16 @@ export const getColorThemeProperties = (theme: AppThemeWeb): string => `
   --state-danger-surface: ${theme.colors.state.dangerSurface};
   --state-danger-border: ${theme.colors.state.dangerBorder};
   --state-danger-content: ${theme.colors.state.dangerContent};
+
+  --badge-success-surface: ${theme.recipes.badge.success.surfaceColor};
+  --badge-success-border: ${theme.recipes.badge.success.borderColor};
+  --badge-success-fg: ${theme.recipes.badge.success.foregroundColor};
+  --badge-warning-surface: ${theme.recipes.badge.warning.surfaceColor};
+  --badge-warning-border: ${theme.recipes.badge.warning.borderColor};
+  --badge-warning-fg: ${theme.recipes.badge.warning.foregroundColor};
+  --badge-danger-surface: ${theme.recipes.badge.danger.surfaceColor};
+  --badge-danger-border: ${theme.recipes.badge.danger.borderColor};
+  --badge-danger-fg: ${theme.recipes.badge.danger.foregroundColor};
 `;
 
 export const getNonColorThemeProperties = (theme: AppThemeWeb): string => `

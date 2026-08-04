@@ -220,7 +220,7 @@
 .loadingOverlay {
   position: absolute;
   inset: 0;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: color-mix(in srgb, var(--surface-canvas) 62%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -262,16 +262,16 @@
 }
 
 .tabButtonActive {
-  color: var(--content-accent);
-  border-bottom-color: var(--content-accent);
+  color: var(--content-primary);
+  border-bottom-color: var(--content-primary);
 }
 
 .tabButtonError {
-  outline: 2px solid var(--status-error, #ef4444);
+  outline: 2px solid var(--state-danger);
   outline-offset: -2px;
   border-radius: var(--radius-sm, 4px);
-  color: var(--status-error, #ef4444);
-  background-color: var(--status-error-bg, rgba(239, 68, 68, 0.08));
+  color: var(--state-danger-content);
+  background-color: var(--state-danger-surface);
 }
 
 .tabButton:disabled {
