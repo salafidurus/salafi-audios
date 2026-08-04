@@ -1,7 +1,7 @@
 # Metadata
 
 - **Date**: 2026-08-03
-- **Status**: In Progress
+- **Status**: In Progress (all implementation + verification stages complete; only push/PR/merge and worktree cleanup remain — user follow-up)
 - **Scope**: Visual redesign of `apps/web` (public client) — new named accent themes (Manuscript / Midnight / Ember) plus a refreshed design language across the whole app surface (chrome, home, search, explore, listing, scholar, library, settings). Web-only. No backend, contract, or shared-package changes that could affect `apps/native`.
 - **Summary**: The current web app ships a single light/dark token theme. We are adding three web-only accent palettes that layer on top of the existing CSS-variable token system (`data-accent-theme` attribute), and restyling screens/chrome to the design language of the approved prototype (gold/jade accent work, medallion avatars, sanad-chain progress dots, category chips, hero banner, theme-card picker in Settings). All behavior and data wiring stay identical — this is a presentational redesign expressed through the existing token CSS variables.
 - **Dependencies**:
@@ -27,6 +27,14 @@
 - **Stage 3** committed `8f43425a` — chrome + shared design language: frosted header (`--chrome-surface`/`--chrome-border` + backdrop blur), sidebar active rail → `--border-focus`, dropdown selected → `--surface-selected`, play button → `var(--accent-primary-bg, var(--action-primary))`; emitted `--badge-{success,warning,danger}-*` vars (+ web-only `badge.warning` recipe); orphan-var fixes in Badge/EmptyState/Modal/Search (admin `--content-tertiary` usages left untouched by explicit user choice).
 - **Stage 4** committed as four sub-commits: `66ac83d4` (hero restyle + resume CTA), `552c9f7a` (category chips + `/search?topic=` wiring), `d919ac85` (scholar medallions row), `e7e2f370` (recently added grid).
 - **Stage 4 decisions**: `FeedContentItemDto` has no `topics` field, so chips link to `/search?topic=<slug>` instead of client-side grid filtering (no new endpoint permitted). `search/page.tsx` now reads the `topic` param; `SearchProcessingScreen` seeds its `filter` from a new `topicSlug` prop. Home e2e assertions (title "Salafi Durus", search button) preserved.
+- **Stage 5** committed as five sub-commits: `bc34bd06` (search: accent result rows, filter chips, empty/loading/error states), `b0a86d8f` (explore: feed cards/rows accent restyle + gold medallion rings), `db602f34` (listing detail: hero artwork gold ring + accent glow, content rows, TOC panel), `96195885` (scholar detail: gold medallion header + content list hover/accent), `da530c30` (library: accent rows, progress bars/badges, tokenized progress indicator).
+- **Stage 6 verification** (all green in worktree):
+  - Web suite: 606 pass / 0 fail across 103 files; `typecheck` + `lint` clean.
+  - `bun run build` succeeds (no errors/warnings); prod route table correct.
+  - `react-doctor --scope changed`: **100/100 Great** (no regressions).
+  - E2E (playwright chromium headless shell installed): `home.e2e.ts` 1 pass, `navigation.e2e.ts` 6 pass.
+  - Manual smoke: `/`, `/search`, `/library`, `/settings` 200; `/scholars` 308 (legacy redirect); `home-hero-title` present in SSR HTML.
+  - Parity: `git diff origin/main..f/web-redesign -- apps/native packages/` empty (no shared/native changes).
 
 # Staging Strategy
 
@@ -188,7 +196,7 @@ Foundational change first (theme layer), then its UI control (settings picker), 
 
 ## Stage 5: Redesign catalog, search, and library screens
 
-- **Status**: Pending
+- **Status**: Completed (committed as five sub-commits: `bc34bd06` search, `b0a86d8f` explore, `db602f34` listing detail, `96195885` scholar detail, `da530c30` library)
 - **Goal**: Extend the design language to the remaining main surfaces — search, explore, listing detail, scholar detail, library — with zero behavior/data changes.
 - **Files**:
   - `apps/web/src/features/search/screens/search-processing/search-processing.screen.tsx` + styles + spec — accent result rows, filter chips, empty state; add popular-searches chips (client-side, reuse suggestions copy) to match prototype.
@@ -216,7 +224,7 @@ Foundational change first (theme layer), then its UI control (settings picker), 
 
 ## Stage 6: Verification, docs, and parity checks
 
-- **Status**: Pending
+- **Status**: Completed (verification + parity done; push/PR + worktree cleanup remain as user follow-up)
 - **Goal**: Full pre-push verification; confirm the native app and shared packages are unaffected; update docs.
 - **Files**:
   - `docs/web.md` (web theming/accent themes section, if not already covered).
