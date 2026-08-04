@@ -19,6 +19,15 @@
   - Mini player is `position: sticky` inside `.appConsentMain`, already has a top progress bar; restyle only, do not move to `position: fixed`.
 - No code changes yet. Immediate next step: Stage 1 (accent-theme foundation, TDD).
 
+### Completed work (2026-08-04)
+
+- **Rebase**: `origin/main` advanced to `65987184` (dependabot `@fastify/static` bump, catalog + `bun.lock` regen, CI hardening — none touch `apps/web`). Branch rebased clean; `bun install` (22 pkgs); guardrails verified (`git diff origin/main..f/web-redesign -- apps/native packages` empty). Web suite post-rebase: 594 pass / 0 fail (branch has 100 web spec files vs 96 on main).
+- **Stage 1** committed `29e39467` — web-only accent themes (Manuscript / Midnight / Ember) + persisted preference.
+- **Stage 2** committed `954a815b` — Settings accent theme picker (Default/Manuscript/Midnight/Ember radio cards, gold active ring, persisted `accent-theme:v1`); `SettingsRow.label` made optional; hide mode `SegmentedControl` when accent ≠ default.
+- **Stage 3** committed `8f43425a` — chrome + shared design language: frosted header (`--chrome-surface`/`--chrome-border` + backdrop blur), sidebar active rail → `--border-focus`, dropdown selected → `--surface-selected`, play button → `var(--accent-primary-bg, var(--action-primary))`; emitted `--badge-{success,warning,danger}-*` vars (+ web-only `badge.warning` recipe); orphan-var fixes in Badge/EmptyState/Modal/Search (admin `--content-tertiary` usages left untouched by explicit user choice).
+- **Stage 4** committed as four sub-commits: `66ac83d4` (hero restyle + resume CTA), `552c9f7a` (category chips + `/search?topic=` wiring), `d919ac85` (scholar medallions row), `e7e2f370` (recently added grid).
+- **Stage 4 decisions**: `FeedContentItemDto` has no `topics` field, so chips link to `/search?topic=<slug>` instead of client-side grid filtering (no new endpoint permitted). `search/page.tsx` now reads the `topic` param; `SearchProcessingScreen` seeds its `filter` from a new `topicSlug` prop. Home e2e assertions (title "Salafi Durus", search button) preserved.
+
 # Staging Strategy
 
 Foundational change first (theme layer), then its UI control (settings picker), then the app-wide restyle (chrome/shared, then screens), then verification. Each stage is independently reviewable and committable. Stages 4 and 5 may be split further during execution if they grow too large.
@@ -67,7 +76,7 @@ Foundational change first (theme layer), then its UI control (settings picker), 
 
 ## Stage 2: Settings appearance — accent theme picker
 
-- **Status**: In Progress (picker implemented + wired, tests green; commit pending, manual smoke TBD)
+- **Status**: Completed (committed `954a815b`; manual smoke of the picker across 4 accents still TBD)
 - **Goal**: Add the prototype's theme-card picker to Settings → Display, alongside the existing `system|light|dark` control. Persists via Stage 1's store.
 - **Files**:
   - `apps/web/src/features/settings/components/accent-theme-picker/AccentThemePicker.tsx` (new) + `AccentThemePicker.module.css` (new) + `AccentThemePicker.spec.tsx` (new).
@@ -98,7 +107,7 @@ Foundational change first (theme layer), then its UI control (settings picker), 
 
 ## Stage 3: Chrome + shared design language refresh
 
-- **Status**: In Progress (implementation done, tests green; commit pending, manual smoke TBD)
+- **Status**: Completed (committed `8f43425a`; manual smoke across 4 accents × desktop/mobile still TBD)
 - **Goal**: Apply the new design language to app chrome and shared primitives purely through the token variables and CSS Modules, so every screen inherits the refreshed look.
 - **Files** (CSS Modules only; behavior unchanged):
   - `apps/web/src/features/navigation/components/sidebar/*.module.css`, `mobile-header`, `sidebar-drawer` styles.
@@ -150,7 +159,7 @@ Foundational change first (theme layer), then its UI control (settings picker), 
 
 ## Stage 4: Home screen redesign
 
-- **Status**: Pending
+- **Status**: Completed (committed as four sub-commits: `66ac83d4` hero, `552c9f7a` category chips + search topic wiring, `d919ac85` scholar medallions, `e7e2f370` recently added grid; manual smoke TBD)
 - **Goal**: Bring the home screen in line with the prototype — accent hero banner, category chips, "Study with a scholar" medallion row, "Recently added" grid — reusing existing data hooks.
 - **Files**:
   - `apps/web/src/features/home/screens/home/home.screen.tsx` + `.module.css` + `home.screen.spec.tsx`.
@@ -160,7 +169,7 @@ Foundational change first (theme layer), then its UI control (settings picker), 
   - `apps/web/src/app/(main)/(consent)/page.spec.tsx` — keep passing; extend if structure changes.
 - **Changes**:
   - Hero restyled to accent banner: radial dotted pattern, gold leaf ribbon accent, eyebrow label, Resume CTA from `ContinueListeningCard` state.
-  - Category chips: horizontal scroll row built from `useTopicsList` (`@sd/domain-search`); selecting a chip filters the Recently Added grid client-side (fallback: navigates to `/search` with the topic) — no new endpoints.
+  - Category chips: horizontal scroll row built from `useTopicsList` (`@sd/domain-search`); chips link to `/search?topic=<slug>` (client-side grid filtering is impossible — `FeedContentItemDto` has no topics field — and new endpoints are out of scope). `search/page.tsx` reads the `topic` param; `SearchProcessingScreen` seeds its filter from a new `topicSlug` prop.
   - Scholar medallion row: `useInfiniteScholarsList` (`@sd/domain-content`), avatar medallions with accent ring, name + lecture count, links to `/scholars/[slug]`.
   - Recently Added grid: `useExploreRecentScreen` (`@sd/domain-content`); `LectureCard`-style cards with sanad-chain progress + accent play button.
   - i18n copy via fallback strings.
