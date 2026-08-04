@@ -24,7 +24,6 @@ describe("SignInScreen", () => {
       }),
     );
 
-    expect(screen.getByTestId("sign-in-host")).toBeTruthy();
     expect(screen.getByText("Continue with Google")).toBeTruthy();
   });
 

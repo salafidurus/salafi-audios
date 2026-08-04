@@ -203,32 +203,6 @@ jest.mock("@expo/ui", () => {
     return React.createElement(View, props, children);
   }
 
-  function Picker({ children, selectedValue, onValueChange, testID }) {
-    const options = React.Children.toArray(children).flatMap((child) => {
-      if (!React.isValidElement(child)) return [];
-      return [child.props];
-    });
-
-    return React.createElement(
-      View,
-      { testID },
-      options.map(({ label, value }) =>
-        React.createElement(
-          Pressable,
-          {
-            key: String(value),
-            testID: `${testID}-option-${String(value)}`,
-            accessibilityRole: "radio",
-            accessibilityState: { checked: value === selectedValue },
-            onPress: () => onValueChange(value),
-          },
-          React.createElement(RNText, null, label),
-        ),
-      ),
-    );
-  }
-  Picker.Item = () => null;
-
   return {
     Host,
     BottomSheet: Stack,
@@ -237,7 +211,6 @@ jest.mock("@expo/ui", () => {
     Icon,
     List,
     ListItem,
-    Picker,
     RNHostView,
     Row: Stack,
     ScrollView: Stack,
