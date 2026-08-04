@@ -78,64 +78,30 @@ jest.mock("@expo/ui", () => {
     Switch: RNSwitch,
     TextInput: RNTextInput,
     View,
-    Text: RNText,
+    Text,
   } = require("react-native");
 
   function Host({ children, style, ...rest }) {
     return React.createElement(View, { style, ...rest }, children);
   }
 
-  function Button({ children, label, onPress, disabled, testID, style, ...rest }) {
+  function Button({ children, label, onPress, disabled, testID }) {
     return React.createElement(
       Pressable,
       {
         onPress,
         disabled,
         testID,
-        style,
         accessibilityRole: "button",
         accessibilityState: { disabled },
-        ...rest,
       },
-      children ?? React.createElement(RNText, null, label),
+      children ?? React.createElement(Text, null, label),
     );
   }
-
-  function Text({ children, textStyle, ...props }) {
-    return React.createElement(RNText, { ...props, textStyle, style: textStyle }, children);
-  }
-
-  function Stack({ children, style, spacing, alignment, ...props }) {
-    return React.createElement(View, { ...props, style, spacing, alignment }, children);
-  }
-
-  function List({ children, onRefresh, ...props }) {
-    return React.createElement(View, { ...props, onRefresh }, children);
-  }
-
-  function ListItem({ children, leading, trailing, supportingText, onPress, testID, ...props }) {
-    return React.createElement(
-      Pressable,
-      { ...props, onPress, testID, accessibilityRole: onPress ? "button" : undefined },
-      leading,
-      children,
-      supportingText,
-      trailing,
-    );
-  }
-
-  ListItem.Leading = ({ children }) => children;
-  ListItem.Trailing = ({ children }) => children;
-  ListItem.Supporting = ({ children }) => children;
 
   function Switch({ value, onValueChange, disabled, testID }) {
     return React.createElement(RNSwitch, { value, onValueChange, disabled, testID });
   }
-
-  function Icon({ name, ...props }) {
-    return React.createElement(View, { ...props, iconName: name });
-  }
-  Icon.select = ({ ios, android }) => ({ ios, android });
 
   // Mirrors the real ObservableState contract (a plain object with a mutable
   // `.value`) but backs it with React state, so a caller mutating `.value`
@@ -199,27 +165,7 @@ jest.mock("@expo/ui", () => {
     });
   }
 
-  function RNHostView({ children, ...props }) {
-    return React.createElement(View, props, children);
-  }
-
-  return {
-    Host,
-    BottomSheet: Stack,
-    Button,
-    Column: Stack,
-    Icon,
-    List,
-    ListItem,
-    RNHostView,
-    Row: Stack,
-    ScrollView: Stack,
-    Spacer: Stack,
-    Switch,
-    Text,
-    TextInput,
-    useNativeState,
-  };
+  return { Host, Button, Switch, TextInput, useNativeState };
 });
 
 jest.mock("@expo/ui/community/segmented-control", () => {
@@ -341,10 +287,6 @@ jest.mock("@expo/ui/swift-ui", () => {
     return React.createElement(Text, null, children);
   }
 
-  function ProgressView(props) {
-    return React.createElement(View, props);
-  }
-
   // isPresented fully controls visibility here (matches the real controlled-
   // component contract); Alert.Trigger is rendered as null since its Button is
   // only a required SwiftUI anchor, never actually pressed by the user.
@@ -360,7 +302,7 @@ jest.mock("@expo/ui/swift-ui", () => {
     return React.createElement(View, null, children);
   };
 
-  return { Button, HStack, Text: SwiftUIText, Alert, ProgressView };
+  return { Button, HStack, Text: SwiftUIText, Alert };
 });
 
 jest.mock("@expo/ui/swift-ui/modifiers", () => ({
@@ -374,8 +316,6 @@ jest.mock("@expo/ui/swift-ui/modifiers", () => ({
   frame: (params) => ({ $type: "frame", ...params }),
   opacity: (value) => ({ $type: "opacity", value }),
   padding: (params) => ({ $type: "padding", ...params }),
-  progressViewStyle: (style) => ({ $type: "progressViewStyle", style }),
-  tint: (color) => ({ $type: "tint", color }),
 }));
 
 jest.mock("@expo/ui/jetpack-compose", () => {
@@ -408,11 +348,6 @@ jest.mock("@expo/ui/jetpack-compose", () => {
     return React.createElement(View, null);
   }
 
-  function ProgressIndicator({ modifiers = [], progress, ...props }) {
-    const testIdMod = modifiers.find((modifier) => modifier.$type === "testID");
-    return React.createElement(View, { ...props, progress, testID: testIdMod?.tag });
-  }
-
   // Visibility is controlled by the caller conditionally rendering AlertDialog
   // (matches the real controlled-component contract), so the mock just renders
   // its compound-component children as-is. `colors` is forwarded onto the
@@ -442,8 +377,6 @@ jest.mock("@expo/ui/jetpack-compose", () => {
     Text: ComposeText,
     Spacer,
     AlertDialog,
-    CircularProgressIndicator: ProgressIndicator,
-    LinearProgressIndicator: ProgressIndicator,
   };
 });
 
