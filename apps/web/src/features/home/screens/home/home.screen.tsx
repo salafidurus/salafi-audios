@@ -10,6 +10,7 @@ import { CategoryChips } from "../../components/category-chips/category-chips";
 import { ContinueListeningCard } from "../../components/continue-listening-card/continue-listening-card";
 import { HeroSection } from "../../components/hero-section/hero-section";
 import { MobileDownloadSection } from "../../components/mobile-download-section/mobile-download-section";
+import { RecentlyAddedSection } from "../../components/recently-added-section/recently-added-section";
 import { ScholarMedallions } from "../../components/scholar-medallions/scholar-medallions";
 import { MOBILE_APP_AVAILABILITY } from "./home.constants";
 import styles from "./home.screen.module.css";
@@ -46,6 +47,7 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
       </div>
       <CategoryChips />
       <ScholarMedallions />
+      <RecentlyAddedSection />
       {recentProgress && (
         <ContinueListeningCard
           recentProgress={recentProgress}

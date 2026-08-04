@@ -13,6 +13,7 @@ vi.mock("@sd/domain-search", () => ({
 
 vi.mock("@sd/domain-content", () => ({
   useInfiniteScholarsList: () => ({ data: undefined }),
+  useExploreRecentScreen: () => ({ data: undefined }),
 }));
 
 describe("HomeScreen", () => {
