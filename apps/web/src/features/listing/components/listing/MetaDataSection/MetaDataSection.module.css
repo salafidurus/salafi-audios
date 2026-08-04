@@ -9,13 +9,15 @@
   width: 136px;
   height: 136px;
   flex-shrink: 0;
-  border-radius: var(--radius-component-panel-sm, 10px);
+  border-radius: var(--radius-full);
   overflow: hidden;
   position: relative;
   background-color: var(--surface-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 3px solid var(--border-secondary);
+  box-shadow: 0 4px 24px color-mix(in srgb, var(--accent-primary-subtle-surface) 70%, transparent);
 }
 
 .artwork {
@@ -30,8 +32,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-subtle);
-  color: var(--content-subtle);
+  background: linear-gradient(
+    135deg,
+    var(--surface-subtle),
+    var(--accent-primary-subtle-surface)
+  );
+  color: var(--content-primary-strong);
 }
 
 .textColumn {
@@ -54,7 +60,7 @@
 }
 
 .scholarLink:hover {
-  color: var(--action-primary);
+  color: var(--content-primary-strong);
   text-decoration: underline;
 }
 

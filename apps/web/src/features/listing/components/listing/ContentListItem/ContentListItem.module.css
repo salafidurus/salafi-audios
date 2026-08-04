@@ -14,7 +14,7 @@
 
 @keyframes highlightFade {
   0% {
-    background-color: var(--surface-hover);
+    background-color: var(--surface-selected);
   }
   100% {
     background-color: transparent;
@@ -70,7 +70,7 @@
 
 .progressBarFill {
   height: 100%;
-  background-color: var(--action-primary);
+  background-color: var(--accent-primary-bg, var(--action-primary));
 }
 
 .playButton {
@@ -82,9 +82,9 @@
   height: 40px;
   width: 100%; /* Full width on mobile */
   border-radius: var(--radius-component-chip, 6px);
-  border: 1px solid var(--border-default);
-  background: var(--surface-subtle);
-  color: var(--content-strong);
+  border: 1px solid var(--border-primary);
+  background: var(--accent-primary-subtle-surface);
+  color: var(--content-primary-strong);
   cursor: pointer;
   flex-shrink: 0;
   font-size: var(--typo-body-sm-font-size);
@@ -96,13 +96,13 @@
 
 .playButton:hover {
   background: var(--surface-hover);
-  border-color: var(--border-strong);
+  border-color: var(--border-primary-strong);
 }
 
 .playing {
-  background: var(--action-primary);
-  color: var(--content-on-primary);
-  border-color: var(--action-primary);
+  background: var(--accent-primary-bg, var(--action-primary));
+  color: var(--accent-primary-fg, var(--content-on-primary));
+  border-color: var(--accent-primary-bg, var(--action-primary));
 }
 
 .playText {

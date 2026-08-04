@@ -86,8 +86,8 @@
 }
 
 .moduleButton:hover {
-  background: var(--surface-hover);
-  color: var(--content-strong);
+  background: var(--surface-selected);
+  color: var(--content-primary-strong);
 }
 
 .moduleText {
