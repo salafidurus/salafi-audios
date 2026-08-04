@@ -61,6 +61,39 @@ vi.mock("@/features/search/components/SearchResultItem/SearchResultItem", () => 
   ),
 }));
 
+vi.mock("@/shared/components/Search", () => ({
+  Search: {
+    Bar: ({ placeholder }: { placeholder?: string }) => (
+      <div data-testid="search-bar" data-placeholder={placeholder} />
+    ),
+    Filter: ({ selected, chips, onChipChange }: any) => (
+      <div data-testid="search-filter" data-selected={JSON.stringify(selected)}>
+        {chips.map((chip: any) => (
+          <button key={chip.id} data-chip-id={chip.id} onClick={() => onChipChange?.(chip.id)}>
+            {chip.label}
+          </button>
+        ))}
+      </div>
+    ),
+  },
+}));
+
+vi.mock("@sd/domain-search", () => ({
+  useTopicsList: () => ({
+    data: [
+      { id: "t1", slug: "fiqh", name: { ar: "فقه", en: "Fiqh" } },
+      { id: "t2", slug: "aqeedah", name: { ar: "عقيدة", en: "Aqeedah" } },
+    ],
+  }),
+  useInfiniteSearch: vi.fn(() => ({
+    data: undefined,
+    isLoading: false,
+    hasNextPage: false,
+    fetchNextPage: vi.fn(),
+    isFetchingNextPage: false,
+  })),
+}));
+
 describe("SearchProcessingScreen", () => {
   let queryClient: QueryClient;
 
@@ -95,5 +128,21 @@ describe("SearchProcessingScreen", () => {
     fireEvent.click(item);
 
     expect(mockPush).toHaveBeenCalledWith(routes.listings.detail("test-series"));
+  });
+
+  it("seeds the topic filter from the topicSlug prop", () => {
+    renderWithProviders(<SearchProcessingScreen topicSlug="fiqh" />);
+
+    const filter = screen.getByTestId("search-filter");
+    expect(filter.getAttribute("data-selected")).toBe('["fiqh"]');
+  });
+
+  it("toggles a topic chip in the filter", () => {
+    renderWithProviders(<SearchProcessingScreen />);
+
+    fireEvent.click(screen.getByText("Fiqh"));
+
+    const filter = screen.getByTestId("search-filter");
+    expect(filter.getAttribute("data-selected")).toBe('["fiqh"]');
   });
 });

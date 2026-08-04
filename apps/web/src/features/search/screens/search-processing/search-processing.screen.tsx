@@ -17,15 +17,16 @@ import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export type SearchProcessingScreenProps = {
   searchKey?: string;
+  topicSlug?: string;
 };
 
-export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProps) {
+export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessingScreenProps) {
   const showOriginal = useShowOriginalContent();
   const { i18n, t } = useTranslation();
   const { navigateToListing } = useListingNavigation();
   const { query, setQuery, debouncedQuery } = useDebouncedSearch({ initialValue: searchKey });
   const { data: topics = [] } = useTopicsList();
-  const [filter, setFilter] = useState<string[]>([]);
+  const [filter, setFilter] = useState<string[]>(topicSlug ? [topicSlug] : []);
 
   const filterChips = useMemo(() => {
     return topics

@@ -6,6 +6,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Search } from "@/shared/components/Search";
 
+import { CategoryChips } from "../../components/category-chips/category-chips";
 import { ContinueListeningCard } from "../../components/continue-listening-card/continue-listening-card";
 import { HeroSection } from "../../components/hero-section/hero-section";
 import { MobileDownloadSection } from "../../components/mobile-download-section/mobile-download-section";
@@ -42,6 +43,7 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
           placeholderClassName={styles.searchPlaceholder}
         />
       </div>
+      <CategoryChips />
       {recentProgress && (
         <ContinueListeningCard
           recentProgress={recentProgress}

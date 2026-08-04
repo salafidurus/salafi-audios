@@ -8,6 +8,7 @@ import { HomeScreen } from "./home.screen";
 // Mock the useContinueListening hook from @sd/domain-search
 vi.mock("@sd/domain-search", () => ({
   useContinueListening: vi.fn(),
+  useTopicsList: () => ({ data: [] }),
 }));
 
 describe("HomeScreen", () => {

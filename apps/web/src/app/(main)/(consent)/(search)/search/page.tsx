@@ -9,8 +9,9 @@ import { SearchProcessingScreen } from "@/features/search/screens/search-process
 function SearchPageInner() {
   const searchParams = useSearchParams();
   const searchKey = searchParams.get("searchKey") ?? undefined;
+  const topicSlug = searchParams.get("topic") ?? undefined;
 
-  return <SearchProcessingScreen searchKey={searchKey} />;
+  return <SearchProcessingScreen searchKey={searchKey} topicSlug={topicSlug} />;
 }
 
 export default function SearchPage() {
