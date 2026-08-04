@@ -72,18 +72,25 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
 
   useEffect(() => {
     setUnauthorizedHandler(() => {
-      authClient.signOut().then(() => {
+      // Only redirect to sign-in if the user was authenticated (session expired
+      // mid-flight). For anonymous users hitting unauthenticated public API
+      // calls, a 401 is expected and should NOT trigger a redirect.
+      if (isAuthenticated) {
+        authClient.signOut().then(() => {
+          queryClient.clear();
+          if (
+            typeof window !== "undefined" &&
+            window.location &&
+            !window.location.pathname.startsWith("/sign-in")
+          ) {
+            window.location.href = "/sign-in";
+          }
+        });
+      } else {
         queryClient.clear();
-        if (
-          typeof window !== "undefined" &&
-          window.location &&
-          !window.location.pathname.startsWith("/sign-in")
-        ) {
-          window.location.href = "/sign-in";
-        }
-      });
+      }
     });
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <I18nextProvider i18n={i18n}>
