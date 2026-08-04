@@ -33,7 +33,7 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
       }}
       data-testid="home-screen-container"
     >
-      <HeroSection />
+      <HeroSection recentProgress={recentProgress} onResume={onContinueListening} />
       <div className={styles.searchWrapper} data-testid="home-search-wrapper">
         <Search.Button
           label={t("home.searchLabel", "What do you want to listen to?")}

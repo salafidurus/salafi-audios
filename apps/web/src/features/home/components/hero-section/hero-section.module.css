@@ -5,6 +5,35 @@
   text-align: center;
   gap: 1rem;
   position: relative;
+  padding: 2rem 1rem 0;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--content-primary) 16%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 26px 26px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black, transparent 75%);
+}
+
+.eyebrow {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-label-md-font-size);
+  font-weight: var(--typo-label-md-font-weight);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--content-primary);
 }
 
 .title {
@@ -29,12 +58,24 @@
   border-radius: 999px;
 }
 
+.ribbon {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 88px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--border-secondary), transparent);
+}
+
 .taglineContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .tagline {
@@ -62,9 +103,16 @@
   color: var(--content-primary-strong);
 }
 
+.ctaRow {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.5rem;
+}
+
 @media (max-width: 640px) {
   .hero {
     gap: 0.75rem;
+    padding: 1rem 1rem 0;
   }
 
   .title {

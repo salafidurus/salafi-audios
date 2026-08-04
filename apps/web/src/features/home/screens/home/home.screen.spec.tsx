@@ -99,6 +99,37 @@ describe("HomeScreen", () => {
     expect(screen.queryByTestId("continue-listening-section")).toBeNull();
   });
 
+  it("renders hero resume CTA when recentProgress is provided", () => {
+    (useContinueListening as unknown as Mock<any>).mockReturnValue({
+      recentProgress: {
+        lectureId: "lecture-123",
+        lectureTitle: "Tauheed Explained",
+        lectureSlug: "tauheed-explained",
+        scholarName: "Shaikh Salih al-Fawzan",
+        durationSeconds: 1800,
+        positionSeconds: 600,
+      },
+      isLoading: false,
+    });
+
+    render(
+      <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
+    );
+
+    const resume = screen.getByTestId("home-hero-resume");
+    expect(resume).toBeTruthy();
+    fireEvent.click(resume);
+    expect(mockOnContinueListening).toHaveBeenCalledWith("tauheed-explained");
+  });
+
+  it("omits hero resume CTA when there is no recent progress", () => {
+    render(
+      <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
+    );
+
+    expect(screen.queryByTestId("home-hero-resume")).toBeNull();
+  });
+
   it("renders disabled mobile app download buttons using testIDs", () => {
     render(
       <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
