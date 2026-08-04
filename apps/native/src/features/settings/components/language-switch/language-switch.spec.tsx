@@ -54,27 +54,27 @@ describe("LanguageSwitch", () => {
     });
   });
 
-  it("shows the active locale as the menu trigger", async () => {
+  it("shows the active locale in the native picker", async () => {
     await render(<LanguageSwitch />);
 
     expect(screen.getAllByText("English").length).toBeGreaterThan(0);
   });
 
-  it("marks the active locale's menu action as selected, and others as not", async () => {
+  it("marks the active locale's picker option as selected, and others as not", async () => {
     await render(<LanguageSwitch />);
 
-    expect(screen.getByTestId("language-switch-menu-action-en").props.accessibilityState).toEqual(
+    expect(screen.getByTestId("language-switch-menu-option-en").props.accessibilityState).toEqual(
       expect.objectContaining({ checked: true }),
     );
-    expect(screen.getByTestId("language-switch-menu-action-ar").props.accessibilityState).toEqual(
+    expect(screen.getByTestId("language-switch-menu-option-ar").props.accessibilityState).toEqual(
       expect.objectContaining({ checked: false }),
     );
   });
 
-  it("changes locale when the other locale's menu action is pressed", async () => {
+  it("changes locale when the other native picker option is pressed", async () => {
     await render(<LanguageSwitch />);
 
-    await fireEvent.press(screen.getByTestId("language-switch-menu-action-ar"));
+    await fireEvent.press(screen.getByTestId("language-switch-menu-option-ar"));
 
     await waitFor(() => expect(changeLocale).toHaveBeenCalledWith("ar"));
   });
@@ -82,7 +82,7 @@ describe("LanguageSwitch", () => {
   it("does not call changeLocale when the already-active locale is pressed", async () => {
     await render(<LanguageSwitch />);
 
-    await fireEvent.press(screen.getByTestId("language-switch-menu-action-en"));
+    await fireEvent.press(screen.getByTestId("language-switch-menu-option-en"));
 
     expect(changeLocale).not.toHaveBeenCalled();
   });
@@ -91,7 +91,7 @@ describe("LanguageSwitch", () => {
     await render(<LanguageSwitch />);
     const mockQueryClient = useQueryClient();
 
-    await fireEvent.press(screen.getByTestId("language-switch-menu-action-ar"));
+    await fireEvent.press(screen.getByTestId("language-switch-menu-option-ar"));
 
     await waitFor(() => expect(changeLocale).toHaveBeenCalledWith("ar"));
     expect(mockQueryClient.clear).toHaveBeenCalled();

@@ -1,5 +1,5 @@
 {
-  "violationCount": 81,
+  "violationCount": 76,
   "files": [
     "src/app/(tabs)/(explore)/index.tsx",
     "src/core/providers.tsx",
@@ -8,7 +8,6 @@
     "src/features/audio/components/mini-player.tsx",
     "src/features/audio/components/playback-controls.tsx",
     "src/features/audio/components/progress-bar.tsx",
-    "src/features/auth/screens/sign-in/sign-in.screen.tsx",
     "src/features/downloads/components/download-button/download-button.tsx",
     "src/features/downloads/components/download-progress/download-progress.tsx",
     "src/features/explore/components/explore-podcast-row/explore-podcast-row.tsx",
@@ -42,12 +41,9 @@
     "src/features/settings/components/SegmentedControl/SegmentedControl.tsx",
     "src/features/settings/components/SettingsRow/SettingsRow.tsx",
     "src/features/settings/components/SettingsSection/SettingsSection.tsx",
-    "src/features/settings/components/content-language-toggle/content-language-toggle.tsx",
-    "src/features/settings/components/language-switch/language-switch.tsx",
     "src/features/settings/screens/account-profile.screen.tsx",
     "src/features/settings/screens/account.screen.tsx",
     "src/features/settings/screens/legal-toggle.screen.tsx",
-    "src/features/settings/screens/settings-general.screen.tsx",
     "src/features/settings/screens/settings-profile.screen.tsx",
     "src/features/settings/screens/support.screen.tsx",
     "src/shared/components/AccentGradientFill/AccentGradientFill.tsx",
