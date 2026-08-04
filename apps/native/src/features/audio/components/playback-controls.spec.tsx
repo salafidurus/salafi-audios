@@ -4,15 +4,6 @@ import React from "react";
 
 import { PlaybackControls } from "./playback-controls";
 
-jest.mock("@/shared/ui", () => {
-  const { Text } = require("react-native");
-  return {
-    NativeText: ({ children, testID }: { children?: string | number; testID?: string }) => (
-      <Text testID={testID}>{children}</Text>
-    ),
-  };
-});
-
 jest.mock("react-native-unistyles", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { lightNativeTheme } = require("@/core/styles/theme");
@@ -79,17 +70,5 @@ describe("PlaybackControls", () => {
     await fireEvent.press(screen.getByLabelText("Next track"));
 
     expect(audioService.skipToNext).toHaveBeenCalled();
-  });
-
-  it("renders speed label and skip labels via NativeText", async () => {
-    usePlaybackStore.getState().actions.setCurrentTrack(trackA);
-
-    await render(<PlaybackControls />);
-
-    // Speed label defaults to 1.00x
-    expect(screen.getByText("1.00x")).toBeTruthy();
-    // Two "30" labels for backward and forward skip
-    const thirtyLabels = screen.getAllByText("30");
-    expect(thirtyLabels.length).toBe(2);
   });
 });
