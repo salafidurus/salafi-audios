@@ -11,6 +11,7 @@ import {
   sanitizeBranchName,
   buildPrBody,
   runCi,
+  suppressHeldCandidates,
 } from "./ci";
 import { clearChangelogCache } from "./utils/changelog";
 
@@ -246,5 +247,184 @@ describe("runCi", () => {
     const { existsSync } = require("fs") as typeof import("fs");
     expect(summaries).toEqual([]);
     expect(existsSync(join(tmpDir, ".worktrees"))).toBe(false);
+  });
+});
+
+describe("suppressHeldCandidates", () => {
+  type ExecResult = { stdout: string; stderr: string; status: number };
+
+  function fakeExec(
+    replay: Record<string, () => ExecResult>,
+  ): (cmd: string, args: string[]) => ExecResult {
+    return (cmd, args) => {
+      const key = `${cmd} ${args.join(" ")}`;
+      return replay[key] ? replay[key]() : { stdout: "", stderr: "", status: 0 };
+    };
+  }
+
+  function catalog(stdout: Record<string, string>) {
+    return () => ({
+      stdout: JSON.stringify({ workspaces: { catalog: stdout } }),
+      stderr: "",
+      status: 0,
+    });
+  }
+
+  const noOpen = () => ({ stdout: "", stderr: "", status: 0 });
+  const branchExists = () => ({ stdout: "sha\trefs/heads/deps/x", stderr: "", status: 0 });
+  const fetchOk = () => ({ stdout: "", stderr: "", status: 0 });
+
+  function closedPr(prs: { number: number; state: string; closedAt: string }[]) {
+    return () => ({
+      stdout: JSON.stringify(prs),
+      stderr: "",
+      status: 0,
+    });
+  }
+
+  it("holds a version-locked group when no strictly newer version exists", async () => {
+    const candidates = [
+      makeCandidate({ packageName: "better-auth", latestVersion: "1.6.25", group: "better-auth" }),
+      makeCandidate({
+        packageName: "@better-auth/expo",
+        latestVersion: "1.6.25",
+        group: "better-auth",
+      }),
+    ];
+    const branch = branchName("better-auth");
+    const exec = fakeExec({
+      [`gh pr list --head ${branch} --state open --json number -q .[0].number`]: noOpen,
+      [`gh pr list --head ${branch} --state closed --json number,state,closedAt`]: closedPr([
+        { number: 379, state: "CLOSED", closedAt: "2026-07-24T00:00:00Z" },
+      ]),
+      [`git ls-remote --heads origin ${branch}`]: branchExists,
+      [`git fetch origin ${branch}`]: fetchOk,
+      "git show FETCH_HEAD:package.json": catalog({
+        "better-auth": "1.6.25",
+        "@better-auth/expo": "1.6.25",
+      }),
+    });
+
+    const { remaining, held } = await suppressHeldCandidates(candidates, exec);
+    expect(remaining).toHaveLength(0);
+    expect(held).toHaveLength(1);
+    expect(held[0]!.pr).toBe(379);
+    expect(held[0]!.packages.sort()).toEqual(["@better-auth/expo", "better-auth"]);
+  });
+
+  it("re-proposes a version-locked group when a strictly newer version exists", async () => {
+    const candidates = [
+      makeCandidate({ packageName: "better-auth", latestVersion: "1.6.26", group: "better-auth" }),
+      makeCandidate({
+        packageName: "@better-auth/expo",
+        latestVersion: "1.6.26",
+        group: "better-auth",
+      }),
+    ];
+    const branch = branchName("better-auth");
+    const exec = fakeExec({
+      [`gh pr list --head ${branch} --state open --json number -q .[0].number`]: noOpen,
+      [`gh pr list --head ${branch} --state closed --json number,state,closedAt`]: closedPr([
+        { number: 379, state: "CLOSED", closedAt: "2026-07-24T00:00:00Z" },
+      ]),
+      [`git ls-remote --heads origin ${branch}`]: branchExists,
+      [`git fetch origin ${branch}`]: fetchOk,
+      "git show FETCH_HEAD:package.json": catalog({ "better-auth": "1.6.25" }),
+    });
+
+    const { remaining, held } = await suppressHeldCandidates(candidates, exec);
+    expect(remaining).toHaveLength(2);
+    expect(held).toHaveLength(0);
+  });
+
+  it("holds per-package for a non-version-locked group", async () => {
+    const candidates = [
+      makeCandidate({
+        packageName: "@testing-library/react",
+        latestVersion: "1.5.0",
+        group: "testing",
+      }),
+      makeCandidate({
+        packageName: "@testing-library/jest-dom",
+        latestVersion: "6.0.0",
+        group: "testing",
+      }),
+    ];
+    const branch = branchName("testing");
+    const exec = fakeExec({
+      [`gh pr list --head ${branch} --state open --json number -q .[0].number`]: noOpen,
+      [`gh pr list --head ${branch} --state closed --json number,state,closedAt`]: closedPr([
+        { number: 20, state: "CLOSED", closedAt: "2026-07-24T00:00:00Z" },
+      ]),
+      [`git ls-remote --heads origin ${branch}`]: branchExists,
+      [`git fetch origin ${branch}`]: fetchOk,
+      "git show FETCH_HEAD:package.json": catalog({
+        "@testing-library/react": "1.5.0",
+        "@testing-library/jest-dom": "1.6.0",
+      }),
+    });
+
+    const { remaining, held } = await suppressHeldCandidates(candidates, exec);
+    expect(remaining.map((c) => c.packageName)).toEqual(["@testing-library/jest-dom"]);
+    expect(held).toHaveLength(1);
+    expect(held[0]!.packages).toEqual(["@testing-library/react"]);
+  });
+
+  it("does not suppress when an open PR exists", async () => {
+    const candidates = [
+      makeCandidate({ packageName: "better-auth", latestVersion: "1.6.25", group: "better-auth" }),
+    ];
+    const branch = branchName("better-auth");
+    const exec = fakeExec({
+      [`gh pr list --head ${branch} --state open --json number -q .[0].number`]: () => ({
+        stdout: "379",
+        stderr: "",
+        status: 0,
+      }),
+    });
+
+    const { remaining, held } = await suppressHeldCandidates(candidates, exec);
+    expect(remaining).toHaveLength(1);
+    expect(held).toHaveLength(0);
+  });
+
+  it("ignores merged PRs and selects the most recent closed PR", async () => {
+    const candidates = [
+      makeCandidate({ packageName: "better-auth", latestVersion: "1.6.25", group: "better-auth" }),
+    ];
+    const branch = branchName("better-auth");
+    const exec = fakeExec({
+      [`gh pr list --head ${branch} --state open --json number -q .[0].number`]: noOpen,
+      [`gh pr list --head ${branch} --state closed --json number,state,closedAt`]: closedPr([
+        { number: 400, state: "MERGED", closedAt: "2026-07-25T00:00:00Z" },
+        { number: 379, state: "CLOSED", closedAt: "2026-07-24T00:00:00Z" },
+      ]),
+      [`git ls-remote --heads origin ${branch}`]: branchExists,
+      [`git fetch origin ${branch}`]: fetchOk,
+      "git show FETCH_HEAD:package.json": catalog({ "better-auth": "1.6.25" }),
+    });
+
+    const { remaining, held } = await suppressHeldCandidates(candidates, exec);
+    expect(remaining).toHaveLength(0);
+    expect(held).toHaveLength(1);
+    expect(held[0]!.pr).toBe(379);
+  });
+
+  it("does not suppress when the branch is deleted", async () => {
+    const candidates = [
+      makeCandidate({ packageName: "better-auth", latestVersion: "1.6.25", group: "better-auth" }),
+    ];
+    const branch = branchName("better-auth");
+    const exec = fakeExec({
+      [`gh pr list --head ${branch} --state open --json number -q .[0].number`]: noOpen,
+      [`gh pr list --head ${branch} --state closed --json number,state,closedAt`]: closedPr([
+        { number: 379, state: "CLOSED", closedAt: "2026-07-24T00:00:00Z" },
+      ]),
+      [`git ls-remote --heads origin ${branch}`]: () => ({ stdout: "", stderr: "", status: 0 }),
+    });
+
+    const { remaining, held } = await suppressHeldCandidates(candidates, exec);
+    expect(remaining).toHaveLength(1);
+    expect(held).toHaveLength(0);
   });
 });
