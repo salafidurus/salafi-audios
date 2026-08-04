@@ -6,7 +6,7 @@ import { useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { NativeList, NativeListItem, NativeScreenHost, NativeStateView } from "@/shared/ui";
+import { NativeButton, NativeScreenHost, NativeStateView, NativeText } from "@/shared/ui";
 
 type AdminDashboardScreenProps = {
   onNavigateToListings?: () => void;
@@ -60,11 +60,12 @@ export function AdminDashboardScreen({
 
   return (
     <NativeScreenHost testID="admin-dashboard-host">
-      <ScrollView showsIndicators={false}>
+      <ScrollView showsIndicators={false} style={{ width: "100%" }}>
         <Column
           spacing={theme.spacing.component.gapLg}
           style={{
             padding: theme.spacing.layout.pageX,
+            width: "100%",
           }}
         >
           {isLoading ? (
@@ -75,18 +76,21 @@ export function AdminDashboardScreen({
               title={t("admin.dashboard.noAccess", "You don't have any admin access.")}
             />
           ) : (
-            <NativeList spacing={theme.spacing.component.gapSm}>
-              {visibleCards.map((card) => (
-                <NativeListItem
-                  key={card.key}
-                  title={card.title}
-                  supportingText={card.subtitle}
-                  leadingIcon={card.icon}
+            visibleCards.map((card) => (
+              <Column key={card.key} spacing={theme.spacing.scale.xs} style={{ width: "100%" }}>
+                <NativeButton
+                  label={card.title}
+                  icon={card.icon}
                   onPress={card.onPress}
+                  variant="surface"
+                  fullWidth
                   testID={`admin-dashboard-${card.key}`}
                 />
-              ))}
-            </NativeList>
+                <NativeText variant="bodySm" colorRole="muted">
+                  {card.subtitle}
+                </NativeText>
+              </Column>
+            ))
           )}
         </Column>
       </ScrollView>

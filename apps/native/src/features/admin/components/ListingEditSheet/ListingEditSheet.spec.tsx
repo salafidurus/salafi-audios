@@ -43,15 +43,14 @@ describe("ListingEditSheet", () => {
     });
   });
 
-  it("keeps the Expo UI sheet dismissed when listingId is null", async () => {
+  it("renders nothing when listingId is null", async () => {
     await render(<ListingEditSheet listingId={null} onClose={() => {}} onSaved={() => {}} />);
-    expect(screen.getByTestId("listing-edit-sheet").props.isPresented).toBe(false);
+    expect(screen.toJSON()).toBeNull();
   });
 
   it("renders edit form when listingId is provided", async () => {
     await render(<ListingEditSheet listingId="lst-1" onClose={() => {}} onSaved={() => {}} />);
     // findByText waits for the useEffect's async fetch to settle.
-    expect(await screen.findByTestId("listing-edit-sheet")).toBeTruthy();
     expect(await screen.findByText("Edit Listing")).toBeTruthy();
     expect(screen.getByText("Title")).toBeTruthy();
   }, 15000);
@@ -60,9 +59,8 @@ describe("ListingEditSheet", () => {
     await render(<ListingEditSheet listingId="lst-1" onClose={() => {}} onSaved={() => {}} />);
     await screen.findByText("Edit Listing");
 
-    expect(screen.getByRole("button", { name: "Save" }).props.accessibilityState?.disabled).toBe(
-      false,
-    );
+    const saveButton = screen.getByText("Save").parent;
+    expect(saveButton?.props.accessibilityState?.disabled).toBeFalsy();
   }, 15000);
 
   it("disables Save when the ability does not grant update for this listing's scholar", async () => {
@@ -76,8 +74,7 @@ describe("ListingEditSheet", () => {
     await render(<ListingEditSheet listingId="lst-1" onClose={() => {}} onSaved={() => {}} />);
     await screen.findByText("Edit Listing");
 
-    expect(screen.getByRole("button", { name: "Save" }).props.accessibilityState?.disabled).toBe(
-      true,
-    );
+    const saveButton = screen.getByText("Save").parent;
+    expect(saveButton?.props.accessibilityState?.disabled).toBe(true);
   }, 15000);
 });

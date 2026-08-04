@@ -1,6 +1,7 @@
-import type { AdminListingListItemDto } from "@sd/core-contracts";
+import type { AdminListingListItemDto, AppAbility } from "@sd/core-contracts";
 
-import { Column, RNHostView } from "@expo/ui";
+import { Column, RNHostView, Row } from "@expo/ui";
+import { MenuView, type MenuAction, type NativeActionEvent } from "@expo/ui/community/menu";
 import { useAbility } from "@sd/domain-account";
 import { useFormattedScholarName } from "@sd/domain-content";
 import { Stack } from "expo-router";
@@ -10,7 +11,7 @@ import { useUnistyles } from "react-native-unistyles";
 import { useAuth } from "@/core/auth/use-auth";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import {
-  NativeIcon,
+  NativeButton,
   NativeList,
   NativeListItem,
   NativeScreenHost,
@@ -18,33 +19,52 @@ import {
 } from "@/shared/ui";
 
 import { bulkListingAction } from "../../api/admin-listings.api";
-import { AdminActionSheet } from "../../components/AdminActionSheet/AdminActionSheet";
-import { AdminFloatingAction } from "../../components/AdminFloatingAction/AdminFloatingAction";
 import { AudioUploaderSheet } from "../../components/AudioUploaderSheet/AudioUploaderSheet";
 import { BulkActionBar } from "../../components/BulkActionBar/BulkActionBar";
 import { ListingEditSheet } from "../../components/ListingEditSheet/ListingEditSheet";
-import { ListingTranslationSheet } from "../../components/ListingTranslationSheet/ListingTranslationSheet";
 import { useAdminListings } from "../../hooks/use-admin-listings";
 import { filterListings } from "./filter-listings";
 
 type AdminListingRowProps = {
   item: AdminListingListItemDto;
   isSelected: boolean;
-  onPress: (item: AdminListingListItemDto) => void;
+  actions: MenuAction[];
+  onPress: () => void;
+  onAction: (action: string) => void;
 };
 
-function AdminListingRow({ item, isSelected, onPress }: AdminListingRowProps) {
+/**
+ * The list endpoint already scope-filters rows server-side, and
+ * AdminListingListItemDto carries scholarSlug (not scholarId), so these are
+ * bare ability checks rather than scholarId-conditioned ones — same
+ * trade-off web's admin Listing.tsx made in Stage 8.
+ */
+function getVisibleRowActions(ability: AppAbility): MenuAction[] {
+  const actions: MenuAction[] = [];
+  if (ability.can("update", "Listing")) actions.push({ id: "edit", title: "Edit" });
+  if (ability.can("publish", "Listing")) actions.push({ id: "publish", title: "Publish" });
+  if (ability.can("archive", "Listing")) actions.push({ id: "archive", title: "Archive" });
+  return actions;
+}
+
+function AdminListingRow({ item, isSelected, actions, onPress, onAction }: AdminListingRowProps) {
   const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
 
   return (
-    <NativeListItem
-      title={item.title}
-      supportingText={`${scholarName} · ${item.status}`}
-      leadingIcon={isSelected ? "check" : "play"}
-      trailing={<NativeIcon name="more" colorRole="muted" />}
-      onPress={() => onPress(item)}
-      testID={`admin-listing-row-${item.id}-trigger`}
-    />
+    <MenuView
+      testID={`admin-listing-row-${item.id}`}
+      actions={actions}
+      shouldOpenOnLongPress
+      onPressAction={(event: NativeActionEvent) => onAction(event.nativeEvent.event)}
+    >
+      <NativeListItem
+        title={item.title}
+        supportingText={`${scholarName} · ${item.status}`}
+        leadingIcon={isSelected ? "check" : "play"}
+        onPress={onPress}
+        testID={`admin-listing-row-${item.id}-trigger`}
+      />
+    </MenuView>
   );
 }
 
@@ -57,15 +77,12 @@ export function AdminListingsScreen() {
   const [isBulkLoading, setIsBulkLoading] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
   const [editingListingId, setEditingListingId] = useState<string | null>(null);
-  const [actionListing, setActionListing] = useState<AdminListingListItemDto | null>(null);
-  const [translationListingId, setTranslationListingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const listings = filterListings(data?.items ?? [], searchQuery);
-  const canCreateListing = ability.can("create", "Listing");
+  const rowActions = getVisibleRowActions(ability);
+  const canUpload = ability.can("upload", "Media");
   const canPublish = ability.can("publish", "Listing");
   const canArchive = ability.can("archive", "Listing");
-  const canUpdateListing = ability.can("update", "Listing");
-  const canReadTranslations = ability.can("read", "Translation");
 
   const headerSearchOptions = {
     headerSearchBarOptions: {
@@ -89,11 +106,11 @@ export function AdminListingsScreen() {
   };
 
   const handleRowPress = useCallback(
-    (listing: AdminListingListItemDto) => {
+    (id: string) => {
       if (selectedIds.size > 0) {
-        toggleSelect(listing.id);
+        toggleSelect(id);
       } else {
-        setActionListing(listing);
+        setEditingListingId(id);
       }
     },
     [selectedIds],
@@ -111,34 +128,60 @@ export function AdminListingsScreen() {
     refetch();
   };
 
+  const handleRowAction = async (id: string, action: string) => {
+    if (action === "edit") {
+      setEditingListingId(id);
+      return;
+    }
+    if (action === "publish" || action === "archive") {
+      try {
+        await bulkListingAction({ action, ids: [id] });
+      } catch {
+        // Ignored for UX robustness
+      }
+      refetch();
+    }
+  };
+
   return (
     <NativeScreenHost testID="admin-listings-host">
       <Stack.Screen options={headerSearchOptions} />
-      <AdminFloatingAction isVisible={canCreateListing} onPress={() => setShowUploader(true)}>
-        <Column
-          spacing={theme.spacing.component.gapLg}
-          style={{
-            padding: theme.spacing.layout.pageX,
-          }}
-        >
-          {isLoading ? (
-            <NativeStateView kind="loading" title="Loading…" />
-          ) : listings.length === 0 ? (
-            <NativeStateView kind="empty" title="No listings found." />
-          ) : (
-            <NativeList testID="admin-listings-list">
-              {listings.map((item) => (
-                <AdminListingRow
-                  key={item.id}
-                  item={item}
-                  isSelected={selectedIds.has(item.id)}
-                  onPress={handleRowPress}
-                />
-              ))}
-            </NativeList>
-          )}
-        </Column>
-      </AdminFloatingAction>
+      <Column
+        spacing={theme.spacing.component.gapLg}
+        style={{
+          width: "100%",
+          padding: theme.spacing.layout.pageX,
+        }}
+      >
+        {canUpload ? (
+          <Row alignment="end">
+            <NativeButton
+              label="Upload"
+              icon="add"
+              onPress={() => setShowUploader(true)}
+              testID="admin-listings-upload"
+            />
+          </Row>
+        ) : null}
+        {isLoading ? (
+          <NativeStateView kind="loading" title="Loading…" />
+        ) : listings.length === 0 ? (
+          <NativeStateView kind="empty" title="No listings found." />
+        ) : (
+          <NativeList testID="admin-listings-list">
+            {listings.map((item) => (
+              <AdminListingRow
+                key={item.id}
+                item={item}
+                isSelected={selectedIds.has(item.id)}
+                actions={rowActions}
+                onPress={() => handleRowPress(item.id)}
+                onAction={(action) => void handleRowAction(item.id, action)}
+              />
+            ))}
+          </NativeList>
+        )}
+      </Column>
 
       <RNHostView>
         <BulkActionBar
@@ -151,62 +194,27 @@ export function AdminListingsScreen() {
         />
       </RNHostView>
 
-      <AudioUploaderSheet
-        isOpen={showUploader}
-        onClose={() => setShowUploader(false)}
-        onUploadComplete={() => {
-          setShowUploader(false);
-          refetch();
-        }}
-      />
+      <RNHostView matchContents>
+        <AudioUploaderSheet
+          isOpen={showUploader}
+          onClose={() => setShowUploader(false)}
+          onUploadComplete={() => {
+            setShowUploader(false);
+            refetch();
+          }}
+        />
+      </RNHostView>
 
-      <ListingEditSheet
-        listingId={editingListingId}
-        onClose={() => setEditingListingId(null)}
-        onSaved={() => {
-          setEditingListingId(null);
-          refetch();
-        }}
-      />
-      <AdminActionSheet
-        isOpen={actionListing != null}
-        title="Listing actions"
-        onClose={() => setActionListing(null)}
-        actions={[
-          ...(canUpdateListing
-            ? [
-                {
-                  label: "Edit",
-                  icon: "edit" as const,
-                  onPress: () => {
-                    setEditingListingId(actionListing?.id ?? null);
-                    setActionListing(null);
-                  },
-                },
-              ]
-            : []),
-          ...(canReadTranslations
-            ? [
-                {
-                  label: "Translate",
-                  icon: "translate" as const,
-                  onPress: () => {
-                    setTranslationListingId(actionListing?.id ?? null);
-                    setActionListing(null);
-                  },
-                },
-              ]
-            : []),
-        ]}
-      />
-      <ListingTranslationSheet
-        listingId={translationListingId}
-        onClose={() => setTranslationListingId(null)}
-        onSaved={() => {
-          setTranslationListingId(null);
-          refetch();
-        }}
-      />
+      <RNHostView matchContents>
+        <ListingEditSheet
+          listingId={editingListingId}
+          onClose={() => setEditingListingId(null)}
+          onSaved={() => {
+            setEditingListingId(null);
+            refetch();
+          }}
+        />
+      </RNHostView>
     </NativeScreenHost>
   );
 }

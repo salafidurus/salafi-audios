@@ -1,16 +1,16 @@
 import type { ReactNode } from "react";
 
-import { Column, ListItem, type ColumnProps, type ListItemProps } from "@expo/ui";
+import { List, ListItem, type ListProps, type ListItemProps } from "@expo/ui";
 
 import type { NativeIconName } from "./native-icon-sources";
 
 import { NativeIcon } from "./native-icon";
 import { NativeText } from "./native-text";
 
-export type NativeListProps = ColumnProps;
+export type NativeListProps = ListProps;
 
 export function NativeList(props: NativeListProps) {
-  return <Column {...props} />;
+  return <List {...props} />;
 }
 
 export type NativeListItemProps = Omit<ListItemProps, "children" | "leading" | "supportingText"> & {

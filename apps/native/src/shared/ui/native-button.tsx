@@ -15,6 +15,7 @@ export type NativeButtonProps = Omit<ButtonProps, "children" | "label" | "varian
   variant?: NativeButtonVariant;
   size?: NativeButtonSize;
   loading?: boolean;
+  fullWidth?: boolean;
 };
 
 export function NativeButton({
@@ -24,6 +25,7 @@ export function NativeButton({
   size = "md",
   loading = false,
   disabled = false,
+  fullWidth = false,
   style,
   ...props
 }: NativeButtonProps) {
@@ -39,6 +41,7 @@ export function NativeButton({
       variant={variant === "ghost" ? "text" : variant === "outline" ? "outlined" : "filled"}
       style={{
         height,
+        width: fullWidth ? "100%" : undefined,
         paddingHorizontal: getHorizontalPadding(size, theme),
         borderRadius: theme.radius.component.chip,
         borderWidth: colors.borderWidth,

@@ -36,10 +36,6 @@ export const nativeIconSources = {
     ios: "checkmark.circle.fill",
     android: import("@expo/material-symbols/check_circle.xml"),
   }),
-  translate: Icon.select({
-    ios: "character.book.closed",
-    android: import("@expo/material-symbols/translate.xml"),
-  }),
 } as const;
 
 export type NativeIconName = keyof typeof nativeIconSources;

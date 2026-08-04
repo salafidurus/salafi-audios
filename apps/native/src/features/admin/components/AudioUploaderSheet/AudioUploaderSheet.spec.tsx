@@ -74,19 +74,18 @@ describe("AudioUploaderSheet", () => {
     });
   });
 
-  it("presents the upload flow in an Expo UI bottom sheet", async () => {
+  it("renders Select Audio Files button when open", async () => {
     await render(
       <AudioUploaderSheet isOpen={true} onClose={() => {}} onUploadComplete={() => {}} />,
     );
-    expect(screen.getByTestId("audio-uploader-sheet")).toBeTruthy();
     expect(screen.getByText("Select Audio Files")).toBeTruthy();
   });
 
-  it("keeps the Expo UI sheet dismissed when closed", async () => {
+  it("renders nothing when closed", async () => {
     await render(
       <AudioUploaderSheet isOpen={false} onClose={() => {}} onUploadComplete={() => {}} />,
     );
-    expect(screen.getByTestId("audio-uploader-sheet").props.isPresented).toBe(false);
+    expect(screen.toJSON()).toBeNull();
   });
 
   it("shows every scholar when the ability grants unscoped upload access", async () => {

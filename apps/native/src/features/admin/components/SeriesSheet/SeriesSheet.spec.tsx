@@ -44,12 +44,11 @@ describe("SeriesSheet", () => {
         onSaved={() => {}}
       />,
     );
-    expect(screen.getByTestId("series-sheet")).toBeTruthy();
     expect(screen.getByText("New Series")).toBeTruthy();
     expect(screen.getByText("Title", { exact: false })).toBeTruthy();
   });
 
-  it("keeps the Expo UI sheet dismissed when closed", async () => {
+  it("renders nothing when closed", async () => {
     await render(
       <SeriesSheet
         isOpen={false}
@@ -59,7 +58,7 @@ describe("SeriesSheet", () => {
         onSaved={() => {}}
       />,
     );
-    expect(screen.getByTestId("series-sheet").props.isPresented).toBe(false);
+    expect(screen.toJSON()).toBeNull();
   });
 
   it("enables Save when the ability grants create for this scholar", async () => {
@@ -72,9 +71,8 @@ describe("SeriesSheet", () => {
         onSaved={() => {}}
       />,
     );
-    expect(screen.getByRole("button", { name: "Save" }).props.accessibilityState?.disabled).toBe(
-      false,
-    );
+    const saveButton = screen.getByText("Save").parent;
+    expect(saveButton?.props.accessibilityState?.disabled).toBeFalsy();
   });
 
   it("disables Save when the ability does not grant create for this scholar", async () => {
@@ -94,8 +92,7 @@ describe("SeriesSheet", () => {
         onSaved={() => {}}
       />,
     );
-    expect(screen.getByRole("button", { name: "Save" }).props.accessibilityState?.disabled).toBe(
-      true,
-    );
+    const saveButton = screen.getByText("Save").parent;
+    expect(saveButton?.props.accessibilityState?.disabled).toBe(true);
   });
 });

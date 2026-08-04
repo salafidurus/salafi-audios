@@ -35,6 +35,7 @@ export function NativeStateView({
       spacing={theme.spacing.component.gapMd}
       testID={testID}
       style={{
+        width: "100%",
         padding: theme.spacing.scale["2xl"],
         borderRadius: theme.radius.component.card,
         backgroundColor: theme.colors.surface.subtle,
