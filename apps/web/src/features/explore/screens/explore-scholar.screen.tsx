@@ -30,7 +30,8 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     debouncedQuery: debouncedSearch,
   } = useDebouncedSearch();
 
-  const { data, isFetching, isLoading, hasNextPage, fetchNextPage } = useInfiniteScholarsList();
+  const { data, isFetching, isLoading, isError, refetch, hasNextPage, fetchNextPage } =
+    useInfiniteScholarsList();
 
   const allScholars = data?.pages.flatMap((p) => p.items) ?? [];
 
@@ -57,7 +58,19 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
         </div>
       </div>
 
-      {filteredScholars.length > 0 ? (
+      {isError && allScholars.length === 0 ? (
+        <div className={styles.empty} role="alert">
+          <p style={{ margin: 0 }}>{t("scholars.error", "Failed to load scholars.")}</p>
+          <button
+            type="button"
+            className={styles.loadMoreButton}
+            onClick={() => refetch()}
+            style={{ marginTop: "12px" }}
+          >
+            {t("common.retry", "Try again")}
+          </button>
+        </div>
+      ) : filteredScholars.length > 0 ? (
         <div className={styles.grid}>
           {filteredScholars.map((scholar) => (
             <ScholarGridCard key={scholar.id} scholar={scholar} onPress={handleNavigateToScholar} />

@@ -1,5 +1,8 @@
 "use client";
 
+import type { FeedContentItemDto, FeedItemDto } from "@sd/core-contracts";
+
+import { useExploreRecentScreen } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
 import { User } from "lucide-react";
 
@@ -21,10 +24,27 @@ export type HomeScreenProps = {
   onContinueListening?: (lectureId: string) => void;
 };
 
+function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
+  return item.kind !== "scholar_row" && item.kind !== "topic_row";
+}
+
 export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProps) {
-  const { recentProgress } = useContinueListening();
+  const { recentProgress, isLoading: isProgressLoading } = useContinueListening();
+  const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen();
   const { t } = useTranslation();
+
+  const items: FeedContentItemDto[] = [];
+  for (const page of exploreData?.pages ?? []) {
+    for (const item of page.items) {
+      if (isContentItem(item)) {
+        items.push(item);
+      }
+    }
+  }
+
+  const featuredContent = items[0] ?? null;
   const hasHistory = Boolean(recentProgress);
+  const isHeroLoading = (isProgressLoading || isExploreLoading) && !recentProgress && !featuredContent;
 
   return (
     <ScreenView
@@ -56,6 +76,8 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
 
       <HeroSection
         recentProgress={recentProgress}
+        featuredContent={featuredContent}
+        isLoading={isHeroLoading}
         onResume={onContinueListening}
         hasHistory={hasHistory}
       />

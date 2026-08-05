@@ -30,7 +30,7 @@ const TOPIC_ICONS: Record<string, LucideIcon> = {
 
 export function CategoryChips() {
   const { i18n, t } = useTranslation();
-  const { data: topics = [] } = useTopicsList();
+  const { data: topics = [], isLoading } = useTopicsList();
 
   const chips = useMemo(() => {
     return topics
@@ -45,6 +45,24 @@ export function CategoryChips() {
         Icon: TOPIC_ICONS[topic.slug],
       }));
   }, [topics, i18n.language]);
+
+  if (isLoading && topics.length === 0) {
+    return (
+      <nav className={styles.chipsRow} aria-label={t("home.categories.label", "Browse by topic")}>
+        <Link
+          href={routes.search}
+          className={`${styles.chip} ${styles.chipAllActive}`}
+          data-testid="category-chip-all"
+        >
+          <BookOpen size={15} strokeWidth={2} className={styles.chipIconActive} />
+          {t("home.categories.all", "All")}
+        </Link>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={`chip-skeleton-${i}`} className={`${styles.skeletonLine} ${styles.skeletonChip}`} />
+        ))}
+      </nav>
+    );
+  }
 
   return (
     <nav className={styles.chipsRow} aria-label={t("home.categories.label", "Browse by topic")}>

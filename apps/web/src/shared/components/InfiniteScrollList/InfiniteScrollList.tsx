@@ -10,6 +10,10 @@ export interface InfiniteScrollListProps<TData> {
   renderItem: (item: TData, index: number) => ReactNode;
   /** Whether data is loading */
   isLoading?: boolean;
+  /** Whether an error occurred */
+  isError?: boolean;
+  /** Callback to retry loading on error */
+  onRetry?: () => void;
   /** Whether more data can be loaded */
   hasMore: boolean;
   /** Callback to load more data */
@@ -18,16 +22,21 @@ export interface InfiniteScrollListProps<TData> {
   isFetchingNextPage?: boolean;
   /** Message when no items */
   emptyMessage?: string;
+  /** Message when an error occurs */
+  errorMessage?: string;
 }
 
 export function InfiniteScrollList<TData>({
   data,
   renderItem,
   isLoading,
+  isError,
+  onRetry,
   hasMore,
   onLoadMore,
   isFetchingNextPage,
   emptyMessage = "No items found",
+  errorMessage = "Failed to load content. Please try again.",
 }: InfiniteScrollListProps<TData>): ReactNode {
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -48,8 +57,27 @@ export function InfiniteScrollList<TData>({
     return () => observer.disconnect();
   }, [hasMore, onLoadMore, isFetchingNextPage]);
 
+  if (isError && data.length === 0) {
+    return (
+      <div className={styles.error} role="alert">
+        <span>{errorMessage}</span>
+        {onRetry && (
+          <button type="button" className={styles.retryButton} onClick={onRetry}>
+            Try again
+          </button>
+        )}
+      </div>
+    );
+  }
+
   if (isLoading && data.length === 0) {
-    return <div className={styles.loading}>Loading items…</div>;
+    return (
+      <div className={styles.skeletonContainer} aria-hidden="true">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={`list-skeleton-${i}`} className={`${styles.skeletonLine} ${styles.skeletonRow}`} />
+        ))}
+      </div>
+    );
   }
 
   if (data.length === 0) {

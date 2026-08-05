@@ -24,6 +24,15 @@ function applyAccentTheme() {
   document.documentElement.setAttribute("data-accent-theme", preference);
 }
 
+function syncAccentTheme() {
+  if (typeof window === "undefined") return;
+  const stored = window.localStorage.getItem("accent-theme:v1");
+  if (!isAccentThemeId(stored)) {
+    const newDefault = getDefaultAccentTheme();
+    document.documentElement.setAttribute("data-accent-theme", newDefault);
+  }
+}
+
 export function ThemeSync() {
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -33,20 +42,12 @@ export function ThemeSync() {
       const preference: ThemePreference =
         stored === "light" || stored === "dark" ? stored : "system";
       applyTheme(preference, mediaQuery);
+      syncAccentTheme();
     };
 
     // Apply on mount from localStorage
     syncTheme();
     applyAccentTheme();
-
-    // Re-sync accent theme when OS preference changes (for system default)
-    const syncAccentTheme = () => {
-      const stored = window.localStorage.getItem("accent-theme:v1");
-      if (!isAccentThemeId(stored)) {
-        const newDefault = getDefaultAccentTheme();
-        document.documentElement.setAttribute("data-accent-theme", newDefault);
-      }
-    };
 
     // Re-sync when OS preference changes (only affects "system" mode)
     const handleMediaChange = () => {
@@ -69,3 +70,4 @@ export function ThemeSync() {
 
   return null;
 }
+

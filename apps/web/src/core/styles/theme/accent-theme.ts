@@ -11,6 +11,9 @@ export const getDefaultAccentTheme = (): AccentThemeId => {
   if (typeof window === "undefined") {
     return "parchment";
   }
+  const storedTheme = window.localStorage.getItem("theme-preference:v1");
+  if (storedTheme === "dark") return "manuscript";
+  if (storedTheme === "light") return "parchment";
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "manuscript" : "parchment";
 };
 

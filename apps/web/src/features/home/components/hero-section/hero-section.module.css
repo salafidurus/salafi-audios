@@ -166,3 +166,56 @@
 [dir="rtl"] .hero {
   direction: rtl;
 }
+
+/* Skeleton loader styles */
+.skeletonEyebrow {
+  height: 12px;
+  width: 220px;
+}
+
+.skeletonTitle {
+  height: 32px;
+  width: 65%;
+  margin: 4px 0;
+}
+
+.skeletonSubtitle {
+  height: 16px;
+  width: 40%;
+}
+
+.skeletonCta {
+  height: 40px;
+  width: 140px;
+  border-radius: 999px;
+  margin-top: 8px;
+}
+
+.skeletonLine {
+  border-radius: var(--radius-scale-sm);
+  background: var(--surface-subtle);
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-subtle) 0%,
+    var(--surface-hover) 50%,
+    var(--surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: heroShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes heroShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeletonLine {
+    animation: none;
+  }
+}
+

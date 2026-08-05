@@ -13,8 +13,25 @@ const MAX_SCHOLARS = 8;
 
 export function ScholarMedallions() {
   const { t } = useTranslation();
-  const { data } = useInfiniteScholarsList();
+  const { data, isLoading } = useInfiniteScholarsList();
   const scholars = data?.pages.flatMap((page) => page.items) ?? [];
+
+  if (isLoading && scholars.length === 0) {
+    return (
+      <section className={styles.section} aria-label={t("home.scholars.label", "Scholars")}>
+        <h2 className={styles.sectionTitle}>{t("home.scholars.title", "Scholars")}</h2>
+        <div className={styles.scrollRow}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={`scholar-skeleton-${i}`} className={styles.skeletonMedallion}>
+              <div className={`${styles.skeletonLine} ${styles.skeletonAvatar}`} />
+              <div className={`${styles.skeletonLine} ${styles.skeletonName}`} />
+              <div className={`${styles.skeletonLine} ${styles.skeletonCount}`} />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   if (scholars.length === 0) {
     return null;

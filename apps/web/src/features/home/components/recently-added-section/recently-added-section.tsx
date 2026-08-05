@@ -18,7 +18,7 @@ function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
 export function RecentlyAddedSection() {
   const { t } = useTranslation();
   const { navigateToListing } = useListingNavigation();
-  const { data } = useExploreRecentScreen();
+  const { data, isLoading } = useExploreRecentScreen();
 
   const items: FeedContentItemDto[] = [];
   for (const page of data?.pages ?? []) {
@@ -44,6 +44,20 @@ export function RecentlyAddedSection() {
         }
       : null,
   );
+
+  if (isLoading && items.length === 0) {
+    return (
+      <section className={styles.section} aria-label={t("home.recent.label", "Recently added")}>
+        <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
+        <div className={styles.list}>
+          <div className={`${styles.skeletonLine} ${styles.skeletonFeaturedCard}`} />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={`recent-skeleton-${i}`} className={`${styles.skeletonLine} ${styles.skeletonRow}`} />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   if (items.length === 0) {
     return null;

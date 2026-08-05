@@ -22,8 +22,18 @@ export function LibraryScreen() {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
 
-  const { data: progressData, isLoading: isLoadingProgress } = useInfiniteLibraryProgress();
-  const { data: savedData, isLoading: isLoadingSaved } = useInfiniteLibrarySaved();
+  const {
+    data: progressData,
+    isLoading: isLoadingProgress,
+    isError: isErrorProgress,
+    refetch: refetchProgress,
+  } = useInfiniteLibraryProgress();
+  const {
+    data: savedData,
+    isLoading: isLoadingSaved,
+    isError: isErrorSaved,
+    refetch: refetchSaved,
+  } = useInfiniteLibrarySaved();
 
   const progressMap = useProgressStore((s) => s.progressMap);
   const currentTrack = usePlaybackStore((s) => s.currentTrack);
@@ -60,6 +70,8 @@ export function LibraryScreen() {
           <InfiniteScrollList
             data={continuingItems}
             isLoading={isLoadingProgress}
+            isError={isErrorProgress}
+            onRetry={() => refetchProgress()}
             hasMore={false}
             onLoadMore={() => {}}
             renderItem={(item) => <LibraryListRow item={item} variant="progress" />}
@@ -87,6 +99,8 @@ export function LibraryScreen() {
           <InfiniteScrollList
             data={savedItems}
             isLoading={isLoadingSaved}
+            isError={isErrorSaved}
+            onRetry={() => refetchSaved()}
             hasMore={false}
             onLoadMore={() => {}}
             renderItem={(item) => <LibraryListRow item={item} variant="saved" />}

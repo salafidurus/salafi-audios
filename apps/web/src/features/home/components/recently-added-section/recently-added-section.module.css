@@ -20,3 +20,45 @@
   gap: var(--space-component-gap-sm);
   width: 100%;
 }
+
+/* Skeleton Styles */
+.skeletonFeaturedCard {
+  height: 120px;
+  width: 100%;
+  border-radius: var(--radius-component-card);
+}
+
+.skeletonRow {
+  height: 56px;
+  width: 100%;
+  border-radius: var(--radius-scale-md);
+}
+
+.skeletonLine {
+  border-radius: var(--radius-scale-sm);
+  background: var(--surface-subtle);
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-subtle) 0%,
+    var(--surface-hover) 50%,
+    var(--surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeletonLine {
+    animation: none;
+  }
+}
+

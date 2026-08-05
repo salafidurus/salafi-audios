@@ -176,8 +176,21 @@ export function FeedRecentScreen({
     );
   }
 
-  if (isFetching && items.length === 0) {
-    body = <p className={styles.loading}>{t("explore.loadingFeed", "Loading feed…")}</p>;
+  if (isError && items.length === 0) {
+    body = (
+      <div className={styles.state} role="alert">
+        <span>{getErrorStateText("feed", t)}</span>
+        <button
+          type="button"
+          className={`${styles.button} ${styles.retryButton}`}
+          onClick={() => refetch()}
+        >
+          {t("feed.retry", "Try Again")}
+        </button>
+      </div>
+    );
+  } else if (isFetching && items.length === 0) {
+    body = <FeedSkeleton />;
   } else if (items.length === 0) {
     body = (
       <p className={styles.empty}>{t("explore.noContent", "No content yet. Check back soon.")}</p>
