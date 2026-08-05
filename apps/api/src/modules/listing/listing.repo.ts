@@ -1,4 +1,5 @@
 import { PrismaService } from '../../core/db/prisma.service';
+import { ConfigService } from '../../core/config/config.service';
 import {
   BadRequestException,
   ConflictException,
@@ -35,7 +36,10 @@ import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 @Injectable()
 export class ListingRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config?: ConfigService,
+  ) {}
 
   async findIdBySlug(slug: string): Promise<string | null> {
     const listing = await this.prisma.listing.findUnique({ where: { slug }, select: { id: true } });
@@ -1828,5 +1832,174 @@ export class ListingRepository {
       data: { status: 'draft' },
     });
     return this.mapListingTranslation(record);
+  }
+
+  async findPromotions() {
+    const locale = getRequestLocale();
+
+    // 1. Get featured hero recommendation and curated editors' picks concurrently
+    const [hero, picks] = await Promise.all([
+      this.prisma.recommendationHero.findFirst({
+        where: { isActive: true },
+        include: {
+          listing: {
+            include: {
+              translations: {
+                where: { locale, status: 'published' },
+                select: { title: true },
+                take: 1,
+              },
+              scholar: {
+                select: {
+                  name: true,
+                  slug: true,
+                  mainLanguage: true,
+                  translations: {
+                    where: { locale, status: 'published' },
+                    select: { name: true },
+                    take: 1,
+                  },
+                },
+              },
+            },
+          },
+        },
+        orderBy: { orderIndex: 'asc' },
+      }),
+      this.prisma.curationMetadata.findMany({
+        include: {
+          listing: {
+            include: {
+              translations: {
+                where: { locale, status: 'published' },
+                select: { title: true },
+                take: 1,
+              },
+              scholar: {
+                select: {
+                  name: true,
+                  slug: true,
+                  mainLanguage: true,
+                  translations: {
+                    where: { locale, status: 'published' },
+                    select: { name: true },
+                    take: 1,
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    const toPublicUrl = (value: string): string => {
+      if (/^[a-z]+:\/\//i.test(value)) {
+        return value;
+      }
+      const base = this.config?.ASSET_CDN_BASE_URL;
+      if (!base) return value;
+      return `${base.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
+    };
+
+    const toOptionalPublicUrl = (value?: string | null): string | undefined => {
+      if (!value) return undefined;
+      return toPublicUrl(value);
+    };
+
+    const mapListing = (l: any) => {
+      const resolved = resolveContentTranslation({
+        base: { title: l.title },
+        originalLanguage: l.language,
+        targetLocale: locale,
+        publishedTranslation: l.translations[0] ?? null,
+      });
+      const scholarName = resolveContentTranslation({
+        base: { name: l.scholar!.name },
+        originalLanguage: l.scholar!.mainLanguage,
+        targetLocale: locale,
+        publishedTranslation: l.scholar!.translations[0] ?? null,
+      }).fields.name;
+
+      const durationSeconds =
+        l.format === 'single' ? (l.durationSeconds ?? 0) : (l.publishedDurationSeconds ?? 0);
+      const thumbnailUrl = l.format === 'single' ? null : toOptionalPublicUrl(l.coverImageUrl);
+      const publishedLectureCount = l.format === 'single' ? 1 : (l.publishedLectureCount ?? 1);
+
+      return {
+        kind: l.format as 'collection' | 'series' | 'single',
+        id: l.id,
+        title: resolved.fields.title,
+        slug: l.slug,
+        scholarName,
+        scholarSlug: l.scholar!.slug,
+        thumbnailUrl: thumbnailUrl ?? null,
+        durationSeconds: durationSeconds ?? 0,
+        publishedLectureCount,
+        publishedAt: (l.publishedAt ?? l.createdAt).toISOString(),
+        originalLanguage: resolved.originalLanguage,
+      };
+    };
+
+    return {
+      hero: hero
+        ? {
+            id: hero.id,
+            listingId: hero.listingId,
+            headline: hero.headline,
+            listing: mapListing(hero.listing),
+          }
+        : null,
+      editorsPicks: picks.map((p) => ({
+        id: p.id,
+        listingId: p.listingId,
+        listing: mapListing(p.listing),
+      })),
+    };
+  }
+
+  async updatePromotions(body: {
+    heroListingId?: string | null;
+    heroHeadline?: string | null;
+    editorsPickListingIds?: string[];
+  }) {
+    await this.prisma.$transaction(async (tx) => {
+      // 1. Update Hero
+      if (body.heroListingId !== undefined) {
+        // Deactivate existing heroes
+        await tx.recommendationHero.updateMany({
+          where: { isActive: true },
+          data: { isActive: false },
+        });
+
+        if (body.heroListingId && body.heroHeadline) {
+          // Create new hero
+          await tx.recommendationHero.create({
+            data: {
+              listingId: body.heroListingId,
+              headline: body.heroHeadline,
+              isActive: true,
+            },
+          });
+        }
+      }
+
+      // 2. Update Editors' Picks
+      if (body.editorsPickListingIds !== undefined) {
+        // Delete existing curation metadata
+        await tx.curationMetadata.deleteMany({});
+
+        if (body.editorsPickListingIds.length > 0) {
+          // Insert new ones in bulk
+          await tx.curationMetadata.createMany({
+            data: body.editorsPickListingIds.map((listingId) => ({
+              listingId,
+            })),
+          });
+        }
+      }
+    });
+
+    return { success: true };
   }
 }

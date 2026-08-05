@@ -1,0 +1,22 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+
+.itemWrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+.dot {
+  display: inline-block;
+  border-radius: 50%;
+  flexShrink: 0;
+}
+
+.line {
+  display: inline-block;
+  height: 1.5px;
+  flexShrink: 0;
+}

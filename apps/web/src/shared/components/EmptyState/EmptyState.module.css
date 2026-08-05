@@ -22,8 +22,8 @@
 
 /* Error variant */
 .emptyState[data-variant="error"] {
-  color: var(--content-error);
-  border: 1px solid var(--border-error);
+  color: var(--state-danger-content);
+  border: 1px solid var(--state-danger-border);
   border-radius: var(--radius-component-card, 12px);
-  background-color: var(--surface-error);
+  background-color: var(--state-danger-surface);
 }

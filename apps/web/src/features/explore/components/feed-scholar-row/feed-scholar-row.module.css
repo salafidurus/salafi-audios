@@ -1,0 +1,70 @@
+.container {
+  padding: var(--space-component-gap-sm) 0;
+}
+
+.title {
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+  margin-bottom: var(--space-scale-sm);
+  padding-inline-start: var(--space-scale-xs);
+}
+
+.scroll {
+  display: flex;
+  gap: var(--space-scale-md);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: var(--space-scale-sm);
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.scholarButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 72px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+}
+
+.avatarRing {
+  border-radius: var(--radius-full);
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    var(--border-secondary),
+    color-mix(in srgb, var(--border-secondary) 30%, transparent)
+  );
+  margin-bottom: var(--space-scale-xs);
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background-color: var(--surface-hover);
+  overflow: hidden;
+  position: relative;
+  display: block;
+}
+
+.name {
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+  text-align: center;
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scholarButton:hover .name {
+  color: var(--content-primary-strong);
+}

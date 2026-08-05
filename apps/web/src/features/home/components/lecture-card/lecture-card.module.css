@@ -1,0 +1,96 @@
+.cardWrap {
+  position: relative;
+  height: 100%;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  height: 100%;
+  padding: 18px;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: start;
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.cardWrap:hover .card {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 26px solid var(--action-primary);
+  border-left: 26px solid transparent;
+  opacity: 0.9;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--content-secondary) 15%, transparent);
+  border: 1px solid var(--border-secondary);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--content-secondary);
+  align-self: flex-start;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--typo-display-lg-font-family), serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--content-default);
+  line-height: 1.3;
+}
+
+.meta {
+  margin: 0;
+  font-family: var(--typo-body-md-font-family), sans-serif;
+  font-size: 13px;
+  color: var(--content-muted);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.playBtn {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--action-primary);
+  color: var(--content-on-primary);
+  border: none;
+  cursor: pointer;
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+
+.playBtn:hover {
+  transform: scale(1.08);
+  background: color-mix(in srgb, var(--action-primary) 85%, black);
+}

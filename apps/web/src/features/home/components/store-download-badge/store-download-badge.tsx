@@ -46,7 +46,7 @@ export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBa
           fill
           sizes="(max-width: 900px) 45vw, 350px"
           className={styles.badgeImage}
-          priority={false}
+          priority
         />
       </a>
     );
@@ -66,7 +66,7 @@ export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBa
         fill
         sizes="(max-width: 900px) 45vw, 350px"
         className={styles.badgeImage}
-        priority={false}
+        priority
       />
       <span className={styles.comingSoonBadge} data-testid={`coming-soon-badge-${testIdBase}`}>
         {t("common.comingSoon", "Coming soon")}

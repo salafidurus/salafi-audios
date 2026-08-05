@@ -137,8 +137,8 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
 
       <List.Item.Actions>
         <Button
-          variant={!isMobile ? "ghost" : "outline"}
-          size={!isMobile ? "sm" : "icon"}
+          variant="primary"
+          size={!isMobile ? "icon" : "sm"}
           fullWidth={isMobile}
           aria-label={isCurrentTrack && isPlaying ? "Pause lecture" : "Play lecture"}
           icon={

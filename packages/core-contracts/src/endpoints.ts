@@ -18,6 +18,7 @@ export const endpoints = {
     lastPlayed: (id: string) => `/listings/${id}/last-played`,
     progressSummary: (id: string) => `/listings/${id}/progress-summary`,
     recent: "/listings/recent",
+    promotions: "/listings/promotions",
   },
   library: {
     saved: "/me/library/saved",
@@ -76,6 +77,7 @@ export const endpoints = {
       bulk: "/admin/listings/bulk",
       arrangeData: (id: string) => `/admin/listings/${id}/arrange-data`,
       arrangeCommit: (id: string) => `/admin/listings/${id}/arrange-commit`,
+      promotions: "/admin/listings/promotions",
     },
     media: {
       presignedUrl: "/admin/media/presigned-url",

@@ -13,9 +13,9 @@ describe("syncTypographyToLocale", () => {
     jest.clearAllMocks();
   });
 
-  it("calls updateTheme for light and dark themes", () => {
+  it("calls updateTheme for all registered themes", () => {
     syncTypographyToLocale("en");
-    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledTimes(2);
+    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledTimes(5);
   });
 
   it("passes correct locale to theme updater for English", () => {

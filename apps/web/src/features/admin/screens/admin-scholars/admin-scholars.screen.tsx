@@ -37,7 +37,7 @@ export function AdminScholarsScreen() {
   const [editingScholarId, setEditingScholarId] = useState<string | null>(null);
   const [translationTarget, setTranslationTarget] = useState<ClientTranslationTarget | null>(null);
 
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+  const { data, isLoading, isError, refetch, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteAdminScholars({
       search: searchQuery,
     });
@@ -110,6 +110,8 @@ export function AdminScholarsScreen() {
             <InfiniteScrollList
               data={allItems}
               isLoading={isLoading}
+              isError={isError}
+              onRetry={() => refetch()}
               hasMore={hasNextPage ?? false}
               onLoadMore={() => fetchNextPage()}
               isFetchingNextPage={isFetchingNextPage}

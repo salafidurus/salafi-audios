@@ -209,3 +209,18 @@ export function fetchListingFormData(id: string) {
     method: "GET",
   });
 }
+
+export function getAdminPromotions() {
+  return httpClient<any>({
+    url: endpoints.admin.listings.promotions,
+    method: "GET",
+  });
+}
+
+export function updateAdminPromotions(body: any) {
+  return httpClient<any>({
+    url: endpoints.admin.listings.promotions,
+    method: "POST",
+    body,
+  });
+}

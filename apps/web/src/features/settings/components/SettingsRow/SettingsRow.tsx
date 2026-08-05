@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import styles from "./settings-row.module.css";
 
 export interface SettingsRowProps {
-  label: string;
+  label?: string;
   sublabel?: string;
   children?: ReactNode;
   /** If true, renders just a full-width child (no label column) */

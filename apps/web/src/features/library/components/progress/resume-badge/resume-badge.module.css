@@ -10,10 +10,10 @@
 
 .resumeBadge {
   font-size: var(--typo-caption-font-size);
-  color: var(--action-primary);
+  color: var(--accent-primary-fg);
   font-weight: 500;
   padding: var(--space-xs) var(--space-scale-xs);
-  background-color: var(--surface-primary-subtle);
+  background-color: var(--accent-primary-subtle-surface);
   border-radius: var(--radius-xs);
   display: inline-block;
 }

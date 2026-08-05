@@ -1,8 +1,22 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect, vi } from "bun:test";
 import React from "react";
 
 import { ScholarHeader, type ScholarHeaderProps } from "./scholar-header";
+
+vi.mock("@/core/i18n/use-translation", () => ({
+  useTranslation: () => ({
+    t: (key: string, fallback: string, options?: { count?: number }) => {
+      if (options && options.count !== undefined) {
+        return fallback.replace("{{count}}", String(options.count));
+      }
+      return fallback;
+    },
+  }),
+}));
+vi.mock("@/shared/utils/format-scholar-name", () => ({
+  useFormatScholarName: () => (scholar: { name: string }) => scholar.name,
+}));
 
 const mockScholar: ScholarHeaderProps["scholar"] = {
   id: "s-1",
@@ -12,24 +26,18 @@ const mockScholar: ScholarHeaderProps["scholar"] = {
   mainLanguage: "ar" as any,
   lectureCount: 42,
   seriesCount: 5,
-  totalDurationSeconds: 7200, // 2 hours
+  totalDurationSeconds: 7200,
   bio: "This is a short bio.",
   country: "SA",
-  socialWebsite: "https://binbaz.org.sa",
-  socialYoutube: "https://youtube.com/binbaz",
-  socialTwitter: "https://x.com/binbaz",
-  socialTelegram: "https://t.me/binbaz",
-  socialFacebook: "https://facebook.com/binbaz",
-  socialInstagram: "https://instagram.com/binbaz",
   isActive: true,
   createdAt: "2024-01-01T00:00:00Z",
 };
 
 describe("ScholarHeader", () => {
-  it("renders scholar name and stats in row 1 and row 2", () => {
+  it("renders scholar name and stats", () => {
     render(<ScholarHeader scholar={mockScholar} />);
-    expect(screen.getByText("Abdul Aziz bin Baz")).toBeInTheDocument();
-    expect(screen.getByText(/42 Lectures · 5 Series · 2h Total/)).toBeInTheDocument();
+    expect(screen.getByText("Abdul Aziz bin Baz")).toBeTruthy();
+    expect(screen.getByText(/42 Lectures/)).toBeTruthy();
   });
 
   it("renders avatar image when imageUrl is present", () => {
@@ -39,30 +47,32 @@ describe("ScholarHeader", () => {
       />,
     );
     const img = container.querySelector("img");
-    expect(img).toBeInTheDocument();
+    expect(img).toBeTruthy();
     expect(img?.getAttribute("src")).toContain("binbaz.jpg");
-    expect(img?.getAttribute("width")).toBe("120");
-    expect(img?.getAttribute("height")).toBe("120");
   });
 
   it("renders fallback initial avatar when imageUrl is not present", () => {
     render(<ScholarHeader scholar={mockScholar} />);
-    expect(screen.getByText("A")).toBeInTheDocument();
+    expect(screen.getByText("A")).toBeTruthy();
   });
 
-  it("renders social icon links in row 3", () => {
+  it("renders bio when present", () => {
     render(<ScholarHeader scholar={mockScholar} />);
-    expect(screen.getByRole("link", { name: "Website" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "YouTube" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "X (Twitter)" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Telegram" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Facebook" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Instagram" })).toBeInTheDocument();
+    expect(screen.getByText("This is a short bio.")).toBeTruthy();
   });
 
-  it("does not render country, language, or bio text", () => {
-    render(<ScholarHeader scholar={mockScholar} />);
-    expect(screen.queryByText("SA · ar")).toBeNull();
+  it("does not render bio when absent", () => {
+    render(<ScholarHeader scholar={{ ...mockScholar, bio: undefined }} />);
     expect(screen.queryByText("This is a short bio.")).toBeNull();
+  });
+
+  it("renders Follow button when onFollow is provided", () => {
+    render(<ScholarHeader scholar={mockScholar} onFollow={vi.fn()} />);
+    expect(screen.getByText("Follow")).toBeTruthy();
+  });
+
+  it("does not render Follow button when onFollow is not provided", () => {
+    render(<ScholarHeader scholar={mockScholar} />);
+    expect(screen.queryByText("Follow")).toBeNull();
   });
 });

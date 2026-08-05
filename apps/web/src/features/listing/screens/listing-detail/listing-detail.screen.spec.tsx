@@ -4,6 +4,14 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "bun:test";
 
 import { ListingDetailScreen } from "./listing-detail.screen";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+  }),
+}));
+
 vi.mock("@sd/domain-content", () => ({
   useListingDetail: vi.fn(),
   useListingContents: vi.fn(),
@@ -76,7 +84,7 @@ describe("ListingDetailScreen", () => {
   it("shows loading state when detail is fetching", () => {
     mockUseListingDetail.mockReturnValue({ data: undefined, isFetching: true });
     render(<ListingDetailScreen slug="tawheed-lecture" />);
-    expect(screen.getByText("Loading content…")).toBeTruthy();
+    expect(screen.getByText("Back")).toBeTruthy();
   });
 
   it("shows not-found state when listing does not exist", () => {

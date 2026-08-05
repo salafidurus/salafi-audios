@@ -49,7 +49,13 @@ export function SegmentedControl<T extends string>({
           if (opt) onChange(opt.value);
         }}
         tintColor={theme.colors.action.primary}
-        appearance={rt.themeName === "dark" ? "dark" : "light"}
+        appearance={
+          rt.themeName === "midnight" ||
+          rt.themeName === "ember" ||
+          (rt.themeName === "system" && rt.colorScheme === "dark")
+            ? "dark"
+            : "light"
+        }
         style={base.control}
       />
     </View>

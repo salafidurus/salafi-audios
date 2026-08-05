@@ -69,6 +69,7 @@ export class RecentListingsRepo {
       const durationSeconds =
         r.format === 'single' ? (r.durationSeconds ?? 0) : (r.publishedDurationSeconds ?? 0);
       const thumbnailUrl = r.format === 'single' ? null : this.toOptionalPublicUrl(r.coverImageUrl);
+      const publishedLectureCount = r.format === 'single' ? 1 : (r.publishedLectureCount ?? 1);
 
       return {
         kind: r.format as 'collection' | 'series' | 'single',
@@ -79,6 +80,7 @@ export class RecentListingsRepo {
         scholarSlug: r.scholar!.slug,
         thumbnailUrl: thumbnailUrl ?? null,
         durationSeconds: durationSeconds ?? 0,
+        publishedLectureCount,
         publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
         originalLanguage: resolved.originalLanguage,
         original: resolved.original ? { title: resolved.original.title } : undefined,

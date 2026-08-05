@@ -16,11 +16,11 @@ test.describe("Navigation — sidebar & routing", () => {
       await expect(page).toHaveURL("/");
     });
 
-    test("clicking Explore sidebar link navigates to /explore", async ({ page }) => {
+    test("clicking Scholars sidebar link navigates to /scholars", async ({ page }) => {
       await page.goto("/");
-      await expect(page.getByTestId("nav-link-explore")).toBeVisible();
-      await page.getByTestId("nav-link-explore").click();
-      await expect(page).toHaveURL(/\/explore/);
+      await expect(page.getByTestId("nav-link-scholars")).toBeVisible();
+      await page.getByTestId("nav-link-scholars").click();
+      await expect(page).toHaveURL(/\/scholars/);
     });
 
     test("clicking Library sidebar link navigates to /library", async ({ page }) => {

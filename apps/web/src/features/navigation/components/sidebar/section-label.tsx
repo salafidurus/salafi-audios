@@ -4,12 +4,8 @@ import styles from "./sidebar.module.css";
 
 interface SectionLabelProps {
   children: React.ReactNode;
-  collapsed?: boolean;
 }
 
-export function SectionLabel({ children, collapsed }: SectionLabelProps) {
-  if (collapsed) {
-    return null;
-  }
+export function SectionLabel({ children }: SectionLabelProps) {
   return <div className={styles.sectionLabel}>{children}</div>;
 }

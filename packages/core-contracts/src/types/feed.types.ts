@@ -13,6 +13,7 @@ export const FeedContentItemDtoSchema = z.object({
   scholarSlug: z.string(),
   thumbnailUrl: z.string().nullable(),
   durationSeconds: z.number().nullable(),
+  publishedLectureCount: z.number().optional(),
   publishedAt: z.string(),
   originalLanguage: LocaleSchema.optional(),
   original: ContentOriginalFieldsSchema.optional(),

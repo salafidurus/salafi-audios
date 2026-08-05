@@ -84,6 +84,8 @@
   },
   "navigation": {
     "explore": "استكشاف",
+    "home": "الرئيسية",
+    "scholars": "العلماء",
     "library": "المكتبة",
     "account": "الحساب",
     "siteTitle": "دروس سلفية",
@@ -94,6 +96,8 @@
     "siteFooter": "تذييل الموقع",
     "languageSwitch": "تغيير اللغة",
     "settings": "الإعدادات",
+    "keepYourPlace": "احفظ مكانك",
+    "keepYourPlaceDesc": "سجّل الدخول لمزامنة التقدّم والدروس المحفوظة عبر أجهزتك.",
     "adminSection": "إدارة",
     "admin": {
       "home": "الرئيسية",
@@ -144,7 +148,11 @@
       "themeOptions": {
         "system": "تلقائي",
         "light": "فاتح",
-        "dark": "داكن"
+        "dark": "داكن",
+        "parchment": "ورق بردي",
+        "manuscript": "مخطوطة",
+        "midnight": "منتصف الليل",
+        "ember": "جمر"
       },
       "notifSection": "الإشعارات",
       "notifDesc": "إدارة الإشعارات التي تتلقاها.",

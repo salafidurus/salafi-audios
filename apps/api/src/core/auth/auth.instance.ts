@@ -88,7 +88,16 @@ function createAuthInstance(config: ConfigService) {
       },
       // HTTPS-only cookies in production (XSS + MITM mitigation)
       useSecureCookies: config.NODE_ENV === 'production',
-      // HttpOnly, SameSite=Lax are already defaults
+      // Allow cross-site cookies in dev (localhost:3000 -> localhost:4000).
+      // Chrome treats localhost as a secure context, so Secure cookies work
+      // over HTTP on localhost. In production, default to lax/same-site cookies.
+      defaultCookieAttributes:
+        config.NODE_ENV === 'development'
+          ? {
+              sameSite: 'none',
+              secure: true,
+            }
+          : undefined,
     },
   });
 }

@@ -3,7 +3,7 @@
 import type { ListingDetailDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
-import { Disc } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -40,27 +40,26 @@ export function MetaDataSection({ listing }: MetaDataSectionProps) {
   return (
     <div className={styles.container}>
       <div className={styles.artworkContainer}>
+        <div className={styles.bookmarkRibbon} aria-hidden="true" />
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={listing.scholar.name}
             fill
-            sizes="(max-width: 640px) 96px, 136px"
+            sizes="(max-width: 640px) 96px, 128px"
             unoptimized
             className={styles.artwork}
           />
         ) : (
           <div className={styles.artworkPlaceholder}>
-            <Disc size={40} />
+            <BookOpen size={38} color="var(--action-primary)" strokeWidth={1.3} />
           </div>
         )}
       </div>
 
       <div className={styles.textColumn}>
-        {/* Row 1: Title (Prominent Display Md) */}
-        <AppText variant="displayMd" color="primary">
-          {title}
-        </AppText>
+        {/* Row 1: Title in Fraunces display font */}
+        <h1 className={styles.titleText}>{title}</h1>
 
         {/* Row 2: Scholar Name Link (Primary strong color Title Md) */}
         <Link href={`/scholars/${listing.scholar.slug}`} className={styles.scholarLink}>

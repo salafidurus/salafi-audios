@@ -5,8 +5,6 @@ import type { ListingModuleDto } from "@sd/core-contracts";
 import { Minimize2, Maximize2 } from "lucide-react";
 import React from "react";
 
-import { AppText } from "@/shared/components/AppText/AppText";
-
 import styles from "./CollectionToc.module.css";
 
 export type CollectionTocProps = {
@@ -30,13 +28,7 @@ export function CollectionToc({
       aria-label="Table of Contents"
     >
       <div className={styles.headerRow}>
-        {!isCollapsed && (
-          <div className={styles.title}>
-            <AppText variant="titleMd" color="primary">
-              Table of Contents
-            </AppText>
-          </div>
-        )}
+        {!isCollapsed && <div className={styles.title}>TABLE OF CONTENTS</div>}
 
         {onToggleCollapse && (
           <button

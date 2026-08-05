@@ -6,16 +6,29 @@
 }
 
 .artworkContainer {
-  width: 136px;
-  height: 136px;
+  width: 128px;
+  height: 128px;
   flex-shrink: 0;
-  border-radius: var(--radius-component-panel-sm, 10px);
+  border-radius: 16px;
   overflow: hidden;
   position: relative;
   background-color: var(--surface-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.bookmarkRibbon {
+  position: absolute;
+  top: -1px;
+  right: 18px;
+  width: 26px;
+  height: 40px;
+  background: linear-gradient(180deg, var(--content-primary-strong), var(--action-primary));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  z-index: 2;
 }
 
 .artwork {
@@ -30,14 +43,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-subtle);
-  color: var(--content-subtle);
+  background: linear-gradient(
+    135deg,
+    var(--surface-subtle),
+    var(--accent-primary-subtle-surface)
+  );
+  color: var(--content-primary-strong);
+}
+
+.titleText {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--content-strong);
+  margin: 0;
+  line-height: 1.25;
 }
 
 .textColumn {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-sm, 12px);
+  gap: var(--space-component-gap-sm, 8px);
   min-width: 0;
   flex: 1;
 }
@@ -54,7 +80,7 @@
 }
 
 .scholarLink:hover {
-  color: var(--action-primary);
+  color: var(--content-primary-strong);
   text-decoration: underline;
 }
 

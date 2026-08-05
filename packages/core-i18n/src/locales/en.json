@@ -84,6 +84,8 @@
   },
   "navigation": {
     "explore": "Explore",
+    "home": "Home",
+    "scholars": "Scholars",
     "library": "Library",
     "account": "Account",
     "siteTitle": "Salafi Durus",
@@ -94,6 +96,8 @@
     "siteFooter": "Site footer",
     "languageSwitch": "Language switch",
     "settings": "Settings",
+    "keepYourPlace": "Keep your place",
+    "keepYourPlaceDesc": "Sign in to sync progress and saved durus across your devices.",
     "adminSection": "ADMIN",
     "admin": {
       "home": "Home",
@@ -144,7 +148,11 @@
       "themeOptions": {
         "system": "System",
         "light": "Light",
-        "dark": "Dark"
+        "dark": "Dark",
+        "parchment": "Parchment",
+        "manuscript": "Manuscript",
+        "midnight": "Midnight",
+        "ember": "Ember"
       },
       "notifSection": "Notifications",
       "notifDesc": "Manage what notifications you receive.",

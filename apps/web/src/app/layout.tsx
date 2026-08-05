@@ -178,6 +178,7 @@ export default function RootLayout({
     <html
       lang="en"
       dir="ltr"
+      suppressHydrationWarning
       className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable} ${alexandria.variable} ${ibmPlexSansArabic.variable}`}
     >
       {/* lang/dir defaults — overridden beforeInteractive by the script below.

@@ -4,7 +4,6 @@ import { MiniPlayer } from "@/features/audio";
 import { CookieConsentGate, AnalyticsScripts } from "@/features/legal";
 import { Footer } from "@/features/navigation/components/footer/footer";
 import { Sidebar } from "@/features/navigation/components/sidebar/sidebar";
-import { TopSubnavTabs } from "@/features/navigation/components/top-subnav-tabs/top-subnav-tabs";
 
 export default function ConsentLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,7 +14,6 @@ export default function ConsentLayout({ children }: { children: React.ReactNode 
         <div className="appConsentShell">
           <Sidebar />
           <div className="appConsentMain">
-            <TopSubnavTabs />
             <div className="appConsentContent">{children}</div>
             <MiniPlayer />
             <Footer />
