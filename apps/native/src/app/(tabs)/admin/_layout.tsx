@@ -14,19 +14,14 @@ export default function AdminLayout() {
   const { ability, isLoading } = useAbility({ isAuthenticated });
 
   if (isLoading) {
-    return (
-      <EmptyState
-        variant="loading"
-        message={t("admin.checkingPermissions", "Checking permissions…")}
-      />
-    );
+    return <EmptyState variant="loading" message={t("admin.checkingAccess", "Checking access…")} />;
   }
 
   if (!hasAnyAdminAccess(ability)) {
     return (
       <EmptyState
         variant="error"
-        message={t("admin.accessDenied", "You do not have admin permissions.")}
+        message={t("admin.accessDenied", "You do not have admin access.")}
       />
     );
   }

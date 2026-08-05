@@ -73,3 +73,29 @@
   text-align: center;
   color: var(--content-muted);
 }
+
+.searchContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm, 12px);
+  margin-bottom: var(--space-component-gap-md, 16px);
+}
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-component-gap-sm, 12px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-component-gap-md, 16px);
+  margin-bottom: var(--space-component-gap-lg, 24px);
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

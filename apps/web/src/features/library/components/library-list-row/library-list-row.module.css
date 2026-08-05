@@ -19,7 +19,11 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-scale-full, 50%);
-  background-color: var(--surface-primary-subtle);
+  background: linear-gradient(
+    135deg,
+    var(--surface-subtle),
+    var(--accent-primary-subtle-surface)
+  );
   color: var(--content-primary-strong);
   display: flex;
   align-items: center;
@@ -71,7 +75,7 @@
 
 .progressBar {
   height: 100%;
-  background-color: var(--action-primary);
+  background: linear-gradient(90deg, var(--accent-primary-bg), var(--accent-primary-fg));
   border-radius: 2px;
   transition: width 200ms ease;
 }
@@ -100,6 +104,6 @@
 }
 
 .row:hover .chevron {
-  color: var(--content-default);
+  color: var(--content-primary-strong);
   transform: translateX(2px);
 }

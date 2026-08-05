@@ -50,3 +50,20 @@ The web app (`apps/web`) serves two roles: public discovery and authenticated ac
 - Web prioritizes discoverability, SEO, and editorial workflows.
 - Mobile prioritizes listening continuity and device-local persistence.
 - Both consume the same backend contracts and must converge on the same authoritative rules.
+
+## 8. Theming and Accent Themes
+
+- Tokens come from `@sd/design-tokens` and are emitted as CSS variables by
+  `apps/web/src/app/theme-css.ts` (light and dark variants), applied on `<html>` via `data-theme`.
+- Web ships three web-only accent palettes — **Manuscript**, **Midnight**, and
+  **Ember** — layered on top of the same token CSS variables through a second
+  attribute, `data-accent-theme`. Palette definitions live in
+  `apps/web/src/core/styles/theme/variants.ts`; the emitted CSS is built by the pure
+  functions in `apps/web/src/core/styles/theme/css.ts`.
+- An active accent theme fully supersedes light/dark mode for color (all palettes
+  are self-contained dark-mood looks); typography, spacing, and radius stay shared.
+  The `system|light|dark` control therefore only applies when the accent is `default`.
+- Preference is persisted under `accent-theme:v1` and applied by `ThemeSync.tsx`;
+  the picker lives in Settings → Display (`AccentThemePicker`).
+- Accent palettes are web-only. `@sd/design-tokens` and `apps/native` Unistyles
+  themes are unaffected — changes must never leak a web accent into shared packages.

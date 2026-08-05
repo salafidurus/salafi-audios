@@ -1,5 +1,4 @@
 import { vi, describe, it, expect, beforeEach } from 'bun:test';
-import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../db/prisma.service';
 import { AccountService } from './account.service';
 
@@ -23,10 +22,7 @@ describe('AccountService', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [AccountService, { provide: PrismaService, useValue: mockPrisma }],
-    }).compile();
-    service = module.get(AccountService);
+    service = new AccountService(mockPrisma as unknown as PrismaService);
   });
 
   it('should be defined', () => {
@@ -43,10 +39,7 @@ describe('AccountService', () => {
         displayName: 'Test User',
         avatarUrl: 'https://example.com/avatar.png',
         emailVerified: true,
-        roles: ['listener'],
-        permissions: [],
-        scholarLinks: [],
-        translatorRoles: [],
+        roles: ['Listener'],
         rules: [],
         createdAt: '2024-01-01T00:00:00.000Z',
         updatedAt: '2024-06-01T00:00:00.000Z',
@@ -94,26 +87,25 @@ describe('AccountService', () => {
       expect(result.emailVerified).toBe(false);
     });
 
-    it('packs a rule for each granted permission', () => {
-      const result = service.getProfile({ ...mockUser, permissions: ['SCHOLARS_VIEW'] });
-      expect(result.rules.length).toBeGreaterThan(0);
-    });
-
-    it('passes scholarLinks and translatorRoles through unchanged', () => {
+    it('packs aggregate capability rules and derives access roles', () => {
       const result = service.getProfile({
         ...mockUser,
-        scholarLinks: [{ scholarId: 'scholar-1', permissionType: 'OWN_CONTENT' }],
-        translatorRoles: [{ scholarId: null, locale: 'ar', canPublish: true }],
+        accessGrants: [{ target: 'listing', capability: 'write', scholarSlug: null, locale: null }],
       });
-      expect(result.scholarLinks).toEqual([
-        { scholarId: 'scholar-1', permissionType: 'OWN_CONTENT' },
-      ]);
-      expect(result.translatorRoles).toEqual([{ scholarId: null, locale: 'ar', canPublish: true }]);
+      expect(result.rules.length).toBeGreaterThan(0);
+      expect(result.roles).toEqual(['Editor']);
     });
 
-    it('produces an empty rules array for a user with no permissions/roles/scopes', () => {
+    it('produces an empty rules array for a listener with no grants', () => {
       const result = service.getProfile(mockUser);
       expect(result.rules).toEqual([]);
+    });
+
+    it('keeps the internal superadmin role when building packed rules', () => {
+      const result = service.getProfile({ ...mockUser, roles: ['superadmin'] });
+
+      expect(result.roles).toEqual(['Superadmin']);
+      expect(result.rules.length).toBeGreaterThan(0);
     });
   });
 
@@ -123,6 +115,7 @@ describe('AccountService', () => {
         ...mockUser,
         name: 'New Name',
         roles: [{ role: 'listener' }],
+        accessGrants: [],
       };
       mockPrisma.user.update.mockResolvedValue(updatedUser);
 
@@ -131,11 +124,14 @@ describe('AccountService', () => {
       expect(mockPrisma.user.update).toHaveBeenCalledWith({
         where: { id: 'user-1' },
         data: { name: 'New Name' },
-        include: { roles: true },
+        include: {
+          roles: true,
+          accessGrants: { include: { scholar: { select: { slug: true } } } },
+        },
       });
       expect(result.displayName).toBe('New Name');
       expect(result.id).toBe('user-1');
-      expect(result.roles).toEqual(['listener']);
+      expect(result.roles).toEqual(['Listener']);
     });
   });
 });

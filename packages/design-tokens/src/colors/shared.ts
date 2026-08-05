@@ -161,11 +161,11 @@ export const sharedColors = {
     content100: "#FAFAFA", // strong text on dark
     content200: "#E4E4E6", // default text on dark
     content300: "#A1A1AA", // subtle text on dark  (8.4:1 on #1C1C1E ✓)
-    content400: "#71717A", // muted text on dark   (4.7:1 on #1C1C1E ✓)
+    content400: "#8E8E93", // muted text on dark   (5.3:1 on #1C1C1E ✓)
     contentDark: "#18181B", // strong text on light
     contentBody: "#3F3F46", // default text on light (9.7:1 on #F2F2F3 ✓)
     contentSubtle: "#52525B", // subtle text on light  (6.2:1 on #F2F2F3 ✓)
-    contentMuted: "#767680", // muted text on light   (4.5:1 on #F2F2F3 ✓)
+    contentMuted: "#64646E", // muted text on light   (5.2:1 on #F2F2F3 ✓)
   },
 } as const;
 
@@ -240,23 +240,23 @@ export const createColors = (mode: "light" | "dark") => {
            *   strong  #18181B  →  19.5:1  (AAA ✓)
            *   default #3F3F46  →   9.7:1  (AAA ✓)
            *   subtle  #52525B  →   6.4:1  (AA  ✓)
-           *   muted   #767680  →   4.6:1  (AA  ✓)  ← was failing at 2.8:1
+           *   muted   #64646E  →   5.2:1  (AA  ✓)
            *   disabled#A1A1AA  →   2.7:1  (decorative only, intentional)
            */
           strong: c.neutral.contentDark, // #18181B
           default: c.neutral.contentBody, // #3F3F46
           subtle: c.neutral.contentSubtle, // #52525B
-          muted: c.neutral.contentMuted, // #767680
+          muted: c.neutral.contentMuted, // #64646E
           inverse: c.neutral.content100, // #FAFAFA
 
           primary: c.primary[700], // #0F766E  — 5.1:1 on canvas ✓
           primaryStrong: c.primary[900], // #134E4A  — 9.0:1 on canvas ✓
-          secondary: c.secondary[700], // #A16207  — 5.4:1 on canvas ✓
+          secondary: c.secondary[800], // #854D0E  — 6.3:1 on canvas ✓
           secondaryStrong: c.secondary[900], // #713F12 — 9.8:1 on canvas ✓
 
           onPrimary: c.neutral[900], // #0D0D0D on #14B8A6 → 7.2:1 ✓
           onSecondary: c.neutral[900], // #0D0D0D on #EAB308 → 8.3:1 ✓
-          onDanger: c.neutral[30], // #FAFAFA on #DC2626 → 5.8:1 ✓
+          onDanger: "#FFFFFF", // #FFFFFF on #DC2626 → 4.9:1 ✓
           onSuccess: c.neutral[900], // #0D0D0D on #10B981 → 5.2:1 ✓
 
           disabled: c.neutral[300], // #A1A1AA — decorative, intentional
@@ -267,7 +267,7 @@ export const createColors = (mode: "light" | "dark") => {
            *
            *   strong  #FAFAFA  →  20.1:1  (AAA ✓)
            *   default #E4E4E6  →  13.8:1  (AAA ✓)
-           *   subtle  #A1A1AA  →   8.2:1  (AAA ✓)  ← was near-white, indistinct
+           *   subtle  #A1A1AA  →   8.2:1  (AAA ✓)  ← fixed: was e0e0e0 (too bright)
            *   muted   #71717A  →   4.8:1  (AA  ✓)
            *   disabled#52525B  →   3.0:1  (decorative only, intentional)
            */
@@ -284,7 +284,7 @@ export const createColors = (mode: "light" | "dark") => {
 
           onPrimary: c.neutral[900], // #0D0D0D on #14B8A6 → 7.2:1 ✓
           onSecondary: c.neutral[900], // #0D0D0D on #EAB308 → 8.3:1 ✓
-          onDanger: c.neutral[30], // #FAFAFA on #B91C1C → 6.2:1 ✓
+          onDanger: "#FFFFFF", // #FFFFFF on #B91C1C → 6.2:1 ✓
           onSuccess: c.neutral[900], // #0D0D0D on #10B981 → 5.2:1 ✓
 
           disabled: c.neutral[500], // #52525B — decorative, intentional
@@ -302,7 +302,7 @@ export const createColors = (mode: "light" | "dark") => {
           muted: c.neutral[100], // #EEEEEF  — barely-there boundaries
           hover: c.neutral[400], // #71717A  — hover emphasis
 
-          focus: c.primary[500], // #14B8A6  — focus ring (4.5:1 on white ✓)
+          focus: c.primary[600], // #0D9488  — focus ring (3.8:1 on white ✓)
 
           primary: c.primary[200], // #81E6D9
           primaryStrong: c.primary[400], // #2DD4BF
@@ -403,3 +403,190 @@ export const createColors = (mode: "light" | "dark") => {
 
 export type SharedColors = typeof sharedColors;
 export type AppColors = ReturnType<typeof createColors>;
+
+export type AccentThemeId = "parchment" | "manuscript" | "midnight" | "ember";
+
+export interface AccentPalette {
+  label: string;
+  description: string;
+  mode: "light" | "dark";
+  swatches: [string, string, string];
+  canvas: string;
+  surface: string;
+  surfaceRaised: string;
+  border: string;
+  borderSoft: string;
+  gold: string;
+  goldBright: string;
+  onGold: string;
+  jade: string;
+  jadeDim: string;
+  text: string;
+  textSoft: string;
+  textFaint: string;
+}
+
+export const ACCENT_PALETTES: Record<AccentThemeId, AccentPalette> = {
+  parchment: {
+    label: "Parchment",
+    description: "Ivory & antique gold",
+    mode: "light",
+    swatches: ["#F7F2E7", "#B8872E", "#2F6B54"],
+    canvas: "#F7F2E7",
+    surface: "#FFFFFF",
+    surfaceRaised: "#F1EAD9",
+    border: "#E3D9C2",
+    borderSoft: "#ECE3CE",
+    gold: "#B8872E",
+    goldBright: "#8A5A12",
+    onGold: "#2B1B06",
+    jade: "#2F6B54",
+    jadeDim: "#BFDCCB",
+    text: "#241C10",
+    textSoft: "#6B5F49",
+    textFaint: "#6E5D3C",
+  },
+  manuscript: {
+    label: "Manuscript",
+    description: "Ink-green & gold leaf",
+    mode: "dark",
+    swatches: ["#0D1912", "#CBA135", "#5EB397"],
+    canvas: "#0D1912",
+    surface: "#152420",
+    surfaceRaised: "#1B2E27",
+    border: "#2A3D33",
+    borderSoft: "#233329",
+    gold: "#CBA135",
+    goldBright: "#E4C767",
+    onGold: "#20180A",
+    jade: "#5EB397",
+    jadeDim: "#3A6F5C",
+    text: "#F2EEE3",
+    textSoft: "#A9BDAF",
+    textFaint: "#8FA89C",
+  },
+  midnight: {
+    label: "Midnight",
+    description: "Indigo dusk & amber",
+    mode: "dark",
+    swatches: ["#0B0F1C", "#E0A458", "#8594DD"],
+    canvas: "#0B0F1C",
+    surface: "#131A2C",
+    surfaceRaised: "#1A2338",
+    border: "#2B3654",
+    borderSoft: "#212B45",
+    gold: "#E0A458",
+    goldBright: "#F0C285",
+    onGold: "#20140A",
+    jade: "#8594DD",
+    jadeDim: "#4A5590",
+    text: "#EDEEF5",
+    textSoft: "#A6ADC6",
+    textFaint: "#8C95B8",
+  },
+  ember: {
+    label: "Ember",
+    description: "Warm charcoal & rust",
+    mode: "dark",
+    swatches: ["#15130F", "#C1633D", "#B08D57"],
+    canvas: "#15130F",
+    surface: "#1E1B15",
+    surfaceRaised: "#26221A",
+    border: "#3A3327",
+    borderSoft: "#2E291F",
+    gold: "#C1633D",
+    goldBright: "#D98761",
+    onGold: "#1A0D07",
+    jade: "#B08D57",
+    jadeDim: "#7A6440",
+    text: "#F1ECE3",
+    textSoft: "#B3A99B",
+    textFaint: "#9E9385",
+  },
+};
+
+const parseHex = (hex: string): [number, number, number] => {
+  const normalized = hex.replace("#", "");
+  const value =
+    normalized.length === 3
+      ? normalized
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : normalized;
+  const int = parseInt(value, 16);
+  return [(int >> 16) & 255, (int >> 8) & 255, int & 255];
+};
+
+const mixHex = (a: string, b: string, t: number): string => {
+  const [ar, ag, ab] = parseHex(a);
+  const [br, bg, bb] = parseHex(b);
+  const toHex = (n: number) => Math.round(n).toString(16).padStart(2, "0");
+  return `#${toHex(ar + (br - ar) * t)}${toHex(ag + (bg - ag) * t)}${toHex(ab + (bb - ab) * t)}`;
+};
+
+export const buildAccentColors = (id: AccentThemeId): AppColors => {
+  const base = createColors(ACCENT_PALETTES[id].mode);
+  const p = ACCENT_PALETTES[id];
+
+  return {
+    surface: {
+      canvas: p.canvas,
+      default: p.surface,
+      subtle: p.surfaceRaised,
+      elevated: p.surfaceRaised,
+      hover: mixHex(p.surface, p.surfaceRaised, 0.55),
+      inverse: p.text,
+      primarySubtle: mixHex(p.jade, p.surface, 0.16),
+      secondarySubtle: mixHex(p.gold, p.surface, 0.16),
+      selected: mixHex(p.jade, p.surface, 0.3),
+      disabled: p.surfaceRaised,
+    },
+    content: {
+      strong: p.text,
+      default: p.text,
+      subtle: p.textSoft,
+      muted: p.textFaint,
+      inverse: p.canvas,
+      primary: p.goldBright,
+      primaryStrong: p.goldBright,
+      secondary: p.jade,
+      secondaryStrong: p.jade,
+      onPrimary: p.onGold,
+      onSecondary: p.canvas,
+      onDanger: "#FFFFFF",
+      onSuccess: p.onGold,
+      disabled: p.textFaint,
+    },
+    border: {
+      default: p.border,
+      subtle: p.borderSoft,
+      strong: p.border,
+      muted: p.borderSoft,
+      hover: mixHex(p.gold, p.border, 0.45),
+      focus: p.gold,
+      primary: p.jade,
+      primaryStrong: p.jadeDim,
+      secondary: p.gold,
+      secondaryStrong: p.goldBright,
+      disabled: p.borderSoft,
+    },
+    action: {
+      primary: p.gold,
+      primaryHover: p.goldBright,
+      primaryActive: mixHex(p.gold, p.canvas, 0.22),
+      secondary: p.jade,
+      secondaryHover: mixHex(p.jade, p.text, 0.2),
+      secondaryActive: p.jadeDim,
+      danger: base.action.danger,
+      dangerHover: base.action.dangerHover,
+      dangerActive: base.action.dangerActive,
+      success: base.action.success,
+      successHover: base.action.successHover,
+      successActive: base.action.successActive,
+      disabled: p.surfaceRaised,
+      disabledContent: p.textFaint,
+    },
+    state: base.state,
+  } as AppColors;
+};

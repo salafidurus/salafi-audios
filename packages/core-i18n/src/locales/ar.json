@@ -84,6 +84,8 @@
   },
   "navigation": {
     "explore": "استكشاف",
+    "home": "الرئيسية",
+    "scholars": "العلماء",
     "library": "المكتبة",
     "account": "الحساب",
     "siteTitle": "دروس سلفية",
@@ -94,6 +96,8 @@
     "siteFooter": "تذييل الموقع",
     "languageSwitch": "تغيير اللغة",
     "settings": "الإعدادات",
+    "keepYourPlace": "احفظ مكانك",
+    "keepYourPlaceDesc": "سجّل الدخول لمزامنة التقدّم والدروس المحفوظة عبر أجهزتك.",
     "adminSection": "إدارة",
     "admin": {
       "home": "الرئيسية",
@@ -144,7 +148,11 @@
       "themeOptions": {
         "system": "تلقائي",
         "light": "فاتح",
-        "dark": "داكن"
+        "dark": "داكن",
+        "parchment": "ورق بردي",
+        "manuscript": "مخطوطة",
+        "midnight": "منتصف الليل",
+        "ember": "جمر"
       },
       "notifSection": "الإشعارات",
       "notifDesc": "إدارة الإشعارات التي تتلقاها.",
@@ -426,19 +434,20 @@
     "revoke": "إلغاء دور {{role}}"
   },
   "admin": {
-    "checkingPermissions": "جارٍ التحقق من الصلاحيات…",
-    "accessDenied": "ليس لديك أي صلاحيات إدارة.",
+    "checkingAccess": "جارٍ التحقق من الوصول…",
+    "accessDeniedTitle": "تم رفض الوصول",
+    "accessDenied": "ليس لديك وصول إلى الإدارة.",
     "dashboard": {
       "title": "لوحة تحكم الإدارة",
       "titleMobile": "إدارة",
       "loading": "جارٍ التحميل...",
-      "noPermissions": "ليس لديك أي صلاحيات إدارة.",
-      "noPermissionsMobile": "لا توجد صلاحيات إدارة.",
+      "noAccess": "ليس لديك وصول إلى الإدارة.",
+      "noAccessMobile": "لا يوجد وصول إلى الإدارة.",
       "scholarsDesc": "إدارة العلماء، ملفاتهم الشخصية وظهورهم",
       "scholarsDescMobile": "إدارة العلماء",
       "contentsDesc": "إدارة المواضيع، المحاضرات، والتسلسل الهرمي للمحتوى",
       "contentsDescMobile": "إدارة المحتوى",
-      "usersDesc": "إدارة المستخدمين المسؤولين والصلاحيات",
+      "usersDesc": "إدارة المستخدمين المسؤولين والوصول",
       "usersDescMobile": "إدارة المستخدمين"
     },
     "stats": {
@@ -488,31 +497,31 @@
       "searchNoMatch": "لم يتم العثور على مستخدمين يطابقون بحثك.",
       "noUsersFound": "لم يتم العثور على مستخدمين."
     },
-    "permissions": {
-      "title": "إدارة الصلاحيات",
-      "titleMobile": "الصلاحيات",
+    "access": {
+      "title": "إدارة الوصول",
+      "titleMobile": "الوصول",
       "userIdLabel": "معرف المستخدم",
       "userIdPlaceholder": "معرف المستخدم",
       "lookup": "بحث",
-      "userPermissionsHeader": "صلاحيات المستخدم {{userId}}",
-      "permissionTableHeader": "الصلاحية",
+      "userAccessHeader": "وصول المستخدم {{userId}}",
+      "accessTableHeader": "الوصول",
       "statusTableHeader": "الحالة",
       "actionTableHeader": "الإجراء",
       "granted": "ممنوحة",
       "notGranted": "غير ممنوحة",
       "revoke": "إلغاء",
       "grant": "منح",
-      "managePermissions": "إدارة الصلاحيات",
-      "managePermissionsBtn": "إدارة الصلاحيات",
-      "managePermissionsBtnShort": "الصلاحيات",
+      "manageAccess": "إدارة الوصول",
+      "manageAccessBtn": "إدارة الوصول",
+      "manageAccessBtnShort": "الوصول",
       "manageRoles": "إدارة الأدوار",
       "manageRolesBtn": "إدارة الأدوار",
       "manageRolesBtnShort": "الأدوار",
       "saving": "جارٍ الحفظ...",
       "done": "تم",
-      "loading": "جارٍ تحميل الصلاحيات...",
+      "loading": "جارٍ تحميل الوصول...",
       "loadingRoles": "جارٍ تحميل الأدوار...",
-      "noPermissions": "لا توجد صلاحيات",
+      "noAccess": "لا يوجد وصول",
       "groups": {
         "scholars": "العلماء",
         "listings": "المحتوى",
@@ -529,121 +538,6 @@
         "translations": "إدارة التراجم",
         "media": "إدارة الوسائط",
         "users": "إدارة المستخدمين"
-      },
-      "revokeTitle": "إلغاء الصلاحية؟",
-      "revoking": "جارٍ إلغاء الصلاحية...",
-      "revokeButton": "إلغاء الصلاحية",
-      "revokePrompt": "هل أنت متأكد من رغبتك في إلغاء صلاحية {{permission}} من المستخدم {{user}}؟",
-      "revokeWarning": "سيؤدي ذلك إلى إزالة إمكانية وصولهم إلى هذه الوظيفة.",
-      "items": {
-        "SCHOLARS_VIEW": {
-          "label": "عرض العلماء",
-          "desc": "عرض الملفات الشخصية للعلماء"
-        },
-        "SCHOLARS_CREATE": {
-          "label": "إضافة عالم",
-          "desc": "إنشاء ملف شخصي جديد لعالم"
-        },
-        "SCHOLARS_EDIT": {
-          "label": "إدارة العلماء",
-          "desc": "إضافة وتعديل وإزالة ملفات العلماء"
-        },
-        "SCHOLARS_DELETE": {
-          "label": "حذف العلماء",
-          "desc": "حذف ملفات العلماء"
-        },
-        "SCHOLARS_PUBLISH": {
-          "label": "نشر العلماء",
-          "desc": "نشر ملفات العلماء"
-        },
-        "LISTINGS_VIEW": {
-          "label": "عرض المحتوى",
-          "desc": "عرض قائمة المحتوى"
-        },
-        "LISTINGS_CREATE": {
-          "label": "إنشاء محتوى",
-          "desc": "إنشاء محتوى جديد"
-        },
-        "LISTINGS_EDIT": {
-          "label": "إدارة المحتوى",
-          "desc": "نشر وأرشفة وإدارة المحاضرات والسلاسل"
-        },
-        "LISTINGS_DELETE": {
-          "label": "حذف المحتوى",
-          "desc": "حذف قائمة المحتوى"
-        },
-        "LISTINGS_PUBLISH": {
-          "label": "نشر المحتوى",
-          "desc": "نشر المحتوى"
-        },
-        "TOPICS_VIEW": {
-          "label": "عرض المواضيع",
-          "desc": "عرض المواضيع"
-        },
-        "TOPICS_CREATE": {
-          "label": "إنشاء مواضيع",
-          "desc": "إنشاء مواضيع جديدة"
-        },
-        "TOPICS_EDIT": {
-          "label": "إدارة المواضيع",
-          "desc": "إنشاء وتنظيم تصنيفات المواضيع"
-        },
-        "TOPICS_DELETE": {
-          "label": "حذف المواضيع",
-          "desc": "حذف المواضيع"
-        },
-        "TOPICS_PUBLISH": {
-          "label": "نشر المواضيع",
-          "desc": "نشر المواضيع"
-        },
-        "TRANSLATIONS_VIEW": {
-          "label": "عرض التراجم",
-          "desc": "عرض التراجم"
-        },
-        "TRANSLATIONS_CREATE": {
-          "label": "إنشاء تراجم",
-          "desc": "إنشاء تراجم جديدة"
-        },
-        "TRANSLATIONS_EDIT": {
-          "label": "تعديل التراجم",
-          "desc": "تعديل التراجم"
-        },
-        "TRANSLATIONS_DELETE": {
-          "label": "حذف التراجم",
-          "desc": "حذف التراجم"
-        },
-        "TRANSLATIONS_PUBLISH": {
-          "label": "نشر التراجم",
-          "desc": "نشر التراجم"
-        },
-        "MEDIA_UPLOAD": {
-          "label": "رفع الوسائط",
-          "desc": "رفع الملفات الصوتية والوسائط"
-        },
-        "MEDIA_DELETE": {
-          "label": "حذف الوسائط",
-          "desc": "حذف ملفات الوسائط"
-        },
-        "USERS_VIEW": {
-          "label": "عرض المستخدمين",
-          "desc": "عرض حسابات المستخدمين وتفاصيلهم"
-        },
-        "USERS_EDIT": {
-          "label": "تعديل المستخدمين",
-          "desc": "تعديل حسابات المستخدمين"
-        },
-        "USERS_DELETE": {
-          "label": "حذف المستخدمين",
-          "desc": "حذف حسابات المستخدمين"
-        },
-        "USERS_GRANT_PERMISSIONS": {
-          "label": "إدارة الصلاحيات",
-          "desc": "منح وإلغاء صلاحيات المستخدمين"
-        },
-        "USERS_GRANT_ROLES": {
-          "label": "إدارة الأدوار",
-          "desc": "تعيين الأدوار للمستخدمين"
-        }
       }
     },
     "contents": {

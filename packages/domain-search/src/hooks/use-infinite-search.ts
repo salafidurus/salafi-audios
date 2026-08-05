@@ -4,16 +4,20 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { buildSearchResultRows } from "../utils/build-search-result-rows";
 
 export interface UseInfiniteSearchOptions {
-  query: string;
+  query?: string;
+  scholarSlug?: string;
   showOriginal?: boolean;
   enabled?: boolean;
   topicSlugs?: string[];
+  format?: string;
   limit?: number;
 }
 
 export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
   const params = {
-    q: options.query,
+    q: options.query?.trim() ? options.query.trim() : undefined,
+    scholarSlug: options.scholarSlug,
+    format: options.format,
     limit: options.limit,
     topicSlugs: options.topicSlugs,
   };
@@ -21,10 +25,6 @@ export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
   return useInfiniteQuery({
     queryKey: queryKeys.search.infinite(params),
     queryFn: async ({ pageParam }) => {
-      if (!options.query.trim()) {
-        return { items: [], nextCursor: undefined, hasMore: false };
-      }
-
       // API returns full list (non-paginated), only fetch on first page
       if (pageParam) {
         return { items: [], nextCursor: undefined, hasMore: false };
@@ -45,6 +45,6 @@ export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
     },
     initialPageParam: undefined as string | undefined,
     getNextPageParam: () => undefined,
-    enabled: options.enabled !== false && !!options.query.trim(),
+    enabled: options.enabled !== false,
   });
 }

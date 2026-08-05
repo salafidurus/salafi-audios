@@ -1,0 +1,153 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-lg);
+  width: 100%;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--content-strong);
+  font-size: var(--typo-title-md-font-size);
+  font-weight: var(--typo-title-md-font-weight);
+  font-family: var(--typo-title-md-font-family);
+  line-height: var(--typo-title-md-line-height);
+}
+
+.seeAllLink {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--action-primary);
+  text-decoration: none;
+  transition: opacity 150ms ease;
+}
+
+.seeAllLink:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+
+.scrollRow {
+  display: flex;
+  gap: var(--space-component-gap-lg);
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  width: 100%;
+}
+
+.scrollRow::-webkit-scrollbar {
+  display: none;
+}
+
+.medallion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 108px;
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: transform 180ms ease;
+}
+
+.medallion:hover {
+  transform: translateY(-2px);
+}
+
+.avatarWrap {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, var(--border-primary-strong), var(--surface-subtle));
+  border: 2px solid var(--action-primary);
+  box-shadow: 0 0 0 3px var(--surface-canvas), 0 4px 14px rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.name {
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+  text-align: center;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.count {
+  font-size: 11px;
+  color: var(--content-muted);
+  text-align: center;
+  margin-top: 2px;
+}
+
+/* Skeleton Styles */
+.skeletonMedallion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 108px;
+  flex-shrink: 0;
+}
+
+.skeletonAvatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+}
+
+.skeletonName {
+  width: 80px;
+  height: 12px;
+}
+
+.skeletonCount {
+  width: 50px;
+  height: 10px;
+}
+
+.skeletonLine {
+  border-radius: var(--radius-scale-sm);
+  background: var(--surface-subtle);
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-subtle) 0%,
+    var(--surface-hover) 50%,
+    var(--surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeletonLine {
+    animation: none;
+  }
+}
+
+

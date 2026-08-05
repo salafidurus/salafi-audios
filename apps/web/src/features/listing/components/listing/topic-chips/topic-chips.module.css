@@ -9,6 +9,18 @@
   display: inline-block;
   padding: 4px 12px;
   border-radius: 999px;
-  background: var(--surface-subtle, #f0f0f0);
-  border: 1px solid var(--border-subtle, #e0e0e0);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--content-muted);
+  font-size: var(--typo-caption-font-size);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.chip:hover {
+  background: var(--surface-selected);
+  border-color: var(--border-primary);
+  color: var(--content-primary-strong);
 }

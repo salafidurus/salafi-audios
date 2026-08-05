@@ -119,7 +119,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
   );
 
   const scholarId = scholar?.id ?? "";
-  const canAdd = ability.can("create", subject("Listing", { scholarId }));
+  const canAdd = ability.can("create", subject("Listing", { scholarSlug }));
 
   const { data: seriesList, refetch: refetchSeries } = useAdminSeries(scholarId);
   const { data: collectionList, refetch: refetchCollections } = useAdminCollections(scholarId);
@@ -242,6 +242,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
         <SeriesSheet
           isOpen={showSeriesSheet}
           scholarId={scholarId}
+          scholarSlug={scholarSlug}
           onClose={() => dispatch({ showSeriesSheet: false })}
           onSaved={() => {
             dispatch({ showSeriesSheet: false, seriesOrder: null });
@@ -251,6 +252,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
         <CollectionSheet
           isOpen={showCollectionSheet}
           scholarId={scholarId}
+          scholarSlug={scholarSlug}
           onClose={() => dispatch({ showCollectionSheet: false })}
           onSaved={() => {
             dispatch({ showCollectionSheet: false, collectionOrder: null });

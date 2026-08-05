@@ -16,10 +16,9 @@
   position: relative;
   width: 20%;
   flex-shrink: 0;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
-  border-radius: var(--radius-component-panel-sm);
-  background: var(--surface-subtle);
+  border-radius: 50%;
 }
 
 @media (min-width: 640px) {

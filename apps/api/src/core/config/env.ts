@@ -6,6 +6,9 @@ const ApiEnvSchema = z.object({
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
   CORS_ORIGINS_NATIVE: z.string().optional().default('salafidurus-dev://,exp://'),
   DATABASE_URL: z.url(),
+  PRISMA_LOG_QUERIES: z
+    .preprocess((val) => val === 'true' || val === true, z.boolean())
+    .default(false),
   ASSET_CDN_BASE_URL: z.url().optional(),
   SITEMAP_BASE_URL: z.url().optional(),
   BETTER_AUTH_SECRET: z.string().min(32),

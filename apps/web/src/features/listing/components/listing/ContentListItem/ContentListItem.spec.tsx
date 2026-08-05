@@ -41,7 +41,7 @@ describe("ContentListItem", () => {
       />,
     );
 
-    fireEvent.click(screen.getByText("Play"));
+    fireEvent.click(screen.getByLabelText("Play Lesson 1"));
 
     const [track] = (audioService.playListing as any).mock.calls[0];
     expect(track.moduleId).toBe("module-1");
@@ -60,7 +60,7 @@ describe("ContentListItem", () => {
       />,
     );
 
-    fireEvent.click(screen.getByText("Play"));
+    fireEvent.click(screen.getByLabelText("Play Lesson 1"));
 
     const [track] = (audioService.playListing as any).mock.calls[0];
     expect(track.seriesId).toBe("series-1");
@@ -71,7 +71,7 @@ describe("ContentListItem", () => {
   it("tags the track with its own slug — the progress-sync PUT resolves strictly by slug, not uuid", () => {
     render(<ContentListItem item={item} scholarName="Ibn Baz" />);
 
-    fireEvent.click(screen.getByText("Play"));
+    fireEvent.click(screen.getByLabelText("Play Lesson 1"));
 
     const [track] = (audioService.playListing as any).mock.calls[0];
     expect(track.slug).toBe("lesson-1");

@@ -6,14 +6,12 @@ type Locale = "en" | "ar";
 
 export function syncTypographyToLocale(locale: Locale): void {
   const typography = createTypography(locale);
+  const themes = ["system", "parchment", "manuscript", "midnight", "ember"] as const;
 
-  UnistylesRuntime.updateTheme("light", (current) => ({
-    ...current,
-    typography,
-  }));
-
-  UnistylesRuntime.updateTheme("dark", (current) => ({
-    ...current,
-    typography,
-  }));
+  for (const theme of themes) {
+    UnistylesRuntime.updateTheme(theme, (current) => ({
+      ...current,
+      typography,
+    }));
+  }
 }

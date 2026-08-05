@@ -2,11 +2,13 @@ import { createE2eApp } from './helpers/create-e2e-app';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { PrismaService } from '../src/core/db/prisma.service';
-import { TestAuthFactory } from './helpers/test-auth.factory';
-import { Permission } from '@sd/core-db';
+import { TestAuthFactory, accessGrant } from './helpers/test-auth.factory';
+import { AccessCapability, AccessTarget } from '@sd/core-db';
 import {
   TEST_SCHOLAR_ID,
+  TEST_SCHOLAR_SLUG,
   TEST_LISTING_ID,
+  TEST_LISTING_SLUG,
   seedTestData,
   cleanupE2ETestData,
 } from './helpers/seed-test-data';
@@ -15,7 +17,7 @@ process.env.DISABLE_THROTTLER = 'true';
 
 /**
  * Translations are written exclusively through the standalone per-locale
- * endpoints (POST /listings/:id/translations, POST /scholars/:id/translations,
+ * endpoints (POST /listings/:slug/translations, POST /scholars/:slug/translations,
  * and their PATCH :locale counterparts) — never as an embedded `translations`
  * array on the listing/scholar create or update DTOs. This suite exercises
  * that standalone path end-to-end against a real database.
@@ -47,14 +49,16 @@ describe('Content translations persistence (e2e)', () => {
   });
 
   describe('Listing translations', () => {
-    it('POST /listings/:id/translations persists a secondary-locale translation under the correct locale', async () => {
+    it('POST /listings/:slug/translations persists a secondary-locale translation under the correct locale', async () => {
       const auth = await authFactory.createAdminUser([
-        Permission.TRANSLATIONS_CREATE,
-        Permission.TRANSLATIONS_VIEW,
+        accessGrant(AccessTarget.translation, AccessCapability.translate, {
+          scholarSlug: TEST_SCHOLAR_SLUG,
+          locale: 'en',
+        }),
       ]);
 
       await request(app.getHttpServer())
-        .post(`/listings/${TEST_LISTING_ID}/translations`)
+        .post(`/listings/${TEST_LISTING_SLUG}/translations`)
         .set(auth.headers)
         .send({ locale: 'en', title: 'English Translation Title', description: 'English desc' })
         .expect(201);
@@ -74,14 +78,16 @@ describe('Content translations persistence (e2e)', () => {
       expect(badRows).toHaveLength(0);
     });
 
-    it('PATCH /listings/:id/translations/:locale updates the existing translation in place', async () => {
+    it('PATCH /listings/:slug/translations/:locale updates the existing translation in place', async () => {
       const auth = await authFactory.createAdminUser([
-        Permission.TRANSLATIONS_EDIT,
-        Permission.TRANSLATIONS_VIEW,
+        accessGrant(AccessTarget.translation, AccessCapability.translate, {
+          scholarSlug: TEST_SCHOLAR_SLUG,
+          locale: 'en',
+        }),
       ]);
 
       await request(app.getHttpServer())
-        .patch(`/listings/${TEST_LISTING_ID}/translations/en`)
+        .patch(`/listings/${TEST_LISTING_SLUG}/translations/en`)
         .set(auth.headers)
         .send({ title: 'Updated English Title' })
         .expect(200);
@@ -94,7 +100,9 @@ describe('Content translations persistence (e2e)', () => {
     });
 
     it('PUT /admin/listings/:id/details does not accept an embedded translations array', async () => {
-      const auth = await authFactory.createAdminUser([Permission.LISTINGS_EDIT]);
+      const auth = await authFactory.createAdminUser([
+        accessGrant(AccessTarget.listing, AccessCapability.write),
+      ]);
 
       const res = await request(app.getHttpServer())
         .put(`/admin/listings/${TEST_LISTING_ID}/details`)
@@ -114,14 +122,13 @@ describe('Content translations persistence (e2e)', () => {
   });
 
   describe('Scholar translations', () => {
-    it('POST /scholars/:id/translations persists a secondary-locale translation under the correct locale', async () => {
+    it('POST /scholars/:slug/translations persists a secondary-locale translation under the correct locale', async () => {
       const auth = await authFactory.createAdminUser([
-        Permission.TRANSLATIONS_CREATE,
-        Permission.TRANSLATIONS_VIEW,
+        accessGrant(AccessTarget.translation, AccessCapability.translate, { locale: 'en' }),
       ]);
 
       await request(app.getHttpServer())
-        .post(`/scholars/${TEST_SCHOLAR_ID}/translations`)
+        .post(`/scholars/${TEST_SCHOLAR_SLUG}/translations`)
         .set(auth.headers)
         .send({ locale: 'en', name: 'English Scholar Name', bio: 'English bio' })
         .expect(201);
@@ -140,14 +147,13 @@ describe('Content translations persistence (e2e)', () => {
       expect(badRows).toHaveLength(0);
     });
 
-    it('PATCH /scholars/:id/translations/:locale updates the existing translation in place', async () => {
+    it('PATCH /scholars/:slug/translations/:locale updates the existing translation in place', async () => {
       const auth = await authFactory.createAdminUser([
-        Permission.TRANSLATIONS_EDIT,
-        Permission.TRANSLATIONS_VIEW,
+        accessGrant(AccessTarget.translation, AccessCapability.translate, { locale: 'en' }),
       ]);
 
       await request(app.getHttpServer())
-        .patch(`/scholars/${TEST_SCHOLAR_ID}/translations/en`)
+        .patch(`/scholars/${TEST_SCHOLAR_SLUG}/translations/en`)
         .set(auth.headers)
         .send({ name: 'Updated English Scholar Name' })
         .expect(200);
@@ -160,7 +166,9 @@ describe('Content translations persistence (e2e)', () => {
     });
 
     it('PATCH /admin/scholars/:id does not accept an embedded translations array', async () => {
-      const auth = await authFactory.createAdminUser([Permission.SCHOLARS_EDIT]);
+      const auth = await authFactory.createAdminUser([
+        accessGrant(AccessTarget.scholar, AccessCapability.write),
+      ]);
 
       const res = await request(app.getHttpServer())
         .patch(`/admin/scholars/${TEST_SCHOLAR_ID}`)
@@ -199,7 +207,9 @@ describe('Content translations persistence (e2e)', () => {
 
     describe('Scholar', () => {
       it('POST /admin/scholars mirrors the new scholar into a matching ScholarTranslation', async () => {
-        const auth = await authFactory.createAdminUser([Permission.SCHOLARS_CREATE]);
+        const auth = await authFactory.createAdminUser([
+          accessGrant(AccessTarget.scholar, AccessCapability.write),
+        ]);
         const res = await request(app.getHttpServer())
           .post('/admin/scholars')
           .set(auth.headers)
@@ -222,7 +232,9 @@ describe('Content translations persistence (e2e)', () => {
       });
 
       it('PATCH /admin/scholars/:id overwrites the current-locale translation when content changes', async () => {
-        const auth = await authFactory.createAdminUser([Permission.SCHOLARS_EDIT]);
+        const auth = await authFactory.createAdminUser([
+          accessGrant(AccessTarget.scholar, AccessCapability.write),
+        ]);
         await request(app.getHttpServer())
           .patch(`/admin/scholars/${scholarId}`)
           .set(auth.headers)
@@ -238,7 +250,9 @@ describe('Content translations persistence (e2e)', () => {
       });
 
       it('PATCH /admin/scholars/:id snapshots the old locale then syncs the new locale on a mainLanguage change', async () => {
-        const auth = await authFactory.createAdminUser([Permission.SCHOLARS_EDIT]);
+        const auth = await authFactory.createAdminUser([
+          accessGrant(AccessTarget.scholar, AccessCapability.write),
+        ]);
         await request(app.getHttpServer())
           .patch(`/admin/scholars/${scholarId}`)
           .set(auth.headers)
@@ -258,7 +272,9 @@ describe('Content translations persistence (e2e)', () => {
       });
 
       it('PATCH /admin/scholars/:id leaves translations untouched when no translatable field is sent', async () => {
-        const auth = await authFactory.createAdminUser([Permission.SCHOLARS_EDIT]);
+        const auth = await authFactory.createAdminUser([
+          accessGrant(AccessTarget.scholar, AccessCapability.write),
+        ]);
         await request(app.getHttpServer())
           .patch(`/admin/scholars/${scholarId}`)
           .set(auth.headers)
@@ -274,7 +290,9 @@ describe('Content translations persistence (e2e)', () => {
 
     describe('Listing', () => {
       it('POST /admin/listings mirrors the new listing into a matching ListingTranslation', async () => {
-        const auth = await authFactory.createAdminUser([Permission.LISTINGS_CREATE]);
+        const auth = await authFactory.createAdminUser([
+          accessGrant(AccessTarget.listing, AccessCapability.write),
+        ]);
         const res = await request(app.getHttpServer())
           .post('/admin/listings')
           .set(auth.headers)
@@ -296,7 +314,9 @@ describe('Content translations persistence (e2e)', () => {
       });
 
       it('PUT /admin/listings/:id/details overwrites the current-locale translation when content changes', async () => {
-        const auth = await authFactory.createAdminUser([Permission.LISTINGS_EDIT]);
+        const auth = await authFactory.createAdminUser([
+          accessGrant(AccessTarget.listing, AccessCapability.write),
+        ]);
         await request(app.getHttpServer())
           .put(`/admin/listings/${listingId}/details`)
           .set(auth.headers)
@@ -310,7 +330,9 @@ describe('Content translations persistence (e2e)', () => {
       });
 
       it('PUT /admin/listings/:id/details snapshots the old locale then syncs the new locale on a language change', async () => {
-        const auth = await authFactory.createAdminUser([Permission.LISTINGS_EDIT]);
+        const auth = await authFactory.createAdminUser([
+          accessGrant(AccessTarget.listing, AccessCapability.write),
+        ]);
         await request(app.getHttpServer())
           .put(`/admin/listings/${listingId}/details`)
           .set(auth.headers)
@@ -332,7 +354,9 @@ describe('Content translations persistence (e2e)', () => {
 
     describe('Topic (Arabic is always the main language)', () => {
       it('POST /admin/topics mirrors the new topic into a matching Arabic TopicTranslation', async () => {
-        const auth = await authFactory.createAdminUser([Permission.TOPICS_CREATE]);
+        const auth = await authFactory.createAdminUser([
+          accessGrant(AccessTarget.topic, AccessCapability.write),
+        ]);
         topicSlug = `e2e-sync-topic-${crypto.randomUUID()}`;
         await request(app.getHttpServer())
           .post('/admin/topics')
@@ -350,7 +374,9 @@ describe('Content translations persistence (e2e)', () => {
       });
 
       it('PUT /admin/topics/:slug keeps the Arabic translation in sync when content changes', async () => {
-        const auth = await authFactory.createAdminUser([Permission.TOPICS_EDIT]);
+        const auth = await authFactory.createAdminUser([
+          accessGrant(AccessTarget.topic, AccessCapability.write),
+        ]);
         await request(app.getHttpServer())
           .put(`/admin/topics/${topicSlug}`)
           .set(auth.headers)
@@ -375,7 +401,9 @@ describe('Content translations persistence (e2e)', () => {
    */
   describe('Admin display-locale resolution', () => {
     let scholarId: string;
+    let scholarSlug: string;
     let listingId: string;
+    let listingSlug: string;
 
     afterAll(async () => {
       if (scholarId) await prisma.scholar.delete({ where: { id: scholarId } });
@@ -384,14 +412,17 @@ describe('Content translations persistence (e2e)', () => {
 
     it('GET /admin/scholars resolves name and bio to the request locale and searches across translations', async () => {
       const marker = crypto.randomUUID().slice(0, 8);
-      const createAuth = await authFactory.createAdminUser([Permission.SCHOLARS_CREATE]);
+      scholarSlug = `e2e-admin-locale-scholar-${marker}`;
+      const createAuth = await authFactory.createAdminUser([
+        accessGrant(AccessTarget.scholar, AccessCapability.write),
+      ]);
       const createRes = await request(app.getHttpServer())
         .post('/admin/scholars')
         .set(createAuth.headers)
         .send({
           name: `اسم عربي ${marker}`,
           bio: `سيرة عربية ${marker}`,
-          slug: `e2e-admin-locale-scholar-${marker}`,
+          slug: scholarSlug,
           mainLanguage: 'ar',
           country: 'SA',
         })
@@ -399,20 +430,26 @@ describe('Content translations persistence (e2e)', () => {
       scholarId = createRes.body.id;
 
       const translateAuth = await authFactory.createAdminUser([
-        Permission.TRANSLATIONS_CREATE,
-        Permission.TRANSLATIONS_PUBLISH,
+        accessGrant(AccessTarget.translation, AccessCapability.translate, {
+          scholarSlug,
+          locale: 'en',
+        }),
+        accessGrant(AccessTarget.translation, AccessCapability.publish, {
+          scholarSlug,
+          locale: 'en',
+        }),
       ]);
       await request(app.getHttpServer())
-        .post(`/scholars/${scholarId}/translations`)
+        .post(`/scholars/${scholarSlug}/translations`)
         .set(translateAuth.headers)
         .send({ locale: 'en', name: `English Name ${marker}`, bio: `English Bio ${marker}` })
         .expect(201);
       await request(app.getHttpServer())
-        .post(`/scholars/${scholarId}/translations/en/publish`)
+        .post(`/scholars/${scholarSlug}/translations/en/publish`)
         .set(translateAuth.headers)
         .expect(201);
 
-      const viewAuth = await authFactory.createAdminUser([Permission.SCHOLARS_VIEW]);
+      const viewAuth = await authFactory.createAdminUser();
       const listRes = await request(app.getHttpServer())
         .get('/admin/scholars?locale=en')
         .set(viewAuth.headers)
@@ -430,13 +467,16 @@ describe('Content translations persistence (e2e)', () => {
 
     it('GET /admin/listings resolves title/scholarName to the request locale, case-insensitively, and searches across translations', async () => {
       const marker = crypto.randomUUID().slice(0, 8);
-      const createAuth = await authFactory.createAdminUser([Permission.LISTINGS_CREATE]);
+      listingSlug = `e2e-admin-locale-listing-${marker}`;
+      const createAuth = await authFactory.createAdminUser([
+        accessGrant(AccessTarget.listing, AccessCapability.write),
+      ]);
       const createRes = await request(app.getHttpServer())
         .post('/admin/listings')
         .set(createAuth.headers)
         .send({
           title: `عنوان عربي ${marker}`,
-          slug: `e2e-admin-locale-listing-${marker}`,
+          slug: listingSlug,
           format: 'single',
           scholarId: TEST_SCHOLAR_ID,
           language: 'ar',
@@ -444,21 +484,35 @@ describe('Content translations persistence (e2e)', () => {
         .expect(201);
       listingId = createRes.body.id;
 
+      const createdListing = await prisma.listing.findUnique({
+        where: { slug: listingSlug },
+        select: { scholar: { select: { slug: true } } },
+      });
+      expect(createdListing?.scholar?.slug).toBe(TEST_SCHOLAR_SLUG);
+      const listingScholarSlug = createdListing?.scholar?.slug;
+      if (!listingScholarSlug) throw new Error('Created listing has no scholar slug');
+
       const translateAuth = await authFactory.createAdminUser([
-        Permission.TRANSLATIONS_CREATE,
-        Permission.TRANSLATIONS_PUBLISH,
+        accessGrant(AccessTarget.translation, AccessCapability.translate, {
+          scholarSlug: listingScholarSlug,
+          locale: 'en',
+        }),
+        accessGrant(AccessTarget.translation, AccessCapability.publish, {
+          scholarSlug: listingScholarSlug,
+          locale: 'en',
+        }),
       ]);
       await request(app.getHttpServer())
-        .post(`/listings/${listingId}/translations`)
+        .post(`/listings/${listingSlug}/translations`)
         .set(translateAuth.headers)
         .send({ locale: 'en', title: `English Title ${marker}` })
         .expect(201);
       await request(app.getHttpServer())
-        .post(`/listings/${listingId}/translations/en/publish`)
+        .post(`/listings/${listingSlug}/translations/en/publish`)
         .set(translateAuth.headers)
         .expect(201);
 
-      const viewAuth = await authFactory.createAdminUser([Permission.LISTINGS_VIEW]);
+      const viewAuth = await authFactory.createAdminUser();
       const listRes = await request(app.getHttpServer())
         .get('/admin/listings?locale=en')
         .set(viewAuth.headers)

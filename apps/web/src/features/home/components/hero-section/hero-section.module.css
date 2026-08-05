@@ -1,83 +1,164 @@
 .hero {
+  position: relative;
+  border-radius: 16px;
+  border: 1px solid var(--border-default);
+  padding: 24px 28px 24px 44px;
+  background-color: var(--surface-default);
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    color-mix(in srgb, var(--action-primary) 15%, transparent) 1px,
+    transparent 0
+  );
+  background-size: 18px 18px;
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+
+.marginalia {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 26px;
+  border-right: 1px solid var(--border-default);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 18px;
+  background: color-mix(in srgb, var(--surface-subtle) 50%, transparent);
+}
+
+.arabicText {
+  writing-mode: vertical-rl;
+  font-family: var(--typo-display-lg-font-family), serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--action-primary);
+  opacity: 0.7;
+}
+
+.bookmark {
+  position: absolute;
+  top: 0;
+  right: 36px;
+  width: 32px;
+  height: 48px;
+  background: linear-gradient(180deg, var(--content-primary-strong), var(--action-primary));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  z-index: 2;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 1rem;
-  position: relative;
+  gap: 8px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--action-primary);
 }
 
 .title {
-  font-size: clamp(3.5rem, 8vw, 5.5rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: clamp(24px, 3.2vw, 32px);
+  font-weight: 600;
+  line-height: 1.25;
   margin: 0;
-  color: var(--content-default);
-  position: relative;
-  z-index: 1;
+  color: var(--content-strong);
 }
 
-.title::before {
-  content: "";
-  position: absolute;
-  inset: -1.5rem -3rem;
-  background: var(--accent-primary-subtle-surface);
-  filter: blur(48px);
-  z-index: -1;
-  pointer-events: none;
-  border-radius: 999px;
-}
-
-.taglineContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-}
-
-.tagline {
-  font-size: clamp(1.5rem, 3.5vw, 2rem);
-  font-weight: 400;
-  line-height: 1.8;
-  letter-spacing: 0.03em;
+.subtitle {
   margin: 0;
-  max-width: 900px;
-  color: var(--content-secondary);
-  font-family: var(--font-body-ar, sans-serif);
-}
-
-.taglineTranslation {
-  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-  font-weight: 400;
-  line-height: 1.7;
-  margin: 0;
-  max-width: 800px;
   color: var(--content-muted);
+  font-size: 13.5px;
 }
 
-.surahReference {
+.recommendation {
+  margin: 2px 0 0 0;
+  color: var(--content-muted);
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ctaRow {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.startBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--action-primary);
+  color: var(--content-on-primary);
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform 150ms ease, opacity 150ms ease;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--action-primary) 30%, transparent);
+}
+
+.startBtn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.browseLabel {
+  font-size: 12.5px;
+  color: var(--content-muted);
+  margin-left: 4px;
+}
+
+.categoryPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  color: var(--content-strong);
+  font-size: 13px;
   font-weight: 500;
-  color: var(--content-primary-strong);
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.categoryPill:hover {
+  border-color: var(--action-primary);
+  background-color: var(--surface-hover);
 }
 
 @media (max-width: 640px) {
   .hero {
-    gap: 0.75rem;
+    padding: 20px 20px 20px 36px;
   }
 
   .title {
-    font-size: 2.5rem;
+    font-size: 24px;
   }
 
-  .tagline {
-    font-size: clamp(1rem, 2.5vw, 1.25rem);
-    letter-spacing: 0.02em;
-  }
-
-  .taglineTranslation {
-    font-size: clamp(0.85rem, 2vw, 1rem);
+  .ctaRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 }
 
@@ -85,3 +166,56 @@
 [dir="rtl"] .hero {
   direction: rtl;
 }
+
+/* Skeleton loader styles */
+.skeletonEyebrow {
+  height: 12px;
+  width: 220px;
+}
+
+.skeletonTitle {
+  height: 32px;
+  width: 65%;
+  margin: 4px 0;
+}
+
+.skeletonSubtitle {
+  height: 16px;
+  width: 40%;
+}
+
+.skeletonCta {
+  height: 40px;
+  width: 140px;
+  border-radius: 999px;
+  margin-top: 8px;
+}
+
+.skeletonLine {
+  border-radius: var(--radius-scale-sm);
+  background: var(--surface-subtle);
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-subtle) 0%,
+    var(--surface-hover) 50%,
+    var(--surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: heroShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes heroShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeletonLine {
+    animation: none;
+  }
+}
+

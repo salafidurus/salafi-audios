@@ -42,11 +42,11 @@
 }
 
 .success {
-  background: var(--surface-success-subtle);
-  color: var(--content-success-strong);
+  background: var(--badge-success-surface);
+  color: var(--badge-success-fg);
 }
 
 .warning {
-  background: var(--surface-warning-subtle);
-  color: var(--content-warning-strong);
+  background: var(--badge-warning-surface);
+  color: var(--badge-warning-fg);
 }

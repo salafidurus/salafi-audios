@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ScrollView } from "react-native";
 import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
 
@@ -11,7 +11,7 @@ import { SegmentedControl } from "../components/SegmentedControl/SegmentedContro
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 
-type ThemePreference = "system" | "light" | "dark";
+type ThemePreference = "system" | "parchment" | "manuscript" | "midnight" | "ember";
 
 interface NotificationState {
   master: boolean;
@@ -19,30 +19,25 @@ interface NotificationState {
   lectures: boolean;
 }
 
-function getInitialTheme(): ThemePreference {
-  if (UnistylesRuntime.hasAdaptiveThemes) {
-    return "system";
-  }
-  return UnistylesRuntime.themeName === "dark" ? "dark" : "light";
-}
-
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
-  const [themePreference, setThemePreference] = useState<ThemePreference>(getInitialTheme);
+  const [themePreference, setThemePreference] = useState<ThemePreference>("system");
   const [notif, setNotif] = useState<NotificationState>({
     master: true,
     scholars: true,
     lectures: true,
   });
 
+  useEffect(() => {
+    const activeTheme = UnistylesRuntime.themeName as ThemePreference;
+    if (activeTheme) {
+      setThemePreference(activeTheme);
+    }
+  }, []);
+
   const handleThemeChange = useCallback((val: ThemePreference) => {
     setThemePreference(val);
-    if (val === "system") {
-      UnistylesRuntime.setAdaptiveThemes(true);
-    } else {
-      UnistylesRuntime.setAdaptiveThemes(false);
-      UnistylesRuntime.setTheme(val);
-    }
+    UnistylesRuntime.setTheme(val);
   }, []);
 
   const handleNotifChange = useCallback(
@@ -54,8 +49,10 @@ export function SettingsGeneralScreen() {
 
   const themeOptions: { value: ThemePreference; label: string }[] = [
     { value: "system", label: t("settings.general.themeOptions.system", "System") },
-    { value: "light", label: t("settings.general.themeOptions.light", "Light") },
-    { value: "dark", label: t("settings.general.themeOptions.dark", "Dark") },
+    { value: "parchment", label: t("settings.general.themeOptions.parchment", "Parchment") },
+    { value: "manuscript", label: t("settings.general.themeOptions.manuscript", "Manuscript") },
+    { value: "midnight", label: t("settings.general.themeOptions.midnight", "Midnight") },
+    { value: "ember", label: t("settings.general.themeOptions.ember", "Ember") },
   ];
 
   return (

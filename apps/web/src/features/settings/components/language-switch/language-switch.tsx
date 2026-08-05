@@ -3,7 +3,7 @@
 import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
 import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
-import { Languages } from "lucide-react";
+import { Globe, Languages } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { setLocaleCookie } from "@/core/i18n/locale-cookie";
@@ -60,7 +60,14 @@ export function LanguageSwitch({ direction = "down", collapsed = false }: Langua
         ariaLabel={t("navigation.languageSwitch", "Language")}
         className={styles.trigger}
       >
-        {collapsed ? <Languages size={18} /> : undefined}
+        {collapsed ? (
+          <Languages size={18} />
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <Globe size={14} color="var(--action-primary)" />
+            <span>{LOCALE_LABELS[activeLocale]}</span>
+          </div>
+        )}
       </DropdownTrigger>
       <DropdownContent>
         {SUPPORTED_LOCALES.map((locale) => (

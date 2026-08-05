@@ -1,4 +1,17 @@
 export {
+  AccessTargetEnum,
+  type AccessTarget,
+  AccessCapabilityEnum,
+  type AccessCapability,
+  AccessGrantRequestSchema,
+  type AccessGrantRequest,
+  UserAccessSnapshotSchema,
+  type UserAccessSnapshot,
+  ReplaceUserAccessRequestSchema,
+  type ReplaceUserAccessRequest,
+} from "./access.types";
+
+export {
   STATUS_VALUES,
   type StatusValue,
   StatusValueSchema,
@@ -219,10 +232,6 @@ export {
   ProgressSyncDtoSchema,
 } from "../types/audio.types";
 export {
-  type AdminPermissionDto,
-  AdminPermissionDtoSchema,
-  type AdminPermissionsListDto,
-  AdminPermissionsListDtoSchema,
   type AdminUserListItemDto,
   AdminUserListItemDtoSchema,
   type AdminUserListDto,
@@ -267,38 +276,6 @@ export {
   type ProgressUpdateDto,
   ProgressUpdateDtoSchema,
 } from "../types/progress.types";
-export {
-  PermissionEnum,
-  Permissions,
-  type Permission,
-  UserRoleEnum,
-  type UserRole,
-  ScholarPermissionTypeEnum,
-  type ScholarPermissionType,
-  UserPermissionDtoSchema,
-  type UserPermissionDto,
-  UserRoleAssignmentDtoSchema,
-  type UserRoleAssignmentDto,
-  UserScholarRoleDtoSchema,
-  type UserScholarRoleDto,
-  UserTranslatorRoleDtoSchema,
-  type UserTranslatorRoleDto,
-  GrantPermissionRequestSchema,
-  type GrantPermissionRequest,
-  GrantRoleRequestSchema,
-  type GrantRoleRequest,
-  GrantScholarRoleRequestSchema,
-  type GrantScholarRoleRequest,
-  SyncTranslatorLocalesRequestSchema,
-  type SyncTranslatorLocalesRequest,
-  UpdateTranslatorPublishRequestSchema,
-  type UpdateTranslatorPublishRequest,
-  PERMISSION_GROUPS,
-  ROLE_DEFAULT_PERMISSIONS,
-  PERMISSIONS_ARRAY,
-  PERMISSION_LABELS,
-  PERMISSION_DESCRIPTIONS,
-} from "../types/permissions.types";
 export {
   type AppActions,
   type AppSubjectType,

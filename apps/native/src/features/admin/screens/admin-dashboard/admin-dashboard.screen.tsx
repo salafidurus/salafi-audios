@@ -11,7 +11,7 @@ import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 type AdminDashboardScreenProps = {
   onNavigateToListings?: () => void;
   onNavigateToScholars?: () => void;
-  onNavigateToPermissions?: () => void;
+  onNavigateToAccess?: () => void;
 };
 
 type AdminCard = {
@@ -64,9 +64,7 @@ export function AdminDashboardScreen({
       <Text style={styles.title}>{t("admin.dashboard.title", "Admin Dashboard")}</Text>
 
       {visibleCards.length === 0 ? (
-        <EmptyState
-          message={t("admin.dashboard.noPermissions", "You don't have any admin permissions.")}
-        />
+        <EmptyState message={t("admin.dashboard.noAccess", "You don't have any admin access.")} />
       ) : (
         visibleCards.map((card) => (
           <Pressable key={card.key} onPress={card.onPress} style={[styles.card, card.cardStyle]}>

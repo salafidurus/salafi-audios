@@ -4,7 +4,7 @@ import { AdminUsersScreen } from "@/features/admin/screens/admin-users/admin-use
 
 export const metadata: Metadata = {
   title: "Admin Users",
-  description: "Manage admin user permissions and access.",
+  description: "Manage admin user access.",
 };
 
 export default function AdminUsersPage() {

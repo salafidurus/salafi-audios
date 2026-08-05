@@ -1,6 +1,30 @@
 import { PrismaService } from '../../src/core/db/prisma.service';
-import { Permission, UserRole } from '@sd/core-db';
+import { AccessCapability, AccessTarget, UserRole } from '@sd/core-db';
+import type { Locale } from '@sd/core-db';
 import { createId } from '@paralleldrive/cuid2';
+
+const E2E_USER_EMAIL_PREFIX = 'e2e-test-';
+const E2E_USER_EMAIL_DOMAIN = '@salafidurus.com';
+
+export type AccessGrantSeed = {
+  target: AccessTarget;
+  capability: AccessCapability;
+  scholarSlug?: string | null;
+  locale?: Locale | null;
+};
+
+export function accessGrant(
+  target: AccessTarget,
+  capability: AccessCapability,
+  options: Pick<AccessGrantSeed, 'scholarSlug' | 'locale'> = {},
+): AccessGrantSeed {
+  return {
+    target,
+    capability,
+    scholarSlug: options.scholarSlug ?? null,
+    locale: options.locale ?? null,
+  };
+}
 
 export class TestAuthFactory {
   private readonly createdUserIds: Set<string> = new Set();
@@ -10,7 +34,7 @@ export class TestAuthFactory {
   async createUser(
     email?: string,
     roles: UserRole[] = [UserRole.listener],
-    permissions: Permission[] = [],
+    grants: AccessGrantSeed[] = [],
   ) {
     const uniqueEmail = email ?? `e2e-test-${createId()}@salafidurus.com`;
     const user = await this.prisma.user.create({
@@ -35,12 +59,14 @@ export class TestAuthFactory {
       });
     }
 
-    // Create permissions
-    if (permissions.length > 0) {
-      await this.prisma.userPermission.createMany({
-        data: permissions.map((permission) => ({
+    if (grants.length > 0) {
+      await this.prisma.userAccessGrant.createMany({
+        data: (await this.resolveGrantScholarIds(grants)).map((grant) => ({
+          target: grant.target,
+          capability: grant.capability,
+          scholarId: grant.scholarId,
+          locale: grant.locale,
           userId: user.id,
-          permission,
         })),
       });
     }
@@ -67,48 +93,90 @@ export class TestAuthFactory {
     };
   }
 
-  async createAdminUser(permissions: Permission[] = []) {
-    return this.createUser(undefined, [UserRole.admin], permissions);
+  private async resolveGrantScholarIds(grants: AccessGrantSeed[]) {
+    const slugs = [
+      ...new Set(grants.flatMap((grant) => (grant.scholarSlug ? [grant.scholarSlug] : []))),
+    ];
+    const scholars = slugs.length
+      ? await this.prisma.scholar.findMany({
+          where: { slug: { in: slugs } },
+          select: { id: true, slug: true },
+        })
+      : [];
+    const ids = new Map(scholars.map((scholar) => [scholar.slug, scholar.id]));
+    return grants.map((grant) => ({
+      ...grant,
+      scholarId: grant.scholarSlug ? (ids.get(grant.scholarSlug) ?? null) : null,
+    }));
+  }
+
+  async createAdminUser(grants: AccessGrantSeed[] = []) {
+    return this.createUser(undefined, [UserRole.admin], grants);
   }
 
   /**
    * Creates a listener-level user linked to a scholar (by internal id, not
-   * slug — tests already have the seeded scholar's id) via UserScholarRole,
-   * with no global permissions. Used to prove scholar-scoped ability rules
+   * with no global access. Used to prove scholar-scoped ability rules
    * (not the grant endpoint's slug-facing API, which has its own e2e specs).
    */
   async createScholarScopedUser(
-    scholarId: string,
-    permissionType: 'OWN_CONTENT' | 'ASSIGNED_EDITOR' = 'OWN_CONTENT',
+    scholarSlug: string,
+    accessProfile: 'OWN_CONTENT' | 'ASSIGNED_EDITOR' = 'OWN_CONTENT',
   ) {
-    const auth = await this.createUser();
-    await this.prisma.userScholarRole.create({
-      data: { userId: auth.user.id, scholarId, permissionType },
-    });
-    return auth;
+    const grants =
+      accessProfile === 'OWN_CONTENT'
+        ? [
+            accessGrant(AccessTarget.scholar, AccessCapability.write, { scholarSlug }),
+            accessGrant(AccessTarget.scholar, AccessCapability.publish, { scholarSlug }),
+            accessGrant(AccessTarget.listing, AccessCapability.write, { scholarSlug }),
+            accessGrant(AccessTarget.listing, AccessCapability.publish, { scholarSlug }),
+            accessGrant(AccessTarget.media, AccessCapability.write, { scholarSlug }),
+          ]
+        : [accessGrant(AccessTarget.listing, AccessCapability.write, { scholarSlug })];
+    return this.createUser(undefined, [UserRole.listener], grants);
   }
 
   /**
    * Creates a listener-level user with a translator role grant (optionally
-   * scoped to a single scholar by id), with no global permissions. Used to
+   * scoped to a single scholar by id), with no global access. Used to
    * prove locale-scoped ability rules.
    */
   async createTranslatorScopedUser(
     locales: string[],
-    options: { scholarId?: string | null; canPublish?: boolean } = {},
+    options: { scholarSlug?: string | null; canPublish?: boolean } = {},
   ) {
-    const auth = await this.createUser();
-    const scholarId = options.scholarId ?? null;
+    const scholarSlug = options.scholarSlug ?? null;
     const canPublish = options.canPublish ?? false;
-    await this.prisma.userTranslatorRole.createMany({
-      data: locales.map((locale) => ({ userId: auth.user.id, scholarId, locale, canPublish })),
-    });
-    return auth;
+    const grants = locales.flatMap((locale) => [
+      accessGrant(AccessTarget.translation, AccessCapability.translate, {
+        scholarSlug,
+        locale: locale as Locale,
+      }),
+      ...(canPublish
+        ? [
+            accessGrant(AccessTarget.translation, AccessCapability.publish, {
+              scholarSlug,
+              locale: locale as Locale,
+            }),
+          ]
+        : []),
+    ]);
+    return this.createUser(undefined, [UserRole.listener], grants);
   }
 
   async cleanup(): Promise<void> {
-    if (this.createdUserIds.size === 0) return;
-    const ids = Array.from(this.createdUserIds);
+    const staleUsers = await this.prisma.user.findMany({
+      where: {
+        email: {
+          startsWith: E2E_USER_EMAIL_PREFIX,
+          endsWith: E2E_USER_EMAIL_DOMAIN,
+        },
+      },
+      select: { id: true },
+    });
+    const ids = [...new Set([...this.createdUserIds, ...staleUsers.map((user) => user.id)])];
+    if (ids.length === 0) return;
+
     await this.prisma.user.deleteMany({
       where: { id: { in: ids } },
     });

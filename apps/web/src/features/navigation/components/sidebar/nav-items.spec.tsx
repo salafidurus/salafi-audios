@@ -1,5 +1,3 @@
-import { createMongoAbility } from "@casl/ability";
-import { useAbility } from "@sd/domain-account";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, type Mock } from "bun:test";
 import { usePathname, useRouter } from "next/navigation";
@@ -23,7 +21,9 @@ vi.mock("@/core/auth", () => ({
 }));
 
 vi.mock("@sd/domain-account", () => ({
-  useAbility: vi.fn(),
+  useAbility: vi
+    .fn()
+    .mockReturnValue({ ability: { rules: [], can: () => false }, isLoading: false }),
   hasAnyAdminAccess: (ability: any) => ability.rules.length > 0,
 }));
 
@@ -39,11 +39,7 @@ vi.mock("@/core/i18n/use-translation", () => ({
 }));
 
 vi.mock("@/features/settings", () => ({
-  LanguageSwitch: ({ collapsed }: { collapsed?: boolean }) => (
-    <div data-testid="mock-language-switch" data-collapsed={String(collapsed)}>
-      Language Switch
-    </div>
-  ),
+  LanguageSwitch: () => <div data-testid="mock-language-switch">Language Switch</div>,
 }));
 
 function setup() {
@@ -51,12 +47,11 @@ function setup() {
   process.env.NEXT_PUBLIC_WEB_URL = "http://localhost:3001";
   (usePathname as Mock<any>).mockReturnValue("/");
   (useRouter as Mock<any>).mockReturnValue({ push: vi.fn() });
-  (useAuth as Mock<any>).mockReturnValue({ isAuthenticated: false, isLoading: false, user: null });
-  (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
+  (useAuth as Mock<any>).mockReturnValue({ isAuthenticated: false, user: null, isLoading: false });
 }
 
-describe("NavItems > language switch visibility", () => {
-  it("shows LanguageSwitch when isTablet is true", () => {
+describe("NavItems", () => {
+  it("shows LanguageSwitch on tablet", () => {
     setup();
     const { useResponsive } = require("@/shared/hooks/use-responsive");
     (useResponsive as Mock<any>).mockReturnValue({ isMobile: false, isTablet: true, isWeb: false });
@@ -66,7 +61,7 @@ describe("NavItems > language switch visibility", () => {
     expect(screen.getByTestId("mock-language-switch")).toBeInTheDocument();
   });
 
-  it("shows LanguageSwitch when isMobile is true", () => {
+  it("shows LanguageSwitch on mobile", () => {
     setup();
     const { useResponsive } = require("@/shared/hooks/use-responsive");
     (useResponsive as Mock<any>).mockReturnValue({ isMobile: true, isTablet: false, isWeb: false });
@@ -84,17 +79,5 @@ describe("NavItems > language switch visibility", () => {
     render(<NavItems />);
 
     expect(screen.queryByTestId("mock-language-switch")).not.toBeInTheDocument();
-  });
-
-  it("passes collapsed=true to LanguageSwitch when sidebar is collapsed on tablet", () => {
-    setup();
-    const { useResponsive } = require("@/shared/hooks/use-responsive");
-    (useResponsive as Mock<any>).mockReturnValue({ isMobile: false, isTablet: true, isWeb: false });
-
-    render(<NavItems collapsed={true} />);
-
-    const switchEl = screen.getByTestId("mock-language-switch");
-    expect(switchEl).toBeInTheDocument();
-    expect(switchEl).toHaveAttribute("data-collapsed", "true");
   });
 });

@@ -149,7 +149,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
               {t("common.cancel", "Cancel")}
             </Button>
             <Button type="submit" variant="primary" loading={saving} form="topic-form">
-              {t("admin.permissions.done", "Done")}
+              {t("admin.access.done", "Done")}
             </Button>
           </>
         )

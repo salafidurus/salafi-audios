@@ -1,0 +1,19 @@
+.state {
+  padding: var(--space-layout-page-y) var(--space-layout-page-x);
+  color: var(--content-default);
+  text-align: center;
+}
+
+.heading {
+  margin: 0 0 var(--space-component-gap-sm);
+  color: var(--content-strong);
+  font-family: var(--typo-title-md-font-family), serif;
+  font-size: var(--typo-title-md-font-size);
+  line-height: var(--typo-title-md-line-height);
+  letter-spacing: var(--typo-title-md-letter-spacing);
+  font-weight: var(--typo-title-md-font-weight);
+}
+
+.message {
+  color: var(--content-muted);
+}

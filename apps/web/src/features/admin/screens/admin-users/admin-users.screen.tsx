@@ -6,10 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState, useCallback, type ReactNode, useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { PermissionsDialog } from "@/features/admin/components/Content/Users/PermissionsDialog";
-import { RoleDialog } from "@/features/admin/components/Content/Users/RoleDialog";
-import { ScholarRolesDialog } from "@/features/admin/components/Content/Users/ScholarRolesDialog";
-import { TranslatorRolesDialog } from "@/features/admin/components/Content/Users/TranslatorRolesDialog";
+import { AccessDialog } from "@/features/admin/components/Content/Users/AccessDialog";
 import { UserItem } from "@/features/admin/components/Content/Users/user-item";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -28,15 +25,7 @@ export function AdminUsersScreen(): ReactNode {
   const { t } = useTranslation();
   const { query: searchQuery, setQuery: setSearchQuery, debouncedQuery } = useDebouncedSearch();
   const [role, setRole] = useState("");
-  const [permUser, setPermUser] = useState<{ id: string; name: string } | null>(null);
-  const [roleUser, setRoleUser] = useState<{ id: string; name: string } | null>(null);
-  const [scholarRolesUser, setScholarRolesUser] = useState<{ id: string; name: string } | null>(
-    null,
-  );
-  const [translatorRolesUser, setTranslatorRolesUser] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
+  const [accessUser, setAccessUser] = useState<{ id: string; name: string } | null>(null);
 
   const roleChips = useMemo(
     () => [
@@ -59,19 +48,7 @@ export function AdminUsersScreen(): ReactNode {
 
   const allItems = data?.pages.flatMap((page: any) => page.items) ?? [];
 
-  const handlePermissionsChange = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
-  }, [queryClient]);
-
-  const handleRolesChange = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
-  }, [queryClient]);
-
-  const handleScholarRolesChange = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
-  }, [queryClient]);
-
-  const handleTranslatorRolesChange = useCallback(() => {
+  const handleAccessChange = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
   }, [queryClient]);
 
@@ -115,12 +92,7 @@ export function AdminUsersScreen(): ReactNode {
               renderItem={(user) => (
                 <UserItem
                   user={user}
-                  onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
-                  onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
-                  onManageScholarRoles={() => setScholarRolesUser({ id: user.id, name: user.name })}
-                  onManageTranslatorRoles={() =>
-                    setTranslatorRolesUser({ id: user.id, name: user.name })
-                  }
+                  onManageAccess={() => setAccessUser({ id: user.id, name: user.name })}
                 />
               )}
               emptyMessage={
@@ -135,43 +107,12 @@ export function AdminUsersScreen(): ReactNode {
 
       <ScrollToTopButton />
 
-      {permUser && (
-        <PermissionsDialog
-          isOpen
-          userId={permUser.id}
-          userName={permUser.name}
-          onClose={() => setPermUser(null)}
-          onPermissionsChange={handlePermissionsChange}
-        />
-      )}
-
-      {roleUser && (
-        <RoleDialog
-          isOpen
-          userId={roleUser.id}
-          userName={roleUser.name}
-          onClose={() => setRoleUser(null)}
-          onRolesChange={handleRolesChange}
-        />
-      )}
-
-      {scholarRolesUser && (
-        <ScholarRolesDialog
-          isOpen
-          userId={scholarRolesUser.id}
-          userName={scholarRolesUser.name}
-          onClose={() => setScholarRolesUser(null)}
-          onScholarRolesChange={handleScholarRolesChange}
-        />
-      )}
-
-      {translatorRolesUser && (
-        <TranslatorRolesDialog
-          isOpen
-          userId={translatorRolesUser.id}
-          userName={translatorRolesUser.name}
-          onClose={() => setTranslatorRolesUser(null)}
-          onTranslatorRolesChange={handleTranslatorRolesChange}
+      {accessUser && (
+        <AccessDialog
+          userId={accessUser.id}
+          userName={accessUser.name}
+          onClose={() => setAccessUser(null)}
+          onSaved={handleAccessChange}
         />
       )}
     </ScreenView>

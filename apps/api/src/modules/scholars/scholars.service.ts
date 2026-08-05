@@ -97,14 +97,18 @@ export class ScholarsService {
 
   // ─── Scholar translations ─────────────────────────────────────────────────
 
-  listTranslations(scholarId: string): Promise<TranslationViewDto[]> {
+  async listTranslations(scholarSlug: string): Promise<TranslationViewDto[]> {
+    const scholarId = await this.repo.findIdBySlug(scholarSlug);
+    if (!scholarId) throw new NotFoundException('Scholar not found');
     return this.repo.listScholarTranslations(scholarId);
   }
 
   async upsertTranslation(
-    scholarId: string,
+    scholarSlug: string,
     dto: SaveScholarTranslationDto,
   ): Promise<TranslationViewDto> {
+    const scholarId = await this.repo.findIdBySlug(scholarSlug);
+    if (!scholarId) throw new NotFoundException('Scholar not found');
     const [result, scholar] = await Promise.all([
       this.repo.upsertScholarTranslation(scholarId, dto),
       this.repo.findById(scholarId),
@@ -116,10 +120,12 @@ export class ScholarsService {
   }
 
   async updateTranslation(
-    scholarId: string,
+    scholarSlug: string,
     locale: string,
     fields: Partial<{ name: string; bio: string | null }>,
   ): Promise<TranslationViewDto> {
+    const scholarId = await this.repo.findIdBySlug(scholarSlug);
+    if (!scholarId) throw new NotFoundException('Scholar not found');
     const [result, scholar] = await Promise.all([
       this.repo.updateScholarTranslation(scholarId, locale, fields),
       this.repo.findById(scholarId),
@@ -130,7 +136,9 @@ export class ScholarsService {
     return result;
   }
 
-  async publishTranslation(scholarId: string, locale: string): Promise<TranslationViewDto> {
+  async publishTranslation(scholarSlug: string, locale: string): Promise<TranslationViewDto> {
+    const scholarId = await this.repo.findIdBySlug(scholarSlug);
+    if (!scholarId) throw new NotFoundException('Scholar not found');
     const [result, scholar] = await Promise.all([
       this.repo.publishScholarTranslation(scholarId, locale),
       this.repo.findById(scholarId),
@@ -141,7 +149,9 @@ export class ScholarsService {
     return result;
   }
 
-  async unpublishTranslation(scholarId: string, locale: string): Promise<TranslationViewDto> {
+  async unpublishTranslation(scholarSlug: string, locale: string): Promise<TranslationViewDto> {
+    const scholarId = await this.repo.findIdBySlug(scholarSlug);
+    if (!scholarId) throw new NotFoundException('Scholar not found');
     const [result, scholar] = await Promise.all([
       this.repo.unpublishScholarTranslation(scholarId, locale),
       this.repo.findById(scholarId),

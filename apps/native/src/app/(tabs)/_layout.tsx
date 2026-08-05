@@ -12,7 +12,7 @@ export default function TabsLayout() {
   const { theme } = useUnistyles();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
-  const hasAnyPermission = hasAnyAdminAccess(ability);
+  const hasAnyAccess = hasAnyAdminAccess(ability);
 
   return (
     <RouteAccessGuard>
@@ -50,7 +50,7 @@ export default function TabsLayout() {
           </NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
-        <NativeTabs.Trigger name="admin" hidden={!hasAnyPermission}>
+        <NativeTabs.Trigger name="admin" hidden={!hasAnyAccess}>
           <NativeTabs.Trigger.Icon
             sf={{ default: "shield", selected: "shield.fill" }}
             md={{ default: "admin_panel_settings", selected: "admin_panel_settings" }}

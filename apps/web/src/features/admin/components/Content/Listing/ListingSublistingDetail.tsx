@@ -176,7 +176,7 @@ export function ListingSublistingDetail({
               disabled={state.saving}
               onClick={handleSave}
             >
-              {state.saving ? t("admin.permissions.saving", "Saving…") : t("common.save", "Save")}
+              {state.saving ? t("admin.access.saving", "Saving…") : t("common.save", "Save")}
             </Button>
           </div>
         </>

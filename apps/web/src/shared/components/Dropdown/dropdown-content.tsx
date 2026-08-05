@@ -140,9 +140,11 @@ export function DropdownContent({ children, searchable = false, className }: Dro
             value={searchQuery}
             onChange={handleSearchChange}
             placeholder={t("search.placeholder", "Search")}
+            className={styles.searchBar}
             inputWrapperStyle={{
-              padding: `var(--space-scale-xs) var(--space-scale-sm)`,
-              gap: `var(--space-scale-xs)`,
+              padding: "6px 8px",
+              gap: "6px",
+              borderRadius: "8px",
             }}
           />
         </div>

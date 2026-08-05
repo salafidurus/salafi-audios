@@ -29,7 +29,6 @@ import {
   resolveScholarIdFromBody,
 } from '../../core/auth/policy-resolvers';
 import { defineAbilityFor } from '../../core/auth/ability/ability.factory';
-import { accessibleScopeIds } from '../../core/auth/ability/accessible-scope';
 import type { AbilityInput } from '../../core/auth/ability/ability.types';
 import { subject } from '@casl/ability';
 import { PrismaService } from '../../core/db/prisma.service';
@@ -49,29 +48,40 @@ export class AdminListingsController {
     private readonly prisma: PrismaService,
   ) {}
 
+  @Get('promotions')
+  @CheckPolicy('write', 'Listing')
+  @ApiOperation({ summary: 'Get current home promotions (admin)' })
+  @ApiOkResponse({ description: 'Current promotions metadata' })
+  async getPromotions(): Promise<any> {
+    return this.service.getPromotions();
+  }
+
+  @Post('promotions')
+  @CheckPolicy('write', 'Listing')
+  @ApiOperation({ summary: 'Update home promotions' })
+  @ApiOkResponse({ description: 'Success status' })
+  async updatePromotions(@Body() body: any): Promise<any> {
+    return this.service.updatePromotions(body);
+  }
+
   @Get()
-  @CheckPolicy('read', 'Listing')
   @ApiOperation({ summary: 'List all listings (admin)' })
   listAdmin(
     @Query('cursor') cursor: string | undefined,
     @Query('scholarId') scholarId: string | undefined,
     @Query('status') status: string | undefined,
     @Query('search') search: string | undefined,
-    @CurrentUser() user: AbilityInput,
   ): Promise<AdminListingListDto> {
-    const ability = defineAbilityFor(user);
-    const accessibleScholarIds = accessibleScopeIds(ability, 'read', 'Listing');
     return this.service.listAdmin({
       cursor,
       scholarId,
       status,
       search,
-      accessibleScholarIds,
+      accessibleScholarIds: undefined,
     });
   }
 
   @Get('series')
-  @CheckPolicy('read', 'Listing')
   @ApiOperation({ summary: 'Get series listings for a scholar (for picker dropdowns)' })
   @ApiOkResponse({ description: 'List of series-format listings' })
   async seriesOptions(@Query('scholarId') scholarId?: string): Promise<ListingRefDto[]> {
@@ -82,35 +92,33 @@ export class AdminListingsController {
   }
 
   @Get(':id')
-  @CheckPolicy('read', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Get listing detail (admin)' })
   getAdminDetail(@Param('id') id: string): Promise<AdminListingDetailDto> {
     return this.service.getAdminDetail(id);
   }
 
   @Get(':id/form-data')
-  @CheckPolicy('update', 'Listing', resolveListingScholarId())
+  @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Get listing with translations for edit form' })
   getFormData(@Param('id') id: string) {
     return this.service.getFormData(id);
   }
 
   @Get(':id/media-data')
-  @CheckPolicy('read', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Get listing media details' })
   getMediaData(@Param('id') id: string): Promise<AdminListingMediaDetailDto> {
     return this.service.getMediaData(id);
   }
 
   @Get(':id/arrange-data')
-  @CheckPolicy('update', 'Listing', resolveListingScholarId())
+  @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Get listing children tree for the upload & arrange flow' })
   getArrangeData(@Param('id') id: string): Promise<AdminArrangeDataDto> {
     return this.service.getArrangeData(id);
   }
 
   @Post(':id/arrange-commit')
-  @CheckPolicy('create', 'Listing', resolveListingScholarId())
+  @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Transactionally create/update modules and lessons with audio' })
   arrangeCommit(
     @Param('id') id: string,
@@ -121,7 +129,7 @@ export class AdminListingsController {
   }
 
   @Post()
-  @CheckPolicy('create', 'Listing', resolveScholarIdFromBody())
+  @CheckPolicy('write', 'Listing', resolveScholarIdFromBody())
   @ApiOperation({ summary: 'Create a listing after R2 upload' })
   createListing(
     @Body() dto: CreateListingDto,
@@ -148,13 +156,13 @@ export class AdminListingsController {
     const ability = defineAbilityFor(user);
     const rows = await this.prisma.listing.findMany({
       where: { id: { in: dto.ids } },
-      select: { id: true, scholarId: true },
+      select: { id: true, scholar: { select: { slug: true } } },
     });
     const action = dto.action === 'archive' ? 'archive' : 'publish';
     for (const row of rows) {
-      if (!ability.can(action, subject('Listing', { scholarId: row.scholarId }))) {
+      if (!ability.can(action, subject('Listing', { scholarSlug: row.scholar.slug } as never))) {
         throw new ForbiddenException(
-          `Missing capability: ${action} Listing (scholarId: ${row.scholarId})`,
+          `Missing capability: ${action} Listing (scholarSlug: ${row.scholar.slug})`,
         );
       }
     }
@@ -162,7 +170,7 @@ export class AdminListingsController {
   }
 
   @Put(':id/details')
-  @CheckPolicy('update', 'Listing', resolveListingScholarId())
+  @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Update listing details (title, description, status, topics, etc.)' })
   @ApiOkResponse({ description: 'Listing details updated successfully' })
   async updateListingDetails(
@@ -175,7 +183,7 @@ export class AdminListingsController {
   }
 
   @Put(':id/media')
-  @CheckPolicy('update', 'Listing', resolveListingScholarId())
+  @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Update listing media (audio file, duration, etc.)' })
   @ApiOkResponse({ description: 'Listing media updated successfully' })
   async updateListingMedia(
@@ -197,7 +205,7 @@ export class AdminListingsController {
   }
 
   @Post(':id/archive')
-  @CheckPolicy('archive', 'Listing', resolveListingScholarId())
+  @CheckPolicy('delete', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Archive a listing' })
   @ApiOkResponse({ description: 'Listing archived successfully' })
   async archiveListing(@Param('id') id: string): Promise<AdminListingActionDto> {

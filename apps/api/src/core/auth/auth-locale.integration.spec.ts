@@ -14,20 +14,14 @@ const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrismaService = {
+  userAccessGrant: {
+    findMany: vi.fn<any>().mockResolvedValue([]),
+  },
   user: {
     update: vi.fn<any>().mockResolvedValue({ preferredLanguage: 'ar' }),
   },
   userRoleAssignment: {
     findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
-  },
-  userPermission: {
-    findMany: vi.fn<any>().mockResolvedValue([]),
-  },
-  userScholarRole: {
-    findMany: vi.fn<any>().mockResolvedValue([]),
-  },
-  userTranslatorRole: {
-    findMany: vi.fn<any>().mockResolvedValue([]),
   },
 };
 

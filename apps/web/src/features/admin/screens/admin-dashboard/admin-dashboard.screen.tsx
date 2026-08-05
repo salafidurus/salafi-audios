@@ -53,7 +53,7 @@ export function AdminDashboardScreen() {
     },
     {
       title: t("navigation.admin.users", "Users"),
-      description: t("admin.dashboard.usersDesc", "Manage admin users and permissions"),
+      description: t("admin.dashboard.usersDesc", "Manage admin users and access"),
       descriptionMobile: t("admin.dashboard.usersDescMobile", "Manage users"),
       href: "/admin/users",
       action: "read",
@@ -91,8 +91,8 @@ export function AdminDashboardScreen() {
         <EmptyState
           message={
             !isMobile
-              ? t("admin.dashboard.noPermissions", "You don't have any admin permissions.")
-              : t("admin.dashboard.noPermissionsMobile", "No admin permissions.")
+              ? t("admin.dashboard.noAccess", "You don't have any admin access.")
+              : t("admin.dashboard.noAccessMobile", "No admin access.")
           }
         />
       ) : (

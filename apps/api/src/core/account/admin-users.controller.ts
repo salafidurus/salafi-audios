@@ -1,40 +1,56 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Put, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../auth/decorators/check-policy.decorator';
-import { PermissionsService } from './permissions.service';
-import type { AdminPermissionsListDto, AdminUserListDto } from '@sd/core-contracts';
+import { UserDirectoryService } from './user-directory.service';
+import type { AdminUserListDto, UserAccessSnapshot } from '@sd/core-contracts';
+import { CurrentUser } from '../auth/decorators';
+import { AccessService } from './access.service';
+import { ReplaceUserAccessDto } from './dto/replace-user-access.dto';
 
 /**
  * AdminUsersController
  *
- * Handles user listing and read-only operations.
- * Role and permission management endpoints have been migrated to PermissionsController.
- * User administration itself is never scholar/locale-scoped.
+ * Handles user listing and aggregate access management.
+ * User administration is global and requires the UserAccess capability.
  */
 @ApiTags('Admin Users')
 @ApiCommonErrors()
 @Controller('admin/users')
 export class AdminUsersController {
-  constructor(private readonly permissionsService: PermissionsService) {}
+  constructor(
+    private readonly userDirectoryService: UserDirectoryService,
+    private readonly accessService: AccessService,
+  ) {}
 
   @Get()
-  @CheckPolicy('read', 'User')
+  @CheckPolicy('manage', 'UserAccess')
   @ApiOperation({
-    summary: 'List all users with their admin permissions and roles',
+    summary: 'List all users with their admin access and roles',
   })
   async listUsers(
     @Query('q') query?: string,
     @Query('role') role?: string,
     @Query('cursor') cursor?: string,
   ): Promise<AdminUserListDto> {
-    return this.permissionsService.listUsers(query, role, cursor);
+    return this.userDirectoryService.listUsers(query, role, cursor);
   }
 
-  @Get(':userId/permissions')
-  @CheckPolicy('read', 'User')
-  @ApiOperation({ summary: 'Get permissions for a user (read-only)' })
-  async getPermissions(@Param('userId') userId: string): Promise<AdminPermissionsListDto> {
-    return this.permissionsService.getPermissions(userId);
+  @Get(':userId/access')
+  @CheckPolicy('manage', 'UserAccess')
+  @ApiOperation({ summary: 'Get the aggregate access snapshot for a user' })
+  getAccess(@Param('userId') userId: string): Promise<UserAccessSnapshot> {
+    return this.accessService.snapshot(userId);
+  }
+
+  @Put(':userId/access')
+  @CheckPolicy('manage', 'UserAccess')
+  @ApiOperation({ summary: 'Replace a user access snapshot atomically' })
+  replaceAccess(
+    @Param('userId') userId: string,
+    @Body() body: ReplaceUserAccessDto,
+    @CurrentUser() user: { id: string },
+  ): Promise<UserAccessSnapshot> {
+    return this.accessService.replace(userId, body, user.id);
   }
 }

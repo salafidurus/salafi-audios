@@ -10,6 +10,8 @@ import type { MongoAbility } from "@casl/ability";
 export type AppActions =
   | "manage"
   | "read"
+  | "write"
+  | "translate"
   | "create"
   | "update"
   | "delete"
@@ -25,18 +27,15 @@ export type AppSubjectType =
   | "Topic"
   | "Media"
   | "User"
-  | "UserRoleAssignment"
-  | "UserPermission"
-  | "UserScholarRole"
-  | "UserTranslatorRole";
+  | "UserAccess";
 
 // Minimal shapes for subjects that are ever checked with resource conditions
-// (scholarId/locale). Plain data shapes, not real domain classes — CASL only
+// (scholarSlug/locale). Plain data shapes, not real domain classes — CASL only
 // needs these to type the `conditions` argument passed alongside a subject().
-export type ScholarSubject = { id: string };
-export type ListingSubject = { scholarId: string };
-export type TranslationSubject = { scholarId?: string; locale: string };
-export type MediaSubject = { scholarId: string };
+export type ScholarSubject = { slug: string };
+export type ListingSubject = { scholarSlug: string };
+export type TranslationSubject = { scholarSlug?: string; locale: string };
+export type MediaSubject = { scholarSlug: string };
 
 export type AppSubjects =
   | "all"

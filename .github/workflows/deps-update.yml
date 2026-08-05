@@ -31,9 +31,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: .cache/deps-state.json
-          key: deps-state-${{ github.run_id }}
-          restore-keys: |
-            deps-state-
+          key: deps-state
 
       - name: Run dependency update
         run: bun run pkg-update:ci
@@ -44,7 +42,7 @@ jobs:
 
       - name: Save deps state cache
         uses: actions/cache/save@v6
-        if: always()
+        if: steps.cache-restore.outputs.cache-hit != 'true'
         with:
           path: .cache/deps-state.json
-          key: deps-state-${{ github.run_id }}
+          key: deps-state

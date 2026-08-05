@@ -1,6 +1,8 @@
 "use client";
 
 import { useListingDetail, useListingContents } from "@sd/domain-content";
+import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useState, useRef, useEffect, useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -24,12 +26,14 @@ export type ListingDetailScreenProps = {
 
 export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const formatScholarName = useFormatScholarName();
   const [searchQuery, setSearchQuery] = useState("");
   const [highlightItemId, setHighlightItemId] = useState<string | undefined>(undefined);
   const headerContentRef = useRef<HTMLDivElement>(null);
 
-  const { data: listing, isFetching: isFetchingDetail } = useListingDetail(slug);
+  const { data: listing, isFetching: isFetchingDetail, isError: isListingError, refetch: refetchListing } =
+    useListingDetail(slug);
   const { data: contents, isFetching: isFetchingContents } = useListingContents(
     listing?.slug ?? "",
   );
@@ -92,10 +96,62 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
     return result;
   }, [contents, query]);
 
-  if (isFetchingDetail) {
+  if (isListingError && !listing) {
     return (
       <ScreenView center>
-        <AppText variant="bodyMd">{t("lecture.loading", "Loading content…")}</AppText>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
+          <AppText variant="titleMd">{t("lecture.error", "Failed to load content details")}</AppText>
+          <button
+            type="button"
+            onClick={() => refetchListing()}
+            style={{
+              padding: "8px 16px",
+              borderRadius: "999px",
+              background: "var(--action-primary)",
+              color: "var(--content-on-primary)",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: 600,
+            }}
+          >
+            {t("common.retry", "Try again")}
+          </button>
+        </div>
+      </ScreenView>
+    );
+  }
+
+  if (isFetchingDetail && !listing) {
+    return (
+      <ScreenView>
+        <StickyHeaderLayout>
+          <StickyHeaderLayout.Header>
+            <div>
+              <button
+                type="button"
+                className={styles.backButton}
+                onClick={() => router.back()}
+                aria-label={t("navigation.back", "Back")}
+              >
+                <ChevronLeft size={14} />
+                <span>{t("navigation.back", "Back")}</span>
+              </button>
+
+              <div className={styles.headerTopRow} style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "16px 0" }}>
+                <div style={{ width: "60%", height: "24px", borderRadius: "4px", background: "var(--surface-subtle)" }} />
+                <div style={{ width: "35%", height: "14px", borderRadius: "4px", background: "var(--surface-subtle)" }} />
+              </div>
+            </div>
+          </StickyHeaderLayout.Header>
+
+          <StickyHeaderLayout.Content>
+            <div className={styles.contentWrapper} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={`listing-detail-skeleton-${i}`} style={{ height: "56px", width: "100%", borderRadius: "8px", background: "var(--surface-subtle)" }} />
+              ))}
+            </div>
+          </StickyHeaderLayout.Content>
+        </StickyHeaderLayout>
       </ScreenView>
     );
   }
@@ -125,6 +181,16 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
       <StickyHeaderLayout>
         <StickyHeaderLayout.Header>
           <div ref={headerContentRef}>
+            <button
+              type="button"
+              className={styles.backButton}
+              onClick={() => router.back()}
+              aria-label={t("navigation.back", "Back")}
+            >
+              <ChevronLeft size={14} />
+              <span>{t("navigation.back", "Back")}</span>
+            </button>
+
             <div className={styles.headerTopRow}>
               <MetaDataSection listing={listing} />
               <QuickButtonSection listing={listing} contents={contents} />

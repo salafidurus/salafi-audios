@@ -3,12 +3,13 @@ import { z } from "zod";
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
 
 export const SearchCatalogParamsSchema = z.object({
-  q: z.string(),
+  q: z.string().optional(),
   limit: z.number().optional(),
   language: z.string().optional(),
   topicSlug: z.string().optional(),
   topicSlugs: z.array(z.string()).optional(),
   scholarSlug: z.string().optional(),
+  format: z.string().optional(),
 });
 export type SearchCatalogParams = z.infer<typeof SearchCatalogParamsSchema>;
 
@@ -47,6 +48,7 @@ export const SearchQueryDtoSchema = z.object({
     }, z.array(z.string()))
     .optional(),
   scholarSlug: z.string().optional(),
+  format: z.string().optional(),
   cursor: z.string().optional(),
   limit: z
     .preprocess((val) => {
