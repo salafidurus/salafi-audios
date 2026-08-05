@@ -93,4 +93,4 @@ Client persistence improves continuity but never becomes authoritative.
   combined into a CASL ability server-side (`apps/api/src/core/auth/ability/ability.factory.ts`)
   and enforced per-request by `PolicyGuard`. Granting access is documented in
   [admin-management.md](./admin-management.md) and is handled by the
-  `grant:access` script or the unified admin access API.
+  `grant:access` script, direct SQL queries, or the unified admin access API.
