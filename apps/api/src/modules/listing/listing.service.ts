@@ -50,6 +50,14 @@ export class ListingService {
     return this.recentRepo.getRecentListings(cursor, limit);
   }
 
+  async getPromotions(): Promise<any> {
+    return this.repo.findPromotions();
+  }
+
+  async updatePromotions(body: any): Promise<any> {
+    return this.repo.updatePromotions(body);
+  }
+
   async getContents(id: string): Promise<ListingContentsDto> {
     const contents = await this.repo.findContentsById(id);
     if (!contents) throw new NotFoundException(`Listing "${id}" not found`);

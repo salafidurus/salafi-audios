@@ -23,6 +23,13 @@ vi.mock("@sd/domain-content", () => ({
   useExploreRecentScreen: () => ({ data: undefined }),
 }));
 
+vi.mock("../../hooks/use-home-promotions", () => ({
+  useHomePromotions: () => ({
+    data: { hero: null, editorsPicks: [] },
+    isLoading: false,
+  }),
+}));
+
 describe("HomeScreen", () => {
   const mockOnOpenSearch = vi.fn();
   const mockOnContinueListening = vi.fn();

@@ -5,12 +5,12 @@ import { useAbility } from "@sd/domain-account";
 import { useAdminTopicsList } from "@sd/domain-content";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Content } from "@/features/admin/components/Content";
 import { ListingsContent } from "@/features/admin/components/Content/Listing";
+import { PromotionsContent } from "@/features/admin/components/Content/Promotions/PromotionsContent";
 import { TopicsContent } from "@/features/admin/components/Content/Topic";
 import { Button } from "@/shared/components/Button";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -27,7 +27,6 @@ const EMPTY_TOPICS_ARRAY: TopicDetailDto[] = [];
 
 export function AdminContentsScreen() {
   const { isMobile } = useResponsive();
-  const pathname = usePathname();
   const { t } = useTranslation();
   const { ability } = useAbility();
   const queryClient = useQueryClient();
@@ -37,7 +36,7 @@ export function AdminContentsScreen() {
     debouncedQuery: debouncedSearch,
   } = useDebouncedSearch();
 
-  const activeTab = pathname.includes("/listings") ? "listings" : "topics";
+  const [activeTab, setActiveTab] = useState<"listings" | "topics" | "promotions">("listings");
 
   const { data: topicsData } = useAdminTopicsList();
 
@@ -77,7 +76,9 @@ export function AdminContentsScreen() {
                   ? t("admin.contents.titleMobile", "Content")
                   : activeTab === "topics"
                     ? t("admin.contents.topicManagement", "Topic Management")
-                    : t("admin.contents.listingManagement", "Listing Management")
+                    : activeTab === "listings"
+                      ? t("admin.contents.listingManagement", "Listing Management")
+                      : t("admin.contents.promotionsManagement", "Promotions Management")
               }
               actions={
                 activeTab === "topics"
@@ -93,30 +94,59 @@ export function AdminContentsScreen() {
                           : t("admin.contents.addTopicMobile", "Topic")}
                       </Button>
                     )
-                  : ability.can("create", "Listing") && (
-                      <Button
-                        variant="primary"
-                        size={!isMobile ? "md" : "sm"}
-                        icon={<Plus size={!isMobile ? 18 : 16} />}
-                        onClick={handleOpenAddListing}
-                      >
-                        {!isMobile
-                          ? t("admin.contents.addListing", "Add Listing")
-                          : t("admin.contents.addListingMobile", "Listing")}
-                      </Button>
-                    )
+                  : activeTab === "listings"
+                    ? ability.can("create", "Listing") && (
+                        <Button
+                          variant="primary"
+                          size={!isMobile ? "md" : "sm"}
+                          icon={<Plus size={!isMobile ? 18 : 16} />}
+                          onClick={handleOpenAddListing}
+                        >
+                          {!isMobile
+                            ? t("admin.contents.addListing", "Add Listing")
+                            : t("admin.contents.addListingMobile", "Listing")}
+                        </Button>
+                      )
+                    : null
               }
             />
 
-            <Search.Bar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder={
-                activeTab === "topics"
-                  ? t("admin.contents.searchPlaceholderTopics", "Search topics...")
-                  : t("admin.contents.searchPlaceholderListings", "Search listings...")
-              }
-            />
+            {/* Sub-navigation tab switcher */}
+            <div className={styles.tabBar}>
+              <button
+                type="button"
+                className={`${styles.tabButton} ${activeTab === "listings" ? styles.tabButtonActive : ""}`}
+                onClick={() => setActiveTab("listings")}
+              >
+                {t("admin.contents.tabListings", "Listings")}
+              </button>
+              <button
+                type="button"
+                className={`${styles.tabButton} ${activeTab === "topics" ? styles.tabButtonActive : ""}`}
+                onClick={() => setActiveTab("topics")}
+              >
+                {t("admin.contents.tabTopics", "Topics")}
+              </button>
+              <button
+                type="button"
+                className={`${styles.tabButton} ${activeTab === "promotions" ? styles.tabButtonActive : ""}`}
+                onClick={() => setActiveTab("promotions")}
+              >
+                {t("admin.contents.tabPromotions", "Promotions")}
+              </button>
+            </div>
+
+            {activeTab !== "promotions" && (
+              <Search.Bar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder={
+                  activeTab === "topics"
+                    ? t("admin.contents.searchPlaceholderTopics", "Search topics...")
+                    : t("admin.contents.searchPlaceholderListings", "Search listings...")
+                }
+              />
+            )}
           </StickyHeaderLayout.Header>
 
           <StickyHeaderLayout.Content>
@@ -150,6 +180,7 @@ export function AdminContentsScreen() {
                 onAudioUploaderOpenChange={setIsListingAudioUploaderOpen}
               />
             )}
+            {activeTab === "promotions" && <PromotionsContent />}
           </StickyHeaderLayout.Content>
         </StickyHeaderLayout>
       </div>

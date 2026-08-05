@@ -16,6 +16,7 @@ import { HeroSection } from "../../components/hero-section/hero-section";
 import { MobileDownloadSection } from "../../components/mobile-download-section/mobile-download-section";
 import { RecentlyAddedSection } from "../../components/recently-added-section/recently-added-section";
 import { ScholarMedallions } from "../../components/scholar-medallions/scholar-medallions";
+import { useHomePromotions } from "../../hooks/use-home-promotions";
 import { MOBILE_APP_AVAILABILITY } from "./home.constants";
 import styles from "./home.screen.module.css";
 
@@ -32,6 +33,7 @@ function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
 
 export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProps) {
   const { recentProgress, isLoading: isProgressLoading } = useContinueListening();
+  const { data: promoData, isLoading: isPromosLoading } = useHomePromotions();
   const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen({
     limit: MAX_RECENT_ITEMS,
   });
@@ -46,9 +48,10 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
     }
   }
 
-  const featuredContent = items[0] ?? null;
+  const featuredContent = promoData?.hero?.listing ?? items[0] ?? null;
   const hasHistory = Boolean(recentProgress);
-  const isHeroLoading = !hasHistory && !featuredContent && (isProgressLoading || isExploreLoading);
+  const isHeroLoading =
+    !hasHistory && !featuredContent && (isProgressLoading || isExploreLoading || isPromosLoading);
 
   return (
     <ScreenView
@@ -81,6 +84,7 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
       <HeroSection
         recentProgress={recentProgress}
         featuredContent={featuredContent}
+        headline={promoData?.hero?.headline}
         isLoading={isHeroLoading}
         onResume={onContinueListening}
         hasHistory={hasHistory}

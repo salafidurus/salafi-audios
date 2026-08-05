@@ -48,6 +48,22 @@ export class AdminListingsController {
     private readonly prisma: PrismaService,
   ) {}
 
+  @Get('promotions')
+  @CheckPolicy((ability) => ability.can('manage', 'Listing'))
+  @ApiOperation({ summary: 'Get current home promotions (admin)' })
+  @ApiOkResponse({ description: 'Current promotions metadata' })
+  async getPromotions(): Promise<any> {
+    return this.service.getPromotions();
+  }
+
+  @Post('promotions')
+  @CheckPolicy((ability) => ability.can('manage', 'Listing'))
+  @ApiOperation({ summary: 'Update home promotions' })
+  @ApiOkResponse({ description: 'Success status' })
+  async updatePromotions(@Body() body: any): Promise<any> {
+    return this.service.updatePromotions(body);
+  }
+
   @Get()
   @ApiOperation({ summary: 'List all listings (admin)' })
   listAdmin(

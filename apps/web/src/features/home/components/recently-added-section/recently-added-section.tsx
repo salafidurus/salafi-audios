@@ -8,6 +8,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { usePlayListing } from "@/features/audio";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
+import { useHomePromotions } from "../../hooks/use-home-promotions";
 import { FeaturedLectureCard } from "../featured-lecture-card/featured-lecture-card";
 import { LectureRow } from "../lecture-row/lecture-row";
 import styles from "./recently-added-section.module.css";
@@ -21,7 +22,8 @@ const MAX_RECENT_ITEMS = 10;
 export function RecentlyAddedSection() {
   const { t } = useTranslation();
   const { navigateToListing } = useListingNavigation();
-  const { data, isLoading } = useExploreRecentScreen({ limit: MAX_RECENT_ITEMS });
+  const { data: promoData, isLoading: isPromosLoading } = useHomePromotions();
+  const { data, isLoading: isExploreLoading } = useExploreRecentScreen({ limit: MAX_RECENT_ITEMS });
 
   const items: FeedContentItemDto[] = [];
   for (const page of data?.pages ?? []) {
@@ -32,7 +34,11 @@ export function RecentlyAddedSection() {
     }
   }
 
-  const [featured, ...rest] = items;
+  const picks = (promoData?.editorsPicks?.map((p: any) => p.listing) ?? []) as FeedContentItemDto[];
+  const itemsToUse = picks.length > 0 ? picks : items;
+  const [featured, ...rest] = itemsToUse;
+
+  const isLoading = isPromosLoading || isExploreLoading;
 
   const { play: playFeatured } = usePlayListing(
     featured

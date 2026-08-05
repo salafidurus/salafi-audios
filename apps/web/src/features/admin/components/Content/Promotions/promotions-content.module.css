@@ -1,0 +1,212 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-2xl);
+  padding: var(--space-scale-md) 0;
+  max-width: 640px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-md);
+  background: var(--surface-default);
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  padding: var(--space-scale-lg);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+  color: var(--content-strong);
+}
+
+.sectionHeader h2 {
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
+  margin: 0;
+}
+
+.sectionIcon {
+  color: var(--action-primary);
+}
+
+.sectionDesc {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  margin: -6px 0 var(--space-scale-xs) 0;
+  line-height: 1.5;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--content-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.select {
+  padding: 8px 12px;
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-component-input);
+  background: var(--surface-default);
+  color: var(--content-default);
+  font-size: var(--typo-body-sm-font-size);
+  outline: none;
+  cursor: pointer;
+}
+
+.select:focus {
+  border-color: var(--action-primary);
+}
+
+.activePromoCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-md);
+  background: var(--surface-subtle);
+  border: var(--border-width-default) solid var(--border-subtle);
+  border-radius: var(--radius-component-input);
+  padding: var(--space-scale-md);
+  margin: var(--space-scale-xs) 0;
+}
+
+.promoDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.promoTag {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--content-primary-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.promoTitle {
+  font-size: var(--typo-body-md-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+  margin: 2px 0 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.promoSub {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  margin: 2px 0 0 0;
+}
+
+.searchAddRow {
+  display: flex;
+  gap: var(--space-scale-sm);
+  align-items: center;
+}
+
+.searchAddRow :first-child {
+  flex: 1;
+}
+
+.picksList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  margin-top: var(--space-scale-xs);
+}
+
+.pickRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-md);
+  padding: var(--space-scale-sm) var(--space-scale-md);
+  border: var(--border-width-default) solid var(--border-subtle);
+  border-radius: var(--radius-component-input);
+  background: var(--surface-default);
+  transition: background-color 150ms ease;
+}
+
+.pickRow:hover {
+  background: var(--surface-subtle);
+}
+
+.pickIndex {
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 700;
+  color: var(--content-muted);
+}
+
+.pickDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.pickTitle {
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pickSub {
+  font-size: 11px;
+  color: var(--content-muted);
+  margin: 2px 0 0 0;
+}
+
+.removeButton {
+  background: transparent;
+  border: none;
+  color: var(--content-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.removeButton:hover {
+  color: var(--state-danger-content);
+  background-color: var(--state-danger-surface);
+}
+
+.emptyPicks {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  text-align: center;
+  padding: var(--space-scale-lg);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-component-input);
+}
+
+.divider {
+  border: 0;
+  height: 1px;
+  background: var(--border-default);
+  margin: var(--space-scale-xs) 0;
+}
+
+.footerActions {
+  display: flex;
+  margin-top: var(--space-scale-xs);
+}
+
+.loading {
+  font-size: var(--typo-body-md-font-size);
+  color: var(--content-muted);
+  text-align: center;
+  padding: var(--space-scale-2xl);
+}

@@ -12,6 +12,7 @@ import styles from "./hero-section.module.css";
 export type HeroSectionProps = {
   recentProgress?: RecentProgressDto | null;
   featuredContent?: FeedContentItemDto | null;
+  headline?: string | null;
   isLoading?: boolean;
   onResume?: (lectureSlug: string) => void;
   hasHistory?: boolean;
@@ -20,32 +21,34 @@ export type HeroSectionProps = {
 export function HeroSection({
   recentProgress,
   featuredContent,
+  headline,
   isLoading = false,
   onResume,
   hasHistory = false,
 }: HeroSectionProps) {
   const { t } = useTranslation();
 
-  const heroItem = hasHistory && recentProgress
-    ? {
-        id: recentProgress.lectureId,
-        slug: recentProgress.lectureSlug,
-        title: recentProgress.lectureTitle,
-        scholarName: recentProgress.scholarName,
-      }
-    : featuredContent
-    ? {
-        id: featuredContent.id,
-        slug: featuredContent.slug,
-        title: featuredContent.title,
-        scholarName: featuredContent.scholarName,
-      }
-    : {
-        id: "nullifiers-of-islam",
-        slug: "nullifiers-of-islam",
-        title: "Nullifiers of Islam",
-        scholarName: "Salih ibn Fawzan al-Fawzan",
-      };
+  const heroItem =
+    hasHistory && recentProgress
+      ? {
+          id: recentProgress.lectureId,
+          slug: recentProgress.lectureSlug,
+          title: recentProgress.lectureTitle,
+          scholarName: recentProgress.scholarName,
+        }
+      : featuredContent
+        ? {
+            id: featuredContent.id,
+            slug: featuredContent.slug,
+            title: featuredContent.title,
+            scholarName: featuredContent.scholarName,
+          }
+        : {
+            id: "nullifiers-of-islam",
+            slug: "nullifiers-of-islam",
+            title: "Nullifiers of Islam",
+            scholarName: "Salih ibn Fawzan al-Fawzan",
+          };
 
   const { play: playHero } = usePlayListing({
     id: heroItem.id,
@@ -97,14 +100,14 @@ export function HeroSection({
         <p className={styles.eyebrow} data-testid="home-hero-eyebrow">
           {hasHistory
             ? "AS-SALAMU 'ALAYKUM · CONTINUE YOUR DURUS"
-            : "AS-SALAMU 'ALAYKUM · FEATURED LESSON"}
+            : headline
+              ? headline.toUpperCase()
+              : "AS-SALAMU 'ALAYKUM · FEATURED LESSON"}
         </p>
         <h1 className={styles.title} data-testid="home-hero-title">
           {title}
         </h1>
-        <p className={styles.subtitle}>
-          {`Shaykh ${scholarName}`}
-        </p>
+        <p className={styles.subtitle}>{`Shaykh ${scholarName}`}</p>
         {!hasHistory && (
           <p className={styles.recommendation}>
             <Sparkles size={13} color="var(--action-primary)" /> Recommended starting point for new
@@ -148,4 +151,3 @@ export function HeroSection({
     </section>
   );
 }
-

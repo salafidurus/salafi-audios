@@ -38,6 +38,13 @@ export class ListingController {
     return this.service.getRecentListings(cursor, limit);
   }
 
+  @Get('promotions')
+  @ApiOperation({ summary: 'Get home promotions (featured hero and editors picks)' })
+  @ApiOkResponse({ description: 'Promotional metadata for home screen' })
+  async getPromotions(): Promise<any> {
+    return this.service.getPromotions();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get listing detail by ID or slug' })
   @ApiOkResponse({
