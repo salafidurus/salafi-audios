@@ -29,7 +29,7 @@ vi.mock("@/shared/hooks/use-formatted-scholar-name", () => ({
 
 const mockUseExploreRecentScreen = useExploreRecentScreen as unknown as ReturnType<typeof vi.fn>;
 
-const mockContentItems = Array.from({ length: 10 }, (_, index) => ({
+const mockContentItems = Array.from({ length: 14 }, (_, index) => ({
   kind: "lecture",
   id: `item-${index}`,
   slug: `listing-${index}`,
@@ -59,12 +59,12 @@ describe("RecentlyAddedSection", () => {
     });
   });
 
-  it("renders a card per content item up to the eight-item cap", () => {
+  it("renders at most the ten-item cap regardless of how many are returned", () => {
     render(<RecentlyAddedSection />);
 
     expect(screen.getByText("Recently Added")).toBeTruthy();
     const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThanOrEqual(8);
+    expect(buttons.length).toBe(10);
   });
 
   it("renders a featured card plus rows", () => {

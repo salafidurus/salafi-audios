@@ -1,5 +1,6 @@
 .cardWrap {
   position: relative;
+  height: 100%;
 }
 
 .card {
@@ -7,6 +8,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-scale-xs);
+  height: 100%;
   padding: 18px;
   border-radius: 14px;
   overflow: hidden;

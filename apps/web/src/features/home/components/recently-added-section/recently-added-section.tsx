@@ -16,6 +16,8 @@ function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
   return item.kind !== "scholar_row" && item.kind !== "topic_row";
 }
 
+const MAX_RECENT_ITEMS = 10;
+
 export function RecentlyAddedSection() {
   const { t } = useTranslation();
   const { navigateToListing } = useListingNavigation();
@@ -30,7 +32,7 @@ export function RecentlyAddedSection() {
     }
   }
 
-  const [featured, ...rest] = items;
+  const [featured, ...rest] = items.slice(0, MAX_RECENT_ITEMS);
 
   const { play: playFeatured } = usePlayListing(
     featured
@@ -58,7 +60,10 @@ export function RecentlyAddedSection() {
         <div className={styles.list}>
           <div className={`${styles.skeletonLine} ${styles.skeletonFeaturedCard}`} />
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={`recent-skeleton-${i}`} className={`${styles.skeletonLine} ${styles.skeletonRow}`} />
+            <div
+              key={`recent-skeleton-${i}`}
+              className={`${styles.skeletonLine} ${styles.skeletonRow}`}
+            />
           ))}
         </div>
       </section>
