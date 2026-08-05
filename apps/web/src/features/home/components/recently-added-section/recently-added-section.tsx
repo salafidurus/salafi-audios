@@ -1,7 +1,8 @@
 "use client";
 
-import { type FeedContentItemDto, type FeedItemDto } from "@sd/core-contracts";
+import { routes, type FeedContentItemDto, type FeedItemDto } from "@sd/core-contracts";
 import { useExploreRecentScreen } from "@sd/domain-content";
+import Link from "next/link";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { usePlayListing } from "@/features/audio";
@@ -48,7 +49,12 @@ export function RecentlyAddedSection() {
   if (isLoading && items.length === 0) {
     return (
       <section className={styles.section} aria-label={t("home.recent.label", "Recently added")}>
-        <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
+          <Link href={routes.explore.recent} className={styles.seeAllLink}>
+            {t("common.seeAll", "See all")}
+          </Link>
+        </div>
         <div className={styles.list}>
           <div className={`${styles.skeletonLine} ${styles.skeletonFeaturedCard}`} />
           {Array.from({ length: 4 }).map((_, i) => (
@@ -65,7 +71,12 @@ export function RecentlyAddedSection() {
 
   return (
     <section className={styles.section} aria-label={t("home.recent.label", "Recently added")}>
-      <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
+        <Link href={routes.explore.recent} className={styles.seeAllLink}>
+          {t("common.seeAll", "See all")}
+        </Link>
+      </div>
       <div className={styles.list}>
         {featured && (
           <FeaturedLectureCard

@@ -5,6 +5,13 @@
   width: 100%;
 }
 
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .sectionTitle {
   margin: 0;
   color: var(--content-strong);
@@ -13,6 +20,20 @@
   font-family: var(--typo-title-md-font-family);
   line-height: var(--typo-title-md-line-height);
 }
+
+.seeAllLink {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--action-primary);
+  text-decoration: none;
+  transition: opacity 150ms ease;
+}
+
+.seeAllLink:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
 
 .list {
   display: flex;

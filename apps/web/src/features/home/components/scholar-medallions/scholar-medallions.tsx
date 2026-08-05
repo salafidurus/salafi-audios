@@ -19,7 +19,12 @@ export function ScholarMedallions() {
   if (isLoading && scholars.length === 0) {
     return (
       <section className={styles.section} aria-label={t("home.scholars.label", "Scholars")}>
-        <h2 className={styles.sectionTitle}>{t("home.scholars.title", "Scholars")}</h2>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>{t("home.scholars.title", "Scholars")}</h2>
+          <Link href={routes.scholars.index} className={styles.seeAllLink}>
+            {t("common.seeAll", "See all")}
+          </Link>
+        </div>
         <div className={styles.scrollRow}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={`scholar-skeleton-${i}`} className={styles.skeletonMedallion}>
@@ -39,7 +44,12 @@ export function ScholarMedallions() {
 
   return (
     <section className={styles.section} aria-label={t("home.scholars.label", "Scholars")}>
-      <h2 className={styles.sectionTitle}>{t("home.scholars.title", "Scholars")}</h2>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>{t("home.scholars.title", "Scholars")}</h2>
+        <Link href={routes.scholars.index} className={styles.seeAllLink}>
+          {t("common.seeAll", "See all")}
+        </Link>
+      </div>
       <div className={styles.scrollRow}>
         {scholars.slice(0, MAX_SCHOLARS).map((scholar) => (
           <Link
