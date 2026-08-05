@@ -83,6 +83,7 @@ export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessin
     <LectureRow
       title={item.title}
       category={item.format}
+      scholarName={item.scholarName}
       duration={formatDuration(item.durationSeconds) || ""}
       totalLessons={item.lectureCount}
       onClick={() => handleItemPress(item.slug)}
