@@ -59,12 +59,18 @@ describe("RecentlyAddedSection", () => {
     });
   });
 
-  it("renders at most the ten-item cap regardless of how many are returned", () => {
+  it("requests a limited recent feed from the API", () => {
+    render(<RecentlyAddedSection />);
+
+    expect(mockUseExploreRecentScreen).toHaveBeenCalledWith({ limit: 10 });
+  });
+
+  it("renders the content items the API returned", () => {
     render(<RecentlyAddedSection />);
 
     expect(screen.getByText("Recently Added")).toBeTruthy();
     const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBe(10);
+    expect(buttons.length).toBe(14);
   });
 
   it("renders a featured card plus rows", () => {

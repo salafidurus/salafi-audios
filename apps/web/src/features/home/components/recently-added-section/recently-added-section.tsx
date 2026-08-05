@@ -21,7 +21,7 @@ const MAX_RECENT_ITEMS = 10;
 export function RecentlyAddedSection() {
   const { t } = useTranslation();
   const { navigateToListing } = useListingNavigation();
-  const { data, isLoading } = useExploreRecentScreen();
+  const { data, isLoading } = useExploreRecentScreen({ limit: MAX_RECENT_ITEMS });
 
   const items: FeedContentItemDto[] = [];
   for (const page of data?.pages ?? []) {
@@ -32,7 +32,7 @@ export function RecentlyAddedSection() {
     }
   }
 
-  const [featured, ...rest] = items.slice(0, MAX_RECENT_ITEMS);
+  const [featured, ...rest] = items;
 
   const { play: playFeatured } = usePlayListing(
     featured

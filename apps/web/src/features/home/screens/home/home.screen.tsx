@@ -24,13 +24,17 @@ export type HomeScreenProps = {
   onContinueListening?: (lectureId: string) => void;
 };
 
+const MAX_RECENT_ITEMS = 10;
+
 function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
   return item.kind !== "scholar_row" && item.kind !== "topic_row";
 }
 
 export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProps) {
   const { recentProgress, isLoading: isProgressLoading } = useContinueListening();
-  const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen();
+  const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen({
+    limit: MAX_RECENT_ITEMS,
+  });
   const { t } = useTranslation();
 
   const items: FeedContentItemDto[] = [];
