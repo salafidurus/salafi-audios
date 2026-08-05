@@ -75,22 +75,33 @@ export function AccentThemePicker({ value, onChange, title, description }: Accen
               className={styles.card}
               style={{ borderColor: active ? option.accent : undefined }}
             >
-              <span className={styles.swatches}>
-                {option.swatches.map((swatch, index) => (
-                  <span key={index} className={styles.swatch} style={{ background: swatch }} />
-                ))}
-              </span>
-              <span className={styles.copy}>
-                <span className={styles.nameRow}>
-                  <span className={styles.name}>{option.name}</span>
-                  {active && (
-                    <span className={styles.check} style={{ background: option.accent }}>
-                      <Check size={12} color={option.onAccent} />
-                    </span>
-                  )}
+              <div className={styles.topRow}>
+                <span className={styles.swatches}>
+                  {option.swatches.map((swatch, index) => (
+                    <span key={index} className={styles.swatch} style={{ background: swatch }} />
+                  ))}
                 </span>
-                <span className={styles.optionDescription}>{option.description}</span>
-              </span>
+                <span className={styles.copy}>
+                  <span className={styles.nameRow}>
+                    <span className={styles.name}>{option.name}</span>
+                    {active && (
+                      <span className={styles.check} style={{ background: option.accent }}>
+                        <Check size={11} color={option.onAccent} />
+                      </span>
+                    )}
+                  </span>
+                  <span className={styles.optionDescription}>{option.description}</span>
+                </span>
+              </div>
+              <div className={styles.previewRow}>
+                <span
+                  className={styles.previewBtn}
+                  style={{ background: option.accent, color: option.onAccent }}
+                >
+                  Preview
+                </span>
+                <span className={styles.aaBtn}>Aa</span>
+              </div>
             </button>
           );
         })}

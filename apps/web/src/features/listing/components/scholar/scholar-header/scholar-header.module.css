@@ -30,21 +30,18 @@
 .avatarFallback {
   width: 92px;
   height: 92px;
-  border-radius: var(--radius-full);
-  background: linear-gradient(
-    135deg,
-    var(--surface-subtle),
-    var(--accent-primary-subtle-surface)
-  );
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, var(--border-primary-strong), var(--surface-subtle));
   color: var(--content-primary-strong);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--typo-body-md-font-family);
-  font-size: 34px;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 32px;
   font-weight: 600;
   flex-shrink: 0;
-  border: 3px solid var(--border-secondary);
+  border: 2px solid var(--action-primary);
+  box-shadow: 0 0 0 3px var(--surface-canvas), 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .infoColumn {
@@ -57,12 +54,11 @@
 }
 
 .name {
-  margin: 0;
-  font-family: var(--typo-title-lg-font-family), serif;
-  font-size: var(--typo-title-lg-font-size);
-  font-weight: var(--typo-title-lg-font-weight);
-  line-height: var(--typo-title-lg-line-height);
-  letter-spacing: var(--typo-title-lg-letter-spacing);
+  margin: 0 0 6px 0;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
   color: var(--content-strong);
 }
 

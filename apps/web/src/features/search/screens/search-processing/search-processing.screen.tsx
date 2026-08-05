@@ -93,8 +93,9 @@ export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessin
     <ScreenView contentStyle={{ flex: 1 }}>
       <StickyHeaderLayout>
         <StickyHeaderLayout.Header>
+          <h1 className={styles.searchTitle}>{t("search.title", "Search")}</h1>
           <Search.Bar
-            placeholder={t("search.placeholder", "Search")}
+            placeholder={t("search.placeholder", "Search lectures, scholars, or topics")}
             value={query}
             onChange={setQuery}
             autoFocus

@@ -48,6 +48,14 @@ export function CategoryChips() {
 
   return (
     <nav className={styles.chipsRow} aria-label={t("home.categories.label", "Browse by topic")}>
+      <Link
+        href={routes.search}
+        className={`${styles.chip} ${styles.chipAllActive}`}
+        data-testid="category-chip-all"
+      >
+        <BookOpen size={15} strokeWidth={2} className={styles.chipIconActive} />
+        {t("home.categories.all", "All")}
+      </Link>
       {chips.map((chip) => {
         const Icon = chip.Icon;
         return (
@@ -57,7 +65,7 @@ export function CategoryChips() {
             className={styles.chip}
             data-testid="category-chip"
           >
-            {Icon && <Icon size={14} strokeWidth={2} className={styles.chipIcon} />}
+            {Icon && <Icon size={15} strokeWidth={2} className={styles.chipIcon} />}
             {chip.label}
           </Link>
         );

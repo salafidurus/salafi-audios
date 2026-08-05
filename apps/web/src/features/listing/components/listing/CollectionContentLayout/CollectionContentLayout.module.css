@@ -18,11 +18,18 @@
 }
 
 .moduleHeader {
-  padding: var(--space-component-gap-md, 16px) 0 var(--space-component-gap-sm, 10px) 0;
-  margin-top: var(--space-component-gap-lg, 24px);
-  margin-bottom: var(--space-component-gap-xs, 8px);
-  border-bottom: 1px solid var(--border-default);
+  padding: 16px 0 8px 0;
+  margin-top: 16px;
+  margin-bottom: 8px;
   scroll-margin-top: calc(var(--sticky-header-height, 240px) + 32px);
+}
+
+.moduleTitle {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--content-primary-strong);
+  margin: 0;
 }
 
 @media (min-width: 768px) {

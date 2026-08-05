@@ -1,11 +1,11 @@
-"use client";
-
 import type { RecentProgressDto } from "@sd/core-contracts";
 
-import { Sparkles } from "lucide-react";
+import { routes } from "@sd/core-contracts";
+import { Sparkles, Play, Shield, Scale, MessageSquare } from "lucide-react";
+import Link from "next/link";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Button } from "@/shared/components/Button";
+import { usePlayListing } from "@/features/audio";
 
 import styles from "./hero-section.module.css";
 
@@ -17,6 +17,26 @@ export type HeroSectionProps = {
 
 export function HeroSection({ recentProgress, onResume, hasHistory = false }: HeroSectionProps) {
   const { t } = useTranslation();
+
+  const { play: playHero } = usePlayListing({
+    id: recentProgress?.lectureId ?? "nullifiers-of-islam",
+    slug: recentProgress?.lectureSlug ?? "nullifiers-of-islam",
+    title: recentProgress?.lectureTitle ?? "Nullifiers of Islam",
+    format: "single",
+    scholarName: recentProgress?.scholarName ?? "Shaykh Allamah Salih ibn Fawzan al-Fawzan",
+  });
+
+  const handleStart = () => {
+    if (hasHistory && recentProgress) {
+      if (onResume) {
+        onResume(recentProgress.lectureSlug);
+      } else {
+        void playHero();
+      }
+    } else {
+      void playHero();
+    }
+  };
 
   return (
     <section className={styles.hero} data-testid="home-hero-section">
@@ -31,35 +51,50 @@ export function HeroSection({ recentProgress, onResume, hasHistory = false }: He
             : "AS-SALAMU 'ALAYKUM · NEW HERE? START WITH THE BASICS"}
         </p>
         <h1 className={styles.title} data-testid="home-hero-title">
-          {recentProgress?.lectureTitle ?? "Salafi Durus"}
+          {recentProgress?.lectureTitle ?? "Nullifiers of Islam"}
         </h1>
         <p className={styles.subtitle}>
-          {hasHistory
-            ? `Shaykh Allamah ${recentProgress?.scholarName ?? ""}`
-            : "Browse scholars, topics, and lectures below."}
+          {hasHistory && recentProgress
+            ? `Shaykh Allamah ${recentProgress.scholarName}`
+            : "Shaykh Allamah Salih ibn Fawzan al-Fawzan · Aqeedah"}
         </p>
         {!hasHistory && (
           <p className={styles.recommendation}>
-            <Sparkles size={12} /> Recommended starting point for new students
+            <Sparkles size={13} color="var(--action-primary)" /> Recommended starting point for new
+            students
           </p>
         )}
         <div className={styles.ctaRow}>
-          {hasHistory && recentProgress ? (
-            <Button
-              variant="primary"
-              size="lg"
-              label={t("home.hero.resume", "Resume")}
-              onClick={() => onResume?.(recentProgress.lectureSlug)}
-              data-testid="home-hero-resume"
-            />
-          ) : (
-            <Button
-              variant="primary"
-              size="lg"
-              label={t("home.hero.start", "Start listening")}
-              onClick={() => {}}
-              data-testid="home-hero-start"
-            />
+          <button
+            type="button"
+            className={styles.startBtn}
+            onClick={handleStart}
+            data-testid={hasHistory ? "home-hero-resume" : "home-hero-start"}
+          >
+            <Play size={14} fill="currentColor" />
+            <span>
+              {hasHistory
+                ? t("home.hero.resume", "Resume")
+                : t("home.hero.start", "Start listening")}
+            </span>
+          </button>
+
+          {!hasHistory && (
+            <>
+              <span className={styles.browseLabel}>Or browse:</span>
+              <Link href={`${routes.search}?topic=aqeedah`} className={styles.categoryPill}>
+                <Shield size={13} color="var(--action-primary)" />
+                <span>Aqeedah</span>
+              </Link>
+              <Link href={`${routes.search}?topic=fiqh`} className={styles.categoryPill}>
+                <Scale size={13} color="var(--action-primary)" />
+                <span>Fiqh</span>
+              </Link>
+              <Link href={`${routes.search}?topic=hadith`} className={styles.categoryPill}>
+                <MessageSquare size={13} color="var(--action-primary)" />
+                <span>Hadith</span>
+              </Link>
+            </>
           )}
         </div>
       </div>

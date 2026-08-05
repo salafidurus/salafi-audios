@@ -6,7 +6,12 @@ import { ScholarHeader, type ScholarHeaderProps } from "./scholar-header";
 
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
-    t: (key: string, fallback: string) => fallback,
+    t: (key: string, fallback: string, options?: { count?: number }) => {
+      if (options && options.count !== undefined) {
+        return fallback.replace("{{count}}", String(options.count));
+      }
+      return fallback;
+    },
   }),
 }));
 vi.mock("@/shared/utils/format-scholar-name", () => ({

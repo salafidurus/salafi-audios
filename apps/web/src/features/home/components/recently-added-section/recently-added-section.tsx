@@ -4,6 +4,8 @@ import { type FeedContentItemDto, type FeedItemDto } from "@sd/core-contracts";
 import { useExploreRecentScreen } from "@sd/domain-content";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { usePlayListing } from "@/features/audio";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 import { FeaturedLectureCard } from "../featured-lecture-card/featured-lecture-card";
 import { LectureRow } from "../lecture-row/lecture-row";
@@ -15,6 +17,7 @@ function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
 
 export function RecentlyAddedSection() {
   const { t } = useTranslation();
+  const { navigateToListing } = useListingNavigation();
   const { data } = useExploreRecentScreen();
 
   const items: FeedContentItemDto[] = [];
@@ -26,11 +29,25 @@ export function RecentlyAddedSection() {
     }
   }
 
+  const [featured, ...rest] = items;
+
+  const { play: playFeatured } = usePlayListing(
+    featured
+      ? {
+          id: featured.id,
+          slug: featured.slug,
+          title: featured.title,
+          format: featured.kind,
+          scholarName: featured.scholarName,
+          scholarSlug: featured.scholarSlug,
+          artworkUrl: featured.thumbnailUrl ?? undefined,
+        }
+      : null,
+  );
+
   if (items.length === 0) {
     return null;
   }
-
-  const [featured, ...rest] = items;
 
   return (
     <section className={styles.section} aria-label={t("home.recent.label", "Recently added")}>
@@ -47,7 +64,8 @@ export function RecentlyAddedSection() {
             }
             progress={0}
             totalLessons={1}
-            onClick={() => {}}
+            onClick={() => navigateToListing(featured.slug)}
+            onPlay={() => void playFeatured()}
           />
         )}
         {rest.map((item) => (
@@ -60,7 +78,7 @@ export function RecentlyAddedSection() {
             duration={item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
             progress={0}
             totalLessons={1}
-            onClick={() => {}}
+            onClick={() => navigateToListing(item.slug)}
           />
         ))}
       </div>

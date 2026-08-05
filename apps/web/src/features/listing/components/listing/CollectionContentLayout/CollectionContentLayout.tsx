@@ -5,7 +5,6 @@ import type { ListingModuleDto, ListingContentItemDto } from "@sd/core-contracts
 import { buildTrackQueue, type Track } from "@sd/domain-audio";
 import React, { useState, useRef } from "react";
 
-import { AppText } from "@/shared/components/AppText/AppText";
 import { InfiniteSectionList, type SectionData } from "@/shared/components/InfiniteSectionList";
 
 import { CollectionToc } from "../CollectionToc/CollectionToc";
@@ -60,9 +59,7 @@ export function CollectionContentLayout({
           onLoadMore={() => {}}
           renderSectionHeader={(mod) => (
             <div className={styles.moduleHeader}>
-              <AppText variant="titleLg" color="primary">
-                {mod.title}
-              </AppText>
+              <h2 className={styles.moduleTitle}>{mod.title}</h2>
             </div>
           )}
           renderItem={(lesson, _index, sectionKey) => {

@@ -1,3 +1,11 @@
+.searchTitle {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--content-strong);
+  margin: 0 0 18px 0;
+}
+
 .popularSearches {
   display: flex;
   flex-direction: column;

@@ -14,6 +14,7 @@ type FeaturedLectureCardProps = {
   progress: number;
   totalLessons: number;
   onClick?: () => void;
+  onPlay?: () => void;
 };
 
 export function FeaturedLectureCard({
@@ -25,15 +26,23 @@ export function FeaturedLectureCard({
   progress,
   totalLessons,
   onClick,
+  onPlay,
 }: FeaturedLectureCardProps) {
   const displayScholar = useFormattedScholarName(scholarName, scholarSlug);
   const done = Math.round(progress * totalLessons);
   const t = totalLessons;
 
   return (
-    <button
-      type="button"
+    <div
+      role="region"
+      aria-label={title}
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          onClick?.();
+        }
+      }}
       className={styles.card}
       style={{
         background: "var(--surface-subtle)",
@@ -75,13 +84,22 @@ export function FeaturedLectureCard({
           </span>
         </span>
       </span>
-      <span
+      <button
+        type="button"
         className={styles.playBtn}
         style={{ background: "var(--action-primary)" }}
-        aria-hidden="true"
+        aria-label={`Play ${title}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onPlay) {
+            onPlay();
+          } else if (onClick) {
+            onClick();
+          }
+        }}
       >
         <Play size={17} fill="currentColor" />
-      </span>
-    </button>
+      </button>
+    </div>
   );
 }

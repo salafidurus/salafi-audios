@@ -6,18 +6,29 @@
 }
 
 .artworkContainer {
-  width: 136px;
-  height: 136px;
+  width: 128px;
+  height: 128px;
   flex-shrink: 0;
-  border-radius: var(--radius-full);
+  border-radius: 16px;
   overflow: hidden;
   position: relative;
   background-color: var(--surface-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid var(--border-secondary);
-  box-shadow: 0 4px 24px color-mix(in srgb, var(--accent-primary-subtle-surface) 70%, transparent);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.bookmarkRibbon {
+  position: absolute;
+  top: -1px;
+  right: 18px;
+  width: 26px;
+  height: 40px;
+  background: linear-gradient(180deg, var(--content-primary-strong), var(--action-primary));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  z-index: 2;
 }
 
 .artwork {
@@ -40,10 +51,19 @@
   color: var(--content-primary-strong);
 }
 
+.titleText {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--content-strong);
+  margin: 0;
+  line-height: 1.25;
+}
+
 .textColumn {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-sm, 12px);
+  gap: var(--space-component-gap-sm, 8px);
   min-width: 0;
   flex: 1;
 }

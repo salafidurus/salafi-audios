@@ -27,28 +27,26 @@ export function LectureRow({
   const done = Math.round(progress * totalLessons);
   const t = totalLessons;
 
+  const metaParts: string[] = [];
+  if (category) metaParts.push(category);
+  if (duration) metaParts.push(duration);
+  if (t > 0) metaParts.push(`${t} ${t === 1 ? "lesson" : "lessons"}`);
+  const metaText = metaParts.join(" · ");
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`${styles.row} ${className ?? ""}`}
-      style={{
-        background: "var(--surface-default)",
-        border: "1px solid var(--border-default)",
-      }}
-    >
+    <button type="button" onClick={onClick} className={`${styles.row} ${className ?? ""}`}>
       <span className={styles.iconWrap}>
-        <BookOpen size={17} color="var(--content-primary-strong)" />
+        <BookOpen size={17} color="var(--action-primary)" strokeWidth={1.5} />
       </span>
       <span className={styles.info}>
         <span className={styles.title}>{title}</span>
-        <span className={styles.meta}>
-          {category} &middot; {duration} &middot; {t} {t === 1 ? "lesson" : "lessons"}
+        {metaText ? <span className={styles.meta}>{metaText}</span> : null}
+      </span>
+      {t > 1 ? (
+        <span className={styles.progress}>
+          <SanadChain total={t} completed={done} />
         </span>
-      </span>
-      <span className={styles.progress}>
-        <SanadChain total={t} completed={done} />
-      </span>
+      ) : null}
       <span className={styles.chevron}>
         <ChevronRight size={16} color="var(--content-muted)" />
       </span>

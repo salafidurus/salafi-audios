@@ -28,7 +28,7 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
 
   return (
     <ScreenView
-      backgroundVariant="mixedWash"
+      backgroundVariant="canvas"
       contentStyle={{
         display: "flex",
         flexDirection: "column",

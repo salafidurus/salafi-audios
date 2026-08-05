@@ -1,6 +1,8 @@
 "use client";
 
 import { useListingDetail, useListingContents } from "@sd/domain-content";
+import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useState, useRef, useEffect, useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -24,6 +26,7 @@ export type ListingDetailScreenProps = {
 
 export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const formatScholarName = useFormatScholarName();
   const [searchQuery, setSearchQuery] = useState("");
   const [highlightItemId, setHighlightItemId] = useState<string | undefined>(undefined);
@@ -125,6 +128,16 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
       <StickyHeaderLayout>
         <StickyHeaderLayout.Header>
           <div ref={headerContentRef}>
+            <button
+              type="button"
+              className={styles.backButton}
+              onClick={() => router.back()}
+              aria-label={t("navigation.back", "Back")}
+            >
+              <ChevronLeft size={14} />
+              <span>{t("navigation.back", "Back")}</span>
+            </button>
+
             <div className={styles.headerTopRow}>
               <MetaDataSection listing={listing} />
               <QuickButtonSection listing={listing} contents={contents} />

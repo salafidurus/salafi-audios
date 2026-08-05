@@ -4,6 +4,14 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "bun:test";
 
 import { ListingDetailScreen } from "./listing-detail.screen";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+  }),
+}));
+
 vi.mock("@sd/domain-content", () => ({
   useListingDetail: vi.fn(),
   useListingContents: vi.fn(),

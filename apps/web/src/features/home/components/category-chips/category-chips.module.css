@@ -43,6 +43,23 @@
   outline-offset: 2px;
 }
 
+.chipAllActive {
+  background: var(--action-primary);
+  border-color: var(--action-primary);
+  color: var(--content-on-primary);
+}
+
+.chipAllActive:hover {
+  background: var(--action-primary);
+  border-color: var(--action-primary);
+  color: var(--content-on-primary);
+}
+
+.chipIconActive {
+  color: var(--content-on-primary);
+  flex-shrink: 0;
+}
+
 @media (max-width: 640px) {
   .chipsRow {
     flex-wrap: nowrap;

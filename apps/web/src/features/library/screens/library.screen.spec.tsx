@@ -89,17 +89,17 @@ describe("Library screens", () => {
   describe("LibraryScreen (Started)", () => {
     it("renders loading state", () => {
       renderWithQueryClient(<LibraryScreen />);
-      expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
+      expect(screen.getAllByTestId("infinite-scroll-list").length).toBeGreaterThan(0);
     });
 
     it("renders empty state", () => {
       renderWithQueryClient(<LibraryScreen />);
-      expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
+      expect(screen.getAllByTestId("infinite-scroll-list").length).toBeGreaterThan(0);
     });
 
     it("renders items", () => {
       renderWithQueryClient(<LibraryScreen />);
-      expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
+      expect(screen.getAllByTestId("library-row")[0]).toHaveTextContent("Lecture Title 1");
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {

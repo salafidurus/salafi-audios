@@ -5,6 +5,14 @@ import React from "react";
 
 import { HomeScreen } from "./home.screen";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+  }),
+}));
+
 vi.mock("@sd/domain-search", () => ({
   useContinueListening: vi.fn(),
   useTopicsList: () => ({ data: [] }),

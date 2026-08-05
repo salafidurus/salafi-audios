@@ -22,14 +22,10 @@
   justify-content: center;
   width: 42px;
   height: 42px;
-  border-radius: 9px;
+  border-radius: 10px;
   flex-shrink: 0;
-  background: linear-gradient(
-    135deg,
-    var(--content-secondary),
-    var(--border-primary-strong)
-  );
-  border: 1px solid color-mix(in srgb, var(--action-primary) 33%, transparent);
+  background: color-mix(in srgb, var(--action-primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--action-primary) 20%, transparent);
 }
 
 .info {

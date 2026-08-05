@@ -30,11 +30,11 @@
   /* Mobile header height */
   --mobile-header-height: 3.5rem;
 
-  /* Content screen widths (70%/90%/100%) */
-  --content-width-desktop: 70%;
-  --content-width-tablet: 90%;
+  /* Content screen widths (100% full width with edge padding) */
+  --content-width-desktop: 100%;
+  --content-width-tablet: 100%;
   --content-width-mobile: 100%;
-  --content-max-width: 1400px;
+  --content-max-width: 100%;
 }
 
 /*

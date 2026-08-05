@@ -36,15 +36,17 @@ export function ScholarGridCard({ scholar, onPress }: ScholarGridCardProps) {
           )}
         </span>
       </span>
-      <span className={styles.name}>{formattedName}</span>
-      <span className={styles.meta}>
-        {scholar.mainLanguage?.toUpperCase() || ""}
-        {scholar.mainLanguage && scholar.lectureCount > 0 ? " \u00B7 " : ""}
-        {scholar.lectureCount > 0
-          ? t("scholarContent.statLecturesFormat", "{{count}} Lectures", {
-              count: scholar.lectureCount,
-            })
-          : ""}
+      <span className={styles.info}>
+        <span className={styles.name}>{formattedName}</span>
+        <span className={styles.meta}>
+          {scholar.mainLanguage?.toUpperCase() || ""}
+          {scholar.mainLanguage && scholar.lectureCount > 0 ? " \u00B7 " : ""}
+          {scholar.lectureCount > 0
+            ? t("scholarContent.statLecturesFormat", "{{count}} Lectures", {
+                count: scholar.lectureCount,
+              })
+            : ""}
+        </span>
       </span>
     </button>
   );

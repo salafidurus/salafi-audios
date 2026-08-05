@@ -3,13 +3,12 @@
 }
 
 .pageTitle {
-  margin: 0;
-  font-family: var(--typo-title-lg-font-family), serif;
-  font-size: var(--typo-title-lg-font-size);
-  font-weight: var(--typo-title-lg-font-weight);
-  line-height: var(--typo-title-lg-line-height);
+  margin: 0 0 18px 0;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
   color: var(--content-strong);
-  margin-bottom: var(--space-component-gap-md);
 }
 
 .searchWrapper {

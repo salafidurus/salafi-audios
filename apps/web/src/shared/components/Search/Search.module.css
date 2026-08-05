@@ -137,34 +137,34 @@ button.barInputWrapper:focus-visible {
 .filterChip {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-scale-xs);
-  padding: var(--space-component-chip-y) var(--space-component-chip-x);
-  background-color: var(--surface-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-component-chip);
-  font-family: var(--typo-label-md-font-family);
-  font-size: var(--typo-label-md-font-size);
-  line-height: var(--typo-label-md-line-height);
-  letter-spacing: var(--typo-label-md-letter-spacing);
-  font-weight: var(--typo-label-md-font-weight);
-  color: var(--content-muted);
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  font-family: var(--font-body), -apple-system, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--content-subtle);
   transition:
-    opacity 100ms ease,
     background 150ms ease,
-    border-color 150ms ease;
+    border-color 150ms ease,
+    color 150ms ease;
   user-select: none;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .filterChip:hover {
-  opacity: 0.9;
+  background-color: var(--surface-hover);
+  border-color: var(--border-primary);
+  color: var(--content-strong);
 }
 
 .filterChip.selected {
-  background-color: var(--surface-selected);
-  border-color: var(--border-primary);
-  color: var(--content-strong);
+  background-color: var(--action-primary);
+  border-color: var(--action-primary);
+  color: var(--content-on-primary);
 }
 
 .filterChip.selected:active {

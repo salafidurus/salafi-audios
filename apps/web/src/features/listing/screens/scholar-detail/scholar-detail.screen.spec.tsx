@@ -37,7 +37,9 @@ vi.mock("@/features/listing/components/scholar/scholar-header/scholar-header", (
 
 vi.mock("@/features/home/components/lecture-row/lecture-row", () => ({
   LectureRow: ({ title }: { title: string }) => (
-    <div data-testid="lecture-row" data-title={title} />
+    <div data-testid="lecture-row" data-title={title}>
+      {title}
+    </div>
   ),
 }));
 
@@ -51,8 +53,13 @@ vi.mock("@/shared/components/Search", () => ({
         onChange={(e) => onChange?.(e.target.value)}
       />
     ),
-    Filter: ({ selected, chips, onChipChange }: any) => (
+    Filter: ({ selected, chips, onChipChange, includeAllOption }: any) => (
       <div data-testid="search-filter" data-selected={JSON.stringify(selected)}>
+        {includeAllOption && (
+          <button data-chip-id="all" onClick={() => onChipChange?.("all")}>
+            All
+          </button>
+        )}
         {chips.map((chip: any) => (
           <button key={chip.id} data-chip-id={chip.id} onClick={() => onChipChange?.(chip.id)}>
             {chip.label}
