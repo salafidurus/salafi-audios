@@ -38,7 +38,7 @@ import { getRequestLocale } from '../../shared/i18n/locale-context';
 export class ListingRepository {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly config: ConfigService,
+    private readonly config?: ConfigService,
   ) {}
 
   async findIdBySlug(slug: string): Promise<string | null> {
@@ -1897,7 +1897,7 @@ export class ListingRepository {
       if (/^[a-z]+:\/\//i.test(value)) {
         return value;
       }
-      const base = this.config.ASSET_CDN_BASE_URL;
+      const base = this.config?.ASSET_CDN_BASE_URL;
       if (!base) return value;
       return `${base.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
     };

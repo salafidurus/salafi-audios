@@ -49,7 +49,7 @@ export class AdminListingsController {
   ) {}
 
   @Get('promotions')
-  @CheckPolicy((ability) => ability.can('manage', 'Listing'))
+  @CheckPolicy('write', 'Listing')
   @ApiOperation({ summary: 'Get current home promotions (admin)' })
   @ApiOkResponse({ description: 'Current promotions metadata' })
   async getPromotions(): Promise<any> {
@@ -57,7 +57,7 @@ export class AdminListingsController {
   }
 
   @Post('promotions')
-  @CheckPolicy((ability) => ability.can('manage', 'Listing'))
+  @CheckPolicy('write', 'Listing')
   @ApiOperation({ summary: 'Update home promotions' })
   @ApiOkResponse({ description: 'Success status' })
   async updatePromotions(@Body() body: any): Promise<any> {
