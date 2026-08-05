@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ScrollView } from "react-native";
 import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
 
@@ -19,18 +19,21 @@ interface NotificationState {
   lectures: boolean;
 }
 
-function getInitialTheme(): ThemePreference {
-  return (UnistylesRuntime.themeName as ThemePreference) || "system";
-}
-
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
-  const [themePreference, setThemePreference] = useState<ThemePreference>(getInitialTheme);
+  const [themePreference, setThemePreference] = useState<ThemePreference>("system");
   const [notif, setNotif] = useState<NotificationState>({
     master: true,
     scholars: true,
     lectures: true,
   });
+
+  useEffect(() => {
+    const activeTheme = UnistylesRuntime.themeName as ThemePreference;
+    if (activeTheme) {
+      setThemePreference(activeTheme);
+    }
+  }, []);
 
   const handleThemeChange = useCallback((val: ThemePreference) => {
     setThemePreference(val);
