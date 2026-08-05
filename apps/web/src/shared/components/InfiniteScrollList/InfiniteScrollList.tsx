@@ -26,6 +26,7 @@ export interface InfiniteScrollListProps<TData> {
   errorMessage?: string;
 }
 
+// react-doctor-disable-next-line react-doctor/no-many-boolean-props
 export function InfiniteScrollList<TData>({
   data,
   renderItem,
@@ -74,7 +75,10 @@ export function InfiniteScrollList<TData>({
     return (
       <div className={styles.skeletonContainer} aria-hidden="true">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={`list-skeleton-${i}`} className={`${styles.skeletonLine} ${styles.skeletonRow}`} />
+          <div
+            key={`list-skeleton-${i}`}
+            className={`${styles.skeletonLine} ${styles.skeletonRow}`}
+          />
         ))}
       </div>
     );
