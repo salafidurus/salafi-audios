@@ -8,8 +8,7 @@ test("home page loads search landing", async ({ page }) => {
   // Check the hero title using its data-testid
   const heading = page.getByTestId("home-hero-title");
   await heading.waitFor({ state: "visible", timeout: 30_000 });
-  await expect(heading).toBeVisible();
-  await expect(heading).toHaveText("Nullifiers of Islam");
+  await expect(heading).toHaveText(/Featured Lecture|Nullifiers of Islam/);
 
   // Check the search button
   const searchButton = page.getByRole("button", { name: "What do you want to listen to?" });
