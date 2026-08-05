@@ -16,6 +16,18 @@ import { ToastContainer } from "@/core/toast";
 import { initProgressPersistence } from "./audio/progress-persistence";
 import { createI18n } from "./i18n/i18n";
 
+// Initialize the API client at module load time to prevent race conditions during hydration/mount
+if (process.env.NEXT_PUBLIC_API_URL) {
+  initApiClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL });
+}
+
+setLocaleProvider(() => {
+  if (typeof window !== "undefined") {
+    return document.documentElement.lang;
+  }
+  return "en";
+});
+
 const queryClient = createQueryClient();
 
 type Props = {
@@ -28,13 +40,14 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   const [i18n] = useState(() => createI18n(initialLocale));
   const { isAuthenticated, user } = useAuth();
 
-  useEffect(() => {
-    initApiClient(apiBaseUrl ? { baseUrl: apiBaseUrl } : undefined);
-    setLocaleProvider(() => i18n.language);
-  }, [apiBaseUrl, i18n]);
+  // Synchronously configure API client on first render if a custom apiBaseUrl is provided (e.g. in tests/Storybook)
+  useState(() => {
+    if (apiBaseUrl) {
+      initApiClient({ baseUrl: apiBaseUrl });
+    }
+  });
 
-  // Must run after the initApiClient effect above — httpClient throws until
-  // configureApiClient() has been called, and effects fire in declaration order.
+  // httpClient requires the API client to be configured (done at module load above).
   useEffect(() => {
     if (!isAuthenticated || !user?.id) return;
     return initProgressPersistence(user.id, {
