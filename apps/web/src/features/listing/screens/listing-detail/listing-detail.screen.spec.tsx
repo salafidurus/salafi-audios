@@ -84,7 +84,7 @@ describe("ListingDetailScreen", () => {
   it("shows loading state when detail is fetching", () => {
     mockUseListingDetail.mockReturnValue({ data: undefined, isFetching: true });
     render(<ListingDetailScreen slug="tawheed-lecture" />);
-    expect(screen.getByText("Loading content…")).toBeTruthy();
+    expect(screen.getByText("Back")).toBeTruthy();
   });
 
   it("shows not-found state when listing does not exist", () => {

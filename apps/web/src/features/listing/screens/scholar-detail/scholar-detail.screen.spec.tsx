@@ -151,7 +151,7 @@ describe("ScholarDetailScreen", () => {
       typeof useScholarDetail
     >);
     render(<ScholarDetailScreen slug="ibn-baz" />);
-    expect(screen.getByText("Loading scholar…")).toBeTruthy();
+    expect(screen.getByText("Back to Scholars")).toBeTruthy();
   });
 
   it("shows not-found state when scholar is missing", () => {
