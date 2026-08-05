@@ -51,7 +51,7 @@ export function RecentlyAddedSection() {
       <section className={styles.section} aria-label={t("home.recent.label", "Recently added")}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
-          <Link href={routes.explore.recent} className={styles.seeAllLink}>
+          <Link href={routes.explore.index} className={styles.seeAllLink}>
             {t("common.seeAll", "See all")}
           </Link>
         </div>
@@ -73,7 +73,7 @@ export function RecentlyAddedSection() {
     <section className={styles.section} aria-label={t("home.recent.label", "Recently added")}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
-        <Link href={routes.explore.recent} className={styles.seeAllLink}>
+        <Link href={routes.explore.index} className={styles.seeAllLink}>
           {t("common.seeAll", "See all")}
         </Link>
       </div>
