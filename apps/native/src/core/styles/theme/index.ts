@@ -10,7 +10,6 @@ import { spacingNative, type SpacingNative } from "./spacing";
 import { typographyNative, type TypographyNative } from "./typography";
 
 export type AppThemeNative = {
-  mode: "light" | "dark";
   colors: AppColors;
   recipes: AccentRecipesNative;
   spacing: SpacingNative;

@@ -1,59 +1,14 @@
 import type { ViewStyle, LayoutChangeEvent } from "react-native";
 
 import React, { useState, useCallback, useRef } from "react";
-import { View, FlatList, Pressable, Text } from "react-native";
+import { View, FlatList, Pressable, StyleSheet } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 export interface RenderItemParams<T> {
   item: T;
   index: number;
   drag: () => void;
   isActive: boolean;
-}
-
-type DraggableListRowProps = {
-  title: string;
-  supportingText: string;
-  drag: () => void;
-  isActive: boolean;
-  testID?: string;
-};
-
-/**
- * React Native row intentionally kept inside the approved reorder bridge.
- * Expo UI hosts the surrounding screen while this row preserves drag behavior.
- */
-export function DraggableListRow({
-  title,
-  supportingText,
-  drag,
-  isActive,
-  testID,
-}: DraggableListRowProps) {
-  const { theme } = useUnistyles();
-
-  return (
-    <Pressable
-      onLongPress={drag}
-      style={[
-        sortableRowStyles.row,
-        {
-          backgroundColor: isActive
-            ? theme.colors.surface.primarySubtle
-            : theme.colors.surface.default,
-          borderColor: isActive ? theme.colors.border.primary : theme.colors.border.subtle,
-          opacity: isActive ? 0.9 : 1,
-        },
-      ]}
-      testID={testID}
-    >
-      <Text style={[sortableRowStyles.title, { color: theme.colors.content.strong }]}>{title}</Text>
-      <Text style={[sortableRowStyles.supportingText, { color: theme.colors.content.muted }]}>
-        {supportingText}
-      </Text>
-    </Pressable>
-  );
 }
 
 interface DraggableListProps<T> {
@@ -117,23 +72,6 @@ const draggableStyles = StyleSheet.create({
     bottom: 0,
   },
 });
-
-const sortableRowStyles = StyleSheet.create((theme) => ({
-  row: {
-    gap: theme.spacing.scale.xs,
-    padding: theme.spacing.component.cardPadding,
-    marginBottom: theme.spacing.component.gapSm,
-    borderWidth: theme.border.width.default,
-    borderRadius: theme.radius.component.card,
-  },
-  title: {
-    ...theme.typography.bodyMd,
-    fontWeight: "600",
-  },
-  supportingText: {
-    ...theme.typography.caption,
-  },
-}));
 
 export function DraggableList<T>({
   data,
