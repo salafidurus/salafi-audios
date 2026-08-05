@@ -28,7 +28,6 @@ export const createThemeNative = (
   const colorMode = variant ? ACCENT_PALETTES[variant].mode : mode;
 
   return {
-    mode: colorMode,
     colors,
     recipes: createAccentRecipesNative(colors, colors.border.focus),
     spacing: spacingNative,
