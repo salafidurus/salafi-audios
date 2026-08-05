@@ -148,7 +148,11 @@
       "themeOptions": {
         "system": "تلقائي",
         "light": "فاتح",
-        "dark": "داكن"
+        "dark": "داكن",
+        "parchment": "ورق بردي",
+        "manuscript": "مخطوطة",
+        "midnight": "منتصف الليل",
+        "ember": "جمر"
       },
       "notifSection": "الإشعارات",
       "notifDesc": "إدارة الإشعارات التي تتلقاها.",

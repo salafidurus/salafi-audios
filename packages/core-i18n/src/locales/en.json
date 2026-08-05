@@ -148,7 +148,11 @@
       "themeOptions": {
         "system": "System",
         "light": "Light",
-        "dark": "Dark"
+        "dark": "Dark",
+        "parchment": "Parchment",
+        "manuscript": "Manuscript",
+        "midnight": "Midnight",
+        "ember": "Ember"
       },
       "notifSection": "Notifications",
       "notifDesc": "Manage what notifications you receive.",
