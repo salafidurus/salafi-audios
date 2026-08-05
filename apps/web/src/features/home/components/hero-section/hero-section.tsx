@@ -40,19 +40,20 @@ export function HeroSection({
         title: featuredContent.title,
         scholarName: featuredContent.scholarName,
       }
-    : null;
+    : {
+        id: "nullifiers-of-islam",
+        slug: "nullifiers-of-islam",
+        title: "Nullifiers of Islam",
+        scholarName: "Salih ibn Fawzan al-Fawzan",
+      };
 
-  const { play: playHero } = usePlayListing(
-    heroItem
-      ? {
-          id: heroItem.id,
-          slug: heroItem.slug,
-          title: heroItem.title,
-          format: "single",
-          scholarName: heroItem.scholarName,
-        }
-      : null,
-  );
+  const { play: playHero } = usePlayListing({
+    id: heroItem.id,
+    slug: heroItem.slug,
+    title: heroItem.title,
+    format: "single",
+    scholarName: heroItem.scholarName,
+  });
 
   const handleStart = () => {
     if (hasHistory && recentProgress) {
