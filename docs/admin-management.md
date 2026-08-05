@@ -230,6 +230,63 @@ SET "accessVersion" = 0
 WHERE email = 'user@example.com';
 ```
 
+### 5. Granting All Global Accesses (Without SuperAdmin)
+
+To explicitly grant all possible capability-based access grants globally to a user (without assigning the break-glass `superadmin` role):
+
+```sql
+INSERT INTO "UserAccessGrant" (id, "userId", target, capability, "scholarId", locale, "grantedAt", "grantedBy")
+SELECT
+  'sql-' || gen_random_uuid(),
+  u.id,
+  grant_combos.target::"AccessTarget",
+  grant_combos.capability::"AccessCapability",
+  NULL,
+  grant_combos.locale::"Locale",
+  CURRENT_TIMESTAMP,
+  NULL
+FROM "User" u
+CROSS JOIN (
+  VALUES
+    -- Scholar management
+    ('scholar', 'write', NULL),
+    ('scholar', 'publish', NULL),
+    ('scholar', 'delete', NULL),
+
+    -- Content / listing management
+    ('listing', 'write', NULL),
+    ('listing', 'publish', NULL),
+    ('listing', 'delete', NULL),
+
+    -- Media files management
+    ('media', 'write', NULL),
+    ('media', 'delete', NULL),
+
+    -- Topic management
+    ('topic', 'write', NULL),
+    ('topic', 'publish', NULL),
+    ('topic', 'delete', NULL),
+
+    -- User management (User manager role)
+    ('user', 'manage', NULL),
+
+    -- Translation capabilities (requires locale scope)
+    ('translation', 'translate', 'ar'),
+    ('translation', 'translate', 'en'),
+    ('translation', 'publish', 'ar'),
+    ('translation', 'publish', 'en'),
+    ('translation', 'delete', 'ar'),
+    ('translation', 'delete', 'en')
+) AS grant_combos(target, capability, locale)
+WHERE u.email = 'user@example.com'
+ON CONFLICT DO NOTHING;
+
+-- Force active client sessions to reload permissions
+UPDATE "User"
+SET "accessVersion" = "accessVersion" + 1
+WHERE email = 'user@example.com';
+```
+
 ---
 
 ## Unified Admin API
