@@ -1,3 +1,7 @@
+.cardWrap {
+  position: relative;
+}
+
 .card {
   position: relative;
   display: flex;
@@ -13,7 +17,7 @@
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
-.card:hover {
+.cardWrap:hover .card {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
@@ -67,12 +71,24 @@
 }
 
 .playBtn {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--action-primary);
   color: var(--content-on-primary);
+  border: none;
+  cursor: pointer;
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+
+.playBtn:hover {
+  transform: scale(1.08);
+  background: color-mix(in srgb, var(--action-primary) 85%, black);
 }

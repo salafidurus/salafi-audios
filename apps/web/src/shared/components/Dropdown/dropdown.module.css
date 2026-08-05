@@ -134,6 +134,21 @@
   flex-shrink: 0;
 }
 
+.searchBar {
+  width: 100%;
+}
+
+.searchBar input {
+  padding: 3px 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.searchBar svg {
+  width: 14px;
+  height: 14px;
+}
+
 .itemsList {
   flex: 1;
   overflow-y: auto;

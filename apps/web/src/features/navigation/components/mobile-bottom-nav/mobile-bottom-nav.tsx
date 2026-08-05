@@ -1,7 +1,7 @@
 "use client";
 
 import { routes } from "@sd/core-contracts";
-import { Bookmark, GraduationCap, Home, Search, Settings2 } from "lucide-react";
+import { Bookmark, Compass, GraduationCap, Home, Search, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -17,6 +17,13 @@ const NAV_ITEMS = [
     defaultLabel: "Search",
     href: routes.search,
     Icon: Search,
+  },
+  {
+    id: "explore",
+    labelKey: "nav.explore",
+    defaultLabel: "Explore",
+    href: routes.explore.index,
+    Icon: Compass,
   },
   {
     id: "scholars",

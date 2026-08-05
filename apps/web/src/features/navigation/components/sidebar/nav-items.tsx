@@ -6,6 +6,7 @@ import clsx from "clsx";
 import {
   BarChart3,
   Bookmark,
+  Compass,
   FolderOpen,
   GraduationCap,
   Home,
@@ -96,6 +97,12 @@ function getNavItems(t: (key: string, fallback: string) => string): NavItem[] {
       Icon: Search,
       href: routes.search,
       activeMatch: routes.search,
+    },
+    {
+      label: t("navigation.explore", "Explore"),
+      Icon: Compass,
+      href: routes.explore.index,
+      activeMatch: routes.explore.index,
     },
     {
       label: t("navigation.scholars", "Scholars"),
