@@ -6,6 +6,7 @@ import { useUnistyles } from "react-native-unistyles";
 import { RouteAccessGuard, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { BottomAccessoryInnerContent } from "@/features/navigation";
+import { useBottomAccessoryVisible } from "@/features/navigation/components/BottomAccessory/useBottomAccessoryVisible";
 
 export default function TabsLayout() {
   const { t } = useTranslation();
@@ -13,6 +14,7 @@ export default function TabsLayout() {
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
   const hasAnyAccess = hasAnyAdminAccess(ability);
+  const showBottomAccessory = useBottomAccessoryVisible();
 
   return (
     <RouteAccessGuard>
@@ -68,7 +70,7 @@ export default function TabsLayout() {
           </NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
-        {Platform.OS === "ios" ? (
+        {Platform.OS === "ios" && showBottomAccessory ? (
           <NativeTabs.BottomAccessory>
             <BottomAccessoryInnerContent />
           </NativeTabs.BottomAccessory>

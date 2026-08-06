@@ -51,7 +51,18 @@
     }
   },
   "explore": {
-    "searchRecent": "Search recent audios..."
+    "searchRecent": "Search recent audios...",
+    "all": {
+      "clearFilter": "Clear filter",
+      "empty": "No lectures found.",
+      "emptyCategory": "Nothing in this category yet.",
+      "error": "Couldn't load lectures. Please try again.",
+      "filteredCount": "{{count}} lectures",
+      "totalCount": "{{count}} lectures"
+    },
+    "curation": {
+      "action": "Browse Scholars"
+    }
   },
   "home": {
     "continueListening": "CONTINUE LISTENING",
@@ -60,11 +71,28 @@
     "lessonsInSeries": "{{count}} lessons in series",
     "studyWithScholar": "Study with a scholar",
     "recentlyAdded": "Recently added",
-    "noLecturesForCategory": "No lectures found for this category."
+    "noLecturesForCategory": "No lectures found for this category.",
+    "curatedCollections": "Curated collections",
+    "curatedCollectionsSub": "Themed learning paths — coming soon"
+  },
+  "library": {
+    "authRequired": "Sign in to access your library",
+    "emptyProgress": "No lectures in progress.",
+    "emptySaved": "No saved lectures yet. Save lectures to listen to later.",
+    "emptyCompleted": "No completed lectures yet. Keep listening!",
+    "markAsCompleted": "Mark as Completed",
+    "removeFromSaved": "Remove from Saved",
+    "percentListened": "{{percent}}% listened",
+    "savedOn": "Saved {{date}}",
+    "completedOn": "Completed {{date}}"
   },
   "navigation": {
     "show_miniplayer": "Show mini player",
-    "show_subroutes": "Show section subroutes"
+    "show_subroutes": "Show section subroutes",
+    "tabs": {
+      "explore": "Explore",
+      "library": "Library"
+    }
   },
   "scholarContent": {
     "filterPlaceholder": "Filter content…",

@@ -6,6 +6,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { LibraryItemRow } from "@/features/library/components/library-item-row/library-item-row";
+import { LibraryItemRowSkeleton } from "@/features/library/components/library-item-row/library-item-row-skeleton";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -26,10 +27,14 @@ export function LibraryCompletedScreen({ onNavigateToListing }: LibraryCompleted
     [onNavigateToListing],
   );
 
-  if (isFetching && items.length === 0) {
+  const isLoading = isFetching && items.length === 0;
+
+  if (isLoading) {
     return (
-      <ScreenView center>
-        <EmptyState message={t("common.loading", "Loading...")} variant="loading" />
+      <ScreenView>
+        <List>
+          <LibraryItemRowSkeleton count={5} />
+        </List>
       </ScreenView>
     );
   }
@@ -54,6 +59,7 @@ export function LibraryCompletedScreen({ onNavigateToListing }: LibraryCompleted
               key={item.id}
               item={item}
               variant="completed"
+              testID={`library-completed-row-${item.id}`}
               onPress={() => handleItemPress(item.listingSlug)}
               hideBorder={index === items.length - 1}
             />
@@ -64,17 +70,8 @@ export function LibraryCompletedScreen({ onNavigateToListing }: LibraryCompleted
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
-  loadingText: {
-    color: theme.colors.content.default,
-  },
-  emptyText: {
-    color: theme.colors.content.muted,
-    textAlign: "center",
-  },
+const styles = StyleSheet.create({
   listContent: {
-    paddingHorizontal: theme.spacing.layout.pageX,
-    paddingVertical: theme.spacing.layout.pageY,
-    paddingBottom: theme.spacing.scale["2xl"],
+    paddingVertical: 4,
   },
-}));
+});

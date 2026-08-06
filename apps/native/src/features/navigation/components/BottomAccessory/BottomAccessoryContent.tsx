@@ -1,15 +1,18 @@
 import { useAudio } from "@sd/domain-audio";
 import { usePathname } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { MiniPlayer, MiniPlayerIconButton } from "@/features/audio";
 import { SECTION_TABS, type Section } from "@/features/navigation/types";
-import { getRootTabFromPathname, isTabRoute } from "@/features/navigation/utils/tab-route-config";
+import { getRootTabFromPathname } from "@/features/navigation/utils/tab-route-config";
 
 import { SubrouteIconButton } from "./SubrouteIconButton";
 import { SubrouteTabsBar } from "./SubrouteTabsBar";
+
+/** Tabs whose sub-route pill bar is handled by their own in-screen UI. */
+const TABS_WITH_OWN_SUBROUTE_UI: string[] = ["home", "explore", "library", "search"];
 
 export function BottomAccessoryContent() {
   const { currentTrack } = useAudio();
@@ -20,18 +23,8 @@ export function BottomAccessoryContent() {
 
   const activeRootTab = getRootTabFromPathname(pathname);
   const hasSubroute =
-    activeRootTab !== "search" &&
-    activeRootTab !== "home" &&
-    activeRootTab !== "explore" &&
+    !TABS_WITH_OWN_SUBROUTE_UI.includes(activeRootTab ?? "") &&
     Boolean(SECTION_TABS[activeRootTab as Section]?.length);
-
-  if (!isTabRoute(pathname)) {
-    return null;
-  }
-
-  if (!hasMiniPlayer && !hasSubroute) {
-    return null;
-  }
 
   if (hasSubroute && !hasMiniPlayer) {
     return (
@@ -47,6 +40,10 @@ export function BottomAccessoryContent() {
         <MiniPlayer embedded />
       </View>
     );
+  }
+
+  if (!hasMiniPlayer && !hasSubroute) {
+    return null;
   }
 
   // Dual mode (both available)

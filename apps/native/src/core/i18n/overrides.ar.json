@@ -51,7 +51,18 @@
     }
   },
   "explore": {
-    "searchRecent": "البحث في الصوتيات الأخيرة..."
+    "searchRecent": "البحث في الصوتيات الأخيرة...",
+    "all": {
+      "clearFilter": "مسح الفلاتر",
+      "empty": "لم يتم العثور على محاضرات.",
+      "emptyCategory": "لا يوجد شيء في هذه الفئة بعد.",
+      "error": "تعذر تحميل المحاضرات. يرجى المحاولة مرة أخرى.",
+      "filteredCount": "{{count}} محاضرة",
+      "totalCount": "{{count}} محاضرة"
+    },
+    "curation": {
+      "action": "تصفح الشيوخ"
+    }
   },
   "home": {
     "continueListening": "متابعة الاستماع",
@@ -60,11 +71,28 @@
     "lessonsInSeries": "{{count}} درساً في السلسلة",
     "studyWithScholar": "الدراسة مع عالم",
     "recentlyAdded": "أضيفت مؤخراً",
-    "noLecturesForCategory": "لم يتم العثور على محاضرات لهذه الفئة."
+    "noLecturesForCategory": "لم يتم العثور على محاضرات لهذه الفئة.",
+    "curatedCollections": "مجموعات منققاة",
+    "curatedCollectionsSub": "مسارات تعلم موجهة — قريباً"
+  },
+  "library": {
+    "authRequired": "سجّل الدخول للوصول إلى مكتبتك",
+    "emptyProgress": "ليس هناك محاضرات قيد التقدم.",
+    "emptySaved": "لا يوجد محاضرات محفوظة بعد. احفظ المحاضرات للاستماع إليها لاحقًا.",
+    "emptyCompleted": "لا يوجد محاضرات مكتملة بعد. استمر في الاستماع!",
+    "markAsCompleted": "تحديد كمكتمل",
+    "removeFromSaved": "إزالة من المحفوظات",
+    "percentListened": "{{percent}}% تم الاستماع إليها",
+    "savedOn": "تم الحفظ {{date}}",
+    "completedOn": "تم الإكمال {{date}}"
   },
   "navigation": {
-    "show_miniplayer": "إظهار المشغل المصغر",
-    "show_subroutes": "إظهار أقسام القسم الفرعي"
+    "show_miniplayer": "إظهار المشغل المصغير",
+    "show_subroutes": "إظهار أقسام القسم الفرعي",
+    "tabs": {
+      "explore": "استكشاف",
+      "library": "المكتبة"
+    }
   },
   "scholarContent": {
     "filterPlaceholder": "تصفية المحتوى…",

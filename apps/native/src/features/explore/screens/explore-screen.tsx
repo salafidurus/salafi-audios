@@ -4,7 +4,7 @@ import type { ListRenderItemInfo } from "react-native";
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen, useInfiniteScholarsList } from "@sd/domain-content";
 import { Sparkles } from "lucide-react-native";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FlatList, Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -44,20 +44,29 @@ function RecentTab({
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
     useExploreRecentScreen();
 
-  const rawItems = data?.pages.flatMap((p) => p.items) ?? [];
+  const rawItems = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
 
   // Show only content rows (lectures) — drop scholar_row and topic_row
-  const contentItems = rawItems.filter(
-    (item): item is FeedContentItemDto => item.kind !== "scholar_row" && item.kind !== "topic_row",
+  const contentItems = useMemo(
+    () =>
+      rawItems.filter(
+        (item): item is FeedContentItemDto =>
+          item.kind !== "scholar_row" && item.kind !== "topic_row",
+      ),
+    [rawItems],
   );
 
-  const filteredItems = searchQuery.trim()
-    ? contentItems.filter(
-        (item) =>
-          item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.scholarName.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : contentItems;
+  const filteredItems = useMemo(
+    () =>
+      searchQuery.trim()
+        ? contentItems.filter(
+            (item) =>
+              item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              item.scholarName.toLowerCase().includes(searchQuery.toLowerCase()),
+          )
+        : contentItems,
+    [contentItems, searchQuery],
+  );
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<FeedContentItemDto>) => (

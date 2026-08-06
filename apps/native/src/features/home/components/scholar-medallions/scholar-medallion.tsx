@@ -20,6 +20,11 @@ export type ScholarMedallionProps = {
 };
 
 export function ScholarMedallion({ scholar, onPress }: ScholarMedallionProps) {
+  const displayName = scholar.name
+    .replace(/^Shaykh\s+(Allamah\s+)?/i, "")
+    .replace(/^al-/i, "")
+    .trim();
+
   const initials =
     scholar.initials ??
     scholar.name
@@ -27,11 +32,6 @@ export function ScholarMedallion({ scholar, onPress }: ScholarMedallionProps) {
       .trim()
       .charAt(0)
       .toUpperCase();
-
-  const displayName = scholar.name
-    .replace(/^Shaykh\s+(Allamah\s+)?/i, "")
-    .replace(/^al-/i, "")
-    .trim();
 
   return (
     <Pressable
