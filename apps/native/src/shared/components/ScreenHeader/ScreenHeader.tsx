@@ -41,7 +41,7 @@ export function ScreenHeader({
             <ChevronLeft size={24} color={theme.colors.content.strong} />
           </Pressable>
         ) : null}
-        <AppText variant="displayLg" style={styles.titleText}>
+        <AppText variant="displayLg" color="strong" style={styles.titleText}>
           {title}
         </AppText>
       </View>
@@ -89,7 +89,6 @@ const styles = StyleSheet.create((theme) => ({
   titleText: {
     fontSize: 28,
     fontWeight: "700",
-    color: theme.colors.content.strong,
   },
   searchBarBox: {
     flexDirection: "row",

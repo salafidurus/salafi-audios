@@ -31,7 +31,7 @@ export function QuickActionsRow({
         <View style={styles.iconWrapper}>
           <ListMusic size={16} color={theme.colors.action.primary} />
         </View>
-        <AppText variant="caption" style={styles.pillText}>
+        <AppText variant="caption" color="strong" style={styles.pillText}>
           {t("navigation.subnav.explore.all", "All Lectures")}
         </AppText>
       </Pressable>
@@ -45,7 +45,7 @@ export function QuickActionsRow({
         <View style={styles.iconWrapper}>
           <GraduationCap size={16} color={theme.colors.action.primary} />
         </View>
-        <AppText variant="caption" style={styles.pillText}>
+        <AppText variant="caption" color="strong" style={styles.pillText}>
           {t("navigation.subnav.explore.scholars", "Scholars")}
         </AppText>
       </Pressable>
@@ -59,7 +59,7 @@ export function QuickActionsRow({
         <View style={styles.iconWrapper}>
           <Bookmark size={16} color={theme.colors.action.primary} />
         </View>
-        <AppText variant="caption" style={styles.pillText}>
+        <AppText variant="caption" color="strong" style={styles.pillText}>
           {t("navigation.saved", "Saved")}
         </AppText>
       </Pressable>
@@ -93,6 +93,5 @@ const styles = StyleSheet.create((theme) => ({
   pillText: {
     fontSize: 12,
     fontWeight: "700",
-    color: theme.colors.content.strong,
   },
 }));

@@ -54,14 +54,14 @@ export function ParchmentLectureCard({ item, onPress }: ParchmentLectureCardProp
       </View>
 
       <View style={styles.textContainer}>
-        <AppText variant="titleMd" style={styles.titleText} numberOfLines={2}>
+        <AppText variant="titleMd" color="strong" style={styles.titleText} numberOfLines={2}>
           {item.title}
         </AppText>
-        <AppText variant="caption" style={styles.scholarText} numberOfLines={1}>
+        <AppText variant="caption" color="subtle" style={styles.scholarText} numberOfLines={1}>
           {item.scholarName}
         </AppText>
         {displayDate ? (
-          <AppText variant="xs" style={styles.dateText}>
+          <AppText variant="xs" color="muted" style={styles.dateText}>
             {displayDate}
           </AppText>
         ) : null}
@@ -106,20 +106,18 @@ const styles = StyleSheet.create((theme) => ({
   titleText: {
     fontSize: 15,
     fontWeight: "700",
-    color: theme.colors.content.strong,
     lineHeight: 20,
     marginBottom: 2,
   },
   scholarText: {
-    fontSize: 12,
-    color: theme.colors.content.subtle,
+    fontSize: 13,
     marginBottom: 2,
   },
   dateText: {
     fontSize: 11,
-    color: theme.colors.content.muted,
   },
   chevronWrapper: {
+    marginLeft: 4,
     justifyContent: "center",
     alignItems: "center",
   },

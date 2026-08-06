@@ -83,8 +83,8 @@ const styles = StyleSheet.create((theme) => ({
     marginRight: 8,
   },
   activeChip: {
-    backgroundColor: theme.colors.content.primary,
-    borderColor: theme.colors.content.primary,
+    backgroundColor: theme.colors.action.primary,
+    borderColor: theme.colors.action.primary,
   },
   inactiveChip: {
     backgroundColor: theme.colors.surface.default,
@@ -98,6 +98,6 @@ const styles = StyleSheet.create((theme) => ({
     color: "#FFFFFF",
   },
   inactiveChipText: {
-    color: theme.colors.content.subtle,
+    color: theme.colors.content.strong,
   },
 }));

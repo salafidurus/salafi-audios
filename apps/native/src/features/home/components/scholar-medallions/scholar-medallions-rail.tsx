@@ -27,11 +27,11 @@ export function ScholarMedallionsRail({
   return (
     <View style={styles.section} testID="scholar-medallions-rail">
       <View style={styles.header}>
-        <AppText variant="titleMd" style={styles.titleText}>
+        <AppText variant="titleMd" color="strong" style={styles.titleText}>
           {t("home.studyWithScholar", "Study with a scholar")}
         </AppText>
         <Pressable onPress={onSeeAllScholars} hitSlop={8}>
-          <AppText variant="caption" style={styles.seeAllText}>
+          <AppText variant="caption" color="primary" style={styles.seeAllText}>
             {t("common.seeAll", "See all")}
           </AppText>
         </Pressable>
@@ -54,7 +54,7 @@ export function ScholarMedallionsRail({
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create({
   section: {
     marginVertical: 14,
   },
@@ -68,14 +68,12 @@ const styles = StyleSheet.create((theme) => ({
   titleText: {
     fontSize: 18,
     fontWeight: "700",
-    color: theme.colors.content.strong,
   },
   seeAllText: {
     fontSize: 13,
     fontWeight: "600",
-    color: theme.colors.action.primary,
   },
   railContent: {
     paddingHorizontal: 16,
   },
-}));
+});

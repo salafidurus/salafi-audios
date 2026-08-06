@@ -57,7 +57,7 @@ export function ContinueListeningCard({ item, onPress, onTogglePlay }: ContinueL
       accessibilityLabel={item.title}
     >
       <View style={styles.topRow}>
-        <AppText variant="xs" style={styles.badgeText}>
+        <AppText variant="xs" color="primary" style={styles.badgeText}>
           {t("home.continueListening", "CONTINUE LISTENING")}
         </AppText>
       </View>
@@ -68,10 +68,10 @@ export function ContinueListeningCard({ item, onPress, onTogglePlay }: ContinueL
         </View>
 
         <View style={styles.textContainer}>
-          <AppText variant="titleMd" style={styles.titleText} numberOfLines={2}>
+          <AppText variant="titleMd" color="strong" style={styles.titleText} numberOfLines={2}>
             {item.title}
           </AppText>
-          <AppText variant="caption" style={styles.scholarText} numberOfLines={1}>
+          <AppText variant="caption" color="subtle" style={styles.scholarText} numberOfLines={1}>
             {item.scholarName}
           </AppText>
         </View>
@@ -117,7 +117,6 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 1,
-    color: theme.colors.content.primary,
   },
   contentRow: {
     flexDirection: "row",
@@ -142,13 +141,11 @@ const styles = StyleSheet.create((theme) => ({
   titleText: {
     fontSize: 16,
     fontWeight: "700",
-    color: theme.colors.content.strong,
     lineHeight: 22,
     marginBottom: 4,
   },
   scholarText: {
     fontSize: 13,
-    color: theme.colors.content.subtle,
   },
   playCircle: {
     width: 42,

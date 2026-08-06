@@ -45,14 +45,14 @@ export function ScholarMedallion({ scholar, onPress }: ScholarMedallionProps) {
           {initials}
         </AppText>
       </View>
-      <AppText variant="xs" style={styles.nameText} numberOfLines={2}>
+      <AppText variant="xs" color="strong" style={styles.nameText} numberOfLines={2}>
         {displayName}
       </AppText>
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     width: 76,
@@ -77,8 +77,7 @@ const styles = StyleSheet.create((theme) => ({
   nameText: {
     fontSize: 11,
     fontWeight: "600",
-    color: theme.colors.content.strong,
     textAlign: "center",
     lineHeight: 14,
   },
-}));
+});

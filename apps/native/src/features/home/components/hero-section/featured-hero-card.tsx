@@ -38,21 +38,21 @@ export function FeaturedHeroCard({ item, onPress }: FeaturedHeroCardProps) {
         <View style={styles.iconWrapper}>
           <Sparkles size={14} color={theme.colors.content.primary} />
         </View>
-        <AppText variant="xs" style={styles.badgeText}>
+        <AppText variant="xs" color="primary" style={styles.badgeText}>
           {item.badgeText ?? t("home.recommendedStartingPoint", "RECOMMENDED STARTING POINT")}
         </AppText>
       </View>
 
-      <AppText variant="displayMd" style={styles.titleText} numberOfLines={2}>
+      <AppText variant="displayMd" color="strong" style={styles.titleText} numberOfLines={2}>
         {item.title}
       </AppText>
 
-      <AppText variant="caption" style={styles.scholarText} numberOfLines={1}>
+      <AppText variant="caption" color="subtle" style={styles.scholarText} numberOfLines={1}>
         {item.scholarName}
       </AppText>
 
       <View style={styles.bottomRow}>
-        <AppText variant="caption" style={styles.lessonsCountText}>
+        <AppText variant="caption" color="subtle" style={styles.lessonsCountText}>
           {t("home.lessonsInSeries", "{{count}} lessons in series", { count: totalLessons })}
         </AppText>
         <View style={styles.startButton}>
@@ -87,18 +87,19 @@ const styles = StyleSheet.create((theme) => ({
     marginRight: 6,
   },
   badgeText: {
+    fontSize: 11,
     fontWeight: "700",
-    letterSpacing: 0.8,
-    color: theme.colors.content.primary,
+    letterSpacing: 0.5,
   },
   titleText: {
+    fontSize: 18,
     fontWeight: "700",
-    color: theme.colors.content.strong,
+    lineHeight: 24,
     marginBottom: 4,
   },
   scholarText: {
-    color: theme.colors.content.subtle,
-    marginBottom: 16,
+    fontSize: 13,
+    marginBottom: 12,
   },
   bottomRow: {
     flexDirection: "row",

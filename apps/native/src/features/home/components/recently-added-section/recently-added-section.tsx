@@ -23,12 +23,12 @@ export function RecentlyAddedSection({
   return (
     <View style={styles.section} testID="recently-added-section">
       <View style={styles.header}>
-        <AppText variant="titleMd" style={styles.titleText}>
+        <AppText variant="titleMd" color="strong" style={styles.titleText}>
           {t("home.recentlyAdded", "Recently added")}
         </AppText>
         {items && items.length > 0 ? (
           <Pressable onPress={onSeeAllRecent} hitSlop={8}>
-            <AppText variant="caption" style={styles.seeAllText}>
+            <AppText variant="caption" color="primary" style={styles.seeAllText}>
               {t("common.seeAll", "See all")}
             </AppText>
           </Pressable>
@@ -37,7 +37,7 @@ export function RecentlyAddedSection({
 
       {!items || items.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <AppText variant="caption" style={styles.emptyText}>
+          <AppText variant="caption" color="subtle" style={styles.emptyText}>
             {t("home.noLecturesForCategory", "No lectures found for this category.")}
           </AppText>
         </View>
@@ -56,7 +56,7 @@ export function RecentlyAddedSection({
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create({
   section: {
     marginVertical: 14,
     paddingHorizontal: 16,
@@ -70,12 +70,10 @@ const styles = StyleSheet.create((theme) => ({
   titleText: {
     fontSize: 18,
     fontWeight: "700",
-    color: theme.colors.content.strong,
   },
   seeAllText: {
     fontSize: 13,
     fontWeight: "600",
-    color: theme.colors.action.primary,
   },
   emptyContainer: {
     paddingVertical: 16,
@@ -83,9 +81,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   emptyText: {
     fontSize: 13,
-    color: theme.colors.content.subtle,
   },
   list: {
     marginTop: 4,
   },
-}));
+});
