@@ -1,4 +1,5 @@
-import { BookOpen, Play } from "lucide-react-native";
+import { useAudio } from "@sd/domain-audio";
+import { BookOpen, Pause, Play } from "lucide-react-native";
 import React from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -19,13 +20,25 @@ export type ContinueListeningCardItem = {
 export type ContinueListeningCardProps = {
   item: ContinueListeningCardItem;
   onPress?: (slug: string) => void;
+  onTogglePlay?: () => void;
 };
 
-export function ContinueListeningCard({ item, onPress }: ContinueListeningCardProps) {
+export function ContinueListeningCard({ item, onPress, onTogglePlay }: ContinueListeningCardProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
+  const { currentTrack, isPlaying, progressPercent: liveProgressPercent } = useAudio();
 
-  const progressPercentClamped = Math.min(Math.max(item.progressPercent * 100, 0), 100);
+  const isCurrentTrackActive =
+    currentTrack &&
+    (currentTrack.id === item.id ||
+      currentTrack.slug === item.slug ||
+      currentTrack.title === item.title);
+
+  const displayProgress = isCurrentTrackActive
+    ? liveProgressPercent
+    : Math.min(Math.max(item.progressPercent * 100, 0), 100);
+
+  const isPlayingActive = isCurrentTrackActive && isPlaying;
 
   return (
     <Pressable
@@ -55,14 +68,25 @@ export function ContinueListeningCard({ item, onPress }: ContinueListeningCardPr
           </AppText>
         </View>
 
-        <View style={styles.playCircle}>
-          <Play size={18} color="#FFFFFF" fill="#FFFFFF" />
-        </View>
+        <Pressable
+          onPress={(e) => {
+            e.stopPropagation();
+            onTogglePlay?.();
+          }}
+          style={styles.playCircle}
+          hitSlop={8}
+        >
+          {isPlayingActive ? (
+            <Pause size={18} color="#FFFFFF" fill="#FFFFFF" />
+          ) : (
+            <Play size={18} color="#FFFFFF" fill="#FFFFFF" />
+          )}
+        </Pressable>
       </View>
 
       {/* Progress Track */}
       <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${progressPercentClamped}%` }]} />
+        <View style={[styles.progressFill, { width: `${displayProgress}%` }]} />
       </View>
     </Pressable>
   );

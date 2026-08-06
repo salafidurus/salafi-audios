@@ -1,10 +1,11 @@
 import type { Href } from "expo-router";
 
 import { routes } from "@sd/core-contracts";
+import { usePlaybackStore } from "@sd/domain-audio";
 import { useExploreRecentScreen, useInfiniteScholarsList } from "@sd/domain-content";
-import { useSearchProcessing } from "@sd/domain-search";
+import { useContinueListening, useSearchProcessing } from "@sd/domain-search";
 import { useRouter } from "expo-router";
-import { Activity, useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -49,8 +50,31 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
   const { setQuery, filter, setFilter, topics, items, isFetching, shouldSearch, errorMessage } =
     useSearchProcessing({ prefill: "", showOriginal });
 
+  const currentTrack = usePlaybackStore((s) => s.currentTrack);
+  const { recentProgress } = useContinueListening();
   const { data: feedData } = useExploreRecentScreen();
   const { data: scholarsData } = useInfiniteScholarsList();
+
+  const activeContinueListeningItem = currentTrack
+    ? {
+        id: currentTrack.id ?? currentTrack.slug ?? "active-track",
+        slug: currentTrack.slug ?? currentTrack.id ?? "active-track",
+        title: currentTrack.title,
+        scholarName: currentTrack.artist ?? "Scholar",
+        progressPercent: 0,
+      }
+    : recentProgress
+      ? {
+          id: recentProgress.lectureSlug,
+          slug: recentProgress.lectureSlug,
+          title: recentProgress.lectureTitle,
+          scholarName: recentProgress.scholarName,
+          progressPercent:
+            recentProgress.durationSeconds > 0
+              ? recentProgress.positionSeconds / recentProgress.durationSeconds
+              : 0,
+        }
+      : CONTINUE_LISTENING_ITEM;
 
   const rawFeedItems = feedData?.pages.flatMap((p) => p.items) ?? [];
   const rawScholarsItems = scholarsData?.pages.flatMap((p) => p.items) ?? [];
@@ -131,9 +155,13 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
 
   const featuredItem = rawRecentLectures[0] ?? null;
 
-  useEffect(() => {
-    setQuery(searchQuery);
-  }, [searchQuery, setQuery]);
+  const handleSearchChange = useCallback(
+    (text: string) => {
+      setSearchQuery(text);
+      setQuery(text);
+    },
+    [setQuery],
+  );
 
   const isSearching = searchQuery.trim().length > 0;
 
@@ -175,16 +203,16 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
 
   return (
     <View style={styles.screen}>
-      <ScreenHeader title="Home" searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <ScreenHeader title="Home" searchQuery={searchQuery} onSearchChange={handleSearchChange} />
 
-      <Activity mode={isSearching ? "hidden" : "visible"}>
+      <View style={[styles.mainContent, isSearching && styles.hidden]}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
           {/* Hero Section */}
           <HeroSection
-            continueListeningItem={CONTINUE_LISTENING_ITEM}
+            continueListeningItem={activeContinueListeningItem}
             featuredItem={featuredItem}
             onPress={handleSelectListing}
           />
@@ -216,24 +244,22 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
             onSeeAllRecent={() => router.push("/explore/recent" as Href)}
           />
         </ScrollView>
-      </Activity>
+      </View>
 
-      <Activity mode={isSearching ? "visible" : "hidden"}>
-        <View style={styles.searchResults}>
-          {shouldSearch ? (
-            <View style={styles.searchFilter}>
-              <SearchFilter value={filter} onChange={setFilter} topics={topics} />
-            </View>
-          ) : null}
-          <SearchResultsList
-            items={items}
-            isFetching={isFetching}
-            shouldSearch={shouldSearch}
-            errorMessage={errorMessage}
-            renderItem={renderSearchResultItem}
-          />
-        </View>
-      </Activity>
+      <View style={[styles.searchResults, !isSearching && styles.hidden]}>
+        {shouldSearch ? (
+          <View style={styles.searchFilter}>
+            <SearchFilter value={filter} onChange={setFilter} topics={topics} />
+          </View>
+        ) : null}
+        <SearchResultsList
+          items={items}
+          isFetching={isFetching}
+          shouldSearch={shouldSearch}
+          errorMessage={errorMessage}
+          renderItem={renderSearchResultItem}
+        />
+      </View>
     </View>
   );
 }
@@ -242,6 +268,12 @@ const styles = StyleSheet.create((theme) => ({
   screen: {
     flex: 1,
     backgroundColor: theme.colors.surface.canvas,
+  },
+  mainContent: {
+    flex: 1,
+  },
+  hidden: {
+    display: "none",
   },
   scrollContent: {
     paddingVertical: 4,
