@@ -32,7 +32,13 @@
   explore-topic-row, scholar-content-list) already use `numberOfLines={2}`; MarqueeText remains
   single-line by design (Now Playing compact marquee); full-screen modal title uses {2}. No code
   changes required for this stage.
-- Next step: Phase 2 — verify parchment palette tokens against the prototype.
+- Phase 2 verified: the parchment accent palette in
+  `packages/design-tokens/src/colors/shared.ts` (ACCENT_PALETTES.parchment) matches the
+  prototype spec exactly — canvas `#F7F2E7`, gold `#B8872E`, jade `#2F6B54`, ivory surfaces
+  (`#FFFFFF`/`#F1EAD9`), tonal borders/text. Native `createThemeNative("light","parchment")`
+  builds from this palette, so `colors.surface.canvas === #F7F2E7`. No token values needed
+  adjustment; no code change.
+- Next step: Phase 3 — navigation restructure (Home tab + Explore sub-tabs + All Lectures).
 
 ## Staging Strategy
 
@@ -98,18 +104,19 @@
 
 ## Stage 4: Verify parchment design tokens
 
-- Status: Pending
+- Status: Completed (verified — no code change required)
 - Goal: Confirm the parchment theme matches the prototype palette (approx `#F7F2E7` background,
   `#B8872E` gold, `#2F6B54` jade, ivory surfaces). No theme picker work.
 - Files:
-  - `packages/design-tokens` (token definitions, `createThemeNative`)
-  - `apps/native/src/core/styles/unistyles.ts`
-- Changes: Compare hex values against the prototype; adjust token values only where they diverge
-  meaningfully. If tokens are already aligned, record verification and move on.
+  - `packages/design-tokens/src/colors/shared.ts` (ACCENT_PALETTES.parchment)
+  - `apps/native/src/core/styles/theme/index.ts` (createThemeNative wiring)
+- Changes: Verified the palette matches the prototype spec exactly (canvas `#F7F2E7`, gold
+  `#B8872E`, jade `#2F6B54`, surface `#FFF`, surfaceRaised `#F1EAD9`, tonal borders/text). No
+  token values diverged, so no adjustments were made.
 - Blockers: None currently identified.
 - Dependencies: None.
-- Completion Criteria: `bun run typecheck` passes; palette values documented in stage notes.
-- Suggested Commit Message: `chore(tokens): align parchment palette with prototype`
+- Completion Criteria: ✅ palette values documented in stage notes; no token edits; typecheck green.
+- Suggested Commit Message: `chore(tokens): verify parchment palette matches prototype (no-op)`
 
 ## Stage 5: Home tab + Explore sub-tab restructure + All Lectures
 
