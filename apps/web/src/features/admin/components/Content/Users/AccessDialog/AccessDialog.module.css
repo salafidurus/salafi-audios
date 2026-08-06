@@ -1,0 +1,235 @@
+.rolesBanner {
+  background: var(--surface-subtle);
+  border: var(--border-width-default) solid var(--border-subtle);
+  border-radius: var(--radius-scale-sm);
+  padding: var(--space-scale-md) var(--space-scale-lg);
+  margin-bottom: var(--space-scale-2xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-md);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-default);
+}
+
+.rolesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-scale-xs);
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  font-size: var(--typo-xs-font-size);
+  font-weight: 600;
+  color: var(--content-strong); /* High contrast dark text */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-2xl); /* Significant gap between target sections */
+  margin-top: var(--space-scale-md);
+}
+
+.row {
+  background: var(--surface-default);
+  padding-bottom: var(--space-scale-2xl); /* Spacious padding before border divider */
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-lg);
+}
+
+.row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.rowHeader {
+  display: flex;
+  align-items: center; /* Center toggles and labels vertically */
+  justify-content: space-between;
+  gap: var(--space-scale-md);
+}
+
+.rowMeta {
+  display: flex;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.rowLabelSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.rowTitle {
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+}
+
+.rowDesc {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  line-height: 1.5;
+  margin-top: var(--space-scale-xs);
+}
+
+.subPanel {
+  padding-top: var(--space-scale-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xl); /* Big gap between capability toggle section and scope selector */
+}
+
+.subSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-sm);
+  width: 100%;
+}
+
+.subSectionRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between; /* title left, controls right */
+  gap: var(--space-scale-md);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.subTitle {
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-label-md-font-size);
+  font-weight: 700;
+  color: var(--content-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.capabilitiesRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-scale-xl); /* Large space between capability toggle items */
+}
+
+.capabilityToggleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-xs);
+}
+
+.capabilityLabel {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-default);
+  font-weight: 500;
+}
+
+.scopeHeaderRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between; /* title left, selector dropdown right */
+  gap: var(--space-scale-md);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.scopeDropdownWrapper {
+  flex: 1;
+  max-width: 320px;
+  min-width: 220px;
+}
+
+.chipContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-scale-xs);
+  margin-top: var(--space-scale-sm);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-scale-sm);
+  padding: var(--space-scale-xs) var(--space-scale-sm);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-strong); /* Extremely legible dark content-strong text */
+  font-weight: 500;
+}
+
+.chipRemoveButton {
+  background: transparent;
+  border: none;
+  color: var(--content-muted);
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  width: 16px;
+  height: 16px;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.chipRemoveButton:hover {
+  background-color: var(--surface-hover);
+  color: var(--content-strong);
+}
+
+.allSelectedText {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  font-style: italic;
+  margin: 0;
+  text-align: end;
+}
+
+.error {
+  background-color: var(--state-danger-surface);
+  border: 1px solid var(--state-danger-border);
+  color: var(--state-danger-content);
+  padding: var(--space-scale-md);
+  border-radius: var(--radius-scale-sm);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  margin-bottom: var(--space-scale-md);
+}
+
+.loading {
+  text-align: center;
+  color: var(--content-muted);
+  padding: var(--space-scale-xl);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.emptyText {
+  color: var(--content-muted);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.footerActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-scale-sm);
+}

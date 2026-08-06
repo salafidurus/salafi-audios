@@ -78,5 +78,6 @@ export type UserAccessSnapshot = z.infer<typeof UserAccessSnapshotSchema>;
 export const ReplaceUserAccessRequestSchema = z.object({
   version: z.number().int().nonnegative(),
   grants: z.array(AccessGrantRequestSchema),
+  isSuperadmin: z.boolean().optional(),
 });
 export type ReplaceUserAccessRequest = z.infer<typeof ReplaceUserAccessRequestSchema>;
