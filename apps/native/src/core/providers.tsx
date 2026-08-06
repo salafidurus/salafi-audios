@@ -72,25 +72,33 @@ function RootDirectionView({ children }: { children: ReactNode }) {
   );
 }
 
+// Initialize integrations & API client at module load time to prevent race conditions during hydration/mount
+initIntegrations();
+const defaultBaseUrl = getApiBaseUrl();
+if (defaultBaseUrl) {
+  initApiClient({ baseUrl: defaultBaseUrl });
+} else {
+  initApiClient();
+}
+
 type Props = {
   children: ReactNode;
+  apiBaseUrl?: string;
 };
 
-export function Providers({ children }: Props) {
+export function Providers({ children, apiBaseUrl }: Props) {
   const [i18nReady, setI18nReady] = useState(false);
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
 
-  useEffect(() => {
-    initIntegrations();
-
-    const baseUrl = getApiBaseUrl();
-    if (baseUrl) {
-      initApiClient({ baseUrl });
-    } else {
-      initApiClient();
+  // Synchronously configure API client on first render if a custom apiBaseUrl is provided (e.g. in tests/Storybook)
+  useState(() => {
+    if (apiBaseUrl) {
+      initApiClient({ baseUrl: apiBaseUrl });
     }
+  });
 
+  useEffect(() => {
     // RN fetch has no cookie jar, so forward the @better-auth/expo session
     // cookie (kept in SecureStore) as a Cookie header on shared API calls.
     setCookieProvider(() => authClient.getCookie());
