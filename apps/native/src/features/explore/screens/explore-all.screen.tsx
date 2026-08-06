@@ -1,13 +1,9 @@
-import type { TopicDetailDto } from "@sd/core-contracts";
-
-import { httpClient, endpoints, queryKeys } from "@sd/core-contracts";
-import { useQuery } from "@tanstack/react-query";
+import { useTopicsList } from "@sd/domain-search";
 import { ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText, ScreenHeader, ScreenView } from "@/shared/components";
 
 import { TopicChipGroup } from "../components/topic-chip-group/topic-chip-group";
 
@@ -23,59 +19,52 @@ export function ExploreAllScreen({ onNavigateToTopicLecture }: ExploreAllScreenP
 
   if (topics === undefined && isFetching) {
     return (
-      <ScreenView center>
-        <AppText variant="bodyMd" style={{ color: theme.colors.content.muted }}>
-          {t("common.loading", "Loading…")}
-        </AppText>
-      </ScreenView>
+      <View style={styles.screen}>
+        <ScreenHeader title={t("navigation.subnav.explore.all", "All Lectures")} />
+        <ScreenView center>
+          <AppText variant="bodyMd" style={{ color: theme.colors.content.muted }}>
+            {t("common.loading", "Loading…")}
+          </AppText>
+        </ScreenView>
+      </View>
     );
   }
 
-  if (!topics || topics.length === 0) {
+  if (isError || !topics || topics.length === 0) {
     return (
-      <ScreenView center>
-        <AppText variant="bodyMd" style={{ color: theme.colors.content.muted }}>
-          {t("topics.noTopics", "No topics available.")}
-        </AppText>
-      </ScreenView>
-    );
-  }
-
-  if (isError) {
-    return (
-      <ScreenView center>
-        <AppText variant="bodyMd" style={{ color: theme.colors.content.muted }}>
-          {t("common.error", "Something went wrong.")}
-        </AppText>
-      </ScreenView>
+      <View style={styles.screen}>
+        <ScreenHeader title={t("navigation.subnav.explore.all", "All Lectures")} />
+        <ScreenView center>
+          <AppText variant="bodyMd" style={{ color: theme.colors.content.muted }}>
+            {isError
+              ? t("common.error", "Something went wrong.")
+              : t("topics.noTopics", "No topics available.")}
+          </AppText>
+        </ScreenView>
+      </View>
     );
   }
 
   const sorted = [...topics].sort((a, b) => (a.orderIndex ?? 99) - (b.orderIndex ?? 99));
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <TopicChipGroup
-        topics={sorted}
-        selectedId={null}
-        onSelect={(topic) => onNavigateToTopicLecture?.(topic.slug)}
-      />
+    <View style={styles.screen}>
+      <ScreenHeader title={t("navigation.subnav.explore.all", "All Lectures")} />
+      <ScrollView contentContainerStyle={styles.content}>
+        <TopicChipGroup
+          topics={sorted}
+          selectedId={null}
+          onSelect={(topic) => onNavigateToTopicLecture?.(topic.slug)}
+        />
 
-      <View style={styles.placeholder}>
-        <AppText variant="bodySm" style={{ color: theme.colors.content.muted }}>
-          {t("explore.all.selectPrompt", "Select a category above to browse its lectures.")}
-        </AppText>
-      </View>
-    </ScrollView>
+        <View style={styles.placeholder}>
+          <AppText variant="bodySm" style={{ color: theme.colors.content.muted }}>
+            {t("explore.all.selectPrompt", "Select a category above to browse its lectures.")}
+          </AppText>
+        </View>
+      </ScrollView>
+    </View>
   );
-}
-
-function useTopicsList() {
-  return useQuery<TopicDetailDto[]>({
-    queryKey: queryKeys.topics.all,
-    queryFn: async () =>
-      httpClient<TopicDetailDto[]>({ url: endpoints.topics.list, method: "GET" }),
-  });
 }
 
 const styles = StyleSheet.create((theme) => ({

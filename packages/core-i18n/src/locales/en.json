@@ -17,7 +17,17 @@
     "arabic": "Arabic (عربي)",
     "hide": "Hide",
     "viewAll": "View all",
-    "scrollToTop": "Return to top"
+    "scrollToTop": "Return to top",
+    "seeAll": "See all",
+    "all": "All"
+  },
+  "home": {
+    "continueListening": "CONTINUE LISTENING",
+    "recommendedStartingPoint": "RECOMMENDED STARTING POINT",
+    "startListening": "Start Listening",
+    "lessonsInSeries": "{{count}} lessons in series",
+    "studyWithScholar": "Study with a scholar",
+    "recentlyAdded": "Recently added"
   },
   "auth": {
     "signIn": {
@@ -88,6 +98,7 @@
     "home": "Home",
     "scholars": "Scholars",
     "library": "Library",
+    "saved": "Saved",
     "account": "Account",
     "siteTitle": "Salafi Durus",
     "primarySidebar": "Primary sidebar",
@@ -111,6 +122,7 @@
       "explore": {
         "recent": "Recent",
         "scholar": "Scholars",
+        "scholars": "Scholars",
         "curation": "Curation",
         "all": "All Lectures"
       },
@@ -326,11 +338,30 @@
   "home": {
     "hero": {
       "taglineTranslation": "Say: 'Are those who know equal to those who do not know?' It is only men of understanding who will remember",
-      "surahReference": "Surah Az-Zumar (39:9)"
+      "surahReference": "Surah Az-Zumar (39:9)",
+      "resumeEyebrow": "CONTINUE YOUR DURUS",
+      "featuredEyebrow": "FEATURED LESSON",
+      "resume": "Resume",
+      "start": "Start listening",
+      "recommendation": "Recommended starting point for new students",
+      "nullifiersTitle": "Nullifiers of Islam",
+      "nullifiersScholar": "Salih ibn Fawzan al-Fawzan",
+      "browseLabel": "Or browse:",
+      "newHerePrompt": "New here? Start with one of these recommended topics."
     },
     "searchLabel": "What do you want to listen to?",
     "downloadAppStore": "Download on the App Store",
-    "getGooglePlay": "Get it on Google Play"
+    "getGooglePlay": "Get it on the Google Play Store",
+    "scholars": {
+      "title": "Scholars",
+      "label": "Scholars",
+      "seeAll": "All scholars"
+    },
+    "recent": {
+      "title": "Recently Added",
+      "label": "Recently added",
+      "seeAll": "See all"
+    }
   },
   "audio": {
     "playbackSpeed": "Playback Speed",

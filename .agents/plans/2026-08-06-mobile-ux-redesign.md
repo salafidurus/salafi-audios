@@ -38,7 +38,25 @@
   (`#FFFFFF`/`#F1EAD9`), tonal borders/text. Native `createThemeNative("light","parchment")`
   builds from this palette, so `colors.surface.canvas === #F7F2E7`. No token values needed
   adjustment; no code change.
-- Next step: Phase 3 — navigation restructure (Home tab + Explore sub-tabs + All Lectures).
+- Phase 3 restructure complete: added `explore.all` (`/explore/all`) + routeDefinition to
+  `packages/core-contracts/src/routes.ts`; added `all` ("All Lectures", icon "library-big") to
+  `SECTION_TABS.explore` in `packages/core-contracts/src/navigation.ts`; added i18n keys
+  `navigation.subnav.explore.all` (en `All Lectures`, ar `جميع الدروس`), `explore.all.*`,
+  `topics.noTopics`, `common.error` to both en.json and ar.json; registered `all` in
+  `translation-helpers.ts` SUBNAV_KEYS/FALLBACKS and `explore-all` (lucide `LibraryBig`) in
+  `section-tab-icons.ts`.
+  Native file layout: created `(home)` group (`(home)/_layout.tsx` + `(home)/index.tsx` → `HomeScreen`
+  at `/`, search-bar composition moved here); converted `(tabs)/(explore)` parens group to a real
+  `explore/` folder (path `/explore`) with Stack `_layout.tsx` (screens index→redirect, recent,
+  scholar, curation, all); added `explore/all.tsx`; wired `(tabs)/_layout.tsx` Home trigger
+  `(name="(home")` first + explore trigger renamed to `name="explore"`. Updated the live
+  `tab-route-config.ts`/`SubrouteTabsBar`/`BottomAccessoryContent` model so `/`→home, `/explore/*`→explore
+  (recent default), `all` sub-tab; updated their specs. `features/home` scaffolded
+  (`home.screen.tsx` placeholder rendering search + ExploreRecent, enriched in Stage 6).
+  `TopicChipGroup` component added. Full native suite green (367 tests), typecheck + lint clean
+  for native, web, core-contracts, core-i18n.
+- Next step: Phase 4 — build the Home screen (hero resume vs promotions vs recent, scholars rail,
+  category chips, recently added).
 
 ## Staging Strategy
 
@@ -120,30 +138,37 @@
 
 ## Stage 5: Home tab + Explore sub-tab restructure + All Lectures
 
-- Status: Pending
+- Status: Completed
 - Goal: Home becomes the landing tab (route `/`); Explore moves to `/explore/*` with sub-tabs
   Recent / Scholars / Curation / All Lectures.
 - Files:
-  - `apps/native/src/app/(tabs)/_layout.tsx` (first `NativeTabs.Trigger` for Home)
-  - `apps/native/src/app/(tabs)/(home)/index.tsx` (new, route `/`; absorbs search-landing)
-  - `apps/native/src/app/(tabs)/(explore)/index.tsx` → `.old`; `recent.tsx` becomes initial route
-  - `apps/native/src/app/(tabs)/(explore)/all.tsx` (new)
-  - `apps/native/src/app/(tabs)/(explore)/_layout.tsx` (Stack screen entries)
-  - `apps/native/src/features/navigation/utils/tab-route-config.ts`
-  - `packages/core-contracts/src/routes.ts` (+`explore.all: "/explore/all"`)
+  - `packages/core-contracts/src/routes.ts` (+`explore.all: "/explore/all"` + routeDefinition)
   - `packages/core-contracts/src/navigation.ts` (SECTION_TABS.explore += all)
-  - `packages/core-i18n/src/locales/en.json` + `ar.json` (`navigation.subnav.explore.all`)
-  - Redirects for legacy `/recent`, `/scholar`, `/curation`
-- Changes: Add Home trigger (first), new `(home)` group; move search-bar composition from the
-  Explore index to Home; rewire explore sub-route paths to canonical `/explore/*`; add "All
-  Lectures" route/config/label; update tab-route-config helpers (`getActiveSubsection`,
-  `buildSectionPath`, `getRootTabFromPathname`, `isTabRoute`); rename old route files `.old`.
+  - `packages/core-i18n/src/locales/en.json` + `ar.json` (`navigation.subnav.explore.all` + helper keys)
+  - `packages/core-i18n/src/translation-helpers.ts` (SUBNAV_KEYS/FALLBACKS += all)
+  - `apps/native/src/app/(tabs)/_layout.tsx` (Home trigger first; explore trigger `name="explore"`)
+  - `apps/native/src/app/(tabs)/(home)/` (new group: `_layout.tsx`, `index.tsx` → HomeScreen)
+  - `apps/native/src/app/(tabs)/explore/` (moved from `(explore)` parens group; `_layout.tsx`
+    Stack now declares `all` screen and redirects `index`→`/explore/recent`; `all.tsx` added)
+  - `apps/native/src/features/home/` (`screens/home.screen.tsx` placeholder, `index.ts`)
+  - `apps/native/src/features/explore/screens/explore-all.screen.tsx` + `topic-chip-group` component
+  - `apps/native/src/features/navigation/utils/tab-route-config.ts` + spec (`/`→home, `/explore/*`→explore, `all`)
+  - `apps/native/src/features/navigation/components/BottomAccessory/*` (guards home section; specs updated)
+  - `apps/native/src/features/navigation/utils/section-tab-icons.ts` (+`explore-all`)
+- Changes: Added `explore.all` route + access definition; added `all` tab to shared `SECTION_TABS.explore`;
+  added i18n keys and registered `all`/`library-big` icon. Split the landing tab into a Home group at
+  `/` (search-bar composition moved here) and converted Explore into a real `/explore` folder with a
+  Stack (`index` redirects to `/explore/recent`; `recent`/`scholar`/`curation`/`all` screens). Updated
+  the native root-tab model (`tab-route-config.ts`) and its tests so `/`→home, `/explore*`→explore
+  (default `recent`), `all` recognized, and legacy bare `/recent|/scholar|/curation` map to explore.
+  `explore/all.tsx` renders `ExploreAllScreen` (topic chips via `GET /topics` + stub list; lecture
+  rows land in Stage 7). `HomeScreen` currently renders the search bar + `ExploreRecentScreen`
+  placeholder (hero/sections arrive in Stage 6).
 - Blockers: None currently identified.
-- Dependencies: Stage 4 (themes) only for visual consistency; no code dependency.
-- Completion Criteria:
-  - App lands on Home tab; tab order Home → Explore → Library → Settings → Admin
-  - Explore sub-tabs Recent/Scholars/Curation/All Lectures switch correctly
-  - `bun run test` + `bun run typecheck` + `bun run lint` pass
+- Dependencies: Stage 4 (themes) only for visual consistency.
+- Completion Criteria: ✅ App lands on Home tab (`/`); Explore tab at `/explore`; sub-tabs
+  Recent/Scholars/Curation/All Lectures switch; native tests 367/367 pass; typecheck passes for
+  native + web + core-contracts + core-i18n; lint clean.
 - Suggested Commit Message: `feat(native): add home tab and restructure explore sub-tabs`
 
 ## Stage 6: Home screen

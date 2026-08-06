@@ -35,7 +35,7 @@ declare module "react-native-unistyles" {
 StyleSheet.configure({
   breakpoints,
   themes: {
-    system: lightNativeTheme,
+    system: parchmentNativeTheme,
     parchment: parchmentNativeTheme,
     manuscript: manuscriptNativeTheme,
     midnight: midnightNativeTheme,

@@ -17,7 +17,17 @@
     "arabic": "العربية (عربي)",
     "hide": "إخفاء",
     "viewAll": "عرض الكل",
-    "scrollToTop": "العودة إلى الأعلى"
+    "scrollToTop": "العودة للأعلى",
+    "seeAll": "عرض الكل",
+    "all": "الكل"
+  },
+  "home": {
+    "continueListening": "متابعة الاستماع",
+    "recommendedStartingPoint": "نقطة البداية الموصى بها",
+    "startListening": "بدء الاستماع",
+    "lessonsInSeries": "{{count}} درساً في السلسلة",
+    "studyWithScholar": "الدراسة مع عالم",
+    "recentlyAdded": "أضيفت مؤخراً"
   },
   "auth": {
     "signIn": {
@@ -88,6 +98,7 @@
     "home": "الرئيسية",
     "scholars": "العلماء",
     "library": "المكتبة",
+    "saved": "المحفوظة",
     "account": "الحساب",
     "siteTitle": "دروس سلفية",
     "primarySidebar": "الشريط الجانبي الرئيسي",
@@ -111,6 +122,7 @@
       "explore": {
         "recent": "الأحدث",
         "scholar": "العلماء",
+        "scholars": "العلماء",
         "curation": "المنتقى",
         "all": "جميع الدروس"
       },
@@ -326,11 +338,30 @@
   "home": {
     "hero": {
       "taglineTranslation": "",
-      "surahReference": ""
+      "surahReference": "",
+      "resumeEyebrow": "استكمل دروسك",
+      "featuredEyebrow": "درس مميّز",
+      "resume": "استكمل",
+      "start": "ابدأ الاستماع",
+      "recommendation": "نقطة بداية مقترحة للطلاب الجدد",
+      "nullifiersTitle": "نافيات للإسلام",
+      "nullifiersScholar": "صالح بن فوازان آل فوازان",
+      "browseLabel": "أو ا�تصفح:",
+      "newHerePrompt": "جديد هنا؟ ابدأ بإحدى الفئات المقترحة."
     },
     "searchLabel": "ماذا تريد أن تستمع إليه؟",
     "downloadAppStore": "تنزيل من متجر التطبيقات",
-    "getGooglePlay": "تنزيل من متجر جوجل"
+    "getGooglePlay": "تنزيل من متجر جوجل بلاي",
+    "scholars": {
+      "title": "العلماء",
+      "label": "العلماء",
+      "seeAll": "جميع العلماء"
+    },
+    "recent": {
+      "title": "الأحدث",
+      "label": "أضيف مؤخرًا",
+      "seeAll": "عرض الكل"
+    }
   },
   "audio": {
     "playbackSpeed": "سرعة التشغيل",

@@ -3,15 +3,12 @@ import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
-import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { List } from "@/shared/components/List";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { List, ScreenHeader } from "@/shared/components";
 
 import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
 import { ExploreScholarRow } from "../components/explore-scholar-row/explore-scholar-row";
@@ -80,7 +77,6 @@ export function ExploreRecentScreen({
   onNavigateToScholar,
 }: ExploreRecentScreenProps) {
   const { t } = useTranslation();
-  const { theme } = useUnistyles();
   const [searchQuery, setSearchQuery] = useState("");
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
     useExploreRecentScreen();
@@ -137,32 +133,31 @@ export function ExploreRecentScreen({
     [onNavigateToListing, onNavigateToScholar],
   );
 
-  const headerSearchOptions = {
-    headerSearchBarOptions: {
-      placeholder: t("explore.searchRecent", "Search recent audios..."),
-      onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
-      onCancelButtonPress: () => setSearchQuery(""),
-      ...getThemedSearchBarOptions(theme),
-    },
-  };
-
   if (isError && items.length === 0) {
     return (
-      <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
+      <View style={styles.screen}>
+        <ScreenHeader
+          title={t("navigation.subnav.explore.recent", "Recent")}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
         <ExploreStatusView
           message={getErrorStateText("feed", t)}
           onRetry={() => refetch()}
           retryLabel={t("feed.retry", "Try Again")}
         />
-      </ScreenView>
+      </View>
     );
   }
 
   if (isFetching && items.length === 0) {
     return (
       <View style={styles.screen}>
-        <Stack.Screen options={headerSearchOptions} />
+        <ScreenHeader
+          title={t("navigation.subnav.explore.recent", "Recent")}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
         <ExploreSkeleton />
       </View>
     );
@@ -170,16 +165,24 @@ export function ExploreRecentScreen({
 
   if (items.length === 0) {
     return (
-      <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
+      <View style={styles.screen}>
+        <ScreenHeader
+          title={t("navigation.subnav.explore.recent", "Recent")}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
         <ExploreStatusView message={getEmptyStateText("feed", t)} />
-      </ScreenView>
+      </View>
     );
   }
 
   return (
     <View style={styles.screen}>
-      <Stack.Screen options={headerSearchOptions} />
+      <ScreenHeader
+        title={t("navigation.subnav.explore.recent", "Recent")}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
       <FlatList
         data={items}
         keyExtractor={getItemKey}

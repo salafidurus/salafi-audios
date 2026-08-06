@@ -53,6 +53,14 @@
   "explore": {
     "searchRecent": "Search recent audios..."
   },
+  "home": {
+    "continueListening": "CONTINUE LISTENING",
+    "recommendedStartingPoint": "RECOMMENDED STARTING POINT",
+    "startListening": "Start Listening",
+    "lessonsInSeries": "{{count}} lessons in series",
+    "studyWithScholar": "Study with a scholar",
+    "recentlyAdded": "Recently added"
+  },
   "navigation": {
     "show_miniplayer": "Show mini player",
     "show_subroutes": "Show section subroutes"

@@ -39,7 +39,7 @@ export const createThemeNative = (
   };
 };
 
-export const lightNativeTheme = createThemeNative("light");
+export const lightNativeTheme = createThemeNative("light", "parchment");
 export const darkNativeTheme = createThemeNative("dark");
 
 export const parchmentNativeTheme = createThemeNative("light", "parchment");

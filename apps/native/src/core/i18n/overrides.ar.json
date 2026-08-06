@@ -53,6 +53,14 @@
   "explore": {
     "searchRecent": "البحث في الصوتيات الأخيرة..."
   },
+  "home": {
+    "continueListening": "متابعة الاستماع",
+    "recommendedStartingPoint": "نقطة البداية الموصى بها",
+    "startListening": "بدء الاستماع",
+    "lessonsInSeries": "{{count}} درساً في السلسلة",
+    "studyWithScholar": "الدراسة مع عالم",
+    "recentlyAdded": "أضيفت مؤخراً"
+  },
   "navigation": {
     "show_miniplayer": "إظهار المشغل المصغر",
     "show_subroutes": "إظهار أقسام القسم الفرعي"

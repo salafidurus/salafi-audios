@@ -2,7 +2,8 @@ import type { AppThemeNative } from "@/core/styles/theme";
 
 function getThemedHeaderColors(theme: AppThemeNative) {
   return {
-    headerStyle: { backgroundColor: theme.colors.surface.default },
+    headerStyle: { backgroundColor: theme.colors.surface.canvas },
+    headerLargeStyle: { backgroundColor: theme.colors.surface.canvas },
     headerTintColor: theme.colors.content.strong,
     headerShadowVisible: false,
     contentStyle: {
@@ -13,9 +14,7 @@ function getThemedHeaderColors(theme: AppThemeNative) {
 
 export function getTabStackScreenOptions(theme: AppThemeNative) {
   return {
-    headerShown: true,
-    headerTransparent: false,
-    headerLargeTitle: true,
+    headerShown: false,
     ...getThemedHeaderColors(theme),
   };
 }

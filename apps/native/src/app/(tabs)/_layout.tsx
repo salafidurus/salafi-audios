@@ -21,7 +21,7 @@ export default function TabsLayout() {
         tintColor={theme.colors.content.primary}
         rippleColor={theme.colors.surface.hover}
         indicatorColor={theme.colors.surface.subtle}
-        backgroundColor={theme.colors.surface.default}
+        backgroundColor={theme.colors.surface.canvas}
         labelVisibilityMode="labeled"
       >
         <NativeTabs.Trigger name="(home)">

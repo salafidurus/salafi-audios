@@ -3,16 +3,13 @@ import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useInfiniteScholarsList } from "@sd/domain-content";
-import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
-import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { List } from "@/shared/components/List";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { List, ScreenHeader } from "@/shared/components";
 
 import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
 import {
@@ -26,7 +23,6 @@ export type ExploreScholarScreenProps = {
 
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
-  const { theme } = useUnistyles();
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
@@ -53,32 +49,33 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     [onNavigateToScholar, filteredScholars.length],
   );
 
-  const headerSearchOptions = {
-    headerSearchBarOptions: {
-      placeholder: t("scholarContent.searchScholars", "Search scholars..."),
-      onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
-      onCancelButtonPress: () => setSearchQuery(""),
-      ...getThemedSearchBarOptions(theme),
-    },
-  };
-
   if (isError && allScholars.length === 0) {
     return (
-      <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
+      <View style={styles.screen}>
+        <ScreenHeader
+          title={t("navigation.subnav.explore.scholar", "Scholars")}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={t("scholarContent.searchScholars", "Search scholars...")}
+        />
         <ExploreStatusView
           message={getErrorStateText("feed", t)}
           onRetry={() => refetch()}
           retryLabel={t("feed.retry", "Try Again")}
         />
-      </ScreenView>
+      </View>
     );
   }
 
   if (isFetching && allScholars.length === 0) {
     return (
       <View style={styles.screen}>
-        <Stack.Screen options={headerSearchOptions} />
+        <ScreenHeader
+          title={t("navigation.subnav.explore.scholar", "Scholars")}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={t("scholarContent.searchScholars", "Search scholars...")}
+        />
         <ExploreSkeleton />
       </View>
     );
@@ -86,8 +83,13 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
 
   if (filteredScholars.length === 0) {
     return (
-      <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
+      <View style={styles.screen}>
+        <ScreenHeader
+          title={t("navigation.subnav.explore.scholar", "Scholars")}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={t("scholarContent.searchScholars", "Search scholars...")}
+        />
         <ExploreStatusView
           message={
             searchQuery
@@ -95,13 +97,18 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
               : getEmptyStateText("feed", t)
           }
         />
-      </ScreenView>
+      </View>
     );
   }
 
   return (
     <View style={styles.screen}>
-      <Stack.Screen options={headerSearchOptions} />
+      <ScreenHeader
+        title={t("navigation.subnav.explore.scholar", "Scholars")}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder={t("scholarContent.searchScholars", "Search scholars...")}
+      />
       <List style={styles.listCard}>
         <FlatList
           data={filteredScholars}

@@ -7,10 +7,9 @@ describe("getTabStackScreenOptions", () => {
     const options = getTabStackScreenOptions(lightNativeTheme);
 
     expect(options).toMatchObject({
-      headerShown: true,
-      headerTransparent: false,
-      headerLargeTitle: true,
-      headerStyle: { backgroundColor: lightNativeTheme.colors.surface.default },
+      headerShown: false,
+      headerStyle: { backgroundColor: lightNativeTheme.colors.surface.canvas },
+      headerLargeStyle: { backgroundColor: lightNativeTheme.colors.surface.canvas },
       headerTintColor: lightNativeTheme.colors.content.strong,
       headerShadowVisible: false,
       contentStyle: {
@@ -29,7 +28,7 @@ describe("getFormSheetScreenOptions", () => {
       presentation: "formSheet",
       headerBackVisible: true,
       headerTitle: "",
-      headerStyle: { backgroundColor: lightNativeTheme.colors.surface.default },
+      headerStyle: { backgroundColor: lightNativeTheme.colors.surface.canvas },
       headerTintColor: lightNativeTheme.colors.content.strong,
       headerShadowVisible: false,
       contentStyle: {
