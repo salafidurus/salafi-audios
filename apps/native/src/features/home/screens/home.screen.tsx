@@ -87,8 +87,10 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
 
   const currentTrack = usePlaybackStore((s) => s.currentTrack);
   const { recentProgress } = useContinueListening();
-  const { data: feedData } = useExploreRecentScreen();
-  const { data: scholarsData } = useInfiniteScholarsList();
+  const { data: feedData, isLoading: feedLoading } = useExploreRecentScreen({
+    limit: 7,
+  });
+  const { data: scholarsData, isLoading: scholarsLoading } = useInfiniteScholarsList();
 
   const activeContinueListeningItem = useMemo(() => {
     if (currentTrack) {
@@ -124,8 +126,9 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
 
   // Scholars list for "Study with a scholar" section
   const scholarsList = useMemo(() => {
+    if (scholarsLoading && rawScholarsItems.length === 0) return [];
     const source = rawScholarsItems.length > 0 ? rawScholarsItems : FALLBACK_SCHOLARS;
-    return source.map((s: any) => ({
+    return source.slice(0, 5).map((s: any) => ({
       id: s.id ?? s.slug,
       slug: s.slug,
       name: s.name,
@@ -133,10 +136,11 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
       imageUrl: s.imageUrl ?? s.avatarUrl ?? s.image,
       lectureCount: s.totalListingsCount ?? s.lectureCount ?? 12,
     }));
-  }, [rawScholarsItems]);
+  }, [rawScholarsItems, scholarsLoading]);
 
   // Feed content items for "Recently added"
   const rawRecentLectures = useMemo(() => {
+    if (feedLoading && rawFeedItems.length === 0) return [];
     const feedContentItems = rawFeedItems.filter(
       (item) => item.kind !== "scholar_row" && item.kind !== "topic_row",
     );
@@ -153,7 +157,7 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
       completedLessonsCount: 0,
       dateFormatted: item.formattedDate ?? item.publishedAt ?? item.dateFormatted ?? undefined,
     }));
-  }, [rawFeedItems]);
+  }, [rawFeedItems, feedLoading]);
 
   // Show all recently added lectures (no local category filter — category chips navigate to Explore)
   const recentLectures = rawRecentLectures;
@@ -215,42 +219,44 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* Hero Section */}
-          <HeroSection
-            continueListeningItem={activeContinueListeningItem}
-            featuredItem={featuredItem}
-            onPress={handleSelectListing}
-          />
+          <View style={styles.scrollInner}>
+            {/* Hero Section */}
+            <HeroSection
+              continueListeningItem={activeContinueListeningItem}
+              featuredItem={featuredItem}
+              onPress={handleSelectListing}
+            />
 
-          {/* Quick Action Pills: All Lectures, Scholars, Saved */}
-          <QuickActionsRow
-            onNavigateToAllLectures={() => router.push("/explore/all" as Href)}
-            onNavigateToScholars={() => router.push("/explore/scholar" as Href)}
-            onNavigateToSaved={() => router.push("/library" as Href)}
-          />
+            {/* Quick Action Pills: All Lectures, Scholars, Saved */}
+            <QuickActionsRow
+              onNavigateToAllLectures={() => router.push("/explore/all" as Href)}
+              onNavigateToScholars={() => router.push("/explore/scholar" as Href)}
+              onNavigateToSaved={() => router.push("/library" as Href)}
+            />
 
-          {/* Category browse chips — navigate to Explore > All with that topic */}
-          <CategoryChipsRail
-            selectedCategory=""
-            onSelectCategory={() => router.push("/explore/all" as Href)}
-          />
+            {/* Category browse chips — navigate to Explore > All with that topic */}
+            <CategoryChipsRail
+              selectedCategory=""
+              onSelectCategory={() => router.push("/explore/all" as Href)}
+            />
 
-          {/* Scholars Rail: Study with a scholar */}
-          <ScholarMedallionsRail
-            scholars={scholarsList}
-            onSelectScholar={handleSelectScholar}
-            onSeeAllScholars={() => router.push("/explore/scholar" as Href)}
-          />
+            {/* Scholars Rail: Study with a scholar */}
+            <ScholarMedallionsRail
+              scholars={scholarsList}
+              onSelectScholar={handleSelectScholar}
+              onSeeAllScholars={() => router.push("/explore/scholar" as Href)}
+            />
 
-          {/* Recently Added Section */}
-          <RecentlyAddedSection
-            items={recentLectures}
-            onSelectLecture={handleSelectListing}
-            onSeeAllRecent={() => router.push("/explore/recent" as Href)}
-          />
+            {/* Recently Added Section */}
+            <RecentlyAddedSection
+              items={recentLectures}
+              onSelectLecture={handleSelectListing}
+              onSeeAllRecent={() => router.push("/explore/recent" as Href)}
+            />
 
-          {/* Curated collections teaser */}
-          <CuratedCollectionsBanner onPress={() => router.push("/explore/curation" as Href)} />
+            {/* Curated collections teaser */}
+            <CuratedCollectionsBanner onPress={() => router.push("/explore/curation" as Href)} />
+          </View>
         </ScrollView>
       </View>
 
@@ -285,6 +291,9 @@ const styles = StyleSheet.create((theme) => ({
   },
   scrollContent: {
     paddingVertical: 4,
+  },
+  scrollInner: {
+    gap: 4,
   },
   searchResults: {
     flex: 1,
