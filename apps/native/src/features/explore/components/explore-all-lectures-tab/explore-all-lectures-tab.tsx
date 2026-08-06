@@ -18,6 +18,8 @@ import { ExploreStatusView } from "../explore-status/explore-status";
 
 export type ExploreAllLecturesTabProps = {
   onNavigateToListing?: (slug: string) => void;
+  /** Pre-select a topic chip on first mount */
+  initialTopicSlug?: string;
 };
 
 /**
@@ -28,11 +30,16 @@ export type ExploreAllLecturesTabProps = {
  * (GET /search/extended?topicSlug=<slug>).
  * "All" shows unfiltered results.
  */
-export function ExploreAllLecturesTab({ onNavigateToListing }: ExploreAllLecturesTabProps) {
+export function ExploreAllLecturesTab({
+  onNavigateToListing,
+  initialTopicSlug,
+}: ExploreAllLecturesTabProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
 
-  const [selectedTopicSlug, setSelectedTopicSlug] = useState<string | null>(null);
+  const [selectedTopicSlug, setSelectedTopicSlug] = useState<string | null>(
+    initialTopicSlug ?? null,
+  );
 
   // Topics for the category filter chips
   const { data: topics } = useTopicsList();
@@ -56,19 +63,27 @@ export function ExploreAllLecturesTab({ onNavigateToListing }: ExploreAllLecture
   const rows = useMemo(() => buildSearchResultRows(data, false), [data]);
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<SearchResultRow>) => (
-      <ParchmentLectureCard
-        item={{
-          id: item.id,
-          slug: item.slug,
-          title: item.title,
-          scholarName: item.scholarName,
-          lessonsCount: item.lectureCount,
-          dateFormatted: `${item.lectureCount} ${item.lectureCount === 1 ? "lecture" : "lectures"}`,
-        }}
-        onPress={() => onNavigateToListing?.(item.slug)}
-      />
-    ),
+    ({ item }: ListRenderItemInfo<SearchResultRow>) => {
+      const count = item.lectureCount ?? 0;
+      const isSingle = item.format === "single";
+      const countLabel = isSingle
+        ? undefined
+        : count > 0
+          ? `${count} ${count === 1 ? "lecture" : "lectures"}`
+          : undefined;
+      return (
+        <ParchmentLectureCard
+          item={{
+            id: item.id,
+            slug: item.slug,
+            title: item.title,
+            scholarName: item.scholarName,
+            dateFormatted: countLabel,
+          }}
+          onPress={() => onNavigateToListing?.(item.slug)}
+        />
+      );
+    },
     [onNavigateToListing],
   );
 

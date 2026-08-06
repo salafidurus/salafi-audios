@@ -4,7 +4,7 @@ import type { ListRenderItemInfo } from "react-native";
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen, useInfiniteScholarsList } from "@sd/domain-content";
 import { Sparkles } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -28,6 +28,8 @@ export type ExploreScreenProps = {
   onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
   initialSub?: ExploreSub;
+  /** Pre-select a topic filter in the All Lectures tab */
+  initialTopicSlug?: string;
 };
 
 // ─────────────────────────────────────────────
@@ -246,10 +248,16 @@ export function ExploreScreen({
   onNavigateToListing,
   onNavigateToScholar,
   initialSub = "all",
+  initialTopicSlug,
 }: ExploreScreenProps) {
   const { t } = useTranslation();
   const [activeSub, setActiveSub] = useState<ExploreSub>(initialSub);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Sync when parent navigates us to a different sub (tab is cached, useState seed only fires once)
+  useEffect(() => {
+    setActiveSub(initialSub);
+  }, [initialSub]);
 
   const handleTabChange = (sub: ExploreSub) => {
     setActiveSub(sub);
@@ -273,7 +281,13 @@ export function ExploreScreen({
         {activeSub === "recent" && (
           <RecentTab searchQuery={searchQuery} onNavigateToListing={onNavigateToListing} />
         )}
-        {activeSub === "all" && <ExploreAllLecturesTab onNavigateToListing={onNavigateToListing} />}
+        {activeSub === "all" && (
+          <ExploreAllLecturesTab
+            key={initialTopicSlug ?? "all"}
+            onNavigateToListing={onNavigateToListing}
+            initialTopicSlug={initialTopicSlug}
+          />
+        )}
         {activeSub === "scholars" && (
           <ScholarsTab searchQuery={searchQuery} onNavigateToScholar={onNavigateToScholar} />
         )}

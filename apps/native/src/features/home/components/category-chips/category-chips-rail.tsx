@@ -87,7 +87,7 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.colors.action.primary,
   },
   inactiveChip: {
-    backgroundColor: theme.colors.surface.default,
+    backgroundColor: "transparent",
     borderColor: theme.colors.border.subtle,
   },
   chipText: {

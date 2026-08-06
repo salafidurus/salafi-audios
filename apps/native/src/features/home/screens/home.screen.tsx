@@ -204,22 +204,26 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
 
             {/* Quick Action Pills: All Lectures, Scholars, Saved */}
             <QuickActionsRow
-              onNavigateToAllLectures={() => router.push("/explore/all" as Href)}
-              onNavigateToScholars={() => router.push("/explore/scholar" as Href)}
+              onNavigateToAllLectures={() => router.push("/explore" as Href)}
+              onNavigateToScholars={() => router.push("/explore?sub=scholars" as Href)}
               onNavigateToSaved={() => router.push("/library" as Href)}
             />
 
-            {/* Category browse chips — navigate to Explore > All with that topic */}
+            {/* Category browse chips — navigate to Explore > All with that topic pre-filtered */}
             <CategoryChipsRail
               selectedCategory=""
-              onSelectCategory={() => router.push("/explore/all" as Href)}
+              onSelectCategory={(cat) =>
+                cat === "all"
+                  ? router.push("/explore" as Href)
+                  : router.push(`/explore?sub=all&topic=${cat}` as Href)
+              }
             />
 
             {/* Scholars Rail: Study with a scholar */}
             <ScholarMedallionsRail
               scholars={scholarsList}
               onSelectScholar={handleSelectScholar}
-              onSeeAllScholars={() => router.push("/explore/scholar" as Href)}
+              onSeeAllScholars={() => router.push("/explore?sub=scholars" as Href)}
               isLoading={scholarsLoading}
             />
 
@@ -227,12 +231,14 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
             <RecentlyAddedSection
               items={recentLectures}
               onSelectLecture={handleSelectListing}
-              onSeeAllRecent={() => router.push("/explore/recent" as Href)}
+              onSeeAllRecent={() => router.push("/explore?sub=recent" as Href)}
               isLoading={feedLoading}
             />
 
             {/* Curated collections teaser */}
-            <CuratedCollectionsBanner onPress={() => router.push("/explore/curation" as Href)} />
+            <CuratedCollectionsBanner
+              onPress={() => router.push("/explore?sub=curation" as Href)}
+            />
           </View>
         </ScrollView>
       </View>
