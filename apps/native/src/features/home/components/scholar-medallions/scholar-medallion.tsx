@@ -1,3 +1,4 @@
+import { Image } from "expo-image";
 import React from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -41,9 +42,18 @@ export function ScholarMedallion({ scholar, onPress }: ScholarMedallionProps) {
       accessibilityLabel={scholar.name}
     >
       <View style={styles.avatar}>
-        <AppText variant="displayMd" style={styles.initialsText}>
-          {initials}
-        </AppText>
+        {scholar.imageUrl ? (
+          <Image
+            source={{ uri: scholar.imageUrl }}
+            style={styles.image}
+            contentFit="cover"
+            testID={`scholar-medallion-image-${scholar.slug}`}
+          />
+        ) : (
+          <AppText variant="displayMd" style={styles.initialsText}>
+            {initials}
+          </AppText>
+        )}
       </View>
       <AppText variant="xs" color="strong" style={styles.nameText} numberOfLines={2}>
         {displayName}
@@ -52,7 +62,7 @@ export function ScholarMedallion({ scholar, onPress }: ScholarMedallionProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     alignItems: "center",
     width: 76,
@@ -62,12 +72,17 @@ const styles = StyleSheet.create({
     width: 62,
     height: 62,
     borderRadius: 20,
-    backgroundColor: "#8CAF9B",
+    backgroundColor: theme.colors.action.primary,
     borderWidth: 1,
-    borderColor: "#749985",
+    borderColor: theme.colors.border.strong,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 8,
+    overflow: "hidden",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
   },
   initialsText: {
     fontSize: 24,
@@ -80,4 +95,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 14,
   },
-});
+}));

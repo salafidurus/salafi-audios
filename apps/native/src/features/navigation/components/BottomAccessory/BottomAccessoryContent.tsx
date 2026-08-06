@@ -22,6 +22,7 @@ export function BottomAccessoryContent() {
   const hasSubroute =
     activeRootTab !== "search" &&
     activeRootTab !== "home" &&
+    activeRootTab !== "explore" &&
     Boolean(SECTION_TABS[activeRootTab as Section]?.length);
 
   if (!isTabRoute(pathname)) {

@@ -19,6 +19,7 @@ import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 import type { ParchmentLectureCardItem } from "../components/lecture-card/lecture-card";
 
 import { CategoryChipsRail } from "../components/category-chips/category-chips-rail";
+import { CuratedCollectionsBanner } from "../components/curated-collections-banner/curated-collections-banner";
 import { HeroSection } from "../components/hero-section/hero-section";
 import { QuickActionsRow } from "../components/quick-actions/quick-actions-row";
 import { RecentlyAddedSection } from "../components/recently-added-section/recently-added-section";
@@ -79,7 +80,6 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
   const showOriginal = useShowOriginalContent();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const searchOptions = useMemo(() => ({ prefill: "", showOriginal }), [showOriginal]);
   const { setQuery, filter, setFilter, topics, items, isFetching, shouldSearch, errorMessage } =
@@ -130,6 +130,7 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
       slug: s.slug,
       name: s.name,
       initials: s.initials,
+      imageUrl: s.imageUrl ?? s.avatarUrl ?? s.image,
       lectureCount: s.totalListingsCount ?? s.lectureCount ?? 12,
     }));
   }, [rawScholarsItems]);
@@ -154,18 +155,8 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
     }));
   }, [rawFeedItems]);
 
-  // Filter lectures by selected category
-  const recentLectures = useMemo(() => {
-    if (selectedCategory === "all") {
-      return rawRecentLectures;
-    }
-    const target = selectedCategory.toLowerCase();
-    return rawRecentLectures.filter((l) => {
-      const cat = l.category?.toLowerCase() ?? "";
-      const title = l.title.toLowerCase();
-      return cat.includes(target) || title.includes(target);
-    });
-  }, [selectedCategory, rawRecentLectures]);
+  // Show all recently added lectures (no local category filter — category chips navigate to Explore)
+  const recentLectures = rawRecentLectures;
 
   const featuredItem = rawRecentLectures[0] ?? null;
 
@@ -238,10 +229,10 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
             onNavigateToSaved={() => router.push("/library" as Href)}
           />
 
-          {/* Category Filter Chips */}
+          {/* Category browse chips — navigate to Explore > All with that topic */}
           <CategoryChipsRail
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
+            selectedCategory=""
+            onSelectCategory={() => router.push("/explore/all" as Href)}
           />
 
           {/* Scholars Rail: Study with a scholar */}
@@ -257,6 +248,9 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
             onSelectLecture={handleSelectListing}
             onSeeAllRecent={() => router.push("/explore/recent" as Href)}
           />
+
+          {/* Curated collections teaser */}
+          <CuratedCollectionsBanner onPress={() => router.push("/explore/curation" as Href)} />
         </ScrollView>
       </View>
 

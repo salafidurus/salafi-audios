@@ -22,12 +22,32 @@
     "all": "All"
   },
   "home": {
-    "continueListening": "CONTINUE LISTENING",
-    "recommendedStartingPoint": "RECOMMENDED STARTING POINT",
-    "startListening": "Start Listening",
-    "lessonsInSeries": "{{count}} lessons in series",
-    "studyWithScholar": "Study with a scholar",
-    "recentlyAdded": "Recently added"
+    "hero": {
+      "taglineTranslation": "Say: 'Are those who know equal to those who do not know?' It is only men of understanding who will remember",
+      "surahReference": "Surah Az-Zumar (39:9)",
+      "resumeEyebrow": "CONTINUE YOUR DURUS",
+      "featuredEyebrow": "FEATURED LESSON",
+      "resume": "Resume",
+      "start": "Start listening",
+      "recommendation": "Recommended starting point for new students",
+      "nullifiersTitle": "Nullifiers of Islam",
+      "nullifiersScholar": "Salih ibn Fawzan al-Fawzan",
+      "browseLabel": "Or browse:",
+      "newHerePrompt": "New here? Start with one of these recommended topics."
+    },
+    "searchLabel": "What do you want to listen to?",
+    "downloadAppStore": "Download on the App Store",
+    "getGooglePlay": "Get it on the Google Play Store",
+    "scholars": {
+      "title": "Scholars",
+      "label": "Scholars",
+      "seeAll": "All scholars"
+    },
+    "recent": {
+      "title": "Recently Added",
+      "label": "Recently added",
+      "seeAll": "See all"
+    }
   },
   "auth": {
     "signIn": {
@@ -335,34 +355,6 @@
     "description": "The page could not be loaded right now. Please try again.",
     "retry": "Try again"
   },
-  "home": {
-    "hero": {
-      "taglineTranslation": "Say: 'Are those who know equal to those who do not know?' It is only men of understanding who will remember",
-      "surahReference": "Surah Az-Zumar (39:9)",
-      "resumeEyebrow": "CONTINUE YOUR DURUS",
-      "featuredEyebrow": "FEATURED LESSON",
-      "resume": "Resume",
-      "start": "Start listening",
-      "recommendation": "Recommended starting point for new students",
-      "nullifiersTitle": "Nullifiers of Islam",
-      "nullifiersScholar": "Salih ibn Fawzan al-Fawzan",
-      "browseLabel": "Or browse:",
-      "newHerePrompt": "New here? Start with one of these recommended topics."
-    },
-    "searchLabel": "What do you want to listen to?",
-    "downloadAppStore": "Download on the App Store",
-    "getGooglePlay": "Get it on the Google Play Store",
-    "scholars": {
-      "title": "Scholars",
-      "label": "Scholars",
-      "seeAll": "All scholars"
-    },
-    "recent": {
-      "title": "Recently Added",
-      "label": "Recently added",
-      "seeAll": "See all"
-    }
-  },
   "audio": {
     "playbackSpeed": "Playback Speed",
     "skipBackward": "Skip backward 30 seconds",
@@ -647,7 +639,7 @@
         "topicsLabel": "Topics",
         "noTopicsAvailable": "No topics available",
         "sublistingsTab": "Sub-listings",
-        "titleRequired": "Title must not be empty",
+        "titleRequired": "Title is required.",
         "uploadTab": "Upload Audio",
         "arrangeTab": "Arrange",
         "languageLabel": "Language",
@@ -655,7 +647,6 @@
         "clickToBrowse": "or click to browse files",
         "extractingAudio": "Analyzing audio file...",
         "uploadingStorage": "Uploading to storage...",
-        "titleRequired": "Title is required.",
         "scholarRequired": "Scholar is required.",
         "audioKeyRequired": "Audio file key is required for creation.",
         "failedToSave": "Failed to save lecture details.",

@@ -22,12 +22,32 @@
     "all": "الكل"
   },
   "home": {
-    "continueListening": "متابعة الاستماع",
-    "recommendedStartingPoint": "نقطة البداية الموصى بها",
-    "startListening": "بدء الاستماع",
-    "lessonsInSeries": "{{count}} درساً في السلسلة",
-    "studyWithScholar": "الدراسة مع عالم",
-    "recentlyAdded": "أضيفت مؤخراً"
+    "hero": {
+      "taglineTranslation": "",
+      "surahReference": "",
+      "resumeEyebrow": "استكمل دروسك",
+      "featuredEyebrow": "درس مميّز",
+      "resume": "استكمل",
+      "start": "ابدأ الاستماع",
+      "recommendation": "نقطة بداية مقترحة للطلاب الجدد",
+      "nullifiersTitle": "نافيات للإسلام",
+      "nullifiersScholar": "صالح بن فوازان آل فوازان",
+      "browseLabel": "أو ا�تصفح:",
+      "newHerePrompt": "جديد هنا؟ ابدأ بإحدى الفئات المقترحة."
+    },
+    "searchLabel": "ماذا تريد أن تستمع إليه؟",
+    "downloadAppStore": "تنزيل من متجر التطبيقات",
+    "getGooglePlay": "تنزيل من متجر جوجل بلاي",
+    "scholars": {
+      "title": "العلماء",
+      "label": "العلماء",
+      "seeAll": "جميع العلماء"
+    },
+    "recent": {
+      "title": "الأحدث",
+      "label": "أضيف مؤخرًا",
+      "seeAll": "عرض الكل"
+    }
   },
   "auth": {
     "signIn": {
@@ -335,34 +355,6 @@
     "description": "تعذر تحميل الصفحة الآن. يرجى المحاولة مرة أخرى.",
     "retry": "أعد المحاولة"
   },
-  "home": {
-    "hero": {
-      "taglineTranslation": "",
-      "surahReference": "",
-      "resumeEyebrow": "استكمل دروسك",
-      "featuredEyebrow": "درس مميّز",
-      "resume": "استكمل",
-      "start": "ابدأ الاستماع",
-      "recommendation": "نقطة بداية مقترحة للطلاب الجدد",
-      "nullifiersTitle": "نافيات للإسلام",
-      "nullifiersScholar": "صالح بن فوازان آل فوازان",
-      "browseLabel": "أو ا�تصفح:",
-      "newHerePrompt": "جديد هنا؟ ابدأ بإحدى الفئات المقترحة."
-    },
-    "searchLabel": "ماذا تريد أن تستمع إليه؟",
-    "downloadAppStore": "تنزيل من متجر التطبيقات",
-    "getGooglePlay": "تنزيل من متجر جوجل بلاي",
-    "scholars": {
-      "title": "العلماء",
-      "label": "العلماء",
-      "seeAll": "جميع العلماء"
-    },
-    "recent": {
-      "title": "الأحدث",
-      "label": "أضيف مؤخرًا",
-      "seeAll": "عرض الكل"
-    }
-  },
   "audio": {
     "playbackSpeed": "سرعة التشغيل",
     "skipBackward": "رجوع ٣٠ ثانية",
@@ -648,7 +640,7 @@
         "topicsLabel": "المواضيع",
         "noTopicsAvailable": "لا توجد مواضيع متاحة",
         "sublistingsTab": "القوائم الفرعية",
-        "titleRequired": "يجب ألا يكون العنوان فارغًا",
+        "titleRequired": "العنوان مطلوب.",
         "uploadTab": "رفع الصوت",
         "arrangeTab": "ترتيب",
         "languageLabel": "اللغة",
@@ -656,7 +648,6 @@
         "clickToBrowse": "أو انقر لتصفح الملفات",
         "extractingAudio": "جارٍ تحليل الملف الصوتي...",
         "uploadingStorage": "جارٍ الرفع إلى التخزين...",
-        "titleRequired": "العنوان مطلوب.",
         "scholarRequired": "العالم مطلوب.",
         "audioKeyRequired": "مفتاح الملف الصوتي مطلوب للإنشاء.",
         "failedToSave": "فشل حفظ تفاصيل المحتوى.",

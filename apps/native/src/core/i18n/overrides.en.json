@@ -59,7 +59,8 @@
     "startListening": "Start Listening",
     "lessonsInSeries": "{{count}} lessons in series",
     "studyWithScholar": "Study with a scholar",
-    "recentlyAdded": "Recently added"
+    "recentlyAdded": "Recently added",
+    "noLecturesForCategory": "No lectures found for this category."
   },
   "navigation": {
     "show_miniplayer": "Show mini player",

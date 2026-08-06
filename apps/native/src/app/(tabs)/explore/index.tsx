@@ -1,6 +1,17 @@
-import { Redirect } from "expo-router";
+import { routes } from "@sd/core-contracts";
+import { type Href, useRouter } from "expo-router";
 
-// The Explore group root (/explore) redirects to the default Recent sub-tab.
+import { ExploreScreen } from "@/features/explore/screens/explore-screen";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
+
 export default function ExploreIndexRoute() {
-  return <Redirect href="/explore/recent" />;
+  const router = useRouter();
+  const { navigateToListing } = useListingNavigation();
+
+  return (
+    <ExploreScreen
+      onNavigateToListing={navigateToListing}
+      onNavigateToScholar={(slug) => router.push(routes.scholars.detail(slug) as Href)}
+    />
+  );
 }

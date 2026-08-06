@@ -59,7 +59,8 @@
     "startListening": "بدء الاستماع",
     "lessonsInSeries": "{{count}} درساً في السلسلة",
     "studyWithScholar": "الدراسة مع عالم",
-    "recentlyAdded": "أضيفت مؤخراً"
+    "recentlyAdded": "أضيفت مؤخراً",
+    "noLecturesForCategory": "لم يتم العثور على محاضرات لهذه الفئة."
   },
   "navigation": {
     "show_miniplayer": "إظهار المشغل المصغر",
