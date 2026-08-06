@@ -120,6 +120,13 @@ export class AccessService {
       ).values(),
     ];
 
+    // Get granter's roles outside the transaction
+    const granter = await this.prisma.user.findUnique({
+      where: { id: grantedBy },
+      include: { roles: { select: { role: true } } },
+    });
+    const granterIsSuperadmin = granter?.roles?.some((r) => r.role === 'superadmin') ?? false;
+
     await this.prisma.$transaction(async (tx) => {
       const updated = await tx.user.updateMany({
         where: { id: userId, accessVersion: request.version },
@@ -128,6 +135,20 @@ export class AccessService {
       if (updated.count !== 1) throw new ConflictException('Access changed; reload and try again');
       await tx.userAccessGrant.deleteMany({ where: { userId } });
       if (uniqueRows.length) await tx.userAccessGrant.createMany({ data: uniqueRows as never });
+
+      if (granterIsSuperadmin && request.isSuperadmin !== undefined) {
+        if (request.isSuperadmin) {
+          await tx.userRoleAssignment.upsert({
+            where: { userId_role: { userId, role: 'superadmin' } },
+            create: { userId, role: 'superadmin', grantedBy },
+            update: { grantedBy },
+          });
+        } else {
+          await tx.userRoleAssignment.deleteMany({
+            where: { userId, role: 'superadmin' },
+          });
+        }
+      }
     });
 
     return this.snapshot(userId);

@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 
 import { MarqueeText } from "@/shared/components/MarqueeText";
 
-import { RoleBadge } from "../role-badge";
 import styles from "./meta-details.module.css";
 
 type MetaDetailsProps = {
@@ -25,7 +24,6 @@ export function MetaDetails({ user }: MetaDetailsProps): ReactNode {
           text={user.name ?? "Unnamed"}
           className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
         />
-        <RoleBadge roles={user.roles} />
       </div>
       <div className={styles.details}>
         <MarqueeText

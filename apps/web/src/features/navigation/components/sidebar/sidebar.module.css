@@ -37,10 +37,6 @@
   justify-content: center;
   width: 34px;
   height: 34px;
-  border-radius: 9px;
-  background: linear-gradient(135deg, var(--content-secondary), var(--border-primary-strong));
-  border: 1px solid color-mix(in srgb, var(--border-focus) 33%, transparent);
-  color: var(--content-primary-strong);
 }
 
 .brandText {
