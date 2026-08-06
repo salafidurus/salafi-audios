@@ -41,6 +41,7 @@
     "dev:web": "turbo run dev --filter=web",
     "dev:native": "turbo run dev --filter=native",
     "dev:api+web": "turbo watch dev --filter=api --filter=web",
+    "dev:api+native": "turbo watch dev --filter=api --filter=native",
     "dev:native:build:android": "bun run --elide-lines=0 --filter native android",
     "dev:native:build:ios": "bun run --elide-lines=0 --filter native ios",
     "dev:native:clean-build:android": "bun run --elide-lines=0 --filter native prebuild:clean && bun run --elide-lines=0 --filter native android",
