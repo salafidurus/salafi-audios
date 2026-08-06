@@ -42,6 +42,7 @@ StyleSheet.configure({
     ember: emberNativeTheme,
   },
   settings: {
+    initialTheme: "system",
     adaptiveThemes: false,
   },
 });

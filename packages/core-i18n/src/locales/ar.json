@@ -147,12 +147,17 @@
       "themeAria": "تفضيل المظهر",
       "themeOptions": {
         "system": "تلقائي",
+        "systemDesc": "يتبع تفضيل النظام",
         "light": "فاتح",
         "dark": "داكن",
         "parchment": "ورق بردي",
+        "parchmentDesc": "عاجي وذهبي عتيق",
         "manuscript": "مخطوطة",
+        "manuscriptDesc": "سبيا وذهبي داكن",
         "midnight": "منتصف الليل",
-        "ember": "جمر"
+        "midnightDesc": "أسود داكن وذهبي ساطع",
+        "ember": "جمر",
+        "emberDesc": "فحمي وذهبي دافئ"
       },
       "notifSection": "الإشعارات",
       "notifDesc": "إدارة الإشعارات التي تتلقاها.",
