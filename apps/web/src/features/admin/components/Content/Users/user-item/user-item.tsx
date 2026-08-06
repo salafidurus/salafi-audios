@@ -31,8 +31,16 @@ export function UserItem({ user, onManageAccess }: UserItemProps): ReactNode {
         </div>
         <div className={styles.contentBody}>
           <MetaDetails user={user} />
-          <div className={styles.accessRoles}>
-            {user.roles.length > 0 ? user.roles.join(", ") : "No access grants"}
+          <div className={styles.rolesList}>
+            {user.roles.length > 0 ? (
+              user.roles.map((role) => (
+                <span key={role} className={styles.roleBadge}>
+                  {role}
+                </span>
+              ))
+            ) : (
+              <span className={styles.noAccess}>No access grants</span>
+            )}
           </div>
         </div>
       </div>

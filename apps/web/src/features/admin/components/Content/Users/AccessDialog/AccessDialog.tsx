@@ -5,36 +5,118 @@ import {
   type AccessGrantRequest,
   type AccessTarget,
   type UserAccessSnapshot,
+  type ScholarListItemDto,
   SUPPORTED_LOCALES,
+  httpClient,
+  endpoints,
 } from "@sd/core-contracts";
+import { useAccountProfile } from "@sd/domain-account";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { fetchUserAccess, replaceUserAccess } from "@/features/admin/api/admin.api";
 import { Button } from "@/shared/components/Button";
 import { Modal } from "@/shared/components/Modal/Modal";
+import { Toggle } from "@/shared/components/Toggle";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
-const targetOptions: AccessTarget[] = [
-  "scholar",
-  "listing",
-  "media",
-  "topic",
-  "translation",
-  "user",
-];
-const capabilities = (target: AccessTarget): AccessCapability[] =>
+import styles from "./AccessDialog.module.css";
+import { PermissionRow } from "./PermissionRow";
+import { RolesBanner } from "./RolesBanner";
+
+type TargetState = {
+  enabled: boolean;
+  capabilities: { [key in AccessCapability]?: boolean };
+  scholarSlugs: string[];
+  locales: string[];
+};
+
+type UiState = { [key in AccessTarget]: TargetState };
+
+const defaultTargetState = (): TargetState => ({
+  enabled: false,
+  capabilities: {},
+  scholarSlugs: [],
+  locales: [],
+});
+
+const initialUiState = (): UiState => ({
+  scholar: defaultTargetState(),
+  listing: defaultTargetState(),
+  media: defaultTargetState(),
+  topic: defaultTargetState(),
+  translation: defaultTargetState(),
+  user: defaultTargetState(),
+});
+
+const capabilitiesList = (target: AccessTarget): AccessCapability[] =>
   target === "translation"
     ? ["translate", "publish", "delete"]
     : target === "user"
       ? ["manage"]
       : ["write", "publish", "delete"];
-const scholarScoped = (target: AccessTarget) =>
-  ["scholar", "listing", "media", "translation"].includes(target);
-const emptyGrant = (): AccessGrantRequest => ({
-  target: "listing",
-  capability: "write",
-  scholarSlugs: [],
-  locales: [],
-});
+
+function getPreviewRoles(uiState: UiState, isSuperadmin: boolean): string[] {
+  const roles = new Set<string>();
+
+  if (isSuperadmin) {
+    roles.add("Superadmin");
+  }
+
+  Object.keys(uiState).forEach((key) => {
+    const target = key as AccessTarget;
+    const item = uiState[target];
+    if (item.enabled) {
+      if (item.capabilities.write) roles.add("Editor");
+      if (item.capabilities.translate) roles.add("Translator");
+      if (item.capabilities.publish) roles.add("Publisher");
+      if (item.capabilities.delete) roles.add("Deleter");
+      if (target === "user" && item.capabilities.manage) {
+        roles.add("User manager");
+      }
+    }
+  });
+
+  return Array.from(roles).sort();
+}
+
+interface TargetRowConfig {
+  target: AccessTarget;
+  title: string;
+  description: string;
+}
+
+const targetRowConfigs: TargetRowConfig[] = [
+  {
+    target: "listing",
+    title: "Listings (Duruses)",
+    description: "Permissions to create, modify, publish, and delete lecture listings.",
+  },
+  {
+    target: "scholar",
+    title: "Scholars",
+    description: "Permissions to manage scholar profiles and biographies.",
+  },
+  {
+    target: "media",
+    title: "Media Files",
+    description: "Permissions to upload, manage, and replace raw audio files.",
+  },
+  {
+    target: "topic",
+    title: "Topics",
+    description: "Permissions to structure category tags and topics.",
+  },
+  {
+    target: "translation",
+    title: "Translations",
+    description: "Permissions to input metadata translations in multiple locales.",
+  },
+  {
+    target: "user",
+    title: "User Management",
+    description: "Permissions to edit other administrative users and manage custom grants.",
+  },
+];
 
 export function AccessDialog({
   userId,
@@ -48,26 +130,129 @@ export function AccessDialog({
   onSaved: () => void;
 }): ReactNode {
   const [snapshot, setSnapshot] = useState<UserAccessSnapshot>();
-  const [grants, setGrants] = useState<AccessGrantRequest[]>([]);
+  const [uiState, setUiState] = useState<UiState>(() => initialUiState());
+  const [targetIsSuperadmin, setTargetIsSuperadmin] = useState(false);
+  const [allScholars, setAllScholars] = useState<ScholarListItemDto[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>();
 
+  const formatScholarName = useFormatScholarName();
+
+  // Fetch current user's profile to check if they are a superadmin
+  const { data: profile } = useAccountProfile();
+  const currentUserIsSuperadmin = profile?.roles.includes("Superadmin");
+
   useEffect(() => {
+    // Fetch user access info
     fetchUserAccess(userId)
       .then((data) => {
         setSnapshot(data);
-        setGrants(data.grants);
+        setTargetIsSuperadmin(data.isSuperadmin);
+
+        const ui = initialUiState();
+        data.grants.forEach((grant) => {
+          const target = grant.target;
+          ui[target].enabled = true;
+          ui[target].capabilities[grant.capability] = true;
+          ui[target].scholarSlugs = Array.from(
+            new Set([...ui[target].scholarSlugs, ...grant.scholarSlugs]),
+          );
+          ui[target].locales = Array.from(new Set([...ui[target].locales, ...grant.locales]));
+        });
+        setUiState(ui);
       })
       .catch(() => setError("Unable to load access."));
+
+    // Fetch full scholars list to get translated names and titles
+    httpClient<{ scholars: ScholarListItemDto[] }>({
+      url: endpoints.scholars.list,
+      method: "GET",
+    })
+      .then((res) => setAllScholars(res.scholars))
+      .catch(() => {});
   }, [userId]);
-  const update = (index: number, patch: Partial<AccessGrantRequest>) =>
-    setGrants((items) => items.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+
+  const handleToggleTarget = (target: AccessTarget, enabled: boolean) => {
+    setUiState((prev) => {
+      const nextState = { ...prev[target] };
+      nextState.enabled = enabled;
+      if (enabled) {
+        const defaultCap = capabilitiesList(target)[0];
+        nextState.capabilities = { [defaultCap as string]: true };
+      } else {
+        nextState.capabilities = {};
+        nextState.scholarSlugs = [];
+        nextState.locales = [];
+      }
+      return { ...prev, [target]: nextState };
+    });
+  };
+
+  const handleToggleCapability = (
+    target: AccessTarget,
+    cap: AccessCapability,
+    checked: boolean,
+  ) => {
+    setUiState((prev) => {
+      const nextState = { ...prev[target] };
+      const nextCaps = { ...nextState.capabilities };
+      if (checked) {
+        nextCaps[cap] = true;
+      } else {
+        delete nextCaps[cap];
+      }
+      const hasCaps = Object.keys(nextCaps).length > 0;
+      if (!hasCaps) {
+        nextState.enabled = false;
+        nextState.scholarSlugs = [];
+        nextState.locales = [];
+      }
+      nextState.capabilities = nextCaps;
+      return { ...prev, [target]: nextState };
+    });
+  };
+
+  const handleUpdateScope = (
+    target: AccessTarget,
+    field: "scholarSlugs" | "locales",
+    values: string[],
+  ) => {
+    setUiState((prev) => ({
+      ...prev,
+      [target]: { ...prev[target], [field]: values },
+    }));
+  };
+
   const save = async () => {
     if (!snapshot) return;
     setSaving(true);
     setError(undefined);
+
+    const grants: AccessGrantRequest[] = [];
+    targetRowConfigs.forEach(({ target }) => {
+      const item = uiState[target];
+      if (item.enabled) {
+        const enabledCaps = Object.keys(item.capabilities).filter(
+          (c) => item.capabilities[c as AccessCapability],
+        ) as AccessCapability[];
+
+        enabledCaps.forEach((capability) => {
+          grants.push({
+            target,
+            capability,
+            scholarSlugs: item.scholarSlugs,
+            locales: item.locales as ("en" | "ar")[],
+          });
+        });
+      }
+    });
+
     try {
-      await replaceUserAccess(userId, { version: snapshot.version, grants });
+      await replaceUserAccess(userId, {
+        version: snapshot.version,
+        grants,
+        isSuperadmin: targetIsSuperadmin,
+      });
       onSaved();
       onClose();
     } catch {
@@ -77,6 +262,13 @@ export function AccessDialog({
     }
   };
 
+  const showProtectedWarning = snapshot?.isSuperadmin && !currentUserIsSuperadmin;
+
+  const scholarOptions = allScholars.map((s) => ({
+    slug: s.slug,
+    name: formatScholarName(s),
+  }));
+
   return (
     <Modal
       isOpen
@@ -84,111 +276,82 @@ export function AccessDialog({
       title={`Manage access — ${userName}`}
       width="standard"
       footer={
-        <Button variant="primary" onClick={save} disabled={saving || !snapshot}>
-          {saving ? "Saving…" : "Save access"}
-        </Button>
+        <div className={styles.footerActions}>
+          <Button variant="ghost" onClick={onClose} disabled={saving}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={save} disabled={saving || !snapshot}>
+            {saving ? "Saving…" : "Save access"}
+          </Button>
+        </div>
       }
     >
-      {error && <p role="alert">{error}</p>}
+      {error && (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      )}
       {!snapshot ? (
-        <p>Loading access…</p>
-      ) : snapshot.isSuperadmin ? (
-        <p>Superadmin access is protected and cannot be edited here.</p>
+        <p className={styles.loading}>Loading access…</p>
+      ) : showProtectedWarning ? (
+        <p className={styles.emptyText}>
+          Superadmin access is protected and cannot be edited here.
+        </p>
       ) : (
-        <>
-          <p>Effective roles: {snapshot.roles.join(", ") || "Listener"}</p>
-          {grants.map((grant, index) => (
-            <fieldset key={JSON.stringify(grant)} disabled={saving} style={{ marginBottom: 16 }}>
-              <legend>Access grant</legend>
-              <select
-                aria-label={`Access area ${index + 1}`}
-                value={grant.target}
-                onChange={(event) => {
-                  const target = event.target.value as AccessTarget;
-                  update(index, {
-                    target,
-                    capability: capabilities(target)[0],
-                    scholarSlugs: scholarScoped(target) ? grant.scholarSlugs : [],
-                    locales: target === "translation" ? grant.locales : [],
-                  });
-                }}
-              >
-                {targetOptions.map((target) => (
-                  <option key={target} value={target}>
-                    {target}
-                  </option>
-                ))}
-              </select>{" "}
-              <select
-                aria-label={`Access capability ${index + 1}`}
-                value={grant.capability}
-                onChange={(event) =>
-                  update(index, { capability: event.target.value as AccessCapability })
+        <div className={styles.container}>
+          <RolesBanner roles={getPreviewRoles(uiState, targetIsSuperadmin)} />
+
+          {/* Superadmin toggle row */}
+          {currentUserIsSuperadmin && (
+            <div className={styles.row}>
+              <div className={styles.rowHeader}>
+                <div className={styles.rowMeta}>
+                  <div className={styles.rowLabelSection}>
+                    <span className={styles.rowTitle}>Super Admin (Full Access)</span>
+                    <span className={styles.rowDesc}>
+                      Grants unrestricted administrative access to the entire platform. Superadmins
+                      can modify other administrators and manage global system settings.
+                    </span>
+                  </div>
+                </div>
+                <Toggle
+                  checked={targetIsSuperadmin}
+                  onChange={setTargetIsSuperadmin}
+                  disabled={saving}
+                  aria-label="Toggle super admin access"
+                />
+              </div>
+            </div>
+          )}
+
+          {targetRowConfigs.map((config) => {
+            const targetState = uiState[config.target];
+            return (
+              <PermissionRow
+                key={config.target}
+                title={config.title}
+                description={config.description}
+                target={config.target}
+                enabled={targetState.enabled}
+                capabilities={capabilitiesList(config.target)}
+                selectedCapabilities={targetState.capabilities}
+                scholarOptions={scholarOptions}
+                selectedScholars={targetState.scholarSlugs}
+                localeOptions={SUPPORTED_LOCALES}
+                selectedLocales={targetState.locales}
+                saving={saving}
+                onToggleTarget={(checked) => handleToggleTarget(config.target, checked)}
+                onToggleCapability={(cap, checked) =>
+                  handleToggleCapability(config.target, cap, checked)
                 }
-              >
-                {capabilities(grant.target).map((capability) => (
-                  <option key={capability} value={capability}>
-                    {capability}
-                  </option>
-                ))}
-              </select>{" "}
-              <Button
-                variant="secondary"
-                onClick={() => setGrants((items) => items.filter((_, i) => i !== index))}
-              >
-                Remove
-              </Button>
-              {scholarScoped(grant.target) && (
-                <div>
-                  <p>Scholars (none means all):</p>
-                  {snapshot.scholars.map((scholar) => (
-                    <label key={scholar.slug} style={{ display: "block" }}>
-                      <input
-                        type="checkbox"
-                        checked={grant.scholarSlugs.includes(scholar.slug)}
-                        onChange={() =>
-                          update(index, {
-                            scholarSlugs: grant.scholarSlugs.includes(scholar.slug)
-                              ? grant.scholarSlugs.filter((slug) => slug !== scholar.slug)
-                              : [...grant.scholarSlugs, scholar.slug],
-                          })
-                        }
-                      />{" "}
-                      {scholar.name}
-                    </label>
-                  ))}
-                </div>
-              )}
-              {grant.target === "translation" && (
-                <div>
-                  <p>Locales:</p>
-                  {SUPPORTED_LOCALES.map((locale) => (
-                    <label key={locale} style={{ marginRight: 12 }}>
-                      <input
-                        type="checkbox"
-                        checked={grant.locales.includes(locale)}
-                        onChange={() =>
-                          update(index, {
-                            locales: grant.locales.includes(locale)
-                              ? grant.locales.filter((item) => item !== locale)
-                              : [...grant.locales, locale],
-                          })
-                        }
-                      />{" "}
-                      {locale.toUpperCase()}
-                    </label>
-                  ))}
-                </div>
-              )}
-            </fieldset>
-          ))}
-          <Button
-            variant="secondary"
-            onClick={() => setGrants((items) => [...items, emptyGrant()])}
-          >
-            Add access grant
-          </Button>
-        </>
+                onUpdateScholars={(slugs) =>
+                  handleUpdateScope(config.target, "scholarSlugs", slugs)
+                }
+                onUpdateLocales={(locales) => handleUpdateScope(config.target, "locales", locales)}
+              />
+            );
+          })}
+        </div>
       )}
     </Modal>
   );

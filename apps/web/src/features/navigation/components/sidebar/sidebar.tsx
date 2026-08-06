@@ -1,7 +1,7 @@
 "use client";
 
 import { routes } from "@sd/core-contracts";
-import { BookOpen } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -33,7 +33,14 @@ export function Sidebar() {
           data-testid="brand-link"
         >
           <span className={styles.brandMark} aria-hidden="true">
-            <BookOpen size={17} color="currentColor" strokeWidth={1.8} />
+            <Image
+              src="/logo/logo_72.png"
+              alt=""
+              width={24}
+              height={24}
+              priority
+              style={{ objectFit: "contain" }}
+            />
           </span>
           <span className={styles.brandText}>{t("navigation.siteTitle")}</span>
         </Link>
