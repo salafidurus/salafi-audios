@@ -49,7 +49,7 @@ export function ScreenHeader({
       {onSearchChange !== undefined ? (
         <View style={styles.searchBarBox}>
           <View style={styles.searchIconWrapper}>
-            <Search size={16} color={theme.colors.content.subtle} />
+            <Search size={18} color={theme.colors.content.subtle} />
           </View>
           <TextInput
             value={searchQuery ?? ""}
@@ -62,7 +62,7 @@ export function ScreenHeader({
           />
           {searchQuery && searchQuery.length > 0 ? (
             <Pressable onPress={() => onSearchChange("")} hitSlop={8}>
-              <X size={16} color={theme.colors.content.subtle} />
+              <X size={18} color={theme.colors.content.subtle} />
             </Pressable>
           ) : null}
         </View>
@@ -75,12 +75,12 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     backgroundColor: theme.colors.surface.canvas,
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingBottom: 12,
   },
   topRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 10,
   },
   backButton: {
     marginRight: 8,
@@ -95,18 +95,20 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: theme.colors.surface.subtle,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderRadius: 22,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    minHeight: 46,
     marginTop: 4,
   },
   searchIconWrapper: {
-    marginRight: 8,
+    marginRight: 10,
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 15,
     color: theme.colors.content.strong,
-    padding: 0,
+    paddingVertical: 2,
+    paddingHorizontal: 0,
   },
 }));
