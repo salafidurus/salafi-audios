@@ -6,6 +6,9 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { BottomAccessoryContent } from "./BottomAccessoryContent";
 
+/** Height of the Android NativeTabs bottom bar (Material 3 bottom navigation with labels). */
+const ANDROID_TAB_BAR_HEIGHT = 80;
+
 export function BottomAccessoryParent({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
   const { theme } = useUnistyles();
@@ -14,7 +17,7 @@ export function BottomAccessoryParent({ children }: { children: React.ReactNode 
     try {
       return (
         <ExpoBottomAccessoryView
-          offsetPadding={0}
+          offsetPadding={theme.spacing.scale.xs}
           animationEnabled={true}
           elevation={8}
           style={styles.androidParent}
@@ -27,7 +30,9 @@ export function BottomAccessoryParent({ children }: { children: React.ReactNode 
     }
   }
 
-  const bottomOffset = 56 + Math.max(insets.bottom, theme.spacing.scale.sm);
+  // JS fallback: clear the Android tab bar (taller than the iOS 56pt bar) plus the
+  // bottom safe-area inset so the accessory never overlaps the tab bar or content.
+  const bottomOffset = ANDROID_TAB_BAR_HEIGHT + Math.max(insets.bottom, theme.spacing.scale.sm);
 
   return (
     <View pointerEvents="box-none" style={[styles.fallbackParent, { bottom: bottomOffset }]}>
