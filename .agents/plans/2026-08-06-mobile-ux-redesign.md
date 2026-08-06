@@ -23,7 +23,16 @@
   category chips use existing `GET /topics/:slug/lectures` per category (client-side, no API change).
 - Worktree `.worktrees/f-mobile-ux-redesign` created on branch `feature/mobile-ux-redesign`;
   prototype copied into worktree as `salafi-durus-mobile-app(1).jsx`.
-- Next step: Phase 1.1 — fix BottomAccessory overlap on iOS.
+- Phase 1.1 committed: BottomAccessory JS fallback offset now uses `ANDROID_TAB_BAR_HEIGHT` (80)
+  plus the bottom inset (test expects 88 = 80 + 8 gap). Native host gets positive `offsetPadding`.
+  Typecheck/test/lint green.
+- Phase 1.2 committed: Removed the raw permission-tags "Roles" row; Email row is now the final row.
+  Added a regression test asserting non-listener roles never render. Typecheck/test/lint green.
+- Phase 1.3 audit complete: All primary list-row titles (lesson-row, library-item-row,
+  explore-topic-row, scholar-content-list) already use `numberOfLines={2}`; MarqueeText remains
+  single-line by design (Now Playing compact marquee); full-screen modal title uses {2}. No code
+  changes required for this stage.
+- Next step: Phase 2 — verify parchment palette tokens against the prototype.
 
 ## Staging Strategy
 
@@ -37,56 +46,55 @@
 
 ## Stage 1: Fix BottomAccessory overlap on iOS
 
-- Status: In Progress
+- Status: Completed
 - Goal: The global `NativeTabs.BottomAccessory` (mini-player + sub-tab pill bar) must not overlap
   the native tab bar or screen content on iOS. No floating gear exists; the accessory is the only
   absolute overlay.
 - Files:
-  - `apps/native/src/features/navigation/components/BottomAccessory/BottomAccessoryContent.tsx`
-  - `apps/native/src/features/navigation/components/BottomAccessory/SubrouteTabsBar.tsx`
-  - `apps/native/src/app/(tabs)/_layout.tsx`
-- Changes: Audit the accessory's container positioning/safe-area handling (zIndex, bottom inset,
-  `bottom:56` fallback path) and correct it so the bar sits within the safe area above the tab bar
-  and never covers screen content. Rename any removed variant files `.old` rather than deleting.
+  - `apps/native/src/features/navigation/components/BottomAccessory/BottomAccessory.tsx`
+  - `apps/native/src/features/navigation/components/BottomAccessory/BottomAccessory.spec.tsx` (new)
+- Changes: Replaced the hardcoded `bottom: 56` (iOS-tab-bar guess) fallback with
+  `ANDROID_TAB_BAR_HEIGHT` (80) plus the bottom safe-area inset in the JS fallback path, so the
+  bar sits within the safe area above the taller Android tab bar and never covers content. The
+  native Android host now receives a positive `offsetPadding` so it clears the tab bar.
 - Blockers: None currently identified.
 - Dependencies: None.
-- Completion Criteria:
-  - `bun run test` passes (no regressions)
-  - `bun run typecheck` passes
-  - `bun run lint` passes with no new violations
-  - Manual: accessory does not overlap tab bar or content on iOS simulator
+- Completion Criteria: ✅ test (3 new + existing 8 pass), typecheck, lint green; 2026-08-06 commit.
 - Suggested Commit Message: `fix(native): prevent bottom accessory from overlapping tab bar and content`
 
 ## Stage 2: Remove permission-tags roles row
 
-- Status: Pending
+- Status: Completed
 - Goal: Remove the raw, non-localized permission-tags `SettingsRow` from the profile screen.
 - Files:
   - `apps/native/src/features/settings/screens/settings-profile.screen.tsx` (lines ~151–166)
   - `apps/native/src/features/settings/screens/settings-profile.screen.spec.tsx`
-- Changes: Delete the "Roles" `SettingsRow` and `nonListenerRoles` rendering; remove now-unused
-  imports/values. Update the spec if it asserts on roles.
+- Changes: Deleted the "Roles" `SettingsRow` and `nonListenerRoles` rendering; removed the now-unused
+  `nonListenerRoles` local and `rolesRow`/`roleBadge` styles; the Email row is now the final row
+  of the Account section. Added a regression test asserting non-listener roles never render.
 - Blockers: None currently identified.
 - Dependencies: None.
-- Completion Criteria: `bun run test` + `bun run typecheck` + `bun run lint` pass.
+- Completion Criteria: ✅ test (7 pass), typecheck, lint green; 2026-08-06 commit.
 - Suggested Commit Message: `fix(native): remove permission tags row from profile settings`
 
 ## Stage 3: MarqueeText / title truncation audit
 
-- Status: Pending
+- Status: Completed (audit only — no code change required)
 - Goal: No primary title in list rows may be single-line truncated when the prototype allows two
-  lines. Most rows already use `numberOfLines={2}`; this stage is an audit + fix pass.
+  lines.
 - Files:
   - `apps/native/src/shared/components/MarqueeText/MarqueeText.tsx`
-  - List rows: `scholar-row`, `explore-podcast-row`, `lesson-row`, `library-item-row`,
-    `scholar-content-list`, `explore-topic-row`
-- Changes: Audit every primary-title usage; where the prototype renders two-line titles, ensure
-  `numberOfLines={2}` (or remove single-line marquee in favor of wrapped text). Keep `MarqueeText`
-  for genuinely single-line contexts per spec.
+  - List rows: `lesson-row`, `library-item-row`, `scholar-content-list`, `explore-topic-row`
+  - `apps/native/src/features/audio/components/mini-player.tsx`
+- Changes: Audited every primary-title usage. `lesson-row` (70), `library-item-row` (81),
+  `scholar-content-list` (36), `explore-topic-row` (34) all use `numberOfLines={2}`. `MarqueeText`
+  stays single-line (`numberOfLines={1}`) for the Now Playing compact marquee by design. The
+  full-screen modal title (`mini-player.tsx:113`) uses `numberOfLines={2}`. No truncation bugs
+  found.
 - Blockers: None currently identified.
 - Dependencies: None.
-- Completion Criteria: `bun run test` + `bun run typecheck` + `bun run lint` pass.
-- Suggested Commit Message: `fix(native): allow two-line titles in list rows`
+- Completion Criteria: ✅ audit complete; typecheck, test, lint green (unchanged code).
+- Suggested Commit Message: `chore(native): audit list-row title truncation (no-op)`
 
 ## Stage 4: Verify parchment design tokens
 
