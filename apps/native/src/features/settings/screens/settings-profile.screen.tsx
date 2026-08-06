@@ -57,7 +57,6 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   }
 
   const isDirty = displayName !== (profile.displayName ?? "");
-  const nonListenerRoles = (profile as any).roles?.filter((r: string) => r !== "listener") ?? [];
 
   const handleSave = () => {
     updateProfile({ displayName });
@@ -140,30 +139,11 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
             )}
           </View>
         </SettingsRow>
-        <SettingsRow
-          label={t("account.profile.email", "Email")}
-          hideBorder={nonListenerRoles.length === 0}
-        >
+        <SettingsRow label={t("account.profile.email", "Email")} hideBorder>
           <AppText variant="bodySm" style={styles.readOnly}>
             {profile.email}
           </AppText>
         </SettingsRow>
-        {nonListenerRoles.length > 0 && (
-          <SettingsRow label={t("account.profile.roles", "Roles")} hideBorder>
-            <View style={styles.rolesRow}>
-              {nonListenerRoles.map((r: string) => (
-                <View
-                  key={r}
-                  style={[styles.roleBadge, { backgroundColor: theme.colors.surface.hover }]}
-                >
-                  <AppText variant="caption" style={{ color: theme.colors.content.strong }}>
-                    {r}
-                  </AppText>
-                </View>
-              ))}
-            </View>
-          </SettingsRow>
-        )}
       </SettingsSection>
 
       {(isSuccess || isError) && (
@@ -337,16 +317,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   readOnly: {
     color: theme.colors.content.muted,
-  },
-  rolesRow: {
-    flexDirection: "row",
-    gap: theme.spacing.scale.xs,
-    flexWrap: "wrap",
-  },
-  roleBadge: {
-    paddingVertical: 2,
-    paddingHorizontal: theme.spacing.scale.sm,
-    borderRadius: theme.radius.scale.xs,
   },
   actionRow: {
     flexDirection: "row",

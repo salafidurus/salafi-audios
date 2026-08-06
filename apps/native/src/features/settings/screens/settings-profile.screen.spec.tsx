@@ -180,6 +180,20 @@ describe("SettingsProfileScreen", () => {
     expect(onSignOut).toHaveBeenCalledTimes(1);
   });
 
+  it("never renders the permission-tags Roles row even when the profile carries non-listener roles", async () => {
+    mockedUseAccountProfile.mockReturnValue({
+      data: { ...baseProfile, roles: ["listener", "admin", "translator"] },
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<SettingsProfileScreen />);
+
+    expect(screen.queryByText("Roles")).toBeNull();
+    expect(screen.queryByText("admin")).toBeNull();
+    expect(screen.queryByText("translator")).toBeNull();
+  });
+
   it("dismisses the delete-account dialog without deleting when cancelled", async () => {
     mockedUseAccountProfile.mockReturnValue({
       data: baseProfile,
