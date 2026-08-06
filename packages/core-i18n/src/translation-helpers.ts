@@ -12,6 +12,7 @@ export const SUBNAV_KEYS: Record<string, Record<string, string>> = {
     recent: "navigation.subnav.explore.recent",
     scholar: "navigation.subnav.explore.scholar",
     curation: "navigation.subnav.explore.curation",
+    all: "navigation.subnav.explore.all",
   },
   library: {
     started: "navigation.subnav.library.started",
@@ -33,6 +34,7 @@ export const SUBNAV_FALLBACKS: Record<string, Record<string, string>> = {
     recent: "Recent",
     scholar: "Scholars",
     curation: "Curation",
+    all: "All Lectures",
   },
   library: {
     started: "Started",

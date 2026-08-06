@@ -14,6 +14,13 @@ export default function ExploreLayout() {
         name="index"
         options={{
           title: t("navigation.subnav.explore.recent", "Recent"),
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="recent"
+        options={{
+          title: t("navigation.subnav.explore.recent", "Recent"),
         }}
       />
       <Stack.Screen
@@ -26,6 +33,12 @@ export default function ExploreLayout() {
         name="curation"
         options={{
           title: t("navigation.subnav.explore.curation", "Curation"),
+        }}
+      />
+      <Stack.Screen
+        name="all"
+        options={{
+          title: t("navigation.subnav.explore.all", "All Lectures"),
         }}
       />
     </Stack>

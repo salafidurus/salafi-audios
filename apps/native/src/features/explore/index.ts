@@ -31,3 +31,8 @@ export {
   type ExploreScholarScreenProps,
 } from "./screens/explore-scholar.screen";
 export { CurationScreen } from "./screens/curation.screen";
+export { ExploreAllScreen, type ExploreAllScreenProps } from "./screens/explore-all.screen";
+export {
+  TopicChipGroup,
+  type TopicChipGroupProps,
+} from "./components/topic-chip-group/topic-chip-group";

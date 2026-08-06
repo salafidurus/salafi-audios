@@ -32,7 +32,12 @@ describe("SubrouteTabsBar", () => {
   });
 
   it.each([
-    ["explore", "/recent", ["Recent", "Scholars", "Curation"], ["/", "/scholar", "/curation"]],
+    [
+      "explore",
+      "/explore/recent",
+      ["Recent", "Scholars", "Curation", "All Lectures"],
+      ["/explore/recent", "/explore/scholar", "/explore/curation", "/explore/all"],
+    ],
     [
       "library",
       "/library/started",

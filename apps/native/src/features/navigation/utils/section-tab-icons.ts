@@ -5,6 +5,7 @@ import {
   CheckCircle,
   Clock,
   GraduationCap,
+  LibraryBig,
   Play,
   Scale,
   SlidersHorizontal,
@@ -24,6 +25,7 @@ export type SectionTabIconKey =
   | "explore-recent"
   | "explore-scholar"
   | "explore-curation"
+  | "explore-all"
   | "library-started"
   | "library-saved"
   | "library-completed"
@@ -35,6 +37,7 @@ const SECTION_TAB_ICONS: Record<SectionTabIconKey, NativeNavigationIcon> = {
   "explore-recent": Clock,
   "explore-scholar": GraduationCap,
   "explore-curation": Sparkles,
+  "explore-all": LibraryBig,
   "library-started": Play,
   "library-saved": Bookmark,
   "library-completed": CheckCircle,

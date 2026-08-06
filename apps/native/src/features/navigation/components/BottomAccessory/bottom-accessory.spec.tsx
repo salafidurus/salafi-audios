@@ -78,7 +78,7 @@ describe("BottomAccessoryContent", () => {
 
   it("renders subroute tabs only when subroute is available and no track playing", async () => {
     useAudio.mockReturnValue({ currentTrack: null });
-    usePathname.mockReturnValue("/recent");
+    usePathname.mockReturnValue("/explore/recent");
 
     await render(<BottomAccessoryContent />);
     expect(screen.getByTestId("subroute-only-container")).toBeTruthy();
@@ -95,7 +95,7 @@ describe("BottomAccessoryContent", () => {
 
   it("renders dual mode and toggles between views when both are available", async () => {
     useAudio.mockReturnValue({ currentTrack: mockTrack });
-    usePathname.mockReturnValue("/recent");
+    usePathname.mockReturnValue("/explore/recent");
 
     await render(<BottomAccessoryContent />);
     expect(screen.getByTestId("dual-mode-container")).toBeTruthy();

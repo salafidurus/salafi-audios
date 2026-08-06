@@ -1,10 +1,10 @@
-import type { ErrorBoundaryProps, Href } from "expo-router";
+import type { Href } from "expo-router";
 
 import { routes } from "@sd/core-contracts";
 import { useSearchProcessing } from "@sd/domain-search";
 import { useRouter, useNavigation } from "expo-router";
-import { Activity, useState, useEffect, useCallback } from "react";
-import { View, Text, Pressable } from "react-native";
+import { Activity, useCallback, useEffect, useState } from "react";
+import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { ExploreRecentScreen } from "@/features/explore/screens/explore-recent.screen";
@@ -15,18 +15,12 @@ import { SearchResultsList } from "@/features/search/components/SearchResultsLis
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
-export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
-  return (
-    <View style={styles.errorBoundary}>
-      <Text>Something went wrong</Text>
-      <Pressable onPress={retry}>
-        <Text>Try again</Text>
-      </Pressable>
-    </View>
-  );
-}
+export type HomeScreenProps = {
+  onNavigateToListing?: (slug: string) => void;
+  onNavigateToScholar?: (slug: string) => void;
+};
 
-export default function ExploreIndexRoute() {
+export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScreenProps) {
   const router = useRouter();
   const navigation = useNavigation();
   const { theme } = useUnistyles();
@@ -38,12 +32,10 @@ export default function ExploreIndexRoute() {
   const { setQuery, filter, setFilter, topics, items, isFetching, shouldSearch, errorMessage } =
     useSearchProcessing({ prefill: "", showOriginal });
 
-  // Sync state search query into hook query
   useEffect(() => {
     setQuery(searchQuery);
   }, [searchQuery, setQuery]);
 
-  // Set the native search bar options dynamically
   useEffect(() => {
     navigation.setOptions({
       headerSearchBarOptions: {
@@ -75,9 +67,12 @@ export default function ExploreIndexRoute() {
   return (
     <View style={styles.screen}>
       <Activity mode={isSearching ? "hidden" : "visible"}>
+        {/* Stage 6: hero / scholars / chips / recently added replace this placeholder content */}
         <ExploreRecentScreen
-          onNavigateToListing={navigateToListing}
-          onNavigateToScholar={(slug) => router.push(routes.scholars.detail(slug) as Href)}
+          onNavigateToListing={onNavigateToListing ?? navigateToListing}
+          onNavigateToScholar={
+            onNavigateToScholar ?? ((slug) => router.push(routes.scholars.detail(slug) as Href))
+          }
         />
       </Activity>
 
@@ -102,12 +97,6 @@ export default function ExploreIndexRoute() {
 }
 
 const styles = StyleSheet.create((theme) => ({
-  errorBoundary: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: theme.colors.surface.canvas,
-  },
   screen: {
     flex: 1,
     backgroundColor: theme.colors.surface.canvas,

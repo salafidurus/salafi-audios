@@ -12,6 +12,7 @@
     "cancel": "إلغاء",
     "save": "حفظ",
     "add": "إضافة",
+    "error": "حدث خطأ ما.",
     "english": "الإنجليزية",
     "arabic": "العربية (عربي)",
     "hide": "إخفاء",
@@ -110,7 +111,8 @@
       "explore": {
         "recent": "الأحدث",
         "scholar": "العلماء",
-        "curation": "المنتقى"
+        "curation": "المنتقى",
+        "all": "جميع الدروس"
       },
       "library": {
         "started": "قيد التشغيل",
@@ -295,10 +297,19 @@
     "errorScholars": "فشل تحميل العلماء.",
     "loadingScholars": "جارٍ تحميل العلماء…",
     "noScholars": "لا توجد علماء متاحون.",
+    "allTitle": "جميع الدروس",
+    "all": {
+      "selectPrompt": "حدّد فئة أعلاه لتصفح دروسها.",
+      "loadingLectures": "جارٍ تحميل الدروس…",
+      "noLectures": "لا توجد دروس لهذه الفئة."
+    },
     "curation": {
       "title": "المنتقى",
       "description": "قريبًا"
     }
+  },
+  "topics": {
+    "noTopics": "لا توجد فئات متاحة."
   },
   "notFound": {
     "title": "عذرًا!",

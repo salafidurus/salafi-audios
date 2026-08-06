@@ -24,7 +24,15 @@ export default function TabsLayout() {
         backgroundColor={theme.colors.surface.default}
         labelVisibilityMode="labeled"
       >
-        <NativeTabs.Trigger name="(explore)">
+        <NativeTabs.Trigger name="(home)">
+          <NativeTabs.Trigger.Icon
+            sf={{ default: "house", selected: "house.fill" }}
+            md={{ default: "home", selected: "home" }}
+          />
+          <NativeTabs.Trigger.Label>{t("navigation.home", "Home")}</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="explore">
           <NativeTabs.Trigger.Icon
             sf={{ default: "safari", selected: "safari.fill" }}
             md={{ default: "explore", selected: "explore" }}

@@ -1,42 +1,61 @@
 import type { ComponentType } from "react";
 
-import { routes } from "@sd/core-contracts";
-import { BookOpen, Cloud, Search, Settings } from "lucide-react-native";
+import { BookOpen, Cloud, Home, Search, Settings } from "lucide-react-native";
 
 import { DEFAULT_TABS, SECTION_TABS, type Section } from "../types";
 
-export type RootTab = Section | "search";
+export type RootTab = Section | "home" | "search";
 
 export type RootTabConfig = {
   id: RootTab;
-  routeName: "explore" | "(search)" | "library" | "settings";
+  routeName: "(home)" | "explore" | "(search)" | "library" | "settings";
   /** English fallback label. */
   label: string;
-  /** i18n key (under the `tabs` namespace) resolved at render time. */
+  /** i18n key (under the `navigation` namespace) resolved at render time. */
   labelKey: string;
   Icon: ComponentType<{ color?: string; size?: number; strokeWidth?: number }>;
 };
 
 export const ROOT_TABS: RootTabConfig[] = [
-  { id: "explore", routeName: "explore", label: "Explore", labelKey: "tabs.explore", Icon: Cloud },
-  { id: "search", routeName: "(search)", label: "Search", labelKey: "tabs.search", Icon: Search },
+  {
+    id: "home",
+    routeName: "(home)",
+    label: "Home",
+    labelKey: "navigation.home",
+    Icon: Home,
+  },
+  {
+    id: "explore",
+    routeName: "explore",
+    label: "Explore",
+    labelKey: "navigation.explore",
+    Icon: Cloud,
+  },
+  {
+    id: "search",
+    routeName: "(search)",
+    label: "Search",
+    labelKey: "navigation.search",
+    Icon: Search,
+  },
   {
     id: "library",
     routeName: "library",
     label: "Library",
-    labelKey: "tabs.library",
+    labelKey: "navigation.library",
     Icon: BookOpen,
   },
   {
     id: "settings",
     routeName: "settings",
     label: "Settings",
-    labelKey: "tabs.settings",
+    labelKey: "navigation.settings",
     Icon: Settings,
   },
 ];
 
 const GROUP_NAME_TO_TAB: Record<RootTabConfig["routeName"], RootTab> = {
+  "(home)": "home",
   explore: "explore",
   "(search)": "search",
   library: "library",
@@ -49,53 +68,78 @@ export function getRootTabByRouteName(routeName: string): RootTabConfig | undefi
 }
 
 export function getRootTabFromPathname(pathname: string): RootTab {
-  if (pathname.startsWith("/search")) {
+  const normalized = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
+
+  if (normalized === "/search" || normalized.startsWith("/search/")) {
     return "search";
   }
 
+  if (normalized === "/") {
+    return "home";
+  }
+
+  if (normalized === "/explore" || normalized.startsWith("/explore/")) {
+    return "explore";
+  }
+
+  // Legacy bare sub-routes redirect into the explore section.
   if (
-    pathname === "/" ||
-    pathname.startsWith("/scholar") ||
-    pathname.startsWith("/curation") ||
-    pathname.startsWith("/recent")
+    normalized === "/recent" ||
+    normalized.startsWith("/recent/") ||
+    normalized === "/scholar" ||
+    normalized.startsWith("/scholar/") ||
+    normalized === "/curation" ||
+    normalized.startsWith("/curation/")
   ) {
     return "explore";
   }
 
-  if (pathname.startsWith(routes.library.index)) {
+  if (normalized === "/library" || normalized.startsWith("/library/")) {
     return "library";
   }
 
-  if (pathname.startsWith(routes.settings.index)) {
+  if (normalized === "/settings" || normalized.startsWith("/settings/")) {
     return "settings";
   }
 
-  return "explore";
+  return "home";
 }
 
 export function isTabRoute(pathname: string): boolean {
+  const normalized = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
+
   if (
-    pathname === "/" ||
-    pathname === "/recent" ||
-    pathname === "/scholar" ||
-    pathname === "/curation" ||
-    pathname.startsWith("/search") ||
-    pathname.startsWith("/library") ||
-    pathname.startsWith("/settings")
+    normalized === "/" ||
+    normalized === "/explore" ||
+    normalized.startsWith("/explore/") ||
+    normalized.startsWith("/search") ||
+    normalized.startsWith("/library") ||
+    normalized.startsWith("/settings")
   ) {
     return true;
   }
   return false;
 }
 
-export function getActiveSubsection(pathname: string, section: Section): string {
+export function getActiveSubsection(pathname: string, section: Section | "home"): string {
+  if (section === "home") {
+    return "home";
+  }
+
   const normalizedPath =
     pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
   const parts = normalizedPath.split("/").filter(Boolean);
 
   if (section === "explore") {
-    const candidate = parts[0] || "recent";
-    if (candidate === "scholar" || candidate === "curation" || candidate === "recent") {
+    // /explore            -> parts = ["explore"]
+    // /explore/recent     -> parts = ["explore","recent"]
+    const candidate = parts[1] ?? "recent";
+    if (
+      candidate === "recent" ||
+      candidate === "scholar" ||
+      candidate === "curation" ||
+      candidate === "all"
+    ) {
       return candidate;
     }
     return "recent";
@@ -107,15 +151,19 @@ export function getActiveSubsection(pathname: string, section: Section): string 
     : DEFAULT_TABS[section];
 }
 
-export function buildSectionPath(section: Section, tabId?: string): string {
+export function buildSectionPath(section: Section | "home", tabId?: string): string {
+  if (section === "home") {
+    return "/";
+  }
+
   const activeTab =
     tabId && SECTION_TABS[section].some((tab) => tab.id === tabId) ? tabId : DEFAULT_TABS[section];
 
   if (section === "explore") {
     if (activeTab === "recent") {
-      return "/";
+      return "/explore/recent";
     }
-    return `/${activeTab}`;
+    return `/explore/${activeTab}`;
   }
 
   if (activeTab === DEFAULT_TABS[section]) {

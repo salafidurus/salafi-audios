@@ -20,14 +20,14 @@ export function SubrouteTabsBar() {
   const { t } = useTranslation();
 
   const activeRootTab = getRootTabFromPathname(pathname);
-  const section = activeRootTab as Section;
-  const tabs = SECTION_TABS[section];
+  const section = activeRootTab as Section | "home";
+  const tabs = SECTION_TABS[section as Section];
   const activeSubsection = getActiveSubsection(pathname, section);
 
   const renderTab = (tab: TabConfig) => {
     const isActive = tab.id === activeSubsection;
     const href = buildSectionPath(section, tab.id);
-    const Icon = getSectionTabIcon(section, tab.id);
+    const Icon = getSectionTabIcon(section as Section, tab.id);
 
     return (
       <Pressable

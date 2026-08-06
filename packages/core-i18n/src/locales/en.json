@@ -12,6 +12,7 @@
     "cancel": "Cancel",
     "save": "Save",
     "add": "Add",
+    "error": "Something went wrong.",
     "english": "English",
     "arabic": "Arabic (عربي)",
     "hide": "Hide",
@@ -110,7 +111,8 @@
       "explore": {
         "recent": "Recent",
         "scholar": "Scholars",
-        "curation": "Curation"
+        "curation": "Curation",
+        "all": "All Lectures"
       },
       "library": {
         "started": "Started",
@@ -295,10 +297,19 @@
     "errorScholars": "Failed to load scholars.",
     "loadingScholars": "Loading scholars…",
     "noScholars": "No scholars available.",
+    "allTitle": "All Lectures",
+    "all": {
+      "selectPrompt": "Select a category above to browse its lectures.",
+      "loadingLectures": "Loading lectures…",
+      "noLectures": "No lectures found for this category."
+    },
     "curation": {
       "title": "Curation",
       "description": "Coming soon"
     }
+  },
+  "topics": {
+    "noTopics": "No topics available."
   },
   "notFound": {
     "title": "Oops!",

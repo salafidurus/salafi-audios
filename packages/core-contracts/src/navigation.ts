@@ -25,6 +25,12 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
       labelKey: "navigation.subnav.explore.curation",
       icon: "sparkles",
     },
+    {
+      id: "all",
+      label: "All Lectures",
+      labelKey: "navigation.subnav.explore.all",
+      icon: "library-big",
+    },
   ],
   library: [
     {
