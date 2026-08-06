@@ -147,12 +147,17 @@
       "themeAria": "Theme preference",
       "themeOptions": {
         "system": "System",
+        "systemDesc": "Follow OS",
         "light": "Light",
         "dark": "Dark",
         "parchment": "Parchment",
+        "parchmentDesc": "Ivory & gold",
         "manuscript": "Manuscript",
+        "manuscriptDesc": "Sepia & dark gold",
         "midnight": "Midnight",
-        "ember": "Ember"
+        "midnightDesc": "Deep black & gold",
+        "ember": "Ember",
+        "emberDesc": "Charcoal & gold"
       },
       "notifSection": "Notifications",
       "notifDesc": "Manage what notifications you receive.",
