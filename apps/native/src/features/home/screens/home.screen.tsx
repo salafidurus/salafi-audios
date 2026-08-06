@@ -51,11 +51,11 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
     useSearchProcessing(searchOptions);
 
   const currentTrack = usePlaybackStore((s) => s.currentTrack);
-  const { recentProgress } = useContinueListening();
+  const { recentProgress, isLoading: progressLoading } = useContinueListening();
   const { data: feedData, isLoading: feedLoading } = useExploreRecentScreen({
     limit: 7,
   });
-  const { data: promoData } = useHomePromotions();
+  const { data: promoData, isLoading: promoLoading } = useHomePromotions();
   const { data: scholarsData, isLoading: scholarsLoading } = useInfiniteScholarsList();
 
   const activeContinueListeningItem = useMemo(() => {
@@ -134,6 +134,10 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
       }
     : (rawRecentLectures[0] ?? null);
 
+  const hasHistory = Boolean(recentProgress || currentTrack);
+  const isHeroLoading =
+    !hasHistory && !featuredItem && (progressLoading || feedLoading || promoLoading);
+
   const handleSearchChange = useCallback(
     (text: string) => {
       setSearchQuery(text);
@@ -195,6 +199,7 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
               continueListeningItem={activeContinueListeningItem}
               featuredItem={featuredItem}
               onPress={handleSelectListing}
+              isLoading={isHeroLoading}
             />
 
             {/* Quick Action Pills: All Lectures, Scholars, Saved */}
@@ -215,6 +220,7 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
               scholars={scholarsList}
               onSelectScholar={handleSelectScholar}
               onSeeAllScholars={() => router.push("/explore/scholar" as Href)}
+              isLoading={scholarsLoading}
             />
 
             {/* Recently Added Section */}
@@ -222,6 +228,7 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
               items={recentLectures}
               onSelectLecture={handleSelectListing}
               onSeeAllRecent={() => router.push("/explore/recent" as Href)}
+              isLoading={feedLoading}
             />
 
             {/* Curated collections teaser */}

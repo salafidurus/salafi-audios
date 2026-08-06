@@ -6,5 +6,6 @@ export * from "./MarqueeText";
 export * from "./ScreenHeader/ScreenHeader";
 export * from "./SanadChain";
 export * from "./ScreenView/ScreenView";
+export * from "./Skeleton/Skeleton";
 export * from "./Toggle/Toggle";
 export * from "./user-avatar/user-avatar";
