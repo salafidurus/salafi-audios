@@ -2,7 +2,11 @@ import type { Href } from "expo-router";
 
 import { routes } from "@sd/core-contracts";
 import { usePlaybackStore } from "@sd/domain-audio";
-import { useExploreRecentScreen, useInfiniteScholarsList } from "@sd/domain-content";
+import {
+  useExploreRecentScreen,
+  useHomePromotions,
+  useInfiniteScholarsList,
+} from "@sd/domain-content";
 import { useContinueListening, useSearchProcessing } from "@sd/domain-search";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -16,8 +20,6 @@ import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { ScreenHeader } from "@/shared/components";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
-import type { ParchmentLectureCardItem } from "../components/lecture-card/lecture-card";
-
 import { CategoryChipsRail } from "../components/category-chips/category-chips-rail";
 import { CuratedCollectionsBanner } from "../components/curated-collections-banner/curated-collections-banner";
 import { HeroSection } from "../components/hero-section/hero-section";
@@ -30,48 +32,11 @@ export type HomeScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
-const CONTINUE_LISTENING_ITEM = {
-  id: "signs-prophethood",
-  slug: "signs-prophethood",
-  title: "The Signs of Prophethood by al-Firyabi",
-  scholarName: "Hasan Al-Muhammadi",
-  progressPercent: 0.72,
-  currentLessonNumber: 4,
-  totalLessonsCount: 6,
-};
-
 const FALLBACK_SCHOLARS = [
   { id: "1", slug: "uthaymin", name: "Salih al-‘Uthaymin", initials: "M" },
   { id: "2", slug: "fawzan", name: "Fawzan al-Fawzan", initials: "S" },
   { id: "3", slug: "bukhari", name: "AbdirRaheem al-Bukhari", initials: "A" },
   { id: "4", slug: "mabram", name: "bn Mabram", initials: "M" },
-];
-
-const FALLBACK_RECENT_LECTURES: ParchmentLectureCardItem[] = [
-  {
-    id: "signs-prophethood",
-    slug: "signs-prophethood",
-    title: "Sittings on the Tafsir of al-Mufassal Surahs",
-    scholarName: "Salih ibn Fawzan al-Fawzan",
-    category: "Tafsir",
-    dateFormatted: "Aug 3, 2026",
-  },
-  {
-    id: "fiqh-worship",
-    slug: "fiqh-worship",
-    title: "Summary of the Fiqh of Worship",
-    scholarName: "Muhammad ibn Salih al-Uthaymin",
-    category: "Fiqh",
-    dateFormatted: "Aug 2, 2026",
-  },
-  {
-    id: "four-principles",
-    slug: "four-principles",
-    title: "The Four Principles",
-    scholarName: "Hasan Al-Muhammadi",
-    category: "Aqeedah",
-    dateFormatted: "Jul 30, 2026",
-  },
 ];
 
 export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScreenProps) {
@@ -90,6 +55,7 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
   const { data: feedData, isLoading: feedLoading } = useExploreRecentScreen({
     limit: 7,
   });
+  const { data: promoData } = useHomePromotions();
   const { data: scholarsData, isLoading: scholarsLoading } = useInfiniteScholarsList();
 
   const activeContinueListeningItem = useMemo(() => {
@@ -114,7 +80,7 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
             : 0,
       };
     }
-    return CONTINUE_LISTENING_ITEM;
+    return null;
   }, [currentTrack, recentProgress]);
 
   const rawFeedItems = useMemo(() => feedData?.pages.flatMap((p) => p.items) ?? [], [feedData]);
@@ -144,9 +110,6 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
     const feedContentItems = rawFeedItems.filter(
       (item) => item.kind !== "scholar_row" && item.kind !== "topic_row",
     );
-    if (feedContentItems.length === 0) {
-      return FALLBACK_RECENT_LECTURES;
-    }
     return feedContentItems.map((item: any) => ({
       id: item.id ?? item.slug,
       slug: item.slug ?? item.id,
@@ -162,7 +125,14 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
   // Show all recently added lectures (no local category filter — category chips navigate to Explore)
   const recentLectures = rawRecentLectures;
 
-  const featuredItem = rawRecentLectures[0] ?? null;
+  const featuredItem = promoData?.hero?.listing
+    ? {
+        id: promoData.hero.listing.id,
+        slug: promoData.hero.listing.slug,
+        title: promoData.hero.listing.title,
+        scholarName: promoData.hero.listing.scholarName,
+      }
+    : (rawRecentLectures[0] ?? null);
 
   const handleSearchChange = useCallback(
     (text: string) => {

@@ -17,6 +17,7 @@ export {
 } from "./hooks";
 
 export { useExploreRecentScreen } from "./use-explore-recent";
+export { useHomePromotions, type HomePromotionsDto } from "./use-home-promotions";
 export { useLibrarySavedScreen } from "./use-library-saved";
 export { useLibraryCompletedScreen } from "./use-library-completed";
 export { useLibraryProgressScreen } from "./use-library-progress";
