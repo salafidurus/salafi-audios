@@ -5,7 +5,7 @@ import { usePlaybackStore } from "@sd/domain-audio";
 import { useExploreRecentScreen, useInfiniteScholarsList } from "@sd/domain-content";
 import { useContinueListening, useSearchProcessing } from "@sd/domain-search";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -39,6 +39,40 @@ const CONTINUE_LISTENING_ITEM = {
   totalLessonsCount: 6,
 };
 
+const FALLBACK_SCHOLARS = [
+  { id: "1", slug: "uthaymin", name: "Salih al-‘Uthaymin", initials: "M" },
+  { id: "2", slug: "fawzan", name: "Fawzan al-Fawzan", initials: "S" },
+  { id: "3", slug: "bukhari", name: "AbdirRaheem al-Bukhari", initials: "A" },
+  { id: "4", slug: "mabram", name: "bn Mabram", initials: "M" },
+];
+
+const FALLBACK_RECENT_LECTURES: ParchmentLectureCardItem[] = [
+  {
+    id: "signs-prophethood",
+    slug: "signs-prophethood",
+    title: "Sittings on the Tafsir of al-Mufassal Surahs",
+    scholarName: "Salih ibn Fawzan al-Fawzan",
+    category: "Tafsir",
+    dateFormatted: "Aug 3, 2026",
+  },
+  {
+    id: "fiqh-worship",
+    slug: "fiqh-worship",
+    title: "Summary of the Fiqh of Worship",
+    scholarName: "Muhammad ibn Salih al-Uthaymin",
+    category: "Fiqh",
+    dateFormatted: "Aug 2, 2026",
+  },
+  {
+    id: "four-principles",
+    slug: "four-principles",
+    title: "The Four Principles",
+    scholarName: "Hasan Al-Muhammadi",
+    category: "Aqeedah",
+    dateFormatted: "Jul 30, 2026",
+  },
+];
+
 export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScreenProps) {
   const router = useRouter();
   const { navigateToListing } = useListingNavigation();
@@ -47,111 +81,91 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
+  const searchOptions = useMemo(() => ({ prefill: "", showOriginal }), [showOriginal]);
   const { setQuery, filter, setFilter, topics, items, isFetching, shouldSearch, errorMessage } =
-    useSearchProcessing({ prefill: "", showOriginal });
+    useSearchProcessing(searchOptions);
 
   const currentTrack = usePlaybackStore((s) => s.currentTrack);
   const { recentProgress } = useContinueListening();
   const { data: feedData } = useExploreRecentScreen();
   const { data: scholarsData } = useInfiniteScholarsList();
 
-  const activeContinueListeningItem = currentTrack
-    ? {
+  const activeContinueListeningItem = useMemo(() => {
+    if (currentTrack) {
+      return {
         id: currentTrack.id ?? currentTrack.slug ?? "active-track",
         slug: currentTrack.slug ?? currentTrack.id ?? "active-track",
         title: currentTrack.title,
         scholarName: currentTrack.artist ?? "Scholar",
         progressPercent: 0,
-      }
-    : recentProgress
-      ? {
-          id: recentProgress.lectureSlug,
-          slug: recentProgress.lectureSlug,
-          title: recentProgress.lectureTitle,
-          scholarName: recentProgress.scholarName,
-          progressPercent:
-            recentProgress.durationSeconds > 0
-              ? recentProgress.positionSeconds / recentProgress.durationSeconds
-              : 0,
-        }
-      : CONTINUE_LISTENING_ITEM;
+      };
+    }
+    if (recentProgress) {
+      return {
+        id: recentProgress.lectureSlug,
+        slug: recentProgress.lectureSlug,
+        title: recentProgress.lectureTitle,
+        scholarName: recentProgress.scholarName,
+        progressPercent:
+          recentProgress.durationSeconds > 0
+            ? recentProgress.positionSeconds / recentProgress.durationSeconds
+            : 0,
+      };
+    }
+    return CONTINUE_LISTENING_ITEM;
+  }, [currentTrack, recentProgress]);
 
-  const rawFeedItems = feedData?.pages.flatMap((p) => p.items) ?? [];
-  const rawScholarsItems = scholarsData?.pages.flatMap((p) => p.items) ?? [];
+  const rawFeedItems = useMemo(() => feedData?.pages.flatMap((p) => p.items) ?? [], [feedData]);
 
-  // Scholars list for "Study with a scholar" section
-  const scholarsList = (
-    rawScholarsItems.length > 0
-      ? rawScholarsItems
-      : [
-          { id: "1", slug: "uthaymin", name: "Salih al-‘Uthaymin", initials: "M" },
-          { id: "2", slug: "fawzan", name: "Fawzan al-Fawzan", initials: "S" },
-          { id: "3", slug: "bukhari", name: "AbdirRaheem al-Bukhari", initials: "A" },
-          { id: "4", slug: "mabram", name: "bn Mabram", initials: "M" },
-        ]
-  ).map((s: any) => ({
-    id: s.id ?? s.slug,
-    slug: s.slug,
-    name: s.name,
-    initials: s.initials,
-    lectureCount: s.totalListingsCount ?? s.lectureCount ?? 12,
-  }));
-
-  // Feed content items for "Recently added"
-  const feedContentItems = rawFeedItems.filter(
-    (item) => item.kind !== "scholar_row" && item.kind !== "topic_row",
+  const rawScholarsItems = useMemo(
+    () => scholarsData?.pages.flatMap((p) => p.items) ?? [],
+    [scholarsData],
   );
 
-  const rawRecentLectures: ParchmentLectureCardItem[] = (
-    feedContentItems.length > 0
-      ? feedContentItems
-      : [
-          {
-            id: "signs-prophethood",
-            slug: "signs-prophethood",
-            title: "Sittings on the Tafsir of al-Mufassal Surahs",
-            scholarName: "Salih ibn Fawzan al-Fawzan",
-            category: "Tafsir",
-            dateFormatted: "Aug 3, 2026",
-          },
-          {
-            id: "fiqh-worship",
-            slug: "fiqh-worship",
-            title: "Summary of the Fiqh of Worship",
-            scholarName: "Muhammad ibn Salih al-Uthaymin",
-            category: "Fiqh",
-            dateFormatted: "Aug 2, 2026",
-          },
-          {
-            id: "four-principles",
-            slug: "four-principles",
-            title: "The Four Principles",
-            scholarName: "Hasan Al-Muhammadi",
-            category: "Aqeedah",
-            dateFormatted: "Jul 30, 2026",
-          },
-        ]
-  ).map((item: any) => ({
-    id: item.id ?? item.slug,
-    slug: item.slug ?? item.id,
-    title: item.title ?? item.name,
-    scholarName: item.scholarName ?? item.scholar?.name ?? "Scholar",
-    category: item.categoryName ?? item.topicName ?? item.category ?? "Audio",
-    lessonsCount: item.trackCount ?? item.lessonsCount ?? 1,
-    completedLessonsCount: 0,
-    dateFormatted: item.formattedDate ?? item.publishedAt ?? item.dateFormatted ?? undefined,
-  }));
+  // Scholars list for "Study with a scholar" section
+  const scholarsList = useMemo(() => {
+    const source = rawScholarsItems.length > 0 ? rawScholarsItems : FALLBACK_SCHOLARS;
+    return source.map((s: any) => ({
+      id: s.id ?? s.slug,
+      slug: s.slug,
+      name: s.name,
+      initials: s.initials,
+      lectureCount: s.totalListingsCount ?? s.lectureCount ?? 12,
+    }));
+  }, [rawScholarsItems]);
+
+  // Feed content items for "Recently added"
+  const rawRecentLectures = useMemo(() => {
+    const feedContentItems = rawFeedItems.filter(
+      (item) => item.kind !== "scholar_row" && item.kind !== "topic_row",
+    );
+    if (feedContentItems.length === 0) {
+      return FALLBACK_RECENT_LECTURES;
+    }
+    return feedContentItems.map((item: any) => ({
+      id: item.id ?? item.slug,
+      slug: item.slug ?? item.id,
+      title: item.title ?? item.name,
+      scholarName: item.scholarName ?? item.scholar?.name ?? "Scholar",
+      category: item.categoryName ?? item.topicName ?? item.category ?? "Audio",
+      lessonsCount: item.trackCount ?? item.lessonsCount ?? 1,
+      completedLessonsCount: 0,
+      dateFormatted: item.formattedDate ?? item.publishedAt ?? item.dateFormatted ?? undefined,
+    }));
+  }, [rawFeedItems]);
 
   // Filter lectures by selected category
-  const recentLectures =
-    selectedCategory === "all"
-      ? rawRecentLectures
-      : rawRecentLectures.filter((l) => {
-          const cat = l.category?.toLowerCase() ?? "";
-          const title = l.title.toLowerCase();
-          const target = selectedCategory.toLowerCase();
-          return cat.includes(target) || title.includes(target);
-        });
+  const recentLectures = useMemo(() => {
+    if (selectedCategory === "all") {
+      return rawRecentLectures;
+    }
+    const target = selectedCategory.toLowerCase();
+    return rawRecentLectures.filter((l) => {
+      const cat = l.category?.toLowerCase() ?? "";
+      const title = l.title.toLowerCase();
+      return cat.includes(target) || title.includes(target);
+    });
+  }, [selectedCategory, rawRecentLectures]);
 
   const featuredItem = rawRecentLectures[0] ?? null;
 

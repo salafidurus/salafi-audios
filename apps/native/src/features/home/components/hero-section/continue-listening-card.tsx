@@ -1,4 +1,4 @@
-import { useAudio } from "@sd/domain-audio";
+import { usePlaybackStore } from "@sd/domain-audio";
 import { BookOpen, Pause, Play } from "lucide-react-native";
 import React from "react";
 import { Pressable, View } from "react-native";
@@ -26,13 +26,21 @@ export type ContinueListeningCardProps = {
 export function ContinueListeningCard({ item, onPress, onTogglePlay }: ContinueListeningCardProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
-  const { currentTrack, isPlaying, progressPercent: liveProgressPercent } = useAudio();
+
+  const currentTrack = usePlaybackStore((s) => s.currentTrack);
+  const isPlaying = usePlaybackStore((s) => s.status === "playing");
 
   const isCurrentTrackActive =
-    currentTrack &&
+    currentTrack != null &&
     (currentTrack.id === item.id ||
       currentTrack.slug === item.slug ||
       currentTrack.title === item.title);
+
+  const liveProgressPercent = usePlaybackStore((s) =>
+    isCurrentTrackActive && s.durationSeconds > 0
+      ? (s.positionSeconds / s.durationSeconds) * 100
+      : 0,
+  );
 
   const displayProgress = isCurrentTrackActive
     ? liveProgressPercent
