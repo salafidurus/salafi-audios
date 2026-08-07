@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: 2026-08-06
-- Status: In Progress
+- Status: Completed
 - Scope: `apps/native` UI/UX redesign per prototype `salafi-durus-mobile-app(1).jsx`, aligning with
   the approved web UX. Includes 3 bug fixes, theme token confirmation, Home tab, Explore
   sub-tab restructure (adds "All Lectures"), Home screen, Explore screen rebuilds, and polish.
@@ -95,6 +95,9 @@
   `home.screen.spec.tsx` (all-loading → all skeletons; staggered → sections stay on skeleton until
   every query resolves; all-resolved → single reveal). Native suite 84 suites / 397 tests green,
   typecheck + lint clean.
+- Final verification pass (2026-08-07): full native suite green (81 suites / 378 tests after the
+  Stage 8d deletions), native typecheck + lint clean. Device smoke tests for 8a/8b were done on
+  iOS per the stage notes. Plan archived to `.agents/plans/completed/`.
 
 ## Staging Strategy
 
@@ -251,7 +254,8 @@ typecheck` + `bun run lint` pass.
 
 ## Stage 8: Polish empty states, downloads, Now Playing
 
-- Status: In Progress
+- Status: Completed (empty-state polish shipped in Phase 6 via `7e52ba18`; download/Now Playing
+  polish absorbed into Stages 8a–8d)
 - Goal: Upgrade empty states (icon + title + copy + CTA), download row states, and the Now
   Playing experience per the prototype.
 - Files:
@@ -389,5 +393,6 @@ typecheck` + `bun run lint` pass.
 
 ## Plan Completion
 
-- Every stage above is complete and verified. Mark the plan `Completed` and move it to
-  `.agents/plans/completed/` after the final verification pass and device smoke tests.
+- ✅ Every stage complete and verified (native suite 81 suites / 378 tests green; typecheck +
+  lint clean; device smoke tests done for 8a/8b). Marked `Completed` and moved to
+  `.agents/plans/completed/` on 2026-08-07.
