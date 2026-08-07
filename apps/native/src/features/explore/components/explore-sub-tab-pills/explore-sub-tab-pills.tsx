@@ -15,16 +15,16 @@ export const EXPLORE_SUBS: {
   Icon: React.FC<{ size: number; color: string }>;
 }[] = [
   {
-    id: "all",
-    labelKey: "navigation.subnav.explore.all",
-    fallback: "All Lectures",
-    Icon: ListMusic,
-  },
-  {
     id: "recent",
     labelKey: "navigation.subnav.explore.recent",
     fallback: "Recent",
     Icon: Clock,
+  },
+  {
+    id: "all",
+    labelKey: "navigation.subnav.explore.all",
+    fallback: "All Lectures",
+    Icon: ListMusic,
   },
   {
     id: "scholars",

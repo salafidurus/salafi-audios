@@ -253,7 +253,7 @@ function CurationTab({ onBrowseScholars }: { onBrowseScholars: () => void }) {
 export function ExploreScreen({
   onNavigateToListing,
   onNavigateToScholar,
-  initialSub = "all",
+  initialSub = "recent",
   initialTopicSlug,
 }: ExploreScreenProps) {
   const { t } = useTranslation();

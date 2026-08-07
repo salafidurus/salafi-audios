@@ -85,7 +85,7 @@
   borderRadius/backgroundColor/elevation/borderWidth, `backgroundColor: "transparent"`,
   `overflow: "hidden"`. Added `testID="mini-player-container"` on the root Pressable + a spec
   asserting the embedded container stays 52px tall with no border/background/elevation.
-- Home cold-start section popping fixed (code done, commit pending for `8c`): sections previously
+- Home cold-start section popping fixed (committed `dd57d6ad`): sections previously
   skeleton-gated on their own query (`isLoading && empty`), so each revealed as its own query
   resolved. Now `home.screen.tsx` computes a single `isHomeLoading` flag
   (`progress || feed || promo || scholars loading`) and gates `ScholarMedallionsRail` +
@@ -320,10 +320,9 @@ typecheck` + `bun run lint` pass.
 
 ## Stage 8c: Fix Home cold-start section popping
 
-- Status: In Progress (code done; commit pending in `8c` commit)
+- Status: Completed (committed `dd57d6ad`)
 - Goal: On cold start each Home section showed its own skeleton and popped to content at a different
-  time as its query resolved. Reveal the Home page in a single transition.
-- Files:
+  time as its query resolved. Reveal the Home page in a single transition.- Files:
   - `apps/native/src/features/home/screens/home.screen.tsx`
   - `apps/native/src/features/home/screens/home.screen.spec.tsx` (new)
   - `apps/native/src/features/home/components/hero-section/hero-section.tsx`
@@ -339,11 +338,43 @@ typecheck` + `bun run lint` pass.
   `@sd/domain-content`/`domain-search`/`domain-audio`, keeps real section components): all-loading →
   all skeletons; staggered (scholars still loading) → sections stay on skeleton until every query
   resolves; all-resolved → single reveal with no skeletons.
+- Explore cleanup done (code done, commit pending for `8d`): the tab is the unified
+  `ExploreScreen`; old per-sub screens + routes + dead row components removed, old routes kept as
+  `<Redirect href="/explore?sub=...">`, Explore defaults to Recent (prototype pill order), home
+  quick-action/chip deep links fixed, and a TDD spec added for `ExploreScreen`.
 - Blockers: None currently identified.
 - Dependencies: Stages 6 (Home screen) only for the components being gated.
 - Completion Criteria: ✅ `home.screen.spec.tsx` passes; full native suite green (84 suites / 397
   tests); typecheck + lint clean.
 - Suggested Commit Message: `fix(native): reveal home sections in a single cold-start transition`
+
+## Stage 8d: Remove stale per-sub Explore screens; keep canonical `/explore?sub=` deep links
+
+- Status: In Progress (code done; commit pending in `8d` commit)
+- Goal: The live Explore tab is the unified `ExploreScreen` (all four sub-tabs, All Lectures chips +
+  in-place list, Curation empty state with CTA). The old per-sub screens (`explore-recent`,
+  `explore-all`, `curation`, `explore-scholar`) and their routes were dead leftovers still on disk.
+- Files:
+  - `apps/native/src/app/(tabs)/explore/{recent,all,curation,scholar}.tsx` (rewritten as `<Redirect>`)
+  - Deleted: `screens/explore-recent.screen.tsx`, `explore-all.screen.tsx`, `curation.screen.tsx`,
+    `explore-scholar.screen.tsx`, their stub specs, and `components/explore-podcast-row/`,
+    `explore-topic-row/`, `explore-scholar-row/` (used only by the old recent screen)
+  - `apps/native/src/features/explore/index.ts` (barrel now exports only the live surface)
+  - `apps/native/src/features/explore/screens/explore-screen.spec.tsx` (new)
+  - `apps/native/src/features/explore/screens/explore-screen.tsx` (default `initialSub` → `recent`)
+  - `apps/native/src/app/(tabs)/explore/index.tsx` (default `sub` → `recent`)
+  - `apps/native/src/features/explore/components/explore-sub-tab-pills/explore-sub-tab-pills.tsx`
+    (pill order now Recent, All, Scholars, Curation per prototype)
+  - `apps/native/src/features/home/screens/home.screen.tsx` ("All Lectures" quick action + "all"
+    category chip now push `/explore?sub=all`, since bare `/explore` opens Recent)
+- Changes: Old routes now `<Redirect href="/explore?sub=...">` so stale deep links still resolve.
+  Explore tab defaults to Recent (prototype order). Added a TDD spec covering default sub-tab,
+  pill switching (Recent/All/Scholars/Curation), and `initialTopicSlug` chip pre-selection.
+- Blockers: None currently identified.
+- Dependencies: Stages 5–7 (the unified Explore screen being kept).
+- Completion Criteria: ✅ `explore-screen.spec.tsx` passes; full native suite green (81 suites / 378
+  tests); typecheck + lint clean; no remaining imports of deleted screens/rows.
+- Suggested Commit Message: `refactor(native): drop stale per-sub explore screens, keep redirects`
 
 ## Final Verification
 

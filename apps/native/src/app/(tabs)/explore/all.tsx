@@ -1,5 +1,5 @@
-import { ExploreAllScreen } from "@/features/explore/screens/explore-all.screen";
+import { Redirect } from "expo-router";
 
-export default function ExploreAllRoute() {
-  return <ExploreAllScreen />;
+export default function ExploreAllRedirect() {
+  return <Redirect href="/explore?sub=all" />;
 }

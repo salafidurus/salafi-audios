@@ -1,5 +1,5 @@
-import { CurationScreen } from "@/features/explore/screens/curation.screen";
+import { Redirect } from "expo-router";
 
-export default function ExploreCurationRoute() {
-  return <CurationScreen />;
+export default function ExploreCurationRedirect() {
+  return <Redirect href="/explore?sub=curation" />;
 }

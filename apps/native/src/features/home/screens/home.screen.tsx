@@ -210,7 +210,7 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
 
             {/* Quick Action Pills: All Lectures, Scholars, Saved */}
             <QuickActionsRow
-              onNavigateToAllLectures={() => router.push("/explore" as Href)}
+              onNavigateToAllLectures={() => router.push("/explore?sub=all" as Href)}
               onNavigateToScholars={() => router.push("/explore?sub=scholars" as Href)}
               onNavigateToSaved={() => router.push("/library" as Href)}
             />
@@ -220,7 +220,7 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
               selectedCategory=""
               onSelectCategory={(cat) =>
                 cat === "all"
-                  ? router.push("/explore" as Href)
+                  ? router.push("/explore?sub=all" as Href)
                   : router.push(`/explore?sub=all&topic=${cat}` as Href)
               }
             />

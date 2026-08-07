@@ -17,7 +17,7 @@ export default function ExploreIndexRoute() {
 
   const VALID_SUBS: ExploreSub[] = ["all", "recent", "scholars", "curation"];
   const initialSub: ExploreSub =
-    sub && VALID_SUBS.includes(sub as ExploreSub) ? (sub as ExploreSub) : "all";
+    sub && VALID_SUBS.includes(sub as ExploreSub) ? (sub as ExploreSub) : "recent";
 
   return (
     <ExploreScreen
