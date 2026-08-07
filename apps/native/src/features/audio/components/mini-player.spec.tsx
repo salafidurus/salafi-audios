@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react-native";
-import React from "react";
 
 import { MiniPlayer } from "./mini-player";
 
 jest.mock("@sd/domain-audio", () => ({
   useAudio: jest.fn(),
+  useQueue: jest.fn(),
 }));
 
 jest.mock("expo-image", () => ({
@@ -16,6 +16,7 @@ jest.mock("lucide-react-native", () => ({
   Pause: "Pause",
   ChevronDown: "ChevronDown",
   Music: "Music",
+  BookOpen: "BookOpen",
 }));
 
 jest.mock("react-native-safe-area-context", () => ({
@@ -38,6 +39,10 @@ jest.mock("./playback-controls", () => ({
   PlaybackControls: () => null,
 }));
 
+jest.mock("@/shared/components/SanadChain", () => ({
+  SanadChain: () => null,
+}));
+
 const mockUseFormattedScholarName = jest.fn((artist: string, _scholarSlug?: string) => artist);
 
 jest.mock("@sd/domain-content", () => ({
@@ -45,7 +50,7 @@ jest.mock("@sd/domain-content", () => ({
     mockUseFormattedScholarName(artist ?? "", scholarSlug ?? undefined),
 }));
 
-const { useAudio } = jest.requireMock("@sd/domain-audio");
+const { useAudio, useQueue } = jest.requireMock("@sd/domain-audio");
 
 const mockTrack = {
   id: "track-1",
@@ -59,6 +64,7 @@ const mockTrack = {
 describe("MiniPlayer", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useQueue.mockReturnValue({ queueLength: 0, currentIndex: -1 });
   });
 
   it("renders nothing when no currentTrack", async () => {

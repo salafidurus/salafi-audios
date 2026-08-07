@@ -1,5 +1,5 @@
-import { useListingDetail, useListingContents } from "@sd/domain-content";
-import { render, screen, fireEvent } from "@testing-library/react-native";
+import { useListingContents, useListingDetail } from "@sd/domain-content";
+import { fireEvent, render, screen } from "@testing-library/react-native";
 import React from "react";
 
 import { LectureDetailScreen } from "./lecture-detail.screen";
@@ -106,16 +106,6 @@ jest.mock("@/shared/components/AppText/AppText", () => ({
   },
 }));
 
-jest.mock("@/features/listing/components/lecture-meta/lecture-meta", () => ({
-  LectureMeta: ({ lecture }: { lecture: { scholar: { name: string } } }) => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const ReactM = require("react");
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { Text } = require("react-native");
-    return ReactM.createElement(Text, null, `Meta:${lecture.scholar.name}`);
-  },
-}));
-
 jest.mock("@/features/listing/components/topic-chips/topic-chips", () => ({
   TopicChips: ({ topics }: { topics: { name: string }[] }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -208,7 +198,7 @@ describe("LectureDetailScreen", () => {
     await render(<LectureDetailScreen slug="lecture-1" />);
 
     expect(screen.getByText("An Example Lecture")).toBeTruthy();
-    expect(screen.getByText("Meta:Ibn Baz")).toBeTruthy();
+    expect(screen.getByText("Ibn Baz")).toBeTruthy();
     expect(screen.getByText("Topics:2")).toBeTruthy();
     expect(screen.getByText("Useful lecture description.")).toBeTruthy();
     expect(screen.getByText("Series:Important Series")).toBeTruthy();
@@ -335,7 +325,7 @@ describe("LectureDetailScreen", () => {
     mockedUseListingDetail.mockReturnValue({ data: singleLecture, isFetching: false, error: null });
 
     await render(<LectureDetailScreen slug="lecture-1" />);
-    await fireEvent.press(screen.getByText("Save"));
+    await fireEvent.press(screen.getByLabelText("Save"));
 
     expect(mockMarkSaved).toHaveBeenCalledWith("lecture-1", "lecture-1");
   });
@@ -345,7 +335,7 @@ describe("LectureDetailScreen", () => {
     mockedUseListingDetail.mockReturnValue({ data: singleLecture, isFetching: false, error: null });
 
     await render(<LectureDetailScreen slug="lecture-1" />);
-    await fireEvent.press(screen.getByText("Saved"));
+    await fireEvent.press(screen.getByLabelText("Unsave"));
 
     expect(mockMarkUnsaved).toHaveBeenCalledWith("lecture-1", "lecture-1");
   });
@@ -358,7 +348,7 @@ describe("LectureDetailScreen", () => {
     });
 
     await render(<LectureDetailScreen slug="tafsir-al-fatiha" />);
-    await fireEvent.press(screen.getByText("Save"));
+    await fireEvent.press(screen.getByLabelText("Save"));
 
     expect(mockMarkSaved).toHaveBeenCalledWith("uuid-1", "tafsir-al-fatiha");
   });

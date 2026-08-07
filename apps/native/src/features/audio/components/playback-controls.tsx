@@ -1,19 +1,24 @@
 import { useAudio, useQueue } from "@sd/domain-audio";
-import { Play, Pause, RotateCw, RotateCcw, SkipBack, SkipForward } from "lucide-react-native";
-import React from "react";
-import { View, Pressable, Text } from "react-native";
+import {
+  Bookmark,
+  Pause,
+  Play,
+  RotateCcw,
+  RotateCw,
+  SkipBack,
+  SkipForward,
+} from "lucide-react-native";
+import { useState } from "react";
+import { Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { audioService } from "../audio-service";
 
-function handlePrevious() {
-  audioService.skipToPrevious();
-}
-
 export function PlaybackControls() {
   const { isPlaying, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
-  const { hasNext } = useQueue();
+  const { hasNext, hasPrevious } = useQueue();
   const { theme } = useUnistyles();
+  const [saved, setSaved] = useState(false);
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -21,6 +26,11 @@ export function PlaybackControls() {
     } else {
       audioService.resume();
     }
+  };
+
+  const handlePrevious = () => {
+    if (!hasPrevious) return;
+    audioService.skipToPrevious();
   };
 
   const handleNext = () => {
@@ -48,26 +58,31 @@ export function PlaybackControls() {
   const onPrimary = theme.colors.content.onPrimary;
   const strong = theme.colors.content.strong;
   const muted = theme.colors.content.muted;
-  const RotateCcwIcon = <RotateCcw size={28} color={strong} />;
-  const PauseIcon = <Pause size={32} color={onPrimary} fill={onPrimary} />;
-  const PlayIcon = <Play size={32} color={onPrimary} fill={onPrimary} />;
-  const RotateCwIcon = <RotateCw size={28} color={strong} />;
+  const RotateCcwIcon = <RotateCcw size={24} color={strong} />;
+  const PauseIcon = <Pause size={24} color={onPrimary} fill={onPrimary} />;
+  const PlayIcon = <Play size={24} color={onPrimary} fill={onPrimary} />;
+  const RotateCwIcon = <RotateCw size={24} color={strong} />;
 
   if (!hasTrack) return null;
 
   return (
     <View style={styles.container}>
       <Pressable onPress={handleCycleSpeed} style={styles.speedButton}>
-        <Text style={styles.speedText}>{speed.toFixed(2)}x</Text>
+        <Text style={styles.speedText}>{speed.toFixed(1)}x</Text>
       </Pressable>
 
       <View style={styles.centerControls}>
         <Pressable
           onPress={handlePrevious}
+          disabled={!hasPrevious}
           style={styles.trackButton}
           accessibilityLabel="Previous track"
         >
-          <SkipBack size={20} color={strong} fill={strong} />
+          <SkipBack
+            size={20}
+            color={hasPrevious ? strong : muted}
+            fill={hasPrevious ? strong : muted}
+          />
         </Pressable>
 
         <Pressable onPress={handleSkipBackward} style={styles.controlButton}>
@@ -94,7 +109,17 @@ export function PlaybackControls() {
         </Pressable>
       </View>
 
-      <View style={styles.placeholder} />
+      <Pressable
+        onPress={() => setSaved((v) => !v)}
+        style={styles.bookmarkButton}
+        accessibilityLabel="Bookmark"
+      >
+        <Bookmark
+          size={16}
+          color={saved ? theme.colors.action.primary : theme.colors.content.subtle}
+          fill={saved ? theme.colors.action.primary : "none"}
+        />
+      </Pressable>
     </View>
   );
 }
@@ -105,54 +130,61 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
-    paddingHorizontal: theme.spacing.scale.xl,
+    paddingHorizontal: theme.spacing.scale.md,
     marginVertical: theme.spacing.scale.lg,
   },
   centerControls: {
     flexDirection: "row",
     alignItems: "center",
   },
-  playButton: {
-    width: 64,
-    height: 64,
+  speedButton: {
+    width: 40,
+    height: 40,
     borderRadius: theme.radius.scale.full,
-    backgroundColor: theme.colors.action.primary,
+    borderWidth: 1,
+    borderColor: theme.colors.border.default,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: theme.spacing.scale["2xl"],
-    boxShadow: "0 4px 6px rgba(59, 130, 246, 0.3)",
+  },
+  speedText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: theme.colors.content.subtle,
   },
   controlButton: {
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
+    paddingHorizontal: theme.spacing.scale.xs,
   },
   trackButton: {
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: theme.spacing.scale.xs,
   },
-  skipLabel: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: theme.colors.content.strong,
-    position: "absolute",
-    top: 9,
-  },
-  speedButton: {
-    paddingVertical: theme.spacing.component.chipY,
-    paddingHorizontal: theme.spacing.scale.md,
-    borderRadius: theme.radius.scale.lg,
-    backgroundColor: theme.colors.surface.subtle,
-    width: 60,
+  playButton: {
+    width: 56,
+    height: 56,
+    borderRadius: theme.radius.scale.full,
+    backgroundColor: theme.colors.action.primary,
     justifyContent: "center",
     alignItems: "center",
+    marginHorizontal: theme.spacing.scale.sm,
   },
-  speedText: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: theme.colors.content.muted,
+  skipLabel: {
+    fontSize: 8,
+    fontWeight: "700",
+    color: theme.colors.content.strong,
+    position: "absolute",
+    bottom: 4,
   },
-  placeholder: {
-    width: 60,
+  bookmarkButton: {
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.scale.full,
+    borderWidth: 1,
+    borderColor: theme.colors.border.default,
+    justifyContent: "center",
+    alignItems: "center",
   },
 }));

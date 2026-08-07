@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Ensure bun is available (it lives outside the minimal PATH Husky inherits)
+export PATH="$HOME/.bun/bin:$PATH"
+
 # react-doctor hook start
 react_doctor_scan_staged_files() {
   bunx react-doctor@latest --staged --blocking warning --max-duration 120

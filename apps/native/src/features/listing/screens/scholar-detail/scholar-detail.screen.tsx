@@ -1,74 +1,85 @@
-import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
-import { ChevronDown } from "lucide-react-native";
-import { useState, useCallback } from "react";
-import "react-native-reanimated";
+import type { ScholarContentItemDto } from "@sd/core-contracts";
+
+import { pickContentField } from "@sd/core-i18n";
+import { useScholarContent, useScholarDetail } from "@sd/domain-content";
+import { ChevronRight } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { ScholarContentList } from "@/features/listing/components/scholar-content-list/scholar-content-list";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { ScholarHeader } from "@/features/listing/components/scholar-header/scholar-header";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export type ScholarDetailScreenProps = {
   slug: string;
 };
 
-type TopicSectionProps = {
-  topicName: string;
-  children: React.ReactNode;
+// ─── Prototype ListRow for scholar content ──────────────────────────────────
+type ContentRowProps = {
+  item: ScholarContentItemDto;
+  onPress: () => void;
+  showOriginal?: boolean;
 };
 
-function TopicSection({ topicName, children }: TopicSectionProps) {
-  const [expanded, setExpanded] = useState(true);
+function ContentRow({ item, onPress, showOriginal = false }: ContentRowProps) {
   const { theme } = useUnistyles();
+  const title = pickContentField(item.title, item.original?.title, showOriginal);
+  const initials = title.trim().charAt(0).toUpperCase();
 
-  const handleToggle = useCallback(() => {
-    setExpanded((prev) => !prev);
-  }, []);
+  const countLabel =
+    item.type !== "single" && (item.lectureCount ?? 0) > 0
+      ? `${item.lectureCount} ${item.lectureCount === 1 ? "lecture" : "lectures"}`
+      : item.type;
 
   return (
-    <View style={styles.topicSection}>
-      <Pressable onPress={handleToggle} style={styles.topicHeader}>
-        <AppText variant="labelMd">{topicName}</AppText>
-        <View style={!expanded && styles.chevronCollapsed}>
-          <ChevronDown size={16} color={theme.colors.content.muted} />
-        </View>
-      </Pressable>
-      {expanded && <View style={styles.topicContent}>{children}</View>}
-    </View>
-  );
-}
-
-type TopicItemProps = {
-  title: string;
-  subtitle?: string;
-};
-
-function TopicItem({ title, subtitle }: TopicItemProps) {
-  return (
-    <View style={styles.topicItem}>
-      <AppText variant="bodySm">{title}</AppText>
-      {subtitle ? (
-        <AppText variant="caption" style={styles.topicItemSubtitle}>
-          {subtitle}
+    <Pressable
+      onPress={onPress}
+      style={styles.row}
+      testID={`content-row-${item.slug}`}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+    >
+      {/* Cover box */}
+      <View style={styles.coverBox}>
+        <AppText variant="displayMd" style={styles.coverInitial}>
+          {initials}
         </AppText>
-      ) : null}
-    </View>
+      </View>
+
+      {/* Text */}
+      <View style={styles.rowText}>
+        <AppText variant="titleMd" style={styles.rowTitle} numberOfLines={2}>
+          {title}
+        </AppText>
+        {countLabel ? (
+          <AppText variant="caption" color="muted" style={styles.rowSub} numberOfLines={1}>
+            {countLabel}
+          </AppText>
+        ) : null}
+      </View>
+
+      <ChevronRight size={16} color={theme.colors.content.muted} />
+    </Pressable>
   );
 }
 
+// ─── Main screen ────────────────────────────────────────────────────────────
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
+  const { t } = useTranslation();
   const { data: scholar, isFetching: isScholarFetching } = useScholarDetail(slug);
   const { data: content, isFetching: isContentFetching } = useScholarContent(slug);
-  const { data: topicsData } = useScholarTopics(slug);
   const isFetching = isScholarFetching || isContentFetching;
+  const { navigateToListing } = useListingNavigation();
+  const showOriginal = useShowOriginalContent();
 
   if (isFetching) {
     return (
       <ScreenView center>
-        <EmptyState message="Loading scholar…" variant="loading" />
+        <EmptyState message={t("scholar.loading", "Loading scholar…")} variant="loading" />
       </ScreenView>
     );
   }
@@ -76,72 +87,102 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   if (!scholar) {
     return (
       <ScreenView center>
-        <EmptyState message="Scholar not found" variant="error" />
+        <EmptyState message={t("scholar.notFound", "Scholar not found")} variant="error" />
       </ScreenView>
     );
   }
 
+  const items = content?.items ?? [];
+
   return (
     <ScreenView>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingVertical: 16 }}>
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Scholar hero — cover box, name, language, bio, stats */}
         <ScholarHeader scholar={scholar} />
-        <View style={{ marginTop: 24 }}>
-          <ScholarContentList items={content?.items ?? []} />
-        </View>
-        {topicsData?.topics && topicsData.topics.length > 0 ? (
-          <View style={styles.topicsContainer}>
-            {topicsData.topics.map((topic) => (
-              <TopicSection key={topic.topicId} topicName={topic.topicName}>
-                {topic.items.map((item) => (
-                  <TopicItem
-                    key={item.id}
-                    title={item.title}
-                    subtitle={item.type === "single" ? undefined : item.type}
-                  />
-                ))}
-              </TopicSection>
+
+        {/* Series / content list */}
+        {items.length > 0 ? (
+          <View style={styles.listSection}>
+            <AppText variant="xs" style={styles.sectionLabel}>
+              {t("scholar.seriesLabel", "SERIES")}
+            </AppText>
+            {items.map((item) => (
+              <ContentRow
+                key={item.id}
+                item={item}
+                showOriginal={showOriginal}
+                onPress={() => navigateToListing(item.slug)}
+              />
             ))}
           </View>
-        ) : null}
+        ) : (
+          <EmptyState
+            message={t("scholarContent.empty", "No published content yet.")}
+            variant="empty"
+          />
+        )}
       </ScrollView>
     </ScreenView>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  topicSection: {
-    marginTop: theme.spacing.scale.sm,
-    borderRadius: theme.radius.component.card,
-    borderWidth: 1,
-    borderColor: theme.colors.border.subtle,
-    overflow: "hidden",
+  scrollContent: {
+    paddingBottom: theme.spacing.scale["2xl"],
   },
-  topicHeader: {
+  listSection: {
+    marginTop: 8,
+  },
+  sectionLabel: {
+    fontSize: 11.5,
+    fontWeight: "700",
+    letterSpacing: 0.6,
+    color: theme.colors.content.muted,
+    textTransform: "uppercase",
+    paddingHorizontal: theme.spacing.layout.pageX,
+    paddingBottom: 8,
+    paddingTop: 4,
+  },
+  row: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: theme.spacing.scale.sm,
-    paddingHorizontal: theme.spacing.scale.md,
-    backgroundColor: theme.colors.surface.subtle,
-  },
-  chevronCollapsed: {
-    transform: [{ rotate: "-90deg" }],
-  },
-  topicContent: {
-    paddingHorizontal: theme.spacing.scale.md,
-    paddingVertical: theme.spacing.scale.xs,
-  },
-  topicItem: {
-    paddingVertical: theme.spacing.scale.sm,
+    paddingVertical: 12,
+    paddingHorizontal: theme.spacing.layout.pageX,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border.subtle,
   },
-  topicItemSubtitle: {
-    marginTop: theme.spacing.scale.xs,
-    opacity: 0.6,
+  coverBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: theme.colors.action.primary,
+    borderWidth: 1,
+    borderColor: theme.colors.border.strong,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+    flexShrink: 0,
   },
-  topicsContainer: {
-    marginTop: theme.spacing.scale.lg,
-    gap: theme.spacing.scale.sm,
+  coverInitial: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  rowText: {
+    flex: 1,
+    marginRight: 8,
+  },
+  rowTitle: {
+    fontSize: 14.5,
+    fontWeight: "600",
+    lineHeight: 20,
+  },
+  rowSub: {
+    fontSize: 12,
+    marginTop: 2,
   },
 }));

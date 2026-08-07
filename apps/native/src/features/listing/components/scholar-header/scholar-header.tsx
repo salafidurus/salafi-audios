@@ -1,11 +1,13 @@
 import type { ScholarDetailDto } from "@sd/core-contracts";
 
 import { useFormatScholarName } from "@sd/domain-content";
-import { Linking, Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import { ChevronLeft } from "lucide-react-native";
+import { Pressable, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
-import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {
@@ -15,83 +17,89 @@ export type ScholarHeaderProps = {
   };
 };
 
-function openLink(url: string) {
-  Linking.openURL(url).catch(() => undefined);
-}
-
 export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   const formatScholarName = useFormatScholarName();
-  const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
+  const { theme } = useUnistyles();
+  const router = useRouter();
+  const totalHours = Math.max(1, Math.round(scholar.totalDurationSeconds / 3600));
+  const initials = scholar.name.trim().charAt(0).toUpperCase();
 
   return (
     <View style={styles.container}>
-      <View style={styles.avatarWrapper}>
-        <UserAvatar image={scholar.imageUrl} name={scholar.name} size={96} />
+      {/* Back button — replaces the native stack header */}
+      <Pressable
+        onPress={() => router.back()}
+        style={styles.backButton}
+        hitSlop={12}
+        accessibilityRole="button"
+        accessibilityLabel="Back"
+      >
+        <ChevronLeft size={24} color={theme.colors.content.strong} />
+      </Pressable>
+
+      {/* Square jade cover box — 84px, matching prototype */}
+      <View style={styles.coverBox}>
+        {scholar.imageUrl ? (
+          <Image source={{ uri: scholar.imageUrl }} style={styles.coverImage} contentFit="cover" />
+        ) : (
+          <AppText variant="displayMd" style={styles.initialText}>
+            {initials}
+          </AppText>
+        )}
       </View>
+
       <AppText variant="titleLg" style={styles.name}>
         {formatScholarName(scholar)}
       </AppText>
+
       {scholar.country || scholar.mainLanguage ? (
         <AppText variant="caption" style={styles.meta}>
-          {[scholar.country, scholar.mainLanguage].filter(Boolean).join(" · ")}
+          {[scholar.mainLanguage?.toUpperCase(), scholar.country].filter(Boolean).join(" · ")}
         </AppText>
       ) : null}
+
       {scholar.bio ? (
         <AppText variant="bodyMd" style={styles.bio}>
           {scholar.bio}
         </AppText>
       ) : null}
 
+      {/* Stats: Lectures · Series · Total */}
       <View style={styles.statsRow}>
         <View style={styles.statItem}>
-          <AppText variant="titleMd">{scholar.lectureCount}</AppText>
+          <AppText
+            variant="titleMd"
+            style={[styles.statValue, { color: theme.colors.content.strong }]}
+          >
+            {scholar.lectureCount}
+          </AppText>
           <AppText variant="caption" style={styles.statLabel}>
             Lectures
           </AppText>
         </View>
         <View style={styles.statItem}>
-          <AppText variant="titleMd">{scholar.seriesCount}</AppText>
+          <AppText
+            variant="titleMd"
+            style={[styles.statValue, { color: theme.colors.content.strong }]}
+          >
+            {scholar.seriesCount}
+          </AppText>
           <AppText variant="caption" style={styles.statLabel}>
             Series
           </AppText>
         </View>
-        {totalHours > 0 ? (
-          <View style={styles.statItem}>
-            <AppText variant="titleMd">{totalHours}h</AppText>
-            <AppText variant="caption" style={styles.statLabel}>
-              Total
-            </AppText>
-          </View>
-        ) : null}
-      </View>
-
-      {scholar.socialWebsite ||
-      scholar.socialYoutube ||
-      scholar.socialTwitter ||
-      scholar.socialTelegram ? (
-        <View style={styles.socialRow}>
-          {scholar.socialWebsite ? (
-            <Pressable onPress={() => openLink(scholar.socialWebsite!)}>
-              <AppText variant="labelMd">Website</AppText>
-            </Pressable>
-          ) : null}
-          {scholar.socialYoutube ? (
-            <Pressable onPress={() => openLink(scholar.socialYoutube!)}>
-              <AppText variant="labelMd">YouTube</AppText>
-            </Pressable>
-          ) : null}
-          {scholar.socialTwitter ? (
-            <Pressable onPress={() => openLink(scholar.socialTwitter!)}>
-              <AppText variant="labelMd">Twitter</AppText>
-            </Pressable>
-          ) : null}
-          {scholar.socialTelegram ? (
-            <Pressable onPress={() => openLink(scholar.socialTelegram!)}>
-              <AppText variant="labelMd">Telegram</AppText>
-            </Pressable>
-          ) : null}
+        <View style={styles.statItem}>
+          <AppText
+            variant="titleMd"
+            style={[styles.statValue, { color: theme.colors.content.strong }]}
+          >
+            {totalHours}h
+          </AppText>
+          <AppText variant="caption" style={styles.statLabel}>
+            Total
+          </AppText>
         </View>
-      ) : null}
+      </View>
     </View>
   );
 }
@@ -99,39 +107,68 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
 const styles = StyleSheet.create((theme) => ({
   container: {
     alignItems: "center",
-    marginBottom: theme.spacing.scale.md,
+    paddingHorizontal: theme.spacing.layout.pageX,
+    paddingBottom: theme.spacing.scale.md,
   },
-  avatarWrapper: {
-    marginBottom: theme.spacing.scale.md,
+  backButton: {
+    alignSelf: "flex-start",
+    padding: 4,
+    marginBottom: 8,
+  },
+  coverBox: {
+    width: 84,
+    height: 84,
+    borderRadius: 20,
+    backgroundColor: theme.colors.action.primary,
+    borderWidth: 1,
+    borderColor: theme.colors.border.strong,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 14,
+    overflow: "hidden",
+  },
+  coverImage: {
+    width: 84,
+    height: 84,
+  },
+  initialText: {
+    fontSize: 32,
+    fontWeight: "700",
+    color: "#FFFFFF",
   },
   name: {
     textAlign: "center",
+    fontSize: 20,
+    fontWeight: "600",
+    lineHeight: 26,
   },
   meta: {
-    marginTop: theme.spacing.scale.xs,
+    marginTop: 4,
     textAlign: "center",
-    opacity: 0.7,
+    color: theme.colors.content.muted,
   },
   bio: {
-    marginTop: theme.spacing.scale.md,
+    marginTop: 12,
+    textAlign: "center",
     lineHeight: 22,
+    color: theme.colors.content.subtle,
   },
   statsRow: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: theme.spacing.scale["2xl"],
-    marginTop: theme.spacing.scale.lg,
+    gap: 32,
+    marginTop: 20,
   },
   statItem: {
     alignItems: "center",
   },
-  statLabel: {
-    opacity: 0.6,
+  statValue: {
+    fontSize: 18,
+    fontWeight: "700",
   },
-  socialRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: theme.spacing.scale.md,
-    marginTop: theme.spacing.scale.lg,
+  statLabel: {
+    marginTop: 2,
+    color: theme.colors.content.muted,
+    fontSize: 10.5,
   },
 }));

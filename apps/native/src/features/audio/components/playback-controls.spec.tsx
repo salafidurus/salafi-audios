@@ -1,6 +1,5 @@
 import { usePlaybackStore, type Track } from "@sd/domain-audio";
-import { render, screen, fireEvent } from "@testing-library/react-native";
-import React from "react";
+import { fireEvent, render, screen } from "@testing-library/react-native";
 
 import { PlaybackControls } from "./playback-controls";
 
@@ -13,6 +12,14 @@ jest.mock("react-native-unistyles", () => {
         typeof styles === "function" ? styles(lightNativeTheme) : styles,
     },
     useUnistyles: () => ({ theme: lightNativeTheme }),
+  };
+});
+
+jest.mock("@sd/domain-audio", () => {
+  const actual = jest.requireActual("@sd/domain-audio");
+  return {
+    ...actual,
+    useQueue: jest.fn(),
   };
 });
 
@@ -29,6 +36,8 @@ jest.mock("../audio-service", () => ({
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { audioService } = require("../audio-service");
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { useQueue } = require("@sd/domain-audio");
 
 const trackA: Track = { id: "a", title: "A", artist: "Scholar", url: "", durationSeconds: 100 };
 const trackB: Track = { id: "b", title: "B", artist: "Scholar", url: "", durationSeconds: 100 };
@@ -36,6 +45,7 @@ const trackB: Track = { id: "b", title: "B", artist: "Scholar", url: "", duratio
 beforeEach(() => {
   jest.clearAllMocks();
   usePlaybackStore.getState().actions.stop();
+  useQueue.mockReturnValue({ hasNext: false, hasPrevious: false });
 });
 
 describe("PlaybackControls", () => {
@@ -46,6 +56,7 @@ describe("PlaybackControls", () => {
 
   it("calls skipToPrevious when Previous is pressed", async () => {
     usePlaybackStore.getState().actions.setCurrentTrack(trackA);
+    useQueue.mockReturnValue({ hasNext: false, hasPrevious: true });
 
     await render(<PlaybackControls />);
     await fireEvent.press(screen.getByLabelText("Previous track"));
@@ -65,6 +76,7 @@ describe("PlaybackControls", () => {
   it("calls skipToNext when a next track exists in the queue", async () => {
     usePlaybackStore.getState().actions.setCurrentTrack(trackA);
     usePlaybackStore.getState().actions.setQueueState([trackA, trackB], 0);
+    useQueue.mockReturnValue({ hasNext: true, hasPrevious: false });
 
     await render(<PlaybackControls />);
     await fireEvent.press(screen.getByLabelText("Next track"));

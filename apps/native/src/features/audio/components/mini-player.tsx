@@ -1,13 +1,14 @@
-import { useAudio } from "@sd/domain-audio";
+import { useAudio, useQueue } from "@sd/domain-audio";
 import { useFormattedScholarName } from "@sd/domain-content";
 import { Image } from "expo-image";
-import { Play, Pause, ChevronDown, Music } from "lucide-react-native";
-import React, { useState } from "react";
-import { View, Pressable, Text, Modal, ActivityIndicator } from "react-native";
+import { BookOpen, ChevronDown, Music, Pause, Play } from "lucide-react-native";
+import { useState } from "react";
+import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { SanadChain } from "@/shared/components/SanadChain";
 
 import { audioService } from "../audio-service";
 import { PlaybackControls } from "./playback-controls";
@@ -19,6 +20,7 @@ export type MiniPlayerProps = {
 
 export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
   const { currentTrack, isPlaying, isLoading, progressPercent, positionSeconds } = useAudio();
+  const { queueLength, currentIndex } = useQueue();
   const { theme } = useUnistyles();
   const { t } = useTranslation();
   const [modalVisible, setModalVisible] = useState(false);
@@ -38,7 +40,10 @@ export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
   const strong = theme.colors.content.strong;
   const PauseIcon = <Pause size={20} color={strong} fill={strong} />;
   const PlayIcon = <Play size={20} color={strong} fill={strong} />;
-  const ChevronDownIcon = <ChevronDown size={28} color={strong} />;
+  const ChevronDownIcon = <ChevronDown size={22} color={strong} />;
+
+  const lessonNum = currentIndex >= 0 ? currentIndex + 1 : 1;
+  const totalLessons = queueLength > 0 ? queueLength : 1;
 
   return (
     <>
@@ -84,7 +89,7 @@ export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
         </View>
       </Pressable>
 
-      {/* Full Screen Player Modal */}
+      {/* Full Screen Player Modal — matches prototype NowPlayingSheet */}
       <Modal
         animationType="slide"
         transparent={false}
@@ -92,30 +97,51 @@ export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
         onRequestClose={() => setModalVisible(false)}
       >
         <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
+          {/* Header: chevron-down left, centered "NOW PLAYING" label */}
+          <View style={[styles.modalHeader, { paddingTop: insets.top }]}>
             <Pressable onPress={() => setModalVisible(false)} style={styles.closeButton}>
               {ChevronDownIcon}
             </Pressable>
-            <Text style={styles.modalHeaderTitle}>{t("audio.now_playing", "Now Playing")}</Text>
+            <Text style={styles.modalHeaderTitle}>
+              {t("audio.now_playing", "NOW PLAYING").toUpperCase()}
+            </Text>
             <View style={styles.placeholder} />
           </View>
 
           <View style={styles.modalBody}>
-            {currentTrack.artworkUrl ? (
-              <Image source={{ uri: currentTrack.artworkUrl }} style={styles.modalArtwork} />
-            ) : (
-              <View style={[styles.modalArtwork, styles.modalArtworkPlaceholder]}>
-                <Music size={80} color={theme.colors.content.muted} />
-              </View>
-            )}
+            {/* Artwork: radial gradient + decorative bookmark ribbon */}
+            <View style={styles.modalArtwork}>
+              {currentTrack.artworkUrl ? (
+                <Image
+                  source={{ uri: currentTrack.artworkUrl }}
+                  style={styles.modalArtworkImage}
+                  contentFit="cover"
+                />
+              ) : (
+                <View style={styles.modalArtworkPlaceholder}>
+                  <BookOpen size={64} color={theme.colors.content.primary} />
+                </View>
+              )}
+              {/* Decorative bookmark ribbon at top-right */}
+              <View style={styles.bookmarkRibbon} />
+            </View>
 
+            {/* Title + scholar + sanad chain */}
             <View style={styles.modalTextContainer}>
               <Text style={styles.modalTitle} numberOfLines={2}>
                 {currentTrack.title}
               </Text>
               <Text style={styles.modalArtist}>{displayArtist}</Text>
+
+              <View style={styles.sanadRow}>
+                <SanadChain total={totalLessons} completed={lessonNum} size={7} />
+                <Text style={styles.sanadLabel}>
+                  {`${t("audio.lessonOf", "Lesson")} ${lessonNum} ${t("audio.of", "of")} ${totalLessons}`}
+                </Text>
+              </View>
             </View>
 
+            {/* Progress */}
             <View style={styles.progressSection}>
               <ProgressBar />
               <View style={styles.timeLabels}>
@@ -124,6 +150,7 @@ export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
               </View>
             </View>
 
+            {/* Controls: speed / skip-30 / play / skip-30 / bookmark */}
             <PlaybackControls />
           </View>
         </SafeAreaView>
@@ -231,8 +258,10 @@ const styles = StyleSheet.create((theme) => ({
     height: 56,
   },
   modalHeaderTitle: {
-    ...theme.typography.titleMd,
-    color: theme.colors.content.strong,
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 0.6,
+    color: theme.colors.content.muted,
   },
   closeButton: {
     padding: theme.spacing.scale.xs,
@@ -248,15 +277,33 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing.scale["4xl"],
   },
   modalArtwork: {
-    width: 280,
-    height: 280,
-    borderRadius: theme.radius.scale.lg,
+    width: 260,
+    height: 260,
+    borderRadius: 20,
     backgroundColor: theme.colors.surface.subtle,
-    ...theme.shadows.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border.default,
+    overflow: "hidden",
+    position: "relative",
+  },
+  modalArtworkImage: {
+    width: "100%",
+    height: "100%",
   },
   modalArtworkPlaceholder: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  bookmarkRibbon: {
+    position: "absolute",
+    top: 0,
+    right: 28,
+    width: 28,
+    height: 42,
+    backgroundColor: theme.colors.action.secondary,
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
   },
   modalTextContainer: {
     alignItems: "center",
@@ -269,12 +316,24 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
     textAlign: "center",
     paddingHorizontal: theme.spacing.scale.md,
+    fontSize: 21,
+    lineHeight: 28,
   },
   modalArtist: {
     ...theme.typography.bodyMd,
-    color: theme.colors.action.primary,
+    color: theme.colors.content.primary,
     fontWeight: "600",
     marginTop: theme.spacing.scale.sm,
+  },
+  sanadRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.sm,
+    marginTop: theme.spacing.scale.md,
+  },
+  sanadLabel: {
+    ...theme.typography.caption,
+    color: theme.colors.content.muted,
   },
   progressSection: {
     width: "100%",

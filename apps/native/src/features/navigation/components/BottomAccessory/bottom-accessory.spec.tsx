@@ -1,5 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react-native";
-import React from "react";
+import { fireEvent, render, screen } from "@testing-library/react-native";
 
 import { BottomAccessoryContent } from "./BottomAccessoryContent";
 
@@ -11,6 +10,7 @@ jest.mock("expo-bottom-accessory", () => ({
 jest.mock("@sd/domain-audio", () => ({
   ...jest.requireActual("@sd/domain-audio"),
   useAudio: jest.fn(),
+  useQueue: jest.fn(() => ({ queueLength: 0, currentIndex: -1 })),
 }));
 
 jest.mock("@sd/domain-content", () => ({
@@ -35,6 +35,7 @@ jest.mock("lucide-react-native", () => ({
   Pause: "Pause",
   ChevronDown: "ChevronDown",
   Music: "Music",
+  BookOpen: "BookOpen",
   Layers: "Layers",
   Cloud: "Cloud",
 }));
@@ -42,6 +43,10 @@ jest.mock("lucide-react-native", () => ({
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: "SafeAreaView",
   useSafeAreaInsets: () => ({ bottom: 0 }),
+}));
+
+jest.mock("@/shared/components/SanadChain", () => ({
+  SanadChain: () => null,
 }));
 
 const { useAudio } = jest.requireMock("@sd/domain-audio");

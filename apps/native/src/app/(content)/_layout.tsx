@@ -6,5 +6,9 @@ import { getFormSheetScreenOptions } from "@/features/navigation/utils/stack-hea
 export default function ContentLayout() {
   const { theme } = useUnistyles();
 
-  return <Stack screenOptions={getFormSheetScreenOptions(theme)} />;
+  return (
+    <Stack screenOptions={getFormSheetScreenOptions(theme)}>
+      <Stack.Screen name="scholars/[slug]" options={{ headerShown: false }} />
+    </Stack>
+  );
 }
