@@ -134,9 +134,15 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
       }
     : (rawRecentLectures[0] ?? null);
 
-  const hasHistory = Boolean(recentProgress || currentTrack);
-  const isHeroLoading =
-    !hasHistory && !featuredItem && (progressLoading || feedLoading || promoLoading);
+  // Single first-load flag for the whole Home page. Every section skeleton-gates on
+  // this so the page reveals in one transition instead of each section popping in
+  // as its own query resolves (cold-start section popping).
+  const isHomeLoading = progressLoading || feedLoading || promoLoading || scholarsLoading;
+
+  // The hero can still surface locally-known content (continue listening, cached
+  // featured item) before the page finishes loading, but it waits for the page
+  // when there is nothing known yet so a brand-new user sees one skeleton reveal.
+  const isHeroLoading = isHomeLoading && !activeContinueListeningItem && !featuredItem;
 
   const handleSearchChange = useCallback(
     (text: string) => {
@@ -224,7 +230,7 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
               scholars={scholarsList}
               onSelectScholar={handleSelectScholar}
               onSeeAllScholars={() => router.push("/explore?sub=scholars" as Href)}
-              isLoading={scholarsLoading}
+              isLoading={isHomeLoading}
             />
 
             {/* Recently Added Section */}
@@ -232,7 +238,7 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
               items={recentLectures}
               onSelectLecture={handleSelectListing}
               onSeeAllRecent={() => router.push("/explore?sub=recent" as Href)}
-              isLoading={feedLoading}
+              isLoading={isHomeLoading}
             />
 
             {/* Curated collections teaser */}

@@ -45,7 +45,7 @@ export function HeroSection({
 
 function HeroSkeleton() {
   return (
-    <View style={styles.skeletonContainer}>
+    <View style={styles.skeletonContainer} testID="hero-skeleton">
       <View style={styles.skeletonRow}>
         <Skeleton width={20} height={20} borderRadius={4} style={styles.skeletonBadge} />
         <Skeleton width={140} height={14} style={styles.skeletonTitle} />

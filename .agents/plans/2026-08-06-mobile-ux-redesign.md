@@ -57,6 +57,44 @@
   for native, web, core-contracts, core-i18n.
 - Next step: Phase 4 — build the Home screen (hero resume vs promotions vs recent, scholars rail,
   category chips, recently added).
+- Phase 4 complete: Home screen built (`features/home/screens/home.screen.tsx`, 289 lines) with
+  hero/resume/promotions, scholars rail, category chips, and recently-added per the prototype.
+- Phase 5 complete: Explore screens rebuilt (`explore-recent`, `explore-scholar`, `explore-all`,
+  `curation`), All Lectures uses `/topics/:slug/lectures` rows; Curation has icon + copy + CTA.
+- Phase 6 polish committed: `7e52ba18` "feat(native): redesign empty states to match prototype"
+  (shared `EmptyState` title/description/icon/action, applied to Library/Search/Explore/
+  lecture-not-found); `22a7537a` low-effort polish (hero welcome, serif display role, initials
+  covers, theme picker); `730feda6`/`889c3716` core redesign + explore/home alignment.
+- UX review fixes (uncommitted): (1) removed the double top inset on scholar-detail + lecture-detail
+  (ScrollView `contentInsetAdjustmentBehavior="never"`), (2) hid the native stack header for
+  `listings/[slug]` and added a custom back button to the lecture-detail views, (3) made the
+  embedded mini-player flush-fill the iOS native BottomAccessory pill (no border/shadow/radius).
+- Root cause of the remaining iOS detail-header blank found: the single root `SafeAreaProvider`
+  reports the full window inset (`insets.top` ≈ 59) to every screen, but the iOS formSheet already
+  sits below the status bar, so `ScreenView`'s `paddingTop: insets.top` added a ~59pt canvas band
+  above the back button. Fixed by adding `ScreenView includeTopInset` (default true) and setting
+  `includeTopInset={Platform.OS !== "ios"}` on the three detail views (scholar + single + container),
+  plus `contentInsetAdjustmentBehavior="never"` on `ListingContentView`'s ScrollView. TDD'd in
+  `ScreenView.spec.tsx`. Native suite 83 suites / 393 tests green, typecheck + lint clean.
+- The iOS mini-player pill experiment (replacing `containerEmbedded` with a new `containerEmbeddedIOS`
+  style) broke the floating player (controls covered). Reverted `mini-player.tsx` to HEAD; the
+  committed baseline renders correctly and mini-player + BottomAccessory specs pass 16/16. Stage 8b
+  needs a fresh approach if the flush-fill pill is still desired.
+- Stage 8b redone (committed `de459bcb`): instead of replacing the container geometry, kept
+  `containerEmbedded` (`flex: 1`, `height: 52`) and stripped only the chrome — no
+  borderRadius/backgroundColor/elevation/borderWidth, `backgroundColor: "transparent"`,
+  `overflow: "hidden"`. Added `testID="mini-player-container"` on the root Pressable + a spec
+  asserting the embedded container stays 52px tall with no border/background/elevation.
+- Home cold-start section popping fixed (code done, commit pending for `8c`): sections previously
+  skeleton-gated on their own query (`isLoading && empty`), so each revealed as its own query
+  resolved. Now `home.screen.tsx` computes a single `isHomeLoading` flag
+  (`progress || feed || promo || scholars loading`) and gates `ScholarMedallionsRail` +
+  `RecentlyAddedSection` on it; the section components skeleton-gate on `isLoading` alone. Hero
+  still reveals immediately when locally-known content exists (continue-listening / featured item)
+  and otherwise waits on `isHomeLoading`. Added `testID="hero-skeleton"`. TDD'd in a new
+  `home.screen.spec.tsx` (all-loading → all skeletons; staggered → sections stay on skeleton until
+  every query resolves; all-resolved → single reveal). Native suite 84 suites / 397 tests green,
+  typecheck + lint clean.
 
 ## Staging Strategy
 
@@ -173,7 +211,7 @@
 
 ## Stage 6: Home screen
 
-- Status: Pending
+- Status: Completed
 - Goal: Build the Home screen per the prototype: search bar, hero (resume vs recommended
   starting point), category chips, scholars rail, recently added.
 - Files:
@@ -194,7 +232,7 @@
 
 ## Stage 7: Rebuild Explore screens
 
-- Status: Pending
+- Status: Completed
 - Goal: Rebuild Recent, Scholars, All Lectures, and Curation screens per the prototype.
 - Files:
   - `apps/native/src/features/explore/screens/explore-recent.screen.tsx`
@@ -213,7 +251,7 @@ typecheck` + `bun run lint` pass.
 
 ## Stage 8: Polish empty states, downloads, Now Playing
 
-- Status: Pending
+- Status: In Progress
 - Goal: Upgrade empty states (icon + title + copy + CTA), download row states, and the Now
   Playing experience per the prototype.
 - Files:
@@ -226,6 +264,86 @@ typecheck` + `bun run lint` pass.
 - Dependencies: Stages 5–6.
 - Completion Criteria: `bun run test` + `bun run typecheck` + `bun run lint` pass.
 - Suggested Commit Message: `feat(native): polish empty states, downloads, and now playing`
+
+## Stage 8a: Fix detail-screen top spacing and native-header gap
+
+- Status: Completed (committed `b0bf0ebe`; verified on device)
+- Goal: Remove the large empty space before the header on scholar-detail and lecture-detail and
+  stop the double safe-area inset.
+- Files:
+  - `apps/native/src/features/listing/screens/scholar-detail/scholar-detail.screen.tsx`
+  - `apps/native/src/features/listing/screens/lecture-detail/single-lecture-view.tsx`
+  - `apps/native/src/features/listing/screens/lecture-detail/container-lecture-view.tsx`
+  - `apps/native/src/features/listing/components/listing-content-view/listing-content-view.tsx`
+  - `apps/native/src/shared/components/ScreenView/ScreenView.tsx`
+  - `apps/native/src/shared/components/ScreenView/ScreenView.spec.tsx`
+  - `apps/native/src/app/(content)/_layout.tsx`
+  - `apps/native/src/features/listing/screens/lecture-detail/lecture-detail.screen.spec.tsx`
+- Changes: `ScrollView contentInsetAdjustmentBehavior="never"` (+ `automaticallyAdjustsScrollIndicatorInsets={false}`)
+  so the ScreenView safe-area padding isn't doubled by iOS's first-scroll-view adjustment; hid the
+  native stack header for `listings/[slug]` (was an empty title bar) and added a custom back button
+  to both lecture-detail views, mirroring the ScholarHeader pattern; trimmed header top padding.
+  Root cause of the remaining blank: the formSheet sits below the status bar but the root
+  `SafeAreaProvider` reports the full window inset, so `ScreenView` added a ~59pt canvas band above
+  the back button. Added `ScreenView includeTopInset` (default true) and set
+  `includeTopInset={Platform.OS !== "ios"}` on the three detail views; also set
+  `contentInsetAdjustmentBehavior="never"` on `ListingContentView`'s ScrollView. TDD'd via two new
+  `ScreenView.spec.tsx` cases (default applies inset, `includeTopInset={false}` omits it). Per iOS
+  device review, added a 4px top margin (`theme.spacing.scale.xs`) to the three custom back buttons
+  (single/container lecture views + ScholarHeader) so they don't sit flush against the sheet edge.
+- Blockers: None currently identified.
+- Dependencies: None.
+- Completion Criteria: ✅ native typecheck + lint clean; lecture/scholar-detail specs pass; full
+  suite 83 suites / 393 tests green.
+- Suggested Commit Message: `fix(native): remove blank space above detail headers`
+
+## Stage 8b: Make the mini-player fit the iOS BottomAccessory pill
+
+- Status: Completed (committed `de459bcb`)
+- Goal: On iOS the embedded mini-player is hosted inside the native BottomAccessory floating pill;
+  the card's own border/radius/shadow/height made it look cramped and doubled-up inside the pill.
+- Files:
+  - `apps/native/src/features/audio/components/mini-player.tsx`
+- Changes: The first attempt replaced `containerEmbedded` with a new `containerEmbeddedIOS` style
+  (flex:1, transparent background, overflow hidden, no border/radius/shadow) — this broke the
+  floating player (controls were covered and unclickable). Redone with a chrome-only approach: keep
+  `containerEmbedded` (`flex: 1`, `height: 52`) and strip only the chrome (no
+  borderRadius/backgroundColor/elevation/borderWidth; `backgroundColor: "transparent"`,
+  `overflow: "hidden"`). Added `testID="mini-player-container"` on the root Pressable + a spec
+  asserting the embedded container stays 52px tall with no border/background/elevation. Full native
+  suite green (84 suites / 397 tests), typecheck + lint clean.
+- Blockers: None currently identified. (Pill renders flush-fill on device per 8a review pass.)
+- Dependencies: None.
+- Completion Criteria: ✅ native typecheck + lint clean; mini-player + BottomAccessory specs pass;
+  pill renders flush-fill on iOS device without covering controls.
+- Suggested Commit Message: `fix(native): fit mini-player into iOS bottom accessory pill`
+
+## Stage 8c: Fix Home cold-start section popping
+
+- Status: In Progress (code done; commit pending in `8c` commit)
+- Goal: On cold start each Home section showed its own skeleton and popped to content at a different
+  time as its query resolved. Reveal the Home page in a single transition.
+- Files:
+  - `apps/native/src/features/home/screens/home.screen.tsx`
+  - `apps/native/src/features/home/screens/home.screen.spec.tsx` (new)
+  - `apps/native/src/features/home/components/hero-section/hero-section.tsx`
+  - `apps/native/src/features/home/components/scholar-medallions/scholar-medallions-rail.tsx`
+  - `apps/native/src/features/home/components/recently-added-section/recently-added-section.tsx`
+- Changes: `home.screen.tsx` now computes a single `isHomeLoading` flag
+  (`progressLoading || feedLoading || promoLoading || scholarsLoading`) and passes it as the
+  `isLoading` gate to `ScholarMedallionsRail` and `RecentlyAddedSection`; both sections now
+  skeleton-gate on `isLoading` alone instead of `isLoading && empty`. The hero still reveals
+  immediately when locally-known content exists (`activeContinueListeningItem` / `featuredItem`)
+  and otherwise waits on `isHomeLoading`, so a brand-new user sees one whole-page skeleton reveal.
+  Added `testID="hero-skeleton"` for assertions. TDD'd in a new `home.screen.spec.tsx` (mocks
+  `@sd/domain-content`/`domain-search`/`domain-audio`, keeps real section components): all-loading →
+  all skeletons; staggered (scholars still loading) → sections stay on skeleton until every query
+  resolves; all-resolved → single reveal with no skeletons.
+- Blockers: None currently identified.
+- Dependencies: Stages 6 (Home screen) only for the components being gated.
+- Completion Criteria: ✅ `home.screen.spec.tsx` passes; full native suite green (84 suites / 397
+  tests); typecheck + lint clean.
+- Suggested Commit Message: `fix(native): reveal home sections in a single cold-start transition`
 
 ## Final Verification
 

@@ -25,7 +25,7 @@ export function RecentlyAddedSection({
 }: RecentlyAddedSectionProps) {
   const { t } = useTranslation();
 
-  if (isLoading && (!items || items.length === 0)) {
+  if (isLoading) {
     return (
       <View style={styles.section} testID="recently-added-skeleton">
         <View style={styles.header}>

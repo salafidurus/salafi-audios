@@ -25,7 +25,7 @@ export function ScholarMedallionsRail({
 }: ScholarMedallionsRailProps) {
   const { t } = useTranslation();
 
-  if (isLoading && (!scholars || scholars.length === 0)) {
+  if (isLoading) {
     return (
       <View style={styles.section} testID="scholar-medallions-rail-skeleton">
         <View style={styles.header}>
