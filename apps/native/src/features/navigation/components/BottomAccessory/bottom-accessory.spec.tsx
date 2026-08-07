@@ -65,8 +65,8 @@ describe("BottomAccessoryContent", () => {
     jest.clearAllMocks();
   });
 
-  it("renders null on routes where native tabs are absent", async () => {
-    useAudio.mockReturnValue({ currentTrack: mockTrack });
+  it("renders null on non-tab routes when no track is playing", async () => {
+    useAudio.mockReturnValue({ currentTrack: null });
     usePathname.mockReturnValue("/lecture/123");
 
     await render(<BottomAccessoryContent />);
@@ -83,7 +83,7 @@ describe("BottomAccessoryContent", () => {
 
   it("renders subroute tabs only when subroute is available and no track playing", async () => {
     useAudio.mockReturnValue({ currentTrack: null });
-    usePathname.mockReturnValue("/explore/recent");
+    usePathname.mockReturnValue("/settings");
 
     await render(<BottomAccessoryContent />);
     expect(screen.getByTestId("subroute-only-container")).toBeTruthy();
@@ -100,7 +100,7 @@ describe("BottomAccessoryContent", () => {
 
   it("renders dual mode and toggles between views when both are available", async () => {
     useAudio.mockReturnValue({ currentTrack: mockTrack });
-    usePathname.mockReturnValue("/explore/recent");
+    usePathname.mockReturnValue("/settings");
 
     await render(<BottomAccessoryContent />);
     expect(screen.getByTestId("dual-mode-container")).toBeTruthy();

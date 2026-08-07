@@ -107,7 +107,13 @@ function RecentTab({
   }
 
   if (filteredItems.length === 0) {
-    return <ExploreStatusView message={getEmptyStateText("feed", t)} />;
+    return (
+      <ExploreStatusView
+        message={getEmptyStateText("feed", t)}
+        title={t("feed.emptyTitle", "Nothing here yet")}
+        description={getEmptyStateText("feed", t)}
+      />
+    );
   }
 
   return (

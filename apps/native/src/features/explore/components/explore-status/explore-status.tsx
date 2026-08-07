@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { ActivityIndicator, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -5,15 +7,28 @@ import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 
 export type ExploreStatusViewProps = {
   message: string;
+  title?: string;
+  description?: string;
+  icon?: ReactNode;
   onRetry?: () => void;
   retryLabel?: string;
 };
 
-export function ExploreStatusView({ message, onRetry, retryLabel }: ExploreStatusViewProps) {
+export function ExploreStatusView({
+  message,
+  title,
+  description,
+  icon,
+  onRetry,
+  retryLabel,
+}: ExploreStatusViewProps) {
   return (
     <View style={styles.container}>
       <EmptyState
         message={message}
+        title={title}
+        description={description}
+        icon={icon}
         variant={onRetry ? "error" : "empty"}
         onRetry={onRetry}
         retryLabel={retryLabel}

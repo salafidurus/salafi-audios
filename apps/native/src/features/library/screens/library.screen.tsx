@@ -5,9 +5,10 @@ import {
   useLibraryProgressScreen,
   useLibrarySavedScreen,
 } from "@sd/domain-content";
+import { Bookmark, CheckCircle2, Clock } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { LibraryItemRow } from "@/features/library/components/library-item-row/library-item-row";
 import { LibraryItemRowSkeleton } from "@/features/library/components/library-item-row/library-item-row-skeleton";
@@ -69,6 +70,7 @@ function StartedTabContent({
 }) {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
   const { items, isFetching } = useLibraryProgressScreen(isAuthenticated);
   const markCompleted = useProgressStore((s) => s.actions.markCompleted);
 
@@ -93,8 +95,9 @@ function StartedTabContent({
     return (
       <ScreenView center>
         <EmptyState
-          message={t("library.emptyProgress", "No lectures in progress.")}
-          variant="empty"
+          title={t("library.emptyProgressTitle", "Nothing in progress")}
+          description={t("library.emptyProgressDesc", "Lectures you start will appear here.")}
+          icon={<Clock size={24} color={theme.colors.action.primary} />}
         />
       </ScreenView>
     );
@@ -125,6 +128,7 @@ function SavedTabContent({
 }) {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
   const { items, isFetching } = useLibrarySavedScreen(isAuthenticated);
 
   const handleItemPress = useCallback(
@@ -152,11 +156,9 @@ function SavedTabContent({
     return (
       <ScreenView center>
         <EmptyState
-          message={t(
-            "library.emptySaved",
-            "No saved lectures yet. Save lectures to listen to later.",
-          )}
-          variant="empty"
+          title={t("library.emptySavedTitle", "Nothing saved yet")}
+          description={t("library.emptySavedDesc", "Bookmark lectures to listen to them later.")}
+          icon={<Bookmark size={24} color={theme.colors.action.primary} />}
         />
       </ScreenView>
     );
@@ -193,6 +195,7 @@ function CompletedTabContent({
 }) {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
   const { items, isFetching } = useLibraryCompletedScreen(isAuthenticated);
 
   const handleItemPress = useCallback(
@@ -216,8 +219,12 @@ function CompletedTabContent({
     return (
       <ScreenView center>
         <EmptyState
-          message={t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
-          variant="empty"
+          title={t("library.emptyCompletedTitle", "Nothing completed yet")}
+          description={t(
+            "library.emptyCompletedDesc",
+            "Finished lectures will appear here. Keep going!",
+          )}
+          icon={<CheckCircle2 size={24} color={theme.colors.action.primary} />}
         />
       </ScreenView>
     );

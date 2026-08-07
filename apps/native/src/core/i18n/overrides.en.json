@@ -43,7 +43,9 @@
     }
   },
   "audio": {
-    "now_playing": "Now Playing"
+    "now_playing": "Now Playing",
+    "lessonOf": "Lesson",
+    "of": "of"
   },
   "auth": {
     "signIn": {
@@ -64,6 +66,9 @@
       "action": "Browse Scholars"
     }
   },
+  "feed": {
+    "emptyTitle": "Nothing here yet"
+  },
   "home": {
     "continueListening": "CONTINUE LISTENING",
     "recommendedStartingPoint": "RECOMMENDED STARTING POINT",
@@ -75,11 +80,26 @@
     "curatedCollections": "Curated collections",
     "curatedCollectionsSub": "Themed learning paths — coming soon"
   },
+  "lecture": {
+    "lessonPlural": "LESSONS",
+    "lessonSingular": "LESSON",
+    "pause": "Pause",
+    "play": "Play",
+    "playAll": "Play All",
+    "save": "Save",
+    "unsave": "Unsave"
+  },
   "library": {
     "authRequired": "Sign in to access your library",
     "emptyProgress": "No lectures in progress.",
+    "emptyProgressTitle": "Nothing in progress",
+    "emptyProgressDesc": "Lectures you start will appear here.",
     "emptySaved": "No saved lectures yet. Save lectures to listen to later.",
+    "emptySavedTitle": "Nothing saved yet",
+    "emptySavedDesc": "Bookmark lectures to listen to them later.",
     "emptyCompleted": "No completed lectures yet. Keep listening!",
+    "emptyCompletedTitle": "Nothing completed yet",
+    "emptyCompletedDesc": "Finished lectures will appear here. Keep going!",
     "markAsCompleted": "Mark as Completed",
     "removeFromSaved": "Remove from Saved",
     "percentListened": "{{percent}}% listened",
@@ -98,6 +118,14 @@
     "filterPlaceholder": "Filter content…",
     "searchNoMatch": "No scholars match your search.",
     "searchScholars": "Search scholars..."
+  },
+  "scholar": {
+    "loading": "Loading scholar…",
+    "notFound": "Scholar not found",
+    "seriesLabel": "SERIES"
+  },
+  "search": {
+    "noResultsDesc": "Try a different search term or browse by scholar."
   },
   "settings": {
     "support": "Support"

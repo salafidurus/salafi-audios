@@ -136,7 +136,7 @@ describe("LibraryScreen", () => {
 
     await render(<LibraryScreen />);
 
-    expect(screen.getByText("No lectures in progress.")).toBeTruthy();
+    expect(screen.getByText("Nothing in progress")).toBeTruthy();
   });
 
   it("switches to saved tab and renders empty state", async () => {
@@ -149,9 +149,7 @@ describe("LibraryScreen", () => {
     await render(<LibraryScreen />);
 
     await fireEvent.press(screen.getByTestId("library-pill-saved"));
-    expect(
-      screen.getByText("No saved lectures yet. Save lectures to listen to later."),
-    ).toBeTruthy();
+    expect(screen.getByText("Nothing saved yet")).toBeTruthy();
   });
 
   it("switches to completed tab and renders empty state", async () => {
@@ -164,7 +162,7 @@ describe("LibraryScreen", () => {
     await render(<LibraryScreen />);
 
     await fireEvent.press(screen.getByTestId("library-pill-completed"));
-    expect(screen.getByText("No completed lectures yet. Keep listening!")).toBeTruthy();
+    expect(screen.getByText("Nothing completed yet")).toBeTruthy();
   });
 
   it("navigates to a lecture when an item is pressed", async () => {

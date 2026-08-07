@@ -43,7 +43,9 @@
     }
   },
   "audio": {
-    "now_playing": "قيد التشغيل الآن"
+    "now_playing": "قيد التشغيل الآن",
+    "lessonOf": "الدرس",
+    "of": "من"
   },
   "auth": {
     "signIn": {
@@ -64,6 +66,9 @@
       "action": "تصفح الشيوخ"
     }
   },
+  "feed": {
+    "emptyTitle": "لا يوجد شيء هنا بعد"
+  },
   "home": {
     "continueListening": "متابعة الاستماع",
     "recommendedStartingPoint": "نقطة البداية الموصى بها",
@@ -75,11 +80,26 @@
     "curatedCollections": "مجموعات منققاة",
     "curatedCollectionsSub": "مسارات تعلم موجهة — قريباً"
   },
+  "lecture": {
+    "lessonPlural": "دروس",
+    "lessonSingular": "درس",
+    "pause": "إيقاف مؤقت",
+    "play": "تشغيل",
+    "playAll": "تشغيل الكل",
+    "save": "حفظ",
+    "unsave": "إلغاء الحفظ"
+  },
   "library": {
     "authRequired": "سجّل الدخول للوصول إلى مكتبتك",
     "emptyProgress": "ليس هناك محاضرات قيد التقدم.",
+    "emptyProgressTitle": "لا يوجد شيء قيد التقدم",
+    "emptyProgressDesc": "ستظهر المحاضرات التي تبدأ الاستماع إليها هنا.",
     "emptySaved": "لا يوجد محاضرات محفوظة بعد. احفظ المحاضرات للاستماع إليها لاحقًا.",
+    "emptySavedTitle": "لا يوجد شيء محفوظ بعد",
+    "emptySavedDesc": "احفظ المحاضرات للاستماع إليها لاحقًا.",
     "emptyCompleted": "لا يوجد محاضرات مكتملة بعد. استمر في الاستماع!",
+    "emptyCompletedTitle": "لا يوجد شيء مكتمل بعد",
+    "emptyCompletedDesc": "ستظهر المحاضرات المكتملة هنا. واصل!",
     "markAsCompleted": "تحديد كمكتمل",
     "removeFromSaved": "إزالة من المحفوظات",
     "percentListened": "{{percent}}% تم الاستماع إليها",
@@ -98,6 +118,14 @@
     "filterPlaceholder": "تصفية المحتوى…",
     "searchNoMatch": "لا يوجد شيوخ يطابقون بحثك.",
     "searchScholars": "البحث عن الشيوخ..."
+  },
+  "scholar": {
+    "loading": "جارٍ تحميل الشيخ…",
+    "notFound": "لم يتم العثور على الشيخ",
+    "seriesLabel": "سلاسل"
+  },
+  "search": {
+    "noResultsDesc": "جرّب مصطلح بحث مختلفًا أو تصفّح الشيوخ."
   },
   "settings": {
     "support": "الدعم"

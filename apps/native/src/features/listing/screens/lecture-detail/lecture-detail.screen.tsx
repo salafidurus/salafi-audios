@@ -2,7 +2,9 @@ import { pickContentField } from "@sd/core-i18n";
 import { useAudio } from "@sd/domain-audio";
 import { useListingContents, useListingDetail } from "@sd/domain-content";
 import { router, useLocalSearchParams } from "expo-router";
+import { AlertCircle } from "lucide-react-native";
 import { useEffect } from "react";
+import { useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
@@ -18,6 +20,7 @@ export type LectureDetailScreenProps = {
 
 export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { anchor } = useLocalSearchParams<{ slug: string; anchor?: string }>();
+  const { theme } = useUnistyles();
   const { data: lecture, isFetching } = useListingDetail(slug);
   const { data: seriesContents } = useListingContents(lecture?.seriesContext?.seriesSlug ?? "");
   const isContainer = lecture?.format === "series" || lecture?.format === "collection";
@@ -48,7 +51,15 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   if (!lecture) {
     return (
       <ScreenView center>
-        <EmptyState message={t("lecture.notFound", "Lecture not found")} variant="error" />
+        <EmptyState
+          message={t("lecture.notFound", "Lecture not found")}
+          variant="error"
+          description={t(
+            "lecture.notFoundDesc",
+            "This lecture may have been removed or is no longer available.",
+          )}
+          icon={<AlertCircle size={24} color={theme.colors.state.dangerContent} />}
+        />
       </ScreenView>
     );
   }

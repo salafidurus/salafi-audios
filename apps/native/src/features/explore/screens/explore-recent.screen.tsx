@@ -171,7 +171,11 @@ export function ExploreRecentScreen({
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
         />
-        <ExploreStatusView message={getEmptyStateText("feed", t)} />
+        <ExploreStatusView
+          message={getEmptyStateText("feed", t)}
+          title={t("feed.emptyTitle", "Nothing here yet")}
+          description={getEmptyStateText("feed", t)}
+        />
       </View>
     );
   }
