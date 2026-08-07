@@ -113,6 +113,7 @@ const styles = StyleSheet.create((theme) => ({
   backButton: {
     alignSelf: "flex-start",
     padding: 4,
+    marginTop: theme.spacing.scale.xs,
     marginBottom: 8,
   },
   coverBox: {

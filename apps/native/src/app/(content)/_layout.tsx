@@ -9,6 +9,7 @@ export default function ContentLayout() {
   return (
     <Stack screenOptions={getFormSheetScreenOptions(theme)}>
       <Stack.Screen name="scholars/[slug]" options={{ headerShown: false }} />
+      <Stack.Screen name="listings/[slug]" options={{ headerShown: false }} />
     </Stack>
   );
 }

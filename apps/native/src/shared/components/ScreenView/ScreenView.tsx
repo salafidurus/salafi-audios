@@ -7,6 +7,7 @@ export interface ScreenViewProps {
   style?: ViewStyle;
   contentStyle?: ViewStyle;
   center?: boolean;
+  includeTopInset?: boolean;
   backgroundVariant?: "canvas" | "primaryWash" | "secondaryWash" | "mixedWash";
 }
 
@@ -15,6 +16,7 @@ export function ScreenView({
   style,
   contentStyle,
   center,
+  includeTopInset = true,
   backgroundVariant = "canvas",
 }: ScreenViewProps) {
   const insets = useSafeAreaInsets();
@@ -22,10 +24,12 @@ export function ScreenView({
 
   return (
     <View
+      testID="screen-view-container"
       style={[
         styles.container,
         getBackgroundVariant(backgroundVariant, theme),
-        { paddingTop: insets.top, paddingBottom: insets.bottom },
+        includeTopInset && { paddingTop: insets.top },
+        { paddingBottom: insets.bottom },
         style,
       ]}
     >

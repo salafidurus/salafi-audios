@@ -2,8 +2,9 @@ import type { ListingContentsDto, ListingDetailDto } from "@sd/core-contracts";
 
 import { buildTrackQueue } from "@sd/domain-audio";
 import { markSaved, markUnsaved, useIsSaved } from "@sd/domain-content";
-import { Bookmark, Play } from "lucide-react-native";
-import { Pressable, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Bookmark, ChevronLeft, Play } from "lucide-react-native";
+import { Platform, Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -28,6 +29,7 @@ export function ContainerLectureView({
 }: ContainerLectureViewProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
+  const router = useRouter();
   const isSaved = useIsSaved(lecture.id);
 
   const primaryTopic = lecture.topics?.[0];
@@ -62,7 +64,18 @@ export function ContainerLectureView({
   };
 
   return (
-    <ScreenView>
+    <ScreenView includeTopInset={Platform.OS !== "ios"}>
+      {/* Back button — replaces the native stack header */}
+      <Pressable
+        onPress={() => router.back()}
+        style={styles.backButton}
+        hitSlop={12}
+        accessibilityRole="button"
+        accessibilityLabel="Back"
+      >
+        <ChevronLeft size={24} color={theme.colors.content.strong} />
+      </Pressable>
+
       {/* Header: Cover left + badge/title/scholar right */}
       <View style={styles.header}>
         <View style={styles.coverBox}>
@@ -148,12 +161,19 @@ export function ContainerLectureView({
 }
 
 const styles = StyleSheet.create((theme) => ({
+  backButton: {
+    alignSelf: "flex-start",
+    padding: 4,
+    marginStart: theme.spacing.layout.pageX,
+    marginTop: theme.spacing.scale.xs,
+    marginBottom: 4,
+  },
   header: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 16,
     paddingHorizontal: theme.spacing.layout.pageX,
-    paddingTop: theme.spacing.layout.pageY,
+    paddingTop: theme.spacing.scale.sm,
     paddingBottom: 4,
   },
   coverBox: {

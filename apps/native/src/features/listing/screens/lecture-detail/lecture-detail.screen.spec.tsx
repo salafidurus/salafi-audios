@@ -5,6 +5,7 @@ import React from "react";
 import { LectureDetailScreen } from "./lecture-detail.screen";
 
 const mockRouterReplace = jest.fn();
+const mockRouterBack = jest.fn();
 const mockUseLocalSearchParams = jest.fn(() => ({ slug: "lecture-1" }) as Record<string, string>);
 const mockIsSaved = jest.fn(() => false);
 const mockMarkSaved = jest.fn();
@@ -12,6 +13,7 @@ const mockMarkUnsaved = jest.fn();
 
 jest.mock("expo-router", () => ({
   router: { replace: (...args: unknown[]) => mockRouterReplace(...args) },
+  useRouter: () => ({ back: mockRouterBack }),
   useLocalSearchParams: () => mockUseLocalSearchParams(),
 }));
 
@@ -162,6 +164,31 @@ describe("LectureDetailScreen", () => {
 
     expect(screen.getByText("Lecture not found")).toBeTruthy();
   });
+
+  it("navigates back when the custom header back button is pressed", async () => {
+    mockedUseListingDetail.mockReturnValue({
+      data: {
+        id: "lecture-1",
+        slug: "an-example-lecture",
+        title: "An Example Lecture",
+        format: "single",
+        language: "en",
+        durationSeconds: 3600,
+        publishedAt: "2026-04-11T00:00:00.000Z",
+        scholar: { id: "scholar-1", slug: "ibn-baz", name: "Ibn Baz", imageUrl: undefined },
+        topics: [],
+        primaryAudioAsset: null,
+        seriesContext: null,
+      },
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<LectureDetailScreen slug="lecture-1" />);
+    await fireEvent.press(screen.getByLabelText("Back"));
+
+    expect(mockRouterBack).toHaveBeenCalledTimes(1);
+  }, 15000);
 
   it("renders lecture details when data exists", async () => {
     mockedUseListingDetail.mockReturnValue({

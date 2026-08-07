@@ -45,7 +45,11 @@ export function ListingContentView({
   };
 
   return (
-    <ScrollView ref={scrollRef} contentContainerStyle={styles.content}>
+    <ScrollView
+      ref={scrollRef}
+      contentInsetAdjustmentBehavior="never"
+      contentContainerStyle={styles.content}
+    >
       {contents.format === "collection"
         ? contents.modules.map((listingModule) => (
             <View key={listingModule.id}>

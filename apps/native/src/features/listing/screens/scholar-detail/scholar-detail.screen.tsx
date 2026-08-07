@@ -3,7 +3,7 @@ import type { ScholarContentItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useScholarContent, useScholarDetail } from "@sd/domain-content";
 import { ChevronRight } from "lucide-react-native";
-import { Pressable, ScrollView, View } from "react-native";
+import { Platform, Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -95,9 +95,10 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const items = content?.items ?? [];
 
   return (
-    <ScreenView>
+    <ScreenView includeTopInset={Platform.OS !== "ios"}>
       <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
+        contentInsetAdjustmentBehavior="never"
+        automaticallyAdjustsScrollIndicatorInsets={false}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
