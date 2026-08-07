@@ -59,14 +59,6 @@ export function SettingsGeneralScreen() {
 
   const themeOptions: ThemeOption[] = [
     {
-      value: "system",
-      label: t("settings.general.themeOptions.system", "System"),
-      description: t("settings.general.themeOptions.systemDesc", "Follow OS"),
-      canvas: "#FAF9F6",
-      accent: "#B8860B",
-      text: "#111111",
-    },
-    {
       value: "parchment",
       label: t("settings.general.themeOptions.parchment", "Parchment"),
       description: t("settings.general.themeOptions.parchmentDesc", "Ivory & gold"),
@@ -77,26 +69,26 @@ export function SettingsGeneralScreen() {
     {
       value: "manuscript",
       label: t("settings.general.themeOptions.manuscript", "Manuscript"),
-      description: t("settings.general.themeOptions.manuscriptDesc", "Sepia & dark gold"),
-      canvas: "#1C160E",
-      accent: "#B58742",
-      text: "#E5D9C5",
+      description: t("settings.general.themeOptions.manuscriptDesc", "Ink-green & gold leaf"),
+      canvas: "#0D1912",
+      accent: "#CBA135",
+      text: "#F2EEE3",
     },
     {
       value: "midnight",
       label: t("settings.general.themeOptions.midnight", "Midnight"),
-      description: t("settings.general.themeOptions.midnightDesc", "Deep black & gold"),
-      canvas: "#080808",
-      accent: "#E0AE43",
-      text: "#F5F5F5",
+      description: t("settings.general.themeOptions.midnightDesc", "Indigo dusk & amber"),
+      canvas: "#0B0F1C",
+      accent: "#E0A458",
+      text: "#EDEEF5",
     },
     {
       value: "ember",
       label: t("settings.general.themeOptions.ember", "Ember"),
-      description: t("settings.general.themeOptions.emberDesc", "Charcoal & gold"),
-      canvas: "#141210",
-      accent: "#D99B26",
-      text: "#E6D9C5",
+      description: t("settings.general.themeOptions.emberDesc", "Charcoal & rust"),
+      canvas: "#15130F",
+      accent: "#C1633D",
+      text: "#F1ECE3",
     },
   ];
 
@@ -128,40 +120,62 @@ export function SettingsGeneralScreen() {
           sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
           stacked
         >
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.themeScroll}
-            contentContainerStyle={styles.themeScrollContent}
-          >
+          <View style={styles.themeGrid}>
             {themeOptions.map((opt) => {
               const isActive = themePreference === opt.value;
               return (
                 <Pressable
                   key={opt.value}
                   onPress={() => handleThemeChange(opt.value)}
-                  style={[styles.themeCard, isActive && styles.themeCardActive]}
+                  style={[
+                    styles.themeCard,
+                    isActive && styles.themeCardActive,
+                    { backgroundColor: opt.canvas },
+                  ]}
                 >
                   <View style={styles.cardHeader}>
                     <View style={styles.swatchRow}>
-                      <View style={[styles.swatchDot, { backgroundColor: opt.canvas }]} />
-                      <View style={[styles.swatchDot, { backgroundColor: opt.accent }]} />
-                      <View style={[styles.swatchDot, { backgroundColor: opt.text }]} />
+                      <View
+                        style={[
+                          styles.swatchDot,
+                          { backgroundColor: opt.canvas, borderColor: opt.accent },
+                        ]}
+                      />
+                      <View
+                        style={[
+                          styles.swatchDot,
+                          { backgroundColor: opt.accent, borderColor: opt.accent },
+                        ]}
+                      />
+                      <View
+                        style={[
+                          styles.swatchDot,
+                          { backgroundColor: opt.text, borderColor: opt.text },
+                        ]}
+                      />
                     </View>
-                    {isActive && <Ionicons name="checkmark-circle" size={16} color={opt.accent} />}
+                    {isActive && (
+                      <View style={[styles.checkBadge, { backgroundColor: opt.accent }]}>
+                        <Ionicons name="checkmark" size={9} color={opt.canvas} />
+                      </View>
+                    )}
                   </View>
                   <View style={styles.cardFooter}>
-                    <AppText variant="bodySm" style={styles.cardLabel}>
+                    <AppText variant="bodySm" style={[styles.cardLabel, { color: opt.text }]}>
                       {opt.label}
                     </AppText>
-                    <AppText variant="caption" style={styles.cardDesc} numberOfLines={1}>
+                    <AppText
+                      variant="caption"
+                      style={[styles.cardDesc, { color: `${opt.text}99` }]}
+                      numberOfLines={1}
+                    >
                       {opt.description}
                     </AppText>
                   </View>
                 </Pressable>
               );
             })}
-          </ScrollView>
+          </View>
         </SettingsRow>
       </SettingsSection>
 
@@ -213,22 +227,19 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.layout.pageX,
     paddingVertical: theme.spacing.layout.pageY,
   },
-  themeScroll: {
+  themeGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
     marginTop: theme.spacing.scale.xs,
-    width: "100%",
-  },
-  themeScrollContent: {
-    paddingRight: theme.spacing.scale.xl,
   },
   themeCard: {
-    width: 140,
+    width: "47%",
     height: 100,
-    marginRight: theme.spacing.scale.md,
     padding: theme.spacing.scale.md,
-    borderRadius: theme.radius.scale.md,
+    borderRadius: 14,
     borderWidth: 2,
     borderColor: theme.colors.border.subtle,
-    backgroundColor: theme.colors.surface.subtle,
     justifyContent: "space-between",
   },
   themeCardActive: {
@@ -241,23 +252,26 @@ const styles = StyleSheet.create((theme) => ({
   },
   swatchRow: {
     flexDirection: "row",
-    gap: theme.spacing.scale.xs,
+    gap: 4,
   },
   swatchDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     borderWidth: 1,
-    borderColor: theme.colors.border.subtle,
+  },
+  checkBadge: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   cardFooter: {
     gap: 2,
   },
   cardLabel: {
     fontWeight: "600",
-    color: theme.colors.content.strong,
   },
-  cardDesc: {
-    color: theme.colors.content.subtle,
-  },
+  cardDesc: {},
 }));

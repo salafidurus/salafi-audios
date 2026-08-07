@@ -313,6 +313,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   modalTitle: {
     ...theme.typography.titleLg,
+    fontFamily: "Fraunces-SemiBold",
     color: theme.colors.content.strong,
     textAlign: "center",
     paddingHorizontal: theme.spacing.scale.md,

@@ -1,4 +1,4 @@
-import type { ListingContents, ListingDetail } from "@sd/domain-content";
+import type { ListingContentsDto, ListingDetailDto } from "@sd/core-contracts";
 
 import { buildTrackQueue } from "@sd/domain-audio";
 import { markSaved, markUnsaved, useIsSaved } from "@sd/domain-content";
@@ -14,9 +14,9 @@ import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 type ContainerLectureViewProps = {
-  lecture: ListingDetail;
+  lecture: ListingDetailDto;
   title: string;
-  ownContents: ListingContents | undefined;
+  ownContents: ListingContentsDto | undefined;
   anchor: string | undefined;
 };
 
@@ -160,9 +160,9 @@ const styles = StyleSheet.create((theme) => ({
     width: 72,
     height: 72,
     borderRadius: 16,
-    backgroundColor: theme.colors.action.primary,
+    backgroundColor: theme.colors.surface.primarySubtle,
     borderWidth: 1,
-    borderColor: theme.colors.border.strong,
+    borderColor: `${theme.colors.action.primary}55`,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create((theme) => ({
   initial: {
     fontSize: 26,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: theme.colors.action.primary,
   },
   meta: {
     flex: 1,

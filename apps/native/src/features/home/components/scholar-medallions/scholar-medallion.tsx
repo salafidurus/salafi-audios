@@ -1,5 +1,4 @@
 import { Image } from "expo-image";
-import React from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -72,9 +71,9 @@ const styles = StyleSheet.create((theme) => ({
     width: 62,
     height: 62,
     borderRadius: 20,
-    backgroundColor: theme.colors.action.primary,
+    backgroundColor: theme.colors.surface.primarySubtle,
     borderWidth: 1,
-    borderColor: theme.colors.border.strong,
+    borderColor: `${theme.colors.action.primary}55`,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 8,
@@ -87,7 +86,7 @@ const styles = StyleSheet.create((theme) => ({
   initialsText: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: theme.colors.action.primaryActive,
   },
   nameText: {
     fontSize: 11,

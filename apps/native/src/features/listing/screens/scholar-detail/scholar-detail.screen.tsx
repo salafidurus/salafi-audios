@@ -159,9 +159,9 @@ const styles = StyleSheet.create((theme) => ({
     width: 44,
     height: 44,
     borderRadius: 10,
-    backgroundColor: theme.colors.action.primary,
+    backgroundColor: theme.colors.surface.primarySubtle,
     borderWidth: 1,
-    borderColor: theme.colors.border.strong,
+    borderColor: `${theme.colors.action.primary}55`,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create((theme) => ({
   coverInitial: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: theme.colors.action.primary,
   },
   rowText: {
     flex: 1,

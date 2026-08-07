@@ -5,6 +5,14 @@ import React from "react";
 
 import { ScholarHeader } from "./scholar-header";
 
+jest.mock("expo-router", () => ({
+  useRouter: () => ({ back: jest.fn() }),
+}));
+
+jest.mock("expo-image", () => ({
+  Image: "Image",
+}));
+
 jest.mock("@sd/domain-content", () => ({
   useFormatScholarName:
     () => (scholar: { name?: string; title?: string | null } | string | null | undefined) => {

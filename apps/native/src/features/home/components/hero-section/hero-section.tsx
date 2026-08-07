@@ -15,6 +15,16 @@ export type HeroSectionProps = {
   isLoading?: boolean;
 };
 
+/** Shown to brand-new users when there is no listening history and the
+ *  promo feed hasn't loaded yet. Mirrors the prototype's first-time hero. */
+const WELCOME_HERO_ITEM: FeaturedHeroCardItem = {
+  id: "welcome-nullifiers",
+  slug: "nullifiers-of-islam",
+  title: "Nullifiers of Islam",
+  scholarName: "Shaykh Salih al-Fawzan",
+  badgeText: "NEW HERE? START WITH THE BASICS",
+};
+
 export function HeroSection({
   continueListeningItem,
   featuredItem,
@@ -29,11 +39,8 @@ export function HeroSection({
     return <ContinueListeningCard item={continueListeningItem} onPress={onPress} />;
   }
 
-  if (featuredItem) {
-    return <FeaturedHeroCard item={featuredItem} onPress={onPress} />;
-  }
-
-  return null;
+  const heroItem = featuredItem ?? WELCOME_HERO_ITEM;
+  return <FeaturedHeroCard item={heroItem} onPress={onPress} />;
 }
 
 function HeroSkeleton() {

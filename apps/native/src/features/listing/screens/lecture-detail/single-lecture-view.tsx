@@ -1,5 +1,5 @@
+import type { ListingContentsDto, ListingDetailDto } from "@sd/core-contracts";
 import type { Track } from "@sd/domain-audio";
-import type { ListingContents, ListingDetail } from "@sd/domain-content";
 
 import { buildTrackQueue } from "@sd/domain-audio";
 import { markSaved, markUnsaved, useIsSaved } from "@sd/domain-content";
@@ -17,12 +17,12 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 type SingleLectureViewProps = {
-  lecture: ListingDetail;
+  lecture: ListingDetailDto;
   title: string;
   description: string | undefined;
   isPlaying: boolean;
   isCurrentTrack: boolean;
-  seriesContents: ListingContents | undefined;
+  seriesContents: ListingContentsDto | undefined;
 };
 
 export function SingleLectureView({
@@ -204,9 +204,9 @@ const styles = StyleSheet.create((theme) => ({
     width: 56,
     height: 56,
     borderRadius: 14,
-    backgroundColor: theme.colors.action.primary,
+    backgroundColor: theme.colors.surface.primarySubtle,
     borderWidth: 1,
-    borderColor: theme.colors.border.strong,
+    borderColor: `${theme.colors.action.primary}55`,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create((theme) => ({
   initial: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: theme.colors.action.primary,
   },
   meta: {
     flex: 1,

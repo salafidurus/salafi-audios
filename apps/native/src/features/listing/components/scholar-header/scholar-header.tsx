@@ -119,9 +119,9 @@ const styles = StyleSheet.create((theme) => ({
     width: 84,
     height: 84,
     borderRadius: 20,
-    backgroundColor: theme.colors.action.primary,
+    backgroundColor: theme.colors.surface.primarySubtle,
     borderWidth: 1,
-    borderColor: theme.colors.border.strong,
+    borderColor: `${theme.colors.action.primary}55`,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 14,
@@ -134,7 +134,7 @@ const styles = StyleSheet.create((theme) => ({
   initialText: {
     fontSize: 32,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: theme.colors.action.primary,
   },
   name: {
     textAlign: "center",

@@ -45,8 +45,10 @@ describe("SettingsGeneralScreen", () => {
   it("renders theme cards options instead of segmented control", async () => {
     await render(<SettingsGeneralScreen />);
 
+    // The system (OS-follow) preference is surfaced as a settings row description
+    expect(screen.getByText("System follows your OS preference")).toBeTruthy();
+
     // Check that we render the horizontal cards options
-    expect(screen.getByText("System")).toBeTruthy();
     expect(screen.getByText("Parchment")).toBeTruthy();
     expect(screen.getByText("Manuscript")).toBeTruthy();
     expect(screen.getByText("Midnight")).toBeTruthy();
