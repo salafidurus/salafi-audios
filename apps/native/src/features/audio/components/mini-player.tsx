@@ -53,6 +53,7 @@ export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
           embedded ? styles.containerEmbedded : styles.container,
           !embedded && { bottom: insets.bottom + 8 },
         ]}
+        testID="mini-player-container"
       >
         {/* Progress Bar underlaid at the very top of mini-player */}
         <View style={styles.miniProgressTrack}>
@@ -183,12 +184,8 @@ const styles = StyleSheet.create((theme) => ({
   containerEmbedded: {
     flex: 1,
     height: 52,
-    borderRadius: theme.radius.scale.md,
-    backgroundColor: theme.colors.surface.default,
-    ...theme.shadows.sm,
+    backgroundColor: "transparent",
     overflow: "hidden",
-    borderWidth: theme.border.width.default,
-    borderColor: theme.colors.border.subtle,
   },
   content: {
     flex: 1,

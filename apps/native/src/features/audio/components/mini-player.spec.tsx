@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 
 import { MiniPlayer } from "./mini-player";
 
@@ -122,5 +123,23 @@ describe("MiniPlayer", () => {
     });
     await render(<MiniPlayer />);
     expect(screen.toJSON()).not.toBeNull();
+  });
+
+  it("renders the embedded container chromeless inside the native accessory pill", async () => {
+    useAudio.mockReturnValue({
+      currentTrack: mockTrack,
+      isPlaying: false,
+      isLoading: false,
+      progressPercent: 0,
+      positionSeconds: 0,
+    });
+    await render(<MiniPlayer embedded />);
+    const containerStyle = StyleSheet.flatten(
+      screen.getByTestId("mini-player-container").props.style,
+    );
+    expect(containerStyle.borderWidth).toBeUndefined();
+    expect(containerStyle.backgroundColor).toBe("transparent");
+    expect(containerStyle.elevation).toBeUndefined();
+    expect(containerStyle.height).toBe(52);
   });
 });
