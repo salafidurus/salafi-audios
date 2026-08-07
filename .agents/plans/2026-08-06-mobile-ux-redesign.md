@@ -338,7 +338,7 @@ typecheck` + `bun run lint` pass.
   `@sd/domain-content`/`domain-search`/`domain-audio`, keeps real section components): all-loading →
   all skeletons; staggered (scholars still loading) → sections stay on skeleton until every query
   resolves; all-resolved → single reveal with no skeletons.
-- Explore cleanup done (code done, commit pending for `8d`): the tab is the unified
+- Explore cleanup committed `b0537de2`: the tab is the unified
   `ExploreScreen`; old per-sub screens + routes + dead row components removed, old routes kept as
   `<Redirect href="/explore?sub=...">`, Explore defaults to Recent (prototype pill order), home
   quick-action/chip deep links fixed, and a TDD spec added for `ExploreScreen`.
@@ -350,7 +350,7 @@ typecheck` + `bun run lint` pass.
 
 ## Stage 8d: Remove stale per-sub Explore screens; keep canonical `/explore?sub=` deep links
 
-- Status: In Progress (code done; commit pending in `8d` commit)
+- Status: Completed (committed `b0537de2`)
 - Goal: The live Explore tab is the unified `ExploreScreen` (all four sub-tabs, All Lectures chips +
   in-place list, Curation empty state with CTA). The old per-sub screens (`explore-recent`,
   `explore-all`, `curation`, `explore-scholar`) and their routes were dead leftovers still on disk.
