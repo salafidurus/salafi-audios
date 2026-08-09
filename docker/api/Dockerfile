@@ -5,7 +5,7 @@
 # Coolify build settings (Build Pack: Dockerfile):
 #   Base Directory:      /      (repo root, so `turbo prune` sees the whole monorepo)
 #   Dockerfile Location: docker/api/Dockerfile
-#   Port Exposes:        3000   (app defaults to this via ENV PORT below)
+#   Port Exposes:        4000   (app defaults to this via ENV PORT below)
 #   Port Mappings:       empty  (Coolify/Traefik route internally)
 #
 # All runtime env vars (DATABASE_URL, better-auth, OAuth, R2, CORS, ...) are
@@ -84,8 +84,15 @@ RUN rm -rf node_modules apps/*/node_modules packages/*/node_modules \
 # ============================================================
 FROM oven/bun:1.3.14 AS runtime
 
+# Install curl so Coolify's container healthcheck (exec'd inside this image)
+# can probe the API. Debian-based oven/bun image; done before the non-root
+# user switch below.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV NODE_ENV=production \
-    PORT=3000
+    PORT=4000
 WORKDIR /app
 
 # Copy the pruned workspace: api source (run directly by Bun), the built
@@ -109,7 +116,7 @@ RUN chown -R 1000:1000 /app
 USER 1000
 ENV HOME=/app
 
-EXPOSE 3000
+EXPOSE 4000
 WORKDIR /app/apps/api
 
 # Production entrypoint — equivalent to `start:prod`
