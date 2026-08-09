@@ -1,15 +1,26 @@
 import type { Track } from "@sd/domain-audio";
 
 import { pickContentField } from "@sd/core-i18n";
-import { useAudio, useProgressStore, buildTrackQueue } from "@sd/domain-audio";
-import { useListingDetail, useListingContents } from "@sd/domain-content";
+import { useAudio, buildTrackQueue } from "@sd/domain-audio";
+import {
+  useListingDetail,
+  useListingContents,
+  useIsSaved,
+  markSaved,
+  markUnsaved,
+} from "@sd/domain-content";
+import { router, useLocalSearchParams } from "expo-router";
 import { Play, Pause, Bookmark } from "lucide-react-native";
+import { useEffect } from "react";
 import { ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { audioService } from "@/features/audio";
+import { DownloadButton } from "@/features/downloads/components/download-button/download-button";
+import { DownloadProgress } from "@/features/downloads/components/download-progress/download-progress";
 import { LectureMeta } from "@/features/listing/components/lecture-meta/lecture-meta";
+import { ListingContentView } from "@/features/listing/components/listing-content-view/listing-content-view";
 import { SeriesContextBar } from "@/features/listing/components/series-context-bar/series-context-bar";
 import { TopicChips } from "@/features/listing/components/topic-chips/topic-chips";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
@@ -24,17 +35,27 @@ export type LectureDetailScreenProps = {
 
 export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { theme } = useUnistyles();
+  const { anchor } = useLocalSearchParams<{ slug: string; anchor?: string }>();
   const { data: lecture, isFetching } = useListingDetail(slug);
-  const { data: seriesContents } = useListingContents(lecture?.seriesContext?.seriesId ?? "");
+  const { data: seriesContents } = useListingContents(lecture?.seriesContext?.seriesSlug ?? "");
+  const isContainer = lecture?.format === "series" || lecture?.format === "collection";
+  const { data: ownContents } = useListingContents(isContainer ? lecture!.slug : "");
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
 
   const { isPlaying, currentTrack } = useAudio();
   const isCurrentTrack = lecture ? currentTrack?.id === lecture.id : false;
 
-  const isSaved = useProgressStore((s) => (lecture ? s.actions.isSaved(lecture.id) : false));
-  const addSaved = useProgressStore((s) => s.actions.addSaved);
-  const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+  const isSaved = useIsSaved(lecture?.id ?? "");
+
+  // Slugs are flat and don't encode nesting, so a Lesson/Module's own slug
+  // resolves to itself — redirect to the top-level page it belongs under,
+  // anchored to this item so the parent page can scroll to and highlight it.
+  useEffect(() => {
+    if (lecture?.rootListing) {
+      router.replace(`/listings/${lecture.rootListing.slug}?anchor=${lecture.id}`);
+    }
+  }, [lecture]);
 
   if (isFetching) {
     return (
@@ -52,10 +73,50 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
     );
   }
 
+  if (lecture.rootListing) {
+    return (
+      <ScreenView center>
+        <EmptyState message={t("lecture.loading", "Loading lecture…")} variant="loading" />
+      </ScreenView>
+    );
+  }
+
   const title = pickContentField(lecture.title, lecture.original?.title, showOriginal);
   const description = lecture.description
     ? pickContentField(lecture.description, lecture.original?.description, showOriginal)
     : undefined;
+
+  if (isContainer) {
+    return (
+      <ScreenView>
+        <View style={styles.headerSection}>
+          <AppText variant="titleLg">{title}</AppText>
+          <LectureMeta lecture={lecture} />
+          {description ? (
+            <AppText variant="bodyMd" style={styles.descriptionSection}>
+              {description}
+            </AppText>
+          ) : null}
+        </View>
+        {ownContents ? (
+          <ListingContentView
+            contents={ownContents}
+            listingRef={{
+              id: lecture.id,
+              title,
+              format: lecture.format,
+              scholarName: lecture.scholar.name,
+              scholarSlug: lecture.scholar.slug,
+              artworkUrl: lecture.scholar.imageUrl ?? undefined,
+            }}
+            highlightItemId={anchor}
+          />
+        ) : (
+          <EmptyState message={t("lecture.loading", "Loading lessons…")} variant="loading" />
+        )}
+      </ScreenView>
+    );
+  }
 
   const handlePlay = async () => {
     if (isCurrentTrack) {
@@ -92,6 +153,7 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
 
     const track: Track = {
       id: lecture.id,
+      slug: lecture.slug,
       title,
       artist: lecture.scholar.name,
       scholarSlug: lecture.scholar.slug,
@@ -107,9 +169,9 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
 
   const handleSave = () => {
     if (isSaved) {
-      removeSaved(lecture.id);
+      markUnsaved(lecture.id, lecture.slug);
     } else {
-      addSaved(lecture.id);
+      markSaved(lecture.id, lecture.slug);
     }
   };
 
@@ -153,6 +215,12 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
           </View>
         </View>
 
+        <DownloadProgress lectureId={lecture.id} />
+
+        {lecture.primaryAudioAsset?.url ? (
+          <DownloadButton lectureId={lecture.id} audioUrl={lecture.primaryAudioAsset.url} />
+        ) : null}
+
         <TopicChips topics={lecture.topics} />
 
         {description ? (
@@ -175,6 +243,12 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.layout.pageY,
     paddingBottom: theme.spacing.layout.sectionY,
     gap: theme.spacing.scale.md,
+  },
+  headerSection: {
+    paddingHorizontal: theme.spacing.layout.pageX,
+    paddingTop: theme.spacing.layout.pageY,
+    paddingBottom: theme.spacing.scale.sm,
+    gap: theme.spacing.scale.sm,
   },
   actionsRow: {
     flexDirection: "row",

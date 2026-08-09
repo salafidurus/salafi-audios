@@ -4,6 +4,27 @@ import React from "react";
 
 import { LectureDetailScreen } from "./lecture-detail.screen";
 
+const mockRouterReplace = jest.fn();
+const mockUseLocalSearchParams = jest.fn(() => ({ slug: "lecture-1" }) as Record<string, string>);
+const mockIsSaved = jest.fn(() => false);
+const mockMarkSaved = jest.fn();
+const mockMarkUnsaved = jest.fn();
+
+jest.mock("expo-router", () => ({
+  router: { replace: (...args: unknown[]) => mockRouterReplace(...args) },
+  useLocalSearchParams: () => mockUseLocalSearchParams(),
+}));
+
+jest.mock("@/features/listing/components/listing-content-view/listing-content-view", () => ({
+  ListingContentView: ({ highlightItemId }: { highlightItemId?: string }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ReactM = require("react");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Text } = require("react-native");
+    return ReactM.createElement(Text, null, `Contents anchor:${highlightItemId ?? "none"}`);
+  },
+}));
+
 jest.mock("react-native-unistyles", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { lightNativeTheme } = require("@/core/styles/theme");
@@ -21,6 +42,9 @@ jest.mock("react-native-unistyles", () => {
 jest.mock("@sd/domain-content", () => ({
   useListingDetail: jest.fn(),
   useListingContents: jest.fn(() => ({ data: undefined })),
+  useIsSaved: () => mockIsSaved(),
+  markSaved: (...args: unknown[]) => mockMarkSaved(...args),
+  markUnsaved: (...args: unknown[]) => mockMarkUnsaved(...args),
 }));
 
 jest.mock("@sd/domain-audio", () => {
@@ -34,13 +58,6 @@ jest.mock("@sd/domain-audio", () => {
       pause: jest.fn(),
       resume: jest.fn(),
     })),
-    useProgressStore: jest.fn(() => ({
-      actions: {
-        isSaved: jest.fn(() => false),
-        addSaved: jest.fn(),
-        removeSaved: jest.fn(),
-      },
-    })),
   };
 });
 
@@ -49,6 +66,23 @@ jest.mock("@/features/audio", () => ({
     playListing: jest.fn(),
     pause: jest.fn(),
     resume: jest.fn(),
+  },
+}));
+
+const mockDownloadButton = jest.fn((_props: unknown) => null);
+const mockDownloadProgress = jest.fn((_props: unknown) => null);
+
+jest.mock("@/features/downloads/components/download-button/download-button", () => ({
+  DownloadButton: (props: unknown) => {
+    mockDownloadButton(props);
+    return null;
+  },
+}));
+
+jest.mock("@/features/downloads/components/download-progress/download-progress", () => ({
+  DownloadProgress: (props: unknown) => {
+    mockDownloadProgress(props);
+    return null;
   },
 }));
 
@@ -110,6 +144,8 @@ const { audioService } = require("@/features/audio");
 beforeEach(() => {
   jest.clearAllMocks();
   mockedUseListingContents.mockReturnValue({ data: undefined });
+  mockUseLocalSearchParams.mockReturnValue({ slug: "lecture-1" });
+  mockIsSaved.mockReturnValue(false);
 });
 
 describe("LectureDetailScreen", () => {
@@ -230,4 +266,143 @@ describe("LectureDetailScreen", () => {
     expect(playedTrack.id).toBe("lesson-1");
     expect(playedQueue.map((t: { id: string }) => t.id)).toEqual(["lesson-1", "lesson-2"]);
   }, 15000);
+
+  it("redirects to the root listing, anchored to itself, when the resolved listing is nested", async () => {
+    mockedUseListingDetail.mockReturnValue({
+      data: {
+        id: "lesson-1",
+        slug: "lesson-1",
+        title: "Lesson 1",
+        format: "single",
+        scholar: { id: "scholar-1", slug: "ibn-baz", name: "Ibn Baz" },
+        topics: [],
+        primaryAudioAsset: null,
+        seriesContext: null,
+        rootListing: { id: "series-1", slug: "explanation-of-tawheed", title: "Explanation" },
+      },
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<LectureDetailScreen slug="lesson-1" />);
+
+    expect(mockRouterReplace).toHaveBeenCalledWith(
+      "/listings/explanation-of-tawheed?anchor=lesson-1",
+    );
+    expect(screen.getByText("Loading lecture…")).toBeTruthy();
+  });
+
+  it("renders the lesson list for a top-level series, passing the anchor query param through", async () => {
+    mockUseLocalSearchParams.mockReturnValue({ slug: "series-1", anchor: "lesson-2" });
+    mockedUseListingDetail.mockReturnValue({
+      data: {
+        id: "series-1",
+        slug: "series-1",
+        title: "Explanation of Tawheed",
+        format: "series",
+        scholar: { id: "scholar-1", slug: "ibn-baz", name: "Ibn Baz" },
+        topics: [],
+        primaryAudioAsset: null,
+        seriesContext: null,
+        rootListing: null,
+      },
+      isFetching: false,
+      error: null,
+    });
+    mockedUseListingContents.mockReturnValue({
+      data: { format: "series", items: [] },
+    });
+
+    await render(<LectureDetailScreen slug="series-1" />);
+
+    expect(screen.getByText("Explanation of Tawheed")).toBeTruthy();
+    expect(screen.getByText("Contents anchor:lesson-2")).toBeTruthy();
+  });
+
+  const singleLecture = {
+    id: "lecture-1",
+    slug: "lecture-1",
+    title: "An Example Lecture",
+    format: "single" as const,
+    scholar: { id: "scholar-1", slug: "ibn-baz", name: "Ibn Baz" },
+    topics: [],
+    primaryAudioAsset: null,
+    seriesContext: null,
+    rootListing: null,
+  };
+
+  it("calls markSaved with id and slug when clicking Save", async () => {
+    mockedUseListingDetail.mockReturnValue({ data: singleLecture, isFetching: false, error: null });
+
+    await render(<LectureDetailScreen slug="lecture-1" />);
+    await fireEvent.press(screen.getByText("Save"));
+
+    expect(mockMarkSaved).toHaveBeenCalledWith("lecture-1", "lecture-1");
+  });
+
+  it("calls markUnsaved with id and slug when clicking Saved", async () => {
+    mockIsSaved.mockReturnValue(true);
+    mockedUseListingDetail.mockReturnValue({ data: singleLecture, isFetching: false, error: null });
+
+    await render(<LectureDetailScreen slug="lecture-1" />);
+    await fireEvent.press(screen.getByText("Saved"));
+
+    expect(mockMarkUnsaved).toHaveBeenCalledWith("lecture-1", "lecture-1");
+  });
+
+  it("passes the resolved listing's own slug (not the uuid id) through to markSaved", async () => {
+    mockedUseListingDetail.mockReturnValue({
+      data: { ...singleLecture, id: "uuid-1", slug: "tafsir-al-fatiha" },
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<LectureDetailScreen slug="tafsir-al-fatiha" />);
+    await fireEvent.press(screen.getByText("Save"));
+
+    expect(mockMarkSaved).toHaveBeenCalledWith("uuid-1", "tafsir-al-fatiha");
+  });
+
+  it("tags the standalone track with its own slug — progress sync resolves strictly by slug, not uuid", async () => {
+    mockedUseListingDetail.mockReturnValue({
+      data: { ...singleLecture, id: "uuid-1", slug: "tafsir-al-fatiha" },
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<LectureDetailScreen slug="tafsir-al-fatiha" />);
+    await fireEvent.press(screen.getByText("Play"));
+
+    expect(audioService.playListing).toHaveBeenCalledTimes(1);
+    const [playedTrack] = audioService.playListing.mock.calls[0];
+    expect(playedTrack).toMatchObject({ id: "uuid-1", slug: "tafsir-al-fatiha" });
+  });
+
+  it("wires the lecture's id and audio url through to DownloadButton and DownloadProgress", async () => {
+    mockedUseListingDetail.mockReturnValue({
+      data: {
+        ...singleLecture,
+        primaryAudioAsset: { id: "asset-1", url: "https://s/lecture-1.mp3" },
+      },
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<LectureDetailScreen slug="lecture-1" />);
+
+    expect(mockDownloadButton).toHaveBeenCalledWith(
+      expect.objectContaining({ lectureId: "lecture-1", audioUrl: "https://s/lecture-1.mp3" }),
+    );
+    expect(mockDownloadProgress).toHaveBeenCalledWith(
+      expect.objectContaining({ lectureId: "lecture-1" }),
+    );
+  });
+
+  it("omits DownloadButton when the lecture has no audio asset", async () => {
+    mockedUseListingDetail.mockReturnValue({ data: singleLecture, isFetching: false, error: null });
+
+    await render(<LectureDetailScreen slug="lecture-1" />);
+
+    expect(mockDownloadButton).not.toHaveBeenCalled();
+  });
 });

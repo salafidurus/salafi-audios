@@ -1,4 +1,5 @@
-import { useAdminPermissions } from "@sd/domain-account";
+import { createMongoAbility } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 
@@ -33,14 +34,14 @@ vi.mock("@/features/admin/api/admin-translations.api", () => ({
 }));
 
 vi.mock("@sd/domain-account", () => ({
-  useAdminPermissions: vi.fn(),
+  useAbility: vi.fn(),
 }));
 
 describe("TranslationModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["TRANSLATIONS_VIEW", "TRANSLATIONS_CREATE", "TRANSLATIONS_PUBLISH"] },
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "manage", subject: "all" }]),
     });
   });
 
@@ -202,9 +203,9 @@ describe("TranslationModal", () => {
     expect(screen.getByRole("tab", { name: "English" })).toHaveAttribute("aria-selected");
   });
 
-  it("hides the publish button without TRANSLATIONS_PUBLISH", async () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["TRANSLATIONS_VIEW"] },
+  it("hides the publish button without publish capability", async () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Translation" }]),
     });
     (fetchListingFormData as Mock<any>).mockResolvedValue({
       listing: {

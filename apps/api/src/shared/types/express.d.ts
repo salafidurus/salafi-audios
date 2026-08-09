@@ -1,3 +1,5 @@
+import type { AccessGrantAttribute } from '../../core/auth/ability/ability.types';
+
 declare global {
   namespace Express {
     interface Request {
@@ -9,6 +11,7 @@ declare global {
         emailVerified: boolean;
         image?: string | null;
         roles: string[];
+        accessGrants: AccessGrantAttribute[];
         banned?: boolean | null;
         banReason?: string | null;
         banExpires?: Date | null;

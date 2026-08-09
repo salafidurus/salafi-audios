@@ -3,7 +3,7 @@
 import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
 import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
-import { Languages } from "lucide-react";
+import { Globe, Languages } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { setLocaleCookie } from "@/core/i18n/locale-cookie";
@@ -41,7 +41,11 @@ export function LanguageSwitch({ direction = "down", collapsed = false }: Langua
     }
     await i18n.changeLanguage(locale as Locale);
     setLocaleCookie(locale as Locale);
-    await queryClient.invalidateQueries();
+    // Content queries carry the locale via Accept-Language. A refetch here
+    // would still use the OLD locale and get thrown away by router.refresh()
+    // anyway, so clear the cache synchronously instead of invalidating +
+    // awaiting a wasted round-trip — mirrors the sign-out cache clear.
+    queryClient.clear();
     refresh();
   };
 
@@ -56,7 +60,14 @@ export function LanguageSwitch({ direction = "down", collapsed = false }: Langua
         ariaLabel={t("navigation.languageSwitch", "Language")}
         className={styles.trigger}
       >
-        {collapsed ? <Languages size={18} /> : undefined}
+        {collapsed ? (
+          <Languages size={18} />
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <Globe size={14} color="var(--action-primary)" />
+            <span>{LOCALE_LABELS[activeLocale]}</span>
+          </div>
+        )}
       </DropdownTrigger>
       <DropdownContent>
         {SUPPORTED_LOCALES.map((locale) => (

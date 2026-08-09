@@ -24,50 +24,21 @@ enum UserRole {
   superadmin // Full system access
 }
 
-enum Permission {
-  // Scholar Permissions
-  SCHOLARS_VIEW
-  SCHOLARS_CREATE
-  SCHOLARS_EDIT
-  SCHOLARS_DELETE
-  SCHOLARS_PUBLISH
-
-  // Listing Permissions (Collections, Series, Singles, Modules, Lessons)
-  LISTINGS_VIEW
-  LISTINGS_CREATE
-  LISTINGS_EDIT
-  LISTINGS_DELETE
-  LISTINGS_PUBLISH
-
-  // Topic Permissions
-  TOPICS_VIEW
-  TOPICS_CREATE
-  TOPICS_EDIT
-  TOPICS_DELETE
-  TOPICS_PUBLISH
-
-  // Translation Permissions
-  TRANSLATIONS_VIEW
-  TRANSLATIONS_CREATE
-  TRANSLATIONS_EDIT
-  TRANSLATIONS_DELETE
-  TRANSLATIONS_PUBLISH
-
-  // Media Permissions
-  MEDIA_UPLOAD
-  MEDIA_DELETE
-
-  // User Management Permissions
-  USERS_VIEW
-  USERS_EDIT
-  USERS_DELETE
-  USERS_GRANT_PERMISSIONS
-  USERS_GRANT_ROLES
+enum AccessTarget {
+  scholar
+  listing
+  media
+  topic
+  translation
+  user
 }
 
-enum ScholarPermissionType {
-  OWN_CONTENT
-  ASSIGNED_EDITOR
+enum AccessCapability {
+  write
+  translate
+  publish
+  delete
+  manage
 }
 
 enum Status {
@@ -86,11 +57,6 @@ enum ListingFormat {
 enum RecommendationRecurrence {
   none
   yearly
-}
-
-enum ScholarRole {
-  scholar
-  scholar_editor
 }
 
 enum Locale {
@@ -134,21 +100,32 @@ model User {
   sessions Session[]
   accounts Account[]
 
-  // Role and Permission Management
+  // System role management
   roles                  UserRoleAssignment[]
   roleAssignmentsGranted UserRoleAssignment[] @relation("UserRoleGranter")
-  permissions            UserPermission[]
-  permissionsGranted     UserPermission[]     @relation("UserPermissionGranter")
-
-  // Scholar and Translator Management
-  scholarRoles           UserScholarRole[]
-  createdScholarRoles    UserScholarRole[]    @relation("createdByUser")
-  translatorRoles        UserTranslatorRole[]
-  createdTranslatorRoles UserTranslatorRole[] @relation("createdByUser")
+  accessGrants           UserAccessGrant[]
+  accessVersion          Int                  @default(0)
 
   // Content Management
   progress  UserListingProgress[]
   favorites FavoriteListing[]
+}
+
+model UserAccessGrant {
+  id         String           @id @default(cuid())
+  userId     String
+  target     AccessTarget
+  capability AccessCapability
+  scholarId  String?
+  locale     Locale?
+  grantedAt  DateTime         @default(now())
+  grantedBy  String?
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scholar Scholar? @relation(fields: [scholarId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([scholarId])
 }
 
 model UserRoleAssignment {
@@ -164,54 +141,6 @@ model UserRoleAssignment {
   @@unique([userId, role])
   @@index([userId])
   @@index([role])
-}
-
-model UserPermission {
-  id         String     @id @default(cuid())
-  userId     String
-  permission Permission
-  grantedAt  DateTime   @default(now())
-  grantedBy  String?
-
-  user          User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  grantedByUser User? @relation("UserPermissionGranter", fields: [grantedBy], references: [id], onDelete: SetNull)
-
-  @@unique([userId, permission])
-  @@index([userId])
-  @@index([permission])
-}
-
-model UserScholarRole {
-  id             String                @id @default(cuid())
-  userId         String
-  scholarId      String
-  permissionType ScholarPermissionType
-  createdAt      DateTime              @default(now())
-  createdBy      String?
-
-  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  scholar       Scholar @relation(fields: [scholarId], references: [id], onDelete: Cascade)
-  createdByUser User?   @relation("createdByUser", fields: [createdBy], references: [id], onDelete: SetNull)
-
-  @@unique([userId, scholarId, permissionType])
-  @@index([scholarId, permissionType], map: "idx_user_scholar_role_scholar_permission")
-  @@index([userId], map: "idx_user_scholar_role_user")
-}
-
-model UserTranslatorRole {
-  id         String   @id @default(cuid())
-  userId     String
-  locale     Locale
-  canPublish Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  createdBy  String?
-
-  user          User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdByUser User? @relation("createdByUser", fields: [createdBy], references: [id], onDelete: SetNull)
-
-  @@unique([userId, locale])
-  @@index([userId])
-  @@index([locale])
 }
 
 //////////////////////////
@@ -245,7 +174,7 @@ model Scholar {
   socialWebsite  String?
 
   listings     Listing[]
-  userRoles    UserScholarRole[]
+  accessGrants UserAccessGrant[]
   translations ScholarTranslation[]
 
   @@unique([slug], map: "uq_scholar_slug")
@@ -406,14 +335,22 @@ model UserListingProgress {
 
 model FavoriteListing {
   userId    String
-  listingId String   @db.Uuid
-  createdAt DateTime @default(now())
+  listingId String    @db.Uuid
+  createdAt DateTime  @default(now())
+  // Not @updatedAt — deliberately app-code-settable, mirroring UserListingProgress,
+  // so a client-supplied timestamp can drive LWW conflict resolution in bulkSync.
+  updatedAt DateTime  @default(now())
+  // Tombstone: unsave sets this instead of deleting the row, so delta sync
+  // (?since=) can propagate a removal to other devices instead of the row
+  // silently vanishing from a `since` query with no trace.
+  deletedAt DateTime?
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@id([userId, listingId])
   @@index([userId, createdAt], map: "idx_fav_user_createdat")
+  @@index([userId, updatedAt], map: "idx_fav_user_updatedat")
   @@index([listingId], map: "idx_fav_listing")
 }
 

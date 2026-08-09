@@ -106,31 +106,73 @@
   }
 }
 
-/* Sign-in CTA */
+/* Sign-in CTA matching prototype ScreenSettings */
 .signInCta {
+  max-width: 480px;
+  margin: 0 auto;
   text-align: center;
-  padding: var(--space-scale-3xl) var(--space-scale-xl);
-  border: var(--border-width-default) solid var(--border-default);
-  border-radius: var(--radius-component-panel);
+  padding: 30px;
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  background: var(--surface-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.iconBadge {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   background: var(--surface-subtle);
+  border: 1px solid color-mix(in srgb, var(--action-primary) 33%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
 }
 
 .signInTitle {
-  margin: 0 0 var(--space-scale-sm);
-  font-size: var(--typo-title-md-font-size);
+  margin: 0 0 8px;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 19px;
   font-weight: 600;
+  color: var(--content-strong);
 }
 
 .signInDesc {
-  margin: 0 0 var(--space-scale-xl);
-  font-size: var(--typo-body-sm-font-size);
-  color: var(--content-muted);
+  margin: 0 0 20px;
+  font-size: 13px;
+  color: var(--content-subtle);
+  line-height: 1.6;
 }
 
-.rolesRow {
+.bulletList {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-scale-sm);
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.bulletRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkCircle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--action-primary) 20%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bulletText {
+  font-size: 13px;
+  color: var(--content-subtle);
 }
 
 .loading,

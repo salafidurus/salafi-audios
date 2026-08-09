@@ -7,7 +7,12 @@
     "noFallthroughCasesInSwitch": true,
     "composite": true,
     "incremental": true,
-    "types": ["bun-types", "node"]
+    "types": ["bun-types", "node"],
+    // @casl/ability only declares types via package.json "exports" conditions,
+    // which the preset's Node10 moduleResolution can't follow. "bundler" reads
+    // "exports" correctly; this is tsc-only (doesn't affect Bun's own runtime
+    // module resolution, unlike a "paths" override would).
+    "moduleResolution": "bundler"
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "test/**/*.ts"],
   "exclude": ["node_modules", "dist"]

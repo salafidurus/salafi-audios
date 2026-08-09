@@ -1,13 +1,24 @@
 import { useListingDetail, useListingContents, useLastPlayedLesson } from "@sd/domain-content";
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, beforeEach, vi } from "bun:test";
+import { cleanup, render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeEach, afterEach, vi } from "bun:test";
 
 import { ListingDetailScreen } from "./listing-detail.screen";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+  }),
+}));
 
 vi.mock("@sd/domain-content", () => ({
   useListingDetail: vi.fn(),
   useListingContents: vi.fn(),
   useLastPlayedLesson: vi.fn(),
+  useIsSaved: vi.fn().mockReturnValue(false),
+  markSaved: vi.fn(),
+  markUnsaved: vi.fn(),
 }));
 
 vi.mock("@/core/auth", () => ({
@@ -17,7 +28,7 @@ vi.mock("@/core/auth", () => ({
 vi.mock("@sd/domain-audio", () => ({
   useAudio: vi.fn().mockReturnValue({ isPlaying: false, currentTrack: null }),
   useProgressStore: vi.fn((selector) =>
-    selector({ progressMap: {}, savedMap: {}, actions: { isSaved: () => false } }),
+    selector({ progressMap: {}, actions: { isSaved: () => false } }),
   ),
 }));
 
@@ -62,13 +73,18 @@ beforeEach(() => {
   mockUseListingDetail.mockReturnValue({ data: undefined, isFetching: false });
   mockUseListingContents.mockReturnValue({ data: undefined, isFetching: false });
   mockUseLastPlayedLesson.mockReturnValue({ data: null, isFetching: false });
+  window.location.hash = "";
+});
+
+afterEach(() => {
+  cleanup();
 });
 
 describe("ListingDetailScreen", () => {
   it("shows loading state when detail is fetching", () => {
     mockUseListingDetail.mockReturnValue({ data: undefined, isFetching: true });
     render(<ListingDetailScreen slug="tawheed-lecture" />);
-    expect(screen.getByText("Loading content…")).toBeTruthy();
+    expect(screen.getByText("Back")).toBeTruthy();
   });
 
   it("shows not-found state when listing does not exist", () => {
@@ -84,5 +100,32 @@ describe("ListingDetailScreen", () => {
     expect(screen.getAllByText("Kitab At-Tawheed Lecture").length).toBeGreaterThan(0);
     expect(screen.getByText("Ibn Baz")).toBeTruthy();
     expect(screen.getAllByText("Play").length).toBeGreaterThan(0);
+  });
+
+  it("renders normally when the resolved listing is already top-level", () => {
+    mockUseListingDetail.mockReturnValue({ data: mockSingleListing, isFetching: false });
+    mockUseListingContents.mockReturnValue({ data: mockSingleContents, isFetching: false });
+
+    render(<ListingDetailScreen slug="tawheed-lecture" />);
+    expect(screen.getAllByText("Kitab At-Tawheed Lecture").length).toBeGreaterThan(0);
+  });
+
+  it("shows a loading guard instead of the wrong content when the resolved listing is nested", () => {
+    // The server-rendered page (app/.../listings/[slug]/page.tsx) redirects a
+    // nested Lesson/Module's slug before this screen ever mounts with real
+    // data; this only covers the defensive fallback if that's ever bypassed.
+    mockUseListingDetail.mockReturnValue({
+      data: {
+        ...mockSingleListing,
+        id: "lesson-1",
+        rootListing: { id: "series-1", slug: "explanation-of-tawheed", title: "Explanation" },
+      },
+      isFetching: false,
+    });
+
+    render(<ListingDetailScreen slug="tawheed-lecture" />);
+
+    expect(screen.getByText("Loading content…")).toBeTruthy();
+    expect(screen.queryByText("Kitab At-Tawheed Lecture")).toBeNull();
   });
 });

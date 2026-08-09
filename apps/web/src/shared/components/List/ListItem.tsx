@@ -6,6 +6,9 @@ export type ListItemProps = {
   children: ReactNode;
   onClick?: () => void;
   className?: string;
+  id?: string;
+  /** Marks the row as momentarily highlighted (e.g. scrolled-to from a URL anchor) via `data-highlighted`. */
+  highlighted?: boolean;
   /**
    * If true, shows hover/active states even without onClick.
    * Useful for items with nested interactive elements.
@@ -22,7 +25,14 @@ export type ListItemProps = {
  * - Should be used inside ListContainer
  * - Compatible with List.Item.Actions which positions on right (desktop/tablet) or below (mobile)
  */
-export function ListItem({ children, onClick, className, interactive = false }: ListItemProps) {
+export function ListItem({
+  children,
+  onClick,
+  className,
+  id,
+  highlighted = false,
+  interactive = false,
+}: ListItemProps) {
   const isClickable = Boolean(onClick);
   const showHoverStates = isClickable || interactive;
 
@@ -51,6 +61,8 @@ export function ListItem({ children, onClick, className, interactive = false }: 
 
   return (
     <div
+      id={id}
+      data-highlighted={highlighted ? "true" : undefined}
       role={isClickable ? "button" : undefined}
       tabIndex={isClickable ? 0 : undefined}
       onClick={handleClick}

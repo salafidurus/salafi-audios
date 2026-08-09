@@ -1,455 +1,339 @@
-# Admin and Permission Management
+# Admin and Access Management
 
-Complete guide for managing admin accounts, granting permissions, and handling SuperAdmin roles in Salafi Durus.
+Salafi Durus uses system roles plus aggregate access grants. Catalog reads are public; grants protect editorial mutations and user administration.
 
----
+## Access Model
 
-## Troubleshooting: "type 'permission' does not exist"
+`UserRoleAssignment` stores system roles (like `superadmin`). `UserAccessGrant` stores fine-grained capabilities and scope attributes (like `scholarId` and `locale`) used by backend CASL policy checks.
 
-If you encounter `ERROR: type "permission" does not exist` when running SQL commands, your database may be in an inconsistent state. The Permission enum type should have been created by migrations but isn't present.
+| Target        | Capabilities                     | Scope                                                    |
+| ------------- | -------------------------------- | -------------------------------------------------------- |
+| `scholar`     | `write`, `publish`, `delete`     | global or one or more scholars                           |
+| `listing`     | `write`, `publish`, `delete`     | global or one or more scholars                           |
+| `media`       | `write`, `delete`                | global or one or more scholars                           |
+| `topic`       | `write`, `publish`, `delete`     | global only                                              |
+| `translation` | `translate`, `publish`, `delete` | global or one or more scholars, plus one or more locales |
+| `user`        | `manage`                         | global only                                              |
 
-### Step 1: Check Migration Status
-
-```bash
-# Deploy pending migrations
-bun run --filter @sd/core-db migrate:deploy
-```
-
-If it says "No pending migrations" but the enum doesn't exist, the migration likely failed or was rolled back.
-
-### Step 2: Reset and Redeploy Migrations (Safe Approach)
-
-**Option A: Hard reset** (if you can afford to lose dev data):
-
-```bash
-# This drops the current database and re-runs all migrations from scratch
-cd packages/core-db
-npx prisma migrate reset --force
-
-# Then re-seed if needed
-bun run prisma:seed
-```
-
-**Option B: Manual Enum Creation** (if you need to preserve data):
-
-If the tables exist but the enum is missing, manually create it:
-
-```sql
--- Create permission enum (capitalized type name to match migration)
-CREATE TYPE "Permission" AS ENUM (
-  'SCHOLARS_VIEW', 'SCHOLARS_CREATE', 'SCHOLARS_EDIT', 'SCHOLARS_DELETE', 'SCHOLARS_PUBLISH',
-  'LISTINGS_VIEW', 'LISTINGS_CREATE', 'LISTINGS_EDIT', 'LISTINGS_DELETE', 'LISTINGS_PUBLISH',
-  'TOPICS_VIEW', 'TOPICS_CREATE', 'TOPICS_EDIT', 'TOPICS_DELETE', 'TOPICS_PUBLISH',
-  'TRANSLATIONS_VIEW', 'TRANSLATIONS_CREATE', 'TRANSLATIONS_EDIT', 'TRANSLATIONS_DELETE', 'TRANSLATIONS_PUBLISH',
-  'MEDIA_UPLOAD', 'MEDIA_DELETE',
-  'USERS_VIEW', 'USERS_EDIT', 'USERS_DELETE', 'USERS_GRANT_PERMISSIONS', 'USERS_GRANT_ROLES'
-);
-
--- If UserPermission table exists but permission column is TEXT, alter it:
--- ALTER TABLE "UserPermission" ALTER COLUMN "permission" TYPE "Permission" USING "permission"::"Permission";
-```
-
-After the enum is created, the SQL commands below will work with enum casting (`::"Permission"`).
+- **Separation of Deleters**: Delete capabilities are separate from write capabilities.
+- **Derived Roles**: Roles shown in the admin UI (`Editor`, `Translator`, `Publisher`, `Deleter`, and `User manager`) are dynamically derived from a user's active access grants rather than stored as database role strings.
+- **SuperAdmin Role**: `superadmin` is the only protected system role. A superadmin bypasses all policy capability checks and is managed explicitly; normal capability-based access grants do not grant superadmin status.
 
 ---
 
-## Quick Start
+## Command-Line CLI Administration
 
-### Make a User an Admin (All Permissions)
+The `grant:access` script inside `@sd/core-db` is the recommended way to manage roles and capabilities. The script resolves scholar slugs to database IDs automatically.
 
-**Automated** (recommended):
+### Usage
 
-```bash
-bun run --filter @sd/core-db make-admin user@example.com
-```
-
-**Manual SQL**:
-
-```sql
--- 1. Assign the admin role via UserRoleAssignment (not User.role, which no longer exists)
-INSERT INTO "UserRoleAssignment" (id, "userId", role, "grantedAt")
-SELECT gen_random_uuid()::text, u.id, 'admin', NOW()
-FROM "User" u
-WHERE u.email = 'user@example.com'
-ON CONFLICT ("userId", "role") DO NOTHING;
-
--- 2. Grant all permissions (33 total)
-INSERT INTO "UserPermission" ("userId", "permission", "grantedAt")
-SELECT u.id, perm::"Permission", NOW()
-FROM "User" u, (
-  VALUES
-    ('SCHOLARS_VIEW'), ('SCHOLARS_CREATE'), ('SCHOLARS_EDIT'), ('SCHOLARS_DELETE'), ('SCHOLARS_PUBLISH'),
-    ('LISTINGS_VIEW'), ('LISTINGS_CREATE'), ('LISTINGS_EDIT'), ('LISTINGS_DELETE'), ('LISTINGS_PUBLISH'),
-    ('TOPICS_VIEW'), ('TOPICS_CREATE'), ('TOPICS_EDIT'), ('TOPICS_DELETE'), ('TOPICS_PUBLISH'),
-    ('TRANSLATIONS_VIEW'), ('TRANSLATIONS_CREATE'), ('TRANSLATIONS_EDIT'), ('TRANSLATIONS_DELETE'), ('TRANSLATIONS_PUBLISH'),
-    ('MEDIA_UPLOAD'), ('MEDIA_DELETE'),
-    ('USERS_VIEW'), ('USERS_EDIT'), ('USERS_DELETE'), ('USERS_GRANT_PERMISSIONS'), ('USERS_GRANT_ROLES'),
-    ('LIVE_VIEW'), ('LIVE_CREATE'), ('LIVE_EDIT'), ('LIVE_DELETE'), ('LIVE_START'), ('LIVE_STOP')
-) AS p(perm)
-WHERE u.email = 'user@example.com'
-ON CONFLICT DO NOTHING;
-```
-
-### Grant a Specific Permission
-
-**Automated**:
+Run the script from the repository root:
 
 ```bash
-bun run --filter @sd/core-db grant:permission user@example.com SCHOLARS_VIEW LISTINGS_CREATE
-```
-
-**Manual SQL**:
-
-```sql
-INSERT INTO "UserPermission" ("userId", "permission", "grantedAt")
-SELECT u.id, 'SCHOLARS_VIEW'::"Permission", NOW()
-FROM "User" u
-WHERE u.email = 'user@example.com'
-ON CONFLICT DO NOTHING;
-```
-
----
-
-## Admin System Overview
-
-The admin system has two components:
-
-1. **Role** (`UserRoleAssignment.role`) — coarse access level (admin, superadmin, etc.). Note: `User.role` field is deprecated; use `UserRoleAssignment` table instead.
-2. **Permissions** (`UserPermission` table) — fine-grained capabilities
-
-### Migration Note
-
-**The `User.role` field is no longer used.** All role assignments now use the `UserRoleAssignment` table, enabling multi-role support. A user can have multiple roles simultaneously (e.g., scholar + translator). All SQL examples and scripts in this guide use `UserRoleAssignment` instead of the deprecated `User.role` field.
-
-### Role Types
-
-| Role         | Creation Method       | API-Revokable | Description                                                |
-| ------------ | --------------------- | ------------- | ---------------------------------------------------------- |
-| `listener`   | Auto at OAuth/signup  | Yes           | Default role for authenticated users                       |
-| `scholar`    | Manual via API/script | Yes           | Content creator managing their own lectures                |
-| `editor`     | Manual via API/script | Yes           | Manages content for assigned or all scholars               |
-| `translator` | Manual via API/script | Yes           | Translates content to assigned language(s)                 |
-| `admin`      | Manual via script/SQL | Yes           | Platform administrator (permissions controlled separately) |
-| `superadmin` | Manual via SQL only   | **No**        | Break-glass account; cannot be revoked via API             |
-
-### Permission Types
-
-**Scholar Permissions:**
-
-- `SCHOLARS_VIEW`, `SCHOLARS_CREATE`, `SCHOLARS_EDIT`, `SCHOLARS_DELETE`, `SCHOLARS_PUBLISH`
-
-**Listing Permissions** (Collections, Series, Singles, Modules, Lessons):
-
-- `LISTINGS_VIEW`, `LISTINGS_CREATE`, `LISTINGS_EDIT`, `LISTINGS_DELETE`, `LISTINGS_PUBLISH`
-
-**Topic Permissions:**
-
-- `TOPICS_VIEW`, `TOPICS_CREATE`, `TOPICS_EDIT`, `TOPICS_DELETE`, `TOPICS_PUBLISH`
-
-**Translation Permissions:**
-
-- `TRANSLATIONS_VIEW`, `TRANSLATIONS_CREATE`, `TRANSLATIONS_EDIT`, `TRANSLATIONS_DELETE`, `TRANSLATIONS_PUBLISH`
-
-**Media Permissions:**
-
-- `MEDIA_UPLOAD`, `MEDIA_DELETE`
-
-**User Management Permissions:**
-
-- `USERS_VIEW`, `USERS_EDIT`, `USERS_DELETE`, `USERS_GRANT_PERMISSIONS`, `USERS_GRANT_ROLES`
-
----
-
-## Creating an Admin User
-
-### Option A: Automated Script (Recommended)
-
-The `grant:role` script assigns the admin role and grants all admin permissions atomically.
-
-```bash
-# 1. Generate the Prisma client (first time setup)
+# 1. Ensure the Prisma client is generated
 bun run --filter @sd/core-db prisma:generate
 
-# 2. Promote a local user to admin
-bun run --filter @sd/core-db grant:role user@example.com admin
+# 2. Grant global listing write access (Global Editor)
+bun run --filter @sd/core-db grant:access user@example.com listing write
 
-# 3. Against a production database (Neon example)
-DATABASE_URL="postgresql://user:pass@ep-xxxx.region.aws.neon.tech/neondb" \
-  bun run --filter @sd/core-db grant:role user@example.com admin
+# 3. Grant listing write access scoped to specific scholar slugs
+bun run --filter @sd/core-db grant:access user@example.com listing write \
+  --scholars bin-baz,al-fawzan
+
+# 4. Grant scholar-scoped translation and publishing access for selected locales
+bun run --filter @sd/core-db grant:access user@example.com translation translate \
+  --scholars bin-baz --locales ar,en
+
+# 5. Grant global user management capability
+bun run --filter @sd/core-db grant:access user@example.com user manage
+
+# 6. Grant break-glass superadmin system role
+bun run --filter @sd/core-db grant:access user@example.com superadmin grant
 ```
 
-**Idempotent** — re-running on an existing admin is safe.
+### Options Reference
 
-### Option B: Direct PostgreSQL SQL
+- `--scholars <slug,...>`: Scope content access to one or more scholars.
+- `--locales <ar,en>`: Scope translation access to one or more locales.
 
-Replace `user@example.com` with the target user's email and execute:
+### Production and External Databases
+
+To run the CLI script against a production database, supply `DATABASE_URL` or `DIRECT_DB_URL` as environment variables:
+
+```bash
+DIRECT_DB_URL="postgresql://user:password@production-host:5432/salafi_db" \
+  bun run --filter @sd/core-db grant:access admin@example.com superadmin grant
+```
+
+The command is idempotent. Scholar arguments use scholar slugs, and unknown slugs or invalid target/capability combinations are rejected. Translation grants always require `--locales`; topics and users reject scholar scope.
+
+---
+
+## Direct SQL Administration
+
+For production environments, direct SQL access allows emergency recovery, break-glass administration, or automated scripting without using NestJS or the CLI scripts.
+
+> [!WARNING]
+>
+> - **Primary Key Generation (`id`)**: The tables `"UserRoleAssignment"` and `"UserAccessGrant"` use CUID strings for primary keys. Since PostgreSQL does not generate CUIDs natively, you **must** supply a unique `id` string when performing SQL inserts. A safe pattern is using `'sql-' || gen_random_uuid()`.
+> - **Optimistic Cache Invalidation (`accessVersion`)**: Active admin user sessions and UI clients check `"User".accessVersion` to detect permission updates. **Whenever you change roles or access grants via SQL, you must increment the user's `accessVersion` by 1** so the system reloads their CASL abilities on subsequent requests.
+
+### 1. Setting Up a SuperAdmin
+
+A `superadmin` bypasses all capability checks. To grant this role to a user via direct SQL using their email address:
 
 ```sql
--- Step 1: Assign the admin role
+-- Step 1: Assign the superadmin role assignment
 INSERT INTO "UserRoleAssignment" (id, "userId", role, "grantedAt", "grantedBy")
-SELECT gen_random_uuid()::text, id, 'admin', CURRENT_TIMESTAMP, NULL
-FROM "User"
-WHERE email = 'user@example.com'
-ON CONFLICT ("userId", role) DO NOTHING;
-
--- Step 2: Grant all 27 admin permissions
-INSERT INTO "UserPermission" (id, "userId", permission, "grantedAt", "grantedBy")
 SELECT
-  gen_random_uuid()::text,
-  id,
-  perm::"Permission",
+  'sql-' || gen_random_uuid(),
+  u.id,
+  'superadmin'::"UserRole",
   CURRENT_TIMESTAMP,
   NULL
-FROM "User",
-  (VALUES
-    ('SCHOLARS_VIEW'), ('SCHOLARS_CREATE'), ('SCHOLARS_EDIT'), ('SCHOLARS_DELETE'), ('SCHOLARS_PUBLISH'),
-    ('LISTINGS_VIEW'), ('LISTINGS_CREATE'), ('LISTINGS_EDIT'), ('LISTINGS_DELETE'), ('LISTINGS_PUBLISH'),
-    ('TOPICS_VIEW'), ('TOPICS_CREATE'), ('TOPICS_EDIT'), ('TOPICS_DELETE'), ('TOPICS_PUBLISH'),
-    ('TRANSLATIONS_VIEW'), ('TRANSLATIONS_CREATE'), ('TRANSLATIONS_EDIT'), ('TRANSLATIONS_DELETE'), ('TRANSLATIONS_PUBLISH'),
-    ('MEDIA_UPLOAD'), ('MEDIA_DELETE'),
-    ('USERS_VIEW'), ('USERS_EDIT'), ('USERS_DELETE'), ('USERS_GRANT_PERMISSIONS'), ('USERS_GRANT_ROLES')
-  ) AS p(perm)
-WHERE email = 'user@example.com'
-ON CONFLICT ("userId", permission) DO NOTHING;
-```
-
-### Option C: Prisma Studio
-
-```bash
-bun run --filter @sd/core-db prisma studio
-```
-
-1. Open the `UserRoleAssignment` table and create a new row:
-   - `id`: generate a UUID (Prisma will provide a helper)
-   - `userId`: select the target user's ID
-   - `role`: set to `admin`
-   - `grantedAt`: set to current timestamp
-   - `grantedBy`: leave NULL (optional audit field)
-2. Open the `UserPermission` table and add one row per permission for that user ID
-3. Grant the 27 permissions listed in the permission types section above
-
----
-
-## Granting Specific Permissions
-
-Use the `grant:permission` script to grant individual permissions to a user.
-
-### Automated Script (Recommended)
-
-```bash
-# Grant a single permission
-bun run --filter @sd/core-db grant:permission user@example.com SCHOLARS_VIEW
-
-# Grant multiple permissions at once
-bun run --filter @sd/core-db grant:permission user@example.com SCHOLARS_VIEW SCHOLARS_EDIT LISTINGS_CREATE
-
-# List all valid permissions
-bun run --filter @sd/core-db grant:permission --list
-```
-
-**Idempotent** — re-running with the same user and permission is a no-op.
-
-### Manual SQL
-
-```sql
--- Grant a single permission
-INSERT INTO "UserPermission" ("userId", "permission", "grantedAt")
-SELECT u.id, 'SCHOLARS_VIEW'::"Permission", NOW()
 FROM "User" u
 WHERE u.email = 'user@example.com'
-ON CONFLICT ("userId", "permission") DO NOTHING;
+ON CONFLICT ("userId", role) DO NOTHING;
 
--- Grant multiple permissions
-INSERT INTO "UserPermission" ("userId", "permission", "grantedAt")
-SELECT u.id, perm::"Permission", NOW()
-FROM "User" u,
-  (VALUES
-    ('SCHOLARS_VIEW'),
-    ('SCHOLARS_EDIT'),
-    ('LISTINGS_CREATE')
-  ) AS p(perm)
-WHERE u.email = 'user@example.com'
-ON CONFLICT ("userId", "permission") DO NOTHING;
-
--- Verify granted permissions
-SELECT p.permission, p."grantedAt"
-FROM "UserPermission" p
-WHERE p."userId" = (SELECT id FROM "User" WHERE email = 'user@example.com')
-ORDER BY p."permission";
+-- Step 2: Increment the accessVersion to force a client session reload
+UPDATE "User"
+SET "accessVersion" = "accessVersion" + 1
+WHERE email = 'user@example.com';
 ```
 
-### Revoking Permissions
+### 2. Demoting a SuperAdmin
+
+To remove the `superadmin` assignment via SQL:
 
 ```sql
--- Revoke a specific permission
-DELETE FROM "UserPermission"
+-- Step 1: Delete the role assignment
+DELETE FROM "UserRoleAssignment"
 WHERE "userId" = (SELECT id FROM "User" WHERE email = 'user@example.com')
-AND permission = 'SCHOLARS_VIEW';
+  AND role = 'superadmin'::"UserRole";
 
--- Revoke all permissions for a user
-DELETE FROM "UserPermission"
+-- Step 2: Increment accessVersion to notify client
+UPDATE "User"
+SET "accessVersion" = "accessVersion" + 1
+WHERE email = 'user@example.com';
+```
+
+### 3. Granting Fine-Grained Access Grants (ABAC)
+
+Fine-grained capabilities are stored in `"UserAccessGrant"`. Below are common patterns to insert grants directly via SQL using the user's email and scholar's slug.
+
+#### A. Global Listing Write Access (Global Editor)
+
+To grant listing write access across all content:
+
+```sql
+INSERT INTO "UserAccessGrant" (id, "userId", target, capability, "scholarId", locale, "grantedAt", "grantedBy")
+SELECT
+  'sql-' || gen_random_uuid(),
+  u.id,
+  'listing'::"AccessTarget",
+  'write'::"AccessCapability",
+  NULL,
+  NULL,
+  CURRENT_TIMESTAMP,
+  NULL
+FROM "User" u
+WHERE u.email = 'user@example.com'
+ON CONFLICT DO NOTHING;
+
+UPDATE "User"
+SET "accessVersion" = "accessVersion" + 1
+WHERE email = 'user@example.com';
+```
+
+#### B. Scholar-Scoped Listing Write Access
+
+To grant listing write access scoped to a specific scholar slug:
+
+```sql
+INSERT INTO "UserAccessGrant" (id, "userId", target, capability, "scholarId", locale, "grantedAt", "grantedBy")
+SELECT
+  'sql-' || gen_random_uuid(),
+  u.id,
+  'listing'::"AccessTarget",
+  'write'::"AccessCapability",
+  s.id,
+  NULL,
+  CURRENT_TIMESTAMP,
+  NULL
+FROM "User" u
+CROSS JOIN "Scholar" s
+WHERE u.email = 'user@example.com'
+  AND s.slug = 'scholar-slug'
+ON CONFLICT DO NOTHING;
+
+UPDATE "User"
+SET "accessVersion" = "accessVersion" + 1
+WHERE email = 'user@example.com';
+```
+
+#### C. Scholar-Scoped Locale-Scoped Translation (Translator)
+
+To grant translation translation/publishing access scoped to a scholar slug and the Arabic (`ar`) language:
+
+```sql
+INSERT INTO "UserAccessGrant" (id, "userId", target, capability, "scholarId", locale, "grantedAt", "grantedBy")
+SELECT
+  'sql-' || gen_random_uuid(),
+  u.id,
+  'translation'::"AccessTarget",
+  capabilities.cap::"AccessCapability",
+  s.id,
+  'ar'::"Locale",
+  CURRENT_TIMESTAMP,
+  NULL
+FROM "User" u
+CROSS JOIN "Scholar" s
+CROSS JOIN (VALUES ('translate'), ('publish')) AS capabilities(cap)
+WHERE u.email = 'user@example.com'
+  AND s.slug = 'scholar-slug'
+ON CONFLICT DO NOTHING;
+
+UPDATE "User"
+SET "accessVersion" = "accessVersion" + 1
+WHERE email = 'user@example.com';
+```
+
+### 4. Revoking and Resetting Access
+
+#### Revoking a Specific Grant
+
+```sql
+DELETE FROM "UserAccessGrant"
+WHERE "userId" = (SELECT id FROM "User" WHERE email = 'user@example.com')
+  AND target = 'listing'::"AccessTarget"
+  AND capability = 'write'::"AccessCapability"
+  AND "scholarId" = (SELECT id FROM "Scholar" WHERE slug = 'scholar-slug');
+
+UPDATE "User"
+SET "accessVersion" = "accessVersion" + 1
+WHERE email = 'user@example.com';
+```
+
+#### Wiping All Grants (Resetting User)
+
+```sql
+-- Wipes all capabilities
+DELETE FROM "UserAccessGrant"
 WHERE "userId" = (SELECT id FROM "User" WHERE email = 'user@example.com');
+
+-- Wipes all roles
+DELETE FROM "UserRoleAssignment"
+WHERE "userId" = (SELECT id FROM "User" WHERE email = 'user@example.com');
+
+UPDATE "User"
+SET "accessVersion" = 0
+WHERE email = 'user@example.com';
+```
+
+### 5. Granting All Global Accesses (Without SuperAdmin)
+
+To explicitly grant all possible capability-based access grants globally to a user (without assigning the break-glass `superadmin` role):
+
+```sql
+INSERT INTO "UserAccessGrant" (id, "userId", target, capability, "scholarId", locale, "grantedAt", "grantedBy")
+SELECT
+  'sql-' || gen_random_uuid(),
+  u.id,
+  grant_combos.target::"AccessTarget",
+  grant_combos.capability::"AccessCapability",
+  NULL,
+  grant_combos.locale::"Locale",
+  CURRENT_TIMESTAMP,
+  NULL
+FROM "User" u
+CROSS JOIN (
+  VALUES
+    -- Scholar management
+    ('scholar', 'write', NULL),
+    ('scholar', 'publish', NULL),
+    ('scholar', 'delete', NULL),
+
+    -- Content / listing management
+    ('listing', 'write', NULL),
+    ('listing', 'publish', NULL),
+    ('listing', 'delete', NULL),
+
+    -- Media files management
+    ('media', 'write', NULL),
+    ('media', 'delete', NULL),
+
+    -- Topic management
+    ('topic', 'write', NULL),
+    ('topic', 'publish', NULL),
+    ('topic', 'delete', NULL),
+
+    -- User management (User manager role)
+    ('user', 'manage', NULL),
+
+    -- Translation capabilities (requires locale scope)
+    ('translation', 'translate', 'ar'),
+    ('translation', 'translate', 'en'),
+    ('translation', 'publish', 'ar'),
+    ('translation', 'publish', 'en'),
+    ('translation', 'delete', 'ar'),
+    ('translation', 'delete', 'en')
+) AS grant_combos(target, capability, locale)
+WHERE u.email = 'user@example.com'
+ON CONFLICT DO NOTHING;
+
+-- Force active client sessions to reload permissions
+UPDATE "User"
+SET "accessVersion" = "accessVersion" + 1
+WHERE email = 'user@example.com';
 ```
 
 ---
 
-## SuperAdmin Management
+## Unified Admin API
 
-**SuperAdmin is a break-glass account** that cannot be revoked through the API. Use it only for emergency recovery.
+Users with global `manage` access on `UserAccess` can manage another user's grants through:
 
-### Understanding SuperAdmin vs Admin
+```text
+GET /admin/users/:userId/access
+PUT /admin/users/:userId/access
+```
 
-| Aspect          | Admin                 | SuperAdmin                |
-| --------------- | --------------------- | ------------------------- |
-| **Creation**    | API/script            | SQL/script only           |
-| **Permissions** | Controlled via API    | Full platform access      |
-| **Revocation**  | Via API               | SQL/script only           |
-| **Protection**  | Normal                | Cannot be demoted via API |
-| **Use Case**    | Day-to-day operations | Emergency break-glass     |
+The GET response includes the current version and normalized grants. The PUT request replaces the complete grant set and must include that version. A stale version is rejected, preventing concurrent administrators from silently overwriting each other's changes.
 
-### Creating a SuperAdmin
+---
 
-**Prerequisites:** The PBAC migrations must have been run first to create the `permission` enum type and tables. If you encounter `ERROR: type "permission" does not exist`, run the migrations first:
+## Migrations and Legacy Data
+
+Apply migrations normally:
 
 ```bash
 bun run --filter @sd/core-db migrate:deploy
 ```
 
-#### Method 1: SQL Script (Recommended)
-
-Replace `superadmin@example.com` with the target user's email and execute:
-
-```sql
--- Step 1: Assign the superadmin role
-INSERT INTO "UserRoleAssignment" (id, "userId", role, "grantedAt", "grantedBy")
-SELECT gen_random_uuid()::text, id, 'superadmin', CURRENT_TIMESTAMP, NULL
-FROM "User"
-WHERE email = 'superadmin@example.com'
-ON CONFLICT ("userId", role) DO NOTHING;
-
--- Step 2: Grant all 27 superadmin permissions
-INSERT INTO "UserPermission" (id, "userId", permission, "grantedAt", "grantedBy")
-SELECT
-  gen_random_uuid()::text,
-  id,
-  perm::"Permission",
-  CURRENT_TIMESTAMP,
-  NULL
-FROM "User",
-  (VALUES
-    ('SCHOLARS_VIEW'), ('SCHOLARS_CREATE'), ('SCHOLARS_EDIT'), ('SCHOLARS_DELETE'), ('SCHOLARS_PUBLISH'),
-    ('LISTINGS_VIEW'), ('LISTINGS_CREATE'), ('LISTINGS_EDIT'), ('LISTINGS_DELETE'), ('LISTINGS_PUBLISH'),
-    ('TOPICS_VIEW'), ('TOPICS_CREATE'), ('TOPICS_EDIT'), ('TOPICS_DELETE'), ('TOPICS_PUBLISH'),
-    ('TRANSLATIONS_VIEW'), ('TRANSLATIONS_CREATE'), ('TRANSLATIONS_EDIT'), ('TRANSLATIONS_DELETE'), ('TRANSLATIONS_PUBLISH'),
-    ('MEDIA_UPLOAD'), ('MEDIA_DELETE'),
-    ('USERS_VIEW'), ('USERS_EDIT'), ('USERS_DELETE'), ('USERS_GRANT_PERMISSIONS'), ('USERS_GRANT_ROLES')
-  ) AS p(perm)
-WHERE email = 'superadmin@example.com'
-ON CONFLICT ("userId", permission) DO NOTHING;
-```
-
-#### Method 2: Node.js Script
-
-Create `create-superadmin.js` in `packages/core-db/scripts/`:
-
-```bash
-# Usage:
-bun run create-superadmin.js admin@example.com
-```
-
-### Demoting a SuperAdmin
-
-**Demotion requires SQL** — cannot be done via API.
-
-#### Option 1: SQL
-
-```sql
--- Find the user
-SELECT id, email FROM "User" WHERE email = 'admin@example.com';
-
--- Revoke superadmin role
-DELETE FROM "UserRoleAssignment"
-WHERE "userId" = 'user-id-here' AND role = 'superadmin';
-
--- Optionally: Assign a lower role
-INSERT INTO "UserRoleAssignment" (
-  id,
-  "userId",
-  role,
-  "grantedAt",
-  "grantedBy"
-)
-VALUES (
-  gen_random_uuid()::text,
-  'user-id-here',
-  'admin',  -- or 'editor', 'listener', etc.
-  CURRENT_TIMESTAMP,
-  NULL
-)
-ON CONFLICT ("userId", "role") DO NOTHING;
-
--- Verify
-SELECT u.email, ura.role
-FROM "User" u
-LEFT JOIN "UserRoleAssignment" ura ON u.id = ura."userId"
-WHERE u.email = 'admin@example.com';
-```
-
-### Listing SuperAdmins
-
-```sql
-SELECT u.id, u.email, u.name, ura."grantedAt"
-FROM "User" u
-JOIN "UserRoleAssignment" ura ON u.id = ura."userId"
-WHERE ura.role = 'superadmin'
-ORDER BY ura."grantedAt" DESC;
-```
+The aggregate schema migration creates `UserAccessGrant` and `User.accessVersion`. The following data migration backfills supported write, translate, publish, delete, and user-management access from legacy rows while intentionally omitting legacy read access. Do not run an ad-hoc backfill script or edit applied migrations; use the checked-in Prisma migrations.
 
 ---
 
-## Security Considerations
+## Verification & Auditing Queries
 
-1. **Access Control** — Only execute admin scripts in secure environments with restricted database access.
-2. **Audit Trail** — SuperAdmin changes bypass the API and don't create audit logs. Document manual changes separately.
-3. **Backups** — Always ensure database backups exist before making admin changes.
-4. **Multiple SuperAdmins** — Recommended to have at least 2 SuperAdmins for operational resilience.
-5. **Monitoring** — Monitor admin and superadmin account activity regularly.
-6. **Permission Revocation** — User must log out and log in again for permission changes to take effect.
-
----
-
-## Verification Queries
-
-### Check User's Roles
+### Check a User's Roles
 
 ```sql
-SELECT u.email, array_agg(ura.role) as roles
-FROM "User" u
-LEFT JOIN "UserRoleAssignment" ura ON u.id = ura."userId"
-WHERE u.email = 'user@example.com'
-GROUP BY u.id, u.email;
-```
-
-### Check User's Permissions
-
-```sql
-SELECT u.email, array_agg(p.permission ORDER BY p.permission) as permissions
-FROM "User" u
-LEFT JOIN "UserPermission" p ON u.id = p."userId"
-WHERE u.email = 'user@example.com'
-GROUP BY u.id, u.email;
-```
-
-### Find All Admins
-
-```sql
-SELECT DISTINCT u.id, u.email, u.name, ura.role, COUNT(p.id) as permission_count
+SELECT u.email, ura.role, ura."grantedAt"
 FROM "User" u
 JOIN "UserRoleAssignment" ura ON u.id = ura."userId"
-LEFT JOIN "UserPermission" p ON u.id = p."userId"
-WHERE ura.role = 'admin'
-GROUP BY u.id, u.email, u.name, ura.role
-ORDER BY u.email;
+WHERE u.email = 'user@example.com';
+```
+
+### Check a User's Grants
+
+```sql
+SELECT u.email, g.target, g.capability, s.slug as "scholarSlug", g.locale, g."grantedAt"
+FROM "User" u
+LEFT JOIN "UserAccessGrant" g ON g."userId" = u.id
+LEFT JOIN "Scholar" s ON g."scholarId" = s.id
+WHERE u.email = 'user@example.com'
+ORDER BY g.target, g.capability, g.locale;
 ```
 
 ### Find All SuperAdmins
@@ -458,88 +342,6 @@ ORDER BY u.email;
 SELECT u.id, u.email, u.name, ura."grantedAt"
 FROM "User" u
 JOIN "UserRoleAssignment" ura ON u.id = ura."userId"
-WHERE ura.role = 'superadmin'
+WHERE ura.role = 'superadmin'::"UserRole"
 ORDER BY ura."grantedAt" DESC;
 ```
-
----
-
-## Emergency Recovery
-
-If you need to recover access when all administrative accounts are locked:
-
-1. Connect directly to the database using `psql`:
-
-   ```bash
-   export DATABASE_URL="postgresql://user:password@localhost:5432/salafi_dev"
-   psql $DATABASE_URL
-   ```
-
-2. Create a temporary SuperAdmin with a known user email:
-
-   ```sql
-   -- Use the SQL commands from "Creating a SuperAdmin" above
-   ```
-
-3. Verify the user can log in with full permissions
-
-4. Investigate what caused the lockout and revoke temporary access
-
----
-
-## Troubleshooting
-
-### User has no permissions after admin creation
-
-```sql
--- Verify permissions were inserted
-SELECT COUNT(*) as permission_count
-FROM "UserPermission"
-WHERE "userId" = (SELECT id FROM "User" WHERE email = 'user@example.com');
-
--- Should return 27 for full admin. If not, re-grant permissions.
-```
-
-### Permission changes not taking effect
-
-The user must **log out and log in again** for permission changes to take effect in the application.
-
-### Can't find user by email
-
-```sql
--- Search with partial match
-SELECT id, email, name FROM "User" WHERE email ILIKE '%search-text%';
-```
-
-### Database connection errors
-
-Verify `DATABASE_URL` or `DIRECT_DB_URL` is set correctly:
-
-```bash
-# Check current value (if set)
-echo $DATABASE_URL
-echo $DIRECT_DB_URL
-
-# Set for a session
-export DATABASE_URL="postgresql://user:pass@localhost:5432/db"
-```
-
----
-
-## API Errors
-
-### Error: Attempting to grant SuperAdmin without being SuperAdmin
-
-```text
-"Only superadmin can grant superadmin role. Use direct database operations for superadmin management."
-```
-
-**Solution:** Have an existing SuperAdmin execute the operation, or use direct database operations (SQL).
-
-### Error: Attempting to revoke SuperAdmin via API
-
-```text
-"SuperAdmin role cannot be revoked through the API. Use direct database operations (SQL or script) for superadmin management."
-```
-
-**Solution:** Use the SQL or script commands from the "Demoting a SuperAdmin" section above.

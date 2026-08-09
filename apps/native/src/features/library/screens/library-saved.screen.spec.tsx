@@ -8,13 +8,7 @@ import { useAuth } from "@/core/auth/use-auth";
 
 import { LibrarySavedScreen } from "./library-saved.screen";
 
-const mockRemoveSaved = jest.fn();
-
-jest.mock("@sd/domain-audio", () => ({
-  useProgressStore: jest.fn((selector: (state: unknown) => unknown) =>
-    selector({ actions: { removeSaved: mockRemoveSaved } }),
-  ),
-}));
+const mockMarkUnsaved = jest.fn();
 
 jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -27,6 +21,16 @@ jest.mock("react-native-safe-area-context", () => ({
 
 jest.mock("@sd/domain-content", () => ({
   useLibrarySavedScreen: jest.fn(),
+  markUnsaved: (...args: unknown[]) => mockMarkUnsaved(...args),
+  getLibraryItemPercent: (item: LibraryItemDto) => {
+    if (item.totalLeafCount && item.totalLeafCount > 0) {
+      return Math.round(((item.completedLeafCount ?? 0) / item.totalLeafCount) * 100);
+    }
+    if (item.durationSeconds && item.progressSeconds) {
+      return Math.round((item.progressSeconds / item.durationSeconds) * 100);
+    }
+    return null;
+  },
 }));
 
 jest.mock("../../../core/auth/use-auth", () => ({
@@ -87,12 +91,12 @@ describe("LibrarySavedScreen", () => {
     expect(onNavigateToListing).toHaveBeenCalledWith("library-lecture");
   });
 
-  it("removes a lecture from saved via the row's long-press action", async () => {
+  it("calls markUnsaved with listingId and slug via the row's long-press action", async () => {
     mockedUseLibrarySavedScreen.mockReturnValue(buildSavedState([savedItem]));
 
     await render(<LibrarySavedScreen />);
     await fireEvent.press(screen.getByTestId("library-saved-row-item-1-action-remove"));
 
-    expect(mockRemoveSaved).toHaveBeenCalledWith("lecture-1");
+    expect(mockMarkUnsaved).toHaveBeenCalledWith("lecture-1", "library-lecture");
   });
 });

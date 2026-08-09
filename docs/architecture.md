@@ -6,9 +6,9 @@ Salafi Durus is a single system delivered through multiple clients around one au
 
 ### Core Components
 
-- **API (`apps/api`)**: authoritative backend for business rules, permissions, content lifecycle, and media coordination.
+- **API (`apps/api`)**: authoritative backend for business rules, access control, content lifecycle, and media coordination.
 - **Web (`apps/web`)**: public discovery surface plus authenticated editorial and account flows.
-- **Mobile (`apps/native`)**: listening-focused client optimized for continuity and eventual offline support.
+- **Mobile (`apps/native`)**: listening-focused client with local-first sync and offline audio downloads.
 - **Database**: PostgreSQL via Prisma for authoritative relational state.
 - **Storage and CDN**: object storage for media, delivered separately from relational state.
 
@@ -57,19 +57,19 @@ Web (`apps/web`): `.tsx` (base, CSS-responsive), `.desktop.tsx` (desktop-only), 
 - `packages/core-i18n` — Internationalization config and keys
 - `packages/core-contracts` — Shared TypeScript contracts (DTOs, types, query hooks)
 - `packages/core-api` — Platform-agnostic API client infrastructure
+- `packages/core-sync` — Local-first repository/sync primitives (entity store, persisted outbox, sync engine, last-write-wins conflict resolution) shared by `domain-audio` (progress) and `domain-content` (saved/library)
 - `packages/design-tokens` — Design tokens (colors, spacing, radius, typography) — authoritative source
 - `packages/domain-content` — Lectures, scholars, series, feed, library data hooks
 - `packages/domain-account` — User profile and auth state hooks
-- `packages/domain-playback` — Playback engine and player state
-- `packages/domain-progress` — Progress tracking state
+- `packages/domain-audio` — Playback engine, player state, and progress tracking (queue management, stream resolution, local-first progress sync) — one unified package, not split by playback/progress
 - `packages/domain-search` — Search and quick-browse hooks
 
 Shared lint/TS config lives at the repo root (`tsconfig.base.json`, `tsconfig.packages.json`, `tsconfig.nest.json`, `eslint.config.base.mjs`, `eslint.config.packages.mjs`, `eslint.config.nest.mjs`). Apps extend/compose these; `next`/`expo` specifics are inlined into `apps/web` and `apps/native`.
 
 ### Package Roles
 
-- **`@sd/core-*`**: Foundational infrastructure (auth, api, config, styles, i18n, env, db, contracts). `core-styles`, `core-config`, and `core-env` have been dissolved — styling bootstrap, environment config, and env validation now live in each app's `src/core/` directory (or the consuming package's `src/env.ts`).
-- **`@sd/domain-*`**: Shared data and state hooks organized by bounded context (`domain-content`, `domain-account`, `domain-playback`, `domain-progress`, `domain-search`).
+- **`@sd/core-*`**: Foundational infrastructure (auth, api, config, styles, i18n, env, db, contracts, sync). `core-styles`, `core-config`, and `core-env` have been dissolved — styling bootstrap, environment config, and env validation now live in each app's `src/core/` directory (or the consuming package's `src/env.ts`).
+- **`@sd/domain-*`**: Shared data and state hooks organized by bounded context (`domain-content`, `domain-account`, `domain-audio`, `domain-search`).
 - **`@sd/design-tokens`**: Authoritative visual tokens.
 
 ## 4. Dependency and Boundary Rules
@@ -88,7 +88,7 @@ These rules are enforcement rules, not style preferences.
 ### Mobile
 
 - Playback-focused listening experience.
-- Local persistence for continuity and planned offline support.
+- Local-first sync for personal state (progress, saved/library) and offline audio downloads, reconciled to the backend via a persisted outbox — see [mobile.md](./mobile.md).
 - No backend authority, no hidden business rules.
 - Expo Router owns route structure through a tab-based main app boundary under `apps/native/src/app/(tabs)`.
 - The bottom navigation surface is package-owned custom chrome layered on top of real Expo Router tabs, with a subsection bar for in-tab route switching.

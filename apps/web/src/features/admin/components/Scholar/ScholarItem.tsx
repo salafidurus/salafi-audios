@@ -1,10 +1,11 @@
 "use client";
 
+import { subject } from "@casl/ability";
 import { type AdminScholarListItemDto, COUNTRY_NAMES } from "@sd/core-contracts";
+import { useAbility } from "@sd/domain-account";
 import { X, Send, Film, ExternalLink, Pencil, Languages } from "lucide-react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
@@ -23,6 +24,7 @@ export interface ScholarItemProps {
 export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
+  const { ability } = useAbility();
   const formatScholarName = useFormatScholarName();
   const countryName = scholar.country
     ? (COUNTRY_NAMES[scholar.country as keyof typeof COUNTRY_NAMES] ?? scholar.country)
@@ -124,7 +126,7 @@ export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) 
         </div>
       </div>
       <List.Item.Actions>
-        <PermissionGate requires="SCHOLARS_EDIT">
+        {ability.can("update", subject("Scholar", { slug: scholar.slug })) && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
@@ -135,8 +137,8 @@ export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) 
           >
             {isMobile && t("common.edit", "Edit")}
           </Button>
-        </PermissionGate>
-        <PermissionGate requires="TRANSLATIONS_VIEW">
+        )}
+        {ability.can("read", subject("Translation", { scholarSlug: scholar.slug })) && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
@@ -147,7 +149,7 @@ export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) 
           >
             {isMobile && t("admin.translations.button", "Translations")}
           </Button>
-        </PermissionGate>
+        )}
       </List.Item.Actions>
     </List.Item>
   );

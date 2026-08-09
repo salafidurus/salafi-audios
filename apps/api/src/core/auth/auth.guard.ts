@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { fromNodeHeaders } from 'better-auth/node';
 import { PrismaService } from '../db/prisma.service';
-import { IS_PUBLIC_KEY, ROLES_KEY } from './decorators';
+import { IS_PUBLIC_KEY } from './decorators';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -39,45 +39,40 @@ export class AuthGuard implements CanActivate {
       if (!expired) throw new ForbiddenException('Account is banned');
     }
 
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
     const sessionUser = session.user as {
       id: string;
-      roles?: string[];
-      permissions?: string[];
       banned?: boolean | null;
       banExpires?: Date | string | null;
     };
 
-    let roles: string[] = sessionUser.roles || [];
-
+    const userRoles = await this.prisma.userRoleAssignment.findMany({
+      where: { userId: sessionUser.id },
+      select: { role: true },
+    });
+    const roles = userRoles.map((r) => r.role);
     if (!roles.length) {
-      const userRoles = await this.prisma.userRoleAssignment.findMany({
-        where: { userId: sessionUser.id },
-        select: { role: true },
-      });
-      roles = userRoles.map((r) => r.role);
-      if (!roles.length) {
-        roles = ['listener'];
-      }
+      roles.push('listener');
     }
 
-    // If specific roles are required via @Roles decorator, check if user has one of them
-    if (requiredRoles?.length) {
-      const roleSet = new Set(roles);
-      if (!requiredRoles.some((r) => roleSet.has(r as string))) {
-        throw new UnauthorizedException();
-      }
-    }
+    const accessGrants = await this.prisma.userAccessGrant.findMany({
+      where: { userId: sessionUser.id },
+      select: {
+        target: true,
+        capability: true,
+        locale: true,
+        scholar: { select: { slug: true } },
+      },
+    });
+    const packedAccessGrants = accessGrants.map(({ scholar, ...grant }) => ({
+      ...grant,
+      scholarSlug: scholar?.slug ?? null,
+    }));
 
     // Attach user info to request (for use by controllers and other services)
     (request as any).user = {
       ...session.user,
       roles,
-      permissions: sessionUser.permissions || [],
+      accessGrants: packedAccessGrants,
     };
     return true;
   }

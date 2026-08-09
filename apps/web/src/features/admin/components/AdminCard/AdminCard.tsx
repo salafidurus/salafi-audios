@@ -9,7 +9,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./AdminCard.module.css";
 
 export interface AdminCardMetadataItem {
-  /** Metadata label (e.g., "Email", "Role", "Permissions") */
+  /** Metadata label (e.g., "Email", "Role", "Access") */
   label: string;
   /** Metadata value (can be string, number, or React element like badge) */
   value: React.ReactNode;

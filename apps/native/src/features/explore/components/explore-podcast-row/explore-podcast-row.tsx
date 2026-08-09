@@ -4,8 +4,8 @@ import type { Track } from "@sd/domain-audio";
 
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
-import { useAudio, useProgressStore, useListingProgress, buildTrackQueue } from "@sd/domain-audio";
-import { useFormattedScholarName } from "@sd/domain-content";
+import { useAudio, useListingProgress, buildTrackQueue } from "@sd/domain-audio";
+import { useFormattedScholarName, useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -41,9 +41,7 @@ export function ExplorePodcastRow({
     currentTrack?.seriesId === item.id ||
     currentTrack?.collectionId === item.id;
 
-  const isSaved = useProgressStore((s) => s.actions.isSaved(item.id));
-  const addSaved = useProgressStore((s) => s.actions.addSaved);
-  const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+  const isSaved = useIsSaved(item.id);
 
   const handlePlay = async () => {
     if (isCurrentTrack) {
@@ -61,7 +59,7 @@ export function ExplorePodcastRow({
     if (item.kind !== "single") {
       try {
         const contents = await httpClient<ListingContentsDto>({
-          url: endpoints.listings.contents(item.id),
+          url: endpoints.listings.contents(item.slug),
           method: "GET",
         });
         const queue = buildTrackQueue(
@@ -87,6 +85,7 @@ export function ExplorePodcastRow({
 
     const track: Track = {
       id: item.id,
+      slug: item.slug,
       title,
       artist: scholarName,
       scholarSlug: item.scholarSlug,
@@ -110,9 +109,9 @@ export function ExplorePodcastRow({
 
   const handleSave = () => {
     if (isSaved) {
-      removeSaved(item.id);
+      markUnsaved(item.id, item.slug);
     } else {
-      addSaved(item.id);
+      markSaved(item.id, item.slug);
     }
   };
 

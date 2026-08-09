@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Param,
   Post,
@@ -20,9 +21,17 @@ import type {
   BulkActionResultDto,
   ListingRefDto,
 } from '@sd/core-contracts';
-import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { RequiresPermission } from '../../core/auth/decorators';
+import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
+import { CurrentUser } from '../../core/auth/decorators';
+import {
+  resolveListingScholarId,
+  resolveScholarIdFromBody,
+} from '../../core/auth/policy-resolvers';
+import { defineAbilityFor } from '../../core/auth/ability/ability.factory';
+import type { AbilityInput } from '../../core/auth/ability/ability.types';
+import { subject } from '@casl/ability';
+import { PrismaService } from '../../core/db/prisma.service';
 import { ListingService } from './listing.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDetailsDto } from './dto/update-listing-details.dto';
@@ -34,27 +43,45 @@ import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 @ApiCommonErrors()
 @Controller('admin/listings')
 export class AdminListingsController {
-  constructor(private readonly service: ListingService) {}
+  constructor(
+    private readonly service: ListingService,
+    private readonly prisma: PrismaService,
+  ) {}
+
+  @Get('promotions')
+  @CheckPolicy('write', 'Listing')
+  @ApiOperation({ summary: 'Get current home promotions (admin)' })
+  @ApiOkResponse({ description: 'Current promotions metadata' })
+  async getPromotions(): Promise<any> {
+    return this.service.getPromotions();
+  }
+
+  @Post('promotions')
+  @CheckPolicy('write', 'Listing')
+  @ApiOperation({ summary: 'Update home promotions' })
+  @ApiOkResponse({ description: 'Success status' })
+  async updatePromotions(@Body() body: any): Promise<any> {
+    return this.service.updatePromotions(body);
+  }
 
   @Get()
-  @RequiresPermission(Permissions.LISTINGS_VIEW)
   @ApiOperation({ summary: 'List all listings (admin)' })
   listAdmin(
-    @Query('cursor') cursor?: string,
-    @Query('scholarId') scholarId?: string,
-    @Query('status') status?: string,
-    @Query('search') search?: string,
+    @Query('cursor') cursor: string | undefined,
+    @Query('scholarId') scholarId: string | undefined,
+    @Query('status') status: string | undefined,
+    @Query('search') search: string | undefined,
   ): Promise<AdminListingListDto> {
     return this.service.listAdmin({
       cursor,
       scholarId,
       status,
       search,
+      accessibleScholarIds: undefined,
     });
   }
 
   @Get('series')
-  @RequiresPermission(Permissions.LISTINGS_VIEW)
   @ApiOperation({ summary: 'Get series listings for a scholar (for picker dropdowns)' })
   @ApiOkResponse({ description: 'List of series-format listings' })
   async seriesOptions(@Query('scholarId') scholarId?: string): Promise<ListingRefDto[]> {
@@ -65,35 +92,33 @@ export class AdminListingsController {
   }
 
   @Get(':id')
-  @RequiresPermission(Permissions.LISTINGS_VIEW)
   @ApiOperation({ summary: 'Get listing detail (admin)' })
   getAdminDetail(@Param('id') id: string): Promise<AdminListingDetailDto> {
     return this.service.getAdminDetail(id);
   }
 
   @Get(':id/form-data')
-  @RequiresPermission(Permissions.LISTINGS_EDIT)
+  @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Get listing with translations for edit form' })
   getFormData(@Param('id') id: string) {
     return this.service.getFormData(id);
   }
 
   @Get(':id/media-data')
-  @RequiresPermission(Permissions.LISTINGS_VIEW)
   @ApiOperation({ summary: 'Get listing media details' })
   getMediaData(@Param('id') id: string): Promise<AdminListingMediaDetailDto> {
     return this.service.getMediaData(id);
   }
 
   @Get(':id/arrange-data')
-  @RequiresPermission(Permissions.LISTINGS_EDIT)
+  @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Get listing children tree for the upload & arrange flow' })
   getArrangeData(@Param('id') id: string): Promise<AdminArrangeDataDto> {
     return this.service.getArrangeData(id);
   }
 
   @Post(':id/arrange-commit')
-  @RequiresPermission(Permissions.LISTINGS_CREATE)
+  @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Transactionally create/update modules and lessons with audio' })
   arrangeCommit(
     @Param('id') id: string,
@@ -104,7 +129,7 @@ export class AdminListingsController {
   }
 
   @Post()
-  @RequiresPermission(Permissions.LISTINGS_CREATE)
+  @CheckPolicy('write', 'Listing', resolveScholarIdFromBody())
   @ApiOperation({ summary: 'Create a listing after R2 upload' })
   createListing(
     @Body() dto: CreateListingDto,
@@ -117,14 +142,35 @@ export class AdminListingsController {
   }
 
   @Post('bulk')
-  @RequiresPermission(Permissions.LISTINGS_PUBLISH)
+  @CheckPolicy('publish', 'Listing')
   @ApiOperation({ summary: 'Bulk publish or archive listings' })
-  bulkAction(@Body() dto: BulkActionDto): Promise<BulkActionResultDto> {
+  async bulkAction(
+    @Body() dto: BulkActionDto,
+    @CurrentUser() user: AbilityInput,
+  ): Promise<BulkActionResultDto> {
+    // The decorator above only confirms the caller has SOME publish/archive
+    // capability. Bulk targets multiple listings that may belong to
+    // different scholars, so each row is checked individually here — the
+    // whole batch is rejected if any row is out of the caller's scope,
+    // rather than silently applying to a subset.
+    const ability = defineAbilityFor(user);
+    const rows = await this.prisma.listing.findMany({
+      where: { id: { in: dto.ids } },
+      select: { id: true, scholar: { select: { slug: true } } },
+    });
+    const action = dto.action === 'archive' ? 'archive' : 'publish';
+    for (const row of rows) {
+      if (!ability.can(action, subject('Listing', { scholarSlug: row.scholar.slug } as never))) {
+        throw new ForbiddenException(
+          `Missing capability: ${action} Listing (scholarSlug: ${row.scholar.slug})`,
+        );
+      }
+    }
     return this.service.bulkAction(dto);
   }
 
   @Put(':id/details')
-  @RequiresPermission(Permissions.LISTINGS_EDIT)
+  @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Update listing details (title, description, status, topics, etc.)' })
   @ApiOkResponse({ description: 'Listing details updated successfully' })
   async updateListingDetails(
@@ -137,7 +183,7 @@ export class AdminListingsController {
   }
 
   @Put(':id/media')
-  @RequiresPermission(Permissions.LISTINGS_EDIT)
+  @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Update listing media (audio file, duration, etc.)' })
   @ApiOkResponse({ description: 'Listing media updated successfully' })
   async updateListingMedia(
@@ -150,7 +196,7 @@ export class AdminListingsController {
   }
 
   @Post(':id/publish')
-  @RequiresPermission(Permissions.LISTINGS_PUBLISH)
+  @CheckPolicy('publish', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Publish a listing' })
   @ApiOkResponse({ description: 'Listing published successfully' })
   async publishListing(@Param('id') id: string): Promise<AdminListingActionDto> {
@@ -159,7 +205,7 @@ export class AdminListingsController {
   }
 
   @Post(':id/archive')
-  @RequiresPermission(Permissions.LISTINGS_PUBLISH)
+  @CheckPolicy('delete', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Archive a listing' })
   @ApiOkResponse({ description: 'Listing archived successfully' })
   async archiveListing(@Param('id') id: string): Promise<AdminListingActionDto> {

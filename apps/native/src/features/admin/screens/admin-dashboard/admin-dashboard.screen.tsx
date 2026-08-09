@@ -1,12 +1,27 @@
+import type { AppActions, AppSubjectType } from "@sd/core-contracts";
+
+import { useAbility } from "@sd/domain-account";
 import { Pressable, ScrollView, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 
 type AdminDashboardScreenProps = {
   onNavigateToListings?: () => void;
   onNavigateToScholars?: () => void;
-  onNavigateToPermissions?: () => void;
+  onNavigateToAccess?: () => void;
+};
+
+type AdminCard = {
+  key: string;
+  title: string;
+  subtitle: string;
+  onPress?: () => void;
+  cardStyle: (typeof styles)["cardListings"] | (typeof styles)["cardScholars"];
+  action: AppActions;
+  subject: AppSubjectType;
 };
 
 export function AdminDashboardScreen({
@@ -14,22 +29,50 @@ export function AdminDashboardScreen({
   onNavigateToScholars,
 }: AdminDashboardScreenProps) {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const { ability, isLoading } = useAbility({ isAuthenticated });
+
+  const cards: AdminCard[] = [
+    {
+      key: "listings",
+      title: t("navigation.subnav.admin.listings", "Listings"),
+      subtitle: t("admin.manageAudios", "Manage audio content"),
+      onPress: onNavigateToListings,
+      cardStyle: styles.cardListings,
+      action: "read",
+      subject: "Listing",
+    },
+    {
+      key: "scholars",
+      title: t("navigation.admin.scholars", "Scholars"),
+      subtitle: t("admin.manageSeries", "Manage scholars & series"),
+      onPress: onNavigateToScholars,
+      cardStyle: styles.cardScholars,
+      action: "read",
+      subject: "Scholar",
+    },
+  ];
+
+  if (isLoading) {
+    return <EmptyState variant="loading" message={t("admin.dashboard.loading", "Loading…")} />;
+  }
+
+  const visibleCards = cards.filter((card) => ability.can(card.action, card.subject));
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <Text style={styles.title}>{t("admin.dashboard.title", "Admin Dashboard")}</Text>
 
-      <Pressable onPress={onNavigateToListings} style={[styles.card, styles.cardListings]}>
-        <Text style={styles.cardTitle}>{t("navigation.subnav.admin.listings", "Listings")}</Text>
-        <Text style={styles.cardSubtitle}>{t("admin.manageAudios", "Manage audio content")}</Text>
-      </Pressable>
-
-      <Pressable onPress={onNavigateToScholars} style={[styles.card, styles.cardScholars]}>
-        <Text style={styles.cardTitle}>{t("navigation.admin.scholars", "Scholars")}</Text>
-        <Text style={styles.cardSubtitle}>
-          {t("admin.manageSeries", "Manage scholars & series")}
-        </Text>
-      </Pressable>
+      {visibleCards.length === 0 ? (
+        <EmptyState message={t("admin.dashboard.noAccess", "You don't have any admin access.")} />
+      ) : (
+        visibleCards.map((card) => (
+          <Pressable key={card.key} onPress={card.onPress} style={[styles.card, card.cardStyle]}>
+            <Text style={styles.cardTitle}>{card.title}</Text>
+            <Text style={styles.cardSubtitle}>{card.subtitle}</Text>
+          </Pressable>
+        ))
+      )}
     </ScrollView>
   );
 }

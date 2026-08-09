@@ -1,54 +1,54 @@
-/* Library screens - sticky header layout now in shared StickyHeaderLayout component */
-
-.container {
-  padding: var(--space-layout-page-y) 0;
-}
-
-.title {
-  margin: 0 0 var(--space-component-gap-md, 16px);
-  font-family: var(--typo-display-md-font-family), serif;
-  font-size: var(--typo-display-md-font-size);
-  font-weight: var(--typo-display-md-font-weight);
-  line-height: var(--typo-display-md-line-height);
+.libraryTitle {
+  margin: 0 0 14px 0;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 26px;
+  font-weight: 600;
   color: var(--content-strong);
 }
 
-.list {
+.downloadBanner {
   display: flex;
-  flex-direction: column;
-  gap: 0;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-component-card, 12px);
-  background-color: var(--surface-default);
-  overflow: hidden;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+  background: color-mix(in srgb, var(--border-primary-strong) 10%, var(--surface-default));
+  border: 1px solid var(--border-primary);
 }
 
-.emptyState {
-  padding: var(--space-scale-xl) var(--space-scale-lg);
-  color: var(--content-muted);
-  text-align: center;
-  font-family: var(--typo-body-md-font-family);
-  font-size: var(--typo-body-md-font-size);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-component-card, 12px);
-  background-color: var(--surface-default);
-}
-
-.loading {
-  padding: var(--space-scale-xl) var(--space-scale-lg);
+.downloadText {
+  margin: 0;
+  font-size: 13px;
   color: var(--content-subtle);
-  text-align: center;
-  font-family: var(--typo-body-md-font-family);
-  font-size: var(--typo-body-md-font-size);
+  flex: 1;
+  min-width: 240px;
 }
 
-/* Mobile adjustments */
-@media (max-width: 899px) {
-  .container {
-    padding: var(--space-scale-lg) 0;
-  }
+.sectionHeading {
+  margin: 0 0 12px 0;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--content-strong);
+}
 
-  .title {
-    font-size: var(--typo-title-lg-font-size);
-  }
+.sectionWrapper {
+  margin-bottom: 36px;
+}
+
+.emptyCard {
+  padding: 28px 20px;
+  text-align: center;
+  border: 1px solid var(--border-default);
+  border-radius: 14px;
+  background: var(--surface-default);
+  color: var(--content-muted);
+  font-size: 13.5px;
+}
+
+.authRequiredHidden {
+  display: none;
 }

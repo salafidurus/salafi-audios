@@ -7,7 +7,10 @@ export const UserProfileDtoSchema = z.object({
   avatarUrl: z.string().optional(),
   emailVerified: z.boolean(),
   roles: z.array(z.string()),
-  permissions: z.array(z.string()).default([]),
+  // Packed CASL rules (via @casl/ability/extra's packRules) — the client
+  // rebuilds an identical ability via unpackRules + createMongoAbility.
+  // Opaque tuple structure, not meaningfully validated field-by-field here.
+  rules: z.array(z.any()).default([]),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

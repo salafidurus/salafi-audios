@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Patch, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { RequiresPermission } from '../../core/auth/decorators';
+import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
+import { resolveListingTranslation } from '../../core/auth/policy-resolvers';
 import { ListingService } from './listing.service';
 import { SaveListingTranslationDto } from './dto/save-listing-translation.dto';
 
@@ -12,42 +12,41 @@ import { SaveListingTranslationDto } from './dto/save-listing-translation.dto';
 export class ListingTranslationsController {
   constructor(private readonly service: ListingService) {}
 
-  @Get(':id/translations')
-  @RequiresPermission(Permissions.TRANSLATIONS_VIEW)
+  @Get(':slug/translations')
   @ApiOperation({ summary: 'List translations for a listing' })
-  listTranslations(@Param('id') id: string) {
-    return this.service.listTranslations(id);
+  listTranslations(@Param('slug') slug: string) {
+    return this.service.listTranslations(slug);
   }
 
-  @Post(':id/translations')
-  @RequiresPermission(Permissions.TRANSLATIONS_CREATE)
+  @Post(':slug/translations')
+  @CheckPolicy('translate', 'Translation', resolveListingTranslation())
   @ApiOperation({ summary: 'Upsert a listing translation' })
-  upsertTranslation(@Param('id') id: string, @Body() dto: SaveListingTranslationDto) {
-    return this.service.upsertTranslation(id, dto);
+  upsertTranslation(@Param('slug') slug: string, @Body() dto: SaveListingTranslationDto) {
+    return this.service.upsertTranslation(slug, dto);
   }
 
-  @Patch(':id/translations/:locale')
-  @RequiresPermission(Permissions.TRANSLATIONS_EDIT)
+  @Patch(':slug/translations/:locale')
+  @CheckPolicy('translate', 'Translation', resolveListingTranslation())
   @ApiOperation({ summary: 'Partially update a listing translation' })
   updateTranslation(
-    @Param('id') id: string,
+    @Param('slug') slug: string,
     @Param('locale') locale: string,
     @Body() body: Partial<{ title: string; description: string | null }>,
   ) {
-    return this.service.updateTranslation(id, locale, body);
+    return this.service.updateTranslation(slug, locale, body);
   }
 
-  @Post(':id/translations/:locale/publish')
-  @RequiresPermission(Permissions.TRANSLATIONS_PUBLISH)
+  @Post(':slug/translations/:locale/publish')
+  @CheckPolicy('publish', 'Translation', resolveListingTranslation())
   @ApiOperation({ summary: 'Publish a listing translation' })
-  publishTranslation(@Param('id') id: string, @Param('locale') locale: string) {
-    return this.service.publishTranslation(id, locale);
+  publishTranslation(@Param('slug') slug: string, @Param('locale') locale: string) {
+    return this.service.publishTranslation(slug, locale);
   }
 
-  @Post(':id/translations/:locale/unpublish')
-  @RequiresPermission(Permissions.TRANSLATIONS_PUBLISH)
+  @Post(':slug/translations/:locale/unpublish')
+  @CheckPolicy('publish', 'Translation', resolveListingTranslation())
   @ApiOperation({ summary: 'Unpublish a listing translation' })
-  unpublishTranslation(@Param('id') id: string, @Param('locale') locale: string) {
-    return this.service.unpublishTranslation(id, locale);
+  unpublishTranslation(@Param('slug') slug: string, @Param('locale') locale: string) {
+    return this.service.unpublishTranslation(slug, locale);
   }
 }

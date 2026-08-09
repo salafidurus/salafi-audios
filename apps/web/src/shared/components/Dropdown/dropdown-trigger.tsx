@@ -67,14 +67,20 @@ export function DropdownTrigger({
       disabled={disabled}
     >
       {children ? (
-        children
+        <div className={styles.triggerContent}>
+          {children}
+          <ChevronDown
+            size={14}
+            className={[styles.chevron, open ? styles.chevronOpen : ""].filter(Boolean).join(" ")}
+          />
+        </div>
       ) : (
         <>
           <span className={selectedLabel ? styles.triggerText : styles.triggerPlaceholder}>
             {selectedLabel || placeholder}
           </span>
           <ChevronDown
-            size={16}
+            size={14}
             className={[styles.chevron, open ? styles.chevronOpen : ""].filter(Boolean).join(" ")}
           />
         </>

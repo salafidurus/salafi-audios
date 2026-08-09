@@ -43,7 +43,7 @@ describe("AdminItem", () => {
     render(
       <AdminItem
         title="Test"
-        metadata={[{ label: "Permissions", value: "perm1, perm2, perm3", expandable: true }]}
+        metadata={[{ label: "Access", value: "write, publish, manage", expandable: true }]}
         actions={mockActions}
       />,
     );
@@ -54,7 +54,7 @@ describe("AdminItem", () => {
     render(
       <AdminItem
         title="Test"
-        metadata={[{ label: "Permissions", value: "perm1, perm2, perm3", expandable: true }]}
+        metadata={[{ label: "Access", value: "write, publish, manage", expandable: true }]}
         actions={mockActions}
       />,
     );

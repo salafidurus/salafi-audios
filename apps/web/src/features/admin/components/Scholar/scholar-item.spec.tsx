@@ -1,11 +1,12 @@
-import { useAdminPermissions } from "@sd/domain-account";
+import { createMongoAbility } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, type Mock } from "bun:test";
 
 import { Scholar } from ".";
 
 vi.mock("@sd/domain-account", () => ({
-  useAdminPermissions: vi.fn(),
+  useAbility: vi.fn(),
 }));
 
 const baseScholar = {
@@ -28,9 +29,9 @@ const baseScholar = {
 };
 
 describe("ScholarItem", () => {
-  it("hides edit button when user lacks SCHOLARS_EDIT", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["SCHOLARS_VIEW"] },
+  it("hides edit button when the user cannot update this scholar", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Scholar" }]),
     });
 
     render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn()} />);
@@ -38,9 +39,11 @@ describe("ScholarItem", () => {
     expect(screen.queryByRole("button", { name: /edit ibn baz/i })).not.toBeInTheDocument();
   });
 
-  it("shows edit button when user has SCHOLARS_EDIT", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["SCHOLARS_EDIT"] },
+  it("shows edit button when the user can update this scholar", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([
+        { action: "update", subject: "Scholar", conditions: { slug: "ibn-baz" } },
+      ]),
     });
 
     render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn()} />);
@@ -48,9 +51,21 @@ describe("ScholarItem", () => {
     expect(screen.getByRole("button", { name: /edit ibn baz/i })).toBeInTheDocument();
   });
 
+  it("hides edit button when the user can only update a different scholar (cross-scholar denial)", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([
+        { action: "update", subject: "Scholar", conditions: { slug: "some-other-scholar" } },
+      ]),
+    });
+
+    render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn()} />);
+
+    expect(screen.queryByRole("button", { name: /edit ibn baz/i })).not.toBeInTheDocument();
+  });
+
   it("never renders a KIBAR badge (isKibar removed)", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["SCHOLARS_VIEW"] },
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "manage", subject: "all" }]),
     });
 
     render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn()} />);
@@ -59,8 +74,8 @@ describe("ScholarItem", () => {
   });
 
   it("prefixes the name with the translated honorific title", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["SCHOLARS_VIEW"] },
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "manage", subject: "all" }]),
     });
 
     render(

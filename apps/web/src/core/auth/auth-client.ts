@@ -1,8 +1,6 @@
 import { adminClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
-import { purgeQueryCacheDb } from "@/core/persister";
-
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_API_URL!,
   plugins: [adminClient()],
@@ -10,7 +8,8 @@ export const authClient = createAuthClient({
     credentials: "include",
     onSuccess: (ctx) => {
       if (String(ctx.request.url).endsWith("/sign-out")) {
-        void purgeQueryCacheDb();
+        // Full navigation to "/" reloads the JS bundle, so the in-memory
+        // (no longer persisted) query client is recreated fresh anyway.
         window.location.href = "/";
       }
     },

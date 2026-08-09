@@ -1,11 +1,23 @@
 "use client";
 
 import {
+  drainPendingProgress,
   flushPendingProgress,
   hydrateProgressFromServer,
+  initProgressSync,
+  onProgressFlushed,
   useProgressStore,
   type ListingProgress,
 } from "@sd/domain-audio";
+import {
+  drainPendingSaved,
+  flushPendingSaved,
+  hydrateSavedFromServer,
+  initSavedSync,
+  onSavedFlushed,
+} from "@sd/domain-content";
+
+import { createLocalStorageAdapter } from "../sync/local-storage-adapter";
 
 const STORAGE_KEY_PREFIX = "sd:progress-cache:v1:";
 const DEFAULT_PERSIST_THROTTLE_MS = 5000;
@@ -36,16 +48,18 @@ function writeCachedProgress(userId: string, entries: ListingProgress[]): void {
 }
 
 /**
- * Wires local, per-user progress persistence for the current browser session:
- * hydrates from the local cache immediately (before the network round-trip
- * resolves), then from the server; persists store changes back to the cache
- * (throttled); and flushes any pending debounced sync when the tab is hidden
- * or closed, since a plain reload/close would otherwise race the debounce
- * timer. Call once per authenticated session; returns a cleanup function.
+ * Wires local, per-user local-first sync for the current browser session —
+ * both progress and saved/library state: hydrates progress from the local
+ * cache immediately (before the network round-trip resolves), then both from
+ * the server; persists progress store changes back to the cache (throttled);
+ * and flushes any pending debounced sync (both progress and saved) when the
+ * tab is hidden or closed, since a plain reload/close would otherwise race
+ * the debounce timers. Call once per authenticated session; returns a
+ * cleanup function.
  */
 export function initProgressPersistence(
   userId: string,
-  options: { persistThrottleMs?: number } = {},
+  options: { persistThrottleMs?: number; onFlushed?: () => void } = {},
 ): () => void {
   const persistThrottleMs = options.persistThrottleMs ?? DEFAULT_PERSIST_THROTTLE_MS;
 
@@ -54,7 +68,10 @@ export function initProgressPersistence(
     useProgressStore.getState().actions.loadProgress(cached);
   }
 
+  void initProgressSync(createLocalStorageAdapter(), userId).then(() => drainPendingProgress());
+  void initSavedSync(createLocalStorageAdapter(), userId).then(() => drainPendingSaved());
   void hydrateProgressFromServer();
+  void hydrateSavedFromServer();
 
   let writeTimeout: ReturnType<typeof setTimeout> | null = null;
   const unsubscribe = useProgressStore.subscribe(() => {
@@ -65,8 +82,14 @@ export function initProgressPersistence(
     }, persistThrottleMs);
   });
 
+  const unsubscribeProgressFlushed = options.onFlushed
+    ? onProgressFlushed(options.onFlushed)
+    : undefined;
+  const unsubscribeSavedFlushed = options.onFlushed ? onSavedFlushed(options.onFlushed) : undefined;
+
   const flush = () => {
     void flushPendingProgress();
+    void flushPendingSaved();
   };
   const handleVisibilityChange = () => {
     if (document.visibilityState === "hidden") flush();
@@ -77,6 +100,8 @@ export function initProgressPersistence(
 
   return () => {
     unsubscribe();
+    unsubscribeProgressFlushed?.();
+    unsubscribeSavedFlushed?.();
     if (writeTimeout) clearTimeout(writeTimeout);
     document.removeEventListener("visibilitychange", handleVisibilityChange);
     window.removeEventListener("beforeunload", flush);

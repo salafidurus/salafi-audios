@@ -433,21 +433,27 @@ export class ScholarsRepository {
   async adminList(
     cursor?: string,
     search?: string,
+    accessibleScholarIds?: string[],
   ): Promise<{ items: AdminScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
     const locale = getRequestLocale();
     const pageSize = 50;
     const take = pageSize + 1;
 
-    const where: Prisma.ScholarWhereInput = search
-      ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' as const } },
-            {
-              translations: { some: { name: { contains: search, mode: 'insensitive' as const } } },
-            },
-          ],
-        }
-      : {};
+    const where: Prisma.ScholarWhereInput = {
+      ...(search
+        ? {
+            OR: [
+              { name: { contains: search, mode: 'insensitive' as const } },
+              {
+                translations: {
+                  some: { name: { contains: search, mode: 'insensitive' as const } },
+                },
+              },
+            ],
+          }
+        : {}),
+      ...(accessibleScholarIds ? { id: { in: accessibleScholarIds } } : {}),
+    };
 
     const records = await this.prisma.scholar.findMany({
       where,
@@ -626,6 +632,11 @@ export class ScholarsRepository {
   }
 
   // ─── Scholar translations ─────────────────────────────────────────────────
+
+  async findIdBySlug(slug: string): Promise<string | null> {
+    const scholar = await this.prisma.scholar.findUnique({ where: { slug }, select: { id: true } });
+    return scholar?.id ?? null;
+  }
 
   private mapScholarTranslation(t: {
     locale: string;

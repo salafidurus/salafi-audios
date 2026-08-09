@@ -1,4 +1,5 @@
-import { useAdminPermissions } from "@sd/domain-account";
+import { createMongoAbility } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { usePathname, useRouter } from "next/navigation";
@@ -24,7 +25,8 @@ vi.mock("@/core/auth", () => ({
 }));
 
 vi.mock("@sd/domain-account", () => ({
-  useAdminPermissions: vi.fn(),
+  useAbility: vi.fn(),
+  hasAnyAdminAccess: (ability: any) => ability.rules.length > 0,
 }));
 
 vi.mock("next/navigation", () => ({
@@ -50,21 +52,19 @@ describe("Sidebar component", () => {
     process.env.NEXT_PUBLIC_WEB_URL = "http://localhost:3001";
   });
 
-  it("renders basic navigation links (Search, Explore, Library, Settings)", () => {
+  it("renders basic navigation links (Search, Explore, Scholars, Library, Settings)", () => {
     (useAuth as Mock<any>).mockReturnValue({
       isAuthenticated: false,
       isLoading: false,
       user: null,
     });
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: undefined,
-    });
+    (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
 
     render(<Sidebar />);
 
-    // Basic nav checks
     expect(screen.getByText("Search")).toBeInTheDocument();
     expect(screen.getByText("Explore")).toBeInTheDocument();
+    expect(screen.getByText("Scholars")).toBeInTheDocument();
     expect(screen.getByText("Library")).toBeInTheDocument();
     expect(screen.getByText("Settings")).toBeInTheDocument();
   });
@@ -75,9 +75,7 @@ describe("Sidebar component", () => {
       isLoading: false,
       user: null,
     });
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: undefined,
-    });
+    (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
 
     render(<Sidebar />);
 
@@ -85,24 +83,24 @@ describe("Sidebar component", () => {
     expect(screen.queryByText("ADMIN")).not.toBeInTheDocument();
   });
 
-  it("shows only the nav items matching the user's specific admin permissions", () => {
+  it("shows editorial navigation for aggregate access without treating read as a grant", () => {
     (useAuth as Mock<any>).mockReturnValue({
       isAuthenticated: true,
       isLoading: false,
       user: { name: "Admin User", email: "admin@example.com" },
     });
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["SCHOLARS_VIEW"] },
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Scholar" }]),
     });
 
     render(<Sidebar />);
 
     expect(screen.getByText("ADMIN")).toBeInTheDocument();
-    expect(screen.getByText("Home")).toBeInTheDocument();
+    expect(screen.getAllByText("Home").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Stats")).toBeInTheDocument();
-    expect(screen.getByText("Scholars")).toBeInTheDocument();
+    expect(screen.getAllByText("Scholars").length).toBeGreaterThanOrEqual(1);
     expect(screen.queryByText("Users")).not.toBeInTheDocument();
-    expect(screen.queryByText("Contents")).not.toBeInTheDocument();
+    expect(screen.getByText("Contents")).toBeInTheDocument();
   });
 
   it("renders profile details and Sign Out when authenticated (non-admin)", () => {
@@ -111,9 +109,7 @@ describe("Sidebar component", () => {
       isLoading: false,
       user: { name: "Test User", email: "test@example.com" },
     });
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: [] },
-    });
+    (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
 
     render(<Sidebar />);
 
@@ -129,9 +125,7 @@ describe("Sidebar component", () => {
       isLoading: false,
       user: { name: "Test User", email: "test@example.com" },
     });
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: [] },
-    });
+    (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
 
     render(<Sidebar />);
 

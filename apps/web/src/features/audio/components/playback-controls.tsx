@@ -107,7 +107,7 @@ export function PlaybackControls() {
     height: 40,
     borderRadius: 20,
     border: "none",
-    backgroundColor: "var(--action-primary)",
+    backgroundColor: "var(--accent-primary-bg, var(--action-primary))",
     color: "var(--content-on-primary)",
     cursor: isLoading ? "wait" : "pointer",
     display: "flex",

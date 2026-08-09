@@ -6,7 +6,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import request from 'supertest';
 import { createTestApp } from '../../test/create-test-app';
 import { AuthGuard } from '../../core/auth/auth.guard';
-import { PermissionGuard } from '../../core/auth/permission.guard';
+import { PolicyGuard } from '../../core/auth/policy.guard';
 import { ScholarsController } from './scholars.controller';
 import { ScholarsTranslationsController } from './scholars-translations.controller';
 import { ScholarsService } from './scholars.service';
@@ -16,9 +16,8 @@ const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../../core/auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
-  userPermission: {
+  userAccessGrant: {
     findMany: vi.fn<any>().mockResolvedValue([]),
-    findUnique: vi.fn<any>().mockResolvedValue(null),
   },
   userRoleAssignment: {
     findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
@@ -55,13 +54,11 @@ async function buildApp(_overrideGuard?: () => boolean | never): Promise<NestFas
     controllers: [ScholarsController, ScholarsTranslationsController],
     providers: [
       { provide: APP_GUARD, useClass: AuthGuard },
-      { provide: APP_GUARD, useClass: PermissionGuard },
+      { provide: APP_GUARD, useClass: PolicyGuard },
       { provide: ScholarsService, useValue: mockScholarsService },
       { provide: PrismaService, useValue: mockPrisma },
     ],
   });
-  // Note: No need to override AdminPermissionGuard - it's not registered in providers.
-  // PermissionGuard handles all permission checking.
 
   return createTestApp(builder);
 }
@@ -80,32 +77,19 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
 
   afterEach(() => app.close());
 
-  describe('authenticated admin with manage:content permission', () => {
+  describe('authenticated admin with scholar translation access', () => {
     beforeEach(() => {
       mockAuth.api.getSession.mockResolvedValue({
         user: { id: 'u1', role: 'admin' },
         session: {},
       });
-      // Mock userPermission.findUnique to return permissions for admin
-      mockPrisma.userPermission.findUnique.mockImplementation(async (args: any) => {
-        const { where } = args;
-        const { userId, permission } = where.userId_permission;
-        if (
-          userId === 'u1' &&
-          [
-            'TRANSLATIONS_VIEW',
-            'TRANSLATIONS_CREATE',
-            'TRANSLATIONS_EDIT',
-            'TRANSLATIONS_PUBLISH',
-          ].includes(permission)
-        ) {
-          return { userId, permission, grantedAt: new Date() };
-        }
-        return null;
-      });
+      mockPrisma.userAccessGrant.findMany.mockResolvedValue([
+        { target: 'translation', capability: 'translate', scholarId: 's1', locale: 'ar' },
+        { target: 'translation', capability: 'publish', scholarId: 's1', locale: 'ar' },
+      ]);
     });
 
-    it('POST /scholars/:id/translations creates a draft translation', async () => {
+    it('POST /scholars/:slug/translations creates a draft translation', async () => {
       const res = await request(app.getHttpServer())
         .post('/scholars/s1/translations')
         .send({ locale: 'ar', name: 'ابن تيمية' })
@@ -113,21 +97,21 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
       expect(res.body.status).toBe('draft');
     });
 
-    it('POST /scholars/:id/translations/:locale/publish publishes the translation', async () => {
+    it('POST /scholars/:slug/translations/:locale/publish publishes the translation', async () => {
       const res = await request(app.getHttpServer())
         .post('/scholars/s1/translations/ar/publish')
         .expect(201);
       expect(res.body.status).toBe('published');
     });
 
-    it('POST /scholars/:id/translations/:locale/unpublish unpublishes the translation', async () => {
+    it('POST /scholars/:slug/translations/:locale/unpublish unpublishes the translation', async () => {
       const res = await request(app.getHttpServer())
         .post('/scholars/s1/translations/ar/unpublish')
         .expect(201);
       expect(res.body.status).toBe('draft');
     });
 
-    it('GET /scholars/:id/translations lists translations', async () => {
+    it('GET /scholars/:slug/translations lists translations', async () => {
       mockScholarsService.listTranslations.mockResolvedValue([draftTranslation]);
       const res = await request(app.getHttpServer()).get('/scholars/s1/translations').expect(200);
       expect(Array.isArray(res.body)).toBe(true);
@@ -152,7 +136,7 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
   });
 
   describe('unauthenticated requests', () => {
-    it('POST /scholars/:id/translations returns 401 without a session', async () => {
+    it('POST /scholars/:slug/translations returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
       const response = await request(app.getHttpServer())
         .post('/scholars/s1/translations')
@@ -161,7 +145,7 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
     });
   });
 
-  describe('missing manage:content permission', () => {
+  describe('missing scholar translation access', () => {
     let forbiddenApp: NestFastifyApplication;
 
     beforeEach(async () => {
@@ -169,15 +153,13 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
         user: { id: 'u1', role: 'user' },
         session: {},
       });
-      // Reset userPermission.findUnique to return null for all queries
-      // This ensures PermissionGuard will throw ForbiddenException
-      mockPrisma.userPermission.findUnique.mockResolvedValue(null);
+      mockPrisma.userAccessGrant.findMany.mockResolvedValue([]);
       forbiddenApp = await buildApp();
     });
 
     afterEach(() => forbiddenApp.close());
 
-    it('POST /scholars/:id/translations returns 403', async () => {
+    it('POST /scholars/:slug/translations returns 403', async () => {
       const response = await request(forbiddenApp.getHttpServer())
         .post('/scholars/s1/translations')
         .send({ locale: 'ar', name: 'ابن تيمية' });

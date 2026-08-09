@@ -1,4 +1,5 @@
-import { useAdminPermissions } from "@sd/domain-account";
+import { createMongoAbility } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 
@@ -7,7 +8,7 @@ import { useAuth } from "@/core/auth/use-auth";
 import { AdminDashboardScreen } from "./admin-dashboard.screen";
 
 vi.mock("@sd/domain-account", () => ({
-  useAdminPermissions: vi.fn(),
+  useAbility: vi.fn(),
 }));
 
 vi.mock("@/core/auth/use-auth", () => ({
@@ -20,22 +21,24 @@ describe("AdminDashboardScreen", () => {
     (useAuth as Mock<any>).mockReturnValue({ isAuthenticated: true });
   });
 
-  it("renders loading state when fetching permissions", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: undefined,
-      isFetching: true,
+  it("renders loading state when fetching access", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([]),
+      isLoading: true,
     });
 
     render(<AdminDashboardScreen />);
     expect(screen.getByText("Loading…")).toBeInTheDocument();
   });
 
-  it("shows cards when user has only view-level permissions", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: {
-        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW"],
-      },
-      isFetching: false,
+  it("shows cards when user has only view-level access", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([
+        { action: "read", subject: "Scholar" },
+        { action: "read", subject: "Listing" },
+        { action: "read", subject: "User" },
+      ]),
+      isLoading: false,
     });
 
     render(<AdminDashboardScreen />);
@@ -45,12 +48,14 @@ describe("AdminDashboardScreen", () => {
     expect(screen.getByRole("link", { name: /users/i })).toBeInTheDocument();
   });
 
-  it("renders sections based on user permissions", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: {
-        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW"],
-      },
-      isFetching: false,
+  it("renders sections based on user access", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([
+        { action: "read", subject: "Scholar" },
+        { action: "read", subject: "Listing" },
+        { action: "read", subject: "User" },
+      ]),
+      isLoading: false,
     });
 
     render(<AdminDashboardScreen />);
@@ -69,5 +74,18 @@ describe("AdminDashboardScreen", () => {
     const usersLink = screen.getByRole("link", { name: /users/i });
     expect(usersLink).toBeInTheDocument();
     expect(usersLink).toHaveAttribute("href", "/admin/users");
+  });
+
+  it("hides sections the user has no read capability for", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Scholar" }]),
+      isLoading: false,
+    });
+
+    render(<AdminDashboardScreen />);
+
+    expect(screen.getByRole("link", { name: /scholars/i })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /contents/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /users/i })).not.toBeInTheDocument();
   });
 });

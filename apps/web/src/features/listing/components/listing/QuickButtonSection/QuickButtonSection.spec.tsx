@@ -40,6 +40,7 @@ const seriesListing: ListingDetailDto = {
   topics: [],
   primaryAudioAsset: null,
   seriesContext: null,
+  rootListing: null,
 };
 
 const seriesContents: ListingContentsDto = {

@@ -1,9 +1,12 @@
 import type { AdminListingDetailDto } from "@sd/core-contracts";
 
+import { subject } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 
@@ -12,6 +15,7 @@ import { createCollection, updateCollection } from "../../api/admin-scholars.api
 type CollectionSheetProps = {
   isOpen: boolean;
   scholarId: string;
+  scholarSlug: string;
   collection?: AdminListingDetailDto;
   onClose: () => void;
   onSaved: () => void;
@@ -32,12 +36,15 @@ function reduce(state: FormState, patch: Partial<FormState>): FormState {
 export function CollectionSheet({
   isOpen,
   scholarId,
+  scholarSlug,
   collection,
   onClose,
   onSaved,
 }: CollectionSheetProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const { ability } = useAbility({ isAuthenticated });
   const [state, dispatch] = useReducer(reduce, {
     title: collection?.title ?? "",
     description: collection?.description ?? "",
@@ -49,6 +56,10 @@ export function CollectionSheet({
   if (!isOpen) return null;
 
   const { title, description, language, isSaving, error } = state;
+  const canSave = ability.can(
+    collection ? "update" : "create",
+    subject("Listing", { scholarSlug }),
+  );
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -113,7 +124,7 @@ export function CollectionSheet({
         {error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>
       <View style={styles.buttonRow}>
-        <Pressable onPress={handleSave} disabled={isSaving} style={styles.saveBtn}>
+        <Pressable onPress={handleSave} disabled={isSaving || !canSave} style={styles.saveBtn}>
           {isSaving ? (
             <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (

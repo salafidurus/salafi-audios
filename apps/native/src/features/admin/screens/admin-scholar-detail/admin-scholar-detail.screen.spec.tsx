@@ -1,4 +1,6 @@
+import { createMongoAbility } from "@casl/ability";
 import { useApiQuery } from "@sd/core-contracts";
+import { useAbility } from "@sd/domain-account";
 import { render, screen } from "@testing-library/react-native";
 import React from "react";
 
@@ -13,6 +15,14 @@ jest.mock("@sd/core-contracts", () => ({
       detail: (slug: string) => `/scholars/${slug}`,
     },
   },
+}));
+
+jest.mock("@sd/domain-account", () => ({
+  useAbility: jest.fn(),
+}));
+
+jest.mock("@/core/auth/use-auth", () => ({
+  useAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false, user: undefined })),
 }));
 
 jest.mock("../../hooks/use-admin-scholars", () => ({
@@ -43,10 +53,17 @@ jest.mock("react-native-gesture-handler", () => {
 const mockUseApiQuery = useApiQuery as jest.Mock;
 const mockUseAdminSeries = useAdminSeries as jest.Mock;
 const mockUseAdminCollections = useAdminCollections as jest.Mock;
+const mockedUseAbility = jest.mocked(useAbility) as any;
 
 describe("AdminScholarDetailScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockedUseAbility.mockReturnValue({
+      ability: createMongoAbility([
+        { action: "create", subject: "Listing", conditions: { scholarSlug: "scholar-one" } },
+      ]),
+      isLoading: false,
+    });
   });
 
   it("renders loading indicator when scholar detail is loading", async () => {
@@ -87,5 +104,37 @@ describe("AdminScholarDetailScreen", () => {
     expect(screen.getByText("scholar-one", { exact: false })).toBeTruthy();
     expect(screen.getByText("Series Title")).toBeTruthy();
     expect(screen.getByText("Collection Title")).toBeTruthy();
+  });
+
+  it("shows both + Add buttons when the ability grants create for this scholar", async () => {
+    mockUseApiQuery.mockReturnValue({
+      data: { id: "s1", name: "Scholar One", slug: "scholar-one" },
+      isLoading: false,
+    });
+    mockUseAdminSeries.mockReturnValue({ data: [], refetch: jest.fn() });
+    mockUseAdminCollections.mockReturnValue({ data: [], refetch: jest.fn() });
+
+    await render(<AdminScholarDetailScreen scholarSlug="scholar-one" />);
+
+    expect(screen.getAllByText("+ Add")).toHaveLength(2);
+  });
+
+  it("hides both + Add buttons when the ability does not grant create for this scholar", async () => {
+    mockedUseAbility.mockReturnValue({
+      ability: createMongoAbility([
+        { action: "create", subject: "Listing", conditions: { scholarSlug: "some-other-scholar" } },
+      ]),
+      isLoading: false,
+    });
+    mockUseApiQuery.mockReturnValue({
+      data: { id: "s1", name: "Scholar One", slug: "scholar-one" },
+      isLoading: false,
+    });
+    mockUseAdminSeries.mockReturnValue({ data: [], refetch: jest.fn() });
+    mockUseAdminCollections.mockReturnValue({ data: [], refetch: jest.fn() });
+
+    await render(<AdminScholarDetailScreen scholarSlug="scholar-one" />);
+
+    expect(screen.queryByText("+ Add")).toBeNull();
   });
 });

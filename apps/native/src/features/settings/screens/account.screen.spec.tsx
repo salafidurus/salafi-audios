@@ -1,14 +1,15 @@
-import { useAccountProfile } from "@sd/domain-account";
+import { createMongoAbility } from "@casl/ability";
+import { useAbility, useAccountProfile } from "@sd/domain-account";
 import { render, screen } from "@testing-library/react-native";
 import React from "react";
 import { useUnistyles } from "react-native-unistyles";
-
-import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 import { AccountScreen } from "./account.screen";
 
 jest.mock("@sd/domain-account", () => ({
   useAccountProfile: jest.fn(),
+  useAbility: jest.fn(),
+  hasAnyAdminAccess: (ability: any) => ability.rules.length > 0,
 }));
 
 jest.mock("lucide-react-native", () => ({
@@ -28,10 +29,6 @@ jest.mock("react-native-unistyles", () => {
     useUnistyles: jest.fn(() => ({ theme: lightNativeTheme, rt: {} })),
   };
 });
-
-jest.mock("@/features/admin/hooks/use-admin-permissions", () => ({
-  useAdminPermissions: jest.fn(),
-}));
 
 jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
@@ -64,7 +61,7 @@ jest.mock("@/features/settings/components/content-language-toggle/content-langua
 });
 
 const mockedUseAccountProfile = jest.mocked(useAccountProfile) as any;
-const mockedUseAdminPermissions = jest.mocked(useAdminPermissions);
+const mockedUseAbility = jest.mocked(useAbility) as any;
 const mockedUseUnistyles = jest.mocked(useUnistyles);
 
 const authenticatedProfile = {
@@ -84,10 +81,8 @@ describe("AccountScreen", () => {
       isFetching: false,
       error: null,
     });
-    mockedUseAdminPermissions.mockReturnValue({
-      permissions: [],
-      hasAnyPermission: false,
-      hasPermission: jest.fn(() => false),
+    mockedUseAbility.mockReturnValue({
+      ability: createMongoAbility([]),
       isLoading: false,
     });
     const { lightNativeTheme } = require("../../../core/styles/theme");
@@ -185,7 +180,7 @@ describe("AccountScreen", () => {
     expect(screen.getByText("LanguageSwitch")).toBeTruthy();
   }, 15000);
 
-  it("renders Admin card when user has admin permissions", async () => {
+  it("renders Admin card when user has admin access", async () => {
     mockedUseAccountProfile.mockReturnValue({
       data: {
         id: "user-1",
@@ -200,14 +195,8 @@ describe("AccountScreen", () => {
       error: null,
     });
 
-    mockedUseAdminPermissions.mockReturnValue({
-      permissions: [
-        {
-          permission: "USERS_VIEW",
-        },
-      ],
-      hasAnyPermission: true,
-      hasPermission: jest.fn((perm) => perm === "USERS_VIEW"),
+    mockedUseAbility.mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "User" }]),
       isLoading: false,
     });
 

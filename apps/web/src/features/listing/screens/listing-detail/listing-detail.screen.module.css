@@ -1,3 +1,22 @@
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--action-primary);
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.backButton:hover {
+  opacity: 0.8;
+}
+
 .headerTopRow {
   display: flex;
   flex-direction: column;
@@ -6,7 +25,8 @@
 }
 
 .searchWrapper {
-  margin-top: var(--space-component-gap-md, 16px);
+  margin-top: 20px;
+  max-width: 360px;
   width: 100%;
 }
 
@@ -21,7 +41,7 @@
 @media (min-width: 768px) {
   .headerTopRow {
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
   }
 }

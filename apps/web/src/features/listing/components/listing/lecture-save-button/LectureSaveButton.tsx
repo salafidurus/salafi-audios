@@ -1,6 +1,6 @@
 "use client";
 
-import { useProgressStore } from "@sd/domain-audio";
+import { useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
 import React, { useState } from "react";
 
 import { useAuth } from "@/core/auth";
@@ -11,14 +11,14 @@ import styles from "./LectureSaveButton.module.css";
 
 export type LectureSaveButtonProps = {
   lectureId: string;
+  /** Required for the save/unsave push to resolve server-side (it resolves by slug, not id). */
+  lectureSlug?: string;
 };
 
-export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
+export function LectureSaveButton({ lectureId, lectureSlug }: LectureSaveButtonProps) {
   const { isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const isSaved = useProgressStore((s) => s.actions.isSaved(lectureId));
-  const addSaved = useProgressStore((s) => s.actions.addSaved);
-  const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+  const isSaved = useIsSaved(lectureId);
 
   const handleClick = () => {
     if (!isAuthenticated) {
@@ -26,10 +26,12 @@ export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
       return;
     }
 
+    // Local-first: optimistic instantly, debounced push with persisted-outbox
+    // retry on failure — no manual rollback needed here anymore.
     if (isSaved) {
-      removeSaved(lectureId);
+      markUnsaved(lectureId, lectureSlug);
     } else {
-      addSaved(lectureId);
+      markSaved(lectureId, lectureSlug);
     }
   };
 

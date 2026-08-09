@@ -10,10 +10,9 @@
   position: relative;
   width: 20%;
   flex-shrink: 0;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
-  border-radius: var(--radius-component-panel-sm);
-  background: var(--surface-subtle);
+  border-radius: 50%;
 }
 
 @media (min-width: 640px) {
@@ -28,4 +27,31 @@
   gap: var(--space-scale-xs);
   flex: 1;
   min-width: 0;
+}
+
+.rolesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-scale-xs);
+  margin-top: var(--space-scale-xs);
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-sans);
+  font-size: var(--typo-xs-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+}
+
+.noAccess {
+  font-family: var(--font-sans);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  font-style: italic;
 }

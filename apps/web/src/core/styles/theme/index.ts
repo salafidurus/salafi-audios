@@ -6,6 +6,9 @@ import { createAccentRecipesWeb, type AccentRecipesWeb } from "./recipes";
 import { createShadowsWeb, type ShadowsWebTheme } from "./shadows";
 import { spacingWeb, type SpacingWeb } from "./spacing";
 import { typographyWeb, type TypographyWeb } from "./typography";
+import { buildAccentColors, ACCENT_PALETTES, type AccentThemeId } from "./variants";
+
+export type { AccentThemeId } from "./variants";
 
 export type AppThemeWeb = {
   colors: AppColors;
@@ -17,7 +20,28 @@ export type AppThemeWeb = {
   typography: TypographyWeb;
 };
 
-export const createThemeWeb = (mode: "light" | "dark"): AppThemeWeb => {
+/**
+ * Builds a web theme. Each accent theme palette declares its own base color
+ * mode (parchment is light-mood; the rest dark-mood). The `mode` parameter
+ * is only used for the light/dark base themes.
+ */
+export const createThemeWeb = (mode: "light" | "dark", variant?: AccentThemeId): AppThemeWeb => {
+  if (variant) {
+    const colorMode: "light" | "dark" = ACCENT_PALETTES[variant].mode;
+    const colors = buildAccentColors(variant);
+    const shadows = createShadowsWeb(colorMode);
+
+    return {
+      colors,
+      recipes: createAccentRecipesWeb(colors, shadows.focus, colorMode),
+      spacing: spacingWeb,
+      radius: radiusWeb,
+      border: borderWeb,
+      shadows,
+      typography: typographyWeb,
+    };
+  }
+
   const colors = createColors(mode);
   const shadows = createShadowsWeb(mode);
 
@@ -34,3 +58,10 @@ export const createThemeWeb = (mode: "light" | "dark"): AppThemeWeb => {
 
 export const lightWebTheme = createThemeWeb("light");
 export const darkWebTheme = createThemeWeb("dark");
+
+export const accentWebThemes: Record<AccentThemeId, AppThemeWeb> = {
+  parchment: createThemeWeb("light", "parchment"),
+  manuscript: createThemeWeb("dark", "manuscript"),
+  midnight: createThemeWeb("dark", "midnight"),
+  ember: createThemeWeb("dark", "ember"),
+};

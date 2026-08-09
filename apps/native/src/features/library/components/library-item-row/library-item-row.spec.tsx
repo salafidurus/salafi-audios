@@ -15,6 +15,18 @@ jest.mock("@sd/core-i18n", () => ({
   pickContentField: (title: string) => title,
 }));
 
+jest.mock("@sd/domain-content", () => ({
+  getLibraryItemPercent: (item: LibraryItemDto) => {
+    if (item.totalLeafCount && item.totalLeafCount > 0) {
+      return Math.round(((item.completedLeafCount ?? 0) / item.totalLeafCount) * 100);
+    }
+    if (item.durationSeconds && item.progressSeconds) {
+      return Math.round((item.progressSeconds / item.durationSeconds) * 100);
+    }
+    return null;
+  },
+}));
+
 jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     t: (_key: string, fallback?: string, vars?: Record<string, unknown>) =>

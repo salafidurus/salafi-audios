@@ -29,6 +29,9 @@ describe('AuthGuard', () => {
       userRoleAssignment: {
         findMany: vi.fn<any>(),
       },
+      userAccessGrant: {
+        findMany: vi.fn<any>().mockResolvedValue([]),
+      },
     } as unknown as Partial<PrismaService>;
     guard = new AuthGuard(reflector, mockPrisma as PrismaService);
     vi.clearAllMocks();
@@ -58,7 +61,11 @@ describe('AuthGuard', () => {
       switchToHttp: () => ({ getRequest: () => req }),
     } as unknown as ExecutionContext;
     await expect(guard.canActivate(ctx)).resolves.toBe(true);
-    expect(req.user).toEqual({ ...fakeUser, roles: ['listener'], permissions: [] });
+    expect(req.user).toEqual({
+      ...fakeUser,
+      roles: ['listener'],
+      accessGrants: [],
+    });
   });
 
   it('assigns default listener role when user has no roles in DB or session', async () => {
@@ -73,33 +80,42 @@ describe('AuthGuard', () => {
       switchToHttp: () => ({ getRequest: () => req }),
     } as unknown as ExecutionContext;
     await expect(guard.canActivate(ctx)).resolves.toBe(true);
-    expect(req.user).toEqual({ ...fakeUser, roles: ['listener'], permissions: [] });
+    expect(req.user).toEqual({
+      ...fakeUser,
+      roles: ['listener'],
+      accessGrants: [],
+    });
   });
 
-  it('throws 401 when user role does not match @Roles()', async () => {
-    const fakeUser = { id: 'u1', email: 'a@b.com' };
-    vi.spyOn(reflector, 'getAllAndOverride')
-      .mockReturnValueOnce(false) // isPublic
-      .mockReturnValueOnce(['admin']); // required roles
+  it('loads aggregate grants fresh instead of trusting session claims', async () => {
+    const fakeUser = { id: 'u1', email: 'a@b.com', accessGrants: [{ target: 'listing' }] };
+    vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
     mockAuth.api.getSession.mockResolvedValue({ user: fakeUser, session: {} });
-    (mockPrisma.userRoleAssignment!.findMany as any).mockResolvedValue([{ role: 'listener' }]);
-    await expect(guard.canActivate(mockContext())).rejects.toThrow(UnauthorizedException);
-  });
-
-  it('allows user with matching role from @Roles()', async () => {
-    const fakeUser = { id: 'u1', email: 'a@b.com' };
-    vi.spyOn(reflector, 'getAllAndOverride')
-      .mockReturnValueOnce(false) // isPublic
-      .mockReturnValueOnce(['admin', 'editor']); // required roles
-    mockAuth.api.getSession.mockResolvedValue({ user: fakeUser, session: {} });
-    (mockPrisma.userRoleAssignment!.findMany as any).mockResolvedValue([{ role: 'editor' }]);
+    (mockPrisma.userRoleAssignment!.findMany as any).mockResolvedValue([]);
+    (mockPrisma.userAccessGrant!.findMany as any).mockResolvedValue([
+      { target: 'listing', capability: 'write', scholar: { slug: 'scholar-a' }, locale: null },
+    ]);
     const req: Record<string, unknown> = { headers: {}, user: undefined };
     const ctx = {
       getHandler: () => ({}),
       getClass: () => ({}),
       switchToHttp: () => ({ getRequest: () => req }),
     } as unknown as ExecutionContext;
-    await expect(guard.canActivate(ctx)).resolves.toBe(true);
+
+    await guard.canActivate(ctx);
+
+    expect(mockPrisma.userAccessGrant!.findMany).toHaveBeenCalledWith({
+      where: { userId: 'u1' },
+      select: {
+        target: true,
+        capability: true,
+        locale: true,
+        scholar: { select: { slug: true } },
+      },
+    });
+    expect((req.user as any).accessGrants).toEqual([
+      { target: 'listing', capability: 'write', locale: null, scholarSlug: 'scholar-a' },
+    ]);
   });
 
   describe('ban enforcement', () => {

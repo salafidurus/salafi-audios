@@ -18,9 +18,12 @@ export const endpoints = {
     lastPlayed: (id: string) => `/listings/${id}/last-played`,
     progressSummary: (id: string) => `/listings/${id}/progress-summary`,
     recent: "/listings/recent",
+    promotions: "/listings/promotions",
   },
   library: {
     saved: "/me/library/saved",
+    savedDelta: "/me/library/saved/delta",
+    savedSync: "/me/library/saved/sync",
     completed: "/me/library/completed",
     progress: "/me/library/progress",
     recentProgress: "/me/library/recent-progress",
@@ -43,16 +46,7 @@ export const endpoints = {
   admin: {
     users: {
       list: "/admin/users",
-    },
-    permissions: {
-      list: (userId: string) => `/admin/users/${userId}/permissions`,
-      grant: (userId: string) => `/admin/permissions/${userId}/permissions`,
-      revoke: (userId: string, permission: string) =>
-        `/admin/permissions/${userId}/permissions/${permission}`,
-    },
-    roles: {
-      grant: (userId: string) => `/admin/permissions/${userId}/roles`,
-      revoke: (userId: string, role: string) => `/admin/permissions/${userId}/roles/${role}`,
+      access: (userId: string) => `/admin/users/${userId}/access`,
     },
     scholars: {
       list: "/admin/scholars",
@@ -83,6 +77,7 @@ export const endpoints = {
       bulk: "/admin/listings/bulk",
       arrangeData: (id: string) => `/admin/listings/${id}/arrange-data`,
       arrangeCommit: (id: string) => `/admin/listings/${id}/arrange-commit`,
+      promotions: "/admin/listings/promotions",
     },
     media: {
       presignedUrl: "/admin/media/presigned-url",

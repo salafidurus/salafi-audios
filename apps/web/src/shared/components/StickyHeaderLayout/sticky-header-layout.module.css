@@ -11,9 +11,9 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   flex-shrink: 0;
-  margin-inline: calc(-1 * var(--space-layout-page-x));
-  padding-inline: var(--space-layout-page-x);
-  border-bottom: 1px solid var(--chrome-border);
+  margin-inline: -40px;
+  padding-inline: 40px;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .results {
@@ -21,6 +21,7 @@
   flex-direction: column;
   min-height: 0;
   flex: 1;
+  padding-top: 20px;
   padding-bottom: var(--space-layout-page-y);
 }
 
@@ -28,5 +29,7 @@
   .stickyHeader {
     gap: var(--space-component-gap-xs);
     padding-bottom: var(--space-component-gap-sm);
+    margin-inline: -16px;
+    padding-inline: 16px;
   }
 }

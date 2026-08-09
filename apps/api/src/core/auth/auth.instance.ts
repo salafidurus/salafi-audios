@@ -1,7 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin, bearer, customSession } from 'better-auth/plugins';
-import { ROLE_DEFAULT_PERMISSIONS } from '@sd/core-contracts';
 import { expo } from '@better-auth/expo';
 import { PrismaClient } from '@sd/core-db';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -64,22 +63,10 @@ function createAuthInstance(config: ConfigService) {
           roles = ['listener'];
         }
 
-        let permissions: string[] = [];
-        if (roles.includes('superadmin')) {
-          permissions = [...ROLE_DEFAULT_PERMISSIONS.superadmin];
-        } else {
-          const userPerms = await prismaInstance.userPermission.findMany({
-            where: { userId: user.id },
-            select: { permission: true },
-          });
-          permissions = userPerms.map((p) => p.permission as string);
-        }
-
         return {
           user: {
             ...user,
             roles,
-            permissions,
           },
           session,
         };
@@ -101,7 +88,16 @@ function createAuthInstance(config: ConfigService) {
       },
       // HTTPS-only cookies in production (XSS + MITM mitigation)
       useSecureCookies: config.NODE_ENV === 'production',
-      // HttpOnly, SameSite=Lax are already defaults
+      // Allow cross-site cookies in dev (localhost:3000 -> localhost:4000).
+      // Chrome treats localhost as a secure context, so Secure cookies work
+      // over HTTP on localhost. In production, default to lax/same-site cookies.
+      defaultCookieAttributes:
+        config.NODE_ENV === 'development'
+          ? {
+              sameSite: 'none',
+              secure: true,
+            }
+          : undefined,
     },
   });
 }

@@ -25,7 +25,7 @@ export function ProgressIndicator({ listingId, size = 32 }: ProgressIndicatorPro
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke="#e5e7eb"
+        stroke="var(--border-default)"
         strokeWidth={strokeWidth}
       />
       <circle
@@ -33,7 +33,7 @@ export function ProgressIndicator({ listingId, size = 32 }: ProgressIndicatorPro
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke={isCompleted ? "#16a34a" : "#2563eb"}
+        stroke={isCompleted ? "var(--state-success)" : "var(--accent-primary-bg)"}
         strokeWidth={strokeWidth}
         strokeDasharray={circumference}
         strokeDashoffset={offset}

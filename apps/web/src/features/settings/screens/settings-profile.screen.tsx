@@ -1,6 +1,7 @@
 "use client";
 
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
+import { Check, LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -246,18 +247,37 @@ function ProfileContent() {
 function SignInCta() {
   const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
+  const benefits = [
+    t("account.profile.benefit1", "Sync progress across devices"),
+    t("account.profile.benefit2", "Save lectures to your library"),
+    t("account.profile.benefit3", "Pick up exactly where you left off"),
+  ];
+
   return (
     <div className={styles.signInCta}>
-      <p className={styles.signInTitle}>
-        {t("account.profile.signInCta", "Sign in to view your profile and roles.")}
-      </p>
+      <div className={styles.iconBadge}>
+        <LogIn size={22} color="var(--action-primary)" />
+      </div>
+      <h3 className={styles.signInTitle}>
+        {t("account.profile.signInHeader", "Sign in to Salafi Durus")}
+      </h3>
       <p className={styles.signInDesc}>
         {t(
           "account.profile.signInDesc",
-          "Create an account or sign in to manage your profile and roles.",
+          "Keep your progress, saved durus, and playback position in sync across every device.",
         )}
       </p>
-      <Button variant="primary" onClick={() => setShowModal(true)}>
+      <div className={styles.bulletList}>
+        {benefits.map((b) => (
+          <div key={b} className={styles.bulletRow}>
+            <div className={styles.checkCircle}>
+              <Check size={11} color="var(--action-primary)" />
+            </div>
+            <span className={styles.bulletText}>{b}</span>
+          </div>
+        ))}
+      </div>
+      <Button variant="primary" style={{ width: "100%" }} onClick={() => setShowModal(true)}>
         {t("account.profile.signIn", "Sign In")}
       </Button>
       <AuthModal
@@ -269,9 +289,13 @@ function SignInCta() {
   );
 }
 
-export function SettingsProfileScreen() {
+export function SettingsProfileScreen({ hideHeader = false }: { hideHeader?: boolean }) {
   const { isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation();
+
+  if (hideHeader) {
+    return isLoading ? null : isAuthenticated ? <ProfileContent /> : <SignInCta />;
+  }
 
   return (
     <ScreenView>

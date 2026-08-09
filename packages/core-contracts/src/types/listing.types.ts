@@ -97,6 +97,14 @@ export const SeriesContextDtoSchema = z.object({
 });
 export type SeriesContextDto = z.infer<typeof SeriesContextDtoSchema>;
 
+/** The top-level Listing a nested Lesson/Module belongs to — null when the listing is already top-level. */
+export const RootListingDtoSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  title: z.string(),
+});
+export type RootListingDto = z.infer<typeof RootListingDtoSchema>;
+
 export const ListingDetailDtoSchema = z.object({
   id: z.string(),
   slug: z.string(),
@@ -114,6 +122,7 @@ export const ListingDetailDtoSchema = z.object({
   topics: z.array(TopicRefDtoSchema),
   primaryAudioAsset: AudioAssetDtoSchema.nullable(),
   seriesContext: SeriesContextDtoSchema.nullable(),
+  rootListing: RootListingDtoSchema.nullable(),
 });
 export type ListingDetailDto = z.infer<typeof ListingDetailDtoSchema>;
 
@@ -166,6 +175,7 @@ export const AdminListingDetailDtoSchema = z.object({
   orderIndex: z.number().optional(),
   durationSeconds: z.number().optional(),
   scholarId: z.string(),
+  scholarSlug: z.string(),
   scholarName: z.string(),
   parentId: z.string().optional(),
   topics: z.array(z.string()),

@@ -1,4 +1,8 @@
-import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-contracts";
+import type {
+  ListingFormat,
+  SearchCatalogItemDto,
+  SearchCatalogResultsDto,
+} from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
 
@@ -6,6 +10,7 @@ export type SearchResultRow = {
   id: string;
   slug: string;
   title: string;
+  format: ListingFormat;
   scholarName: string;
   scholarSlug: string;
   imageUrl?: string;
@@ -21,16 +26,23 @@ export function buildSearchResultRows(
     return [];
   }
 
-  const toRow = (item: SearchCatalogItemDto): SearchResultRow => ({
-    id: item.id,
-    slug: item.slug,
-    title: pickContentField(item.title, item.original?.title, showOriginal),
-    scholarName: item.scholarName,
-    scholarSlug: item.scholarSlug,
-    imageUrl: item.coverImageUrl ?? item.scholarImageUrl,
-    lectureCount: item.lectureCount,
-    durationSeconds: item.durationSeconds,
-  });
+  const toRow =
+    (format: ListingFormat) =>
+    (item: SearchCatalogItemDto): SearchResultRow => ({
+      id: item.id,
+      slug: item.slug,
+      title: pickContentField(item.title, item.original?.title, showOriginal),
+      format,
+      scholarName: item.scholarName,
+      scholarSlug: item.scholarSlug,
+      imageUrl: item.coverImageUrl ?? item.scholarImageUrl,
+      lectureCount: item.lectureCount,
+      durationSeconds: item.durationSeconds,
+    });
 
-  return [...data.collections.map(toRow), ...data.series.map(toRow), ...data.singles.map(toRow)];
+  return [
+    ...data.collections.map(toRow("collection")),
+    ...data.series.map(toRow("series")),
+    ...data.singles.map(toRow("single")),
+  ];
 }

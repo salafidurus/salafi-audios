@@ -1,5 +1,6 @@
 import type {
   AppColors,
+  AccentBadgeRecipe,
   AccentRecipesShared,
   ScreenWashRecipe,
   ChromeRecipe,
@@ -22,6 +23,9 @@ export type AccentRecipesWeb = AccentRecipesShared & {
   };
   mixedPromotedPanel: AccentRecipesShared["mixedPromotedPanel"] & {
     background: string;
+  };
+  badge: AccentRecipesShared["badge"] & {
+    warning: AccentBadgeRecipe;
   };
   screen: ScreenWashRecipe;
   chrome: ChromeRecipe;
@@ -202,6 +206,11 @@ export const createAccentRecipesWeb = (
         surfaceColor: `color-mix(in srgb, ${colors.action.primaryHover} 20%, ${colors.surface.default})`,
         borderColor: `color-mix(in srgb, ${colors.action.primary} 40%, ${colors.border.default})`,
         foregroundColor: `color-mix(in srgb, ${colors.action.primary} 80%, ${colors.content.strong})`,
+      },
+      warning: {
+        surfaceColor: colors.surface.secondarySubtle,
+        borderColor: colors.border.secondary,
+        foregroundColor: colors.content.secondaryStrong,
       },
       danger: {
         surfaceColor: `color-mix(in srgb, #ef4444 20%, ${colors.surface.default})`,

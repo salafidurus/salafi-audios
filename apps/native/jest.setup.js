@@ -422,3 +422,9 @@ jest.mock("react-native-reanimated", () => {
     Extrapolate: { CLAMP: "clamp" },
   };
 });
+
+jest.mock("@expo/vector-icons", () => {
+  return {
+    Ionicons: "Ionicons",
+  };
+});

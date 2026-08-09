@@ -2,17 +2,13 @@ import { QueryClient } from "@tanstack/react-query";
 
 import type { SearchCatalogParams } from "../types";
 
-import { DEFAULT_MAX_AGE } from "./persist";
-
-export * from "./persist";
-
 // Centralized query client configuration
 export const createQueryClient = () =>
   new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 1000 * 60, // 1 minute
-        gcTime: DEFAULT_MAX_AGE, // 24 hours (for persistence)
+        gcTime: 1000 * 60 * 60 * 24, // 24 hours
         retry: (failureCount, error: unknown) => {
           // Don't retry on 4xx errors (client errors)
           if (
@@ -87,11 +83,6 @@ export const queryKeys = {
   },
   admin: {
     all: ["admin"] as const,
-    permissions: {
-      all: () => [...queryKeys.admin.all, "permissions"] as const,
-      me: () => [...queryKeys.admin.all, "permissions", "me"] as const,
-      user: (userId: string) => [...queryKeys.admin.all, "permissions", userId] as const,
-    },
     users: {
       all: () => [...queryKeys.admin.all, "users"] as const,
       list: (query?: string, role?: string) =>

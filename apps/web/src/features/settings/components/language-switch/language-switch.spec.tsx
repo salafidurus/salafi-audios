@@ -7,7 +7,7 @@ import { LanguageSwitch } from "./language-switch";
 
 const mockChangeLanguage = vi.fn().mockResolvedValue(undefined);
 const mockRefresh = vi.fn();
-const mockInvalidate = vi.fn().mockResolvedValue(undefined);
+const mockClear = vi.fn();
 
 vi.mock("@sd/core-i18n", () => ({
   SUPPORTED_LOCALES: ["en", "ar"],
@@ -25,7 +25,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@tanstack/react-query", () => ({
-  useQueryClient: () => ({ invalidateQueries: mockInvalidate }),
+  useQueryClient: () => ({ clear: mockClear }),
 }));
 
 vi.mock("../../../../core/i18n/locale-cookie", () => ({
@@ -71,7 +71,7 @@ describe("LanguageSwitch", () => {
     expect(trigger.querySelector("svg")).toBeInTheDocument();
   });
 
-  it("switches locale, persists it, invalidates queries, and refreshes", async () => {
+  it("switches locale, persists it, clears the query cache, and refreshes", async () => {
     render(<LanguageSwitch />);
 
     fireEvent.click(screen.getByRole("combobox", { name: "Language" }));
@@ -81,6 +81,6 @@ describe("LanguageSwitch", () => {
 
     expect(mockChangeLanguage).toHaveBeenCalledWith("ar");
     expect(setLocaleCookie).toHaveBeenCalledWith("ar");
-    expect(mockInvalidate).toHaveBeenCalled();
+    expect(mockClear).toHaveBeenCalled();
   });
 });

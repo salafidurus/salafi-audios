@@ -1,28 +1,27 @@
 import type { AdminUserListItemDto } from "@sd/core-contracts";
 import type { ReactNode } from "react";
 
-import { ShieldCog, UserCog } from "lucide-react";
+import { useAbility } from "@sd/domain-account";
+import { ShieldCog } from "lucide-react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
 import { UserAvatar } from "@/shared/components/user-avatar";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 
 import { MetaDetails } from "./meta-details";
-import { PermissionDetails } from "./permission-details";
 import styles from "./user-item.module.css";
 
 export type UserItemProps = {
   user: AdminUserListItemDto;
-  onManagePermissions?: () => void;
-  onManageRoles?: () => void;
+  onManageAccess?: () => void;
 };
 
-export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemProps): ReactNode {
+export function UserItem({ user, onManageAccess }: UserItemProps): ReactNode {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
+  const { ability } = useAbility();
 
   return (
     <List.Item interactive>
@@ -32,35 +31,33 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
         </div>
         <div className={styles.contentBody}>
           <MetaDetails user={user} />
-          <PermissionDetails permissions={user.permissions.map((p) => ({ permission: p }))} />
+          <div className={styles.rolesList}>
+            {user.roles.length > 0 ? (
+              user.roles.map((role) => (
+                <span key={role} className={styles.roleBadge}>
+                  {role}
+                </span>
+              ))
+            ) : (
+              <span className={styles.noAccess}>No access grants</span>
+            )}
+          </div>
         </div>
       </div>
 
       <List.Item.Actions orientation="horizontal" mobileOrientation="vertical">
-        <PermissionGate requires="USERS_GRANT_PERMISSIONS">
+        {ability.can("manage", "UserAccess") && (
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
             fullWidth={isMobile}
-            onClick={onManagePermissions}
+            onClick={onManageAccess}
             icon={<ShieldCog size={16} />}
-            aria-label={t("admin.permissions.managePermissionsBtn", "Manage Permissions")}
+            aria-label={t("admin.access.manageAccessBtn", "Manage Access")}
           >
-            {isMobile && t("admin.permissions.managePermissionsBtnShort", "Permissions")}
+            {isMobile && t("admin.access.manageAccessBtnShort", "Access")}
           </Button>
-        </PermissionGate>
-        <PermissionGate requires="USERS_GRANT_ROLES">
-          <Button
-            variant={isMobile ? "outline" : "ghost"}
-            size={isMobile ? "sm" : "icon"}
-            fullWidth={isMobile}
-            onClick={onManageRoles}
-            icon={<UserCog size={16} />}
-            aria-label={t("admin.permissions.manageRolesBtn", "Manage Roles")}
-          >
-            {isMobile && t("admin.permissions.manageRolesBtnShort", "Roles")}
-          </Button>
-        </PermissionGate>
+        )}
       </List.Item.Actions>
     </List.Item>
   );

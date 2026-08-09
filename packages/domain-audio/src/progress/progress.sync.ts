@@ -4,35 +4,128 @@ import {
   type AudioProgressDto,
   type ProgressSyncItemDto,
 } from "@sd/core-contracts";
+import { createOutboxStore, drainOutbox, type StorageAdapter } from "@sd/core-sync";
 
 import { useProgressStore } from "./progress.store";
 
 let syncTimeout: ReturnType<typeof setTimeout> | null = null;
-const SYNC_DEBOUNCE_MS = 5000;
+// Batched: individual position ticks debounce into one write per listing every
+// couple of minutes rather than every few seconds. `flushPendingProgress` is
+// still called directly at lesson-end and app-background, so completion and
+// backgrounding are never delayed by this window.
+const SYNC_DEBOUNCE_MS = 120_000;
 
-const pendingUpdates = new Map<
-  string,
-  { listingId: string; positionSeconds: number; durationSeconds: number }
->();
+type PendingUpdate = { listingId: string; positionSeconds: number; durationSeconds: number };
+
+const pendingUpdates = new Map<string, PendingUpdate>();
+
+const flushListeners = new Set<() => void>();
+
+/**
+ * Subscribes to "a progress flush just completed" — used by each app's
+ * progress-persistence layer to invalidate library queries once fresh data
+ * has actually reached the server, without domain-audio depending on
+ * react-query. Returns an unsubscribe function.
+ */
+export function onProgressFlushed(listener: () => void): () => void {
+  flushListeners.add(listener);
+  return () => flushListeners.delete(listener);
+}
+
+function createInMemoryStorageAdapter(): StorageAdapter {
+  const backing = new Map<string, string>();
+  return {
+    getItem: async (key) => backing.get(key) ?? null,
+    setItem: async (key, value) => void backing.set(key, value),
+    removeItem: async (key) => void backing.delete(key),
+  };
+}
+
+// In-memory by default, matching the module's prior (pre-outbox) behavior, so it
+// works standalone with no required setup. Apps upgrade this to a real persisted
+// adapter via `initProgressSync` (see apps/*/core/audio/progress-persistence.ts)
+// so a failed push survives an app restart/crash instead of vanishing.
+let delegateAdapter: StorageAdapter = createInMemoryStorageAdapter();
+const proxyAdapter: StorageAdapter = {
+  getItem: (key) => delegateAdapter.getItem(key),
+  setItem: (key, value) => delegateAdapter.setItem(key, value),
+  removeItem: (key) => delegateAdapter.removeItem(key),
+};
+// Namespaced by userId (see `initProgressSync`) so a second user signing in on
+// the same device never sees — or retries — a prior user's queued push. Starts
+// under a generic namespace until the first `initProgressSync` call scopes it.
+let outbox = createOutboxStore(proxyAdapter, "progress");
+
+/**
+ * Upgrades the retry queue to a persisted `StorageAdapter`, scoped to `userId`,
+ * and recovers any entries a previous session for that same user left queued
+ * after a failed push. Call once per authenticated session, before the first
+ * `syncProgressToBackend` call, after the app's platform storage adapter is
+ * constructed.
+ */
+export async function initProgressSync(adapter: StorageAdapter, userId: string): Promise<void> {
+  delegateAdapter = adapter;
+  outbox = createOutboxStore(proxyAdapter, `progress:${userId}`);
+  await outbox.hydrate();
+}
+
+async function pushUpdate(update: PendingUpdate): Promise<void> {
+  await httpClient({
+    url: endpoints.audio.progress.update(update.listingId),
+    method: "PUT",
+    body: {
+      positionSeconds: update.positionSeconds,
+      durationSeconds: update.durationSeconds,
+    },
+  });
+}
+
+/**
+ * Retries any progress pushes left queued in the persisted outbox — entries
+ * left over from a previous session's failed push, or from a previous failed
+ * flush this session. Notifies flush listeners whenever an entry was
+ * attempted, mirroring `flushPending`'s "notify on any attempt" semantics.
+ */
+async function drainQueuedRetries(): Promise<void> {
+  const { succeeded, failed } = await drainOutbox(outbox, (entry) =>
+    pushUpdate(entry.payload as PendingUpdate),
+  );
+  if (succeeded + failed > 0) {
+    for (const listener of flushListeners) listener();
+  }
+}
+
+/**
+ * Retries any progress pushes left queued from a previous session (or a
+ * previous failed flush). Safe to call independently of `flushPendingProgress`
+ * — e.g. from a network-reconnect listener with nothing currently debounced.
+ */
+export function drainPendingProgress(): Promise<void> {
+  return drainQueuedRetries();
+}
 
 async function flushPending(): Promise<void> {
   const updates = Array.from(pendingUpdates.values());
   pendingUpdates.clear();
 
+  // Retry anything left over from a previous failed flush first, so a failure
+  // is picked up again on the very next flush — same as the pre-outbox
+  // behavior, just now surviving an app restart in between.
+  await drainQueuedRetries();
+
+  if (updates.length === 0) return;
+
   await Promise.all(
     updates.map((update) =>
-      httpClient({
-        url: endpoints.audio.progress.update(update.listingId),
-        method: "PUT",
-        body: {
-          positionSeconds: update.positionSeconds,
-          durationSeconds: update.durationSeconds,
-        },
-      }).catch(() => {
-        pendingUpdates.set(update.listingId, update);
+      pushUpdate(update).catch(() => {
+        // Persisted (not just in-memory) so this survives an app restart/crash —
+        // recovered on the next flush, or by `drainPendingProgress` on reconnect.
+        outbox.useOutboxStore.getState().actions.enqueue("progress-update", update);
       }),
     ),
   );
+
+  for (const listener of flushListeners) listener();
 }
 
 /**

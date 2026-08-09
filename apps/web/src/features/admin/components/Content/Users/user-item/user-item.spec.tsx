@@ -1,15 +1,24 @@
-import { useAdminPermissions } from "@sd/domain-account";
+import type { AppAbility } from "@sd/core-contracts";
+
+import { createMongoAbility, AbilityBuilder } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, type Mock } from "bun:test";
 
 import { UserItem } from "./user-item";
 
 vi.mock("@sd/domain-account", () => ({
-  useAdminPermissions: vi.fn(),
+  useAbility: vi.fn(),
 }));
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: () => ({ isTablet: false }),
 }));
+
+function abilityWith(build: (can: AbilityBuilder<AppAbility>["can"]) => void): AppAbility {
+  const { can, build: buildAbility } = new AbilityBuilder<AppAbility>(createMongoAbility);
+  build(can);
+  return buildAbility();
+}
 
 const baseUser = {
   id: "u1",
@@ -18,40 +27,28 @@ const baseUser = {
   image: null,
   roles: [],
   createdAt: "2024-01-01T00:00:00.000Z",
-  permissions: [] as import("@sd/core-contracts").AdminPermission[],
 };
 
 describe("UserItem", () => {
-  it("shows Manage Permissions button only when user has USERS_GRANT_PERMISSIONS", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["USERS_GRANT_PERMISSIONS"] },
+  it("shows one Manage Access button when the user can manage UserAccess", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: abilityWith((can) => can("manage", "UserAccess")),
+      isLoading: false,
     });
 
-    render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
+    render(<UserItem user={baseUser} onManageAccess={vi.fn()} />);
 
-    expect(screen.getByRole("button", { name: "Manage Permissions" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Manage Roles" })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Manage Access" })).toHaveLength(1);
   });
 
-  it("shows Manage Roles button only when user has USERS_GRANT_ROLES", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["USERS_GRANT_ROLES"] },
+  it("hides every management button when the user has no grant capability", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: abilityWith((can) => can("read", "User")),
+      isLoading: false,
     });
 
-    render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
+    render(<UserItem user={baseUser} onManageAccess={vi.fn()} />);
 
-    expect(screen.queryByRole("button", { name: "Manage Permissions" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Manage Roles" })).toBeInTheDocument();
-  });
-
-  it("hides both buttons when user has only USERS_VIEW", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["USERS_VIEW"] },
-    });
-
-    render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
-
-    expect(screen.queryByRole("button", { name: "Manage Permissions" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Manage Roles" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Manage Access" })).not.toBeInTheDocument();
   });
 });

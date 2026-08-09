@@ -1,73 +1,28 @@
 import type {
-  Permission,
-  UserPermissionDto,
-  UserRoleAssignmentDto,
-  UserRole,
   AdminUserListDto,
   AdminTopicDetailDto,
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
   ScholarFormDataDto,
   ScholarTitle,
+  ReplaceUserAccessRequest,
+  UserAccessSnapshot,
 } from "@sd/core-contracts";
 
 import { httpClient, endpoints } from "@sd/core-contracts";
 
-// --- Permissions ---
-
-export type AdminPermissionsListResponse = {
-  permissions: UserPermissionDto[];
-};
-
-export function fetchUserPermissions(userId: string) {
-  return httpClient<AdminPermissionsListResponse>({
-    url: endpoints.admin.permissions.list(userId),
+export function fetchUserAccess(userId: string) {
+  return httpClient<UserAccessSnapshot>({
+    url: endpoints.admin.users.access(userId),
     method: "GET",
   });
 }
 
-export function grantPermission(userId: string, permission: Permission) {
-  return httpClient<AdminPermissionsListResponse>({
-    url: endpoints.admin.permissions.grant(userId),
-    method: "POST",
-    body: { permission },
-  });
-}
-
-export function revokePermission(userId: string, permission: string) {
-  return httpClient<AdminPermissionsListResponse>({
-    url: endpoints.admin.permissions.revoke(userId, permission),
-    method: "DELETE",
-    body: {},
-  });
-}
-
-// --- Roles ---
-
-export type AdminRolesListResponse = {
-  roles: UserRoleAssignmentDto[];
-};
-
-export function fetchUserRoles(userId: string) {
-  return httpClient<AdminRolesListResponse>({
-    url: endpoints.admin.roles.grant(userId),
-    method: "GET",
-  });
-}
-
-export function grantRole(userId: string, role: UserRole) {
-  return httpClient<AdminRolesListResponse>({
-    url: endpoints.admin.roles.grant(userId),
-    method: "POST",
-    body: { role },
-  });
-}
-
-export function revokeRole(userId: string, role: UserRole) {
-  return httpClient<AdminRolesListResponse>({
-    url: endpoints.admin.roles.revoke(userId, role),
-    method: "DELETE",
-    body: {},
+export function replaceUserAccess(userId: string, body: ReplaceUserAccessRequest) {
+  return httpClient<UserAccessSnapshot>({
+    url: endpoints.admin.users.access(userId),
+    method: "PUT",
+    body,
   });
 }
 

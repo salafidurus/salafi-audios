@@ -1,4 +1,5 @@
-import { useAdminPermissions } from "@sd/domain-account";
+import { createMongoAbility } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
@@ -7,7 +8,7 @@ import React from "react";
 import { AdminScholarsScreen } from "./admin-scholars.screen";
 
 vi.mock("@sd/domain-account", () => ({
-  useAdminPermissions: vi.fn(),
+  useAbility: vi.fn(),
 }));
 vi.mock("@sd/core-contracts", () => {
   // Import the real module to preserve all exports
@@ -31,8 +32,8 @@ describe("AdminScholarsScreen", () => {
         queries: { retry: false },
       },
     });
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["SCHOLARS_VIEW"] },
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Scholar" }]),
     });
   });
 
@@ -40,9 +41,9 @@ describe("AdminScholarsScreen", () => {
     return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
   };
 
-  it("hides Add Scholar button when user lacks SCHOLARS_CREATE", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["SCHOLARS_VIEW"] },
+  it("hides Add Scholar button when user cannot create scholars", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Scholar" }]),
     });
 
     renderWithProviders(<AdminScholarsScreen />);
@@ -51,9 +52,9 @@ describe("AdminScholarsScreen", () => {
     expect(screen.queryByText("Add")).not.toBeInTheDocument();
   });
 
-  it("shows Add Scholar button when user has SCHOLARS_CREATE", () => {
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["SCHOLARS_CREATE"] },
+  it("shows Add Scholar button when user can create scholars", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "create", subject: "Scholar" }]),
     });
 
     renderWithProviders(<AdminScholarsScreen />);
@@ -64,8 +65,8 @@ describe("AdminScholarsScreen", () => {
   it("invalidates with base prefix key (admin.scholars.all()) to match active search queries", () => {
     const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
-    (useAdminPermissions as Mock<any>).mockReturnValue({
-      data: { permissions: ["SCHOLARS_CREATE"] },
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "create", subject: "Scholar" }]),
     });
 
     renderWithProviders(<AdminScholarsScreen />);

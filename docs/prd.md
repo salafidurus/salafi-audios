@@ -30,7 +30,7 @@
 - The platform is curated, not crowdsourced.
 - Structure is a first-class feature, not metadata cleanup.
 - Offline support exists for continuity, not authority.
-- The backend is the single source of truth for content, permissions, and canonical user state.
+- The backend is the single source of truth for content, access control, and canonical user state.
 
 ## 3. User Roles
 
@@ -39,7 +39,7 @@
 - **Editor**: manages scoped content, metadata, ordering, and uploads.
 - **Administrator**: has global moderation, role, and platform control.
 
-Permissions are explicit and backend-enforced. Editors have scoped trust, not broad administrative authority.
+Access grants are explicit and backend-enforced. Editors have scoped trust, not broad administrative authority.
 
 ## 4. Trust and Responsibility Model
 

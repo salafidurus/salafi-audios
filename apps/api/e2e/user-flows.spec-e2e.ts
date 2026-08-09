@@ -3,7 +3,12 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { PrismaService } from '../src/core/db/prisma.service';
 import { TestAuthFactory } from './helpers/test-auth.factory';
-import { TEST_LISTING_ID, seedTestData, cleanupE2ETestData } from './helpers/seed-test-data';
+import {
+  TEST_LISTING_ID,
+  TEST_LISTING_SLUG,
+  seedTestData,
+  cleanupE2ETestData,
+} from './helpers/seed-test-data';
 
 describe('Core User Flows (e2e)', () => {
   let app: NestFastifyApplication;
@@ -28,13 +33,13 @@ describe('Core User Flows (e2e)', () => {
       const auth = await authFactory.createUser();
       // First save
       await request(app.getHttpServer())
-        .post(`/me/library/save/${TEST_LISTING_ID}`)
+        .post(`/me/library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
 
       // Second save (should be idempotent, i.e., return 201/200 and not error)
       await request(app.getHttpServer())
-        .post(`/me/library/save/${TEST_LISTING_ID}`)
+        .post(`/me/library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
     });
@@ -44,7 +49,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Save it first
       await request(app.getHttpServer())
-        .post(`/me/library/save/${TEST_LISTING_ID}`)
+        .post(`/me/library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
 
@@ -64,13 +69,13 @@ describe('Core User Flows (e2e)', () => {
 
       // Save it first
       await request(app.getHttpServer())
-        .post(`/me/library/save/${TEST_LISTING_ID}`)
+        .post(`/me/library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
 
       // Unsave it
       await request(app.getHttpServer())
-        .delete(`/me/library/save/${TEST_LISTING_ID}`)
+        .delete(`/me/library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(200);
 
@@ -91,7 +96,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Send progress update
       await request(app.getHttpServer())
-        .put(`/audio/progress/${TEST_LISTING_ID}`)
+        .put(`/audio/progress/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .send({
           positionSeconds: 120,
@@ -115,7 +120,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Create a progress record
       await request(app.getHttpServer())
-        .put(`/audio/progress/${TEST_LISTING_ID}`)
+        .put(`/audio/progress/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .send({
           positionSeconds: 50,
@@ -148,7 +153,7 @@ describe('Core User Flows (e2e)', () => {
       const auth = await authFactory.createUser();
 
       await request(app.getHttpServer())
-        .put(`/audio/progress/${TEST_LISTING_ID}`)
+        .put(`/audio/progress/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .send({
           positionSeconds: 300,
@@ -171,7 +176,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Mark completed
       await request(app.getHttpServer())
-        .put(`/audio/progress/${TEST_LISTING_ID}`)
+        .put(`/audio/progress/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .send({
           positionSeconds: 300,
@@ -196,7 +201,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Update progress, but not completed
       await request(app.getHttpServer())
-        .put(`/audio/progress/${TEST_LISTING_ID}`)
+        .put(`/audio/progress/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .send({
           positionSeconds: 150,

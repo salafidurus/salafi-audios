@@ -84,3 +84,6 @@ out/
 apps/web/public/uploads/
 apps/web/src/app/api/
 
+# Reference files (prototypes, design docs — never commit)
+_reference/
+

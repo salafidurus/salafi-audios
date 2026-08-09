@@ -2,6 +2,7 @@ import type { MenuAction } from "@expo/ui/community/menu";
 import type { LibraryItemDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
+import { getLibraryItemPercent } from "@sd/domain-content";
 import { Bookmark, Clock, CheckCircle } from "lucide-react-native";
 import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -68,10 +69,7 @@ export function LibraryItemRow({
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const lectureTitle = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
-  const progress =
-    item.durationSeconds && item.progressSeconds
-      ? Math.round((item.progressSeconds / item.durationSeconds) * 100)
-      : null;
+  const progress = getLibraryItemPercent(item);
 
   return (
     <List.Item onPress={onPress} hideBorder={hideBorder} testID={testID}>

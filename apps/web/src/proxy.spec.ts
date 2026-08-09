@@ -13,12 +13,22 @@ vi.mock("next/server", () => ({
 const mockRedirect = NextResponse.redirect as Mock<any>;
 const mockNext = NextResponse.next as Mock<any>;
 
-function makeRequest(pathname: string, cookieValue?: string): NextRequest {
+function makeRequest(
+  pathname: string,
+  cookieValueOrCookies?: string | Record<string, string>,
+): NextRequest {
   return {
     nextUrl: { pathname },
     cookies: {
-      get: (_name: string) =>
-        cookieValue !== undefined ? { name: _name, value: cookieValue } : undefined,
+      get: (_name: string) => {
+        if (!cookieValueOrCookies) return undefined;
+        if (typeof cookieValueOrCookies === "string") {
+          return { name: _name, value: cookieValueOrCookies };
+        }
+        return _name in cookieValueOrCookies
+          ? { name: _name, value: cookieValueOrCookies[_name] }
+          : undefined;
+      },
     },
     url: `http://localhost${pathname}`,
   } as unknown as NextRequest;
@@ -56,6 +66,16 @@ describe("proxy", () => {
         expect(mockRedirect).not.toHaveBeenCalled();
       },
     );
+
+    it("allows authenticated request via secure cookie in production", () => {
+      proxy(
+        makeRequest("/admin", {
+          "__Secure-better-auth.session_token": "some-session-token",
+        }),
+      );
+      expect(mockNext).toHaveBeenCalledTimes(1);
+      expect(mockRedirect).not.toHaveBeenCalled();
+    });
   });
 
   describe("auth-optional and public paths", () => {

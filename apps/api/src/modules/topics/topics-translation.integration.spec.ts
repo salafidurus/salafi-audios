@@ -6,7 +6,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import request from 'supertest';
 import { createTestApp } from '../../test/create-test-app';
 import { AuthGuard } from '../../core/auth/auth.guard';
-import { PermissionGuard } from '../../core/auth/permission.guard';
+import { PolicyGuard } from '../../core/auth/policy.guard';
 import { TopicsController } from './topics.controller';
 import { TopicsTranslationsController } from './topics-translations.controller';
 import { TopicsService } from './topics.service';
@@ -16,9 +16,8 @@ const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../../core/auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
-  userPermission: {
+  userAccessGrant: {
     findMany: vi.fn<any>().mockResolvedValue([]),
-    findUnique: vi.fn<any>().mockResolvedValue(null),
   },
   userRoleAssignment: {
     findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
@@ -51,7 +50,7 @@ async function buildApp(): Promise<NestFastifyApplication> {
     controllers: [TopicsController, TopicsTranslationsController],
     providers: [
       { provide: APP_GUARD, useClass: AuthGuard },
-      { provide: APP_GUARD, useClass: PermissionGuard },
+      { provide: APP_GUARD, useClass: PolicyGuard },
       { provide: TopicsService, useValue: mockTopicsService },
       { provide: PrismaService, useValue: mockPrisma },
     ],
@@ -72,24 +71,15 @@ describe('TopicsTranslationsController — auth boundaries', () => {
 
   afterEach(() => app.close());
 
-  describe('authenticated admin with manage:content permission', () => {
+  describe('authenticated admin with topic translation access', () => {
     beforeEach(() => {
       mockAuth.api.getSession.mockResolvedValue({
         user: { id: 'u1', role: 'admin' },
         session: {},
       });
-      // Mock userPermission.findUnique to return permissions for admin
-      mockPrisma.userPermission.findUnique.mockImplementation(async (args: any) => {
-        const { where } = args;
-        const { userId, permission } = where.userId_permission;
-        if (
-          userId === 'u1' &&
-          ['TRANSLATIONS_VIEW', 'TRANSLATIONS_CREATE', 'TRANSLATIONS_EDIT'].includes(permission)
-        ) {
-          return { userId, permission, grantedAt: new Date() };
-        }
-        return null;
-      });
+      mockPrisma.userAccessGrant.findMany.mockResolvedValue([
+        { target: 'translation', capability: 'translate', scholarId: null, locale: null },
+      ]);
     });
 
     it('POST /topics/:id/translations creates a translation', async () => {
@@ -117,7 +107,7 @@ describe('TopicsTranslationsController — auth boundaries', () => {
     });
   });
 
-  describe('missing manage:content permission', () => {
+  describe('missing topic translation access', () => {
     let forbiddenApp: NestFastifyApplication;
 
     beforeEach(async () => {
@@ -125,9 +115,7 @@ describe('TopicsTranslationsController — auth boundaries', () => {
         user: { id: 'u1', role: 'user' },
         session: {},
       });
-      // Reset userPermission.findUnique to return null for all queries
-      // This ensures PermissionGuard will throw ForbiddenException
-      mockPrisma.userPermission.findUnique.mockResolvedValue(null);
+      mockPrisma.userAccessGrant.findMany.mockResolvedValue([]);
       forbiddenApp = await buildApp();
     });
 

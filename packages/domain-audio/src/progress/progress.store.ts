@@ -1,3 +1,4 @@
+import { resolveLastWriteWins } from "@sd/core-sync";
 import { create } from "zustand";
 
 export type ListingProgress = {
@@ -10,8 +11,6 @@ export type ListingProgress = {
 
 type ProgressState = {
   progressMap: Record<string, ListingProgress>;
-  /** Map of listingId → savedAt ISO string */
-  savedMap: Record<string, string>;
   lastSyncedAt: string | null;
   actions: {
     setProgress: (listingId: string, positionSeconds: number, durationSeconds: number) => void;
@@ -19,17 +18,11 @@ type ProgressState = {
     loadProgress: (entries: ListingProgress[]) => void;
     getProgress: (listingId: string) => ListingProgress | undefined;
     setLastSyncedAt: (timestamp: string) => void;
-    addSaved: (listingId: string) => void;
-    removeSaved: (listingId: string) => void;
-    isSaved: (listingId: string) => boolean;
-    getSavedIds: () => string[];
-    loadSaved: (entries: Array<{ listingId: string; savedAt: string }>) => void;
   };
 };
 
 export const useProgressStore = create<ProgressState>((set, get) => ({
   progressMap: {},
-  savedMap: {},
   lastSyncedAt: null,
 
   actions: {
@@ -63,11 +56,14 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
         };
       }),
 
+    // Last-write-wins by `updatedAt`, mirroring the server's own conflict-resolution
+    // convention (AudioRepository.bulkSync) — a pulled entry never overwrites a newer
+    // unsynced local edit still sitting in the outbox waiting to be pushed.
     loadProgress: (entries) =>
       set((state) => {
         const newMap = { ...state.progressMap };
         for (const entry of entries) {
-          newMap[entry.listingId] = entry;
+          newMap[entry.listingId] = resolveLastWriteWins(newMap[entry.listingId], entry);
         }
         return { progressMap: newMap };
       }),
@@ -75,32 +71,5 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
     getProgress: (listingId) => get().progressMap[listingId],
 
     setLastSyncedAt: (timestamp) => set({ lastSyncedAt: timestamp }),
-
-    addSaved: (listingId) =>
-      set((state) => ({
-        savedMap: {
-          ...state.savedMap,
-          [listingId]: new Date().toISOString(),
-        },
-      })),
-
-    removeSaved: (listingId) =>
-      set((state) => {
-        const { [listingId]: _, ...rest } = state.savedMap;
-        return { savedMap: rest };
-      }),
-
-    isSaved: (listingId) => listingId in get().savedMap,
-
-    getSavedIds: () => Object.keys(get().savedMap),
-
-    loadSaved: (entries) =>
-      set((state) => {
-        const newMap = { ...state.savedMap };
-        for (const entry of entries) {
-          newMap[entry.listingId] = entry.savedAt;
-        }
-        return { savedMap: newMap };
-      }),
   },
 }));

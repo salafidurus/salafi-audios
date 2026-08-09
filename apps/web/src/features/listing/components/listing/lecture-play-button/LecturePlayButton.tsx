@@ -19,7 +19,7 @@ export type LecturePlayButtonProps = {
 export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
   const { isPlaying, currentTrack } = useAudio();
   const formatScholarName = useFormatScholarName();
-  const { data: seriesContents } = useListingContents(lecture.seriesContext?.seriesId ?? "");
+  const { data: seriesContents } = useListingContents(lecture.seriesContext?.seriesSlug ?? "");
 
   if (!lecture.primaryAudioAsset) {
     return null;
@@ -64,6 +64,7 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
 
     const track: Track = {
       id: lecture.id,
+      slug: lecture.slug,
       title: lecture.title,
       artist: scholarName,
       url: asset.url,

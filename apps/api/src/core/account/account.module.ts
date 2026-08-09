@@ -2,15 +2,15 @@ import { Module } from '@nestjs/common';
 import { DbModule } from '../db/db.module';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
-import { PermissionsController } from './permissions.controller';
 import { AdminUsersController } from './admin-users.controller';
-import { PermissionsService } from './permissions.service';
-import { PermissionsRepository } from './permissions.repository';
+import { UserDirectoryService } from './user-directory.service';
+import { UserDirectoryRepository } from './user-directory.repository';
+import { AccessService } from './access.service';
 
 @Module({
   imports: [DbModule],
-  controllers: [AccountController, PermissionsController, AdminUsersController],
-  providers: [AccountService, PermissionsService, PermissionsRepository],
-  exports: [PermissionsService],
+  controllers: [AccountController, AdminUsersController],
+  providers: [AccountService, UserDirectoryService, UserDirectoryRepository, AccessService],
+  exports: [UserDirectoryService],
 })
 export class AccountModule {}

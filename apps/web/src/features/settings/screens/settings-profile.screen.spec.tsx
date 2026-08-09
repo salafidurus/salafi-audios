@@ -92,7 +92,7 @@ describe("SettingsProfileScreen", () => {
       typeof useAccountProfile
     >);
     render(<SettingsProfileScreen />);
-    expect(screen.getByText("Sign in to view your profile and roles.")).toBeInTheDocument();
+    expect(screen.getByText("Sign in to Salafi Durus")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sign In" })).toBeInTheDocument();
   });
 

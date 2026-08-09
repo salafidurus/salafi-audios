@@ -1,9 +1,12 @@
 import type { AdminListingDetailDto, Locale } from "@sd/core-contracts";
 
+import { subject } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { useEffect, useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 
@@ -31,6 +34,8 @@ function reduce(state: FormState, patch: Partial<FormState>): FormState {
 export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditSheetProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const { ability } = useAbility({ isAuthenticated });
   const [state, dispatch] = useReducer(reduce, {
     listing: null,
     title: "",
@@ -59,6 +64,9 @@ export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditShe
   if (!listingId) return null;
 
   const { listing, title, description, language, isSaving, error } = state;
+  const canSave = listing
+    ? ability.can("update", subject("Listing", { scholarSlug: listing.scholarSlug }))
+    : false;
 
   const handleSave = async () => {
     if (!listing) return;
@@ -113,7 +121,11 @@ export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditShe
         </ScrollView>
       )}
       <View style={styles.buttonRow}>
-        <Pressable onPress={handleSave} disabled={isSaving || !listing} style={styles.saveBtn}>
+        <Pressable
+          onPress={handleSave}
+          disabled={isSaving || !listing || !canSave}
+          style={styles.saveBtn}
+        >
           {isSaving ? (
             <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (

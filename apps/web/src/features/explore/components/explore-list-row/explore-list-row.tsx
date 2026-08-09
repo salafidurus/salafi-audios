@@ -3,12 +3,14 @@
 import type { FeedContentItemDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
-import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
+import { useAudio, useProgressStore } from "@sd/domain-audio";
+import { useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
 import { Play, Pause, Bookmark } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
-import { audioService } from "@/features/audio";
+import { useToast } from "@/core/toast";
+import { audioService, usePlayListing } from "@/features/audio";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
@@ -29,13 +31,31 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const { isMobile } = useResponsive();
   const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
+  const { addToast } = useToast();
 
   const { isPlaying, currentTrack } = useAudio();
-  const isCurrentTrack = currentTrack?.id === item.id;
+  // A series/collection row is "current" whenever any of its own lessons is
+  // playing, not just when currentTrack.id equals this container's own id
+  // (which only happens for a single).
+  const isCurrentTrack =
+    currentTrack?.id === item.id ||
+    currentTrack?.seriesId === item.id ||
+    currentTrack?.collectionId === item.id;
 
-  const isSaved = useProgressStore((s) => s.actions.isSaved(item.id));
-  const addSaved = useProgressStore((s) => s.actions.addSaved);
-  const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+  const { play } = usePlayListing(
+    {
+      id: item.id,
+      slug: item.slug,
+      title,
+      format: item.kind,
+      scholarName,
+      scholarSlug: item.scholarSlug,
+      artworkUrl: item.thumbnailUrl ?? undefined,
+    },
+    { onError: (message) => addToast(message, "error") },
+  );
+
+  const isSaved = useIsSaved(item.id);
 
   const progress = useProgressStore((s) => s.progressMap[item.id]);
   const isInProgress = progress && progress.positionSeconds > 0 && !progress.completedAt;
@@ -56,26 +76,15 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
       return;
     }
 
-    const track: Track = {
-      id: item.id,
-      title,
-      artist: scholarName,
-      url: "", // resolved lazily by DurusAudioService
-      durationSeconds: item.durationSeconds ?? 0,
-      artworkUrl: item.thumbnailUrl ?? undefined,
-      seriesId: null,
-      seriesTitle: null,
-    };
-
-    await audioService.playListing(track, [track]);
+    await play();
   };
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isSaved) {
-      removeSaved(item.id);
+      markUnsaved(item.id, item.slug);
     } else {
-      addSaved(item.id);
+      markSaved(item.id, item.slug);
     }
   };
 
@@ -128,8 +137,8 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
 
       <List.Item.Actions>
         <Button
-          variant={!isMobile ? "ghost" : "outline"}
-          size={!isMobile ? "sm" : "icon"}
+          variant="primary"
+          size={!isMobile ? "icon" : "sm"}
           fullWidth={isMobile}
           aria-label={isCurrentTrack && isPlaying ? "Pause lecture" : "Play lecture"}
           icon={

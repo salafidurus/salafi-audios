@@ -1,7 +1,8 @@
 import type { Mocked } from '../../test/setup';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
-import type { LibraryPageDto } from '@sd/core-contracts';
+import { NotFoundException } from '@nestjs/common';
+import type { LibraryPageDto, SavedDeltaItemDto } from '@sd/core-contracts';
 import { LibraryRepository } from './library.repo';
 import { LibraryService } from './library.service';
 
@@ -37,9 +38,10 @@ describe('LibraryService', () => {
             findInProgress: vi.fn<any>(),
             findCompleted: vi.fn<any>(),
             findSaved: vi.fn<any>(),
+            findSavedDelta: vi.fn<any>(),
             saveLecture: vi.fn<any>(),
             unsaveLecture: vi.fn<any>(),
-            bulkSave: vi.fn<any>(),
+            bulkSync: vi.fn<any>(),
           } as Partial<Mocked<LibraryRepository>>,
         },
       ],
@@ -125,40 +127,83 @@ describe('LibraryService', () => {
 
   describe('saveListing', () => {
     it('should save listing for user', async () => {
-      repo.saveLecture.mockResolvedValue(undefined);
+      repo.saveLecture.mockResolvedValue(true);
 
       await service.saveListing('user1', 'listing1');
 
       expect(repo.saveLecture).toHaveBeenCalledWith('user1', 'listing1');
     });
+
+    it('should throw NotFoundException when the listing id/slug cannot be resolved', async () => {
+      repo.saveLecture.mockResolvedValue(false);
+
+      await expect(service.saveListing('user1', 'missing-slug')).rejects.toThrow(NotFoundException);
+    });
   });
 
   describe('unsaveListing', () => {
     it('should unsave listing for user', async () => {
-      repo.unsaveLecture.mockResolvedValue(undefined);
+      repo.unsaveLecture.mockResolvedValue(true);
 
       await service.unsaveListing('user1', 'listing1');
 
       expect(repo.unsaveLecture).toHaveBeenCalledWith('user1', 'listing1');
     });
+
+    it('should throw NotFoundException when the listing id/slug cannot be resolved', async () => {
+      repo.unsaveLecture.mockResolvedValue(false);
+
+      await expect(service.unsaveListing('user1', 'missing-slug')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
   });
 
-  describe('bulkSave', () => {
-    it('should bulk save listings for user', async () => {
-      const listingIds = ['listing1', 'listing2', 'listing3'];
-      repo.bulkSave.mockResolvedValue(undefined);
+  describe('bulkSyncSaved', () => {
+    it('should bulk sync saved items for user', async () => {
+      const items = [{ listingId: 'listing1', saved: true, updatedAt: '2026-01-01T00:00:00.000Z' }];
+      repo.bulkSync.mockResolvedValue(undefined);
 
-      await service.bulkSave('user1', listingIds);
+      await service.bulkSyncSaved('user1', items);
 
-      expect(repo.bulkSave).toHaveBeenCalledWith('user1', listingIds);
+      expect(repo.bulkSync).toHaveBeenCalledWith('user1', items);
     });
 
-    it('should handle empty listing ids array', async () => {
-      repo.bulkSave.mockResolvedValue(undefined);
+    it('should handle an empty items array', async () => {
+      repo.bulkSync.mockResolvedValue(undefined);
 
-      await service.bulkSave('user1', []);
+      await service.bulkSyncSaved('user1', []);
 
-      expect(repo.bulkSave).toHaveBeenCalledWith('user1', []);
+      expect(repo.bulkSync).toHaveBeenCalledWith('user1', []);
+    });
+  });
+
+  describe('getSavedDelta', () => {
+    it('returns the repo result as-is (no pagination envelope, unlike getSaved)', async () => {
+      const delta: SavedDeltaItemDto[] = [
+        {
+          listingId: 'l1',
+          updatedAt: '2026-01-02T00:00:00.000Z',
+          savedAt: '2026-01-01T00:00:00.000Z',
+        },
+      ];
+      repo.findSavedDelta.mockResolvedValue(delta);
+
+      const result = await service.getSavedDelta('user1', '2026-01-01T00:00:00.000Z');
+
+      expect(result).toEqual(delta);
+      expect(repo.findSavedDelta).toHaveBeenCalledWith(
+        'user1',
+        new Date('2026-01-01T00:00:00.000Z'),
+      );
+    });
+
+    it('passes undefined through as no cursor when since is omitted', async () => {
+      repo.findSavedDelta.mockResolvedValue([]);
+
+      await service.getSavedDelta('user1');
+
+      expect(repo.findSavedDelta).toHaveBeenCalledWith('user1', undefined);
     });
   });
 });

@@ -17,10 +17,6 @@ const baseItem: FeedContentItemDto = {
   publishedAt: "2026-06-20T10:00:00Z",
 };
 
-const mockIsSaved = jest.fn(() => false);
-const mockAddSaved = jest.fn();
-const mockRemoveSaved = jest.fn();
-
 jest.mock("@sd/domain-audio", () => {
   const actual = jest.requireActual("@sd/domain-audio");
   return {
@@ -37,16 +33,6 @@ jest.mock("@sd/domain-audio", () => {
       pause: jest.fn(),
       resume: jest.fn(),
     })),
-    useProgressStore: jest.fn((selector: (state: unknown) => unknown) =>
-      selector({
-        actions: {
-          isSaved: mockIsSaved,
-          addSaved: mockAddSaved,
-          removeSaved: mockRemoveSaved,
-        },
-        progressMap: {},
-      }),
-    ),
   };
 });
 
@@ -79,9 +65,16 @@ const mockUseFormattedScholarName = jest.fn(
   (scholarName: string, _scholarSlug?: string) => scholarName,
 );
 
+const mockIsSaved = jest.fn(() => false);
+const mockMarkSaved = jest.fn();
+const mockMarkUnsaved = jest.fn();
+
 jest.mock("@sd/domain-content", () => ({
   useFormattedScholarName: (scholarName: string, scholarSlug: string) =>
     mockUseFormattedScholarName(scholarName, scholarSlug),
+  useIsSaved: () => mockIsSaved(),
+  markSaved: (...args: unknown[]) => mockMarkSaved(...args),
+  markUnsaved: (...args: unknown[]) => mockMarkUnsaved(...args),
 }));
 
 describe("ExplorePodcastRow", () => {
@@ -137,22 +130,22 @@ describe("ExplorePodcastRow", () => {
     expect(onNavigateToListing).toHaveBeenCalledWith("test-lecture");
   });
 
-  it("saves the item when the Save long-press menu action is pressed", async () => {
+  it("calls markSaved with id and slug when the Save long-press menu action is pressed", async () => {
     mockIsSaved.mockReturnValue(false);
 
     await render(<ExplorePodcastRow item={baseItem} />);
     await fireEvent.press(screen.getByTestId("podcast-row-item-action-save"));
 
-    expect(mockAddSaved).toHaveBeenCalledWith(baseItem.id);
+    expect(mockMarkSaved).toHaveBeenCalledWith(baseItem.id, baseItem.slug);
   });
 
-  it("removes the item when the Save long-press menu action is pressed while already saved", async () => {
+  it("calls markUnsaved with id and slug when the Save long-press menu action is pressed while already saved", async () => {
     mockIsSaved.mockReturnValue(true);
 
     await render(<ExplorePodcastRow item={baseItem} />);
     await fireEvent.press(screen.getByTestId("podcast-row-item-action-save"));
 
-    expect(mockRemoveSaved).toHaveBeenCalledWith(baseItem.id);
+    expect(mockMarkUnsaved).toHaveBeenCalledWith(baseItem.id, baseItem.slug);
   });
 
   it("shows progress bar when 0 < progressPercent < 100", async () => {
@@ -205,7 +198,7 @@ describe("ExplorePodcastRow", () => {
     await fireEvent.press(screen.getByTestId("podcast-row"));
 
     expect(httpClientMock).toHaveBeenCalledWith({
-      url: "/listings/lec-1/contents",
+      url: "/listings/test-lecture/contents",
       method: "GET",
     });
     const lastCall = audioMock.playListing.mock.calls.at(-1);
@@ -225,6 +218,17 @@ describe("ExplorePodcastRow", () => {
 
     expect(audioMock.playListing).toHaveBeenCalledWith(
       expect.objectContaining({ id: "lec-1" }),
+      expect.anything(),
+    );
+  });
+
+  it("tags the single-track fallback with its own slug — progress sync resolves strictly by slug, not uuid", async () => {
+    const audioMock = jest.requireMock("@/features/audio").audioService;
+    await render(<ExplorePodcastRow item={baseItem} />);
+    await fireEvent.press(screen.getByTestId("podcast-row"));
+
+    expect(audioMock.playListing).toHaveBeenCalledWith(
+      expect.objectContaining({ id: baseItem.id, slug: baseItem.slug }),
       expect.anything(),
     );
   });

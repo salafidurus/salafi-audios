@@ -1,0 +1,91 @@
+name: Dependabot Sync
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: dependabot-sync-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: >
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      startsWith(github.event.pull_request.head.ref, 'dependabot/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout base branch (trusted)
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+
+      - name: Determine changed files
+        id: files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr diff "$PR_NUMBER" --name-only > /tmp/pr-files.txt
+          if ! grep -qvE '^\.github\/' /tmp/pr-files.txt; then
+            echo "needs-update=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "needs-update=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Apply PR package.json changes (data only, no scripts)
+        if: steps.files.outputs.needs-update == 'true'
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git fetch origin "$PR_HEAD_SHA"
+          git read-tree "$PR_HEAD_SHA"
+          git checkout "$PR_HEAD_SHA" -- ':(glob)**/package.json'
+
+      - name: Normalize catalog + regenerate lockfile
+        if: steps.files.outputs.needs-update == 'true'
+        run: |
+          bun run catalog fix
+          bun install --ignore-scripts
+
+      - name: Stage + commit scoped changes
+        id: commit
+        if: steps.files.outputs.needs-update == 'true'
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git add -- ':(glob)**/package.json' 'bun.lock' 'catalog.config.json'
+          if git diff --cached --quiet "$PR_HEAD_SHA" -- ':(glob)**/package.json' 'bun.lock' 'catalog.config.json'; then
+            echo "No package/lock/config changes to commit — nothing to do"
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+          else
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config user.name "github-actions[bot]"
+            TREE=$(git write-tree)
+            NEW_SHA=$(git commit-tree "$TREE" -p "$PR_HEAD_SHA" -m "chore(deps): align catalog + regenerate bun.lock for dependabot")
+            echo "commit_sha=$NEW_SHA" >> "$GITHUB_OUTPUT"
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Push back to PR branch
+        if: steps.files.outputs.needs-update == 'true' && steps.commit.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SALAFIDURUS_PR_WRITE }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          COMMIT_SHA: ${{ steps.commit.outputs.commit_sha }}
+        run: |
+          case "$PR_HEAD_REF" in
+            dependabot/*) ;;
+            *) echo "Refusing to push to unexpected branch: $PR_HEAD_REF" >&2; exit 1 ;;
+          esac
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "$COMMIT_SHA:refs/heads/$PR_HEAD_REF"

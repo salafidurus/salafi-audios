@@ -1,11 +1,14 @@
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
+import { subject } from "@casl/ability";
+import { useAbility } from "@sd/domain-account";
 import { useScholarsList } from "@sd/domain-content";
 import * as DocumentPicker from "expo-document-picker";
 import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 
 import { getPresignedUrl, uploadToR2, createListing } from "../../api/admin-listings.api";
@@ -112,8 +115,12 @@ function QueueItem({ item }: QueueItemProps) {
 export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioUploaderSheetProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const { ability } = useAbility({ isAuthenticated });
   const { data: scholarsData } = useScholarsList();
-  const scholars = scholarsData?.scholars ?? [];
+  const scholars = (scholarsData?.scholars ?? []).filter((s) =>
+    ability.can("upload", subject("Media", { scholarSlug: s.slug })),
+  );
   const [selectedScholarId, setSelectedScholarId] = useState<string | null>(null);
   const [queue, setQueue] = useState<UploadItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);

@@ -77,6 +77,7 @@ export class SearchRepository {
             AND s."isActive" = true
             ${query.language ? Prisma.sql`AND lst."language" = ${query.language}` : Prisma.sql``}
             ${query.scholarSlug ? Prisma.sql`AND s."slug" = ${query.scholarSlug}` : Prisma.sql``}
+            ${query.format ? Prisma.sql`AND lst."format" = ${query.format}` : Prisma.sql``}
             AND (${matchSql})
             ${topicFilterSql}
         )
@@ -129,6 +130,7 @@ export class SearchRepository {
             AND s."isActive" = true
             ${query.language ? Prisma.sql`AND lst."language" = ${query.language}` : Prisma.sql``}
             ${query.scholarSlug ? Prisma.sql`AND s."slug" = ${query.scholarSlug}` : Prisma.sql``}
+            ${query.format ? Prisma.sql`AND lst."format" = ${query.format}` : Prisma.sql``}
             AND (${fallbackMatchSql})
             ${topicFilterSql}
         )
@@ -227,6 +229,7 @@ export class SearchRepository {
   }
 
   private matchSql(query: string, includeRelated: boolean, locale: Locale): Prisma.Sql {
+    if (!query) return Prisma.sql`1=1`;
     const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
     const clauses: Prisma.Sql[] = [
       Prisma.sql`lst."title" % ${queryText}`,
@@ -271,6 +274,7 @@ export class SearchRepository {
   }
 
   private fallbackMatchSql(query: string, includeRelated: boolean, locale: Locale): Prisma.Sql {
+    if (!query) return Prisma.sql`1=1`;
     const pattern = this.likeContainsPattern(query);
     const clauses: Prisma.Sql[] = [
       Prisma.sql`lst."title" ILIKE ${pattern} ESCAPE '\\'`,
@@ -324,6 +328,7 @@ export class SearchRepository {
   }
 
   private fallbackOrderBySql(query: string, includeRelated: boolean, locale: Locale): Prisma.Sql {
+    if (!query) return Prisma.sql`lst."publishedAt" DESC NULLS LAST, lst."id" ASC`;
     const clauses = this.fallbackRankingClauses(query, includeRelated);
     void locale; // reserved for parity with matchSql's signature; ILIKE ranking has no locale-scoped subquery.
 
@@ -337,6 +342,7 @@ export class SearchRepository {
   }
 
   private orderBySql(query: string, includeRelated: boolean, locale: Locale): Prisma.Sql {
+    if (!query) return Prisma.sql`lst."publishedAt" DESC NULLS LAST, lst."id" ASC`;
     const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
     const clauses: Prisma.Sql[] = [
       Prisma.sql`GREATEST(similarity(lst."title", ${queryText}), similarity(COALESCE(lt_tr."title", ''), ${queryText})) DESC`,

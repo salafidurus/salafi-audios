@@ -290,7 +290,7 @@ export function Modal({
                       {activeTab === reviewTabId ? (
                         <Button type="submit" form={saveFormId} variant="primary" loading={saving}>
                           {saving
-                            ? (savingLabel ?? t("admin.permissions.saving", "Saving…"))
+                            ? (savingLabel ?? t("admin.access.saving", "Saving…"))
                             : (saveLabel ?? t("common.save", "Save"))}
                         </Button>
                       ) : (

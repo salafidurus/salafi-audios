@@ -3,9 +3,9 @@
 import type { Locale } from "@sd/core-contracts";
 
 import { initApiClient, setLocaleProvider, setUnauthorizedHandler } from "@sd/core-api";
-import { createQueryClient, shouldPersistQuery, DEFAULT_MAX_AGE } from "@sd/core-contracts";
+import { createQueryClient, queryKeys } from "@sd/core-contracts";
 import { localeToDir } from "@sd/core-i18n";
-import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 
@@ -15,10 +15,20 @@ import { ToastContainer } from "@/core/toast";
 
 import { initProgressPersistence } from "./audio/progress-persistence";
 import { createI18n } from "./i18n/i18n";
-import { createIdbPersister, purgeQueryCacheDb } from "./persister";
+
+// Initialize the API client at module load time to prevent race conditions during hydration/mount
+if (process.env.NEXT_PUBLIC_API_URL) {
+  initApiClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL });
+}
+
+setLocaleProvider(() => {
+  if (typeof window !== "undefined") {
+    return document.documentElement.lang;
+  }
+  return "en";
+});
 
 const queryClient = createQueryClient();
-const persister = createIdbPersister();
 
 type Props = {
   children: ReactNode;
@@ -30,16 +40,21 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   const [i18n] = useState(() => createI18n(initialLocale));
   const { isAuthenticated, user } = useAuth();
 
-  useEffect(() => {
-    initApiClient(apiBaseUrl ? { baseUrl: apiBaseUrl } : undefined);
-    setLocaleProvider(() => i18n.language);
-  }, [apiBaseUrl, i18n]);
+  // Synchronously configure API client on first render if a custom apiBaseUrl is provided (e.g. in tests/Storybook)
+  useState(() => {
+    if (apiBaseUrl) {
+      initApiClient({ baseUrl: apiBaseUrl });
+    }
+  });
 
-  // Must run after the initApiClient effect above — httpClient throws until
-  // configureApiClient() has been called, and effects fire in declaration order.
+  // httpClient requires the API client to be configured (done at module load above).
   useEffect(() => {
     if (!isAuthenticated || !user?.id) return;
-    return initProgressPersistence(user.id);
+    return initProgressPersistence(user.id, {
+      onFlushed: () => {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.library.all });
+      },
+    });
   }, [isAuthenticated, user?.id]);
 
   // Sync i18n with cookie after hydration. The root layout is static so it
@@ -70,36 +85,32 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
 
   useEffect(() => {
     setUnauthorizedHandler(() => {
-      authClient.signOut().then(async () => {
+      // Only redirect to sign-in if the user was authenticated (session expired
+      // mid-flight). For anonymous users hitting unauthenticated public API
+      // calls, a 401 is expected and should NOT trigger a redirect.
+      if (isAuthenticated) {
+        authClient.signOut().then(() => {
+          queryClient.clear();
+          if (
+            typeof window !== "undefined" &&
+            window.location &&
+            !window.location.pathname.startsWith("/sign-in")
+          ) {
+            window.location.href = "/sign-in";
+          }
+        });
+      } else {
         queryClient.clear();
-        await purgeQueryCacheDb();
-        if (
-          typeof window !== "undefined" &&
-          window.location &&
-          !window.location.pathname.startsWith("/sign-in")
-        ) {
-          window.location.href = "/sign-in";
-        }
-      });
+      }
     });
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <I18nextProvider i18n={i18n}>
-      <PersistQueryClientProvider
-        client={queryClient}
-        persistOptions={{
-          persister,
-          maxAge: DEFAULT_MAX_AGE,
-          dehydrateOptions: {
-            shouldDehydrateQuery: (query: any) =>
-              query.state.status === "success" && shouldPersistQuery(query.queryKey),
-          },
-        }}
-      >
+      <QueryClientProvider client={queryClient}>
         {children}
         <ToastContainer />
-      </PersistQueryClientProvider>
+      </QueryClientProvider>
     </I18nextProvider>
   );
 }
