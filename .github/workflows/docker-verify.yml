@@ -1,4 +1,4 @@
-name: docker-api
+name: docker-verify
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
       - "docker/**"
 
 concurrency:
-  group: docker-api-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: docker-verify-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -45,7 +45,7 @@ jobs:
           call: check
 
   # 2) Build the real image, deploy it in the runner, and confirm the API is
-  #    actually listening on 0.0.0.0:3000 with a live /health/healthz.
+  #    actually listening on 0.0.0.0:4000 with a live /health/healthz.
   build-and-healthcheck:
     name: Build, run & healthcheck
     runs-on: ubuntu-latest
@@ -72,12 +72,12 @@ jobs:
       - name: Run the container
         run: |
           docker run -d --name salafidurus-api-ci \
-            -p 3000:3000 \
+            -p 4000:4000 \
             -e NODE_ENV=production \
-            -e PORT=3000 \
+            -e PORT=4000 \
             -e DATABASE_URL=postgresql://ci:ci@localhost:5432/ci \
             -e BETTER_AUTH_SECRET=e2e-test-secret-must-be-at-least-32-chars-long \
-            -e BETTER_AUTH_URL=http://localhost:3000 \
+            -e BETTER_AUTH_URL=http://localhost:4000 \
             -e CORS_ORIGIN=http://localhost:3000 \
             -e GOOGLE_CLIENT_ID=dummy \
             -e GOOGLE_CLIENT_SECRET=dummy \
@@ -94,7 +94,7 @@ jobs:
         run: |
           code=000
           for i in $(seq 1 30); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/health/healthz || true)
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4000/health/healthz || true)
             if [ "$code" = "200" ]; then
               break
             fi
@@ -103,7 +103,7 @@ jobs:
           if [ "$code" = "200" ]; then
             echo "::notice::/health/healthz is up (HTTP 200 after ${i} attempts)"
             echo "body:"
-            curl -s http://127.0.0.1:3000/health/healthz
+            curl -s http://127.0.0.1:4000/health/healthz
             echo
           else
             echo "::error::/health/healthz did not return 200 (last code: ${code})"
