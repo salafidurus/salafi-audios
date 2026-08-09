@@ -1,0 +1,61 @@
+# ---------------------------------------------------------------------------
+# Docker build context exclusions for the API image.
+# The context root is the monorepo root ("Base Directory: /" in Coolify), so
+# this file MUST live here regardless of where individual Dockerfiles live
+# (docker/api/Dockerfile, docker/redis/Dockerfile, ...).
+# ---------------------------------------------------------------------------
+
+# VCS / CI / tooling
+.git
+.github
+.worktrees
+.agents
+
+# Dependencies & build output (regenerated inside the image)
+node_modules
+**/node_modules
+.turbo
+**/.turbo
+out
+.pruned-target
+dist
+**/dist
+build
+**/build
+coverage
+**/coverage
+**/*.tsbuildinfo
+
+# Secrets / local env — never sent into the build context
+.env
+.env.*
+!**/.env.example
+
+# Unrelated monorepo trees (the API image needs none of these; turbo prune
+# only traces the api workspace and its packages)
+apps/web
+apps/native
+infra
+scripts
+docs
+
+# App-specific build / cache dirs
+.expo
+.android
+assets
+.gradle
+.cargo
+
+# Editor / agent / OS clutter
+.cache
+.bun
+.claude
+.codex
+.cursor
+.gemini
+.opencode
+.serena
+.codegraph
+.vscode
+*.log
+.DS_Store
