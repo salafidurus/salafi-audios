@@ -6,7 +6,7 @@ import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
 import type { HealthCheckResult } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CDNHealthIndicator } from './cdn-health.indicator';
-import { PrismaHealthIndicator } from './prisma-health.indicator';
+import { DbHealthIndicator } from './db-health.indicator';
 import { RedisHealthIndicator } from './redis-health.indicator';
 import { RedisService } from '../redis/redis.service';
 
@@ -18,7 +18,7 @@ import { RedisService } from '../redis/redis.service';
 export class HealthController {
   constructor(
     private readonly health: HealthCheckService,
-    private readonly prismaHealth: PrismaHealthIndicator,
+    private readonly dbHealth: DbHealthIndicator,
     private readonly cdnHealth: CDNHealthIndicator,
     private readonly redis: RedisService,
     private readonly redisHealth: RedisHealthIndicator,
@@ -30,7 +30,7 @@ export class HealthController {
   @HealthCheck()
   getHealth(): Promise<HealthCheckResult> {
     const checks = [
-      () => this.prismaHealth.pingCheck('database', { timeout: 5000 }),
+      () => this.dbHealth.pingCheck('database', { timeout: 5000 }),
       () => this.cdnHealth.pingCheck('cdn', { timeout: 5000 }),
     ];
     if (this.redis.enabled) checks.push(() => this.redisHealth.pingCheck('redis'));
@@ -50,6 +50,6 @@ export class HealthController {
   @ApiOkResponse({ description: 'Ok when core dependencies (database) are available' })
   @HealthCheck()
   getReadiness(): Promise<HealthCheckResult> {
-    return this.health.check([() => this.prismaHealth.pingCheck('database', { timeout: 5000 })]);
+    return this.health.check([() => this.dbHealth.pingCheck('database', { timeout: 5000 })]);
   }
 }

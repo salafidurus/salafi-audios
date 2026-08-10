@@ -84,6 +84,9 @@ jobs:
         env:
           DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
           DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          NEON_API_KEY: "e2e-test-neon-api-key"
+          NEON_PROJECT_ID: "e2e-test-project"
+          NEON_ENDPOINT_ID: "ep-e2e-test-endpoint"
           BETTER_AUTH_SECRET: "e2e-test-secret-must-be-at-least-32-chars-long"
           BETTER_AUTH_URL: "http://localhost:4000"
           CORS_ORIGINS: "http://localhost:3000"

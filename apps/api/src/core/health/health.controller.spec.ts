@@ -3,20 +3,20 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
 import { CDNHealthIndicator } from './cdn-health.indicator';
-import { PrismaHealthIndicator } from './prisma-health.indicator';
+import { DbHealthIndicator } from './db-health.indicator';
 import { RedisHealthIndicator } from './redis-health.indicator';
 import { RedisService } from '../redis/redis.service';
 
 describe('HealthController', () => {
   let controller: HealthController;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let prismaHealth: { pingCheck: any };
+  let dbHealth: { pingCheck: any };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let cdnHealth: { pingCheck: any };
   let redisHealth: { pingCheck: any };
 
   beforeEach(async () => {
-    prismaHealth = {
+    dbHealth = {
       pingCheck: vi.fn<any>().mockResolvedValue({ database: { status: 'up' } }),
     };
     cdnHealth = {
@@ -30,7 +30,7 @@ describe('HealthController', () => {
       imports: [TerminusModule],
       controllers: [HealthController],
       providers: [
-        { provide: PrismaHealthIndicator, useValue: prismaHealth },
+        { provide: DbHealthIndicator, useValue: dbHealth },
         { provide: CDNHealthIndicator, useValue: cdnHealth },
         { provide: RedisHealthIndicator, useValue: redisHealth },
         { provide: RedisService, useValue: { enabled: false } },
@@ -42,7 +42,7 @@ describe('HealthController', () => {
 
   it('getHealth calls database and CDN indicators', async () => {
     await controller.getHealth();
-    expect(prismaHealth.pingCheck).toHaveBeenCalledWith('database', {
+    expect(dbHealth.pingCheck).toHaveBeenCalledWith('database', {
       timeout: 5000,
     });
     expect(cdnHealth.pingCheck).toHaveBeenCalledWith('cdn', {
@@ -52,7 +52,7 @@ describe('HealthController', () => {
 
   it('getReadiness calls database indicator but not CDN indicator', async () => {
     await controller.getReadiness();
-    expect(prismaHealth.pingCheck).toHaveBeenCalledWith('database', {
+    expect(dbHealth.pingCheck).toHaveBeenCalledWith('database', {
       timeout: 5000,
     });
     expect(cdnHealth.pingCheck).not.toHaveBeenCalled();
@@ -61,7 +61,7 @@ describe('HealthController', () => {
   it('getLiveness succeeds with no indicator calls', async () => {
     const result = await controller.getLiveness();
     expect(result.status).toBe('ok');
-    expect(prismaHealth.pingCheck).not.toHaveBeenCalled();
+    expect(dbHealth.pingCheck).not.toHaveBeenCalled();
     expect(cdnHealth.pingCheck).not.toHaveBeenCalled();
   });
 });
