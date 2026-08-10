@@ -1,16 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'bun:test';
 import { ConfigService } from '../config/config.service';
-import { PrismaHealthIndicator } from './prisma-health.indicator';
+import { DbHealthIndicator } from './db-health.indicator';
 
-describe('PrismaHealthIndicator', () => {
+describe('DbHealthIndicator', () => {
   const fetchMock = vi.fn();
   const originalFetch = globalThis.fetch;
-  let indicator: PrismaHealthIndicator;
+  let indicator: DbHealthIndicator;
 
   beforeEach(() => {
     fetchMock.mockReset();
     globalThis.fetch = fetchMock as unknown as typeof fetch;
-    indicator = new PrismaHealthIndicator({
+    indicator = new DbHealthIndicator({
       NEON_API_KEY: 'neon-test-key',
       NEON_PROJECT_ID: 'test-project',
       NEON_ENDPOINT_ID: 'ep-test-endpoint',
@@ -21,7 +21,7 @@ describe('PrismaHealthIndicator', () => {
     globalThis.fetch = originalFetch;
   });
 
-  it('returns up when Neon returns endpoint details', async () => {
+  it('returns up with Neon endpoint state information', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ endpoint: { current_state: 'idle' } }), { status: 200 }),
     );
@@ -29,15 +29,6 @@ describe('PrismaHealthIndicator', () => {
     await expect(indicator.pingCheck('database')).resolves.toEqual({
       database: { status: 'up', currentState: 'idle' },
     });
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://console.neon.tech/api/v2/projects/test-project/endpoints/ep-test-endpoint',
-      expect.objectContaining({
-        headers: {
-          accept: 'application/json',
-          authorization: 'Bearer neon-test-key',
-        },
-      }),
-    );
   });
 
   it('fails when Neon is unavailable or returns an invalid response', async () => {

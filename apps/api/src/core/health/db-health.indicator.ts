@@ -6,7 +6,7 @@ import { ConfigService } from '../config/config.service';
 const NEON_API_BASE_URL = 'https://console.neon.tech/api/v2';
 
 @Injectable()
-export class PrismaHealthIndicator extends HealthIndicator {
+export class DbHealthIndicator extends HealthIndicator {
   constructor(private readonly config: ConfigService) {
     super();
   }
