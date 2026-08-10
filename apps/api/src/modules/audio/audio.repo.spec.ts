@@ -36,11 +36,14 @@ describe('isPositionCompleted', () => {
 describe('AudioRepository', () => {
   let repo: AudioRepository;
   let prisma: any;
+  let redis: any;
+  let config: any;
 
   beforeEach(() => {
     prisma = {
       listing: {
         findFirst: vi.fn<any>(),
+        findUnique: vi.fn<any>(),
         findMany: vi.fn<any>(),
       },
       userListingProgress: {
@@ -50,11 +53,78 @@ describe('AudioRepository', () => {
       $executeRaw: vi.fn<any>(),
       $transaction: vi.fn<any>().mockResolvedValue(undefined),
     };
+    redis = {
+      enabled: false,
+      namespace: 'sd:test:api:',
+      get: vi.fn<any>(),
+      mget: vi.fn<any>(),
+      set: vi.fn<any>(),
+      del: vi.fn<any>(),
+      eval: vi.fn<any>(),
+      zrangebyscore: vi.fn<any>(),
+    };
+    config = {
+      REDIS_PROGRESS_BUFFER_DELAY_MS: 120_000,
+      REDIS_PROGRESS_PENDING_TTL_SECONDS: 900,
+    };
+    const logger = {
+      setContext: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    };
 
-    repo = new AudioRepository(prisma);
+    repo = new AudioRepository(prisma, redis, config, logger as any);
   });
 
   describe('upsertProgress', () => {
+    it('writes directly to PostgreSQL when Redis is not configured', async () => {
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
+
+      const result = await repo.upsertProgress('user1', 'listing-slug', 10);
+
+      expect(result).toBe(true);
+      expect(prisma.userListingProgress.upsert).toHaveBeenCalled();
+      expect(redis.eval).not.toHaveBeenCalled();
+    });
+
+    it('buffers progress through Redis when Redis is enabled', async () => {
+      redis.enabled = true;
+      redis.get.mockResolvedValue(null);
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
+      redis.eval.mockResolvedValue(1);
+
+      const result = await repo.upsertProgress('user1', 'listing-slug', 10);
+
+      expect(result).toBe(true);
+      expect(redis.eval).toHaveBeenCalledTimes(1);
+      expect(prisma.userListingProgress.upsert).not.toHaveBeenCalled();
+    });
+
+    it('falls back to PostgreSQL when Redis enqueue fails', async () => {
+      redis.enabled = true;
+      redis.get.mockResolvedValue(null);
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
+      redis.eval.mockRejectedValue(new Error('Redis unavailable'));
+
+      const result = await repo.upsertProgress('user1', 'listing-slug', 10);
+
+      expect(result).toBe(true);
+      expect(prisma.userListingProgress.upsert).toHaveBeenCalled();
+    });
+
+    it('falls back to PostgreSQL when the Redis listing cache is unavailable', async () => {
+      redis.enabled = true;
+      redis.get.mockRejectedValue(new Error('Redis unavailable'));
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
+      redis.eval.mockRejectedValue(new Error('Redis unavailable'));
+
+      const result = await repo.upsertProgress('user1', 'listing-slug', 10);
+
+      expect(result).toBe(true);
+      expect(redis.eval).toHaveBeenCalled();
+      expect(prisma.userListingProgress.upsert).toHaveBeenCalled();
+    });
+
     it("derives isCompleted from the listing's own stored duration when the client omits it", async () => {
       prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
       prisma.userListingProgress.findUnique.mockResolvedValue(null);
@@ -204,6 +274,55 @@ describe('AudioRepository', () => {
         where: { slug: 'tafsir-al-fatiha' },
         select: { id: true, durationSeconds: true },
       });
+    });
+  });
+
+  describe('flushBufferedProgress', () => {
+    it('persists due progress and removes the matching Redis version', async () => {
+      redis.enabled = true;
+      redis.set.mockResolvedValue('OK');
+      redis.zrangebyscore.mockResolvedValue([
+        JSON.stringify({ userId: 'user1', listingId: 'listing1' }),
+      ]);
+      redis.mget.mockResolvedValue([
+        JSON.stringify({
+          version: 'version-1',
+          userId: 'user1',
+          listingId: 'listing1',
+          positionSeconds: 120,
+          isCompleted: false,
+          updatedAt: '2026-08-10T10:00:00.000Z',
+        }),
+      ]);
+      prisma.listing.findMany.mockResolvedValue([{ id: 'listing1', durationSeconds: 300 }]);
+
+      await repo.flushBufferedProgress();
+
+      expect(prisma.$transaction).toHaveBeenCalled();
+      expect(redis.eval).toHaveBeenCalledTimes(2);
+    });
+
+    it('retains pending Redis data when PostgreSQL fails', async () => {
+      redis.enabled = true;
+      redis.set.mockResolvedValue('OK');
+      redis.zrangebyscore.mockResolvedValue([
+        JSON.stringify({ userId: 'user1', listingId: 'listing1' }),
+      ]);
+      redis.mget.mockResolvedValue([
+        JSON.stringify({
+          version: 'version-1',
+          userId: 'user1',
+          listingId: 'listing1',
+          positionSeconds: 120,
+          isCompleted: false,
+          updatedAt: '2026-08-10T10:00:00.000Z',
+        }),
+      ]);
+      prisma.listing.findMany.mockRejectedValue(new Error('database unavailable'));
+
+      await repo.flushBufferedProgress();
+
+      expect(redis.eval).toHaveBeenCalledTimes(1);
     });
   });
 });

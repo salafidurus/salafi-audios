@@ -63,6 +63,11 @@ Catalog/search/browse data is network-first and in-memory only (`QueryClientProv
 - **Local writes are immediate and optimistic.** A save/unsave or a progress tick updates the local entity store (Zustand, keyed by id) before any network call.
 - **Debounced background sync.** Changes are batched and pushed after a short debounce rather than on every write.
 - **Persisted outbox.** Pending pushes are queued in a `createOutboxStore` instance backed by the platform's `StorageAdapter`, so a failed push (offline, crash, force-quit) survives and is retried on the next flush — not lost like an in-memory retry queue would be.
+
+The client-side persisted progress outbox remains the recovery mechanism for
+network/API failures. The server-side Redis buffer only reduces PostgreSQL
+write frequency after a request has reached the API.
+
 - **Outbox is namespaced per user** (`progress:${userId}`, `saved:${userId}`) so switching accounts on the same device never leaks or retries another user's queued writes.
 - **Conflict resolution is last-write-wins by `updatedAt`**, mirroring the server's own `bulkSync` SQL (`INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...`). Progress additionally merges `isCompleted` monotonically (a completion can't be un-completed by an older write); saved/library uses plain LWW on a `deletedAt` tombstone, since a later unsave must be able to override an earlier save and vice versa.
 - **Delta hydration** pulls only what changed since the last sync via `?since=` on both the progress and saved/library endpoints.

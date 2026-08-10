@@ -97,4 +97,20 @@ export class ConfigService {
   get DISABLE_THROTTLER(): boolean {
     return this.env.DISABLE_THROTTLER;
   }
+
+  get REDIS_URL(): string | undefined {
+    return this.env.REDIS_URL;
+  }
+
+  get REDIS_PROGRESS_BUFFER_DELAY_MS(): number {
+    return 120_000;
+  }
+
+  get REDIS_PROGRESS_FLUSH_INTERVAL_MS(): number {
+    return 15_000;
+  }
+
+  get REDIS_PROGRESS_PENDING_TTL_SECONDS(): number {
+    return 900;
+  }
 }

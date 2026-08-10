@@ -17,7 +17,7 @@ import { CacheControlInterceptor } from '../../shared/interceptors/cache-control
 @Public()
 @Controller('search')
 @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
-@CacheTTL(5 * 60 * 1000) // 5 minutes cache
+@CacheTTL(15 * 60 * 1000) // Search results change with catalog mutations; writes clear cache
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 

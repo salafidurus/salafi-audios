@@ -7,6 +7,8 @@ import type { HealthCheckResult } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CDNHealthIndicator } from './cdn-health.indicator';
 import { PrismaHealthIndicator } from './prisma-health.indicator';
+import { RedisHealthIndicator } from './redis-health.indicator';
+import { RedisService } from '../redis/redis.service';
 
 @SkipThrottle()
 @ApiTags('Health')
@@ -18,6 +20,8 @@ export class HealthController {
     private readonly health: HealthCheckService,
     private readonly prismaHealth: PrismaHealthIndicator,
     private readonly cdnHealth: CDNHealthIndicator,
+    private readonly redis: RedisService,
+    private readonly redisHealth: RedisHealthIndicator,
   ) {}
 
   @Get()
@@ -25,10 +29,12 @@ export class HealthController {
   @ApiOkResponse({ description: 'Health check result' })
   @HealthCheck()
   getHealth(): Promise<HealthCheckResult> {
-    return this.health.check([
+    const checks = [
       () => this.prismaHealth.pingCheck('database', { timeout: 5000 }),
       () => this.cdnHealth.pingCheck('cdn', { timeout: 5000 }),
-    ]);
+    ];
+    if (this.redis.enabled) checks.push(() => this.redisHealth.pingCheck('redis'));
+    return this.health.check(checks);
   }
 
   @Get('healthz')

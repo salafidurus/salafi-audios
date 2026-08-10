@@ -2,12 +2,15 @@ import { Module } from '@nestjs/common';
 import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { HealthModule } from './core/health/health.module';
 import { ConfigModule } from './core/config/config.module';
 import { DbModule } from './core/db/db.module';
 import { AppLoggerModule } from './core/logger/logger.module';
 import { AppThrottlerModule } from './core/security/throttler.module';
+import { RedisModule } from './core/redis/redis.module';
+import { RedisService } from './core/redis/redis.service';
 
 import { AuthModule } from './core/auth/auth.module';
 import { AuthGuard } from './core/auth/auth.guard';
@@ -24,20 +27,26 @@ import { MediaModule } from './modules/media/media.module';
 import { ListingModule } from './modules/listing/listing.module';
 import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
 import { LocaleMiddleware } from './shared/i18n/locale.middleware';
+import { CacheInvalidationInterceptor } from './shared/interceptors/cache-invalidation.interceptor';
 
 import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
   imports: [
     ConfigModule,
+    RedisModule,
+    ScheduleModule.forRoot(),
     HealthModule,
     AppLoggerModule,
     AppThrottlerModule,
     DbModule,
-    CacheModule.register({
+    CacheModule.registerAsync({
       isGlobal: true,
-      ttl: 300000, // 5 minutes default TTL (in milliseconds)
-      max: 1000, // Maximum number of items in cache
+      inject: [RedisService],
+      useFactory: (redis: RedisService) => ({
+        ttl: 300_000,
+        stores: redis.enabled ? [redis.createCacheStore()] : undefined,
+      }),
     }),
     AuthModule,
     AccountModule,
@@ -52,6 +61,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
   ],
   providers: [
     ThrottlerGuard,
+    { provide: APP_INTERCEPTOR, useClass: CacheInvalidationInterceptor },
     { provide: APP_GUARD, useExisting: ThrottlerGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_GUARD, useClass: PolicyGuard },

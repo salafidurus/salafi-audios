@@ -4,6 +4,8 @@ import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
 import { CDNHealthIndicator } from './cdn-health.indicator';
 import { PrismaHealthIndicator } from './prisma-health.indicator';
+import { RedisHealthIndicator } from './redis-health.indicator';
+import { RedisService } from '../redis/redis.service';
 
 describe('HealthController', () => {
   let controller: HealthController;
@@ -11,6 +13,7 @@ describe('HealthController', () => {
   let prismaHealth: { pingCheck: any };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let cdnHealth: { pingCheck: any };
+  let redisHealth: { pingCheck: any };
 
   beforeEach(async () => {
     prismaHealth = {
@@ -19,6 +22,9 @@ describe('HealthController', () => {
     cdnHealth = {
       pingCheck: vi.fn<any>().mockResolvedValue({ cdn: { status: 'up' } }),
     };
+    redisHealth = {
+      pingCheck: vi.fn<any>().mockResolvedValue({ redis: { status: 'up' } }),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [TerminusModule],
@@ -26,6 +32,8 @@ describe('HealthController', () => {
       providers: [
         { provide: PrismaHealthIndicator, useValue: prismaHealth },
         { provide: CDNHealthIndicator, useValue: cdnHealth },
+        { provide: RedisHealthIndicator, useValue: redisHealth },
+        { provide: RedisService, useValue: { enabled: false } },
       ],
     }).compile();
 
