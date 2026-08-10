@@ -4,6 +4,8 @@ import { AppModule } from '../../src/app.module';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { MockCDNHealthIndicator } from './mock-cdn.health';
+import { MockPrismaHealthIndicator } from './mock-prisma.health';
+import { PrismaHealthIndicator } from '../../src/core/health/prisma-health.indicator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { AllExceptionsFilter } from '../../src/shared/errors/http-exception.filter';
@@ -19,7 +21,9 @@ export async function createE2eApp(options?: { disableThrottler?: boolean }): Pr
     imports: [AppModule],
   })
     .overrideProvider(CDNHealthIndicator)
-    .useClass(MockCDNHealthIndicator);
+    .useClass(MockCDNHealthIndicator)
+    .overrideProvider(PrismaHealthIndicator)
+    .useClass(MockPrismaHealthIndicator);
 
   if (options?.disableThrottler) {
     moduleBuilder = moduleBuilder.overrideProvider(ThrottlerGuard).useValue({

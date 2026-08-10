@@ -6,6 +6,9 @@ const ApiEnvSchema = z.object({
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
   CORS_ORIGINS_NATIVE: z.string().optional().default('salafidurus-dev://,exp://'),
   DATABASE_URL: z.url(),
+  NEON_API_KEY: z.string().min(1),
+  NEON_PROJECT_ID: z.string().min(1),
+  NEON_ENDPOINT_ID: z.string().regex(/^ep-[a-z0-9-]{1,60}$/),
   PRISMA_LOG_QUERIES: z
     .preprocess((val) => val === 'true' || val === true, z.boolean())
     .default(false),
