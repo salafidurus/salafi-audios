@@ -4,6 +4,9 @@ import { ConfigService } from './config.service';
 describe('ConfigService', () => {
   const dummyEnv = {
     DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+    NEON_API_KEY: 'dummy-neon-api-key',
+    NEON_PROJECT_ID: 'dummy-project',
+    NEON_ENDPOINT_ID: 'ep-dummy-endpoint',
     BETTER_AUTH_SECRET: '01234567890123456789012345678901',
     BETTER_AUTH_URL: 'http://localhost:3001',
     GOOGLE_CLIENT_ID: 'dummy-google-id',
