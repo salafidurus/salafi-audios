@@ -20,7 +20,7 @@ import { ScholarsService } from './scholars.service';
 @Public()
 @Controller('scholars')
 @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor) // Cache control must wrap cache interceptor to capture cache hits
-@CacheTTL(10 * 60 * 1000) // 10 minutes cache (scholar data changes infrequently)
+@CacheTTL(24 * 60 * 60 * 1000) // 24 hours; successful mutations clear the cache
 export class ScholarsController {
   constructor(private readonly scholars: ScholarsService) {}
 

@@ -96,6 +96,14 @@ The CI workflow caches Playwright browser binaries at `$GITHUB_WORKSPACE/.cache/
 
 ## 8. Production Deployment Configuration
 
+Preview and production provide `REDIS_URL` through Coolify. The API owns a
+single `RedisService` instance. Redis keys are namespaced by `NODE_ENV` so
+preview and production cannot collide if they share a Redis instance.
+
+Redis is used for distributed caching and rate limiting when configured.
+Rate limiting fails closed if configured Redis is unavailable. Progress writes
+fall back to PostgreSQL instead.
+
 To reduce dependency footprint and prevent Out-of-Memory (OOM) errors during build stages, production deployments utilize Turborepo's pruning mechanism. Unused workspaces and packages are stripped before dependency installation begins.
 
 ### 8.1 Vercel (Next.js Web Deployment)
