@@ -22,12 +22,12 @@ import { CacheControlInterceptor } from '../../shared/interceptors/cache-control
 @Public()
 @Controller('listings')
 @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
-@CacheTTL(10 * 60 * 1000) // 10 minutes cache
+@CacheTTL(24 * 60 * 60 * 1000) // 24 hours; successful mutations clear the cache
 export class ListingController {
   constructor(private readonly service: ListingService) {}
 
   @Get('recent')
-  @CacheTTL(5 * 60 * 1000) // 5 minutes cache
+  @CacheTTL(3 * 60 * 60 * 1000) // Recent feed changes more often than catalog details
   @ApiOperation({ summary: 'Get recent top-level listings' })
   @ApiOkResponse({ description: 'Paginated recent listings feed (single, series, collection)' })
   async getRecentListings(
@@ -39,6 +39,7 @@ export class ListingController {
   }
 
   @Get('promotions')
+  @CacheTTL(24 * 60 * 60 * 1000)
   @ApiOperation({ summary: 'Get home promotions (featured hero and editors picks)' })
   @ApiOkResponse({ description: 'Promotional metadata for home screen' })
   async getPromotions(): Promise<any> {

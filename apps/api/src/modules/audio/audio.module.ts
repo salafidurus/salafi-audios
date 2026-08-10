@@ -3,11 +3,12 @@ import { DbModule } from '../../core/db/db.module';
 import { AudioController } from './audio.controller';
 import { AudioService } from './audio.service';
 import { AudioRepository } from './audio.repo';
+import { AudioProgressFlushJob } from './audio-progress-flush.job';
 
 @Module({
   imports: [DbModule],
   controllers: [AudioController],
-  providers: [AudioService, AudioRepository],
+  providers: [AudioService, AudioRepository, AudioProgressFlushJob],
   exports: [AudioService],
 })
 export class AudioModule {}
