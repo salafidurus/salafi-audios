@@ -1,10 +1,37 @@
 import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import { PinoLogger } from 'nestjs-pino';
 import { PrismaService } from '../../core/db/prisma.service';
+import { ConfigService } from '../../core/config/config.service';
+import { RedisService } from '../../core/redis/redis.service';
 import { Status } from '@sd/core-db';
 import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
 
 const COMPLETION_PERCENT_THRESHOLD = 0.95;
 const COMPLETION_TAIL_SECONDS = 30;
+
+type PendingProgress = {
+  version: string;
+  userId: string;
+  listingId: string;
+  positionSeconds: number;
+  isCompleted: boolean;
+  updatedAt: string;
+};
+
+type ProgressWrite = Omit<PendingProgress, 'version' | 'updatedAt'> & { updatedAt: Date };
+
+const ENQUEUE_PROGRESS_SCRIPT = `
+local existing = redis.call('GET', KEYS[1])
+local incoming = cjson.decode(ARGV[1])
+if existing then
+  local previous = cjson.decode(existing)
+  if previous.isCompleted == true then incoming.isCompleted = true end
+end
+redis.call('SET', KEYS[1], cjson.encode(incoming), 'EX', ARGV[3])
+redis.call('ZADD', KEYS[2], ARGV[2], ARGV[4])
+return 1
+`;
 
 /**
  * Server-side completion safety net: a position counts as "complete" once it
@@ -27,7 +54,14 @@ export function isPositionCompleted(
 
 @Injectable()
 export class AudioRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
+    private readonly config: ConfigService,
+    private readonly logger: PinoLogger,
+  ) {
+    this.logger.setContext(AudioRepository.name);
+  }
 
   async getUserProgress(userId: string, since?: Date): Promise<AudioProgressDto[]> {
     const progressRecords = await this.prisma.userListingProgress.findMany({
@@ -62,37 +96,44 @@ export class AudioRepository {
     _durationSeconds?: number,
     isCompleted?: boolean,
   ): Promise<boolean> {
-    const listing = await this.prisma.listing.findFirst({
-      where: { slug },
-      select: { id: true, durationSeconds: true },
-    });
+    const listing = await this.findProgressListingBySlug(slug);
     if (!listing) return false;
-
-    const listingId = listing.id;
-    const existing = await this.prisma.userListingProgress.findUnique({
-      where: { userId_listingId: { userId, listingId } },
-      select: { isCompleted: true },
-    });
 
     const derivedCompleted =
       isCompleted ?? isPositionCompleted(positionSeconds, listing.durationSeconds);
-    // Monotonic: once completed, a later sync can never un-complete it.
-    const finalCompleted = existing?.isCompleted ? true : derivedCompleted;
+    const updatedAt = new Date();
 
-    await this.prisma.userListingProgress.upsert({
-      where: { userId_listingId: { userId, listingId } },
-      create: {
+    if (!this.redis.enabled) {
+      await this.persistProgressImmediately({
         userId,
-        listingId,
+        listingId: listing.id,
         positionSeconds,
-        isCompleted: finalCompleted,
-      },
-      update: {
+        isCompleted: derivedCompleted,
+        updatedAt,
+      });
+      return true;
+    }
+
+    try {
+      await this.enqueueProgress({
+        userId,
+        listingId: listing.id,
         positionSeconds,
-        isCompleted: finalCompleted,
-        updatedAt: new Date(),
-      },
-    });
+        isCompleted: derivedCompleted,
+        updatedAt,
+      });
+    } catch (error) {
+      this.logger.warn(
+        `Redis progress enqueue failed for ${userId}/${listing.id}; using PostgreSQL fallback: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      await this.persistProgressImmediately({
+        userId,
+        listingId: listing.id,
+        positionSeconds,
+        isCompleted: derivedCompleted,
+        updatedAt,
+      });
+    }
     return true;
   }
 
@@ -107,38 +148,231 @@ export class AudioRepository {
     });
     const durationById = new Map(listings.map((listing) => [listing.id, listing.durationSeconds]));
 
-    const operations = items.map((item) => {
-      const clientUpdatedAt = new Date(item.updatedAt);
-      const isCompleted =
-        !!item.completedAt ||
-        isPositionCompleted(item.positionSeconds, durationById.get(item.listingId));
+    await this.persistProgressBatch(
+      items.map((item) => ({
+        userId,
+        listingId: item.listingId,
+        positionSeconds: item.positionSeconds,
+        isCompleted:
+          Boolean(item.completedAt) ||
+          isPositionCompleted(item.positionSeconds, durationById.get(item.listingId)),
+        updatedAt: new Date(item.updatedAt),
+      })),
+      durationById,
+    );
+  }
 
-      return this.prisma.$executeRaw`
-        INSERT INTO "UserListingProgress" ("userId", "listingId", "positionSeconds", "isCompleted", "updatedAt")
-        VALUES (${userId}, ${item.listingId}::uuid, ${item.positionSeconds}, ${isCompleted}, ${clientUpdatedAt})
-        ON CONFLICT ("userId", "listingId")
-        DO UPDATE SET
-          "positionSeconds" = CASE
-            WHEN "UserListingProgress"."updatedAt" > ${clientUpdatedAt}
-            THEN "UserListingProgress"."positionSeconds"
-            ELSE ${item.positionSeconds}
-          END,
-          "isCompleted" = "UserListingProgress"."isCompleted" OR (
-            CASE
-              WHEN "UserListingProgress"."updatedAt" > ${clientUpdatedAt}
-              THEN "UserListingProgress"."isCompleted"
-              ELSE ${isCompleted}
-            END
-          ),
-          "updatedAt" = CASE
-            WHEN "UserListingProgress"."updatedAt" > ${clientUpdatedAt}
-            THEN "UserListingProgress"."updatedAt"
-            ELSE ${clientUpdatedAt}
-          END
-      `;
+  async flushBufferedProgress(): Promise<void> {
+    if (!this.redis.enabled) return;
+    const owner = await this.acquireProgressFlushLock();
+    if (!owner) return;
+
+    try {
+      const pending = await this.readDueProgress();
+      if (pending.length === 0) return;
+      await this.persistProgressBatch(
+        pending.map((item) => ({
+          userId: item.userId,
+          listingId: item.listingId,
+          positionSeconds: item.positionSeconds,
+          isCompleted: item.isCompleted,
+          updatedAt: new Date(item.updatedAt),
+        })),
+      );
+      await Promise.all(pending.map((item) => this.removePendingProgressIfVersionMatches(item)));
+    } catch (error) {
+      this.logger.error(
+        `Buffered progress flush failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    } finally {
+      await this.releaseProgressFlushLock(owner);
+    }
+  }
+
+  private async findProgressListingBySlug(
+    slug: string,
+  ): Promise<{ id: string; durationSeconds: number | null } | null> {
+    const key = this.progressListingKey(slug);
+    if (this.redis.enabled) {
+      try {
+        const cachedId = await this.redis.get(key);
+        if (cachedId) {
+          const cached = await this.prisma.listing.findUnique({
+            where: { id: cachedId },
+            select: { id: true, durationSeconds: true },
+          });
+          if (cached) return cached;
+          await this.redis.del(key);
+        }
+      } catch (error) {
+        this.logger.warn(
+          `Redis listing cache lookup failed for ${slug}; using PostgreSQL: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+
+    const listing = await this.prisma.listing.findFirst({
+      where: { slug },
+      select: { id: true, durationSeconds: true },
     });
+    if (listing && this.redis.enabled) {
+      try {
+        await this.redis.set(key, listing.id, 'EX', 300);
+      } catch (error) {
+        this.logger.warn(
+          `Redis listing cache write failed for ${slug}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+    return listing;
+  }
 
+  private async persistProgressImmediately(input: ProgressWrite): Promise<void> {
+    const existing = await this.prisma.userListingProgress.findUnique({
+      where: { userId_listingId: { userId: input.userId, listingId: input.listingId } },
+      select: { isCompleted: true },
+    });
+    const finalCompleted = Boolean(existing?.isCompleted) || input.isCompleted;
+    await this.prisma.userListingProgress.upsert({
+      where: { userId_listingId: { userId: input.userId, listingId: input.listingId } },
+      create: {
+        userId: input.userId,
+        listingId: input.listingId,
+        positionSeconds: input.positionSeconds,
+        isCompleted: finalCompleted,
+        updatedAt: input.updatedAt,
+      },
+      update: {
+        positionSeconds: input.positionSeconds,
+        isCompleted: finalCompleted,
+        updatedAt: input.updatedAt,
+      },
+    });
+  }
+
+  private async enqueueProgress(
+    input: Omit<ProgressWrite, 'userId'> & { userId: string },
+  ): Promise<void> {
+    const pending: PendingProgress = {
+      version: randomUUID(),
+      userId: input.userId,
+      listingId: input.listingId,
+      positionSeconds: input.positionSeconds,
+      isCompleted: input.isCompleted,
+      updatedAt: input.updatedAt.toISOString(),
+    };
+    await this.redis.eval(
+      ENQUEUE_PROGRESS_SCRIPT,
+      2,
+      this.progressPendingKey(input.userId, input.listingId),
+      this.progressDueKey(),
+      JSON.stringify(pending),
+      String(Date.now() + this.config.REDIS_PROGRESS_BUFFER_DELAY_MS),
+      String(this.config.REDIS_PROGRESS_PENDING_TTL_SECONDS),
+      JSON.stringify({ userId: input.userId, listingId: input.listingId }),
+    );
+  }
+
+  private async persistProgressBatch(
+    items: ProgressWrite[],
+    knownDurations?: Map<string, number | null>,
+  ): Promise<void> {
+    if (items.length === 0) return;
+    const durationById = knownDurations ?? (await this.loadProgressDurations(items));
+    const operations = [];
+    for (const item of items) {
+      if (!durationById.has(item.listingId)) continue;
+      const completed =
+        item.isCompleted ||
+        isPositionCompleted(item.positionSeconds, durationById.get(item.listingId));
+      operations.push(this.prisma.$executeRaw`
+          INSERT INTO "UserListingProgress" ("userId", "listingId", "positionSeconds", "isCompleted", "updatedAt")
+          VALUES (${item.userId}, ${item.listingId}::uuid, ${item.positionSeconds}, ${completed}, ${item.updatedAt})
+          ON CONFLICT ("userId", "listingId")
+          DO UPDATE SET
+            "positionSeconds" = CASE WHEN "UserListingProgress"."updatedAt" > ${item.updatedAt} THEN "UserListingProgress"."positionSeconds" ELSE ${item.positionSeconds} END,
+            "isCompleted" = "UserListingProgress"."isCompleted" OR ${completed},
+            "updatedAt" = CASE WHEN "UserListingProgress"."updatedAt" > ${item.updatedAt} THEN "UserListingProgress"."updatedAt" ELSE ${item.updatedAt} END
+        `);
+    }
     await this.prisma.$transaction(operations);
+  }
+
+  private async loadProgressDurations(items: ProgressWrite[]): Promise<Map<string, number | null>> {
+    const listingIds = [...new Set(items.map((item) => item.listingId))];
+    const listings = await this.prisma.listing.findMany({
+      where: { id: { in: listingIds } },
+      select: { id: true, durationSeconds: true },
+    });
+    return new Map(listings.map((listing) => [listing.id, listing.durationSeconds]));
+  }
+
+  private async readDueProgress(): Promise<PendingProgress[]> {
+    const members = await this.redis.zrangebyscore(this.progressDueKey(), 0, Date.now(), {
+      offset: 0,
+      count: 100,
+    });
+    if (members.length === 0) return [];
+    const values = await this.redis.mget(
+      members.map((member) => {
+        const parsed = JSON.parse(member) as { userId: string; listingId: string };
+        return this.progressPendingKey(parsed.userId, parsed.listingId);
+      }),
+    );
+    return values.flatMap((value) => {
+      if (!value) return [];
+      try {
+        return [JSON.parse(value) as PendingProgress];
+      } catch {
+        return [];
+      }
+    });
+  }
+
+  private async acquireProgressFlushLock(): Promise<string | null> {
+    const owner = randomUUID();
+    const result = await this.redis.set(this.progressFlushLockKey(), owner, 'PX', 25_000, 'NX');
+    return result === 'OK' ? owner : null;
+  }
+
+  private async releaseProgressFlushLock(owner: string): Promise<void> {
+    await this.redis.eval(
+      `if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) end return 0`,
+      1,
+      this.progressFlushLockKey(),
+      owner,
+    );
+  }
+
+  private async removePendingProgressIfVersionMatches(item: PendingProgress): Promise<void> {
+    await this.redis.eval(
+      `local current = redis.call('GET', KEYS[1])
+       if not current then redis.call('ZREM', KEYS[2], ARGV[2]) return 1 end
+       local decoded = cjson.decode(current)
+       if decoded.version == ARGV[1] then redis.call('DEL', KEYS[1]) redis.call('ZREM', KEYS[2], ARGV[2]) return 1 end
+       return 0`,
+      2,
+      this.progressPendingKey(item.userId, item.listingId),
+      this.progressDueKey(),
+      item.version,
+      JSON.stringify({ userId: item.userId, listingId: item.listingId }),
+    );
+  }
+
+  private progressListingKey(slug: string): string {
+    return `${this.redis.namespace}progress:listing:${slug}`;
+  }
+
+  private progressPendingKey(userId: string, listingId: string): string {
+    return `${this.redis.namespace}progress:pending:${userId}:${listingId}`;
+  }
+
+  private progressDueKey(): string {
+    return `${this.redis.namespace}progress:due`;
+  }
+
+  private progressFlushLockKey(): string {
+    return `${this.redis.namespace}progress:flush-lock`;
   }
 
   async findListingById(slug: string) {

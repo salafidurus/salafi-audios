@@ -88,6 +88,22 @@ Authentication and authorization are centralized in the backend.
 
 ## 6. Media and Analytics Through the API
 
+### Progress buffering
+
+Progress writes remain PostgreSQL-authoritative. High-frequency playback
+updates may be coalesced in Redis by the API repository and flushed to
+PostgreSQL within two minutes. Redis is an optimization only; it is not a
+source of truth.
+
+The API falls back to direct PostgreSQL progress writes when Redis is
+unconfigured or unavailable. Progress may lose a recently buffered update if
+Redis permanently loses the pending record, which is acceptable for playback
+continuity state.
+
+Bulk progress reconciliation remains a direct PostgreSQL transaction and
+continues to use client timestamps and backend last-write-wins conflict
+resolution.
+
 - Media uploads must be authorized by the backend before clients can write to storage.
 - Media delivery may be CDN-backed, but access patterns are still governed by backend-issued references and content visibility rules.
 - Analytics endpoints are intentionally isolated from authoritative core state.
