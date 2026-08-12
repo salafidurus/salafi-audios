@@ -1,4 +1,4 @@
-name: docker-promote-tag
+name: docker-deploy
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - production
 
 concurrency:
-  group: docker-promote-tag-${{ github.ref_name }}
+  group: docker-deploy-${{ github.ref_name }}
   cancel-in-progress: false
 
 permissions:
@@ -21,6 +21,7 @@ jobs:
   promote:
     name: Promote approved API image
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -84,6 +85,20 @@ jobs:
           ensure_marker "${IMAGE_REPOSITORY}:preview-approved-${MERGE_SHA}"
           echo "Preview now points to $digest"
 
+      - name: Trigger Dokploy preview deployment
+        if: github.ref_name == 'preview'
+        env:
+          DOKPLOY_DEPLOY_WEBHOOK: ${{ secrets.DOKPLOY_DEPLOY_WEBHOOK }}
+        run: |
+          curl \
+            --fail-with-body \
+            --silent \
+            --show-error \
+            --retry 3 \
+            --retry-all-errors \
+            --request POST \
+            "$DOKPLOY_DEPLOY_WEBHOOK"
+
       - name: Verify and promote the preview-approved production artifact
         if: github.ref_name == 'production'
         env:
@@ -100,3 +115,17 @@ jobs:
 
           docker buildx imagetools create --tag "${IMAGE_REPOSITORY}:production" "${IMAGE_REPOSITORY}@${digest}"
           echo "Production now points to the preview-approved digest $digest"
+
+      - name: Trigger Dokploy production deployment
+        if: github.ref_name == 'production'
+        env:
+          DOKPLOY_DEPLOY_WEBHOOK: ${{ secrets.DOKPLOY_DEPLOY_WEBHOOK }}
+        run: |
+          curl \
+            --fail-with-body \
+            --silent \
+            --show-error \
+            --retry 3 \
+            --retry-all-errors \
+            --request POST \
+            "$DOKPLOY_DEPLOY_WEBHOOK"
