@@ -66,13 +66,26 @@ This directory contains the authoritative documentation for Salafi Durus.
 
 ---
 
+## Documentation Placement
+
+- Product requirements belong under `product/`.
+- Platform architecture stays in `architecture.md`.
+- Client, backend, data, security, administration, and content documents belong
+  in their named folders.
+- Provider-neutral rules belong under `policies/`.
+- Operational procedures belong under `runbooks/`; Dokploy procedures belong
+  under `runbooks/infrastructure/`.
+- Update an existing appropriate document before adding a new file or folder.
+
 ## Key Documentation Files
 
-- **[prd.md](./prd.md)** — Vision, philosophy, user roles, and guardrails.
+- **[product requirements](./product/requirements.md)** — Vision, philosophy, user roles, and guardrails.
 - **[architecture.md](./architecture.md)** — Monorepo structure and system architecture.
-- **[api.md](./api.md)** — Backend architecture and API design.
-- **[auth.md](./auth.md)** — Cross-cutting authentication mechanism (api + web + native).
-- **[database.md](./database.md)** — DB schema and media management.
-- **[mobile.md](./mobile.md)** — Mobile app and offline mechanics.
-- **[web.md](./web.md)** — Web app structure and SEO.
-- **[dev-ops.md](./dev-ops.md)** — Environments and deployment.
+- **[api.md](./backend/api.md)** — Backend architecture and API design.
+- **[authentication](./security/authentication.md)** — Cross-cutting authentication mechanism.
+- **[database.md](./data/database.md)** — Database and media management.
+- **[mobile.md](./clients/mobile.md)** — Mobile app and offline mechanics.
+- **[web.md](./clients/web.md)** — Web app structure and SEO.
+- **[access management](./administration/access-management.md)** — Roles and scoped grants.
+- **[deployment policy](./policies/deployment.md)** — Environments and delivery.
+- **[runbooks](./runbooks/README.md)** — Operational procedures.

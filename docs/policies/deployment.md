@@ -1,0 +1,70 @@
+# Deployment Policy
+
+## Environment model
+
+Salafi Durus uses three environments:
+
+- **development**: local development and CI validation;
+- **preview**: staging-like validation with production-like behavior;
+- **production**: live traffic and stricter operational controls.
+
+The environment must be explicit in configuration. Clients must not infer it
+only from hostname patterns.
+
+## Branch promotion
+
+Protected branches map to deployment stages:
+
+```text
+main       → development
+preview    → preview
+production → production
+```
+
+Changes enter protected branches through pull requests. Preview and production
+backend deployments are promoted from approved immutable container artifacts;
+promotion does not rebuild the application.
+
+## Configuration and security
+
+- Environment variables and secrets are isolated per environment.
+- Backend secrets remain on the backend or in secure secret stores.
+- Clients receive only explicit public configuration.
+- Critical configuration fails fast when missing or invalid.
+- Credentials must be scoped to the minimum required access and remain
+  revocable.
+- Direct pushes to protected deployment branches are blocked.
+- Hard-coded secrets and runtime configuration mutation are prohibited.
+
+## Backend delivery
+
+The API follows a build-once/promote-many flow:
+
+```text
+trusted preview PR → immutable sha-<commit> image → test
+preview merge → :preview promotion → Preview Dokploy webhook
+production merge → same approved digest → :production promotion
+                 → Production Dokploy webhook
+```
+
+The API image is stored in GHCR and pulled by Dokploy. See the
+[platform architecture](../architecture.md) and [Dokploy runbooks](../runbooks/infrastructure/README.md).
+
+## Web and mobile delivery
+
+The web application is delivered through Vercel. Native builds and releases
+are delivered through Expo/EAS. These pipelines remain separate from backend
+GHCR/Dokploy promotion.
+
+## Redis and data authority
+
+Preview and Production use separate Redis runtime services. Redis supports
+caching, throttling, and progress buffering, but PostgreSQL remains the durable
+source of truth. Redis must not be treated as a substitute for database
+durability.
+
+## Dependency updates and CI
+
+Dependency updates must preserve coupled version matrices such as Expo,
+React/React Native, Prisma, NestJS, Turborepo, and TypeScript. Changes must use
+the repository’s normal CI and validation commands; hooks must not be bypassed.

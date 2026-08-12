@@ -1,185 +1,226 @@
-# System Architecture
+# Salafi Durus Platform Architecture
 
-## 1. High-Level Overview
+This is the short platform map. Detailed behavior belongs in the linked domain
+documents and operational procedures.
 
-Salafi Durus is a single system delivered through multiple clients around one authoritative backend.
+## Platform at a glance
 
-### Core Components
-
-- **API (`apps/api`)**: authoritative backend for business rules, access control, content lifecycle, and media coordination.
-- **Web (`apps/web`)**: public discovery surface plus authenticated editorial and account flows.
-- **Mobile (`apps/native`)**: listening-focused client with local-first sync and offline audio downloads.
-- **Database**: PostgreSQL via Prisma for authoritative relational state.
-- **Storage and CDN**: object storage for media, delivered separately from relational state.
-
-## 2. Architectural Intent
-
-- Centralize authority in the backend.
-- Keep clients thin in policy and rich in presentation.
-- Share contracts and reusable primitives without collapsing platform boundaries.
-- Isolate media and analytics from core authoritative state.
-- Preserve a structure that can evolve without re-architecture.
-
-## 3. Monorepo Structure
-
-The monorepo exists because the web app, mobile app, and backend are one coordinated product, not separate systems.
-
-### Top-Level Areas
-
-- `apps/api` — authoritative backend core
-- `apps/web` — public/admin web client (Next.js, CSS-responsive — no React Native Web)
-- `apps/native` — offline-first native client (iOS + Android — no Expo Web)
-- `packages/*` — shared libraries: core infra, domain state, design tokens, cross-app utilities
-- `docs/` — product + implementation authority
-
-### App Source Structure
-
-Both apps follow this layout:
-
-```text
-src/
-  app/      ← routing ONLY — imports screen components from ../features or ../shared
-  features/ ← one folder per feature; each owns components, hooks, screens, utils
-  shared/   ← components and hooks used across 2+ features within this app
-  core/     ← platform bootstrap (providers, config, auth, styles)
+```mermaid
+flowchart TB
+  Users[Users] --> Web[Next.js web]
+  Users --> Mobile[Expo mobile]
+  Web --> Vercel[Vercel]
+  Mobile --> EAS[Expo / EAS]
+  Web --> DNS[Cloudflare DNS]
+  Mobile --> DNS
+  DNS --> API[API hostnames]
+  API --> Hetzner[Hetzner VPS]
+  Hetzner --> Dokploy[Dokploy / Traefik]
+  Dokploy --> Prod[Production API + Redis]
+  Dokploy --> Preview[Preview API + Redis]
+  Prod --> Neon[Neon PostgreSQL]
+  Preview --> Neon
+  Prod --> R2[Cloudflare R2]
+  Preview --> R2
+  GitHub[GitHub] --> Actions[GitHub Actions]
+  Actions --> GHCR[GHCR]
+  GHCR --> Dokploy
+  Dynadot[Dynadot registrar] --> DNS
+  Dokploy --> Backup[Private R2 backup bucket]
 ```
 
-### Platform File Extensions
+## Applications and packages
 
-Mobile (`apps/native`): `.tsx` (base), `.ios.tsx` (iOS-only), `.android.tsx` (Android-only).
+```text
+apps/api       NestJS API and authority for backend rules
+apps/web       Next.js public, account, and editorial client
+apps/native    Expo / React Native iOS and Android client
+packages/      shared contracts, domain logic, database access, i18n, and UI tokens
+```
 
-Web (`apps/web`): `.tsx` (base, CSS-responsive), `.desktop.tsx` (desktop-only), `.mobile.tsx` (mobile-web).
-
-### Package Map
-
-- `packages/core-db` — Database schema and client
-- `packages/core-env` — Environment variable schemas
-- `packages/core-i18n` — Internationalization config and keys
-- `packages/core-contracts` — Shared TypeScript contracts (DTOs, types, query hooks)
-- `packages/core-api` — Platform-agnostic API client infrastructure
-- `packages/core-sync` — Local-first repository/sync primitives (entity store, persisted outbox, sync engine, last-write-wins conflict resolution) shared by `domain-audio` (progress) and `domain-content` (saved/library)
-- `packages/design-tokens` — Design tokens (colors, spacing, radius, typography) — authoritative source
-- `packages/domain-content` — Lectures, scholars, series, feed, library data hooks
-- `packages/domain-account` — User profile and auth state hooks
-- `packages/domain-audio` — Playback engine, player state, and progress tracking (queue management, stream resolution, local-first progress sync) — one unified package, not split by playback/progress
-- `packages/domain-search` — Search and quick-browse hooks
-
-Shared lint/TS config lives at the repo root (`tsconfig.base.json`, `tsconfig.packages.json`, `tsconfig.nest.json`, `eslint.config.base.mjs`, `eslint.config.packages.mjs`, `eslint.config.nest.mjs`). Apps extend/compose these; `next`/`expo` specifics are inlined into `apps/web` and `apps/native`.
-
-### Package Roles
-
-- **`@sd/core-*`**: Foundational infrastructure (auth, api, config, styles, i18n, env, db, contracts, sync). `core-styles`, `core-config`, and `core-env` have been dissolved — styling bootstrap, environment config, and env validation now live in each app's `src/core/` directory (or the consuming package's `src/env.ts`).
-- **`@sd/domain-*`**: Shared data and state hooks organized by bounded context (`domain-content`, `domain-account`, `domain-audio`, `domain-search`).
-- **`@sd/design-tokens`**: Authoritative visual tokens.
-
-## 4. Dependency and Boundary Rules
-
-- Apps may depend on packages.
-- Packages may depend on packages.
-- Apps must not depend on other apps.
-- Packages must not import from apps.
-- Backend-only logic must never leak into client bundles.
-- Circular dependencies across package boundaries are forbidden.
-
-These rules are enforcement rules, not style preferences.
-
-## 5. Platform Responsibilities
-
-### Mobile
-
-- Playback-focused listening experience.
-- Local-first sync for personal state (progress, saved/library) and offline audio downloads, reconciled to the backend via a persisted outbox — see [mobile.md](./mobile.md).
-- No backend authority, no hidden business rules.
-- Expo Router owns route structure through a tab-based main app boundary under `apps/native/src/app/(tabs)`.
-- The bottom navigation surface is package-owned custom chrome layered on top of real Expo Router tabs, with a subsection bar for in-tab route switching.
+Applications may depend on packages, but applications must not depend on one
+another. The backend owns authorization, business rules, and durable state.
 
 ### Web
 
-- Public discovery, SEO, and shareable routes.
-- Authenticated account and editorial surfaces.
-- Pure consumer of backend APIs.
+Vercel hosts `apps/web`. The web client communicates with the API through its
+configured API origin. Vercel is not the backend, database, Redis, or image
+registry host. Repository-specific build settings are in
+[`apps/web/vercel.json`](../apps/web/vercel.json); the operational notes are in
+the [Vercel runbook](runbooks/deployment/vercel.md).
 
-### Backend
+### Mobile
 
-- Authentication, authorization, validation, and use-case orchestration.
-- Content visibility, lifecycle rules, and conflict resolution.
-- Mediation of database, storage, and analytics integrations.
+`apps/native` is an Expo/React Native listening client. Expo Router owns
+routing, feature slices own screens, and local-first state uses persisted
+storage plus an outbox. EAS builds and distributes the mobile app using the
+`development`, `preview`, and `production` profiles in
+[`apps/native/eas.json`](../apps/native/eas.json).
 
-### Infrastructure
+### API, authentication, and administration
 
-- Durable storage, media delivery, deployment, and secret management.
-- No policy ownership.
+The NestJS API is split into interface, application, domain, and infrastructure
+layers. Better Auth establishes identity; backend policy checks establish
+authorization. Administration uses protected roles and scoped access grants.
 
-## 6. Communication Model
+See the [API](backend/api.md), [authentication](security/authentication.md),
+and [access management](administration/access-management.md) documents.
 
-- Clients communicate with the backend via stable HTTP contracts.
-- The backend owns authoritative decisions and state transitions.
-- Media uploads and delivery are mediated through backend-issued references, not direct client authority.
-- Analytics are isolated so they can scale without becoming part of core domain truth.
+## Runtime and data
 
-## 7. Platform-Specific Implementation Pattern
+The Preview and Production APIs run as separate Dokploy services on the same
+Hetzner VPS. Traefik routes the API hostnames to the correct service. Each API
+has its own Redis service; Redis is internal and is never a public dependency.
 
-The repo uses platform-specific module extensions to colocate a feature while keeping implementations explicit:
+Neon provides managed PostgreSQL, which is the durable authority for users,
+content, publication state, grants, and personal state. Cloudflare R2 stores
+application media; PostgreSQL stores object references and metadata, not media
+blobs.
 
-### App-Level Extensions
+```text
+Production API → Production Redis
+                └→ Neon PostgreSQL
+                └→ Cloudflare R2 media
 
-| Context               | Extension      | When                           |
-| --------------------- | -------------- | ------------------------------ |
-| Mobile (shared)       | `.tsx`         | iOS + Android                  |
-| Mobile (iOS-only)     | `.ios.tsx`     | Behavior truly diverges        |
-| Mobile (Android-only) | `.android.tsx` | Behavior truly diverges        |
-| Web (shared)          | `.tsx`         | Fully CSS-responsive (default) |
-| Web (desktop)         | `.desktop.tsx` | Desktop-only layout            |
-| Web (mobile-web)      | `.mobile.tsx`  | Mobile-web layout              |
+Preview API    → Preview Redis
+                └→ Neon PostgreSQL
+                └→ Cloudflare R2 media
+```
 
-### Shared Package Extensions
+See [database and media](data/database.md) for data ownership and migrations.
 
-| Context           | Extension                              | When                 |
-| ----------------- | -------------------------------------- | -------------------- |
-| Platform-agnostic | `.ts` / `.tsx`                         | Works everywhere     |
-| Mobile native     | `.native.ts` / `.native.tsx`           | iOS + Android        |
-| Web (shared)      | `.web.ts` / `.web.tsx`                 | Desktop + mobile web |
-| Desktop web only  | `.desktop.web.ts` / `.desktop.web.tsx` | Desktop-only impl    |
-| Mobile web only   | `.mobile.web.ts` / `.mobile.web.tsx`   | Mobile web only      |
+## Domains and providers
 
-### Package Entrypoint Rules
+Dynadot owns the registration for `salafidurus.com`. Cloudflare manages the
+authoritative DNS records. They are separate responsibilities.
 
-- Use plain `index.ts` only when the package public surface is fully platform-agnostic and there is no real web/native split.
-- If a package has distinct platform behavior, use `index.web.ts` and `index.native.ts` as the only public entrypoints.
-- Intermediate barrel files inside `src/` are not allowed. Export only from the package root entrypoint files.
+| Role | Provider |
+| --- | --- |
+| Web hosting | Vercel |
+| Backend compute | Hetzner |
+| Backend runtime and deployment | Dokploy and Traefik |
+| PostgreSQL | Neon |
+| Redis | Dokploy-hosted, environment-specific services |
+| Media and Dokploy backups | Cloudflare R2 |
+| Source control and CI/CD | GitHub and GitHub Actions |
+| Container images | GHCR |
+| Mobile builds and releases | Expo / EAS |
+| Domain registration | Dynadot |
+| DNS | Cloudflare |
 
-### Package Structure Rules
+Important hostnames, where active, are:
 
-- Use explicit folders such as `components/`, `screens/`, `hooks/`, `utils/`, `types/`, `api/`, and `store/`.
-- Do not leave platform implementation files loose in `src/` if they belong to one of those categories.
-- Route-level or app-level assembly belongs in apps, not inside low-level shared packages.
+```text
+salafidurus.com             Web application
+api.salafidurus.com         Production API
+preview-api.salafidurus.com Preview API
+vps.salafidurus.com         Dokploy management
+```
 
-### Dependency Rules
+The exact records and proxy settings are managed in Cloudflare and are not
+duplicated here.
 
-- Every package must declare the external libraries it imports directly.
-- Do not rely on app-level installs to satisfy package-level imports.
-- If a package imports `next/*`, `expo-*`, `better-auth/*`, `clsx`, or any other non-workspace module, that package manifest must declare it in `dependencies` or `peerDependencies`.
+## Delivery
 
-## 8. Navigation Architecture
+The backend pipeline builds an immutable image once and promotes that same
+artifact:
 
-### Mobile App Shell
+```text
+PR targeting preview
+  → build/test ghcr.io/salafidurus/salafi-durus-api:sha-<commit>
+  → merge to preview
+  → promote existing digest to :preview
+  → invoke Preview Dokploy webhook
+  → promote the approved digest to :production
+  → invoke Production Dokploy webhook
+```
 
-The mobile app uses Expo Router `Tabs` for top-level sections, with a custom tab bar and subsection bar supplied by `apps/native/src/features/navigation/`.
+Preview and Production use separate GitHub Environments, each exposing the
+same secret name, `DOKPLOY_DEPLOY_WEBHOOK`, with a different value. Dokploy
+pulls promoted GHCR images; it does not build the application.
 
-- Top-level sections are real tab roots.
-- Subsections are route-owned within each tab stack.
-- Tab chrome and section constants live in the app-local `features/navigation/` slice.
+Web delivery is handled by Vercel. Mobile delivery is handled by EAS. These
+pipelines are separate from the backend image pipeline.
 
-This keeps Expo Router responsible for tab state, route structure, and screen lifecycle while preserving a product-specific navigation surface.
+See the [deployment policy](policies/deployment.md).
 
-### Web Navigation
+## Request and environment flows
 
-The shipped web app currently preserves the same high-level section model and section re-entry behavior, but it still uses its own web navigation surface (sidebar) rather than the mobile shell implementation as a shared source of truth.
+```text
+Browser → Cloudflare DNS → Vercel → Next.js
+Web/mobile → API hostname → Cloudflare → Hetzner → Traefik → API
+API → Better Auth, Neon, environment Redis, and Cloudflare R2
+```
 
-## 9. Technology Stack
+| Area | Development | Preview | Production |
+| --- | --- | --- | --- |
+| Web | Local | Vercel preview where configured | Vercel production where configured |
+| API | Local NestJS | Dokploy Preview API | Dokploy Production API |
+| Redis | Local/optional | Preview Redis | Production Redis |
+| Mobile | EAS development | EAS preview | EAS production |
 
-- Monorepo: Bun Workspaces, Turborepo
-- Backend: NestJS, Prisma, PostgreSQL (with native UUIDv4 primary keys and pg_trgm GIN indexing)
-- Web: Next.js, React, CSS Modules + CSS custom properties (design tokens)
-- Mobile: Expo, React Native, Expo Router, react-native-unistyles
-- Shared: TypeScript, Zod, TanStack Query
+The API exposes `/health/healthz` for liveness and `/health` for dependency
+health, including database, storage/CDN, and Redis checks where configured.
+
+## Operations and recovery
+
+Dokploy manages backend services, environment values, domains, Traefik,
+health checks, deployments, and deployment webhooks. Its control-plane backup
+is stored in the private R2 bucket `vps-dokploy-backups`; application media is
+a separate R2 concern. Neon and GHCR provide their respective managed data and
+artifact recovery capabilities.
+
+If the VPS is lost, the high-level recovery order is:
+
+```text
+replacement VPS → fresh Dokploy → restore R2 backup
+→ update server IP and DNS → reload Traefik
+→ Redis first → verify REDIS_URL → API second → health checks
+```
+
+Use the [backup](runbooks/infrastructure/dokploy-backup.md) and
+[disaster recovery](runbooks/infrastructure/dokploy-disaster-recovery.md)
+runbooks for the exact procedure. Provisioning is documented separately in the
+[server provisioning runbook](runbooks/infrastructure/dokploy-server-provisioning.md).
+
+## Security boundaries
+
+- Backend authorization is the security boundary; client checks are UX only.
+- SSH uses keys, and Hetzner Cloud Firewalls restrict VPS ingress.
+- Dokploy port 3000 is temporary setup access, not normal management access.
+- Redis is internal and must not be publicly exposed.
+- GHCR, deployment webhooks, runtime secrets, and R2 credentials are protected.
+- Preview and Production GitHub Environment secrets remain separate.
+- No credentials or webhook URLs belong in the repository.
+
+The Hetzner VPS does not host the web application, primary PostgreSQL, media
+storage, GitHub, GHCR, mobile builds, domain registration, or authoritative
+DNS.
+
+## Sources of truth
+
+| Concern | Source |
+| --- | --- |
+| Product intent | [`docs/product/`](product/) |
+| Platform map | This document |
+| Client architecture | [`docs/clients/`](clients/) |
+| API contracts | [`docs/backend/api.md`](backend/api.md) and `@sd/core-contracts` |
+| Authentication | [`docs/security/`](security/) and API implementation |
+| Database schema | Prisma schema and migrations |
+| Web delivery | [`apps/web/vercel.json`](../apps/web/vercel.json) and Vercel |
+| Mobile delivery | [`apps/native/eas.json`](../apps/native/eas.json) and EAS |
+| CI/CD | [`.github/workflows/`](../.github/workflows/) |
+| Images | GHCR |
+| Backend runtime | Dokploy and the infrastructure runbooks |
+| DNS | Cloudflare |
+| Domain ownership | Dynadot |
+
+## Related documentation
+
+- [Product requirements](product/requirements.md)
+- [Web](clients/web.md) · [Mobile](clients/mobile.md)
+- [API](backend/api.md) · [Authentication](security/authentication.md)
+- [Access management](administration/access-management.md)
+- [Database and media](data/database.md)
+- [Deployment policy](policies/deployment.md)
+- [All runbooks](runbooks/README.md)

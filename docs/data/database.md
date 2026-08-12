@@ -20,7 +20,7 @@ Salafi Durus separates authoritative relational state, media storage, analytics,
 ### Core Domain Shape
 
 - **Scholars**: authoritative teaching source profiles (name, bio, image, social links).
-- **Listings**: a single hierarchical table storing all content types — collections, series, singles, and their nested children (modules, lessons) — using self-referencing parent relations. See [nomenclature.md](./nomenclature.md) for the full content hierarchy definitions.
+- **Listings**: a single hierarchical table storing all content types — collections, series, singles, and their nested children (modules, lessons) — using self-referencing parent relations. See [nomenclature.md](../content/nomenclature.md) for the full content hierarchy definitions.
 - **AudioAssets**: file URL metadata points linked directly to singles.
 
 ## 3. What the Database Must Not Store
@@ -80,7 +80,7 @@ Client persistence improves continuity but never becomes authoritative.
 ## 9. Soft-Delete Tombstones for Delta Sync
 
 - `FavoriteListing` (saved/library) carries an app-settable `updatedAt` and a `deletedAt` tombstone, the same shape as `UserListingProgress`. Unsaving sets `deletedAt`/`updatedAt` instead of deleting the row; re-saving clears `deletedAt` and bumps `updatedAt`. This lets offline clients delta-sync via `?since=` and reconcile removals — a hard delete would be invisible to a client that was offline when it happened.
-- Conflict resolution on both tables is last-write-wins by `updatedAt`, applied via a raw `INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...` upsert (see `AudioRepository.bulkSync` / `LibraryRepository.bulkSync`). Progress additionally merges `isCompleted` monotonically; saved/library uses plain LWW since a later unsave must be able to override an earlier save and vice versa. See [mobile.md](./mobile.md#6-sync-architecture) for the client-side half of this.
+- Conflict resolution on both tables is last-write-wins by `updatedAt`, applied via a raw `INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...` upsert (see `AudioRepository.bulkSync` / `LibraryRepository.bulkSync`). Progress additionally merges `isCompleted` monotonically; saved/library uses plain LWW since a later unsave must be able to override an earlier save and vice versa. See [mobile.md](../clients/mobile.md#6-sync-architecture) for the client-side half of this.
 - Every read path over these tables filters `deletedAt: null`.
 
 ## 10. Privacy and Hard Deletions
@@ -92,5 +92,5 @@ Client persistence improves continuity but never becomes authoritative.
 - System roles (`UserRoleAssignment`) and aggregate grants (`UserAccessGrant`) are
   combined into a CASL ability server-side (`apps/api/src/core/auth/ability/ability.factory.ts`)
   and enforced per-request by `PolicyGuard`. Granting access is documented in
-  [admin-management.md](./admin-management.md) and is handled by the
+  [access-management.md](../administration/access-management.md) and is handled by the
   `grant:access` script, direct SQL queries, or the unified admin access API.

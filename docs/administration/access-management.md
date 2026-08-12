@@ -61,7 +61,7 @@ bun run --filter @sd/core-db grant:access user@example.com superadmin grant
 To run the CLI script against a production database, supply `DATABASE_URL` or `DIRECT_DB_URL` as environment variables:
 
 ```bash
-DIRECT_DB_URL="postgresql://user:password@production-host:5432/salafi_db" \
+DIRECT_DB_URL="<database-url>" \
   bun run --filter @sd/core-db grant:access admin@example.com superadmin grant
 ```
 

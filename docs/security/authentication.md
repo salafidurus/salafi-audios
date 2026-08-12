@@ -3,7 +3,7 @@
 This document describes how authentication works across the whole platform —
 the backend (`apps/api`), the web client (`apps/web`), the native client
 (`apps/native`), and the shared transport packages. It complements
-[`api.md` §5](./api.md), which states the authority rules; this file explains the
+[`api.md` §5](../backend/api.md), which states the authority rules; this file explains the
 mechanism that implements them.
 
 ## Principles
