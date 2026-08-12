@@ -17,7 +17,7 @@ import { TranslationViewDtoSchema } from "./translation.types";
  * **Module**, and a Lecture inside a Series/Module is a **Lesson**. Those are
  * surfaced only for grouping and progress, not as discovery entry points.
  *
- * See `docs/nomenclature.md` for the full two-axis model.
+ * See `docs/content/nomenclature.md` for the full two-axis model.
  */
 export const ListingFormatSchema = z.enum(["collection", "series", "single"]);
 export type ListingFormat = z.infer<typeof ListingFormatSchema>;

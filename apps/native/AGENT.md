@@ -47,7 +47,7 @@ src/
 - Use `localhost` in the dev client URL — not the LAN IP. On the emulator,
   `getApiBaseUrl()` also auto-rewrites `localhost` to `10.0.2.2` in dev as a
   fallback if `adb reverse` didn't run.
-- `android/app/debug.keystore` is committed (see `docs/auth.md`) so native
+- `android/app/debug.keystore` is committed (see `docs/security/authentication.md`) so native
   Google Sign-In's SHA-1 stays stable — `bun run prebuild:clean` restores it
   automatically via `postprebuild:clean`. Don't delete or regenerate it
   without re-registering the new SHA-1 in Google Cloud Console.

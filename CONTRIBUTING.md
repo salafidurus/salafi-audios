@@ -19,14 +19,14 @@ At minimum, please read:
 1. **Documentation Index**  
    `docs/README.md`
 
-2. **Product Overview**  
-   `docs/product-overview/`
+2. **Product Requirements**
+   `docs/product/requirements.md`
 
-3. **Implementation Guide**  
-   `docs/implementation-guide/`
+3. **Platform Architecture**
+   `docs/architecture.md`
 
-4. **Current Timeline Phase**  
-   `docs/timeline/`
+4. **Relevant Domain and Operational Documentation**
+   `docs/clients/`, `docs/backend/`, `docs/policies/`, and `docs/runbooks/`
 
 These documents define the **source of truth** for how the system is designed and how it must evolve.
 

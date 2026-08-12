@@ -21,13 +21,13 @@ These rules are NON-NEGOTIABLE. Violations will be rejected.
 | If working on...                                  | Read this file first   |
 | ------------------------------------------------- | ---------------------- |
 | Getting started / overall system                  | `docs/README.md`       |
-| Product vision, philosophy, and guardrails        | `docs/prd.md`          |
+| Product vision, philosophy, and guardrails        | `docs/product/requirements.md` |
 | Monorepo layout, dependencies, package boundaries | `docs/architecture.md` |
-| Backend architecture, API design, and auth        | `docs/api.md`          |
-| Database schemas, Prisma, and media management    | `docs/database.md`     |
-| Mobile app structure and offline synchronization  | `docs/mobile.md`       |
-| Web app structure and SEO strategy                | `docs/web.md`          |
-| Environments, configuration, and CI/CD            | `docs/dev-ops.md`      |
+| Backend architecture, API design, and auth        | `docs/backend/api.md` and `docs/security/authentication.md` |
+| Database schemas, Prisma, and media management    | `docs/data/database.md` |
+| Mobile app structure and offline synchronization  | `docs/clients/mobile.md` |
+| Web app structure and SEO strategy                | `docs/clients/web.md`   |
+| Environments, configuration, and CI/CD            | `docs/policies/deployment.md` |
 | Current roadmap and phase progress                | `docs/AGENT.md`        |
 
 ## Referenced Rules

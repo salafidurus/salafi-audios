@@ -18,7 +18,7 @@
 #   Uses Turborepo's prune to isolate the `api` workspace plus the
 #   workspace packages it depends on (core-contracts / core-db / core-i18n)
 #   and drop web/native/infra entirely. This is the repo's established
-#   deployment strategy (scripts/deploy/* and docs/dev-ops.md §8).
+#   deployment strategy (scripts/deploy/* and docs/policies/deployment.md).
 # ============================================================
 FROM oven/bun:1.3.14 AS pruner
 WORKDIR /repo

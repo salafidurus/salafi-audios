@@ -43,4 +43,4 @@ Targeted testing examples:
 - Use explicit backend transition endpoints (publish/archive/reorder/replace).
 - Keep app structure aligned with `app/`, `features/`, `core/`, `shared/` boundaries.
 
-See `apps/web/AGENT.md` and `docs/implementation-guide/09-web-application-structure.md` for architecture details.
+See `apps/web/AGENT.md`, `docs/clients/web.md`, and `docs/runbooks/deployment/vercel.md` for architecture and deployment details.

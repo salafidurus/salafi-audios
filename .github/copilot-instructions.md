@@ -5,7 +5,7 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 ## Quick orientation ✅
 
 - Monorepo layout: `apps/` (api/web/mobile) + `packages/` (shared libraries) + `docs/` (source of truth).
-- Canonical docs: the standard top-level docs in `docs/*.md` and the `AGENT.md` files at repo root and in each package/app (e.g. `apps/api/AGENT.md`). Start with `docs/README.md`.
+- Canonical docs: `docs/README.md`, `docs/architecture.md`, the responsibility-based folders under `docs/`, and the `AGENT.md` files at repo root and in each package/app. Start with `docs/README.md`.
 
 ## Non-negotiable guardrails 🛡️
 
@@ -111,7 +111,7 @@ bun run test:prepush                                          # CI gate (changed
 ## Repo & CI conventions 🔁
 
 - Commits: Conventional Commits enforced via commitlint + Husky.
-- Branches/Deploys: protected branches map to deployment environments (`main` -> development, `preview` -> preview, `production` -> production); deployments are branch-based via PR merges (see `README.md` and `docs/dev-ops.md`).
+- Branches/Deploys: protected branches map to deployment environments (`main` -> development, `preview` -> preview, `production` -> production); deployments are branch-based via PR merges (see `README.md` and `docs/policies/deployment.md`).
 
 ## Safety & non-goals ⚠️
 
@@ -135,7 +135,7 @@ Add `POST /lectures/:id/publish` →
 **Where to look for examples** 📁
 
 - Backend layering & rules: `apps/api/AGENT.md`, `apps/api/src`
-- Mobile offline/outbox: `apps/native/AGENT.md`, `docs/mobile.md`
+- Mobile offline/outbox: `apps/native/AGENT.md`, `docs/clients/mobile.md`
 - Web structure: `apps/web/AGENT.md` (`app/`, `core/`, `features/`, `shared/`)
 - DB modeling & migrations: `packages/core-db/AGENT.md`, `packages/core-db/prisma`
 
