@@ -3,6 +3,12 @@ name: Dependabot Sync
 on:
   pull_request_target:
     types: [opened, reopened, synchronize]
+    branches:
+      - main
+    paths:
+      - "**/package.json"
+      - "bun.lock"
+      - "catalog.config.json"
 
 permissions:
   contents: write
