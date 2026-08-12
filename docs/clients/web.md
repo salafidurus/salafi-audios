@@ -2,7 +2,9 @@
 
 ## 1. Role of the Web App
 
-The web app (`apps/web`) serves two roles: public discovery and authenticated account or editorial workflows. It is a backend client, not an authority in its own right.
+The web app (`apps/web`) serves public discovery, authenticated account flows,
+and the primary browser-based administration surface. It is a backend client,
+not an authority in its own right.
 
 ## 2. Structure
 
@@ -13,6 +15,12 @@ The web app (`apps/web`) serves two roles: public discovery and authenticated ac
 - **Core (`@sd/core-*`)**: auth, API access, styling, and shared infrastructure.
 - **Domain (`@sd/domain-*`)**: shared data and state hooks used across both apps.
 - **Shared (`apps/web/src/shared/` and `@sd/shared`)**: app-local primitives and cross-app utilities.
+
+Current route groups include consent-gated public/account routes under
+`apps/web/src/app/(main)/(consent)/(non-admin)/`, admin routes under
+`apps/web/src/app/(main)/(consent)/(admin)/admin/`, legal routes under
+`apps/web/src/app/(main)/(no-consent)/(legal)/`, and the OAuth callback at
+`apps/web/src/app/auth/callback/page.tsx`.
 
 ### Structural Rules
 
@@ -29,8 +37,9 @@ The web app (`apps/web`) serves two roles: public discovery and authenticated ac
 
 ## 4. Authenticated and Editorial Responsibilities
 
-- Account and library flows for signed-in users.
-- Editorial/admin flows gated by backend-enforced roles.
+- Account, settings, support, and library flows for signed-in users.
+- Editorial/admin flows for content, scholars, users, and stats, gated by
+  backend-enforced roles.
 - Bulk workflows may exist on web for usability, but all policy remains server-side.
 
 ## 5. Data Fetching and Authority

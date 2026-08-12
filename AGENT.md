@@ -38,7 +38,7 @@ If alias files or tool-specific folders are missing/broken, run `node scripts/sy
 
 ## Content nomenclature
 
-See `docs/nomenclature.md` for the canonical vocabulary (Collection, Series, Single, Module, Lesson). Do not overload "lecture" or "series".
+See `docs/content/nomenclature.md` for the canonical vocabulary (Collection, Series, Single, Module, Lesson). Do not overload "lecture" or "series".
 
 ## Non-negotiable guardrails
 

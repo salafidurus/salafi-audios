@@ -4,16 +4,16 @@ This directory contains the authoritative documentation for Salafi Durus.
 
 ## Timeline Summary
 
-| Phase | Name                | Status      | Key Deliverables                                           |
-| ----- | ------------------- | ----------- | ---------------------------------------------------------- |
-| 01    | Foundations         | COMPLETE    | Monorepo, CI/CD, environments                              |
-| 02    | Model & Ingestion   | COMPLETE    | Schema, Prisma, ingestion pipeline                         |
-| 03    | Read-Only Catalog   | PARTIAL     | Web routes complete; mobile catalog detail screens missing |
-| 04    | Auth & User State   | PARTIAL     | Auth live; account, library, feed screens implemented      |
-| 05    | Playback & Progress | COMPLETE    | Audio player, local-first progress tracking (web + mobile) |
-| 06    | Offline & Downloads | COMPLETE    | Offline audio downloads, outbox sync (mobile)              |
-| 07    | Admin & Uploads     | NOT STARTED | Admin workflows, moderation                                |
-| 08    | Polish & Analytics  | NOT STARTED | UX polish, analytics integration                           |
+| Phase | Name                | Status   | Key Deliverables                                                      |
+| ----- | ------------------- | -------- | --------------------------------------------------------------------- |
+| 01    | Foundations         | COMPLETE | Monorepo, CI/CD, environments                                         |
+| 02    | Model & Ingestion   | COMPLETE | Schema, Prisma, ingestion pipeline                                    |
+| 03    | Read-Only Catalog   | COMPLETE | Web and mobile listing/scholar discovery routes exist                 |
+| 04    | Auth & User State   | COMPLETE | Auth, account, library, and progress sync implemented                 |
+| 05    | Playback & Progress | COMPLETE | Audio player, local-first progress tracking (web + mobile)            |
+| 06    | Offline & Downloads | COMPLETE | Offline audio downloads, outbox sync (mobile)                         |
+| 07    | Admin & Uploads     | PARTIAL  | Admin content/scholars/users exist; stats/moderation remain limited   |
+| 08    | Polish & Analytics  | PARTIAL  | Vexo web analytics and native Sentry/Vexo exist; admin stats is basic |
 
 ---
 
@@ -34,16 +34,17 @@ This directory contains the authoritative documentation for Salafi Durus.
 
 ### Web (apps/web)
 
-| Route                  | Status      | MVP        | Notes                                                         |
-| ---------------------- | ----------- | ---------- | ------------------------------------------------------------- |
-| `/`                    | IMPLEMENTED | CRITICAL   | Search landing                                                |
-| `/search`              | IMPLEMENTED | CRITICAL   | Active search                                                 |
-| `/scholars/[slug]`     | IMPLEMENTED | CRITICAL   | Scholar detail page                                           |
-| `/listings/[slug]`     | NOT STARTED | CRITICAL   | Unified listing detail (replaces collections/series/lectures) |
-| `/feed/*`              | IMPLEMENTED | SUPPORTING | Recent + following feeds with infinite scroll                 |
-| `/library/*`           | IMPLEMENTED | SUPPORTING | Saved and completed lists                                     |
-| `/account/*`           | IMPLEMENTED | SUPPORTING | Profile and settings                                          |
-| `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | App-local `features/auth/` slices                             |
+| Route                          | Status      | MVP        | Notes                                                     |
+| ------------------------------ | ----------- | ---------- | --------------------------------------------------------- |
+| `/`                            | IMPLEMENTED | CRITICAL   | Search landing                                            |
+| `/search`                      | IMPLEMENTED | CRITICAL   | Active search                                             |
+| `/scholars/[slug]`             | IMPLEMENTED | CRITICAL   | Scholar detail page                                       |
+| `/listings/[slug]`             | IMPLEMENTED | CRITICAL   | Unified listing detail                                    |
+| `/explore`, `/explore/recent`  | IMPLEMENTED | SUPPORTING | Browse and recent discovery surfaces                      |
+| `/library`                     | IMPLEMENTED | SUPPORTING | Saved and completed list surfaces                         |
+| `/settings/*`                  | IMPLEMENTED | SUPPORTING | Profile, display, support, and legal/account settings     |
+| `/sign-in`                     | IMPLEMENTED | SUPPORTING | App-local `features/auth/` sign-in surface                |
+| `/admin/*`                     | PARTIAL     | SUPPORTING | Dashboard, content, scholars, users, and stats            |
 
 ### Mobile (apps/native)
 
@@ -66,13 +67,26 @@ This directory contains the authoritative documentation for Salafi Durus.
 
 ---
 
+## Documentation Placement
+
+- Product requirements belong under `product/`.
+- Platform architecture stays in `architecture.md`.
+- Client, backend, data, security, administration, and content documents belong
+  in their named folders.
+- Provider-neutral rules belong under `policies/`.
+- Operational procedures belong under `runbooks/`; Dokploy procedures belong
+  under `runbooks/infrastructure/`.
+- Update an existing appropriate document before adding a new file or folder.
+
 ## Key Documentation Files
 
-- **[prd.md](./prd.md)** — Vision, philosophy, user roles, and guardrails.
+- **[product requirements](./product/requirements.md)** — Vision, philosophy, user roles, and guardrails.
 - **[architecture.md](./architecture.md)** — Monorepo structure and system architecture.
-- **[api.md](./api.md)** — Backend architecture and API design.
-- **[auth.md](./auth.md)** — Cross-cutting authentication mechanism (api + web + native).
-- **[database.md](./database.md)** — DB schema and media management.
-- **[mobile.md](./mobile.md)** — Mobile app and offline mechanics.
-- **[web.md](./web.md)** — Web app structure and SEO.
-- **[dev-ops.md](./dev-ops.md)** — Environments and deployment.
+- **[api.md](./backend/api.md)** — Backend architecture and API design.
+- **[authentication](./security/authentication.md)** — Cross-cutting authentication mechanism.
+- **[database.md](./data/database.md)** — Database and media management.
+- **[mobile.md](./clients/mobile.md)** — Mobile app and offline mechanics.
+- **[web.md](./clients/web.md)** — Web app structure and SEO.
+- **[access management](./administration/access-management.md)** — Roles and scoped grants.
+- **[deployment policy](./policies/deployment.md)** — Environments and delivery.
+- **[runbooks](./runbooks/README.md)** — Operational procedures.

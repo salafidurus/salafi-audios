@@ -53,14 +53,16 @@ Access grants are explicit and backend-enforced. Editors have scoped trust, not 
 
 ### Catalog and Discovery
 
-- Stable, semantic routes for scholars, collections, series, and lectures.
+- Stable, semantic routes for scholars and listings, using the canonical
+  content vocabulary in [`nomenclature.md`](../content/nomenclature.md).
 - Search and browse flows designed for clear navigation through a curated corpus.
 
 ### Listening and Continuity
 
 - Streaming on web and mobile.
 - Playback continuity across sessions and devices.
-- Planned offline downloads and eventual sync for personal listening state.
+- Mobile offline downloads for audio continuity.
+- Local-first sync for personal listening state.
 
 ### Editorial Operations
 

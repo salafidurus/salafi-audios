@@ -2,14 +2,14 @@
 #
 # SalafiDurus backend API — production Docker image.
 #
-# Coolify build settings (Build Pack: Dockerfile):
+# Dokploy application settings (Build Pack: Dockerfile):
 #   Base Directory:      /      (repo root, so `turbo prune` sees the whole monorepo)
 #   Dockerfile Location: docker/api/Dockerfile
 #   Port Exposes:        4000   (app defaults to this via ENV PORT below)
-#   Port Mappings:       empty  (Coolify/Traefik route internally)
+#   Port Mappings:       empty  (Dokploy/Traefik route internally)
 #
 # All runtime env vars (DATABASE_URL, better-auth, OAuth, R2, CORS, ...) are
-# injected by Coolify at runtime. Nothing secret is baked into this image and
+# injected by Dokploy at runtime. Nothing secret is baked into this image and
 # no .env file is copied in. Neon PostgreSQL, Cloudflare R2 and Redis run
 # outside this container.
 
@@ -18,7 +18,7 @@
 #   Uses Turborepo's prune to isolate the `api` workspace plus the
 #   workspace packages it depends on (core-contracts / core-db / core-i18n)
 #   and drop web/native/infra entirely. This is the repo's established
-#   deployment strategy (scripts/deploy/* and docs/dev-ops.md §8).
+#   deployment strategy (scripts/deploy/* and docs/policies/deployment.md).
 # ============================================================
 FROM oven/bun:1.3.14 AS pruner
 WORKDIR /repo
@@ -37,7 +37,7 @@ WORKDIR /app
 # without DIRECT_DB_URL or DATABASE_URL. Prisma 7 generation is OFFLINE
 # (it does not connect to the database), so the value only needs to be
 # non-empty — it is never used to connect and never reaches the runtime
-# image. This is a deliberate, non-secret placeholder. Coolify can override
+# image. This is a deliberate, non-secret placeholder. Dokploy can override
 # it via build args only if you ever need generation to read a live schema.
 ARG DIRECT_DB_URL="prisma-generate-offline-placeholder"
 ARG DATABASE_URL="${DIRECT_DB_URL}"
@@ -84,7 +84,7 @@ RUN rm -rf node_modules apps/*/node_modules packages/*/node_modules \
 # ============================================================
 FROM oven/bun:1.3.14 AS runtime
 
-# Install curl so Coolify's container healthcheck (exec'd inside this image)
+# Install curl so Dokploy's container healthcheck (exec'd inside this image)
 # can probe the API. Debian-based oven/bun image; done before the non-root
 # user switch below.
 RUN apt-get update \

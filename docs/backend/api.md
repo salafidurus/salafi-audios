@@ -58,7 +58,7 @@ Authentication and authorization are centralized in the backend.
 - The current auth implementation is **Better Auth**.
 - Identity is established through backend-managed auth flows and sessions.
 - Web and mobile consume auth as clients; neither client owns the trust model.
-- See **[auth.md](./auth.md)** for the end-to-end mechanism: per-platform
+- See **[authentication](../security/authentication.md)** for the end-to-end mechanism: per-platform
   credentials (web bearer token, native cookie), session validation, and the
   cross-site OAuth handoff.
 
@@ -81,9 +81,9 @@ Authentication and authorization are centralized in the backend.
 
 ### Sync and Conflict Resolution
 
-- Clients record intent locally first (`@sd/core-sync`'s entity store + persisted outbox — see [mobile.md](./mobile.md#6-sync-architecture)) and push it via debounced bulk-sync calls; the backend is always the conflict-resolution authority, never the client.
+- Clients record intent locally first (`@sd/core-sync`'s entity store + persisted outbox — see [mobile.md](../clients/mobile.md#6-sync-architecture)) and push it via debounced bulk-sync calls; the backend is always the conflict-resolution authority, never the client.
 - Conflicts resolve by **last-write-wins on `updatedAt`**, implemented as a raw `INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...` upsert (see `AudioRepository.bulkSync`, `LibraryRepository.bulkSync`). This is the house convention for every future sync resource.
-- Progress additionally merges `isCompleted` **monotonically** — an older write can never un-complete a lesson. Saved/library uses **plain** LWW on a `deletedAt` tombstone instead, since a later unsave must be able to override an earlier save (and vice versa); see [database.md](./database.md#9-soft-delete-tombstones-for-delta-sync).
+- Progress additionally merges `isCompleted` **monotonically** — an older write can never un-complete a lesson. Saved/library uses **plain** LWW on a `deletedAt` tombstone instead, since a later unsave must be able to override an earlier save (and vice versa); see [database.md](../data/database.md#9-soft-delete-tombstones-for-delta-sync).
 - Delta-pull endpoints (`?since=`) return tombstoned/removed rows too, so an offline client can reconcile deletions instead of only ever accumulating state.
 
 ## 6. Media and Analytics Through the API

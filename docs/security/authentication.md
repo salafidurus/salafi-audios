@@ -3,7 +3,7 @@
 This document describes how authentication works across the whole platform —
 the backend (`apps/api`), the web client (`apps/web`), the native client
 (`apps/native`), and the shared transport packages. It complements
-[`api.md` §5](./api.md), which states the authority rules; this file explains the
+[`api.md` §5](../backend/api.md), which states the authority rules; this file explains the
 mechanism that implements them.
 
 ## Principles
@@ -61,10 +61,11 @@ Better Auth is configured with:
 `apps/api/src/main.ts` mounts Better Auth as a Fastify route at `/api/auth/*`
 and configures CORS:
 
-- `credentials: true` and an origin allowlist (`CORS_ORIGINS`).
+- `credentials: true` and an origin allowlist parsed from `CORS_ORIGIN`.
 - `exposedHeaders` includes `Set-Cookie` for cookie header inspection.
 
-`trustedOrigins` is set to `CORS_ORIGINS` (web) plus `CORS_ORIGINS_NATIVE`
+`trustedOrigins` is set to the parsed web origins (`config.CORS_ORIGINS`,
+derived from `CORS_ORIGIN`) plus `CORS_ORIGINS_NATIVE`
 (native deep-link schemes, e.g. `salafidurus-dev://`, `exp://`). Better Auth
 validates absolute `callbackURL` values against this combined list.
 

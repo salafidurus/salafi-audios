@@ -22,13 +22,13 @@ The mobile app (`apps/native`) is the listening-first client. It prioritizes con
 
 ## 3. Current Implementation State
 
-Mobile has search, auth, catalog browsing, audio playback with progress tracking, saved/library, offline audio downloads, and local-first sync all implemented. See §6 for the sync architecture and §7 for playback/downloads specifics.
+Mobile has search, auth, catalog browsing, audio playback with progress tracking, saved/library, offline audio downloads, local-first sync, and admin surfaces implemented. See §6 for the sync architecture and §7 for playback/downloads specifics.
 
 The navigation surface has been reworked into a tabs-owned structure:
 
 - the main app surface lives under `apps/native/src/app/(tabs)/`
 - the shared tabs boundary is `apps/native/src/app/(tabs)/_layout.tsx`
-- top-level sections are real tabs: search, feed, library, and account
+- top-level sections are real tabs: explore, library, settings, and admin
 - tab chrome UI is rendered by `apps/native/src/features/navigation/` components
 - route state is the source of truth for active tab and subsection
 - subsection selection happens inside each tab stack rather than through a shell-owned navigation store
@@ -37,7 +37,9 @@ This means mobile now uses Expo Router tabs for peer-root navigation, with app-l
 
 ## 4. Offline and Sync Principles
 
-Offline support is a product requirement, but the architecture must be described as target-state until implemented.
+Offline support is implemented for selected personal listening state and
+downloaded audio. It is intentionally narrow; catalog browsing remains
+network-first and in-memory.
 
 ### Non-Negotiable Rules
 
@@ -50,7 +52,7 @@ Offline support is a product requirement, but the architecture must be described
 
 Mobile data falls into three categories:
 
-1. **Offline-readable**: downloaded audio (`apps/native/src/features/downloads/`) and in-memory catalog/browse data (no longer persisted — see §6).
+1. **Offline-readable**: downloaded audio (`apps/native/src/features/downloads/`).
 2. **Offline-writable**: personal intent — progress and saved/library — recorded locally first and queued for sync via `@sd/core-sync`.
 3. **Offline-only**: temporary UI state and device-local preferences.
 
@@ -87,6 +89,9 @@ This is the implemented architecture, not a target — backend rules still resol
 - Persistence is narrow and repository-owned (progress, saved/library, downloads) — not a blanket cache. Catalog/browse data is network-first and in-memory only.
 - It must not duplicate backend policy.
 - It must not invent alternative sync semantics outside the documented outbox model (§6).
+- Native admin screens are convenience clients for backend-protected
+  mutations. Offline mode never enables admin actions, and native UI checks do
+  not replace API authorization.
 
 ## 9. Navigation Surface
 
@@ -98,13 +103,16 @@ The tab bar is a product-specific navigation surface layered over a standard Exp
 - Top-level section switches are owned by Expo Router tabs.
 - Subsection routes live inside each tab stack.
 - Current route state is authoritative for the active location.
-- Default subsection routes are canonical bare paths like `/feed`.
+- Default subsection routes are canonical tab paths like `/(tabs)/(explore)`,
+  `/(tabs)/library`, and `/(tabs)/settings`.
 
 ### Ownership
 
 - Top-level tab chrome lives in `apps/native/src/features/navigation/components/CustomTabBar.tsx`
 - Subsection chrome lives in `apps/native/src/features/navigation/components/SubsectionBarHost.tsx`
 - Shared route helpers for tabs live in `apps/native/src/features/navigation/utils/tab-route-config.ts`
+- Native admin screens live under `apps/native/src/app/(tabs)/admin/` and
+  `apps/native/src/features/admin/`.
 
 ### Package Discipline
 
@@ -117,6 +125,8 @@ The tab bar is a product-specific navigation surface layered over a standard Exp
 ### Verification Status
 
 - The `(tabs)` route group is restored as the main app boundary
-- Mobile and web route defaults now align on `/feed`, `/library`, and `/account`
+- Mobile and web route defaults now align conceptually around explore,
+  library, and settings/account surfaces, while each platform keeps its own
+  route naming.
 - Mobile and web typecheck/lint pass on the tabs migration
 - Native runtime smoke coverage is still required to confirm the old shell-era crash is gone on device
