@@ -75,9 +75,9 @@ Bug fixes start with a failing test that reproduces the bug.
 - Every auth boundary (public vs. auth vs. admin permission) must have an integration test that verifies the correct HTTP status without a session vs. with one.
 - Use `@nestjs/testing` + mocked repositories. Never connect to a real database in unit tests.
 
-**Domain packages (`domain-progress`, `domain-playback`):**
+**Domain packages (`@sd/domain-audio`, `@sd/domain-content`, `@sd/domain-account`, `@sd/domain-search`):**
 
-- Zustand store actions are pure state machines — test every action with before/after state assertions.
+- State/store actions are pure state machines — test every action with before/after state assertions.
 - Reset the store between tests: `useStore.setState(initialState)`.
 
 **Feature packages:**
@@ -111,7 +111,9 @@ bun run test:prepush                                          # CI gate (changed
 ## Repo & CI conventions 🔁
 
 - Commits: Conventional Commits enforced via commitlint + Husky.
-- Branches/Deploys: protected branches map to deployment environments (`main` -> development, `preview` -> preview, `production` -> production); deployments are branch-based via PR merges (see `README.md` and `docs/policies/deployment.md`).
+- Branches/Deploys: `main` is the default integration branch, while
+  `preview` and `production` drive backend deployment promotion through PR
+  merges (see `README.md` and `docs/policies/deployment.md`).
 
 ## Safety & non-goals ⚠️
 
@@ -121,13 +123,13 @@ bun run test:prepush                                          # CI gate (changed
 
 ## Common change workflow (example) 💡
 
-Add `POST /lectures/:id/publish` →
+Add `POST /admin/listings/:id/publish` →
 
-1. **Write the failing test first** — `lectures.service.spec.ts`: `publish throws NotFoundException when lecture missing`, `publish throws BadRequestException when already published`.
+1. **Write the failing test first** — `listing.service.spec.ts`: `publish throws NotFoundException when listing missing`, `publish throws BadRequestException when already published`.
 2. Implement domain + application logic in `apps/api/src` to make the tests pass.
 3. Add or update the API interface in `apps/api/src` and keep request/response DTOs explicit.
 4. Update `packages/core-contracts` to keep shared response types in sync.
-5. Add an integration test that verifies `POST /lectures/:id/publish` returns 401 without auth.
+5. Add an integration test that verifies `POST /admin/listings/:id/publish` returns 401 without auth.
 6. Run `bun run test` — all tests pass, commit.
 
 ---

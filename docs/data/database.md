@@ -27,7 +27,8 @@ Salafi Durus separates authoritative relational state, media storage, analytics,
 
 - Audio or image blobs.
 - Client-only ephemeral UI state.
-- Analytics events (the Clickstream events table is fully removed from PostgreSQL; analytics must be sent directly to external collectors like PostHog or ClickHouse).
+- Analytics events (the Clickstream events table is fully removed from
+  PostgreSQL; current client analytics are external to the database).
 - Secrets or infrastructure credentials.
 
 These are structural rules, not optimization suggestions.
@@ -59,7 +60,7 @@ Clients may persist:
 
 - cached metadata,
 - playback continuity,
-- planned offline assets and queued intent,
+- downloaded audio assets and queued personal intent,
 - temporary preferences.
 
 Client persistence improves continuity but never becomes authoritative.

@@ -13,12 +13,12 @@ only from hostname patterns.
 
 ## Branch promotion
 
-Protected branches map to deployment stages:
+Protected branches map to validation or deployment stages:
 
 ```text
-main       → development
-preview    → preview
-production → production
+main       → default integration branch and development baseline
+preview    → Preview backend deployment
+production → Production backend deployment
 ```
 
 Changes enter protected branches through pull requests. Preview and production
@@ -47,8 +47,14 @@ production merge → same approved digest → :production promotion
                  → Production Dokploy webhook
 ```
 
+The PR image build uses GitHub Actions BuildKit cache (`cache-from:
+type=gha`, `cache-to: type=gha,mode=max`). Preview and Production promotion do
+not build; they move tags to existing image digests with `docker buildx
+imagetools create`.
+
 The API image is stored in GHCR and pulled by Dokploy. See the
-[platform architecture](../architecture.md) and [Dokploy runbooks](../runbooks/infrastructure/README.md).
+[platform architecture](../architecture.md) and
+[Dokploy runbooks](../runbooks/infrastructure/README.md).
 
 ## Web and mobile delivery
 

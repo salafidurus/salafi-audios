@@ -51,8 +51,9 @@ the [Vercel runbook](runbooks/deployment/vercel.md).
 
 ### Mobile
 
-`apps/native` is an Expo/React Native listening client. Expo Router owns
-routing, feature slices own screens, and local-first state uses persisted
+`apps/native` is an Expo/React Native listening client with account, library,
+settings, content detail, downloads, and scoped admin surfaces. Expo Router
+owns routing, feature slices own screens, and local-first state uses persisted
 storage plus an outbox. EAS builds and distributes the mobile app using the
 `development`, `preview`, and `production` profiles in
 [`apps/native/eas.json`](../apps/native/eas.json).
@@ -128,16 +129,26 @@ artifact:
 ```text
 PR targeting preview
   → build/test ghcr.io/salafidurus/salafi-durus-api:sha-<commit>
-  → merge to preview
+  → publish immutable SHA image for trusted preview PRs
+
+merge to preview
   → promote existing digest to :preview
+  → create preview-approved markers
   → invoke Preview Dokploy webhook
-  → promote the approved digest to :production
+
+merge approved preview change to production
+  → resolve preview-approved digest
+  → promote same digest to :production
   → invoke Production Dokploy webhook
 ```
 
 Preview and Production use separate GitHub Environments, each exposing the
 same secret name, `DOKPLOY_DEPLOY_WEBHOOK`, with a different value. Dokploy
 pulls promoted GHCR images; it does not build the application.
+
+The Docker build workflow uses GitHub Actions BuildKit cache (`type=gha`) for
+the PR image build. Preview and Production promotion use `docker buildx
+imagetools create` against existing digests and do not rebuild the image.
 
 Web delivery is handled by Vercel. Mobile delivery is handled by EAS. These
 pipelines are separate from the backend image pipeline.
@@ -161,6 +172,9 @@ API → Better Auth, Neon, environment Redis, and Cloudflare R2
 
 The API exposes `/health/healthz` for liveness and `/health` for dependency
 health, including database, storage/CDN, and Redis checks where configured.
+Web analytics use Vexo only after cookie consent and outside development.
+Native runtime monitoring is wired through Sentry when its public project
+configuration is present, with Vexo enabled when its project id is configured.
 
 ## Operations and recovery
 

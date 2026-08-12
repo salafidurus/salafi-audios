@@ -20,15 +20,17 @@ These rules are NON-NEGOTIABLE. Violations will be rejected.
 
 | If working on...                                  | Read this file first   |
 | ------------------------------------------------- | ---------------------- |
-| Getting started / overall system                  | `docs/README.md`       |
-| Product vision, philosophy, and guardrails        | `docs/product/requirements.md` |
-| Monorepo layout, dependencies, package boundaries | `docs/architecture.md` |
+| Getting started / overall system                  | `docs/README.md`                                      |
+| Product vision, philosophy, and guardrails        | `docs/product/requirements.md`                        |
+| Monorepo layout, dependencies, package boundaries | `docs/architecture.md`                                |
 | Backend architecture, API design, and auth        | `docs/backend/api.md` and `docs/security/authentication.md` |
-| Database schemas, Prisma, and media management    | `docs/data/database.md` |
-| Mobile app structure and offline synchronization  | `docs/clients/mobile.md` |
-| Web app structure and SEO strategy                | `docs/clients/web.md`   |
-| Environments, configuration, and CI/CD            | `docs/policies/deployment.md` |
-| Current roadmap and phase progress                | `docs/AGENT.md`        |
+| Database schemas, Prisma, and media management    | `docs/data/database.md`                               |
+| Mobile app structure and offline synchronization  | `docs/clients/mobile.md`                              |
+| Web app structure and SEO strategy                | `docs/clients/web.md`                                 |
+| Admin roles and scoped grants                     | `docs/administration/access-management.md`            |
+| Environments, configuration, and CI/CD            | `docs/policies/deployment.md`                         |
+| Operational procedures                            | `docs/runbooks/README.md`                             |
+| Current roadmap and phase progress                | `docs/AGENT.md`                                       |
 
 ## Referenced Rules
 
@@ -63,12 +65,12 @@ docs/      → authoritative documentation
 ### Package Map
 
 - **`@sd/core-*`**: Foundational infrastructure (auth, api, config, styles, i18n, env, db, contracts).
-- **`@sd/domain-content`**: Data hooks for lectures, scholars, series, feed, library.
+- **`@sd/domain-content`**: Data hooks for listings, scholars, topics, feed, and library.
+- **`@sd/domain-audio`**: Shared playback, track resolution, and progress behavior.
 - **`@sd/domain-account`**: Data hooks for user profile and auth state.
-- **`@sd/domain-playback`**: Playback engine and player state (Zustand + hooks).
-- **`@sd/domain-progress`**: Progress tracking state (Zustand + hooks).
 - **`@sd/domain-search`**: Search and quick-browse hooks.
 - **`@sd/design-tokens`**: Design tokens — authoritative source.
+- **`@sd/utils-error`**: Shared error utilities.
 
 **Dependency rules:**
 
