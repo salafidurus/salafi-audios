@@ -40,15 +40,14 @@ function withOptionalLocale(
  */
 
 /**
- * Forces a truly-unconditioned check for subjects that CAN have conditioned
- * scoped grants elsewhere (for example, scholar/locale translation grants) but must
- * stay global-only on this route (e.g. topic translations aren't scholar-
- * owned). Without this, a bare subjectType check (no resolver at all) would
- * match ANY rule for that action+subject regardless of its conditions —
- * CASL only evaluates conditions when an instance is provided — letting a
- * scholar/locale-scoped grant leak into a route it shouldn't apply to.
+ * Resolves only the locale for resources without a Scholar owner (currently
+ * topic translations). Scholar-scoped grants cannot match this resource,
+ * while a global translation grant can still be limited to its locale.
  */
-export const resolveUnscoped: PolicyResourceResolver = () => ({});
+export const resolveUnscoped: PolicyResourceResolver = (ctx) => {
+  const locale = readOptionalLocaleValue(ctx.params.locale) ?? readOptionalBodyLocale(ctx);
+  return locale ? { locale } : {};
+};
 
 /** Scholar routes use the public slug as the resource identity. */
 export const resolveScholarParam =
