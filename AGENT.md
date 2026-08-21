@@ -36,6 +36,20 @@ If alias files or tool-specific folders are missing/broken, run `node scripts/sy
 - Read in order: `docs/README.md` → this file → target workspace `AGENT.md`.
 - If code and docs conflict, reconcile intentionally.
 
+## Agent skills
+
+### Issue tracker
+
+Issues are tracked in this repository's GitHub Issues through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Triage uses the default Matt Pocock engineering label vocabulary. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Domain documentation uses a multi-context layout with a root `CONTEXT-MAP.md`, system-wide ADRs, and context-local documentation created as needed. See `docs/agents/domain.md`.
+
 ## Content nomenclature
 
 See `docs/content/nomenclature.md` for the canonical vocabulary (Collection, Series, Single, Module, Lesson). Do not overload "lecture" or "series".
