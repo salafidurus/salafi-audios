@@ -51,7 +51,9 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
   const featuredContent = promoData?.hero ?? items[0] ?? null;
   const hasHistory = Boolean(recentProgress);
   const isHeroLoading =
-    !hasHistory && !featuredContent && (isProgressLoading || isExploreLoading || isPromosLoading);
+    !hasHistory &&
+    Boolean(featuredContent) &&
+    (isProgressLoading || isExploreLoading || isPromosLoading);
 
   return (
     <ScreenView
