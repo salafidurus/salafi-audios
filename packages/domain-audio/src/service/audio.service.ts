@@ -201,6 +201,7 @@ export class DurusAudioService {
       // listing either way, but reads far better in server logs/traces.
       syncProgressToBackend({
         listingId: currentTrack.slug ?? currentTrack.id,
+        localListingId: currentTrack.id,
         positionSeconds: duration,
         durationSeconds: duration,
       });
@@ -220,6 +221,7 @@ export class DurusAudioService {
       // reasoning as onTrackEnd above.
       syncProgressToBackend({
         listingId: currentTrack.slug ?? currentTrack.id,
+        localListingId: currentTrack.id,
         positionSeconds,
         durationSeconds: duration,
       });

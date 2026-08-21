@@ -7,8 +7,18 @@ import { drainOutbox } from "../outbox/outbox.drain";
 
 const DEFAULT_DEBOUNCE_MS = 120_000;
 
+export type SyncStore<T extends SyncableEntity> = {
+  get: (id: string) => T | undefined;
+  upsert: (entity: T) => void;
+  mergeMany: (entities: T[]) => void;
+};
+
+type ZustandSyncStore<T extends SyncableEntity> = UseBoundStore<StoreApi<EntityStoreState<T>>>;
+
+type SyncStoreInput<T extends SyncableEntity> = SyncStore<T> | ZustandSyncStore<T>;
+
 export type SyncEngineOptions<T extends SyncableEntity & JsonValue> = {
-  store: UseBoundStore<StoreApi<EntityStoreState<T>>>;
+  store: SyncStoreInput<T>;
   outbox: Outbox<T>;
   /** Tag written on outbox entries queued by this engine (e.g. "progress-update"). */
   entryType: string;
@@ -29,13 +39,27 @@ export type SyncEngine<T extends SyncableEntity & JsonValue> = {
   flush: () => Promise<void>;
   /** Delta-pulls from the server and LWW-merges the result into the local store. */
   hydrate: (since?: string) => Promise<T[]>;
+  /** The newest cursor observed by `hydrate`, or null before the first pull. */
+  getLastSyncedAt: () => string | null;
   /** Pushes a batch of entities immediately (not debounced). */
   bulkSync: (entities: T[]) => Promise<void>;
   /** Subscribes to "a flush just reached the server" notifications. Returns an unsubscribe fn. */
   onFlushed: (listener: () => void) => () => void;
   /** Retries any outbox entries left over from a previous session. Call after `outbox.hydrate()`. */
   drainPending: () => Promise<void>;
+  /** Cancels scheduled work and prevents this engine from starting new work. */
+  dispose: () => void;
 };
+
+function normalizeStore<T extends SyncableEntity>(store: SyncStoreInput<T>): SyncStore<T> {
+  if ("get" in store) return store;
+
+  return {
+    get: (id) => store.getState().actions.get(id),
+    upsert: (entity) => store.getState().actions.upsert(entity),
+    mergeMany: (entities) => store.getState().actions.mergeMany(entities),
+  };
+}
 
 export function createSyncEngine<T extends SyncableEntity & JsonValue>(
   options: SyncEngineOptions<T>,
@@ -50,11 +74,17 @@ export function createSyncEngine<T extends SyncableEntity & JsonValue>(
     pullSince,
   } = options;
 
+  const syncStore = normalizeStore(store);
   let timeout: ReturnType<typeof setTimeout> | null = null;
   const pendingIds = new Set<string>();
   const flushListeners = new Set<() => void>();
+  let lastSyncedAt: string | null = null;
+  let flushPromise: Promise<void> | null = null;
+  let disposed = false;
 
-  async function flush(): Promise<void> {
+  async function flushImpl(): Promise<void> {
+    if (disposed) return;
+
     if (timeout) {
       clearTimeout(timeout);
       timeout = null;
@@ -74,7 +104,7 @@ export function createSyncEngine<T extends SyncableEntity & JsonValue>(
       attempted = true;
       await Promise.all(
         ids.map(async (id) => {
-          const entity = store.getState().actions.get(id);
+          const entity = syncStore.get(id);
           if (!entity) return;
 
           try {
@@ -93,9 +123,19 @@ export function createSyncEngine<T extends SyncableEntity & JsonValue>(
     }
   }
 
+  function flush(): Promise<void> {
+    if (disposed) return Promise.resolve();
+    if (flushPromise) return flushPromise;
+    flushPromise = flushImpl().finally(() => {
+      flushPromise = null;
+    });
+    return flushPromise;
+  }
+
   return {
     scheduleSync: (entity) => {
-      store.getState().actions.upsert(entity);
+      if (disposed) return;
+      syncStore.upsert(entity);
       pendingIds.add(entity.id);
 
       if (timeout) clearTimeout(timeout);
@@ -104,13 +144,22 @@ export function createSyncEngine<T extends SyncableEntity & JsonValue>(
 
     flush,
 
-    hydrate: async (since) => {
+    hydrate: async (since = lastSyncedAt ?? undefined) => {
+      if (disposed) return [];
       const entities = await pullSince(since);
-      store.getState().actions.mergeMany(entities);
+      syncStore.mergeMany(entities);
+      for (const entity of entities) {
+        if (!lastSyncedAt || entity.updatedAt > lastSyncedAt) {
+          lastSyncedAt = entity.updatedAt;
+        }
+      }
       return entities;
     },
 
+    getLastSyncedAt: () => lastSyncedAt,
+
     bulkSync: async (entities) => {
+      if (disposed) return;
       if (entities.length === 0) return;
 
       if (pushBulk) {
@@ -122,14 +171,29 @@ export function createSyncEngine<T extends SyncableEntity & JsonValue>(
     },
 
     onFlushed: (listener) => {
+      if (disposed) return () => {};
       flushListeners.add(listener);
       return () => flushListeners.delete(listener);
     },
 
     drainPending: async () => {
-      await drainOutbox(outbox, async (entry) => {
+      if (disposed) return;
+      const result = await drainOutbox(outbox, async (entry) => {
         await pushOne(entry.payload);
       });
+      if (result.succeeded + result.failed > 0) {
+        for (const listener of flushListeners) listener();
+      }
+    },
+
+    dispose: () => {
+      disposed = true;
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      pendingIds.clear();
+      flushListeners.clear();
     },
   };
 }

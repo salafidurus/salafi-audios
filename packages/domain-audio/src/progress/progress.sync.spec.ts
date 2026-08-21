@@ -226,6 +226,18 @@ describe("progress.sync", () => {
       expect(JSON.parse((await adapter.getItem("sd:outbox:progress:user-1"))!)).toHaveLength(1);
     });
 
+    it("clears the previous user's in-memory progress when the account changes", async () => {
+      const adapter = createFakeStorageAdapter();
+      await initProgressSync(adapter, "user-1");
+      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
+
+      await initProgressSync(adapter, "user-2");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(useProgressStore.getState().actions.getProgress("l1")).toBeUndefined();
+      expect(httpClient).not.toHaveBeenCalled();
+    });
+
     it("notifies onProgressFlushed listeners when drainPendingProgress successfully retries an entry", async () => {
       const adapter = createFakeStorageAdapter();
       await initProgressSync(adapter, "user-1");
