@@ -2,7 +2,31 @@
 /* Include shared package sources so desktop-web utility classes are emitted in the app build. */
 @source "../../../../packages/**/*.{js,jsx,ts,tsx}";
 
+/* Keep shadcn's dark variant in lockstep with ThemeSync's document state. */
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
+  /* shadcn semantic roles — every value resolves to an authoritative token. */
+  --color-background: var(--surface-canvas);
+  --color-foreground: var(--content-default);
+  --color-card: var(--surface-default);
+  --color-card-foreground: var(--content-default);
+  --color-popover: var(--surface-elevated);
+  --color-popover-foreground: var(--content-default);
+  --color-primary: var(--action-primary);
+  --color-primary-foreground: var(--content-on-primary);
+  --color-secondary: var(--action-secondary);
+  --color-secondary-foreground: var(--content-on-secondary);
+  --color-muted: var(--surface-subtle);
+  --color-muted-foreground: var(--content-muted);
+  --color-accent: var(--surface-hover);
+  --color-accent-foreground: var(--content-strong);
+  --color-destructive: var(--action-danger);
+  --color-destructive-foreground: var(--content-on-danger);
+  --color-border: var(--border-default);
+  --color-input: var(--input-border-rest);
+  --color-ring: var(--border-focus);
+
   --surface-default: var(--surface-default);
   --action-primary: var(--action-primary);
   --border-default: var(--border-default);
@@ -12,6 +36,9 @@
   --spacing-card-p: var(--space-component-card-padding);
   --radius-component-panel: var(--radius-component-panel);
   --radius-component-chip: var(--radius-component-chip);
+  --radius-lg: var(--radius-component-panel);
+  --radius-md: var(--radius-scale-md);
+  --radius-sm: var(--radius-scale-sm);
   --shadow-lg: var(--shadow-lg);
   --text-h1: var(--typo-display-lg-font-size);
   --text-h2: var(--typo-title-lg-font-size);
