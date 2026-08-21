@@ -18,7 +18,9 @@ export const THEME_CHANGE_EVENT = "theme-change";
 
 function applyTheme(preference: ThemePreference, mediaQuery: MediaQueryList) {
   const resolved = preference === "system" ? (mediaQuery.matches ? "dark" : "light") : preference;
-  document.documentElement.setAttribute("data-theme", resolved);
+  const root = document.documentElement;
+  root.setAttribute("data-theme", resolved);
+  root.classList.toggle("dark", resolved === "dark");
 }
 
 function applyAccentTheme() {

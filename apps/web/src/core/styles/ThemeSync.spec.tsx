@@ -12,6 +12,7 @@ describe("ThemeSync", () => {
     window.localStorage.clear();
     document.documentElement.removeAttribute("data-theme");
     document.documentElement.removeAttribute("data-accent-theme");
+    document.documentElement.classList.remove("dark");
   });
 
   it("applies the system-based default accent theme when none is stored", () => {
@@ -29,6 +30,15 @@ describe("ThemeSync", () => {
     setMode("dark");
     render(<ThemeSync />);
     expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+    expect(document.documentElement).toHaveClass("dark");
+  });
+
+  it("removes the dark variant class when light mode is selected", () => {
+    document.documentElement.classList.add("dark");
+    setMode("light");
+    render(<ThemeSync />);
+    expect(document.documentElement).toHaveAttribute("data-theme", "light");
+    expect(document.documentElement).not.toHaveClass("dark");
   });
 
   it("re-applies the accent theme when an accent-theme-change event fires", () => {

@@ -76,3 +76,11 @@ Current route groups include consent-gated public/account routes under
   the picker lives in Settings → Display (`AccentThemePicker`).
 - Accent palettes are web-only. `@sd/design-tokens` and `apps/native` Unistyles
   themes are unaffected — changes must never leak a web accent into shared packages.
+
+The shadcn foundation is configured in `apps/web/components.json`;
+its `ui` alias points to the existing `src/shared/components` boundary. Semantic
+Tailwind roles (`background`, `primary`, `destructive`, `ring`, and related
+roles) map to the emitted design-token variables in `src/app/globals.css`.
+`ThemeSync` keeps the document `data-theme` attribute and `.dark` class
+synchronized so Tailwind `dark:` utilities follow the same state as the
+CSS-variable themes.
