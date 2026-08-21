@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'bun:test';
-import { resolveListingTranslation, resolveScholarTranslation } from './policy-resolvers';
+import {
+  resolveListingTranslation,
+  resolveScholarTranslation,
+  resolveUnscoped,
+} from './policy-resolvers';
 
 describe('slug-based policy resolvers', () => {
   it('uses only the scholar slug for scholar translations', async () => {
@@ -37,5 +41,14 @@ describe('slug-based policy resolvers', () => {
     );
 
     expect(resource).toEqual({ scholarSlug: 'sheikh-example', locale: 'en' });
+  });
+
+  it('keeps topic translation checks locale-scoped without inventing a scholar scope', async () => {
+    const resource = await resolveUnscoped(
+      { params: { locale: 'ar' }, body: {}, query: {} },
+      {} as never,
+    );
+
+    expect(resource).toEqual({ locale: 'ar' });
   });
 });

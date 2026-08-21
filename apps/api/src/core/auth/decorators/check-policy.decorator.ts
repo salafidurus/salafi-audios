@@ -1,7 +1,9 @@
 import { SetMetadata } from '@nestjs/common';
-import type { Locale } from '@sd/core-contracts';
 import type { PrismaService } from '../../db/prisma.service';
 import type { AppActions, AppSubjectType } from '../ability/ability.types';
+import type { PolicyResource } from '../policy';
+
+export type { PolicyResource } from '../policy';
 
 export const CHECK_POLICY_KEY = 'checkPolicy';
 
@@ -9,12 +11,6 @@ export type PolicyRequestContext = {
   params: Record<string, string>;
   body: unknown;
   query: Record<string, string | string[] | undefined>;
-};
-
-export type PolicyResource = {
-  slug?: string;
-  scholarSlug?: string;
-  locale?: Locale;
 };
 
 export type PolicyResourceResolver = (

@@ -141,4 +141,20 @@ describe('PolicyGuard', () => {
     });
     await expect(guard.canActivate(ctx)).resolves.toBe(true);
   });
+
+  it('denies a global grant when a resolver cannot resolve the resource', async () => {
+    const resolve = vi.fn().mockReturnValue({ scholarSlug: undefined });
+    vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue({
+      action: 'write',
+      subjectType: 'Listing',
+      resolve,
+    });
+    const ctx = mockContext({
+      user: baseUser({
+        accessGrants: [{ target: 'listing', capability: 'write', scholarSlug: null, locale: null }],
+      }),
+    });
+
+    await expect(guard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+  });
 });
