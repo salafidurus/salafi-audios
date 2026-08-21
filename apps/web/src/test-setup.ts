@@ -40,8 +40,20 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 } as any;
 
-// Mock matchMedia
-if (hasWindow()) {
+// Mock IntersectionObserver
+// SAFETY: the mock class matches the browser API surface these tests rely on.
+global.IntersectionObserver = class IntersectionObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as any;
+
+// Mock scrollIntoView
+Element.prototype.scrollIntoView = () => {};
+
+function configureBrowserMocks(): void {
+  if (!hasWindow()) return;
+
   Object.defineProperty(window, "matchMedia", {
     writable: true,
     value: (query: string) => ({
@@ -55,21 +67,7 @@ if (hasWindow()) {
       dispatchEvent: () => true,
     }),
   });
-}
 
-// Mock IntersectionObserver
-// SAFETY: the mock class matches the browser API surface these tests rely on.
-global.IntersectionObserver = class IntersectionObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-} as any;
-
-// Mock scrollIntoView
-Element.prototype.scrollIntoView = () => {};
-
-// Mock window.location
-if (hasWindow()) {
   Object.defineProperty(window, "location", {
     writable: true,
     value: {
@@ -88,6 +86,8 @@ if (hasWindow()) {
     },
   });
 }
+
+configureBrowserMocks();
 
 // Global mocks for common hooks that need to work in test environment
 const { vi } = require("bun:test");

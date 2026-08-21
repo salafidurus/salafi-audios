@@ -6,7 +6,7 @@ import { type Locale, LocaleSchema } from '@sd/core-contracts';
 import { z } from 'zod';
 import { runWithLocale } from './locale-context';
 
-const localeQuerySchema = z.object({ locale: LocaleSchema.optional() }).passthrough();
+const localeQuerySchema = z.looseObject({ locale: LocaleSchema.optional() });
 
 /**
  * Opens an async-local locale scope for every request so repositories can read

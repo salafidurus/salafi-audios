@@ -7,7 +7,7 @@ import { type Locale, LocaleSchema } from '@sd/core-contracts';
 import { z } from 'zod';
 import { setRequestLocale } from '../i18n/locale-context';
 
-const localeQuerySchema = z.object({ locale: LocaleSchema.optional() }).passthrough();
+const localeQuerySchema = z.looseObject({ locale: LocaleSchema.optional() });
 
 @Injectable()
 export class LocaleInterceptor implements NestInterceptor {

@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useSyncExternalStore, type CSSProperties } from "react";
+
+import { hasDocument } from "@/shared/lib/runtime-guards";
 
 import styles from "./provider-button.module.css";
 
@@ -61,27 +63,23 @@ function AppleSvg() {
   );
 }
 
-function useThemeMode(): ThemeMode {
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    if (globalThis.document) {
-      return globalThis.document.documentElement.getAttribute("data-theme") === "dark"
-        ? "dark"
-        : "light";
-    }
-    return "light";
+function readThemeMode(): ThemeMode {
+  if (!hasDocument()) return "light";
+  return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+}
+
+function subscribeToTheme(onChange: () => void): () => void {
+  if (!hasDocument()) return () => {};
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
   });
+  return () => observer.disconnect();
+}
 
-  useEffect(() => {
-    const root = document.documentElement;
-    const readTheme = (): ThemeMode =>
-      root.getAttribute("data-theme") === "dark" ? "dark" : "light";
-    const syncTheme = () => setThemeMode(readTheme());
-    const observer = new MutationObserver(syncTheme);
-    observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
-    return () => observer.disconnect();
-  }, []);
-
-  return themeMode;
+function useThemeMode(): ThemeMode {
+  return useSyncExternalStore(subscribeToTheme, readThemeMode, () => "light");
 }
 
 export function GoogleButton({ onClick, disabled = false }: GoogleButtonProps) {

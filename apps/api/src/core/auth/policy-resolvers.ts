@@ -6,13 +6,10 @@ import type {
   PolicyResourceResolver,
 } from './decorators/check-policy.decorator';
 
-const localeBodySchema = z.object({ locale: LocaleSchema.optional() }).passthrough();
+const localeBodySchema = z.looseObject({ locale: LocaleSchema.optional() });
 
 function readOptionalStringField(ctx: PolicyRequestContext, field: string): string | undefined {
-  const parsed = z
-    .object({ [field]: z.string().optional() })
-    .passthrough()
-    .safeParse(ctx.body);
+  const parsed = z.looseObject({ [field]: z.string().optional() }).safeParse(ctx.body);
   if (!parsed.success) return undefined;
   return parsed.data[field];
 }
