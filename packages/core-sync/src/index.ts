@@ -11,4 +11,9 @@ export { resolveLastWriteWins, type Timestamped } from "./conflict/last-write-wi
 export { createOutboxStore, type Outbox, type OutboxEntry } from "./outbox/outbox.store";
 export { drainOutbox, type DrainResult } from "./outbox/outbox.drain";
 
-export { createSyncEngine, type SyncEngine, type SyncEngineOptions } from "./sync/sync-engine";
+export {
+  createSyncEngine,
+  type SyncEngine,
+  type SyncEngineOptions,
+  type SyncStore,
+} from "./sync/sync-engine";

@@ -81,7 +81,7 @@ function buildEngine(outbox: Outbox<SavedEntry>): SyncEngine<SavedEntry> {
 // Namespaced by userId (see `initSavedSync`), same isolation rationale as progress's outbox.
 let outbox = createOutboxStore<SavedEntry>(proxyAdapter, "saved");
 let engine = buildEngine(outbox);
-let lastSyncedAt: string | null = null;
+let activeUserId: string | null = null;
 
 /**
  * Upgrades the retry queue to a persisted `StorageAdapter`, scoped to `userId`,
@@ -90,10 +90,13 @@ let lastSyncedAt: string | null = null;
  * call, after the app's platform storage adapter is constructed.
  */
 export async function initSavedSync(adapter: StorageAdapter, userId: string): Promise<void> {
+  if (activeUserId && activeUserId !== userId) {
+    useSavedStore.setState({ entities: {} });
+  }
+  activeUserId = userId;
   delegateAdapter = adapter;
   outbox = createOutboxStore<SavedEntry>(proxyAdapter, `saved:${userId}`);
   engine = buildEngine(outbox);
-  lastSyncedAt = null;
   await outbox.hydrate();
 }
 
@@ -137,8 +140,5 @@ export function onSavedFlushed(listener: () => void): () => void {
  * as before this module existed; only within-session refreshes narrow by `since`.
  */
 export async function hydrateSavedFromServer(): Promise<void> {
-  const entries = await engine.hydrate(lastSyncedAt ?? undefined);
-  for (const entry of entries) {
-    if (!lastSyncedAt || entry.updatedAt > lastSyncedAt) lastSyncedAt = entry.updatedAt;
-  }
+  await engine.hydrate();
 }

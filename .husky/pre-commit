@@ -2,7 +2,7 @@
 
 # react-doctor hook start
 react_doctor_scan_staged_files() {
-  bunx react-doctor@latest --staged --blocking warning --max-duration 120
+  bunx --no-install react-doctor --staged --blocking warning --max-duration 120
 }
 
 react_doctor_output=$(mktemp "${TMPDIR:-/tmp}/react-doctor-hook.XXXXXX")
@@ -57,4 +57,3 @@ fi
 # catalog fix end
 
 bun run lint:staged
-

@@ -156,6 +156,7 @@ describe("DurusAudioService", () => {
     expect(useProgressStore.getState().progressMap[mockTrack.id]!.positionSeconds).toBe(90);
     expect(syncProgressToBackend).toHaveBeenCalledWith({
       listingId: mockTrack.id,
+      localListingId: mockTrack.id,
       positionSeconds: 90,
       durationSeconds: 1800,
     });
@@ -169,7 +170,7 @@ describe("DurusAudioService", () => {
     engineEvents.onPositionChange!(90);
 
     expect(syncProgressToBackend).toHaveBeenCalledWith(
-      expect.objectContaining({ listingId: "tafsir-al-fatiha" }),
+      expect.objectContaining({ listingId: "tafsir-al-fatiha", localListingId: slugTrack.id }),
     );
     // The live progress store still keys by the stable uuid id, unaffected.
     expect(useProgressStore.getState().progressMap[slugTrack.id]).toBeDefined();
@@ -200,7 +201,7 @@ describe("DurusAudioService", () => {
     await engineEvents.onTrackEnd!();
 
     expect(syncProgressToBackend).toHaveBeenCalledWith(
-      expect.objectContaining({ listingId: "tafsir-al-fatiha" }),
+      expect.objectContaining({ listingId: "tafsir-al-fatiha", localListingId: slugTrack.id }),
     );
   });
 

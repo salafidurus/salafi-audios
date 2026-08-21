@@ -165,6 +165,14 @@ describe("saved.sync", () => {
         params: { since: "2026-01-01T00:00:00.000Z" },
       });
     });
+
+    it("clears the previous user's in-memory saved state when the account changes", async () => {
+      markSaved("l1");
+
+      await initSavedSync(createFakeStorageAdapter(), "user-2");
+
+      expect(isSaved("l1")).toBe(false);
+    });
   });
 
   describe("drainPendingSaved", () => {
