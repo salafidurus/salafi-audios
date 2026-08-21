@@ -84,6 +84,27 @@ describe("createSyncEngine", () => {
     expect(pushCalls).toBe(1);
   });
 
+  it("dispose() cancels pending debounced work", async () => {
+    let pushCalls = 0;
+    const outbox = createTestOutbox();
+    const engine = createSyncEngine<TestEntity>({
+      store: useTestStore,
+      outbox,
+      entryType: "test-update",
+      debounceMs: 20,
+      pushOne: async () => {
+        pushCalls++;
+      },
+      pullSince: async () => [],
+    });
+
+    engine.scheduleSync({ id: "a", updatedAt: "2026-01-01T00:00:00.000Z", value: 1 });
+    engine.dispose();
+    await wait(60);
+
+    expect(pushCalls).toBe(0);
+  });
+
   it("flush() with nothing pending does not call pushOne", async () => {
     let pushCalls = 0;
     const outbox = createTestOutbox();

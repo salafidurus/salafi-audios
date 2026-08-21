@@ -108,6 +108,7 @@ engine = buildEngine(outbox);
  * the app before the platform adapter became available.
  */
 export async function initProgressSync(adapter: StorageAdapter, userId: string): Promise<void> {
+  engine.dispose();
   if (activeUserId && activeUserId !== userId) {
     useProgressStore.setState({ progressMap: {} });
   }

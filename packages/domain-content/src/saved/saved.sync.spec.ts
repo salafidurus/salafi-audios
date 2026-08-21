@@ -167,11 +167,14 @@ describe("saved.sync", () => {
     });
 
     it("clears the previous user's in-memory saved state when the account changes", async () => {
+      await initSavedSync(createFakeStorageAdapter(), "user-1");
       markSaved("l1");
 
       await initSavedSync(createFakeStorageAdapter(), "user-2");
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(isSaved("l1")).toBe(false);
+      expect(httpClient).not.toHaveBeenCalled();
     });
   });
 

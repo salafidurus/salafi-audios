@@ -47,6 +47,8 @@ export type SyncEngine<T extends SyncableEntity & JsonValue> = {
   onFlushed: (listener: () => void) => () => void;
   /** Retries any outbox entries left over from a previous session. Call after `outbox.hydrate()`. */
   drainPending: () => Promise<void>;
+  /** Cancels scheduled work and prevents this engine from starting new work. */
+  dispose: () => void;
 };
 
 function normalizeStore<T extends SyncableEntity>(store: SyncStoreInput<T>): SyncStore<T> {
@@ -78,8 +80,11 @@ export function createSyncEngine<T extends SyncableEntity & JsonValue>(
   const flushListeners = new Set<() => void>();
   let lastSyncedAt: string | null = null;
   let flushPromise: Promise<void> | null = null;
+  let disposed = false;
 
   async function flushImpl(): Promise<void> {
+    if (disposed) return;
+
     if (timeout) {
       clearTimeout(timeout);
       timeout = null;
@@ -119,6 +124,7 @@ export function createSyncEngine<T extends SyncableEntity & JsonValue>(
   }
 
   function flush(): Promise<void> {
+    if (disposed) return Promise.resolve();
     if (flushPromise) return flushPromise;
     flushPromise = flushImpl().finally(() => {
       flushPromise = null;
@@ -128,6 +134,7 @@ export function createSyncEngine<T extends SyncableEntity & JsonValue>(
 
   return {
     scheduleSync: (entity) => {
+      if (disposed) return;
       syncStore.upsert(entity);
       pendingIds.add(entity.id);
 
@@ -138,6 +145,7 @@ export function createSyncEngine<T extends SyncableEntity & JsonValue>(
     flush,
 
     hydrate: async (since = lastSyncedAt ?? undefined) => {
+      if (disposed) return [];
       const entities = await pullSince(since);
       syncStore.mergeMany(entities);
       for (const entity of entities) {
@@ -151,6 +159,7 @@ export function createSyncEngine<T extends SyncableEntity & JsonValue>(
     getLastSyncedAt: () => lastSyncedAt,
 
     bulkSync: async (entities) => {
+      if (disposed) return;
       if (entities.length === 0) return;
 
       if (pushBulk) {
@@ -162,17 +171,29 @@ export function createSyncEngine<T extends SyncableEntity & JsonValue>(
     },
 
     onFlushed: (listener) => {
+      if (disposed) return () => {};
       flushListeners.add(listener);
       return () => flushListeners.delete(listener);
     },
 
     drainPending: async () => {
+      if (disposed) return;
       const result = await drainOutbox(outbox, async (entry) => {
         await pushOne(entry.payload);
       });
       if (result.succeeded + result.failed > 0) {
         for (const listener of flushListeners) listener();
       }
+    },
+
+    dispose: () => {
+      disposed = true;
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      pendingIds.clear();
+      flushListeners.clear();
     },
   };
 }

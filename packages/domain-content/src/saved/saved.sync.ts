@@ -90,6 +90,7 @@ let activeUserId: string | null = null;
  * call, after the app's platform storage adapter is constructed.
  */
 export async function initSavedSync(adapter: StorageAdapter, userId: string): Promise<void> {
+  engine.dispose();
   if (activeUserId && activeUserId !== userId) {
     useSavedStore.setState({ entities: {} });
   }

@@ -229,11 +229,13 @@ describe("progress.sync", () => {
     it("clears the previous user's in-memory progress when the account changes", async () => {
       const adapter = createFakeStorageAdapter();
       await initProgressSync(adapter, "user-1");
-      useProgressStore.getState().actions.setProgress("l1", 90, 1800);
+      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
 
       await initProgressSync(adapter, "user-2");
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(useProgressStore.getState().actions.getProgress("l1")).toBeUndefined();
+      expect(httpClient).not.toHaveBeenCalled();
     });
 
     it("notifies onProgressFlushed listeners when drainPendingProgress successfully retries an entry", async () => {
