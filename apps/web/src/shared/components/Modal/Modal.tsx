@@ -12,10 +12,12 @@ import {
   createContext,
   useContext,
   Children,
+  isValidElement,
   type ReactElement,
   useMemo,
 } from "react";
 import { createPortal } from "react-dom";
+import { z } from "zod";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 
@@ -40,8 +42,7 @@ function useModalTabs() {
 }
 
 function getModalPortalRoot(): HTMLElement | null {
-  if (typeof document === "undefined") return null;
-  return document.body;
+  return globalThis.document?.body ?? null;
 }
 
 function subscribeModalPortalRoot(): () => void {
@@ -55,6 +56,50 @@ const JUSTIFY_MAP = {
   "flex-end": "flex-end",
   "space-between": "space-between",
 } as const;
+
+function resolveJustifyContent(
+  alignment: "left" | "right" | "center" | "space-between",
+): (typeof JUSTIFY_MAP)[keyof typeof JUSTIFY_MAP] {
+  return JUSTIFY_MAP[alignment];
+}
+
+type ModalDimensionStyle = {
+  width?: string;
+  height?: string;
+};
+
+function normalizeModalDimension(
+  value: ModalWidthVariant | ModalHeightVariant | string | number | undefined,
+): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const numericValue = z.number().safeParse(value);
+  if (numericValue.success) {
+    return `${numericValue.data}px`;
+  }
+
+  const stringValue = z.string().safeParse(value);
+  return stringValue.success ? stringValue.data : undefined;
+}
+
+function buildModalDimensionStyle(
+  customWidth: string | undefined,
+  customHeight: string | undefined,
+): ModalDimensionStyle {
+  const modalStyle: ModalDimensionStyle = {};
+
+  if (customWidth) {
+    modalStyle.width = customWidth;
+  }
+
+  if (customHeight) {
+    modalStyle.height = customHeight;
+  }
+
+  return modalStyle;
+}
 
 export type ModalWidthVariant = "wide" | "standard" | "narrow" | "auto";
 export type ModalHeightVariant = "long" | "standard" | "short" | "auto";
@@ -151,7 +196,7 @@ export function Modal({
     }
   }, [isOpen]);
 
-  const justifyContent = JUSTIFY_MAP[footerAlignment as keyof typeof JUSTIFY_MAP] || "flex-end";
+  const justifyContent = resolveJustifyContent(footerAlignment);
 
   const widthClass =
     width === "wide"
@@ -164,8 +209,7 @@ export function Modal({
             ? styles["width-auto"]
             : undefined;
 
-  const customWidth =
-    width && !widthClass ? (typeof width === "number" ? `${width}px` : width) : undefined;
+  const customWidth = width && !widthClass ? normalizeModalDimension(width) : undefined;
 
   const heightClass =
     height === "long"
@@ -178,8 +222,7 @@ export function Modal({
             ? styles["height-auto"]
             : undefined;
 
-  const customHeight =
-    height && !heightClass ? (typeof height === "number" ? `${height}px` : height) : undefined;
+  const customHeight = height && !heightClass ? normalizeModalDimension(height) : undefined;
 
   const tabContextValue = useMemo(
     () => ({
@@ -231,10 +274,7 @@ export function Modal({
                 .filter(Boolean)
                 .join(" ")}
               onClick={(e) => e.stopPropagation()}
-              style={{
-                ...(customWidth ? { width: customWidth } : {}),
-                ...(customHeight ? { height: customHeight } : {}),
-              }}
+              style={buildModalDimensionStyle(customWidth, customHeight)}
             >
               {(title || multiTab) && (
                 <header className={`${styles.header} ${multiTab ? styles.headerWithTabs : ""}`}>
@@ -322,7 +362,7 @@ export function Modal({
         )}
       </AnimatePresence>
     </LazyMotion>,
-    portalRoot!,
+    portalRoot,
   );
 }
 
@@ -350,9 +390,8 @@ function ModalTabs({ children, errorTabs: propsErrorTabs }: ModalTabsProps) {
   const errorTabSet = new Set(errorTabs);
 
   const tabs = Children.toArray(children).reduce<ModalTabItemProps[]>((acc, child) => {
-    const props = (child as ReactElement<ModalTabItemProps>)?.props;
-    if (props && props.id) {
-      acc.push(props);
+    if (isValidElement<ModalTabItemProps>(child) && child.props.id) {
+      acc.push(child.props);
     }
     return acc;
   }, []);
@@ -404,15 +443,18 @@ interface ModalContentProps {
   children?: ReactNode;
 }
 
+function isModalContentItemElement(child: ReactNode): child is ReactElement<ModalContentItemProps> {
+  return isValidElement<ModalContentItemProps>(child);
+}
+
 function ModalContent({ children }: ModalContentProps) {
   const { activeTab } = useModalTabs();
 
   const activeContent = Children.toArray(children).find((child) => {
-    const props = (child as ReactElement<ModalContentItemProps>)?.props;
-    return props?.id === activeTab;
-  }) as ReactElement<ModalContentItemProps> | undefined;
+    return isModalContentItemElement(child) && child.props.id === activeTab;
+  });
 
-  return <>{activeContent?.props?.children}</>;
+  return isModalContentItemElement(activeContent) ? <>{activeContent.props.children}</> : null;
 }
 
 // Compound components for advanced use cases
@@ -458,7 +500,7 @@ interface ModalFooterProps {
 }
 
 export function ModalFooter({ children, alignment = "right", border = true }: ModalFooterProps) {
-  const justifyContent = JUSTIFY_MAP[alignment as keyof typeof JUSTIFY_MAP] || "flex-end";
+  const justifyContent = resolveJustifyContent(alignment);
 
   return (
     <footer

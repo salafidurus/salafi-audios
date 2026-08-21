@@ -19,6 +19,10 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function getErrorMessage(error: Error | null, fallback: string): string {
+  return error?.message ?? fallback;
+}
+
 interface AudioUploaderProps {
   onUploadComplete: (result: {
     audioKey: string;
@@ -78,7 +82,9 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
         filename: file.name,
       });
     } catch (err) {
-      setError((err as Error)?.message || "An error occurred during file upload.");
+      setError(
+        getErrorMessage(err instanceof Error ? err : null, "An error occurred during file upload."),
+      );
       setUploadState("error");
     }
   };
@@ -108,7 +114,12 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
       }
       await handleFile(file);
     } catch (err) {
-      setError((err as Error)?.message || "An error occurred while importing this link.");
+      setError(
+        getErrorMessage(
+          err instanceof Error ? err : null,
+          "An error occurred while importing this link.",
+        ),
+      );
       setUploadState("error");
     }
   };

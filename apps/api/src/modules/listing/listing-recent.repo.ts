@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../core/db/prisma.service';
-import { Status } from '@sd/core-db';
-import type { FeedContentItemDto, FeedPageDto } from '@sd/core-contracts';
+import { Prisma, Status, TranslationStatus } from '@sd/core-db';
+import type { FeedContentItemDto, FeedPageDto, ListingFormat } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { ConfigService } from '../../core/config/config.service';
@@ -16,19 +16,22 @@ export class RecentListingsRepo {
   async getRecentListings(cursor?: string, limit = 20): Promise<FeedPageDto> {
     const locale = getRequestLocale();
     const cursorDate = cursor ? new Date(cursor) : undefined;
+    const where: Prisma.ListingWhereInput = {
+      format: { in: ['single', 'series', 'collection'] },
+      status: Status.published,
+      deletedAt: null,
+      parentId: null,
+      scholar: { isActive: true },
+    };
+    if (cursorDate) {
+      where.createdAt = { lt: cursorDate };
+    }
 
-    const listings = await this.prisma.listing.findMany({
-      where: {
-        format: { in: ['single', 'series', 'collection'] },
-        status: Status.published,
-        deletedAt: null,
-        parentId: null,
-        scholar: { isActive: true },
-        ...(cursorDate && { createdAt: { lt: cursorDate } }),
-      },
+    const queryArgs = {
+      where,
       include: {
         translations: {
-          where: { locale, status: 'published' },
+          where: { locale, status: TranslationStatus.published },
           select: { title: true },
           take: 1,
         },
@@ -38,7 +41,7 @@ export class RecentListingsRepo {
             slug: true,
             mainLanguage: true,
             translations: {
-              where: { locale, status: 'published' },
+              where: { locale, status: TranslationStatus.published },
               select: { name: true },
               take: 1,
             },
@@ -47,7 +50,8 @@ export class RecentListingsRepo {
       },
       orderBy: [{ createdAt: 'desc' }],
       take: limit + 1,
-    });
+    } satisfies Prisma.ListingFindManyArgs;
+    const listings = await this.prisma.listing.findMany(queryArgs);
 
     const hasMore = listings.length > limit;
     const page = hasMore ? listings.slice(0, limit) : listings;
@@ -70,9 +74,10 @@ export class RecentListingsRepo {
         r.format === 'single' ? (r.durationSeconds ?? 0) : (r.publishedDurationSeconds ?? 0);
       const thumbnailUrl = r.format === 'single' ? null : this.toOptionalPublicUrl(r.coverImageUrl);
       const publishedLectureCount = r.format === 'single' ? 1 : (r.publishedLectureCount ?? 1);
+      const kind: ListingFormat = r.format;
 
       return {
-        kind: r.format as 'collection' | 'series' | 'single',
+        kind,
         id: r.id,
         title: resolved.fields.title,
         slug: r.slug,

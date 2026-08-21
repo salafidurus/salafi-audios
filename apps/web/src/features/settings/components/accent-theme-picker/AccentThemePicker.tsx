@@ -31,9 +31,10 @@ const SYSTEM_OPTION: Omit<AccentThemeOption, "id"> & { id: "system" } = {
   isSystem: true,
 };
 
-const ACCENT_OPTIONS: AccentThemeOption[] = [
+const ACCENT_OPTIONS = [
   SYSTEM_OPTION,
   ...Object.entries(ACCENT_PALETTES).map(([id, palette]) => ({
+    // SAFETY: ACCENT_PALETTES is keyed by AccentThemeId.
     id: id as AccentThemeId,
     name: palette.label,
     description: palette.description,
@@ -41,7 +42,7 @@ const ACCENT_OPTIONS: AccentThemeOption[] = [
     accent: palette.gold,
     onAccent: palette.onGold,
   })),
-];
+] satisfies AccentThemeOption[];
 
 export type AccentThemePickerValue = "system" | AccentThemeId;
 

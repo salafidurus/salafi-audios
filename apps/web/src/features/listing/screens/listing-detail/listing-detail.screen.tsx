@@ -32,8 +32,12 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const [highlightItemId, setHighlightItemId] = useState<string | undefined>(undefined);
   const headerContentRef = useRef<HTMLDivElement>(null);
 
-  const { data: listing, isFetching: isFetchingDetail, isError: isListingError, refetch: refetchListing } =
-    useListingDetail(slug);
+  const {
+    data: listing,
+    isFetching: isFetchingDetail,
+    isError: isListingError,
+    refetch: refetchListing,
+  } = useListingDetail(slug);
   const { data: contents, isFetching: isFetchingContents } = useListingContents(
     listing?.slug ?? "",
   );
@@ -56,6 +60,8 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
     if (!el) return;
 
     const updateHeight = () => {
+      // SAFETY: `StickyHeaderLayout` renders the measured content inside its sticky header shell,
+      // so the nearest matching ancestor is the layout's sticky header container when present.
       const stickyHeaderEl = el.closest('[class*="stickyHeader"]') as HTMLElement | null;
       const height = stickyHeaderEl
         ? stickyHeaderEl.getBoundingClientRect().height
@@ -99,8 +105,12 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   if (isListingError && !listing) {
     return (
       <ScreenView center>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
-          <AppText variant="titleMd">{t("lecture.error", "Failed to load content details")}</AppText>
+        <div
+          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}
+        >
+          <AppText variant="titleMd">
+            {t("lecture.error", "Failed to load content details")}
+          </AppText>
           <button
             type="button"
             onClick={() => refetchListing()}
@@ -137,17 +147,45 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
                 <span>{t("navigation.back", "Back")}</span>
               </button>
 
-              <div className={styles.headerTopRow} style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "16px 0" }}>
-                <div style={{ width: "60%", height: "24px", borderRadius: "4px", background: "var(--surface-subtle)" }} />
-                <div style={{ width: "35%", height: "14px", borderRadius: "4px", background: "var(--surface-subtle)" }} />
+              <div
+                className={styles.headerTopRow}
+                style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "16px 0" }}
+              >
+                <div
+                  style={{
+                    width: "60%",
+                    height: "24px",
+                    borderRadius: "4px",
+                    background: "var(--surface-subtle)",
+                  }}
+                />
+                <div
+                  style={{
+                    width: "35%",
+                    height: "14px",
+                    borderRadius: "4px",
+                    background: "var(--surface-subtle)",
+                  }}
+                />
               </div>
             </div>
           </StickyHeaderLayout.Header>
 
           <StickyHeaderLayout.Content>
-            <div className={styles.contentWrapper} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div
+              className={styles.contentWrapper}
+              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+            >
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={`listing-detail-skeleton-${i}`} style={{ height: "56px", width: "100%", borderRadius: "8px", background: "var(--surface-subtle)" }} />
+                <div
+                  key={`listing-detail-skeleton-${i}`}
+                  style={{
+                    height: "56px",
+                    width: "100%",
+                    borderRadius: "8px",
+                    background: "var(--surface-subtle)",
+                  }}
+                />
               ))}
             </div>
           </StickyHeaderLayout.Content>

@@ -2,6 +2,8 @@ import { QueryClient } from "@tanstack/react-query";
 
 import type { SearchCatalogParams } from "../types";
 
+import { HttpError } from "../http";
+
 // Centralized query client configuration
 export const createQueryClient = () =>
   new QueryClient({
@@ -9,18 +11,10 @@ export const createQueryClient = () =>
       queries: {
         staleTime: 1000 * 60, // 1 minute
         gcTime: 1000 * 60 * 60 * 24, // 24 hours
-        retry: (failureCount, error: unknown) => {
+        retry: (failureCount, cause: unknown) => {
           // Don't retry on 4xx errors (client errors)
-          if (
-            error &&
-            typeof error === "object" &&
-            "status" in error &&
-            typeof (error as { status: unknown }).status === "number"
-          ) {
-            const status = (error as { status: number }).status;
-            if (status >= 400 && status < 500) {
-              return false;
-            }
+          if (cause instanceof HttpError && cause.status >= 400 && cause.status < 500) {
+            return false;
           }
           return failureCount < 3;
         },

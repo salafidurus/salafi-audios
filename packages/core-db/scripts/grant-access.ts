@@ -30,14 +30,26 @@ export type ParsedAccessArgs =
     }
   | { email: string; superadmin: true };
 
-const allowedCapabilities: Record<Target, Capability[]> = {
+const allowedCapabilities = {
   scholar: ["write", "publish", "delete"],
   listing: ["write", "publish", "delete"],
   media: ["write", "delete"],
   topic: ["write", "publish", "delete"],
   translation: ["translate", "publish", "delete"],
   user: ["manage"],
-};
+} as const satisfies Record<Target, readonly Capability[]>;
+
+function isAccessTarget(value: string): value is Target {
+  return ACCESS_TARGETS.some((target) => target === value);
+}
+
+function isAccessCapability(value: string): value is Capability {
+  return ACCESS_CAPABILITIES.some((capability) => capability === value);
+}
+
+function isLocale(value: string): value is (typeof LOCALES)[number] {
+  return LOCALES.some((locale) => locale === value);
+}
 
 function csv(value: string | undefined): string[] {
   return value
@@ -63,9 +75,8 @@ export function parseAccessArgs(args: string[]): ParsedAccessArgs {
     if (options.length) throw new Error("The superadmin command does not accept options");
     return { email, superadmin: true };
   }
-  if (!(ACCESS_TARGETS as readonly string[]).includes(target))
-    throw new Error(`Invalid target: ${target}`);
-  if (!(ACCESS_CAPABILITIES as readonly string[]).includes(capability)) {
+  if (!isAccessTarget(target)) throw new Error(`Invalid target: ${target}`);
+  if (!isAccessCapability(capability)) {
     throw new Error(`Invalid capability: ${capability}`);
   }
 
@@ -81,9 +92,7 @@ export function parseAccessArgs(args: string[]): ParsedAccessArgs {
     if (option === "--locales") locales = csv(value);
   }
 
-  const typedTarget = target as Target;
-  const typedCapability = capability as Capability;
-  if (!allowedCapabilities[typedTarget].includes(typedCapability)) {
+  if (!allowedCapabilities[target].includes(capability)) {
     throw new Error(`${capability} cannot be granted on ${target}`);
   }
   if (target === "topic" || target === "user") {
@@ -95,14 +104,14 @@ export function parseAccessArgs(args: string[]): ParsedAccessArgs {
   if (target === "translation" && !locales.length) {
     throw new Error("Translation access requires --locales");
   }
-  if (locales.some((locale) => !(LOCALES as readonly string[]).includes(locale))) {
+  if (locales.some((locale) => !isLocale(locale))) {
     throw new Error(`Invalid locale. Use: ${LOCALES.join(", ")}`);
   }
 
   return {
     email,
-    target: typedTarget,
-    capability: typedCapability,
+    target,
+    capability,
     scholarSlugs: scholars,
     locales,
   };

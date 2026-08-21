@@ -6,7 +6,11 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { MiniPlayer, MiniPlayerIconButton } from "@/features/audio";
 import { SECTION_TABS, type Section } from "@/features/navigation/types";
-import { getRootTabFromPathname, isTabRoute } from "@/features/navigation/utils/tab-route-config";
+import {
+  getRootTabFromPathname,
+  isSection,
+  isTabRoute,
+} from "@/features/navigation/utils/tab-route-config";
 
 import { SubrouteIconButton } from "./SubrouteIconButton";
 import { SubrouteTabsBar } from "./SubrouteTabsBar";
@@ -19,8 +23,8 @@ export function BottomAccessoryContent() {
   const hasMiniPlayer = Boolean(currentTrack);
 
   const activeRootTab = getRootTabFromPathname(pathname);
-  const hasSubroute =
-    activeRootTab !== "search" && Boolean(SECTION_TABS[activeRootTab as Section]?.length);
+  const activeSection: Section | null = isSection(activeRootTab) ? activeRootTab : null;
+  const hasSubroute = Boolean(activeSection && SECTION_TABS[activeSection].length);
 
   if (!isTabRoute(pathname)) {
     return null;

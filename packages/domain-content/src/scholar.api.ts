@@ -12,6 +12,12 @@ import {
   type ScholarTopicsDto,
 } from "@sd/core-contracts";
 
+type SplitScholarContentResult = {
+  featured: ScholarContentItemDto | undefined;
+  recommended: ScholarContentItemDto[];
+  browse: ScholarContentItemDto[];
+};
+
 export function useScholarsList(
   options?: Omit<
     UseQueryOptions<{ scholars: ScholarListItemDto[] }, Error, { scholars: ScholarListItemDto[] }>,
@@ -70,11 +76,7 @@ export function useScholarContent(
 export function splitScholarContent(
   items: ScholarContentItemDto[],
   recommendedCount = 4,
-): {
-  featured: ScholarContentItemDto | undefined;
-  recommended: ScholarContentItemDto[];
-  browse: ScholarContentItemDto[];
-} {
+): SplitScholarContentResult {
   return {
     featured: items[0],
     recommended: items.slice(1, 1 + recommendedCount),

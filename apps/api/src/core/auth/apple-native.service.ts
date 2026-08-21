@@ -38,6 +38,8 @@ export class AppleNativeService {
         issuer: 'https://appleid.apple.com',
         audience: clientId,
       });
+      // SAFETY: jwtVerify validated signature, issuer, and audience; the
+      // Apple identity payload fields we read are standard JWT string claims.
       payload = result.payload as typeof payload;
     } catch (err) {
       if (err instanceof errors.JWTExpired) {
@@ -46,6 +48,8 @@ export class AppleNativeService {
       if (err instanceof errors.JWSSignatureVerificationFailed) {
         throw new Error('Apple identity token signature verification failed');
       }
+      // SAFETY: the non-JOSE path here is still an Error-like thrown value from
+      // verification; we only read its message for diagnostic context.
       throw new Error(`Apple identity token verification failed: ${(err as Error).message}`);
     }
 

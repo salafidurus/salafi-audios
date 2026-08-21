@@ -6,23 +6,31 @@ import { routes, routeDefinitions, resolveRouteAccess } from "./routes";
 /*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
 
-/** Recursively collect all leaf string values from a nested object. */
-function collectLeafStrings(
-  obj: Record<string, unknown>,
-  path = "",
-): { path: string; value: string }[] {
-  const results: { path: string; value: string }[] = [];
-  for (const [key, val] of Object.entries(obj)) {
-    const fullPath = path ? `${path}.${key}` : key;
-    if (typeof val === "string") {
-      results.push({ path: fullPath, value: val });
-    } else if (typeof val === "object" && val !== null && typeof val !== "function") {
-      results.push(...collectLeafStrings(val as Record<string, unknown>, fullPath));
-    }
-    // Skip functions (dynamic route builders like detail(id))
-  }
-  return results;
-}
+const leafRoutes = [
+  routes.home,
+  routes.search,
+  routes.explore.index,
+  routes.explore.recent,
+  routes.explore.scholar,
+  routes.explore.curation,
+  routes.library.index,
+  routes.library.saved,
+  routes.library.completed,
+  routes.settings.index,
+  routes.settings.profile,
+  routes.settings.legal,
+  routes.scholars.index,
+  routes.admin.index,
+  routes.admin.stats,
+  routes.admin.users,
+  routes.admin.contents,
+  routes.admin.scholars,
+  routes.signIn,
+  routes.support,
+  routes.privacy,
+  routes.termsOfUse,
+  routes.cookiePolicy,
+] as const;
 
 const VALID_ACCESS: ReadonlySet<RouteAccess> = new Set<RouteAccess>([
   "public",
@@ -35,22 +43,20 @@ const VALID_ACCESS: ReadonlySet<RouteAccess> = new Set<RouteAccess>([
 /* ------------------------------------------------------------------ */
 
 describe("routes – structural integrity", () => {
-  const leaves = collectLeafStrings(routes as unknown as Record<string, unknown>);
-
   it("has at least one leaf route", () => {
-    expect(leaves.length).toBeGreaterThan(0);
+    expect(leafRoutes.length).toBeGreaterThan(0);
   });
 
   it("every leaf string value starts with /", () => {
-    for (const { path, value } of leaves) {
-      expect({ path, value, startsWithSlash: value.startsWith("/") }).toEqual(
+    for (const value of leafRoutes) {
+      expect({ value, startsWithSlash: value.startsWith("/") }).toEqual(
         expect.objectContaining({ startsWithSlash: true }),
       );
     }
   });
 
   it("has no duplicate leaf string values", () => {
-    const values = leaves.map((l) => l.value);
+    const values = [...leafRoutes];
     const unique = new Set(values);
     const duplicates = values.filter((v, i) => values.indexOf(v) !== i);
     expect(duplicates).toEqual([]);

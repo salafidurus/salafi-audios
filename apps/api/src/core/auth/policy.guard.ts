@@ -4,7 +4,11 @@ import { Reflector } from '@nestjs/core';
 import { subject } from '@casl/ability';
 import type { Request } from 'express';
 import { CHECK_POLICY_KEY } from './decorators/check-policy.decorator';
-import type { CheckPolicyMetadata } from './decorators/check-policy.decorator';
+import type {
+  CheckPolicyMetadata,
+  PolicyRequestContext,
+  PolicyResource,
+} from './decorators/check-policy.decorator';
 import { defineAbilityFor } from './ability/ability.factory';
 import { PrismaService } from '../db/prisma.service';
 
@@ -30,21 +34,22 @@ export class PolicyGuard implements CanActivate {
 
     const ability = defineAbilityFor(user);
 
-    let resource: Record<string, unknown> | undefined;
+    let resource: PolicyResource | undefined;
     if (metadata.resolve) {
-      resource = await metadata.resolve(
-        {
-          params: (request.params as Record<string, string>) ?? {},
-          body: request.body,
-          query: (request.query as Record<string, unknown>) ?? {},
-        },
-        this.prisma,
-      );
+      const policyContext: PolicyRequestContext = {
+        // SAFETY: Fastify/Nest route params are string-keyed path params at this boundary.
+        params: (request.params as Record<string, string>) ?? {},
+        body: request.body,
+        query: {},
+      };
+      resource = await metadata.resolve(policyContext, this.prisma);
     }
 
     // The resolver's return shape is only known at each @CheckPolicy call site,
     // not to this generic guard — the cast below is the dynamic-dispatch
     // boundary; correctness is verified by ability.factory/policy.guard specs.
+    // SAFETY: each resolver returns the concrete resource shape for its subject,
+    // and `subject()` needs that instance shape to evaluate CASL conditions.
     const target = resource
       ? subject(metadata.subjectType, resource as never)
       : metadata.subjectType;

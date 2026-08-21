@@ -32,6 +32,10 @@ interface ResolvedEntry {
   url: string;
 }
 
+function getErrorMessage(error: Error | null | undefined, fallback: string): string {
+  return error?.message ?? fallback;
+}
+
 /** Resolves one pasted line into zero or more fetchable URLs, or an immediate per-line error. */
 async function resolveLine(
   line: string,
@@ -45,7 +49,12 @@ async function resolveLine(
       const files = await resolveArchiveOrgFiles(archiveOrgId);
       return { entries: files.map((f) => ({ url: f.url })) };
     } catch (err) {
-      return { error: (err as Error)?.message ?? "Failed to load this archive.org item." };
+      return {
+        error: getErrorMessage(
+          err instanceof Error ? err : null,
+          "Failed to load this archive.org item.",
+        ),
+      };
     }
   }
 
@@ -107,7 +116,10 @@ export async function importFilesFromLines(
       } catch (err) {
         errors.push({
           input: entry.url,
-          message: (err as Error)?.message ?? "Failed to download this file.",
+          message: getErrorMessage(
+            err instanceof Error ? err : null,
+            "Failed to download this file.",
+          ),
         });
       }
     }
@@ -135,7 +147,10 @@ export async function importSingleLineWithProgress(
         return {
           error: {
             input: entry.url,
-            message: (err as Error)?.message ?? "Failed to download this file.",
+            message: getErrorMessage(
+              err instanceof Error ? err : null,
+              "Failed to download this file.",
+            ),
           },
         };
       }
@@ -175,7 +190,10 @@ export async function resolveLinksToMetadata(
       } catch (err) {
         errors.push({
           input: entry.url,
-          message: (err as Error)?.message ?? "Failed to read this link's metadata.",
+          message: getErrorMessage(
+            err instanceof Error ? err : null,
+            "Failed to read this link's metadata.",
+          ),
         });
       }
     }

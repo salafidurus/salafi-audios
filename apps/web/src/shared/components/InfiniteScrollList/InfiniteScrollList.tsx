@@ -1,4 +1,5 @@
 import { useEffect, useRef, Fragment, type ReactNode } from "react";
+import { z } from "zod";
 
 import { List } from "../List";
 import styles from "./InfiniteScrollList.module.css";
@@ -25,6 +26,10 @@ export interface InfiniteScrollListProps<TData> {
   /** Message when an error occurs */
   errorMessage?: string;
 }
+
+const ItemWithIdSchema = z.object({
+  id: z.union([z.string(), z.number()]),
+});
 
 // react-doctor-disable-next-line react-doctor/no-many-boolean-props
 export function InfiniteScrollList<TData>({
@@ -92,7 +97,12 @@ export function InfiniteScrollList<TData>({
   return (
     <List>
       {data.map((item, itemIndex) => (
-        <Fragment key={String((item as Record<string, unknown>)?.id ?? itemIndex)}>
+        <Fragment
+          key={(() => {
+            const parsed = ItemWithIdSchema.safeParse(item);
+            return parsed.success ? String(parsed.data.id) : String(itemIndex);
+          })()}
+        >
           {renderItem(item, itemIndex)}
         </Fragment>
       ))}

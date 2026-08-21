@@ -63,6 +63,7 @@ function getPreviewRoles(uiState: UiState, isSuperadmin: boolean): string[] {
   }
 
   Object.keys(uiState).forEach((key) => {
+    // SAFETY: `uiState` is a full `UiState` record keyed only by `AccessTarget`.
     const target = key as AccessTarget;
     const item = uiState[target];
     if (item.enabled) {
@@ -178,6 +179,8 @@ export function AccessDialog({
       nextState.enabled = enabled;
       if (enabled) {
         const defaultCap = capabilitiesList(target)[0];
+        // SAFETY: `defaultCap` comes directly from `capabilitiesList(target)`, so the
+        // computed key is always a valid `AccessCapability` for this target.
         nextState.capabilities = { [defaultCap as string]: true };
       } else {
         nextState.capabilities = {};
@@ -232,8 +235,12 @@ export function AccessDialog({
     targetRowConfigs.forEach(({ target }) => {
       const item = uiState[target];
       if (item.enabled) {
+        // SAFETY: `item.capabilities` is only mutated through AccessCapability-driven UI
+        // toggles above, so its enumerable keys are the same AccessCapability domain.
         const enabledCaps = Object.keys(item.capabilities).filter(
+          // SAFETY: see note above — each enumerable key originated from an AccessCapability toggle.
           (c) => item.capabilities[c as AccessCapability],
+          // SAFETY: see note above — after filtering, the remaining keys are still AccessCapability values.
         ) as AccessCapability[];
 
         enabledCaps.forEach((capability) => {
@@ -241,6 +248,7 @@ export function AccessDialog({
             target,
             capability,
             scholarSlugs: item.scholarSlugs,
+            // SAFETY: locale selections come only from SUPPORTED_LOCALES-backed UI chips.
             locales: item.locales as ("en" | "ar")[],
           });
         });

@@ -92,9 +92,12 @@ function buildEditFormState(data: ListingFormDataDto): FormState {
 
   const title = listing.title || "";
   const description = listing.description || "";
+  // SAFETY: admin listing form data returns status values from the same listing contract
+  // the editor writes back to, so this is already a valid `LectureStatus`.
   const status = (listing.status as LectureStatus) || "draft";
   const orderIndex = listing.orderIndex || 0;
   const selectedTopics = listing.topics || [];
+  // SAFETY: the form-data payload carries only supported locale values for listing language.
   const language = (listing.language as Locale) || "ar";
   const coverImageUrl = listing.coverImageUrl || "";
 
@@ -106,6 +109,7 @@ function buildEditFormState(data: ListingFormDataDto): FormState {
     slugSuffix: "",
     description,
     scholarId: listing.scholarId || "",
+    // SAFETY: listing format comes from the same admin DTO/domain union consumed by the editor.
     format: (listing.format as "single" | "series" | "collection") || "single",
     status,
     orderIndex,

@@ -7,9 +7,11 @@ export interface UseInfiniteAdminScholarsOptions {
 }
 
 export function useInfiniteAdminScholars(options?: UseInfiniteAdminScholarsOptions) {
+  const initialPageParam: string | undefined = undefined;
+
   return useInfiniteQuery({
     queryKey: queryKeys.admin.scholars.infinite(options?.search),
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       const params = new URLSearchParams();
       if (options?.search) params.append("search", options.search);
       if (pageParam) params.append("cursor", pageParam);
@@ -23,7 +25,7 @@ export function useInfiniteAdminScholars(options?: UseInfiniteAdminScholarsOptio
         hasMore: response.hasMore ?? false,
       };
     },
-    initialPageParam: undefined as string | undefined,
+    initialPageParam,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: options?.enabled !== false,
   });

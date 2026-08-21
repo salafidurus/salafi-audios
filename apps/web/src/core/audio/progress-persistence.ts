@@ -17,6 +17,8 @@ import {
   onSavedFlushed,
 } from "@sd/domain-content";
 
+import { hasWindow } from "@/shared/lib/runtime-guards";
+
 import { createLocalStorageAdapter } from "../sync/local-storage-adapter";
 
 const STORAGE_KEY_PREFIX = "sd:progress-cache:v1:";
@@ -27,7 +29,7 @@ function storageKey(userId: string): string {
 }
 
 function readCachedProgress(userId: string): ListingProgress[] {
-  if (typeof window === "undefined") return [];
+  if (!hasWindow()) return [];
   try {
     const raw = window.localStorage.getItem(storageKey(userId));
     if (!raw) return [];
@@ -39,7 +41,7 @@ function readCachedProgress(userId: string): ListingProgress[] {
 }
 
 function writeCachedProgress(userId: string, entries: ListingProgress[]): void {
-  if (typeof window === "undefined") return;
+  if (!hasWindow()) return;
   try {
     window.localStorage.setItem(storageKey(userId), JSON.stringify(entries));
   } catch {

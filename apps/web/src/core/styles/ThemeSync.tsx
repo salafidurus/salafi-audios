@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import { hasWindow } from "@/shared/lib/runtime-guards";
+
 import {
   ACCENT_THEME_CHANGE_EVENT,
   getDefaultAccentTheme,
@@ -25,7 +27,7 @@ function applyAccentTheme() {
 }
 
 function syncAccentTheme() {
-  if (typeof window === "undefined") return;
+  if (!hasWindow()) return;
   const stored = window.localStorage.getItem("accent-theme:v1");
   if (!isAccentThemeId(stored)) {
     const newDefault = getDefaultAccentTheme();
@@ -33,15 +35,25 @@ function syncAccentTheme() {
   }
 }
 
+function getStoredThemePreference(): ThemePreference {
+  if (!hasWindow()) {
+    return "system";
+  }
+
+  const stored = window.localStorage.getItem(THEME_KEY);
+  if (stored === "light" || stored === "dark") {
+    return stored;
+  }
+
+  return "system";
+}
+
 export function ThemeSync() {
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const syncTheme = () => {
-      const stored = localStorage.getItem(THEME_KEY) as ThemePreference | null;
-      const preference: ThemePreference =
-        stored === "light" || stored === "dark" ? stored : "system";
-      applyTheme(preference, mediaQuery);
+      applyTheme(getStoredThemePreference(), mediaQuery);
       syncAccentTheme();
     };
 
@@ -70,4 +82,3 @@ export function ThemeSync() {
 
   return null;
 }
-

@@ -20,6 +20,8 @@ const getWebFontFamily = (role: "display" | "body" | "mono"): string => {
 };
 
 export const createTypographyWeb = () => {
+  // SAFETY: `typographyBase` already covers every `TypographyVariant`; this mapping preserves
+  // the same keys while converting token values into concrete web typography primitives.
   return Object.fromEntries(
     Object.entries(typographyBase).map(([variant, token]) => [
       variant,

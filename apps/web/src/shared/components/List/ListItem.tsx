@@ -1,5 +1,7 @@
 import type { ReactNode, MouseEvent, KeyboardEvent } from "react";
 
+import { isHtmlElement } from "@/shared/lib/runtime-guards";
+
 import styles from "./list-item.module.css";
 
 export type ListItemProps = {
@@ -38,7 +40,10 @@ export function ListItem({
 
   const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     // Don't trigger onClick if the click came from a nested interactive element
-    const target = e.target as HTMLElement;
+    const target = e.target;
+    if (!isHtmlElement(target)) {
+      return;
+    }
     if (
       target.tagName === "BUTTON" ||
       target.closest("button") ||

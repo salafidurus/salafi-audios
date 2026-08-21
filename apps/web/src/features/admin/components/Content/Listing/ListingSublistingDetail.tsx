@@ -69,6 +69,8 @@ export function ListingSublistingDetail({
           status: "ready",
           title: data.listing.title,
           description: data.listing.description ?? "",
+          // SAFETY: `fetchListingFormData` returns listing statuses from the same admin
+          // contract used by the form, so this value is already constrained to `LectureStatus`.
           lectureStatus: (data.listing.status as LectureStatus) ?? "draft",
           orderIndex: data.listing.orderIndex ?? 0,
         }));

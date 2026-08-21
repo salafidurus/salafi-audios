@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Patch, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { LocaleSchema } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { resolveListingTranslation } from '../../core/auth/policy-resolvers';
@@ -33,20 +34,20 @@ export class ListingTranslationsController {
     @Param('locale') locale: string,
     @Body() body: Partial<{ title: string; description: string | null }>,
   ) {
-    return this.service.updateTranslation(slug, locale, body);
+    return this.service.updateTranslation(slug, LocaleSchema.parse(locale), body);
   }
 
   @Post(':slug/translations/:locale/publish')
   @CheckPolicy('publish', 'Translation', resolveListingTranslation())
   @ApiOperation({ summary: 'Publish a listing translation' })
   publishTranslation(@Param('slug') slug: string, @Param('locale') locale: string) {
-    return this.service.publishTranslation(slug, locale);
+    return this.service.publishTranslation(slug, LocaleSchema.parse(locale));
   }
 
   @Post(':slug/translations/:locale/unpublish')
   @CheckPolicy('publish', 'Translation', resolveListingTranslation())
   @ApiOperation({ summary: 'Unpublish a listing translation' })
   unpublishTranslation(@Param('slug') slug: string, @Param('locale') locale: string) {
-    return this.service.unpublishTranslation(slug, locale);
+    return this.service.unpublishTranslation(slug, LocaleSchema.parse(locale));
   }
 }

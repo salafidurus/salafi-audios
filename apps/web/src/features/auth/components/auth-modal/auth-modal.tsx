@@ -13,8 +13,7 @@ import { AppleSignInButton, GoogleSignInButton } from "../social-buttons";
 import styles from "./auth-modal.module.css";
 
 function getPortalRoot(): HTMLElement | null {
-  if (typeof document === "undefined") return null;
-  return document.body;
+  return globalThis.document?.body ?? null;
 }
 
 function subscribePortalRoot(): () => void {
@@ -28,7 +27,7 @@ export type AuthModalProps = {
 };
 
 const getRedirectTo = () => {
-  if (typeof window !== "undefined") {
+  if (globalThis.window) {
     return window.location.pathname + window.location.search;
   }
   return "/";
@@ -154,6 +153,6 @@ export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
         )}
       </AnimatePresence>
     </LazyMotion>,
-    portalRoot!,
+    portalRoot,
   );
 }

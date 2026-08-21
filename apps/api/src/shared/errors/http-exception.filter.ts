@@ -4,12 +4,51 @@ import { Prisma } from '@sd/core-db';
 import { ConfigService } from '../../core/config/config.service';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { ZodValidationException } from 'nestjs-zod';
+import { z } from 'zod';
+
+const httpExceptionBodySchema = z
+  .object({
+    message: z.union([z.string(), z.array(z.string())]).optional(),
+    statusCode: z.number().optional(),
+    error: z.string().optional(),
+  })
+  .catchall(z.unknown());
+
+const bodyMessageArraySchema = z.array(z.string());
+const bodyMessageStringSchema = z.string();
+const zodIssueMessagesSchema = z.array(z.object({ message: z.string() }));
+const zodValidationErrorSchema = z.object({ issues: zodIssueMessagesSchema });
+const errorExtraSourceSchema = z.record(z.string(), z.unknown());
+const errorExtraValueSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.array(z.string()),
+  z.null(),
+  z.undefined(),
+]);
+
+type ErrorExtras = Record<string, string | number | boolean | string[] | null | undefined>;
+
+type DevDetails =
+  | string[]
+  | {
+      kind: string;
+      message?: string;
+      clientVersion?: string;
+      code?: string;
+      errorCode?: string;
+      stack?: string;
+      meta?: unknown;
+    };
+
+type ErrorExtraSource = z.infer<typeof errorExtraSourceSchema>;
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly config: ConfigService) {}
 
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: Error | HttpException | ZodValidationException | unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const req = ctx.getRequest<FastifyRequest>();
     const res = ctx.getResponse<FastifyReply>();
@@ -19,39 +58,39 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal Server Error';
-    let details: unknown = undefined;
-    let extras: Record<string, unknown> = {};
+    let details: DevDetails | undefined;
+    let extras: ErrorExtras = {};
 
     if (this.isPrismaConnectionRefused(exception)) {
       message = 'Database connection refused. Ensure PostgreSQL is running and reachable.';
     } else if (exception instanceof ZodValidationException) {
       statusCode = exception.getStatus();
       message = 'Validation failed';
-      details = (exception.getZodError() as any).issues;
+      const parsedZodError = zodValidationErrorSchema.safeParse(exception.getZodError());
+      details = parsedZodError.success
+        ? parsedZodError.data.issues.map((issue) => issue.message)
+        : ['Validation failed'];
     } else if (exception instanceof HttpException) {
       statusCode = exception.getStatus();
-      const response = exception.getResponse();
+      const parsedResponse = httpExceptionBodySchema.safeParse(exception.getResponse());
 
-      if (typeof response === 'string') {
-        message = response;
-      } else if (response && typeof response === 'object' && 'message' in response) {
-        const body = response;
-
-        if (Array.isArray(body.message)) {
+      if (parsedResponse.success) {
+        const body = parsedResponse.data;
+        const messageList = bodyMessageArraySchema.safeParse(body.message);
+        const messageText = bodyMessageStringSchema.safeParse(body.message);
+        if (messageList.success) {
           message = 'Validation failed';
-          details = body.message;
-        } else {
+          details = messageList.data;
+        } else if (messageText.success) {
           message = exception.message || message;
           // Preserve structured fields (e.g. conflictingSlugs) thrown alongside
           // the message — `details` is dev-only, so they must survive here.
-          const {
-            message: _msg,
-            statusCode: _status,
-            error: _error,
-            ...rest
-          } = body as Record<string, unknown>;
-          extras = rest;
+          const { message: _msg, statusCode: _status, error: _error, ...rest } = body;
+          const parsedExtraSource = errorExtraSourceSchema.safeParse(rest);
+          extras = parsedExtraSource.success ? toErrorExtras(parsedExtraSource.data) : {};
         }
+      } else {
+        message = exception.message || message;
       }
     } else if (exception instanceof Error) {
       message = exception.message || message;
@@ -71,7 +110,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     });
   }
 
-  private buildDevDetails(exception: unknown, existingDetails: unknown): unknown {
+  private buildDevDetails(
+    exception: Error | HttpException | ZodValidationException | unknown,
+    existingDetails: DevDetails | undefined,
+  ): DevDetails | undefined {
     if (existingDetails !== undefined) {
       return existingDetails;
     }
@@ -122,9 +164,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
     return existingDetails;
   }
 
-  private isPrismaConnectionRefused(exception: unknown): boolean {
+  private isPrismaConnectionRefused(
+    exception: Error | HttpException | ZodValidationException | unknown,
+  ): boolean {
     return (
       exception instanceof Prisma.PrismaClientKnownRequestError && exception.code === 'ECONNREFUSED'
     );
   }
+}
+
+function toErrorExtras(input: ErrorExtraSource): ErrorExtras {
+  const entries = Object.entries(input).flatMap(([key, value]) => {
+    const parsed = errorExtraValueSchema.safeParse(value);
+    return parsed.success ? [[key, parsed.data] as const] : [];
+  });
+
+  return Object.fromEntries(entries);
 }

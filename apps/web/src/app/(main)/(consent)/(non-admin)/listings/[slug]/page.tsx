@@ -3,9 +3,22 @@ import type { Metadata } from "next";
 
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import { z } from "zod";
 
 import { getApiBaseUrl } from "@/core/config/env";
 import { ListingDetailScreen } from "@/features/listing/screens/listing-detail/listing-detail.screen";
+
+const ListingDetailSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().nullable().optional(),
+  rootListing: z
+    .object({
+      slug: z.string(),
+    })
+    .nullable()
+    .optional(),
+});
 
 const fetchListingDetail = cache(async (slug: string): Promise<ListingDetailDto | null> => {
   const baseUrl = getApiBaseUrl();
@@ -14,7 +27,8 @@ const fetchListingDetail = cache(async (slug: string): Promise<ListingDetailDto 
   try {
     const res = await fetch(`${baseUrl}/listings/${slug}`, { next: { revalidate: 600 } });
     if (!res.ok) return null;
-    return (await res.json()) as ListingDetailDto;
+    // SAFETY: ListingDetailSchema validates the network payload before it is treated as the DTO shape.
+    return ListingDetailSchema.parse(await res.json()) as ListingDetailDto;
   } catch {
     return null;
   }

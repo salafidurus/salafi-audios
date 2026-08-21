@@ -3,10 +3,12 @@ export function resolveTranslatedFields<T extends Record<string, string | null |
   publishedTranslation: Partial<T> | null,
 ): T {
   if (!publishedTranslation) return primaryFields;
-  return Object.fromEntries(
-    Object.entries(primaryFields).map(([key, value]) => [
-      key,
-      publishedTranslation[key as keyof T] ?? value,
-    ]),
-  ) as T;
+  const resolved = { ...primaryFields };
+  // SAFETY: `resolved` starts as a full copy of `primaryFields`, and this key
+  // list is exactly the set of assignable keys on that object.
+  const keys = Object.keys(primaryFields) as (keyof T)[];
+  for (const key of keys) {
+    resolved[key] = publishedTranslation[key] ?? primaryFields[key];
+  }
+  return resolved;
 }

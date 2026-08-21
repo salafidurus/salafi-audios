@@ -14,6 +14,18 @@ import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 
 type ThemePreference = "system" | "parchment" | "manuscript" | "midnight" | "ember";
 
+function parseThemePreference(themeName: string | undefined): ThemePreference {
+  switch (themeName) {
+    case "parchment":
+    case "manuscript":
+    case "midnight":
+    case "ember":
+      return themeName;
+    default:
+      return "system";
+  }
+}
+
 interface NotificationState {
   master: boolean;
   scholars: boolean;
@@ -30,7 +42,7 @@ export function SettingsGeneralScreen() {
   });
 
   useEffect(() => {
-    const activeTheme = UnistylesRuntime.themeName as ThemePreference;
+    const activeTheme = parseThemePreference(UnistylesRuntime.themeName);
     if (activeTheme) {
       setThemePreference(activeTheme);
     }

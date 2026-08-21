@@ -4,7 +4,7 @@ import type { LibraryItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { getLibraryItemPercent } from "@sd/domain-content";
 import { Bookmark, Clock, CheckCircle } from "lucide-react-native";
-import { View } from "react-native";
+import { View, type DimensionValue } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -48,13 +48,17 @@ function LibraryItemIcon({ variant }: LibraryItemIconProps) {
 }
 
 function ProgressBarFill({ percent }: { percent: number }) {
+  const width = getPercentWidth(percent);
+
   return (
     <View style={styles.progressTrack} testID="library-progress-bar">
-      <View
-        style={[styles.progressFill, { width: `${Math.min(percent, 100)}%` as unknown as number }]}
-      />
+      <View style={[styles.progressFill, { width }]} />
     </View>
   );
+}
+
+function getPercentWidth(percent: number): DimensionValue {
+  return `${Math.min(percent, 100)}%`;
 }
 
 export function LibraryItemRow({

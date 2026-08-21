@@ -26,24 +26,27 @@ describe("downloads outbox drain", () => {
   });
 
   it("enqueueDownloadMutation queues an entry", () => {
-    enqueueDownloadMutation("start-download", { lectureId: "l1" });
+    enqueueDownloadMutation("start-download", { lectureId: "l1", audioUrl: "https://s/l1.mp3" });
 
     expect(downloadsOutbox.useOutboxStore.getState().entries).toHaveLength(1);
   });
 
   it("drainDownloadsOutbox calls the handler with each entry's type and payload, and removes it on success", async () => {
-    enqueueDownloadMutation("start-download", { lectureId: "l1" });
+    enqueueDownloadMutation("start-download", { lectureId: "l1", audioUrl: "https://s/l1.mp3" });
     const handler = jest.fn(async () => {});
 
     const result = await drainDownloadsOutbox(handler);
 
-    expect(handler).toHaveBeenCalledWith("start-download", { lectureId: "l1" });
+    expect(handler).toHaveBeenCalledWith("start-download", {
+      lectureId: "l1",
+      audioUrl: "https://s/l1.mp3",
+    });
     expect(result).toEqual({ succeeded: 1, failed: 0 });
     expect(downloadsOutbox.useOutboxStore.getState().entries).toEqual([]);
   });
 
   it("keeps a failed entry queued for retry", async () => {
-    enqueueDownloadMutation("start-download", { lectureId: "l1" });
+    enqueueDownloadMutation("start-download", { lectureId: "l1", audioUrl: "https://s/l1.mp3" });
     const handler = jest.fn(async () => {
       throw new Error("offline");
     });

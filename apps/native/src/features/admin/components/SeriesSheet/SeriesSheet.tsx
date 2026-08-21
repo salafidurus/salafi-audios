@@ -1,4 +1,4 @@
-import type { AdminListingDetailDto } from "@sd/core-contracts";
+import type { AdminListingDetailDto, Locale } from "@sd/core-contracts";
 
 import { subject } from "@casl/ability";
 import { useAbility } from "@sd/domain-account";
@@ -31,6 +31,14 @@ type FormState = {
 
 function reduce(state: FormState, patch: Partial<FormState>): FormState {
   return { ...state, ...patch };
+}
+
+function parseLocaleInput(language: string): Locale | undefined {
+  return language === "ar" || language === "en" ? language : undefined;
+}
+
+function getErrorMessage(cause: unknown): string {
+  return cause instanceof Error ? cause.message : "Unable to save series";
 }
 
 export function SeriesSheet({
@@ -69,7 +77,7 @@ export function SeriesSheet({
         await updateSeries(series.id, {
           title,
           description: description || undefined,
-          language: (language || undefined) as any,
+          language: parseLocaleInput(language),
         });
       } else {
         await createSeries({
@@ -79,8 +87,8 @@ export function SeriesSheet({
         });
       }
       onSaved();
-    } catch (e) {
-      dispatch({ error: (e as Error).message });
+    } catch (cause) {
+      dispatch({ error: getErrorMessage(cause) });
     } finally {
       dispatch({ isSaving: false });
     }

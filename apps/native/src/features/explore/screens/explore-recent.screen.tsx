@@ -99,7 +99,7 @@ export function ExploreRecentScreen({
             item.items.some((i) => i.title.toLowerCase().includes(searchQuery.toLowerCase()))
           );
         }
-        return (item as any).title?.toLowerCase().includes(searchQuery.toLowerCase());
+        return item.title.toLowerCase().includes(searchQuery.toLowerCase());
       })
     : rawItems;
 
@@ -119,7 +119,7 @@ export function ExploreRecentScreen({
       }
       items.push(item);
     } else {
-      currentGroup.push(item as FeedContentItemDto);
+      currentGroup.push(item);
     }
   });
 

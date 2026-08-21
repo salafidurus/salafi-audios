@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Search } from "@/shared/components/Search";
+import { isNode } from "@/shared/lib/runtime-guards";
 
 import { useDropdownContext } from "./context";
 import styles from "./dropdown.module.css";
@@ -104,11 +105,15 @@ export function DropdownContent({ children, searchable = false, className }: Dro
       return;
     }
     const handleClickOutside = (e: MouseEvent) => {
+      if (!isNode(e.target)) {
+        return;
+      }
+
       if (
         contentRef.current &&
-        !contentRef.current.contains(e.target as Node) &&
+        !contentRef.current.contains(e.target) &&
         triggerRef.current &&
-        !triggerRef.current.contains(e.target as Node)
+        !triggerRef.current.contains(e.target)
       ) {
         setOpen(false);
       }

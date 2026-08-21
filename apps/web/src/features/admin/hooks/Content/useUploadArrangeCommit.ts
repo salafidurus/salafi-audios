@@ -21,6 +21,10 @@ import {
 
 const UPLOAD_CONCURRENCY = 3;
 
+function getErrorMessage(error: Error | null, fallback: string): string {
+  return error?.message ?? fallback;
+}
+
 /** Local files are already in memory; url-sourced items are only fetched here — at the
  *  moment the admin actually confirms the upload, not when the link was first added. */
 async function resolveItemFile(
@@ -76,7 +80,7 @@ async function uploadWithConcurrency(
         dispatch({
           type: "UPLOAD_ERROR",
           itemId: id,
-          error: (err as Error)?.message ?? "Upload failed",
+          error: getErrorMessage(err instanceof Error ? err : null, "Upload failed"),
         });
       }
     }
@@ -171,7 +175,10 @@ export function useUploadArrangeCommit(
       }
       dispatch({
         type: "SET_ERROR",
-        error: (err as Error)?.message ?? "Failed to save the arrangement.",
+        error: getErrorMessage(
+          err instanceof Error ? err : null,
+          "Failed to save the arrangement.",
+        ),
       });
     }
   }, [state, dispatch, onSuccess]);

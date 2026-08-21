@@ -4,6 +4,7 @@ import { Host, TextInput as NativeTextInput, useNativeState } from "@expo/ui";
 import { useEffect, useState } from "react";
 import {
   StyleSheet as RNStyleSheet,
+  type DimensionValue,
   type KeyboardTypeOptions,
   type StyleProp,
   type TextStyle,
@@ -30,32 +31,64 @@ export type TextInputProps = {
   testID?: string;
 };
 
-const BOX_STYLE_KEYS = new Set<keyof UniversalStyle>([
-  "padding",
-  "paddingHorizontal",
-  "paddingVertical",
-  "paddingTop",
-  "paddingBottom",
-  "paddingLeft",
-  "paddingRight",
-  "backgroundColor",
-  "borderRadius",
-  "borderWidth",
-  "borderColor",
-  "opacity",
-  "width",
-  "height",
-]);
+type SplitTextInputStyle = {
+  boxStyle: Partial<UniversalStyle>;
+  textStyle: Partial<UniversalTextStyle>;
+};
 
-const TEXT_STYLE_KEYS = new Set<keyof UniversalTextStyle>([
-  "fontSize",
-  "fontWeight",
-  "fontFamily",
-  "color",
-  "lineHeight",
-  "letterSpacing",
-  "textAlign",
-]);
+const FULL_WIDTH: DimensionValue = "100%";
+
+function mapUniversalFontWeight(
+  weight: TextStyle["fontWeight"],
+): UniversalTextStyle["fontWeight"] | undefined {
+  switch (weight) {
+    case "normal":
+    case "bold":
+    case "100":
+    case "200":
+    case "300":
+    case "400":
+    case "500":
+    case "600":
+    case "700":
+    case "800":
+    case "900":
+      return weight;
+    case 100:
+      return "100";
+    case 200:
+      return "200";
+    case 300:
+      return "300";
+    case 400:
+      return "400";
+    case 500:
+      return "500";
+    case 600:
+      return "600";
+    case 700:
+      return "700";
+    case 800:
+      return "800";
+    case 900:
+      return "900";
+    default:
+      return undefined;
+  }
+}
+
+function mapUniversalTextAlign(
+  textAlign: TextStyle["textAlign"],
+): UniversalTextStyle["textAlign"] | undefined {
+  switch (textAlign) {
+    case "left":
+    case "right":
+    case "center":
+      return textAlign;
+    default:
+      return undefined;
+  }
+}
 
 /**
  * @expo/ui's TextInput only accepts a constrained style subset (box paint via
@@ -63,27 +96,41 @@ const TEXT_STYLE_KEYS = new Set<keyof UniversalTextStyle>([
  * `margin*`/`minWidth`/`flex`. Anything outside both buckets is routed to the
  * `Host` wrapper instead, which is a full RN View and supports them natively.
  */
-function splitStyle(style: StyleProp<ViewStyle & TextStyle>): {
-  hostStyle: ViewStyle;
-  boxStyle: UniversalStyle;
-  textStyle: UniversalTextStyle;
-} {
-  const flattened = (RNStyleSheet.flatten(style) ?? {}) as Record<string, unknown>;
-  const hostStyle: Record<string, unknown> = {};
-  const boxStyle: Record<string, unknown> = {};
-  const textStyle: Record<string, unknown> = {};
+function splitStyle(style: StyleProp<ViewStyle & TextStyle>): SplitTextInputStyle {
+  const flattened = RNStyleSheet.flatten(style);
+  const boxStyle: Partial<UniversalStyle> = {};
+  const textStyle: Partial<UniversalTextStyle> = {};
 
-  for (const [key, val] of Object.entries(flattened)) {
-    if (BOX_STYLE_KEYS.has(key as keyof UniversalStyle)) {
-      boxStyle[key] = val;
-    } else if (TEXT_STYLE_KEYS.has(key as keyof UniversalTextStyle)) {
-      textStyle[key] = val;
-    } else {
-      hostStyle[key] = val;
-    }
+  if (!flattened) {
+    return { boxStyle, textStyle };
   }
 
-  return { hostStyle, boxStyle, textStyle };
+  boxStyle.padding = flattened.padding;
+  boxStyle.paddingHorizontal = flattened.paddingHorizontal;
+  boxStyle.paddingVertical = flattened.paddingVertical;
+  boxStyle.paddingTop = flattened.paddingTop;
+  boxStyle.paddingBottom = flattened.paddingBottom;
+  boxStyle.paddingLeft = flattened.paddingLeft;
+  boxStyle.paddingRight = flattened.paddingRight;
+  boxStyle.backgroundColor = flattened.backgroundColor;
+  boxStyle.borderRadius = flattened.borderRadius;
+  boxStyle.borderWidth = flattened.borderWidth;
+  boxStyle.borderColor = flattened.borderColor;
+  boxStyle.opacity = flattened.opacity;
+  boxStyle.width = flattened.width;
+  boxStyle.height = flattened.height;
+
+  textStyle.fontSize = flattened.fontSize;
+  textStyle.fontWeight = mapUniversalFontWeight(flattened.fontWeight);
+  textStyle.fontFamily = flattened.fontFamily;
+  textStyle.lineHeight = flattened.lineHeight;
+  textStyle.letterSpacing = flattened.letterSpacing;
+  textStyle.textAlign = mapUniversalTextAlign(flattened.textAlign);
+  if (flattened.color !== undefined && flattened.color !== null) {
+    textStyle.color = String(flattened.color);
+  }
+
+  return { boxStyle, textStyle };
 }
 
 export function TextInput({
@@ -115,10 +162,10 @@ export function TextInput({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  const { hostStyle, boxStyle, textStyle } = splitStyle(style);
+  const { boxStyle, textStyle } = splitStyle(style);
 
   return (
-    <Host matchContents={false} style={[base.stretch, hostStyle]}>
+    <Host matchContents={false} style={[base.stretch, style]}>
       <NativeTextInput
         value={nativeValue}
         onChangeText={onChangeText}
@@ -155,7 +202,7 @@ export function TextInput({
 }
 
 const base = {
-  stretch: { width: "100%" } as ViewStyle,
+  stretch: { width: FULL_WIDTH },
 };
 
 const styles = StyleSheet.create((theme) => ({

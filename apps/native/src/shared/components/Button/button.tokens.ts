@@ -23,7 +23,7 @@ export type ButtonTokens = {
 /** Explicit per-size height, applied as a native frame/height constraint on
  * both platforms — without it, the platform's own minimum tap-target sizing
  * (SwiftUI/Material) inflates the button well past its intended size. */
-const HEIGHT_BY_SIZE: Record<ButtonSize, number> = { sm: 32, md: 40, lg: 48 };
+const HEIGHT_BY_SIZE = { sm: 32, md: 40, lg: 48 } satisfies Record<ButtonSize, number>;
 
 export function getButtonTokens(variant: ButtonVariant, size: ButtonSize, t: Theme): ButtonTokens {
   const variantColors = getVariantColors(variant, t);
@@ -102,10 +102,10 @@ function getPaddingHorizontal(size: ButtonSize, t: Theme): number {
 function getLabelStyle(size: ButtonSize, t: Theme): TextStyle {
   switch (size) {
     case "sm":
-      return t.typography.bodySm as TextStyle;
+      return { ...t.typography.bodySm };
     case "md":
-      return t.typography.labelMd as TextStyle;
+      return { ...t.typography.labelMd };
     case "lg":
-      return t.typography.bodyLg as TextStyle;
+      return { ...t.typography.bodyLg };
   }
 }

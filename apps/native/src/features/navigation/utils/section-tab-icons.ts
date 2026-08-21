@@ -31,7 +31,7 @@ export type SectionTabIconKey =
   | "settings-profile"
   | "settings-legal";
 
-const SECTION_TAB_ICONS: Record<SectionTabIconKey, NativeNavigationIcon> = {
+const SECTION_TAB_ICONS = {
   "explore-recent": Clock,
   "explore-scholar": GraduationCap,
   "explore-curation": Sparkles,
@@ -41,9 +41,17 @@ const SECTION_TAB_ICONS: Record<SectionTabIconKey, NativeNavigationIcon> = {
   "settings-general": SlidersHorizontal,
   "settings-profile": User,
   "settings-legal": Scale,
-};
+} satisfies Record<SectionTabIconKey, NativeNavigationIcon>;
+
+function isSectionTabIconKey(value: string): value is SectionTabIconKey {
+  return Object.hasOwn(SECTION_TAB_ICONS, value);
+}
 
 export function getSectionTabIcon(section: Section, tabId: string): NativeNavigationIcon | null {
-  const key = `${section}-${tabId}` as SectionTabIconKey;
+  const key = `${section}-${tabId}`;
+  if (!isSectionTabIconKey(key)) {
+    return null;
+  }
+
   return SECTION_TAB_ICONS[key] ?? null;
 }

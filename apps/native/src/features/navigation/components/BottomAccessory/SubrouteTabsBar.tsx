@@ -1,17 +1,18 @@
 import { getSubnavLabel } from "@sd/core-i18n";
-import { type Href, usePathname, useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { EaseView } from "react-native-ease";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { SECTION_TABS, type Section, type TabConfig } from "@/features/navigation/types";
+import { SECTION_TABS, type TabConfig } from "@/features/navigation/types";
 import { getSectionTabIcon } from "@/features/navigation/utils/section-tab-icons";
 import {
   buildSectionPath,
   getActiveSubsection,
   getRootTabFromPathname,
+  isSection,
 } from "@/features/navigation/utils/tab-route-config";
 
 export function SubrouteTabsBar() {
@@ -20,19 +21,22 @@ export function SubrouteTabsBar() {
   const { t } = useTranslation();
 
   const activeRootTab = getRootTabFromPathname(pathname);
-  const section = activeRootTab as Section;
-  const tabs = SECTION_TABS[section];
-  const activeSubsection = getActiveSubsection(pathname, section);
+  if (!isSection(activeRootTab)) {
+    return null;
+  }
+
+  const tabs = SECTION_TABS[activeRootTab];
+  const activeSubsection = getActiveSubsection(pathname, activeRootTab);
 
   const renderTab = (tab: TabConfig) => {
     const isActive = tab.id === activeSubsection;
-    const href = buildSectionPath(section, tab.id);
-    const Icon = getSectionTabIcon(section, tab.id);
+    const href = buildSectionPath(activeRootTab, tab.id);
+    const Icon = getSectionTabIcon(activeRootTab, tab.id);
 
     return (
       <Pressable
         key={tab.id}
-        onPress={() => router.replace(href as Href)}
+        onPress={() => router.replace(href)}
         accessibilityRole="button"
         accessibilityState={{ selected: isActive }}
         style={styles.tabPressable}
@@ -54,7 +58,7 @@ export function SubrouteTabsBar() {
               ellipsizeMode="tail"
               style={[styles.label, isActive && styles.labelActive]}
             >
-              {getSubnavLabel(section, tab.id, t)}
+              {getSubnavLabel(activeRootTab, tab.id, t)}
             </Text>
           </View>
         </EaseView>
@@ -62,7 +66,7 @@ export function SubrouteTabsBar() {
     );
   };
 
-  if (activeRootTab === "search" || !tabs || tabs.length === 0) {
+  if (tabs.length === 0) {
     return null;
   }
 

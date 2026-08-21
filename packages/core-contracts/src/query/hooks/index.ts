@@ -17,14 +17,15 @@ export function useApiQuery<TData, TError = Error>(
   },
   queryClient?: QueryClient,
 ) {
-  const client = queryClient ?? (options as { queryClient?: QueryClient })?.queryClient;
+  const { queryClient: optionsQueryClient, ...queryOptions } = options ?? {};
+  const client = queryClient ?? optionsQueryClient;
   return useQuery<TData, TError>(
     {
       queryKey: key,
       queryFn: fn,
       retry: 1,
       staleTime: 30_000,
-      ...options,
+      ...queryOptions,
     },
     client,
   );

@@ -3,8 +3,11 @@ import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/com
 import type { Request } from 'express';
 import type { Observable } from 'rxjs';
 import { resolveLocale } from '@sd/core-i18n';
-import type { Locale } from '@sd/core-contracts';
+import { type Locale, LocaleSchema } from '@sd/core-contracts';
+import { z } from 'zod';
 import { setRequestLocale } from '../i18n/locale-context';
+
+const localeQuerySchema = z.looseObject({ locale: LocaleSchema.optional() });
 
 @Injectable()
 export class LocaleInterceptor implements NestInterceptor {
@@ -19,8 +22,8 @@ export class LocaleInterceptor implements NestInterceptor {
   }
 
   private resolve(req: Request & { user?: { preferredLanguage?: string } }): Locale {
-    const fromQuery = req.query['locale'];
-    if (typeof fromQuery === 'string') return resolveLocale(fromQuery);
+    const parsedQuery = localeQuerySchema.safeParse(req.query);
+    if (parsedQuery.success && parsedQuery.data.locale) return parsedQuery.data.locale;
 
     const fromUser = req.user?.preferredLanguage;
     if (fromUser) return resolveLocale(fromUser);

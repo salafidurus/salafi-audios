@@ -7,7 +7,7 @@
 
 import type { ScholarTitle } from "@sd/core-contracts";
 
-export const SUBNAV_KEYS: Record<string, Record<string, string>> = {
+export const SUBNAV_KEYS = {
   explore: {
     recent: "navigation.subnav.explore.recent",
     scholar: "navigation.subnav.explore.scholar",
@@ -26,9 +26,9 @@ export const SUBNAV_KEYS: Record<string, Record<string, string>> = {
     topics: "navigation.subnav.admin.topics",
     listings: "navigation.subnav.admin.listings",
   },
-};
+} as const satisfies Record<string, Record<string, string>>;
 
-export const SUBNAV_FALLBACKS: Record<string, Record<string, string>> = {
+export const SUBNAV_FALLBACKS = {
   explore: {
     recent: "Recent",
     scholar: "Scholars",
@@ -47,23 +47,43 @@ export const SUBNAV_FALLBACKS: Record<string, Record<string, string>> = {
     topics: "Topics",
     listings: "Listings",
   },
-};
+} as const satisfies Record<string, Record<string, string>>;
 
 export type TranslateFn = (key: any, options?: any) => any;
 
+type SubnavSection = keyof typeof SUBNAV_KEYS;
+type LocalizedNameInput = { en?: string; ar?: string } | string | undefined | null;
+
+function isSubnavSection(section: string): section is SubnavSection {
+  return section in SUBNAV_KEYS;
+}
+
+function isScholarTitle(value: string): value is ScholarTitle {
+  return value in SCHOLAR_TITLE_KEYS;
+}
+
+function isLocalizedNameRecord(value: LocalizedNameInput): value is { en?: string; ar?: string } {
+  return Object.prototype.toString.call(value) === "[object Object]";
+}
+
 /** Translate a subsection tab label, falling back to the default label or raw id if unmapped. */
 export function getSubnavLabel(section: string, tabId: string, t: TranslateFn): string {
-  const key = SUBNAV_KEYS[section]?.[tabId];
-  const fallback = SUBNAV_FALLBACKS[section]?.[tabId] ?? tabId;
+  const key = isSubnavSection(section)
+    ? Object.entries(SUBNAV_KEYS[section]).find(([candidate]) => candidate === tabId)?.[1]
+    : undefined;
+  const fallback = isSubnavSection(section)
+    ? (Object.entries(SUBNAV_FALLBACKS[section]).find(([candidate]) => candidate === tabId)?.[1] ??
+      tabId)
+    : tabId;
   return key ? t(key, fallback) : fallback;
 }
 
-export const SCHOLAR_TITLE_KEYS: Record<ScholarTitle, string> = {
+export const SCHOLAR_TITLE_KEYS = {
   allamah: "scholar.title.allamah",
   sheikh: "scholar.title.sheikh",
   ustadh: "scholar.title.ustadh",
   akh: "scholar.title.akh",
-};
+} as const satisfies Record<ScholarTitle, string>;
 
 /** Translate a scholar's honorific title, falling back to the raw value if unmapped. */
 export function getScholarTitleLabel(
@@ -71,7 +91,7 @@ export function getScholarTitleLabel(
   t: TranslateFn,
 ): string {
   if (!title) return "";
-  const key = SCHOLAR_TITLE_KEYS[title as ScholarTitle];
+  const key = isScholarTitle(title) ? SCHOLAR_TITLE_KEYS[title] : undefined;
   return key ? t(key) : title;
 }
 
@@ -90,12 +110,9 @@ export function getErrorStateText(feature: "feed", t: (key: string) => string): 
  * may be the required "main language" field — Listing/Scholar-adjacent entities
  * default to English required, Topic requires Arabic) or a plain string.
  */
-export function getLocalizedName(
-  name: { en?: string; ar?: string } | string | undefined | null,
-  locale: string,
-): string {
+export function getLocalizedName(name: LocalizedNameInput, locale: string): string {
   if (!name) return "";
-  if (typeof name === "string") return name;
+  if (!isLocalizedNameRecord(name)) return name;
   if (locale === "ar" && name.ar) return name.ar;
   return name.en || name.ar || "";
 }

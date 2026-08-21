@@ -73,6 +73,7 @@ function FeedGridItemCard({
       id: item.id,
       slug: item.slug,
       title: item.title,
+      // SAFETY: feed cards are built only from listing-format content rows, never scholar/topic rows.
       format: item.kind as "single" | "series" | "collection",
       scholarName,
       scholarSlug: item.scholarSlug,
@@ -326,6 +327,7 @@ export function FeedRecentScreen({
           </section>,
         );
       } else {
+        // SAFETY: the non-row branch excludes `scholar_row` and `topic_row`, leaving only listing content items.
         const feedContentItem = item as FeedContentItemDto;
         cards.push({
           key: feedContentItem.id,

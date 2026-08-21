@@ -1,5 +1,3 @@
-import type { ComponentType } from "react";
-
 import { Image } from "expo-image";
 import { Clock3, Headphones } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
@@ -26,16 +24,6 @@ export function SearchResultItem({
 }: SearchResultItemProps) {
   const { theme } = useUnistyles();
   const durationLabel = formatDuration(durationSeconds);
-  const HeadphonesIcon = Headphones as ComponentType<{
-    size?: number;
-    strokeWidth?: number;
-    color?: string;
-  }>;
-  const ClockIcon = Clock3 as ComponentType<{
-    size?: number;
-    strokeWidth?: number;
-    color?: string;
-  }>;
 
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
@@ -44,7 +32,7 @@ export function SearchResultItem({
           <Image source={{ uri: imageUrl }} style={styles.cover} contentFit="cover" />
         ) : (
           <View style={styles.coverFallback}>
-            <HeadphonesIcon size={20} color={theme.colors.content.subtle} />
+            <Headphones size={20} color={theme.colors.content.subtle} />
           </View>
         )}
       </View>
@@ -52,12 +40,12 @@ export function SearchResultItem({
         <MarqueeText text={title} variant="titleMd" style={styles.title} />
         <MarqueeText text={scholarName} variant="bodySm" style={styles.scholarName} />
         <View style={styles.metaRow}>
-          <HeadphonesIcon size={11} color={theme.colors.content.muted} />
+          <Headphones size={11} color={theme.colors.content.muted} />
           <Text style={styles.metaText}>{formatLectureCount(lectureCount)}</Text>
           {durationLabel ? (
             <>
               <Text style={styles.metaText}> · </Text>
-              <ClockIcon size={11} color={theme.colors.content.muted} />
+              <Clock3 size={11} color={theme.colors.content.muted} />
               <Text style={styles.metaText}>{durationLabel}</Text>
             </>
           ) : null}

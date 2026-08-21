@@ -58,6 +58,8 @@ function createAuthInstance(config: ConfigService) {
           where: { userId: user.id },
           select: { role: true },
         });
+        // SAFETY: role values come from the persisted role assignment table and
+        // are serialized onto the Better Auth session as strings.
         let roles = userRoles.map((r) => r.role as string);
         if (!roles.length) {
           roles = ['listener'];

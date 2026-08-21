@@ -27,6 +27,9 @@ export function defineAbilityFor(user: AbilityInput): AppAbility {
         : [grant.capability];
 
     for (const action of actions) {
+      // SAFETY: the action/subject/conditions are all derived from the shared
+      // access-grant vocabulary, but CASL's builder signature is not specific
+      // enough to carry those narrowed unions through this dynamic mapping.
       can(
         action as never,
         subject as never,

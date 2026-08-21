@@ -37,6 +37,8 @@ export function resolveContentTranslation<
 
   if (publishedTranslation && !sameAsOriginal) {
     const merged = resolveTranslatedFields(base, publishedTranslation);
+    // SAFETY: `base` is the owner object for `F`, so its own keys are the
+    // concrete keys that can be compared on both `merged` and `base`.
     const changed = (Object.keys(base) as (keyof F)[]).some((key) => merged[key] !== base[key]);
     if (changed) {
       result.fields = merged;

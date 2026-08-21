@@ -145,9 +145,11 @@ const logoContainerStyle: React.CSSProperties = {
   marginBottom: 16,
 };
 
+const titleFontWeight: React.CSSProperties["fontWeight"] = "var(--typo-title-md-font-weight)";
+
 const titleStyle: React.CSSProperties = {
   fontSize: "var(--typo-title-md-font-size)",
-  fontWeight: "var(--typo-title-md-font-weight)" as React.CSSProperties["fontWeight"],
+  fontWeight: titleFontWeight,
   fontFamily: "var(--typo-title-md-font-family)",
   textAlign: "center",
   margin: 0,

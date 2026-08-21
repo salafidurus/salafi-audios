@@ -1,5 +1,5 @@
 import { routes } from "@sd/core-contracts";
-import { type Href, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 
 import { useAuth } from "@/core/auth";
@@ -22,17 +22,19 @@ export default function SignInRoute() {
     error: googleError,
   } = useNativeGoogleSignIn();
 
+  const fallbackPath = routes.home;
+
   useEffect(() => {
     if (isAuthenticated) {
       if (from) {
-        router.replace(from as Href);
+        router.replace(from);
       } else if (router.canGoBack()) {
         router.back();
       } else {
-        router.replace(routes.home as Href);
+        router.replace(fallbackPath);
       }
     }
-  }, [isAuthenticated, from, router]);
+  }, [fallbackPath, isAuthenticated, from, router]);
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -40,7 +42,7 @@ export default function SignInRoute() {
       return;
     }
 
-    router.replace(routes.home as Href);
+    router.replace(fallbackPath);
   };
 
   return (

@@ -6,8 +6,8 @@
  * @param error - The error message or Error object
  * @returns A user-friendly error message suitable for end users
  */
-export function sanitizeError(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error);
+export function sanitizeError(cause: unknown): string {
+  const message = cause instanceof Error ? cause.message : String(cause);
 
   // Check for JSON block in the message (e.g. from NestJS validation filters)
   const jsonStartIdx = message.indexOf("{");

@@ -27,6 +27,14 @@ interface ListingUploadArrangeModalProps {
   listingId?: string | null;
 }
 
+function getErrorMessage(error: Error | null, fallback: string): string {
+  return error?.message ?? fallback;
+}
+
+function isUploadArrangeTabId(id: string): id is "upload" | "arrange" | "review" {
+  return id === "upload" || id === "arrange" || id === "review";
+}
+
 export function ListingUploadArrangeModal({
   isOpen,
   onClose,
@@ -47,9 +55,10 @@ export function ListingUploadArrangeModal({
       .catch((err) =>
         dispatch({
           type: "SET_ERROR",
-          error:
-            (err as Error)?.message ||
+          error: getErrorMessage(
+            err instanceof Error ? err : null,
             t("admin.contents.listing.failedToLoadArrange", "Failed to load listing data."),
+          ),
         }),
       );
   }, [isOpen, listingId, dispatch, t]);
@@ -129,7 +138,11 @@ export function ListingUploadArrangeModal({
       multiTab
       requireReview
       activeTab={activeTab}
-      onActiveTabChange={(id) => setActiveTab(id as typeof activeTab)}
+      onActiveTabChange={(id) => {
+        if (isUploadArrangeTabId(id)) {
+          setActiveTab(id);
+        }
+      }}
       defaultActiveTab="upload"
       saveFormId="listing-upload-arrange-form"
       saving={busy}

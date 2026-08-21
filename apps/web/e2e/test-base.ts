@@ -19,6 +19,8 @@ export const test = base.extend({
     });
 
     const originalGoto = page.goto.bind(page);
+    // SAFETY: this wrapper preserves Playwright's `page.goto` call shape and return value,
+    // only injecting a default `waitUntil` that callers may still override via `options`.
     page.goto = ((
       url: Parameters<typeof page.goto>[0],
       options?: Parameters<typeof page.goto>[1],

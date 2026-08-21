@@ -3,6 +3,7 @@ import type { Locale } from "@sd/core-contracts";
 import type { TranslationFormState } from "@/features/admin/hooks/Translation/useTranslationForm";
 
 export type StatusDot = "published" | "draft" | "notCreated";
+export type StatusInfo = { label: string; dot: StatusDot };
 
 /**
  * Shared by the root listing/scholar/topic locale tabs and the translation
@@ -13,7 +14,7 @@ export function statusInfo(
   locale: Locale,
   supportsPublish: boolean,
   t: (key: string, fallback: string) => string,
-): { label: string; dot: StatusDot } {
+): StatusInfo {
   const hasTranslation = !!state.initial[locale];
   if (!supportsPublish) {
     return hasTranslation
