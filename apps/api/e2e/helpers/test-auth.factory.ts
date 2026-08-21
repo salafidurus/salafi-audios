@@ -142,7 +142,7 @@ export class TestAuthFactory {
    * prove locale-scoped ability rules.
    */
   async createTranslatorScopedUser(
-    locales: string[],
+    locales: Locale[],
     options: { scholarSlug?: string | null; canPublish?: boolean } = {},
   ) {
     const scholarSlug = options.scholarSlug ?? null;
@@ -150,13 +150,13 @@ export class TestAuthFactory {
     const grants = locales.flatMap((locale) => [
       accessGrant(AccessTarget.translation, AccessCapability.translate, {
         scholarSlug,
-        locale: locale as Locale,
+        locale,
       }),
       ...(canPublish
         ? [
             accessGrant(AccessTarget.translation, AccessCapability.publish, {
               scholarSlug,
-              locale: locale as Locale,
+              locale,
             }),
           ]
         : []),

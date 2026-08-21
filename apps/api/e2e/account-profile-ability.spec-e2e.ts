@@ -3,6 +3,7 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { subject, createMongoAbility } from '@casl/ability';
 import { unpackRules } from '@casl/ability/extra';
+import type { UserProfileDto } from '@sd/core-contracts';
 import { PrismaService } from '../src/core/db/prisma.service';
 import { TestAuthFactory, accessGrant } from './helpers/test-auth.factory';
 import { AccessCapability, AccessTarget } from '@sd/core-db';
@@ -11,6 +12,13 @@ import type { AppAbility } from '../src/core/auth/ability/ability.types';
 import { TEST_SCHOLAR_SLUG, seedTestData, cleanupE2ETestData } from './helpers/seed-test-data';
 
 process.env.DISABLE_THROTTLER = 'true';
+
+function unpackClientAbility(rules: UserProfileDto['rules']): AppAbility {
+  const ability = createMongoAbility(unpackRules(rules));
+  // SAFETY: `/account/profile` returns packed CASL rules produced by the same
+  // shared ability vocabulary, and `unpackRules` reconstructs that client-side shape.
+  return ability as AppAbility;
+}
 
 /**
  * Proves the packed-rules design's core trust boundary: unpacking
@@ -58,7 +66,7 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
       roles: ['listener'],
       accessGrants,
     });
-    const clientAbility = createMongoAbility(unpackRules(res.body.rules)) as AppAbility;
+    const clientAbility = unpackClientAbility(res.body.rules);
 
     expect(clientAbility.can('update', 'Scholar')).toBe(serverAbility.can('update', 'Scholar'));
     expect(clientAbility.can('update', 'Scholar')).toBe(true);
@@ -96,7 +104,7 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
       roles: ['listener'],
       accessGrants,
     });
-    const clientAbility = createMongoAbility(unpackRules(res.body.rules)) as AppAbility;
+    const clientAbility = unpackClientAbility(res.body.rules);
 
     const ownListing = subject('Listing', { scholarSlug: TEST_SCHOLAR_SLUG });
     const otherListing = subject('Listing', { scholarSlug: 'some-other-scholar' });
@@ -132,7 +140,7 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
       roles: ['listener'],
       accessGrants,
     });
-    const clientAbility = createMongoAbility(unpackRules(res.body.rules)) as AppAbility;
+    const clientAbility = unpackClientAbility(res.body.rules);
 
     const arTranslation = subject('Translation', { locale: 'ar' });
     const enTranslation = subject('Translation', { locale: 'en' });
@@ -156,7 +164,7 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
       .expect(200);
 
     expect(res.body.rules).toEqual([]);
-    const clientAbility = createMongoAbility(unpackRules(res.body.rules)) as AppAbility;
+    const clientAbility = unpackClientAbility(res.body.rules);
     expect(clientAbility.can('read', 'Scholar')).toBe(false);
     expect(clientAbility.can('manage', 'all')).toBe(false);
   });

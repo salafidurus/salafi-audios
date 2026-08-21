@@ -181,7 +181,12 @@ describe("download.engine", () => {
     });
 
     it("ignores an unknown entry type", async () => {
-      await expect(handleDownloadOutboxEntry("unknown-type", {})).resolves.toBeUndefined();
+      await expect(
+        handleDownloadOutboxEntry("unknown-type", {
+          lectureId: "l1",
+          audioUrl: "https://s/l1.mp3",
+        }),
+      ).resolves.toBeUndefined();
       expect(mockDownloadAsync).not.toHaveBeenCalled();
     });
   });

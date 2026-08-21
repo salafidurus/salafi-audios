@@ -22,6 +22,10 @@ export type SettingsProfileScreenProps = {
   onSignIn?: () => void;
 };
 
+function getVisibleRoles(profile: { roles?: string[] }): string[] {
+  return profile.roles?.filter((role) => role !== "listener") ?? [];
+}
+
 function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
@@ -57,7 +61,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   }
 
   const isDirty = displayName !== (profile.displayName ?? "");
-  const nonListenerRoles = (profile as any).roles?.filter((r: string) => r !== "listener") ?? [];
+  const nonListenerRoles = getVisibleRoles(profile);
 
   const handleSave = () => {
     updateProfile({ displayName });

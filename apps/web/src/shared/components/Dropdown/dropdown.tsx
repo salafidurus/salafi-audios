@@ -12,24 +12,26 @@ import {
   type ReactNode,
 } from "react";
 
+import { isReactNodeText } from "@/shared/lib/runtime-guards";
+
 import type { DropdownItem, DropdownContextValue } from "./types";
 
 import { DropdownContext } from "./context";
-import { DropdownItem as DropdownItemComponent } from "./dropdown-item";
+import { DropdownItem as DropdownItemComponent, type DropdownItemProps } from "./dropdown-item";
 import styles from "./dropdown.module.css";
 
 function extractItemsFromChildren(children: ReactNode): DropdownItem[] {
   const extracted: DropdownItem[] = [];
   Children.forEach(children, (child) => {
-    if (!isValidElement<{ children?: ReactNode }>(child)) {
+    if (!isValidElement<DropdownItemProps>(child)) {
       return;
     }
     if (child.type === DropdownItemComponent) {
-      const label = typeof child.props.children === "string" ? child.props.children : "";
+      const label = isReactNodeText(child.props.children) ? child.props.children : "";
       extracted.push({
-        value: (child.props as Record<string, unknown>).value as string,
+        value: child.props.value,
         label,
-        disabled: (child.props as Record<string, unknown>).disabled as boolean | undefined,
+        disabled: child.props.disabled,
       });
     }
     if (child.props.children) {

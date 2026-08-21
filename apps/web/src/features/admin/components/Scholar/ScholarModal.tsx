@@ -29,6 +29,10 @@ export interface ScholarModalProps {
   scholarId?: string | null;
 }
 
+function isScholarModalTab(id: string): id is "general" | "main" | "review" {
+  return id === "general" || id === "main" || id === "review";
+}
+
 export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarModalProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<string>("general");
@@ -146,7 +150,11 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
       requireReview
       errorTabs={errorTabs}
       activeTab={activeTab}
-      onActiveTabChange={(id) => setActiveTab(id as "general" | "main" | "review")}
+      onActiveTabChange={(id) => {
+        if (isScholarModalTab(id)) {
+          setActiveTab(id);
+        }
+      }}
       defaultActiveTab="general"
       saveFormId="scholar-form"
       saving={state.saving}
@@ -160,7 +168,12 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
       <form id="scholar-form" onSubmit={handleSubmit} className={styles.form}>
         <Modal.Tabs errorTabs={errorTabs}>
           <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
-          <Modal.TabItem id="main">{getLocaleLabel(state.mainLanguage as Locale)}</Modal.TabItem>
+          <Modal.TabItem id="main">
+            {
+              // SAFETY: scholar main language is constrained to the same locale domain used by locale labels.
+              getLocaleLabel(state.mainLanguage as Locale)
+            }
+          </Modal.TabItem>
           <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
         </Modal.Tabs>
 

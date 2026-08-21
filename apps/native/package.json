@@ -16,7 +16,7 @@
     "preandroid": "adb reverse tcp:8081 tcp:8081 && adb reverse tcp:4000 tcp:4000 || true",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "lint": "oxlint .",
+    "lint": "oxlint . --ignore-path .oxlintignore",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage --watchAll=false",

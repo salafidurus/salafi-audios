@@ -17,7 +17,7 @@ export function TableOfContents({ sections }: TableOfContentsProps) {
   const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
-    const container = document.querySelector(".appNoConsentContent") as HTMLElement;
+    const container = document.querySelector<HTMLElement>(".appNoConsentContent");
     if (!container) return;
 
     const handleScroll = () => {
@@ -56,7 +56,7 @@ export function TableOfContents({ sections }: TableOfContentsProps) {
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
-    const container = document.querySelector(".appNoConsentContent") as HTMLElement;
+    const container = document.querySelector<HTMLElement>(".appNoConsentContent");
 
     if (element && container) {
       const elementTop =

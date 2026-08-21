@@ -12,8 +12,9 @@ import type { Locale } from '@sd/core-contracts';
  */
 export async function syncMainLanguageTranslation<
   F extends Record<string, string | null | undefined>,
+  TResult,
 >(args: {
-  upsert: (locale: Locale, fields: F) => Promise<unknown>;
+  upsert: (locale: Locale, fields: F) => Promise<TResult>;
   oldLocale?: Locale | null;
   oldFields?: F | null;
   newLocale: Locale;

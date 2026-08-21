@@ -6,9 +6,11 @@ export interface UseInfiniteScholarsListOptions {
 }
 
 export function useInfiniteScholarsList(options?: UseInfiniteScholarsListOptions) {
+  const initialPageParam: string | undefined = undefined;
+
   return useInfiniteQuery({
     queryKey: queryKeys.scholars.list.infinite(),
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       // API returns full list (non-paginated), only fetch on first page
       if (pageParam) {
         return { items: [], nextCursor: undefined, hasMore: false };
@@ -23,7 +25,7 @@ export function useInfiniteScholarsList(options?: UseInfiniteScholarsListOptions
         hasMore: false,
       };
     },
-    initialPageParam: undefined as string | undefined,
+    initialPageParam,
     getNextPageParam: () => undefined,
     enabled: options?.enabled !== false,
   });

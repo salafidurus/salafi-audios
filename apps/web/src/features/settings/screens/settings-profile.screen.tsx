@@ -17,6 +17,7 @@ import { Modal } from "@/shared/components/Modal";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { hasWindow } from "@/shared/lib/runtime-guards";
 
 import styles from "./settings-profile.screen.module.css";
 
@@ -53,7 +54,7 @@ function ProfileContent() {
     } catch (err) {
       console.error("Sign out error", err);
     } finally {
-      if (typeof window !== "undefined" && window.location && !process.env.VITEST) {
+      if (hasWindow() && window.location && !process.env.VITEST) {
         window.location.href = "/";
       } else {
         router.push("/");

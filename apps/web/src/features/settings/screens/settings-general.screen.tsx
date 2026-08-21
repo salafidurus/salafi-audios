@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { z } from "zod";
 
 import type { ThemePreference } from "@/core/styles/ThemeSync";
 import type { AccentThemePickerValue } from "@/features/settings/components/accent-theme-picker/AccentThemePicker";
@@ -19,6 +20,7 @@ import { SettingsRow } from "@/features/settings/components/SettingsRow/Settings
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Toggle } from "@/shared/components/Toggle";
+import { hasWindow } from "@/shared/lib/runtime-guards";
 
 import styles from "./settings-general.screen.module.css";
 import { SettingsProfileScreen } from "./settings-profile.screen";
@@ -30,15 +32,20 @@ interface NotificationState {
 }
 
 const NOTIF_KEY = "notification-settings:v1";
+const NotificationStateSchema = z.object({
+  master: z.boolean(),
+  scholars: z.boolean(),
+  lectures: z.boolean(),
+});
 
 function loadNotifState(): NotificationState {
-  if (typeof window === "undefined") {
+  if (!hasWindow()) {
     return { master: true, scholars: true, lectures: true };
   }
   try {
-    const raw = localStorage.getItem(NOTIF_KEY);
+    const raw = window.localStorage.getItem(NOTIF_KEY);
     if (raw) {
-      return JSON.parse(raw) as NotificationState;
+      return NotificationStateSchema.parse(JSON.parse(raw));
     }
   } catch {
     // ignore parse errors
@@ -47,13 +54,26 @@ function loadNotifState(): NotificationState {
 }
 
 function loadThemePreference(): ThemePreference {
-  if (typeof window === "undefined") {
+  if (!hasWindow()) {
     return "system";
   }
-  const stored = localStorage.getItem(THEME_KEY);
+  const stored = window.localStorage.getItem(THEME_KEY);
   if (stored === "light" || stored === "dark") {
     return stored;
   }
+  return "system";
+}
+
+function loadAccentThemePreference(): AccentThemePickerValue {
+  if (!hasWindow()) {
+    return "system";
+  }
+
+  const stored = window.localStorage.getItem("accent-theme:v1");
+  if (stored && isAccentThemeId(stored)) {
+    return stored;
+  }
+
   return "system";
 }
 
@@ -61,12 +81,7 @@ export function SettingsGeneralScreen() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"General" | "Profile">("General");
   const [themePreference, setThemePreference] = useState<ThemePreference>(loadThemePreference);
-  const [accentTheme, setAccentTheme] = useState<AccentThemePickerValue>(() => {
-    const stored =
-      typeof window !== "undefined" ? window.localStorage.getItem("accent-theme:v1") : null;
-    if (stored && isAccentThemeId(stored)) return stored;
-    return "system";
-  });
+  const [accentTheme, setAccentTheme] = useState<AccentThemePickerValue>(loadAccentThemePreference);
   const [notif, setNotif] = useState<NotificationState>(loadNotifState);
 
   const themeOptions: { value: ThemePreference; label: string }[] = [

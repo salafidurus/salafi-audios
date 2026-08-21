@@ -14,7 +14,13 @@ import {
   width,
   type ModifierConfig,
 } from "@expo/ui/jetpack-compose/modifiers";
-import { ActivityIndicator, type StyleProp, type ViewStyle } from "react-native";
+import {
+  ActivityIndicator,
+  type DimensionValue,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
 import { getButtonTokens, type ButtonSize, type ButtonVariant } from "./button.tokens";
@@ -31,6 +37,8 @@ type TextFontWeight =
   | "700"
   | "800"
   | "900";
+
+const FULL_WIDTH: DimensionValue = "100%";
 
 export type ButtonProps = {
   variant?: ButtonVariant;
@@ -50,16 +58,13 @@ export type ButtonProps = {
 // button's fill/content color without fighting its default chrome — unlike
 // SwiftUI's buttonStyle, it doesn't also own padding/shape, so layering a
 // border modifier on top doesn't double up the way it did on iOS.
-const VARIANT_COMPONENT: Record<
-  ButtonVariant,
-  typeof FilledButton | typeof OutlinedButton | typeof TextButton
-> = {
+const VARIANT_COMPONENT = {
   primary: FilledButton,
   surface: FilledButton,
   outline: OutlinedButton,
   ghost: TextButton,
   danger: FilledButton,
-};
+} satisfies Record<ButtonVariant, typeof FilledButton | typeof OutlinedButton | typeof TextButton>;
 
 export function Button({
   variant = "surface",
@@ -114,7 +119,7 @@ export function Button({
               </>
             ) : null}
             <ComposeText
-              color={t.labelStyle.color as string}
+              color={getComposeTextColor(t.labelStyle.color, t.textColor)}
               style={{
                 fontSize: t.labelStyle.fontSize,
                 fontWeight: mapFontWeight(t.labelStyle.fontWeight),
@@ -136,24 +141,29 @@ export function Button({
 }
 
 const base = {
-  stretch: { width: "100%" } as ViewStyle,
+  stretch: { width: FULL_WIDTH },
 };
 
-const VALID_FONT_WEIGHTS = new Set<TextFontWeight>([
-  "normal",
-  "bold",
-  "100",
-  "200",
-  "300",
-  "400",
-  "500",
-  "600",
-  "700",
-  "800",
-  "900",
-]);
+function mapFontWeight(weight: TextStyle["fontWeight"] | undefined): TextFontWeight {
+  const str = String(weight ?? "400");
+  switch (str) {
+    case "normal":
+    case "bold":
+    case "100":
+    case "200":
+    case "300":
+    case "400":
+    case "500":
+    case "600":
+    case "700":
+    case "800":
+    case "900":
+      return str;
+    default:
+      return "400";
+  }
+}
 
-function mapFontWeight(weight: unknown): TextFontWeight {
-  const str = String(weight ?? "400") as TextFontWeight;
-  return VALID_FONT_WEIGHTS.has(str) ? str : "400";
+function getComposeTextColor(color: TextStyle["color"], fallback: string): string {
+  return color !== undefined && color !== null ? String(color) : fallback;
 }

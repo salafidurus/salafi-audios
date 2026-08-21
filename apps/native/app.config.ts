@@ -13,6 +13,14 @@ const OWNER = "basmalabs";
 // mobile project so OTA channels are shared during the transition period.
 const PROJECT_ID = "f943688f-bb4a-4f22-af5a-60dc5bafb485";
 
+function parseAppEnv(value: string | undefined): AppEnv {
+  if (value === "preview" || value === "production") {
+    return value;
+  }
+
+  return "development";
+}
+
 function ids(env: AppEnv) {
   const baseName = "Salafi Durus";
   const baseBundle = "com.salafidevs.salafidurus";
@@ -51,7 +59,7 @@ type ExpoConfigWithAutolinking = ExpoConfig & {
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => {
-  const appEnv = (process.env.APP_ENV ?? "development") as AppEnv;
+  const appEnv = parseAppEnv(process.env.APP_ENV);
 
   const { name, iosBundleId, androidPackage, scheme } = ids(appEnv);
 

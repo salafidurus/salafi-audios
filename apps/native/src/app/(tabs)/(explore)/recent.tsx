@@ -1,5 +1,5 @@
 import { routes } from "@sd/core-contracts";
-import { type Href, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 import { ExploreRecentScreen } from "@/features/explore/screens/explore-recent.screen";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
@@ -11,7 +11,7 @@ export default function ExploreRecent() {
   return (
     <ExploreRecentScreen
       onNavigateToListing={navigateToListing}
-      onNavigateToScholar={(slug) => router.push(routes.scholars.detail(slug) as Href)}
+      onNavigateToScholar={(slug) => router.push(routes.scholars.detail(slug))}
     />
   );
 }

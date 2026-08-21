@@ -23,6 +23,7 @@ import type {
   AdminArrangeDataDto,
   ArrangeCommitDto,
   ArrangeCommitResultDto,
+  Locale,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ListingRepository } from './listing.repo';
@@ -205,7 +206,7 @@ export class ListingService {
 
   async updateTranslation(
     listingSlug: string,
-    locale: string,
+    locale: Locale,
     fields: Partial<{ title: string; description: string | null }>,
   ): Promise<TranslationViewDto> {
     const listingId = await this.repo.findIdBySlug(listingSlug);
@@ -215,7 +216,7 @@ export class ListingService {
     return result;
   }
 
-  async publishTranslation(listingSlug: string, locale: string): Promise<TranslationViewDto> {
+  async publishTranslation(listingSlug: string, locale: Locale): Promise<TranslationViewDto> {
     const listingId = await this.repo.findIdBySlug(listingSlug);
     if (!listingId) throw new NotFoundException('Listing not found');
     const result = await this.repo.publishListingTranslation(listingId, locale);
@@ -223,7 +224,7 @@ export class ListingService {
     return result;
   }
 
-  async unpublishTranslation(listingSlug: string, locale: string): Promise<TranslationViewDto> {
+  async unpublishTranslation(listingSlug: string, locale: Locale): Promise<TranslationViewDto> {
     const listingId = await this.repo.findIdBySlug(listingSlug);
     if (!listingId) throw new NotFoundException('Listing not found');
     const result = await this.repo.unpublishListingTranslation(listingId, locale);

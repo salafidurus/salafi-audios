@@ -59,9 +59,9 @@ export const createThemeWeb = (mode: "light" | "dark", variant?: AccentThemeId):
 export const lightWebTheme = createThemeWeb("light");
 export const darkWebTheme = createThemeWeb("dark");
 
-export const accentWebThemes: Record<AccentThemeId, AppThemeWeb> = {
+export const accentWebThemes = {
   parchment: createThemeWeb("light", "parchment"),
   manuscript: createThemeWeb("dark", "manuscript"),
   midnight: createThemeWeb("dark", "midnight"),
   ember: createThemeWeb("dark", "ember"),
-};
+} satisfies Record<AccentThemeId, AppThemeWeb>;

@@ -1,15 +1,15 @@
 import type { StoreApi, UseBoundStore } from "zustand";
 
-import type { Outbox } from "../outbox/outbox.store";
+import type { Outbox, JsonValue } from "../outbox/outbox.store";
 import type { EntityStoreState, SyncableEntity } from "../store/entity-store";
 
 import { drainOutbox } from "../outbox/outbox.drain";
 
 const DEFAULT_DEBOUNCE_MS = 120_000;
 
-export type SyncEngineOptions<T extends SyncableEntity> = {
+export type SyncEngineOptions<T extends SyncableEntity & JsonValue> = {
   store: UseBoundStore<StoreApi<EntityStoreState<T>>>;
-  outbox: Outbox;
+  outbox: Outbox<T>;
   /** Tag written on outbox entries queued by this engine (e.g. "progress-update"). */
   entryType: string;
   /** Multiple `scheduleSync` calls for the same id within this window collapse into one push. */
@@ -22,7 +22,7 @@ export type SyncEngineOptions<T extends SyncableEntity> = {
   pullSince: (since?: string) => Promise<T[]>;
 };
 
-export type SyncEngine<T extends SyncableEntity> = {
+export type SyncEngine<T extends SyncableEntity & JsonValue> = {
   /** Optimistically writes the entity locally, then schedules a debounced push. */
   scheduleSync: (entity: T) => void;
   /** Immediately pushes any pending debounced writes, bypassing the debounce timer. */
@@ -37,7 +37,7 @@ export type SyncEngine<T extends SyncableEntity> = {
   drainPending: () => Promise<void>;
 };
 
-export function createSyncEngine<T extends SyncableEntity>(
+export function createSyncEngine<T extends SyncableEntity & JsonValue>(
   options: SyncEngineOptions<T>,
 ): SyncEngine<T> {
   const {
@@ -63,7 +63,7 @@ export function createSyncEngine<T extends SyncableEntity>(
     // Retry anything left over from a previous failed flush/session first, so a
     // failure is picked up again on the very next flush rather than requiring a
     // separate explicit `drainPending()` call.
-    const drainResult = await drainOutbox(outbox, (entry) => pushOne(entry.payload as T));
+    const drainResult = await drainOutbox(outbox, (entry) => pushOne(entry.payload));
 
     const ids = Array.from(pendingIds);
     pendingIds.clear();
@@ -128,7 +128,7 @@ export function createSyncEngine<T extends SyncableEntity>(
 
     drainPending: async () => {
       await drainOutbox(outbox, async (entry) => {
-        await pushOne(entry.payload as T);
+        await pushOne(entry.payload);
       });
     },
   };

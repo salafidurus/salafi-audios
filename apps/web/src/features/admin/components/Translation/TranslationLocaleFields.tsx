@@ -20,11 +20,11 @@ import styles from "./translation-modal.module.css";
 import { statusInfo, type StatusDot } from "./translation-status";
 import { TranslationFieldRow } from "./TranslationFieldRow";
 
-const STATUS_DOT_CLASS: Record<StatusDot, string> = {
+const STATUS_DOT_CLASS = {
   published: styles.dotPublished ?? "",
   draft: styles.dotDraft ?? "",
   notCreated: styles.dotNotCreated ?? "",
-};
+} satisfies Record<StatusDot, string>;
 
 export interface TranslationLocaleFieldsProps {
   config: TranslationEntityConfig;

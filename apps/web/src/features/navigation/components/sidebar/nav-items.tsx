@@ -27,6 +27,7 @@ import { LanguageSwitch } from "@/features/settings";
 import { Button } from "@/shared/components/Button/Button";
 import { Modal } from "@/shared/components/Modal";
 import { useResponsive } from "@/shared/hooks/use-responsive";
+import { hasWindow } from "@/shared/lib/runtime-guards";
 
 import { SectionLabel } from "./section-label";
 import styles from "./sidebar.module.css";
@@ -266,7 +267,7 @@ export function NavItems({ onItemClick }: NavItemsProps) {
           } catch (err) {
             console.error("Sign out error", err);
           } finally {
-            if (typeof window !== "undefined" && window.location && !process.env.VITEST) {
+            if (hasWindow() && window.location && !process.env.VITEST) {
               window.location.href = "/";
             } else {
               router.push("/");

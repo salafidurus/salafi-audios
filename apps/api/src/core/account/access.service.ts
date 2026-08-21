@@ -4,7 +4,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type { ReplaceUserAccessRequest, UserAccessSnapshot } from '@sd/core-contracts';
+import type {
+  AccessCapability,
+  AccessTarget,
+  Locale,
+  ReplaceUserAccessRequest,
+  UserAccessSnapshot,
+} from '@sd/core-contracts';
 
 import { PrismaService } from '../db/prisma.service';
 
@@ -31,10 +37,10 @@ export class AccessService {
     const grouped = new Map<
       string,
       {
-        target: string;
-        capability: string;
+        target: AccessTarget;
+        capability: AccessCapability;
         scholarSlugs: Set<string>;
-        locales: Set<string>;
+        locales: Set<Locale>;
       }
     >();
     for (const grant of user.accessGrants) {
@@ -43,7 +49,7 @@ export class AccessService {
         target: grant.target,
         capability: grant.capability,
         scholarSlugs: new Set<string>(),
-        locales: new Set<string>(),
+        locales: new Set<Locale>(),
       };
       if (grant.scholar?.slug) current.scholarSlugs.add(grant.scholar.slug);
       if (grant.locale) current.locales.add(grant.locale);
@@ -55,7 +61,7 @@ export class AccessService {
       capability: grant.capability,
       scholarSlugs: [...grant.scholarSlugs].sort(),
       locales: [...grant.locales].sort(),
-    })) as UserAccessSnapshot['grants'];
+    }));
     const roles = new Set<string>();
     if (grants.some((grant) => grant.capability === 'write')) roles.add('Editor');
     if (grants.some((grant) => grant.capability === 'translate')) roles.add('Translator');
@@ -134,7 +140,11 @@ export class AccessService {
       });
       if (updated.count !== 1) throw new ConflictException('Access changed; reload and try again');
       await tx.userAccessGrant.deleteMany({ where: { userId } });
-      if (uniqueRows.length) await tx.userAccessGrant.createMany({ data: uniqueRows as never });
+      if (uniqueRows.length) {
+        // SAFETY: `uniqueRows` is built from validated request grants plus
+        // resolved scholar ids, matching the userAccessGrant create shape.
+        await tx.userAccessGrant.createMany({ data: uniqueRows as never });
+      }
 
       if (granterIsSuperadmin && request.isSuperadmin !== undefined) {
         if (request.isSuperadmin) {

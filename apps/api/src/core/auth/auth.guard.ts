@@ -6,6 +6,15 @@ import { fromNodeHeaders } from 'better-auth/node';
 import { PrismaService } from '../db/prisma.service';
 import { IS_PUBLIC_KEY } from './decorators';
 
+type SessionBanState = {
+  banned?: boolean | null;
+  banExpires?: Date | string | null;
+};
+
+type AuthenticatedSessionUser = SessionBanState & {
+  id: string;
+};
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
@@ -30,20 +39,16 @@ export class AuthGuard implements CanActivate {
 
     if (!session) throw new UnauthorizedException();
 
-    const { banned, banExpires } = session.user as {
-      banned?: boolean | null;
-      banExpires?: Date | string | null;
-    };
+    // SAFETY: better-auth's session user includes these persisted ban fields
+    // in this app; the runtime source is the authenticated session payload.
+    const { banned, banExpires } = session.user as SessionBanState;
     if (banned) {
       const expired = banExpires && new Date(banExpires) <= new Date();
       if (!expired) throw new ForbiddenException('Account is banned');
     }
 
-    const sessionUser = session.user as {
-      id: string;
-      banned?: boolean | null;
-      banExpires?: Date | string | null;
-    };
+    // SAFETY: authenticated sessions always carry the user's primary key.
+    const sessionUser = session.user as AuthenticatedSessionUser;
 
     const userRoles = await this.prisma.userRoleAssignment.findMany({
       where: { userId: sessionUser.id },
@@ -69,11 +74,14 @@ export class AuthGuard implements CanActivate {
     }));
 
     // Attach user info to request (for use by controllers and other services)
-    (request as any).user = {
+    const authenticatedUser = {
       ...session.user,
       roles,
       accessGrants: packedAccessGrants,
     };
+    // SAFETY: downstream guards/controllers in this app read `request.user`
+    // after AuthGuard attaches the authenticated principal for the request.
+    (request as Request & { user?: typeof authenticatedUser }).user = authenticatedUser;
     return true;
   }
 }

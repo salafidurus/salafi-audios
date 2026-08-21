@@ -1,24 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+import { hasWindow } from "@/shared/lib/runtime-guards";
 
 const COOKIE_CONSENT_KEY = "cookie-consent:v1";
 const COOKIE_CONSENT_CHANGE_EVENT = "cookie-consent-change";
 
-export interface CookieConsentState {
-  accepted: true;
-}
-
-function getCookieConsentFromStorage(): CookieConsentState | null {
-  if (typeof localStorage === "undefined") return null;
-  const stored = localStorage.getItem(COOKIE_CONSENT_KEY);
-  if (stored === "true") return { accepted: true };
-  return null;
+function getCookieConsentFromStorage(): boolean {
+  if (!hasWindow()) return false;
+  const stored = window.localStorage.getItem(COOKIE_CONSENT_KEY);
+  return stored === "true";
 }
 
 function setCookieConsentInStorage(): void {
-  if (typeof localStorage === "undefined") return;
-  localStorage.setItem(COOKIE_CONSENT_KEY, "true");
+  if (!hasWindow()) return;
+  window.localStorage.setItem(COOKIE_CONSENT_KEY, "true");
   window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_CHANGE_EVENT));
 }
 
@@ -26,26 +23,23 @@ export const accept = () => {
   setCookieConsentInStorage();
 };
 
+function subscribeToCookieConsent(onChange: () => void): () => void {
+  if (!hasWindow()) return () => {};
+  window.addEventListener(COOKIE_CONSENT_CHANGE_EVENT, onChange);
+  return () => {
+    window.removeEventListener(COOKIE_CONSENT_CHANGE_EVENT, onChange);
+  };
+}
+
 export function useCookieConsent() {
-  const [consent, setConsent] = useState<CookieConsentState | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setConsent(getCookieConsentFromStorage());
-    setMounted(true);
-
-    const handleConsentChange = () => {
-      setConsent(getCookieConsentFromStorage());
-    };
-
-    window.addEventListener(COOKIE_CONSENT_CHANGE_EVENT, handleConsentChange);
-    return () => {
-      window.removeEventListener(COOKIE_CONSENT_CHANGE_EVENT, handleConsentChange);
-    };
-  }, []);
+  const hasAccepted = useSyncExternalStore(
+    subscribeToCookieConsent,
+    getCookieConsentFromStorage,
+    () => false,
+  );
 
   return {
-    hasAccepted: mounted && consent !== null,
+    hasAccepted,
     accept,
   };
 }

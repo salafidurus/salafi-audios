@@ -4,8 +4,11 @@ import type { KeyvStoreAdapter } from 'keyv';
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 import { PinoLogger } from 'nestjs-pino';
+import { z } from 'zod';
 
 import { ConfigService } from '../config/config.service';
+
+const jsonValueSchema = z.unknown();
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
@@ -60,12 +63,30 @@ export class RedisService implements OnModuleDestroy {
     duration?: number,
     condition?: 'NX' | 'XX',
   ): Promise<string | null> {
-    const args: (string | number)[] = [key, value];
-    if (mode && duration !== undefined) args.push(mode, duration);
-    if (condition) args.push(condition);
-    return Reflect.apply(this.requireClient().set, this.requireClient(), args) as Promise<
-      string | null
-    >;
+    const client = this.requireClient();
+    if (mode === 'EX' && duration !== undefined && condition) {
+      return condition === 'NX'
+        ? client.set(key, value, 'EX', duration, 'NX')
+        : client.set(key, value, 'EX', duration, 'XX');
+    }
+    if (mode === 'PX' && duration !== undefined && condition) {
+      return condition === 'NX'
+        ? client.set(key, value, 'PX', duration, 'NX')
+        : client.set(key, value, 'PX', duration, 'XX');
+    }
+    if (mode === 'EX' && duration !== undefined) {
+      return client.set(key, value, 'EX', duration);
+    }
+    if (mode === 'PX' && duration !== undefined) {
+      return client.set(key, value, 'PX', duration);
+    }
+    if (condition === 'NX') {
+      return client.set(key, value, 'NX');
+    }
+    if (condition === 'XX') {
+      return client.set(key, value, 'XX');
+    }
+    return client.set(key, value);
   }
 
   async del(...keys: string[]): Promise<number> {
@@ -99,6 +120,8 @@ export class RedisService implements OnModuleDestroy {
   }
 
   async eval<T = unknown>(script: string, numberOfKeys: number, ...args: string[]): Promise<T> {
+    // SAFETY: callers choose `T` to match the Redis script contract they invoke,
+    // and ioredis exposes `eval` with a wider return type than those call sites.
     return this.requireClient().eval(script, numberOfKeys, ...args) as Promise<T>;
   }
 
@@ -115,9 +138,12 @@ export class RedisService implements OnModuleDestroy {
       get: async <Value>(key: string) => {
         const value = await this.get(`${namespace}${key}`);
         if (value === null) return undefined;
+        // SAFETY: values stored in this namespace are serialized by the paired
+        // `set` function below, so a successful parse reconstructs that payload.
         return JSON.parse(value) as Value;
       },
-      set: async (key: string, value: unknown, ttl?: number) => {
+      set: async <Value>(key: string, value: Value, ttl?: number) => {
+        jsonValueSchema.parse(value);
         await this.set(`${namespace}${key}`, JSON.stringify(value), 'PX', ttl ?? 300_000);
       },
       delete: async (key: string) => (await this.del(`${namespace}${key}`)) > 0,

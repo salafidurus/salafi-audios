@@ -10,7 +10,7 @@ import styles from "./scroll-to-top-button.module.css";
 const SCROLL_THRESHOLD = 320;
 
 const scrollToTop = () => {
-  const scrollContainer = document.querySelector(".appConsentContent") as HTMLElement;
+  const scrollContainer = document.querySelector<HTMLElement>(".appConsentContent");
   if (scrollContainer) {
     scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -21,7 +21,7 @@ export function ScrollToTopButton() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const scrollContainer = document.querySelector(".appConsentContent") as HTMLElement;
+    const scrollContainer = document.querySelector<HTMLElement>(".appConsentContent");
     if (!scrollContainer) return;
 
     const handleScroll = () => {

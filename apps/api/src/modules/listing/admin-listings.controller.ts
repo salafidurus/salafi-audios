@@ -160,6 +160,8 @@ export class AdminListingsController {
     });
     const action = dto.action === 'archive' ? 'archive' : 'publish';
     for (const row of rows) {
+      // SAFETY: `subject()` needs a concrete resource instance so CASL evaluates
+      // scholar-scoped conditions; the object literal exactly matches that shape.
       if (!ability.can(action, subject('Listing', { scholarSlug: row.scholar.slug } as never))) {
         throw new ForbiddenException(
           `Missing capability: ${action} Listing (scholarSlug: ${row.scholar.slug})`,

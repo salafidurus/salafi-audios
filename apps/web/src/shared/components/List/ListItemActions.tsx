@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import styles from "./ListItemActions.module.css";
 
@@ -15,6 +15,10 @@ export type ListItemActionsProps = {
   widthPercentDesktop?: string;
   /** Optional click handler for actions container */
   onClick?: (e: React.MouseEvent) => void;
+};
+
+type ActionsStyleVars = CSSProperties & {
+  "--actions-width-desktop": string;
 };
 
 /**
@@ -47,7 +51,13 @@ export function ListItemActions({
     <div
       data-testid="list-item-actions"
       className={`${styles.actions} ${styles[`orientation-${orientation}`]} ${styles[`mobile-orientation-${mobileOrientation}`]} ${className ?? ""}`}
-      style={{ "--actions-width-desktop": widthPercentDesktop } as React.CSSProperties}
+      style={
+        // SAFETY: React accepts CSS custom properties at runtime; this narrows the style
+        // object to the single custom property consumed by ListItemActions.module.css.
+        {
+          "--actions-width-desktop": widthPercentDesktop,
+        } as ActionsStyleVars
+      }
     >
       {children}
     </div>

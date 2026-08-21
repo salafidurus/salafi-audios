@@ -1,12 +1,14 @@
 /** Mirrors the backend's audio extension allowlist (apps/api media.service.ts) for client-side use. */
-const AUDIO_EXTENSION_MIME: Record<string, string> = {
+const AUDIO_EXTENSION_MIME = {
   mp3: "audio/mpeg",
   m4a: "audio/mp4",
   aac: "audio/aac",
   ogg: "audio/ogg",
   opus: "audio/opus",
   wav: "audio/wav",
-};
+} satisfies Record<string, string>;
+
+type AudioExtension = keyof typeof AUDIO_EXTENSION_MIME;
 
 export const AUDIO_EXTENSIONS = Object.keys(AUDIO_EXTENSION_MIME);
 
@@ -33,11 +35,18 @@ function extensionOf(filename: string): string {
   return parts.length > 1 ? (parts.pop()?.toLowerCase() ?? "") : "";
 }
 
+function isAudioExtension(value: string): value is AudioExtension {
+  return value in AUDIO_EXTENSION_MIME;
+}
+
 /** Resolves a response's Content-Type, falling back to an extension-based guess when missing/generic. */
 export function resolveContentType(contentType: string | null, filename: string): string {
   const isGeneric = !contentType || contentType.startsWith("application/octet-stream");
+  const extension = extensionOf(filename);
   return isGeneric
-    ? (AUDIO_EXTENSION_MIME[extensionOf(filename)] ?? "application/octet-stream")
+    ? isAudioExtension(extension)
+      ? AUDIO_EXTENSION_MIME[extension]
+      : "application/octet-stream"
     : contentType;
 }
 
@@ -71,6 +80,7 @@ async function readBodyWithProgress(
     }
   }
 
+  // SAFETY: the stream reader yields Uint8Array chunks, which are valid BlobPart values.
   return new Blob(chunks as BlobPart[]);
 }
 

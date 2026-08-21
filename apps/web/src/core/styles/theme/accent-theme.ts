@@ -1,14 +1,17 @@
+import { z } from "zod";
+
 import { ACCENT_THEME_IDS, type AccentThemeId } from "./variants";
 
 export const ACCENT_THEME_KEY = "accent-theme:v1";
 export const ACCENT_THEME_CHANGE_EVENT = "accent-theme-change";
+const AccentThemeIdSchema = z.enum(ACCENT_THEME_IDS);
 
-export const isAccentThemeId = (value: unknown): value is AccentThemeId =>
-  typeof value === "string" && (ACCENT_THEME_IDS as readonly string[]).includes(value);
+export const isAccentThemeId = (value: string | null): value is AccentThemeId =>
+  AccentThemeIdSchema.safeParse(value).success;
 
 /** Returns the resolved accent theme for SSR (no window access). */
 export const getDefaultAccentTheme = (): AccentThemeId => {
-  if (typeof window === "undefined") {
+  if (!globalThis.window) {
     return "parchment";
   }
   const storedTheme = window.localStorage.getItem("theme-preference:v1");
@@ -18,7 +21,7 @@ export const getDefaultAccentTheme = (): AccentThemeId => {
 };
 
 export const getAccentThemePreference = (): AccentThemeId => {
-  if (typeof window === "undefined") {
+  if (!globalThis.window) {
     return "parchment";
   }
   const stored = window.localStorage.getItem(ACCENT_THEME_KEY);
@@ -29,7 +32,7 @@ export const getAccentThemePreference = (): AccentThemeId => {
 };
 
 export const setAccentThemePreference = (id: AccentThemeId): void => {
-  if (typeof window === "undefined") {
+  if (!globalThis.window) {
     return;
   }
   window.localStorage.setItem(ACCENT_THEME_KEY, id);

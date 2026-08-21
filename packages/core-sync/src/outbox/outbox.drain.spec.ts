@@ -48,14 +48,15 @@ describe("drainOutbox", () => {
   });
 
   it("processes a mix of succeeding and failing entries independently", async () => {
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "progress");
+    type Payload = { ok: boolean };
+    const outbox = createOutboxStore<Payload>(createFakeStorageAdapter(), "progress");
     outbox.useOutboxStore.getState().actions.enqueue("progress-update", { ok: true });
     const failing = outbox.useOutboxStore
       .getState()
       .actions.enqueue("progress-update", { ok: false });
 
     const result = await drainOutbox(outbox, async (entry) => {
-      if ((entry.payload as { ok: boolean }).ok === false) throw new Error("fail");
+      if (entry.payload.ok === false) throw new Error("fail");
     });
 
     expect(result).toEqual({ succeeded: 1, failed: 1 });

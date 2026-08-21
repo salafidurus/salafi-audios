@@ -36,7 +36,7 @@ describe("initI18nOptions", () => {
 
   it("disables escape-value so HTML entities are not double-escaped", () => {
     const opts = initI18nOptions();
-    expect((opts.interpolation as { escapeValue: boolean }).escapeValue).toBe(false);
+    expect(opts.interpolation?.escapeValue).toBe(false);
   });
 
   it("sets defaultNS to translation", () => {

@@ -206,7 +206,7 @@ export class SearchRepository {
     try {
       return await primary();
     } catch (error) {
-      if (!isTrigramSearchFailure(error)) {
+      if (!(error instanceof Error) || !isTrigramSearchFailure(error)) {
         throw error;
       }
 

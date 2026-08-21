@@ -2,6 +2,7 @@ import { httpClient, endpoints, type SavedDeltaItemDto } from "@sd/core-contract
 import {
   createOutboxStore,
   createSyncEngine,
+  type Outbox,
   type StorageAdapter,
   type SyncEngine,
 } from "@sd/core-sync";
@@ -32,7 +33,7 @@ const proxyAdapter: StorageAdapter = {
   removeItem: (key) => delegateAdapter.removeItem(key),
 };
 
-function buildEngine(outbox: ReturnType<typeof createOutboxStore>): SyncEngine<SavedEntry> {
+function buildEngine(outbox: Outbox<SavedEntry>): SyncEngine<SavedEntry> {
   return createSyncEngine<SavedEntry>({
     store: useSavedStore,
     outbox,
@@ -78,7 +79,7 @@ function buildEngine(outbox: ReturnType<typeof createOutboxStore>): SyncEngine<S
 }
 
 // Namespaced by userId (see `initSavedSync`), same isolation rationale as progress's outbox.
-let outbox = createOutboxStore(proxyAdapter, "saved");
+let outbox = createOutboxStore<SavedEntry>(proxyAdapter, "saved");
 let engine = buildEngine(outbox);
 let lastSyncedAt: string | null = null;
 
@@ -90,7 +91,7 @@ let lastSyncedAt: string | null = null;
  */
 export async function initSavedSync(adapter: StorageAdapter, userId: string): Promise<void> {
   delegateAdapter = adapter;
-  outbox = createOutboxStore(proxyAdapter, `saved:${userId}`);
+  outbox = createOutboxStore<SavedEntry>(proxyAdapter, `saved:${userId}`);
   engine = buildEngine(outbox);
   lastSyncedAt = null;
   await outbox.hydrate();

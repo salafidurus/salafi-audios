@@ -31,6 +31,10 @@ export type AccentRecipesWeb = AccentRecipesShared & {
   chrome: ChromeRecipe;
 };
 
+function createGradientPair(start: string, end: string): [string, string] {
+  return [start, end];
+}
+
 const createLayeredBackground = (
   radial: AccentRecipesShared["primaryCta"]["radial"],
   linear: AccentRecipesShared["primaryCta"]["linear"],
@@ -55,7 +59,7 @@ export const createAccentRecipesWeb = (
     shadowColor: colors.border.primaryStrong,
     shadowColorPressed: colors.action.primaryActive,
     linear: {
-      colors: [colors.action.primary, colors.action.primaryHover] as [string, string],
+      colors: createGradientPair(colors.action.primary, colors.action.primaryHover),
       start: { x: 0, y: 0 },
       end: { x: 1, y: 1 },
     },
@@ -72,10 +76,10 @@ export const createAccentRecipesWeb = (
     borderColor: colors.border.primary,
     textColor: colors.content.primaryStrong,
     linear: {
-      colors: [
+      colors: createGradientPair(
         `color-mix(in srgb, ${colors.surface.primarySubtle} 96%, ${colors.surface.default})`,
         colors.surface.default,
-      ] as [string, string],
+      ),
       start: { x: 0, y: 0 },
       end: { x: 1, y: 1 },
     },
@@ -92,10 +96,10 @@ export const createAccentRecipesWeb = (
     borderColor: colors.border.secondary,
     textColor: colors.content.secondaryStrong,
     linear: {
-      colors: [
+      colors: createGradientPair(
         `color-mix(in srgb, ${colors.surface.secondarySubtle} 96%, ${colors.surface.default})`,
         colors.surface.default,
-      ] as [string, string],
+      ),
       start: { x: 0, y: 0 },
       end: { x: 1, y: 1 },
     },
@@ -112,10 +116,10 @@ export const createAccentRecipesWeb = (
     borderColor: colors.border.default,
     textColor: colors.content.strong,
     linear: {
-      colors: [
+      colors: createGradientPair(
         `color-mix(in srgb, ${colors.surface.primarySubtle} 78%, ${colors.surface.default})`,
         `color-mix(in srgb, ${colors.surface.secondarySubtle} 58%, ${colors.surface.default})`,
-      ] as [string, string],
+      ),
       start: { x: 0, y: 0 },
       end: { x: 1, y: 1 },
     },
@@ -132,10 +136,10 @@ export const createAccentRecipesWeb = (
     borderColor: colors.border.primary,
     textColor: colors.content.strong,
     linear: {
-      colors: [
+      colors: createGradientPair(
         `color-mix(in srgb, ${colors.surface.primarySubtle} 62%, ${colors.surface.default})`,
         `color-mix(in srgb, ${colors.surface.secondarySubtle} 42%, ${colors.surface.default})`,
-      ] as [string, string],
+      ),
       start: { x: 0, y: 0 },
       end: { x: 1, y: 1 },
     },

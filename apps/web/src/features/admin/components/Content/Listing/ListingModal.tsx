@@ -30,6 +30,10 @@ export interface ListingModalProps {
   listingId?: string | null;
 }
 
+function isListingModalTab(id: string): id is "general" | "main" | "sublistings" | "review" {
+  return id === "general" || id === "main" || id === "sublistings" || id === "review";
+}
+
 export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingModalProps) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
@@ -123,6 +127,7 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
 
   const scholars = scholarsData?.scholars ?? [];
   const topicsArray = topicsData ?? [];
+  // SAFETY: listing form state stores only supported locale values for the main content language.
   const mainLocale = (state.language || "ar") as Locale;
   const errorTabSet = new Set(errorTabs);
   const showSublistingsTab = state.isEditing && !!state.id && state.format !== "single";
@@ -143,7 +148,11 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
       requireReview
       errorTabs={errorTabs}
       activeTab={activeTab}
-      onActiveTabChange={(id) => setActiveTab(id as typeof activeTab)}
+      onActiveTabChange={(id) => {
+        if (isListingModalTab(id)) {
+          setActiveTab(id);
+        }
+      }}
       defaultActiveTab="general"
       saveFormId="lecture-form"
       saving={state.saving}

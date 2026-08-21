@@ -82,6 +82,7 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
     <FormSection title={t("admin.scholars.socialMedia", "Social Media")}>
       <div className={styles.fieldsGrid}>
         {SOCIAL_FIELDS.map((field) => {
+          // SAFETY: SOCIAL_FIELDS only enumerates social URL fields that exist on FormState.
           const fieldKey = field.key as keyof Pick<
             FormState,
             "socialTwitter" | "socialTelegram" | "socialYoutube" | "socialWebsite"

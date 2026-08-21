@@ -9,7 +9,7 @@ export type ApiRequestOptions = Parameters<typeof httpClient>[0];
 export type ApiInterceptor = {
   onRequest?: (options: ApiRequestOptions) => ApiRequestOptions;
   onResponse?: <T>(data: T, options: ApiRequestOptions) => T;
-  onError?: (error: unknown, options: ApiRequestOptions) => void;
+  onError?: (cause: unknown, options: ApiRequestOptions) => void;
 };
 
 const interceptors: ApiInterceptor[] = [];

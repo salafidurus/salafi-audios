@@ -1,16 +1,25 @@
 import { httpClient, endpoints, queryKeys, type FeedPageDto } from "@sd/core-contracts";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 
 export type UseExploreRecentScreenOptions = {
   limit?: number;
 };
 
 export function useExploreRecentScreen({ limit }: UseExploreRecentScreenOptions = {}) {
-  return useInfiniteQuery<FeedPageDto>({
-    queryKey: limit ? [...queryKeys.listings.recent(), { limit }] : queryKeys.listings.recent(),
+  const initialPageParam: string | undefined = undefined;
+  const queryKey = [...queryKeys.listings.all, "recent", limit ?? null] as const;
+
+  return useInfiniteQuery<
+    FeedPageDto,
+    Error,
+    InfiniteData<FeedPageDto>,
+    typeof queryKey,
+    string | undefined
+  >({
+    queryKey,
     queryFn: async ({ pageParam }) => {
       const params: Record<string, string> = {};
-      if (pageParam) params.cursor = pageParam as string;
+      if (pageParam) params.cursor = pageParam;
       if (limit) params.limit = String(limit);
       return httpClient<FeedPageDto>({
         url: endpoints.listings.recent,
@@ -18,7 +27,7 @@ export function useExploreRecentScreen({ limit }: UseExploreRecentScreenOptions 
         params,
       });
     },
-    initialPageParam: undefined as string | undefined,
+    initialPageParam,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
 }

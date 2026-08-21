@@ -7,7 +7,9 @@ const WebPublicEnvSchema = z.object({
 
 export type WebPublicEnv = z.infer<typeof WebPublicEnvSchema>;
 
-export function validateEnv(raw: Record<string, unknown> = process.env): WebPublicEnv {
+export function validateEnv(
+  raw: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
+): WebPublicEnv {
   const parsed = WebPublicEnvSchema.safeParse(raw);
   if (!parsed.success) {
     const details = parsed.error.issues

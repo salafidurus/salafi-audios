@@ -1,4 +1,4 @@
-import { mergeLocaleMessages } from "./merge-locale-messages";
+import { mergeLocaleMessages, type LocaleMessages } from "./merge-locale-messages";
 
 describe("mergeLocaleMessages", () => {
   it("returns shared unchanged when overrides is empty", () => {
@@ -29,15 +29,15 @@ describe("mergeLocaleMessages", () => {
   });
 
   it("handles deeply nested overrides", () => {
-    const shared = { a: { b: { c: "original", d: "keep" } } } as Record<string, unknown>;
-    const overrides = { a: { b: { c: "replaced" } } } as Record<string, unknown>;
+    const shared: LocaleMessages = { a: { b: { c: "original", d: "keep" } } };
+    const overrides: LocaleMessages = { a: { b: { c: "replaced" } } };
     const result = mergeLocaleMessages(shared, overrides);
-    expect((result.a as Record<string, unknown>).b).toEqual({ c: "replaced", d: "keep" });
+    expect(result.a).toEqual({ b: { c: "replaced", d: "keep" } });
   });
 
   it("adds new keys from overrides", () => {
-    const shared = { common: { ok: "OK" } } as Record<string, unknown>;
-    const overrides = { extra: "new value" } as Record<string, unknown>;
+    const shared: LocaleMessages = { common: { ok: "OK" } };
+    const overrides: LocaleMessages = { extra: "new value" };
     const result = mergeLocaleMessages(shared, overrides);
     expect(result.extra).toBe("new value");
   });

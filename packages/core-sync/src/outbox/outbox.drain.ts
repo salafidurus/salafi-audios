@@ -1,4 +1,4 @@
-import type { Outbox, OutboxEntry } from "./outbox.store";
+import type { Outbox, OutboxEntry, JsonValue } from "./outbox.store";
 
 export type DrainResult = {
   succeeded: number;
@@ -14,9 +14,9 @@ export type DrainResult = {
  * network-reconnect trigger firing within the same tick) — a call made while
  * one is already in flight is a no-op that returns immediately.
  */
-export async function drainOutbox(
-  outbox: Outbox,
-  handler: (entry: OutboxEntry) => Promise<void>,
+export async function drainOutbox<TPayload extends JsonValue>(
+  outbox: Outbox<TPayload>,
+  handler: (entry: OutboxEntry<TPayload>) => Promise<void>,
 ): Promise<DrainResult> {
   const { entries, isDraining, actions } = outbox.useOutboxStore.getState();
 

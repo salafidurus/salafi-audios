@@ -1,4 +1,4 @@
-import type { ErrorBoundaryProps, Href } from "expo-router";
+import type { ErrorBoundaryProps } from "expo-router";
 
 import { routes } from "@sd/core-contracts";
 import { useSearchProcessing } from "@sd/domain-search";
@@ -77,7 +77,7 @@ export default function ExploreIndexRoute() {
       <Activity mode={isSearching ? "hidden" : "visible"}>
         <ExploreRecentScreen
           onNavigateToListing={navigateToListing}
-          onNavigateToScholar={(slug) => router.push(routes.scholars.detail(slug) as Href)}
+          onNavigateToScholar={(slug) => router.push(routes.scholars.detail(slug))}
         />
       </Activity>
 

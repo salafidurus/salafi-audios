@@ -1,6 +1,7 @@
 import { DownloadTask, Directory, File, Paths } from "expo-file-system";
 
 import { enqueueDownloadMutation } from "@/features/downloads/outbox/outbox.drain";
+import { type DownloadOutboxPayload } from "@/features/downloads/outbox/outbox.store";
 import { getDownload } from "@/features/downloads/registry/downloads.registry";
 import { useDownloadsStore } from "@/features/downloads/store/downloads.store";
 
@@ -19,6 +20,8 @@ type DirectoryWithFsOps = Directory & {
 };
 
 function destinationFor(lectureId: string): File {
+  // SAFETY: expo-file-system's Directory instance exposes `exists` and
+  // `create()` at runtime; this narrows a known library typing gap.
   const dir = new Directory(Paths.document, "lectures") as DirectoryWithFsOps;
   if (!dir.exists) {
     dir.create({ intermediates: true });
@@ -54,6 +57,8 @@ export async function downloadLecture(lectureId: string, audioUrl: string): Prom
   activeTasks.set(lectureId, task);
 
   try {
+    // SAFETY: expo-file-system resolves downloads to File instances with a
+    // concrete `uri`; the extra method/property are present at runtime.
     const file = (await task.downloadAsync()) as FileWithFsOps | null;
     if (file) {
       await actions.upsert({ listingId: lectureId, status: "complete", localUri: file.uri });
@@ -77,6 +82,8 @@ export async function removeLecture(lectureId: string): Promise<void> {
   const row = await getDownload(lectureId);
   if (row?.localUri) {
     try {
+      // SAFETY: constructing File from a persisted local uri yields a runtime
+      // File instance whose `delete()` method exists despite missing typings.
       (new File(row.localUri) as FileWithFsOps).delete();
     } catch {
       // Best-effort — still remove the row below regardless.
@@ -95,9 +102,12 @@ export async function getLocalAudioUri(lectureId: string): Promise<string | unde
 
 /** Dispatches a queued downloads-outbox entry by type. Passed to
  * `drainDownloadsOutbox` from the app-foreground/network-reconnect triggers. */
-export async function handleDownloadOutboxEntry(type: string, payload: unknown): Promise<void> {
+export async function handleDownloadOutboxEntry(
+  type: string,
+  payload: DownloadOutboxPayload,
+): Promise<void> {
   if (type === "start-download") {
-    const { lectureId, audioUrl } = payload as { lectureId: string; audioUrl: string };
+    const { lectureId, audioUrl } = payload;
     await downloadLecture(lectureId, audioUrl);
   }
 }

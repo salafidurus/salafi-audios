@@ -2,6 +2,7 @@ import "@testing-library/jest-dom";
 import { afterEach } from "bun:test";
 
 import { createI18n } from "./core/i18n/i18n";
+import { hasWindow } from "./shared/lib/runtime-guards";
 
 // Register happy-dom globals - this MUST run before any test imports
 const { GlobalRegistrator } = require("@happy-dom/global-registrator");
@@ -11,6 +12,8 @@ GlobalRegistrator.register();
 // Initialize i18n for tests
 const testI18n = createI18n("en");
 // Make it globally available for react-i18next
+// SAFETY: test setup intentionally exposes the initialized i18n instance on the global object
+// so hooks/components under test can read the same singleton react-i18next expects.
 (global as any).i18n = testI18n;
 
 // Set up environment variables for tests
@@ -30,6 +33,7 @@ afterEach(() => {
 });
 
 // Mock ResizeObserver
+// SAFETY: the mock class matches the browser API surface these tests rely on.
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
@@ -37,7 +41,7 @@ global.ResizeObserver = class ResizeObserver {
 } as any;
 
 // Mock matchMedia
-if (typeof window !== "undefined") {
+if (hasWindow()) {
   Object.defineProperty(window, "matchMedia", {
     writable: true,
     value: (query: string) => ({
@@ -54,6 +58,7 @@ if (typeof window !== "undefined") {
 }
 
 // Mock IntersectionObserver
+// SAFETY: the mock class matches the browser API surface these tests rely on.
 global.IntersectionObserver = class IntersectionObserver {
   observe() {}
   unobserve() {}
@@ -64,7 +69,7 @@ global.IntersectionObserver = class IntersectionObserver {
 Element.prototype.scrollIntoView = () => {};
 
 // Mock window.location
-if (typeof window !== "undefined") {
+if (hasWindow()) {
   Object.defineProperty(window, "location", {
     writable: true,
     value: {

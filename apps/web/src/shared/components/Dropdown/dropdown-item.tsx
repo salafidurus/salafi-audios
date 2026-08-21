@@ -3,6 +3,8 @@
 import { Check } from "lucide-react";
 import { useLayoutEffect, type ReactNode } from "react";
 
+import { isReactNodeText } from "@/shared/lib/runtime-guards";
+
 import { useDropdownContext } from "./context";
 import styles from "./dropdown.module.css";
 
@@ -22,7 +24,7 @@ export function DropdownItem({ value, children, disabled }: DropdownItemProps) {
     searchQuery,
   } = useDropdownContext();
   const isSelected = selectedValue === value;
-  const label = typeof children === "string" ? children : "";
+  const label = isReactNodeText(children) ? children : "";
 
   useLayoutEffect(() => {
     const unregister = registerItem(value, label, disabled);

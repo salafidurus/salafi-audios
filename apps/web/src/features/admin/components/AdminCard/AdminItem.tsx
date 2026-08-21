@@ -3,6 +3,7 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { z } from "zod";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { List } from "@/shared/components/List";
@@ -38,6 +39,17 @@ export interface AdminItemProps {
   className?: string;
 }
 
+const ThumbnailImageSchema = z.object({
+  src: z.string(),
+  alt: z.string(),
+});
+
+function isThumbnailImage(
+  thumbnail: AdminItemProps["thumbnail"],
+): thumbnail is { src: string; alt: string } {
+  return ThumbnailImageSchema.safeParse(thumbnail).success;
+}
+
 export function AdminItem({
   thumbnail,
   title,
@@ -63,8 +75,6 @@ export function AdminItem({
     });
   };
 
-  const isThumbnailImage = thumbnail && typeof thumbnail === "object" && "src" in thumbnail;
-
   return (
     <List.Item
       interactive={!!onClick}
@@ -73,7 +83,7 @@ export function AdminItem({
     >
       {thumbnail && (
         <div className={styles.thumbnail}>
-          {isThumbnailImage ? (
+          {isThumbnailImage(thumbnail) ? (
             <Image
               src={thumbnail.src}
               alt={thumbnail.alt}

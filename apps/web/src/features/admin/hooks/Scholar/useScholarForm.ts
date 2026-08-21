@@ -90,6 +90,7 @@ function buildEditFormState(data: ScholarFormDataDto): FormState {
   const bio = scholar.bio || "";
   const imageUrl = scholar.imageUrl || "";
   const isActive = scholar.isActive !== undefined ? scholar.isActive : true;
+  // SAFETY: scholar form data is hydrated from the same locale union used by the editor.
   const mainLanguage = (scholar.mainLanguage as Locale) || "ar";
   const orderIndex = scholar.orderIndex || 999;
 

@@ -169,7 +169,87 @@ export const sharedColors = {
   },
 } as const;
 
-export const createColors = (mode: "light" | "dark") => {
+export type SurfaceTokens = {
+  canvas: string;
+  default: string;
+  subtle: string;
+  elevated: string;
+  hover: string;
+  inverse: string;
+  primarySubtle: string;
+  secondarySubtle: string;
+  selected: string;
+  disabled: string;
+};
+
+export type ContentTokens = {
+  strong: string;
+  default: string;
+  subtle: string;
+  muted: string;
+  inverse: string;
+  primary: string;
+  primaryStrong: string;
+  secondary: string;
+  secondaryStrong: string;
+  onPrimary: string;
+  onSecondary: string;
+  onDanger: string;
+  onSuccess: string;
+  disabled: string;
+};
+
+export type BorderTokens = {
+  default: string;
+  subtle: string;
+  strong: string;
+  muted: string;
+  hover: string;
+  focus: string;
+  primary: string;
+  primaryStrong: string;
+  secondary: string;
+  secondaryStrong: string;
+  disabled: string;
+};
+
+export type ActionTokens = {
+  primary: string;
+  primaryHover: string;
+  primaryActive: string;
+  secondary: string;
+  secondaryHover: string;
+  secondaryActive: string;
+  danger: string;
+  dangerHover: string;
+  dangerActive: string;
+  success: string;
+  successHover: string;
+  successActive: string;
+  disabled: string;
+  disabledContent: string;
+};
+
+export type StateTokens = {
+  success: string;
+  successSurface: string;
+  successBorder: string;
+  successContent: string;
+  danger: string;
+  dangerSurface: string;
+  dangerBorder: string;
+  dangerContent: string;
+};
+
+export type AppColors = {
+  surface: SurfaceTokens;
+  content: ContentTokens;
+  border: BorderTokens;
+  action: ActionTokens;
+  state: StateTokens;
+};
+
+export const createColors = (mode: "light" | "dark"): AppColors => {
   const c = sharedColors;
   const isLight = mode === "light";
 
@@ -402,7 +482,6 @@ export const createColors = (mode: "light" | "dark") => {
 };
 
 export type SharedColors = typeof sharedColors;
-export type AppColors = ReturnType<typeof createColors>;
 
 export type AccentThemeId = "parchment" | "manuscript" | "midnight" | "ember";
 
@@ -426,7 +505,7 @@ export interface AccentPalette {
   textFaint: string;
 }
 
-export const ACCENT_PALETTES: Record<AccentThemeId, AccentPalette> = {
+export const ACCENT_PALETTES = {
   parchment: {
     label: "Parchment",
     description: "Ivory & antique gold",
@@ -503,7 +582,7 @@ export const ACCENT_PALETTES: Record<AccentThemeId, AccentPalette> = {
     textSoft: "#B3A99B",
     textFaint: "#9E9385",
   },
-};
+} satisfies Record<AccentThemeId, AccentPalette>;
 
 const parseHex = (hex: string): [number, number, number] => {
   const normalized = hex.replace("#", "");
@@ -588,5 +667,5 @@ export const buildAccentColors = (id: AccentThemeId): AppColors => {
       disabledContent: p.textFaint,
     },
     state: base.state,
-  } as AppColors;
+  } satisfies AppColors;
 };

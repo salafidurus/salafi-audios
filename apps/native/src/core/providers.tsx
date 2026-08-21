@@ -7,7 +7,7 @@ import {
 import { routes, queryKeys } from "@sd/core-contracts";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
-import { type Href, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { type ReactNode, useEffect, useState } from "react";
 import { I18nextProvider } from "react-i18next";
 import { AppState, type AppStateStatus, LogBox, View } from "react-native";
@@ -31,6 +31,10 @@ import { queryClient } from "./query-client";
 import { syncTypographyToLocale } from "./styles/theme/typography-sync";
 
 LogBox.ignoreLogs(["API client initialization failed", "Open debugger to view warnings"]);
+
+function getSupportedLocale(locale: string): "en" | "ar" {
+  return locale === "ar" ? "ar" : "en";
+}
 
 function AppFontsProvider({ children }: { children: ReactNode }) {
   const [loaded] = useFonts({
@@ -115,7 +119,7 @@ export function Providers({ children, apiBaseUrl }: Props) {
         })
         .finally(() => {
           queryClient.clear();
-          router.replace(routes.home as Href);
+          router.replace(routes.home);
         });
     });
   }, [router]);
@@ -158,7 +162,7 @@ export function Providers({ children, apiBaseUrl }: Props) {
     void initI18n()
       .then(() => {
         setI18nReady(true);
-        syncTypographyToLocale(i18n.language as "en" | "ar");
+        syncTypographyToLocale(getSupportedLocale(i18n.language));
       })
       .catch((err) => {
         console.warn("[i18n] init failed, falling back to default:", err);

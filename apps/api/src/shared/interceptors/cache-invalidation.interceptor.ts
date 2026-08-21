@@ -28,7 +28,7 @@ export class CacheInvalidationInterceptor implements NestInterceptor {
     return next.handle().pipe(
       concatMap((value) =>
         from(this.cache.clear()).pipe(
-          catchError((error: unknown) => {
+          catchError((error) => {
             this.logger.warn(
               { err: error, method },
               'Cache invalidation failed after successful mutation',

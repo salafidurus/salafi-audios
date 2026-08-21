@@ -15,6 +15,21 @@ export type AccessTarget = z.infer<typeof AccessTargetEnum>;
 export const AccessCapabilityEnum = z.enum(["write", "translate", "publish", "delete", "manage"]);
 export type AccessCapability = z.infer<typeof AccessCapabilityEnum>;
 
+function canGrantCapability(target: AccessTarget, capability: AccessCapability): boolean {
+  switch (target) {
+    case "scholar":
+    case "listing":
+    case "topic":
+      return capability === "write" || capability === "publish" || capability === "delete";
+    case "media":
+      return capability === "write" || capability === "delete";
+    case "translation":
+      return capability === "translate" || capability === "publish" || capability === "delete";
+    case "user":
+      return capability === "manage";
+  }
+}
+
 export const AccessGrantRequestSchema = z
   .object({
     target: AccessTargetEnum,
@@ -32,15 +47,7 @@ export const AccessGrantRequestSchema = z
       });
     }
 
-    const allowedCapabilities: Record<AccessTarget, AccessCapability[]> = {
-      scholar: ["write", "publish", "delete"],
-      listing: ["write", "publish", "delete"],
-      media: ["write", "delete"],
-      topic: ["write", "publish", "delete"],
-      translation: ["translate", "publish", "delete"],
-      user: ["manage"],
-    };
-    if (!allowedCapabilities[grant.target].includes(grant.capability)) {
+    if (!canGrantCapability(grant.target, grant.capability)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["capability"],
