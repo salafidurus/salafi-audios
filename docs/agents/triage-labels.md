@@ -11,3 +11,12 @@ The engineering skills use five canonical triage roles. This table maps each rol
 | `wontfix`                   | `wontfix`                | Will not be actioned                     |
 
 When a skill names a triage role, use the corresponding repository label from the right-hand column. Edit that column if the GitHub label vocabulary changes.
+
+## Artifact labels
+
+Generated work items also carry an artifact label so they can be filtered independently of triage state:
+
+| Artifact      | Repository label | Applied by   |
+| ------------- | ---------------- | ------------ |
+| Specification | `spec`           | `to-spec`    |
+| Ticket        | `ticket`         | `to-tickets` |
