@@ -53,6 +53,13 @@ Ask the user:
 - Are the blocking edges correct: does each ticket only depend on tickets that genuinely gate it?
 - Should any tickets be merged or split further?
 
+Before asking for approval, write down the complete dependency matrix, including
+every ticket whose blockers are explicitly "None". Do not infer that an
+implementation order is a blocking edge: only mark a ticket blocked when the
+blocked ticket genuinely cannot start without the blocker. If the proposed
+implementation order is intended to be a strict sequence, show those edges in
+the numbered breakdown and get approval for them.
+
 Iterate until the user approves the breakdown.
 
 ### 5. Publish the tickets to the configured tracker
@@ -63,6 +70,20 @@ Publish the approved tickets. **How** depends on the tracker `/setup-matt-pocock
 - **A real issue tracker (GitHub, Linear, …)** → publish one issue per ticket in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers. Use the platform's native blocking / sub-issue relationship where it has one; otherwise set each ticket's "Blocked by" to the blocking issues. Apply both `ready-for-agent` and the `ticket` artifact label unless instructed otherwise; if the tracker does not have `ticket` yet, create it before publishing. The tickets are agent-grabbable by construction.
 
 Work the **frontier**: any ticket whose blockers are all done. For a purely linear chain that means top to bottom.
+
+Before finishing publication, perform a dependency audit:
+
+- Compare the approved dependency matrix with every ticket's published
+  `Blocked by` section.
+- On GitHub or another tracker with native dependencies, create one native
+  `blocked_by` edge for every approved blocker and verify the returned edges for
+  every published ticket, including tickets whose blocker set is empty.
+- On trackers without native dependencies, verify that every approved edge is
+  present in the ticket body and that every no-blocker ticket explicitly says
+  "None (can start immediately)".
+- Do not report the ticket set as complete until the audit finds no missing or
+  extra edges. If an edge cannot be represented, stop and report the exact
+  missing relationship instead of silently publishing an incomplete graph.
 
 Do NOT close or modify any parent issue.
 

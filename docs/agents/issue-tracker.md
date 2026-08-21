@@ -30,6 +30,15 @@ GitHub shares one number space across issues and pull requests, so resolve an am
 - When a skill says **publish to the issue tracker**, create a GitHub issue.
 - When a skill says **fetch the relevant ticket**, run `gh issue view <number> --comments`.
 
+## Generated ticket dependencies
+
+When `to-tickets` publishes GitHub issues, it must preserve the approved
+dependency matrix in two places: each issue's `Blocked by` section and GitHub's
+native issue dependency graph. After publication, audit every generated issue
+with `gh api repos/<owner>/<repo>/issues/<number>/dependencies/blocked_by`.
+Implementation order alone is not a blocker unless the approved breakdown says
+the dependent ticket cannot start without the preceding ticket.
+
 ## Wayfinding operations
 
 The map is one issue labelled `wayfinder:map`; its child issues are the tickets.
