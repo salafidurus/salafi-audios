@@ -8,9 +8,11 @@ export interface UseInfiniteAdminUsersOptions {
 }
 
 export function useInfiniteAdminUsers(options?: UseInfiniteAdminUsersOptions) {
+  const initialPageParam: string | undefined = undefined;
+
   return useInfiniteQuery({
     queryKey: queryKeys.admin.users.infinite(options?.search, options?.role),
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       const params = new URLSearchParams();
       if (options?.search) params.append("q", options.search);
       if (options?.role) params.append("role", options.role);
@@ -25,7 +27,7 @@ export function useInfiniteAdminUsers(options?: UseInfiniteAdminUsersOptions) {
         hasMore: response.hasMore ?? false,
       };
     },
-    initialPageParam: undefined as string | undefined,
+    initialPageParam,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: options?.enabled !== false,
   });

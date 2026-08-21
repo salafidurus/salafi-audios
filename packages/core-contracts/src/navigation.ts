@@ -10,7 +10,7 @@ export type Section = "explore" | "library" | "settings" | "adminContents";
 
 export type TabConfig = { id: string; label: string; labelKey: string; icon: string };
 
-export const SECTION_TABS: Record<Section, TabConfig[]> = {
+export const SECTION_TABS = {
   explore: [
     { id: "recent", label: "Recent", labelKey: "navigation.subnav.explore.recent", icon: "clock" },
     {
@@ -69,25 +69,25 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
       icon: "list",
     },
   ],
-};
+} satisfies Record<Section, TabConfig[]>;
 
-export const DEFAULT_TABS: Record<Section, string> = {
+export const DEFAULT_TABS = {
   explore: "recent",
   library: "started",
   settings: "general",
   adminContents: "topics",
-};
+} satisfies Record<Section, string>;
 
-export const SECTION_LABELS: Record<Section, string> = {
+export const SECTION_LABELS = {
   explore: "Explore",
   library: "Library",
   settings: "Settings",
   adminContents: "Content",
-};
+} satisfies Record<Section, string>;
 
-export const SECTION_ROUTES: Record<Section, string> = {
+export const SECTION_ROUTES = {
   explore: routes.explore.index,
   library: routes.library.index,
   settings: routes.settings.index,
   adminContents: routes.admin.contents,
-};
+} satisfies Record<Section, string>;

@@ -174,6 +174,7 @@ export function ListingGeneralSection({
           <Dropdown
             value={language}
             onValueChange={(value) =>
+              // SAFETY: the language dropdown renders only supported locale options below.
               dispatch({ type: "UPDATE_FIELD", field: "language", value: value as Locale })
             }
           >
@@ -195,6 +196,7 @@ export function ListingGeneralSection({
           <Dropdown
             value={format}
             onValueChange={(value) =>
+              // SAFETY: the format dropdown renders only the three listing format literals below.
               dispatch({
                 type: "UPDATE_FIELD",
                 field: "format",

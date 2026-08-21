@@ -2,7 +2,12 @@
  * Seed listings (singles, series, collections with modules and lessons)
  */
 
-import type { PrismaClient, ListingFormat, Status } from "../../../src/generated/prisma/client.js";
+import type {
+  PrismaClient,
+  ListingFormat,
+  Locale,
+  Status,
+} from "../../../src/generated/prisma/client.js";
 import type { TopicPair } from "../types.js";
 
 import { SCHOLARS, TOPICS, SINGLES, SERIES, COLLECTIONS } from "../data/index.js";
@@ -23,7 +28,7 @@ async function upsertListing(
   status: Status,
   orderIndex: number | undefined,
   durationSeconds: number | undefined,
-  language?: string,
+  language?: Locale,
 ) {
   return prisma.listing.upsert({
     where: { id },
@@ -37,7 +42,7 @@ async function upsertListing(
       status,
       orderIndex,
       durationSeconds,
-      language: language as any,
+      language,
     },
     create: {
       id,
@@ -50,7 +55,7 @@ async function upsertListing(
       status,
       orderIndex,
       durationSeconds,
-      language: language as any,
+      language,
       publishedAt: status === "published" ? new Date() : undefined,
     },
   });

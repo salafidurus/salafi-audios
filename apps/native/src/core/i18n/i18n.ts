@@ -6,20 +6,20 @@ import { initReactI18next } from "react-i18next";
 import { syncDirectionToLocale } from "../styles/theme/direction-sync";
 import { syncTypographyToLocale } from "../styles/theme/typography-sync";
 import { getStoredLocale, storeLocale } from "./locale-storage";
-import { mergeLocaleMessages } from "./merge-locale-messages";
+import { mergeLocaleMessages, type LocaleMessages } from "./merge-locale-messages";
 
 export const i18n = i18next;
 
 const loadedLocaleBundles = new Set<Locale>();
 
-function loadLocaleBundle(locale: Locale): Record<string, unknown> {
+function loadLocaleBundle(locale: Locale): LocaleMessages {
   if (locale === "ar") {
-    const arShared = require("@sd/core-i18n/locales/ar.json") as Record<string, unknown>;
-    const arOverrides = require("./overrides.ar.json") as Partial<Record<string, unknown>>;
+    const arShared = require("@sd/core-i18n/locales/ar.json") satisfies LocaleMessages;
+    const arOverrides = require("./overrides.ar.json") satisfies Partial<LocaleMessages>;
     return mergeLocaleMessages(arShared, arOverrides);
   }
-  const enShared = require("@sd/core-i18n/locales/en.json") as Record<string, unknown>;
-  const enOverrides = require("./overrides.en.json") as Partial<Record<string, unknown>>;
+  const enShared = require("@sd/core-i18n/locales/en.json") satisfies LocaleMessages;
+  const enOverrides = require("./overrides.en.json") satisfies Partial<LocaleMessages>;
   return mergeLocaleMessages(enShared, enOverrides);
 }
 
@@ -65,7 +65,7 @@ export async function initI18n(): Promise<void> {
       try {
         locale = await getStoredLocale();
       } catch {
-        locale = "en" as Locale;
+        locale = "en";
       }
 
       ensureLocaleLoaded(locale);

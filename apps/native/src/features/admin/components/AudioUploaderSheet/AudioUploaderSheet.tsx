@@ -5,7 +5,7 @@ import { useAbility } from "@sd/domain-account";
 import { useScholarsList } from "@sd/domain-content";
 import * as DocumentPicker from "expo-document-picker";
 import { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, type ViewStyle, Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
@@ -81,13 +81,21 @@ type QueueItemProps = {
   item: UploadItem;
 };
 
+function getErrorMessage(cause: unknown): string {
+  return cause instanceof Error ? cause.message : "Upload failed";
+}
+
+function getProgressFillWidth(progress: number): ViewStyle["width"] {
+  return `${Math.round(progress * 100)}%`;
+}
+
 function QueueItem({ item }: QueueItemProps) {
   const { theme } = useUnistyles();
   const fillStyle = useMemo(
     () => [
       styles.progressFill,
       {
-        width: `${Math.round(item.progress * 100)}%` as unknown as number,
+        width: getProgressFillWidth(item.progress),
         backgroundColor:
           item.status === "error"
             ? theme.colors.state.danger
@@ -173,12 +181,12 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
             audioKey: objectKey,
             scholarId: selectedScholarId,
             format: "single",
-            ...(durationSeconds != null ? { durationSeconds } : {}),
+            durationSeconds: durationSeconds ?? undefined,
           });
           setItemState(i, { progress: 1, status: "done" });
           anySuccess = true;
         } catch (err) {
-          setItemState(i, { status: "error", error: (err as Error).message });
+          setItemState(i, { status: "error", error: getErrorMessage(err) });
         }
       }
     } finally {

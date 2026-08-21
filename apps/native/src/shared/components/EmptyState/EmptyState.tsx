@@ -12,14 +12,6 @@ export type EmptyStateProps = {
   retryLabel?: string;
 };
 
-function getTextStyleMap(): Record<EmptyStateVariant, TextStyle> {
-  return {
-    empty: styles.text_empty,
-    loading: styles.text_loading,
-    error: styles.text_error,
-  };
-}
-
 export function EmptyState({
   message,
   variant = "empty",
@@ -28,7 +20,7 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <View style={[styles.emptyState, styles[variant]]}>
-      <AppText variant="bodyMd" style={getTextStyleMap()[variant]}>
+      <AppText variant="bodyMd" style={TEXT_STYLE_BY_VARIANT[variant]}>
         {message}
       </AppText>
       {onRetry ? (
@@ -87,3 +79,9 @@ const styles = StyleSheet.create((theme) => ({
     fontWeight: "600",
   },
 }));
+
+const TEXT_STYLE_BY_VARIANT = {
+  empty: styles.text_empty,
+  loading: styles.text_loading,
+  error: styles.text_error,
+} satisfies Record<EmptyStateVariant, TextStyle>;

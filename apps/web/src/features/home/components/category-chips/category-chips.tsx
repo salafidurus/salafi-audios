@@ -18,7 +18,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 
 import styles from "./category-chips.module.css";
 
-const TOPIC_ICONS: Record<string, LucideIcon> = {
+const TOPIC_ICONS = {
   aqeedah: Shield,
   fiqh: Scale,
   hadith: MessageSquareText,
@@ -26,7 +26,13 @@ const TOPIC_ICONS: Record<string, LucideIcon> = {
   seerah: Footprints,
   tafsir: BookOpen,
   "da'wah": GraduationCap,
-};
+} satisfies Record<string, LucideIcon>;
+
+type TopicIconKey = keyof typeof TOPIC_ICONS;
+
+function isTopicIconKey(value: string): value is TopicIconKey {
+  return value in TOPIC_ICONS;
+}
 
 export function CategoryChips() {
   const { i18n, t } = useTranslation();
@@ -42,7 +48,7 @@ export function CategoryChips() {
       .map((topic) => ({
         slug: topic.slug,
         label: getLocalizedName(topic.name, i18n.language),
-        Icon: TOPIC_ICONS[topic.slug],
+        Icon: isTopicIconKey(topic.slug) ? TOPIC_ICONS[topic.slug] : undefined,
       }));
   }, [topics, i18n.language]);
 
@@ -58,7 +64,10 @@ export function CategoryChips() {
           {t("home.categories.all", "All")}
         </Link>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={`chip-skeleton-${i}`} className={`${styles.skeletonLine} ${styles.skeletonChip}`} />
+          <div
+            key={`chip-skeleton-${i}`}
+            className={`${styles.skeletonLine} ${styles.skeletonChip}`}
+          />
         ))}
       </nav>
     );

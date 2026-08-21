@@ -6,9 +6,11 @@ export interface UseInfiniteLibraryCompletedOptions {
 }
 
 export function useInfiniteLibraryCompleted(options?: UseInfiniteLibraryCompletedOptions) {
+  const initialPageParam: string | undefined = undefined;
+
   return useInfiniteQuery({
     queryKey: queryKeys.library.completed.infinite(),
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       if (pageParam) {
         return { items: [], nextCursor: undefined, hasMore: false };
       }
@@ -22,7 +24,7 @@ export function useInfiniteLibraryCompleted(options?: UseInfiniteLibraryComplete
         hasMore: false,
       };
     },
-    initialPageParam: undefined as string | undefined,
+    initialPageParam,
     getNextPageParam: () => undefined,
     enabled: options?.enabled !== false,
   });

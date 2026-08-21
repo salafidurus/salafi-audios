@@ -51,30 +51,41 @@ const getNativeFontFamily = (
   return fontFamilies[locale][role][weightKey];
 };
 
-type TypographyVariantShape = {
+type TypographyVariantConfig = {
   fontFamily: string;
   fontSize: number;
   lineHeight: number;
   letterSpacing: number;
 };
 
+function createVariantConfig(locale: Locale, variant: TypographyVariant): TypographyVariantConfig {
+  const token = typographyBase[variant];
+  const weightKey = getWeightKey(token.fontWeight);
+
+  return {
+    fontFamily: getNativeFontFamily(locale, token.fontRole, weightKey),
+    fontSize: token.fontSize.mobile,
+    lineHeight: token.lineHeight.mobile,
+    letterSpacing: token.letterSpacing.mobile,
+  };
+}
+
 export const createTypography = (
   locale: Locale = "en",
-): Record<TypographyVariant, TypographyVariantShape> => {
-  return Object.fromEntries(
-    Object.entries(typographyBase).map(([variant, token]) => {
-      const weightKey = getWeightKey(token.fontWeight);
-      return [
-        variant,
-        {
-          fontFamily: getNativeFontFamily(locale, token.fontRole, weightKey),
-          fontSize: token.fontSize.mobile,
-          lineHeight: token.lineHeight.mobile,
-          letterSpacing: token.letterSpacing.mobile,
-        },
-      ];
-    }),
-  ) as Record<TypographyVariant, TypographyVariantShape>;
+): Record<TypographyVariant, TypographyVariantConfig> => {
+  // SAFETY: typographyBase is the canonical source of every TypographyVariant
+  // key, so enumerating its own keys yields the full variant set for this record.
+  const variants = Object.keys(typographyBase) as TypographyVariant[];
+
+  // SAFETY: the reducer assigns every TypographyVariant from the canonical list
+  // above before returning, so the final object satisfies the full record.
+  return variants.reduce<Record<TypographyVariant, TypographyVariantConfig>>(
+    (acc, variant) => {
+      acc[variant] = createVariantConfig(locale, variant);
+      return acc;
+    },
+    {} as Record<TypographyVariant, TypographyVariantConfig>,
+  );
 };
 
 export const typographyNative = createTypography("en");

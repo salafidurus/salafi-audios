@@ -14,6 +14,8 @@ export interface UseInfiniteSearchOptions {
 }
 
 export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
+  const initialPageParam: string | undefined = undefined;
+
   const params = {
     q: options.query?.trim() ? options.query.trim() : undefined,
     scholarSlug: options.scholarSlug,
@@ -24,7 +26,7 @@ export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
 
   return useInfiniteQuery({
     queryKey: queryKeys.search.infinite(params),
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       // API returns full list (non-paginated), only fetch on first page
       if (pageParam) {
         return { items: [], nextCursor: undefined, hasMore: false };
@@ -43,7 +45,7 @@ export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
         hasMore: false,
       };
     },
-    initialPageParam: undefined as string | undefined,
+    initialPageParam,
     getNextPageParam: () => undefined,
     enabled: options.enabled !== false,
   });

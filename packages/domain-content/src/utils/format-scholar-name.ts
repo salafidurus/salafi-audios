@@ -12,6 +12,12 @@ export interface ScholarWithNameAndTitle {
   title?: ScholarTitle | string | null;
 }
 
+type ScholarInput = ScholarWithNameAndTitle | string | null | undefined;
+
+function isStringScholar(scholar: ScholarInput): scholar is string {
+  return Object.prototype.toString.call(scholar) === "[object String]";
+}
+
 const fallbackQueryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -32,14 +38,14 @@ const fallbackQueryClient = new QueryClient({
  * - formatScholarName("Muhammad Nasiruddin al-Albani", "allamah", t) => "Shaykh Allamah Muhammad Nasiruddin al-Albani"
  */
 export function formatScholarName(
-  scholar: ScholarWithNameAndTitle | string | null | undefined,
+  scholar: ScholarInput,
   titleParam: ScholarTitle | string | null | undefined,
   t: TranslateFn,
 ): string {
   if (!scholar) return "";
 
-  const name = typeof scholar === "string" ? scholar : scholar.name;
-  const title = typeof scholar === "string" ? titleParam : scholar.title;
+  const name = isStringScholar(scholar) ? scholar : scholar.name;
+  const title = isStringScholar(scholar) ? titleParam : scholar.title;
 
   if (!name) return "";
   if (!title) return name;

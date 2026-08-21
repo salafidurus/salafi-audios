@@ -7,17 +7,20 @@ import { StyleSheet } from "react-native-unistyles";
 import { changeLocale } from "@/core/i18n/i18n";
 import { useTranslation } from "@/core/i18n/use-translation";
 
-const LOCALE_LABELS: Record<Locale, string> = {
+const LOCALE_LABELS = {
   en: "English",
   ar: "العربية",
-};
+} satisfies Record<Locale, string>;
+
+function parseLocale(locale: string): Locale {
+  return locale === "ar" ? "ar" : "en";
+}
 
 export function LanguageSwitch() {
   const { i18n } = useTranslation();
   const queryClient = useQueryClient();
 
-  const activeLocale =
-    (i18n.language as Locale) in LOCALE_LABELS ? (i18n.language as Locale) : "en";
+  const activeLocale = parseLocale(i18n.language);
 
   const handleSelect = async (locale: Locale) => {
     if (i18n.language === locale) return;
@@ -41,7 +44,7 @@ export function LanguageSwitch() {
       testID="language-switch-menu"
       actions={actions}
       onPressAction={(event: NativeActionEvent) =>
-        void handleSelect(event.nativeEvent.event as Locale)
+        void handleSelect(parseLocale(event.nativeEvent.event))
       }
     >
       {/* Plain View, not Pressable: MenuView's tap-to-open needs SwiftUI's Menu to

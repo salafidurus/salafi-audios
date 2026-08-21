@@ -219,16 +219,21 @@ export class LibraryRepository {
     const locale = getRequestLocale();
 
     const records = await this.prisma.favoriteListing.findMany({
-      where: { userId, deletedAt: null },
-      orderBy: { createdAt: 'desc' },
-      take,
-      ...(cursor
-        ? {
-            cursor: { userId_listingId: { userId, listingId: cursor } },
-            skip: 1,
-          }
-        : {}),
-      include: { listing: { select: listingRelationSelect(locale) } },
+      ...(() => {
+        const baseArgs = {
+          where: { userId, deletedAt: null },
+          orderBy: { createdAt: 'desc' },
+          take,
+          include: { listing: { select: listingRelationSelect(locale) } },
+        } satisfies Prisma.FavoriteListingFindManyArgs;
+        return cursor
+          ? {
+              ...baseArgs,
+              cursor: { userId_listingId: { userId, listingId: cursor } },
+              skip: 1,
+            }
+          : baseArgs;
+      })(),
     });
 
     const hasMore = records.length > limit;
@@ -248,10 +253,13 @@ export class LibraryRepository {
    */
   async findSavedDelta(userId: string, since?: Date): Promise<SavedDeltaItemDto[]> {
     const records = await this.prisma.favoriteListing.findMany({
-      where: {
-        userId,
-        ...(since ? { updatedAt: { gt: since } } : {}),
-      },
+      where: (() => {
+        const where: Prisma.FavoriteListingWhereInput = { userId };
+        if (since) {
+          where.updatedAt = { gt: since };
+        }
+        return where;
+      })(),
       orderBy: { updatedAt: 'desc' },
       select: { listingId: true, updatedAt: true, deletedAt: true, createdAt: true },
     });

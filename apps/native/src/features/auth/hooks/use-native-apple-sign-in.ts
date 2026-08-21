@@ -1,9 +1,17 @@
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as SecureStore from "expo-secure-store";
 import { useState, useCallback } from "react";
+import { z } from "zod";
 
 import { refreshSession } from "@/core/auth";
 import { getApiBaseUrl } from "@/core/config/runtime-env";
+
+const AppleNativeSessionResponseSchema = z.object({
+  session: z.object({
+    id: z.string(),
+    expiresAt: z.string().optional(),
+  }),
+});
 
 export function useNativeAppleSignIn() {
   const [isLoading, setIsLoading] = useState(false);
@@ -56,9 +64,8 @@ export function useNativeAppleSignIn() {
         throw new Error(`Server returned ${response.status}: ${body}`);
       }
 
-      const { session } = (await response.json()) as {
-        session: { id: string; expiresAt?: string };
-      };
+      const parsedResponse = AppleNativeSessionResponseSchema.parse(await response.json());
+      const { session } = parsedResponse;
 
       // Persist session token using better-auth expo client cookie structure
       const cookieData = JSON.stringify({

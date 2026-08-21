@@ -383,6 +383,8 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
         } else if (action.field === "description") {
           assignment.description = String(action.value ?? "");
         } else if (action.field === "status") {
+          // SAFETY: the status editor dispatches only domain `StatusValue` options for the
+          // `"status"` field branch of this reducer action.
           assignment.status = action.value as StatusValue;
         } else {
           assignment.orderIndex = action.value === null ? null : Number(action.value);

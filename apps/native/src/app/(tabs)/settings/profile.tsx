@@ -1,5 +1,5 @@
 import { routes } from "@sd/core-contracts";
-import { type Href, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 import { authClient } from "@/core/auth/auth-client";
 import { queryClient } from "@/core/query-client";
@@ -11,7 +11,7 @@ export default function SettingsProfileRoute() {
   const handleSignOut = async () => {
     await authClient.signOut();
     queryClient.clear();
-    router.replace(routes.home as Href);
+    router.replace(routes.home);
   };
 
   return (

@@ -31,6 +31,14 @@ function reduce(state: FormState, patch: Partial<FormState>): FormState {
   return { ...state, ...patch };
 }
 
+function parseLocaleInput(language: string): Locale | undefined {
+  return language === "ar" || language === "en" ? language : undefined;
+}
+
+function getErrorMessage(cause: unknown): string {
+  return cause instanceof Error ? cause.message : "Unable to save listing";
+}
+
 export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditSheetProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
@@ -72,14 +80,20 @@ export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditShe
     if (!listing) return;
     dispatch({ isSaving: true, error: null });
     try {
-      await updateListing(listing.id, {
+      const update = {
         title,
-        ...(description ? { description } : {}),
-        ...(language ? { language: language as Locale } : {}),
-      });
+        description: description || undefined,
+        language: parseLocaleInput(language),
+      } satisfies {
+        title: string;
+        description?: string;
+        language?: Locale;
+      };
+
+      await updateListing(listing.id, update);
       onSaved();
-    } catch (e) {
-      dispatch({ error: (e as Error).message });
+    } catch (cause) {
+      dispatch({ error: getErrorMessage(cause) });
     } finally {
       dispatch({ isSaving: false });
     }

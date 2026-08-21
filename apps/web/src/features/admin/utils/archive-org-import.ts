@@ -1,6 +1,11 @@
+import { z } from "zod";
+
 import { AUDIO_EXTENSIONS } from "./fetch-remote-file";
 
 const IDENTIFIER_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+const ArchiveMetadataSchema = z.object({
+  files: z.array(z.object({ name: z.string() })).optional(),
+});
 
 /** Extracts an archive.org item identifier from /details/, /download/, /compress/ links, or a bare identifier. */
 export function parseArchiveOrgIdentifier(input: string): string | null {
@@ -37,7 +42,7 @@ export async function resolveArchiveOrgFiles(
     throw new Error(`Couldn't load this archive.org item (HTTP ${response.status}).`);
   }
 
-  const data = (await response.json()) as { files?: { name: string }[] };
+  const data = ArchiveMetadataSchema.parse(await response.json());
   const files = data.files ?? [];
 
   const audioFiles: { url: string; filename: string }[] = [];

@@ -36,15 +36,27 @@ export const ROOT_TABS: RootTabConfig[] = [
   },
 ];
 
-const GROUP_NAME_TO_TAB: Record<RootTabConfig["routeName"], RootTab> = {
+const GROUP_NAME_TO_TAB = {
   explore: "explore",
   "(search)": "search",
   library: "library",
   settings: "settings",
-};
+} satisfies Record<RootTabConfig["routeName"], RootTab>;
+
+export function isSection(value: RootTab): value is Section {
+  return value !== "search";
+}
+
+function isRootTabRouteName(routeName: string): routeName is keyof typeof GROUP_NAME_TO_TAB {
+  return routeName in GROUP_NAME_TO_TAB;
+}
 
 export function getRootTabByRouteName(routeName: string): RootTabConfig | undefined {
-  const tabId = GROUP_NAME_TO_TAB[routeName as RootTabConfig["routeName"]];
+  if (!isRootTabRouteName(routeName)) {
+    return undefined;
+  }
+
+  const tabId = GROUP_NAME_TO_TAB[routeName];
   return ROOT_TABS.find((tab) => tab.id === tabId);
 }
 

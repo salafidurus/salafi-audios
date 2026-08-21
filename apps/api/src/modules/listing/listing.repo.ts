@@ -835,34 +835,36 @@ export class ListingRepository {
     const where: Prisma.ListingWhereInput = {
       deletedAt: null,
       parentId: null,
-      ...(scholarIdFilter ? { scholarId: scholarIdFilter } : {}),
-      ...(params.status ? { status: params.status as Status } : {}),
-      ...(params.search
-        ? {
-            OR: [
-              { title: { contains: params.search, mode: 'insensitive' as const } },
-              {
-                translations: {
-                  some: { title: { contains: params.search, mode: 'insensitive' as const } },
-                },
-              },
-              { scholar: { name: { contains: params.search, mode: 'insensitive' as const } } },
-              {
-                scholar: {
-                  translations: {
-                    some: { name: { contains: params.search, mode: 'insensitive' as const } },
-                  },
-                },
-              },
-            ],
-          }
-        : {}),
     };
+    if (scholarIdFilter) {
+      where.scholarId = scholarIdFilter;
+    }
+    if (params.status) {
+      // SAFETY: admin listing status filters come from validated route/query inputs and match the shared Status union.
+      where.status = params.status as Status;
+    }
+    if (params.search) {
+      where.OR = [
+        { title: { contains: params.search, mode: 'insensitive' } },
+        {
+          translations: {
+            some: { title: { contains: params.search, mode: 'insensitive' } },
+          },
+        },
+        { scholar: { name: { contains: params.search, mode: 'insensitive' } } },
+        {
+          scholar: {
+            translations: {
+              some: { name: { contains: params.search, mode: 'insensitive' } },
+            },
+          },
+        },
+      ];
+    }
 
-    const records = await this.prisma.listing.findMany({
+    const baseQueryArgs = {
       where,
       take,
-      ...(params.cursor ? { cursor: { id: params.cursor }, skip: 1 } : {}),
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
@@ -891,7 +893,11 @@ export class ListingRepository {
           },
         },
       },
-    });
+    } satisfies Prisma.ListingFindManyArgs;
+    const queryArgs = params.cursor
+      ? { ...baseQueryArgs, cursor: { id: params.cursor }, skip: 1 }
+      : baseQueryArgs;
+    const records = await this.prisma.listing.findMany(queryArgs);
 
     const hasMore = records.length > pageSize;
     const items = (hasMore ? records.slice(0, pageSize) : records).map((r) => {
@@ -1761,7 +1767,7 @@ export class ListingRepository {
   // ─── Translation Methods ──────────────────────────────────────────────────
 
   private mapListingTranslation(t: {
-    locale: string;
+    locale: Locale;
     status: string;
     title: string;
     description: string | null;
@@ -1769,7 +1775,7 @@ export class ListingRepository {
     updatedAt: Date;
   }): TranslationViewDto {
     return {
-      locale: t.locale as Locale,
+      locale: t.locale,
       status: t.status === 'published' ? 'published' : 'draft',
       fields: { title: t.title, description: t.description },
       createdAt: t.createdAt.toISOString(),
@@ -1805,19 +1811,19 @@ export class ListingRepository {
 
   async updateListingTranslation(
     listingId: string,
-    locale: string,
+    locale: Locale,
     fields: Partial<{ title: string; description: string | null }>,
   ): Promise<TranslationViewDto> {
     const record = await this.prisma.listingTranslation.update({
-      where: { listingId_locale: { listingId, locale: locale as Locale } },
+      where: { listingId_locale: { listingId, locale } },
       data: { ...fields },
     });
     return this.mapListingTranslation(record);
   }
 
-  async publishListingTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
+  async publishListingTranslation(listingId: string, locale: Locale): Promise<TranslationViewDto> {
     const record = await this.prisma.listingTranslation.update({
-      where: { listingId_locale: { listingId, locale: locale as Locale } },
+      where: { listingId_locale: { listingId, locale } },
       data: { status: 'published' },
     });
     return this.mapListingTranslation(record);
@@ -1825,10 +1831,10 @@ export class ListingRepository {
 
   async unpublishListingTranslation(
     listingId: string,
-    locale: string,
+    locale: Locale,
   ): Promise<TranslationViewDto> {
     const record = await this.prisma.listingTranslation.update({
-      where: { listingId_locale: { listingId, locale: locale as Locale } },
+      where: { listingId_locale: { listingId, locale } },
       data: { status: 'draft' },
     });
     return this.mapListingTranslation(record);
@@ -1927,6 +1933,7 @@ export class ListingRepository {
       const publishedLectureCount = l.format === 'single' ? 1 : (l.publishedLectureCount ?? 1);
 
       return {
+        // SAFETY: listing formats are constrained by the shared listing schema to these three values.
         kind: l.format as 'collection' | 'series' | 'single',
         id: l.id,
         title: resolved.fields.title,

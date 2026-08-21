@@ -1,5 +1,5 @@
-import { resolveLocale } from "./locale-utils";
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES, type Locale } from "./supported-locales";
+import { isSupportedLocale, resolveLocale } from "./locale-utils";
+import { DEFAULT_LOCALE, type Locale } from "./supported-locales";
 
 /**
  * Minimal async storage interface that both web (localStorage adapter) and
@@ -32,10 +32,7 @@ export function createLanguageStore(adapter: LanguageStorageAdapter): LanguageSt
     async getLanguage(): Promise<Locale> {
       const raw = await adapter.getItem(STORAGE_KEY);
       if (!raw) return DEFAULT_LOCALE;
-      const candidate = (SUPPORTED_LOCALES as readonly string[]).includes(raw)
-        ? raw
-        : resolveLocale(raw);
-      return candidate as Locale;
+      return isSupportedLocale(raw) ? raw : resolveLocale(raw);
     },
 
     async setLanguage(locale: Locale): Promise<void> {

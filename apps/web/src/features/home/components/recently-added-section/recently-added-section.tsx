@@ -34,7 +34,7 @@ export function RecentlyAddedSection() {
     }
   }
 
-  const picks = (promoData?.editorsPicks?.map((p: any) => p.listing) ?? []) as FeedContentItemDto[];
+  const picks = promoData?.editorsPicks?.map((pick) => pick.listing) ?? [];
   const itemsToUse = picks.length > 0 ? picks : items;
   const [featured, ...rest] = itemsToUse;
 

@@ -23,6 +23,17 @@ export type HttpClientConfig = {
   onError?: (status: number) => void;
 };
 
+export class HttpError extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly statusText: string,
+    public readonly body: string,
+  ) {
+    super(`API ${status} ${statusText}: ${body}`);
+    this.name = "HttpError";
+  }
+}
+
 type QueryParamValue = string | number | boolean | null | undefined;
 
 type QueryParams = Record<string, QueryParamValue | QueryParamValue[]>;
@@ -88,23 +99,29 @@ export async function httpClient<T>(options: {
   let res: Response;
 
   try {
+    const headers = { ...options.headers };
+    if (payload !== undefined && payload !== null) {
+      headers["Content-Type"] = "application/json";
+    }
+    if (token) {
+      headers["Authorization"] ??= `Bearer ${token}`;
+    }
+    if (cookie) {
+      headers["Cookie"] ??= cookie;
+    }
+    if (locale) {
+      headers["Accept-Language"] ??= locale;
+    }
+
     res = await fetch(endpoint.toString(), {
       method: options.method,
       // Send cookies automatically (web via browser, native via @better-auth/expo).
       // Cookies are sent via either credentials:"include" (web) or Cookie header
       // (native). For native, getCookie() will override via headers below.
       credentials: "include",
-      headers: {
-        ...(payload !== undefined && payload !== null
-          ? { "Content-Type": "application/json" }
-          : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(cookie ? { Cookie: cookie } : {}),
-        ...(locale ? { "Accept-Language": locale } : {}),
-        ...options.headers,
-      },
+      headers,
       body: payload ? JSON.stringify(payload) : undefined,
-      signal: controller.signal as any,
+      signal: controller.signal,
     });
   } catch {
     throw new Error("Network request failed. Check API availability and base URL configuration.");
@@ -115,14 +132,18 @@ export async function httpClient<T>(options: {
   if (!res.ok) {
     config.onError?.(res.status);
     const text = await res.text().catch(() => "");
-    throw new Error(`API ${res.status} ${res.statusText}: ${text}`);
+    throw new HttpError(res.status, res.statusText, text);
   }
 
   // allow empty responses
   const ct = res.headers.get("content-type") || "";
   if (!ct.includes("application/json")) {
-    return (await res.text()) as unknown as T;
+    // SAFETY: non-JSON responses are delivered as the transport body text, and
+    // callers explicitly choose T to match that endpoint's response contract.
+    return (await res.text()) as T;
   }
 
+  // SAFETY: JSON responses are decoded by the API contract; callers choose T to
+  // match the endpoint's declared payload shape.
   return (await res.json()) as T;
 }

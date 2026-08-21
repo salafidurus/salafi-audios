@@ -67,6 +67,8 @@ async function bootstrap() {
   // returned no CORS headers. A proper route stays inside Fastify's hook
   // pipeline, letting the CORS plugin handle preflight automatically. See
   // https://better-auth.com/docs/integrations/fastify
+  // SAFETY: this Nest app is bootstrapped with the Fastify adapter above, so
+  // the underlying HTTP adapter instance is a Fastify server here.
   const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
   fastify.route({
     method: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -74,11 +76,17 @@ async function bootstrap() {
     async handler(request: FastifyRequest, reply: FastifyReply) {
       const url = new URL(request.url, `http://${request.headers.host}`);
       const headers = fromNodeHeaders(request.headers);
-      const req = new Request(url.toString(), {
+      const requestInit: RequestInit = {
         method: request.method,
         headers,
-        ...(request.body ? { body: JSON.stringify(request.body) } : {}),
-      });
+      };
+      if (request.body) {
+        requestInit.body = JSON.stringify(request.body);
+      }
+      const req = new Request(url.toString(), requestInit);
+      if (request.body) {
+        req.headers.set('content-type', 'application/json');
+      }
 
       try {
         const response = await getAuth().handler(req);
@@ -90,6 +98,8 @@ async function bootstrap() {
         // nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
         return reply.send(response.body ? await response.text() : null);
       } catch (error) {
+        // SAFETY: Better Auth throws Error instances for handler failures and
+        // pino expects an Error object for structured error logging.
         fastify.log.error(error as Error, 'Authentication Error:');
         return reply.status(500).send({
           error: 'Internal authentication error',

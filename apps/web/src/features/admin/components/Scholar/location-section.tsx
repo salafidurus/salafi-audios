@@ -33,6 +33,7 @@ export function LocationSection({ formData, dispatch }: LocationSectionProps) {
           <Dropdown
             value={formData.country ?? ""}
             onValueChange={(value) =>
+              // SAFETY: the country dropdown renders only COUNTRY_LIST country-code options.
               dispatch({ type: "UPDATE_FIELD", field: "country", value: value as CountryCode })
             }
           >
@@ -56,6 +57,7 @@ export function LocationSection({ formData, dispatch }: LocationSectionProps) {
           <Dropdown
             value={formData.mainLanguage}
             onValueChange={(value) =>
+              // SAFETY: the language dropdown renders only the `"en"` and `"ar"` literals below.
               dispatch({
                 type: "UPDATE_FIELD",
                 field: "mainLanguage",

@@ -17,10 +17,10 @@ import {
 
 import styles from "./language-switch.module.css";
 
-const LOCALE_LABELS: Record<Locale, string> = {
+const LOCALE_LABELS = {
   en: "English",
   ar: "العربية",
-};
+} satisfies Record<Locale, string>;
 
 interface LanguageSwitchProps {
   direction?: "up" | "down";
@@ -32,14 +32,15 @@ export function LanguageSwitch({ direction = "down", collapsed = false }: Langua
   const { refresh } = useRouter();
   const queryClient = useQueryClient();
 
-  const activeLocale =
-    (i18n.language as Locale) in LOCALE_LABELS ? (i18n.language as Locale) : "en";
+  const activeLocale = SUPPORTED_LOCALES.find((locale) => locale === i18n.language) ?? "en";
 
   const handleSelect = async (locale: string) => {
     if (i18n.language === locale) {
       return;
     }
+    // SAFETY: Dropdown values come only from SUPPORTED_LOCALES below.
     await i18n.changeLanguage(locale as Locale);
+    // SAFETY: Dropdown values come only from SUPPORTED_LOCALES below.
     setLocaleCookie(locale as Locale);
     // Content queries carry the locale via Accept-Language. A refetch here
     // would still use the OLD locale and get thrown away by router.refresh()

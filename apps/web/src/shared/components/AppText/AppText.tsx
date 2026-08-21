@@ -12,6 +12,13 @@ export type AppTextProps = {
   color?: "primary" | "secondary" | "muted" | "inherit";
 };
 
+const COLOR_CLASS_MAP = {
+  primary: styles.colorPrimary,
+  secondary: styles.colorSecondary,
+  muted: styles.colorMuted,
+  inherit: styles.colorInherit,
+} as const;
+
 export function AppText({
   variant,
   children,
@@ -29,8 +36,7 @@ export function AppText({
         }
       : {};
 
-  const colorKey = `color${color.charAt(0).toUpperCase()}${color.slice(1)}` as keyof typeof styles;
-  const colorClass = styles[colorKey] ?? "";
+  const colorClass = COLOR_CLASS_MAP[color];
 
   return (
     <span className={`${styles[variant]} ${colorClass}`} style={{ ...clampStyle, ...style }}>

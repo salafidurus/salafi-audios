@@ -19,16 +19,6 @@ type StatusBadgeProps = {
 
 export type BadgeProps = RoleBadgeProps | StatusBadgeProps;
 
-function getStatusStyleMap(): Record<string, ViewStyle> {
-  return {
-    primary: styles.status_primary,
-    secondary: styles.status_secondary,
-    muted: styles.status_muted,
-    success: styles.status_success,
-    warning: styles.status_warning,
-  };
-}
-
 export function Badge(props: BadgeProps): ReactNode {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
@@ -52,7 +42,7 @@ export function Badge(props: BadgeProps): ReactNode {
   const colorKey = props.color ?? "primary";
 
   return (
-    <View style={[styles.badge, getStatusStyleMap()[colorKey]]}>
+    <View style={[styles.badge, STATUS_STYLE_BY_COLOR[colorKey]]}>
       <AppText variant="caption" style={styles.statusText}>
         {props.status}
       </AppText>
@@ -95,3 +85,11 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.state.dangerSurface,
   },
 }));
+
+const STATUS_STYLE_BY_COLOR = {
+  primary: styles.status_primary,
+  secondary: styles.status_secondary,
+  muted: styles.status_muted,
+  success: styles.status_success,
+  warning: styles.status_warning,
+} satisfies Record<NonNullable<StatusBadgeProps["color"]>, ViewStyle>;

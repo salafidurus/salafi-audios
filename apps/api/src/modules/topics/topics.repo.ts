@@ -34,6 +34,10 @@ type TopicViewRecord = Prisma.TopicGetPayload<{
 export class TopicsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  private normalizeLectureLimit(limit?: number): number {
+    return limit != null && Number.isFinite(limit) ? Math.max(1, Math.min(100, limit)) : 50;
+  }
+
   async list(): Promise<TopicDetailDto[]> {
     const records = await this.findManyTopics();
 
@@ -80,10 +84,7 @@ export class TopicsRepository {
         topics: { some: { topicId: topic.id } },
       },
       orderBy: [{ publishedAt: 'desc' }, { title: 'asc' }],
-      take:
-        typeof limit === 'number' && Number.isFinite(limit)
-          ? Math.max(1, Math.min(100, limit))
-          : 50,
+      take: this.normalizeLectureLimit(limit),
       select: {
         id: true,
         scholarId: true,
@@ -187,13 +188,13 @@ export class TopicsRepository {
   // ─── Topic translations ───────────────────────────────────────────────────
 
   private mapTopicTranslation(t: {
-    locale: string;
+    locale: Locale;
     name: string;
     createdAt: Date;
     updatedAt: Date;
   }): TranslationViewDto {
     return {
-      locale: t.locale as Locale,
+      locale: t.locale,
       fields: { name: t.name },
       createdAt: t.createdAt.toISOString(),
       updatedAt: t.updatedAt.toISOString(),
@@ -222,11 +223,11 @@ export class TopicsRepository {
 
   async updateTopicTranslation(
     topicId: string,
-    locale: string,
+    locale: Locale,
     fields: Partial<{ name: string }>,
   ): Promise<TranslationViewDto> {
     const record = await this.prisma.topicTranslation.update({
-      where: { topicId_locale: { topicId, locale: locale as Locale } },
+      where: { topicId_locale: { topicId, locale } },
       data: { ...fields },
     });
     return this.mapTopicTranslation(record);

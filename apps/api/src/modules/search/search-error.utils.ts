@@ -8,14 +8,10 @@ const TRIGRAM_ERROR_PATTERNS = [
   /function .*similarity.* does not exist/i,
 ] as const;
 
-export function isTrigramSearchFailure(error: unknown): boolean {
+export function isTrigramSearchFailure(error: Error): boolean {
+  const message = error.message;
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     return TRIGRAM_ERROR_PATTERNS.some((pattern) => pattern.test(error.message));
   }
-
-  if (error instanceof Error) {
-    return TRIGRAM_ERROR_PATTERNS.some((pattern) => pattern.test(error.message));
-  }
-
-  return false;
+  return TRIGRAM_ERROR_PATTERNS.some((pattern) => pattern.test(message));
 }

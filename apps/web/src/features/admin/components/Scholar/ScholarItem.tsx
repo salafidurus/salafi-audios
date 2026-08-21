@@ -26,9 +26,7 @@ export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) 
   const { t } = useTranslation();
   const { ability } = useAbility();
   const formatScholarName = useFormatScholarName();
-  const countryName = scholar.country
-    ? (COUNTRY_NAMES[scholar.country as keyof typeof COUNTRY_NAMES] ?? scholar.country)
-    : null;
+  const countryName = scholar.country ? (COUNTRY_NAMES[scholar.country] ?? scholar.country) : null;
 
   const hasSocials =
     scholar.socialTwitter ||

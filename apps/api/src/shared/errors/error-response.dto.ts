@@ -11,7 +11,7 @@ export class ErrorResponseDto {
     type: 'object',
     additionalProperties: true,
   })
-  details?: Record<string, unknown>;
+  details?: object;
 
   @ApiProperty({
     type: String,

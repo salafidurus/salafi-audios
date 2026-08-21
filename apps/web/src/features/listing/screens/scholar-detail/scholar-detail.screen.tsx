@@ -48,8 +48,12 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const headerContentRef = useRef<HTMLDivElement>(null);
 
-  const { data: scholar, isFetching: isFetchingScholar, isError: isScholarError, refetch: refetchScholar } =
-    useScholarDetail(slug);
+  const {
+    data: scholar,
+    isFetching: isFetchingScholar,
+    isError: isScholarError,
+    refetch: refetchScholar,
+  } = useScholarDetail(slug);
   const { data: contentData } = useScholarContent(slug);
   const { data: topicsData } = useScholarTopics(slug);
 
@@ -58,6 +62,8 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
     if (!el) return;
 
     const updateHeight = () => {
+      // SAFETY: `StickyHeaderLayout` renders the measured content inside its sticky header shell,
+      // so the nearest matching ancestor is the layout's sticky header container when present.
       const stickyHeaderEl = el.closest('[class*="stickyHeader"]') as HTMLElement | null;
       const height = stickyHeaderEl
         ? stickyHeaderEl.getBoundingClientRect().height
@@ -94,8 +100,12 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   if (isScholarError && !scholar) {
     return (
       <ScreenView center>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
-          <AppText variant="titleMd">{t("scholarContent.error", "Failed to load scholar details")}</AppText>
+        <div
+          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}
+        >
+          <AppText variant="titleMd">
+            {t("scholarContent.error", "Failed to load scholar details")}
+          </AppText>
           <button
             type="button"
             onClick={() => refetchScholar()}
@@ -129,11 +139,35 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
                 </button>
               </div>
 
-              <div className={styles.headerContent} style={{ display: "flex", gap: "16px", alignItems: "center", padding: "16px 0" }}>
-                <div style={{ width: 80, height: 80, borderRadius: "50%", background: "var(--surface-subtle)" }} />
+              <div
+                className={styles.headerContent}
+                style={{ display: "flex", gap: "16px", alignItems: "center", padding: "16px 0" }}
+              >
+                <div
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: "50%",
+                    background: "var(--surface-subtle)",
+                  }}
+                />
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
-                  <div style={{ width: "160px", height: "20px", borderRadius: "4px", background: "var(--surface-subtle)" }} />
-                  <div style={{ width: "100px", height: "14px", borderRadius: "4px", background: "var(--surface-subtle)" }} />
+                  <div
+                    style={{
+                      width: "160px",
+                      height: "20px",
+                      borderRadius: "4px",
+                      background: "var(--surface-subtle)",
+                    }}
+                  />
+                  <div
+                    style={{
+                      width: "100px",
+                      height: "14px",
+                      borderRadius: "4px",
+                      background: "var(--surface-subtle)",
+                    }}
+                  />
                 </div>
               </div>
             </div>
@@ -142,7 +176,15 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
           <StickyHeaderLayout.Content>
             <div className={styles.contentList}>
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={`scholar-detail-skeleton-${i}`} style={{ height: "56px", width: "100%", borderRadius: "8px", background: "var(--surface-subtle)" }} />
+                <div
+                  key={`scholar-detail-skeleton-${i}`}
+                  style={{
+                    height: "56px",
+                    width: "100%",
+                    borderRadius: "8px",
+                    background: "var(--surface-subtle)",
+                  }}
+                />
               ))}
             </div>
           </StickyHeaderLayout.Content>

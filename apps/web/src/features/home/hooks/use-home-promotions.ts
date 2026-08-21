@@ -1,12 +1,19 @@
-import { httpClient, endpoints } from "@sd/core-contracts";
+import { httpClient, endpoints, type FeedContentItemDto } from "@sd/core-contracts";
 import { useQuery } from "@tanstack/react-query";
+
+type HomePromotions = {
+  hero: FeedContentItemDto | null;
+  editorsPicks: Array<{
+    listing: FeedContentItemDto;
+  }>;
+};
 
 export function useHomePromotions() {
   return useQuery({
     queryKey: ["home", "promotions"],
     queryFn: async () => {
       try {
-        return await httpClient<any>({
+        return await httpClient<HomePromotions>({
           url: endpoints.listings.promotions,
           method: "GET",
         });

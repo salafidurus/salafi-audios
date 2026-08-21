@@ -8,6 +8,7 @@ import type {
   AdminTopicDetailDto,
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
+  Locale,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
@@ -123,7 +124,7 @@ export class TopicsService {
 
   async updateTranslation(
     topicId: string,
-    locale: string,
+    locale: Locale,
     fields: Partial<{ name: string }>,
   ): Promise<TranslationViewDto> {
     const result = await this.repo.updateTopicTranslation(topicId, locale, fields);

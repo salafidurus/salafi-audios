@@ -54,7 +54,7 @@ const proxyAdapter: StorageAdapter = {
 // Namespaced by userId (see `initProgressSync`) so a second user signing in on
 // the same device never sees — or retries — a prior user's queued push. Starts
 // under a generic namespace until the first `initProgressSync` call scopes it.
-let outbox = createOutboxStore(proxyAdapter, "progress");
+let outbox = createOutboxStore<PendingUpdate>(proxyAdapter, "progress");
 
 /**
  * Upgrades the retry queue to a persisted `StorageAdapter`, scoped to `userId`,
@@ -65,7 +65,7 @@ let outbox = createOutboxStore(proxyAdapter, "progress");
  */
 export async function initProgressSync(adapter: StorageAdapter, userId: string): Promise<void> {
   delegateAdapter = adapter;
-  outbox = createOutboxStore(proxyAdapter, `progress:${userId}`);
+  outbox = createOutboxStore<PendingUpdate>(proxyAdapter, `progress:${userId}`);
   await outbox.hydrate();
 }
 
@@ -87,9 +87,7 @@ async function pushUpdate(update: PendingUpdate): Promise<void> {
  * attempted, mirroring `flushPending`'s "notify on any attempt" semantics.
  */
 async function drainQueuedRetries(): Promise<void> {
-  const { succeeded, failed } = await drainOutbox(outbox, (entry) =>
-    pushUpdate(entry.payload as PendingUpdate),
-  );
+  const { succeeded, failed } = await drainOutbox(outbox, (entry) => pushUpdate(entry.payload));
   if (succeeded + failed > 0) {
     for (const listener of flushListeners) listener();
   }

@@ -8,6 +8,7 @@ import type {
   ScholarTopicsDto,
   TranslationViewDto,
   AdminScholarListDto,
+  Locale,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
@@ -121,7 +122,7 @@ export class ScholarsService {
 
   async updateTranslation(
     scholarSlug: string,
-    locale: string,
+    locale: Locale,
     fields: Partial<{ name: string; bio: string | null }>,
   ): Promise<TranslationViewDto> {
     const scholarId = await this.repo.findIdBySlug(scholarSlug);
@@ -136,7 +137,7 @@ export class ScholarsService {
     return result;
   }
 
-  async publishTranslation(scholarSlug: string, locale: string): Promise<TranslationViewDto> {
+  async publishTranslation(scholarSlug: string, locale: Locale): Promise<TranslationViewDto> {
     const scholarId = await this.repo.findIdBySlug(scholarSlug);
     if (!scholarId) throw new NotFoundException('Scholar not found');
     const [result, scholar] = await Promise.all([
@@ -149,7 +150,7 @@ export class ScholarsService {
     return result;
   }
 
-  async unpublishTranslation(scholarSlug: string, locale: string): Promise<TranslationViewDto> {
+  async unpublishTranslation(scholarSlug: string, locale: Locale): Promise<TranslationViewDto> {
     const scholarId = await this.repo.findIdBySlug(scholarSlug);
     if (!scholarId) throw new NotFoundException('Scholar not found');
     const [result, scholar] = await Promise.all([

@@ -28,8 +28,8 @@ export type CountryCode = (typeof COUNTRY_CODES)[number];
 
 export const CountryCodeSchema = z.enum(COUNTRY_CODES);
 
-export function isCountryCode(val: unknown): val is CountryCode {
-  return CountryCodeSchema.safeParse(val).success;
+export function isCountryCode(code: string): code is CountryCode {
+  return CountryCodeSchema.safeParse(code).success;
 }
 
 export function validateCountryCode(val: string, fallback: CountryCode = "SA"): CountryCode {
@@ -37,7 +37,7 @@ export function validateCountryCode(val: string, fallback: CountryCode = "SA"): 
   return result.success ? result.data : fallback;
 }
 
-export const COUNTRY_NAMES: Record<CountryCode, string> = {
+export const COUNTRY_NAMES = {
   SA: "Saudi Arabia",
   AE: "United Arab Emirates",
   EG: "Egypt",
@@ -59,9 +59,9 @@ export const COUNTRY_NAMES: Record<CountryCode, string> = {
   US: "United States",
   GB: "United Kingdom",
   OTHER: "Other",
-};
+} satisfies Record<CountryCode, string>;
 
-export const COUNTRY_LIST = Object.entries(COUNTRY_NAMES).map(([code, name]) => ({
-  code: code as CountryCode,
-  name,
+export const COUNTRY_LIST = COUNTRY_CODES.map((code) => ({
+  code,
+  name: COUNTRY_NAMES[code],
 }));

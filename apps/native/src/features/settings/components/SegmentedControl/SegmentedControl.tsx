@@ -1,10 +1,12 @@
 import { SegmentedControl as NativeSegmentedControl } from "@expo/ui/community/segmented-control";
-import { I18nManager, View, type ViewStyle } from "react-native";
+import { I18nManager, View, type DimensionValue } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
+const FULL_WIDTH: DimensionValue = "100%";
+
 const base = {
-  container: { width: "100%" } as ViewStyle,
-  control: { width: "100%" } as ViewStyle,
+  container: { width: FULL_WIDTH },
+  control: { width: FULL_WIDTH },
 };
 
 export interface SegmentedControlOption<T extends string> {

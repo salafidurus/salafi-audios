@@ -309,7 +309,7 @@ jest.mock("@expo/ui/swift-ui/modifiers", () => ({
   background: (color) => ({ $type: "background", color }),
   border: (params) => ({ $type: "border", ...params }),
   buttonStyle: (style) => ({ $type: "buttonStyle", style }),
-  clipShape: (shape, cornerRadius) => ({ $type: "clipShape", shape, cornerRadius }),
+  cornerRadius: (value) => ({ $type: "cornerRadius", value }),
   disabled: (value = true) => ({ $type: "disabled", value }),
   font: (params) => ({ $type: "font", ...params }),
   foregroundStyle: (style) => ({ $type: "foregroundStyle", style }),

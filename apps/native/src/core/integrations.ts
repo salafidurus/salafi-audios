@@ -33,5 +33,5 @@ export function getWrappedLayout<T extends ComponentType<unknown>>(
   if (isDev() || !env?.sentryDsn) {
     return Layout;
   }
-  return Sentry.wrap(Layout) as T;
+  return Sentry.wrap(Layout);
 }

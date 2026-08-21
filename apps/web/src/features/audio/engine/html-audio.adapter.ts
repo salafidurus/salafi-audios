@@ -1,7 +1,9 @@
 import type { PlaybackEngine, PlaybackEngineEvents, Track } from "@sd/domain-audio";
 
+import { hasMediaMetadataConstructor, hasNavigator, hasWindow } from "@/shared/lib/runtime-guards";
+
 function hasMediaSession(): boolean {
-  return typeof navigator !== "undefined" && "mediaSession" in navigator;
+  return hasNavigator() && "mediaSession" in navigator;
 }
 
 export class HTMLAudioAdapter implements PlaybackEngine {
@@ -10,7 +12,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   private activeListeners: { [K in string]?: (e: Event) => void } = {};
 
   async setup(): Promise<void> {
-    if (typeof window === "undefined") {
+    if (!hasWindow()) {
       return;
     }
     if (!this.audio) {
@@ -100,7 +102,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   }
 
   private updateMediaSessionMetadata(track: Track) {
-    if (!hasMediaSession() || typeof MediaMetadata === "undefined") return;
+    if (!hasMediaSession() || !hasMediaMetadataConstructor()) return;
 
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.title,
@@ -130,7 +132,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
       this.events.onSkipNext?.();
     });
     navigator.mediaSession.setActionHandler("seekto", (details) => {
-      if (typeof details.seekTime === "number") {
+      if (details.seekTime !== undefined) {
         void this.seek(details.seekTime);
       }
     });

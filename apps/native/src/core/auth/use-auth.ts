@@ -10,10 +10,7 @@ export function useAuth() {
   };
 }
 
-export function useRequireAuth(): {
-  isAuthenticated: boolean;
-  isLoading: boolean;
-} {
+export function useRequireAuth() {
   const { data: session, isPending } = authClient.useSession();
 
   return {

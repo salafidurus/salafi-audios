@@ -69,6 +69,7 @@ export function GeneralDataSection({
             <Dropdown
               value={formData.title ?? ""}
               onValueChange={(value) =>
+                // SAFETY: the title dropdown renders only ScholarTitle entries from SCHOLAR_TITLES_ARRAY.
                 dispatch({
                   type: "UPDATE_FIELD",
                   field: "title",

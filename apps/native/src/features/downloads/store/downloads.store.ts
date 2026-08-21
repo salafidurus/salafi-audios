@@ -43,6 +43,8 @@ export const useDownloadsStore = create<DownloadsState>((set, get) => ({
       set((state) => ({
         downloads: {
           ...state.downloads,
+          // SAFETY: merging a partial write-through row onto an existing
+          // DownloadRow preserves the persisted registry shape for that id.
           [row.listingId]: { ...state.downloads[row.listingId], ...row } as DownloadRow,
         },
       }));

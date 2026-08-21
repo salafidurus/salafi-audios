@@ -13,20 +13,21 @@ const NativeRuntimeExtraSchema = z.object({
 });
 
 export type NativeRuntimeExtra = z.infer<typeof NativeRuntimeExtraSchema>;
+type RuntimeExtraCandidate = Partial<NativeRuntimeExtra> | null | undefined;
 
-export function parseNativeRuntimeExtra(extra: unknown): NativeRuntimeExtra | null {
+export function parseNativeRuntimeExtra(extra: RuntimeExtraCandidate): NativeRuntimeExtra | null {
   const parsed = NativeRuntimeExtraSchema.safeParse(extra);
   return parsed.success ? parsed.data : null;
 }
 
 type ConstantsWithLegacyManifests = typeof Constants & {
   manifest?: {
-    extra?: unknown;
+    extra?: object;
   };
   manifest2?: {
     extra?: {
       expoClient?: {
-        extra?: unknown;
+        extra?: object;
       };
     };
   };
@@ -35,7 +36,10 @@ type ConstantsWithLegacyManifests = typeof Constants & {
 let cachedEnv: NativeRuntimeExtra | null | undefined;
 let hasLoggedRuntimeExtraWarning = false;
 
-function getRuntimeExtra(): unknown {
+function getRuntimeExtra(): RuntimeExtraCandidate {
+  // SAFETY: expo-constants exposes these legacy manifest properties at runtime
+  // during older/native startup paths; this local structural view only reads
+  // the optional `extra` objects if present.
   const constants = Constants as ConstantsWithLegacyManifests;
 
   return (

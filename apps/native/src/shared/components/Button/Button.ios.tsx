@@ -4,7 +4,7 @@ import {
   background,
   border,
   buttonStyle,
-  clipShape,
+  cornerRadius,
   disabled as disabledModifier,
   font,
   foregroundStyle,
@@ -13,7 +13,13 @@ import {
   padding,
   type ModifierConfig,
 } from "@expo/ui/swift-ui/modifiers";
-import { ActivityIndicator, type StyleProp, type ViewStyle } from "react-native";
+import {
+  ActivityIndicator,
+  type DimensionValue,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
 import { getButtonTokens, type ButtonSize, type ButtonVariant } from "./button.tokens";
@@ -31,6 +37,19 @@ export type ButtonProps = {
   style?: StyleProp<ViewStyle>;
   testID?: string;
 };
+
+type SwiftFontWeight =
+  | "ultraLight"
+  | "thin"
+  | "light"
+  | "regular"
+  | "medium"
+  | "semibold"
+  | "bold"
+  | "heavy"
+  | "black";
+
+const FULL_WIDTH: DimensionValue = "100%";
 
 export function Button({
   variant = "surface",
@@ -60,14 +79,14 @@ export function Button({
   if (t.borderWidth && t.borderColor) {
     modifiers.push(border({ color: t.borderColor, width: t.borderWidth }));
   }
-  modifiers.push(clipShape("roundedRectangle", t.borderRadius));
+  modifiers.push(cornerRadius(t.borderRadius));
   if (isDisabled) {
     modifiers.push(opacity(0.5), disabledModifier(true));
   }
 
   const textModifiers: ModifierConfig[] = [
     font({ size: t.labelStyle.fontSize, weight: mapFontWeight(t.labelStyle.fontWeight) }),
-    foregroundStyle(t.labelStyle.color as string),
+    foregroundStyle(getSwiftTextColor(t.labelStyle.color, t.textColor)),
   ];
 
   return (
@@ -90,13 +109,10 @@ export function Button({
 }
 
 const base = {
-  stretch: { width: "100%" } as ViewStyle,
+  stretch: { width: FULL_WIDTH },
 };
 
-const FONT_WEIGHT_MAP: Record<
-  string,
-  "ultraLight" | "thin" | "light" | "regular" | "medium" | "semibold" | "bold" | "heavy" | "black"
-> = {
+const FONT_WEIGHT_MAP = {
   "100": "ultraLight",
   "200": "thin",
   "300": "light",
@@ -108,8 +124,38 @@ const FONT_WEIGHT_MAP: Record<
   "900": "black",
   normal: "regular",
   bold: "bold",
-};
+} satisfies Record<string, SwiftFontWeight>;
 
-function mapFontWeight(weight: unknown): (typeof FONT_WEIGHT_MAP)[string] {
-  return FONT_WEIGHT_MAP[String(weight ?? "400")] ?? "regular";
+function mapFontWeight(weight: TextStyle["fontWeight"] | undefined): SwiftFontWeight {
+  const normalizedWeight = String(weight ?? "400");
+  switch (normalizedWeight) {
+    case "100":
+      return FONT_WEIGHT_MAP["100"];
+    case "200":
+      return FONT_WEIGHT_MAP["200"];
+    case "300":
+      return FONT_WEIGHT_MAP["300"];
+    case "400":
+      return FONT_WEIGHT_MAP["400"];
+    case "500":
+      return FONT_WEIGHT_MAP["500"];
+    case "600":
+      return FONT_WEIGHT_MAP["600"];
+    case "700":
+      return FONT_WEIGHT_MAP["700"];
+    case "800":
+      return FONT_WEIGHT_MAP["800"];
+    case "900":
+      return FONT_WEIGHT_MAP["900"];
+    case "normal":
+      return FONT_WEIGHT_MAP.normal;
+    case "bold":
+      return FONT_WEIGHT_MAP.bold;
+    default:
+      return "regular";
+  }
+}
+
+function getSwiftTextColor(color: TextStyle["color"], fallback: string): string {
+  return color !== undefined && color !== null ? String(color) : fallback;
 }

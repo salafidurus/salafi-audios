@@ -1,11 +1,14 @@
 import { Global, Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
 import crypto from 'node:crypto';
+import { z } from 'zod';
 import { ConfigService } from '../config/config.service';
 
 function genId() {
   return crypto.randomUUID();
 }
+
+const requestIdHeaderSchema = z.string().trim().min(1);
 
 @Global()
 @Module({
@@ -19,9 +22,8 @@ function genId() {
           pinoHttp: {
             // Respect inbound request id if present, else generate one.
             genReqId: (req, res) => {
-              const existing = req.headers['x-request-id'];
-              const id =
-                typeof existing === 'string' && existing.trim().length > 0 ? existing : genId();
+              const parsedExisting = requestIdHeaderSchema.safeParse(req.headers['x-request-id']);
+              const id = parsedExisting.success ? parsedExisting.data : genId();
 
               res.setHeader('x-request-id', id);
               return id;

@@ -5,7 +5,9 @@ import { PrismaService } from '../../core/db/prisma.service';
 import { ConfigService } from '../../core/config/config.service';
 import { RedisService } from '../../core/redis/redis.service';
 import { Status } from '@sd/core-db';
+import type { Prisma } from '@sd/core-db';
 import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
+import { z } from 'zod';
 
 const COMPLETION_PERCENT_THRESHOLD = 0.95;
 const COMPLETION_TAIL_SECONDS = 30;
@@ -20,6 +22,7 @@ type PendingProgress = {
 };
 
 type ProgressWrite = Omit<PendingProgress, 'version' | 'updatedAt'> & { updatedAt: Date };
+type ProgressWhere = Prisma.UserListingProgressWhereInput;
 
 const ENQUEUE_PROGRESS_SCRIPT = `
 local existing = redis.call('GET', KEYS[1])
@@ -32,6 +35,20 @@ redis.call('SET', KEYS[1], cjson.encode(incoming), 'EX', ARGV[3])
 redis.call('ZADD', KEYS[2], ARGV[2], ARGV[4])
 return 1
 `;
+
+const progressMemberSchema = z.object({
+  userId: z.string().min(1),
+  listingId: z.string().min(1),
+});
+
+const pendingProgressSchema = z.object({
+  version: z.string().min(1),
+  userId: z.string().min(1),
+  listingId: z.string().min(1),
+  positionSeconds: z.number(),
+  isCompleted: z.boolean(),
+  updatedAt: z.string().min(1),
+}) satisfies z.ZodType<PendingProgress>;
 
 /**
  * Server-side completion safety net: a position counts as "complete" once it
@@ -64,11 +81,12 @@ export class AudioRepository {
   }
 
   async getUserProgress(userId: string, since?: Date): Promise<AudioProgressDto[]> {
+    const where: ProgressWhere = { userId };
+    if (since) {
+      where.updatedAt = { gt: since };
+    }
     const progressRecords = await this.prisma.userListingProgress.findMany({
-      where: {
-        userId,
-        ...(since ? { updatedAt: { gt: since } } : {}),
-      },
+      where,
       orderBy: { updatedAt: 'desc' },
       include: {
         listing: {
@@ -315,14 +333,18 @@ export class AudioRepository {
     if (members.length === 0) return [];
     const values = await this.redis.mget(
       members.map((member) => {
-        const parsed = JSON.parse(member) as { userId: string; listingId: string };
+        // SAFETY: members were originally enqueued by this repository with the
+        // same `{ userId, listingId }` JSON shape.
+        const parsed = progressMemberSchema.parse(member);
         return this.progressPendingKey(parsed.userId, parsed.listingId);
       }),
     );
     return values.flatMap((value) => {
       if (!value) return [];
       try {
-        return [JSON.parse(value) as PendingProgress];
+        // SAFETY: the pending payload is serialized by `enqueueProgress` using
+        // the `PendingProgress` contract owned by this repository.
+        return [pendingProgressSchema.parse(value)];
       } catch {
         return [];
       }

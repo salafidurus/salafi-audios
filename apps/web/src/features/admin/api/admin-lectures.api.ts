@@ -16,6 +16,7 @@ import type {
 } from "@sd/core-contracts";
 
 import { httpClient, endpoints } from "@sd/core-contracts";
+import { z } from "zod";
 
 export function getPresignedUrl(data: PresignedUrlRequestDto) {
   return httpClient<PresignedUrlResponseDto>({
@@ -93,6 +94,10 @@ export class ArrangeConflictError extends Error {
   }
 }
 
+const ArrangeConflictBodySchema = z.object({
+  conflictingSlugs: z.array(z.string()).optional(),
+});
+
 export async function commitArrange(id: string, data: ArrangeCommitDto) {
   try {
     return await httpClient<ArrangeCommitResultDto>({
@@ -103,12 +108,12 @@ export async function commitArrange(id: string, data: ArrangeCommitDto) {
   } catch (err) {
     // httpClient flattens non-2xx bodies into the error message — recover the
     // structured conflictingSlugs payload from a 409 so the UI can highlight rows.
-    const message = (err as Error)?.message ?? "";
+    const message = err instanceof Error ? err.message : "";
     if (message.startsWith("API 409")) {
       const jsonStart = message.indexOf("{");
       if (jsonStart !== -1) {
         try {
-          const body = JSON.parse(message.slice(jsonStart)) as { conflictingSlugs?: string[] };
+          const body = ArrangeConflictBodySchema.parse(JSON.parse(message.slice(jsonStart)));
           if (body.conflictingSlugs?.length) {
             throw new ArrangeConflictError(body.conflictingSlugs);
           }

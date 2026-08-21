@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Patch, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { LocaleSchema } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { resolveUnscoped } from '../../core/auth/policy-resolvers';
@@ -34,6 +35,6 @@ export class TopicsTranslationsController {
     @Param('locale') locale: string,
     @Body() body: Partial<{ name: string }>,
   ) {
-    return this.service.updateTranslation(id, locale, body);
+    return this.service.updateTranslation(id, LocaleSchema.parse(locale), body);
   }
 }

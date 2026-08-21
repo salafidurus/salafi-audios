@@ -1,5 +1,7 @@
 "use client";
 
+import type { CSSProperties } from "react";
+
 import React from "react";
 
 import styles from "./progress-bar.module.css";
@@ -7,6 +9,10 @@ import styles from "./progress-bar.module.css";
 type ProgressBarProps = {
   progressPercent: number;
   onSeek?: (percent: number) => void;
+};
+
+type ProgressBarStyleVars = CSSProperties & {
+  "--progress-percent": string;
 };
 
 export function ProgressBar({ progressPercent, onSeek }: ProgressBarProps) {
@@ -28,7 +34,13 @@ export function ProgressBar({ progressPercent, onSeek }: ProgressBarProps) {
         aria-label="Audio progress"
         disabled={!onSeek}
         className={`${styles.range} ${onSeek ? styles.rangeSeekable : styles.rangeDisabled}`}
-        style={{ "--progress-percent": `${progressPercent}%` } as React.CSSProperties}
+        style={
+          // SAFETY: React accepts CSS custom properties at runtime; this narrows the style
+          // object to the single progress variable consumed by progress-bar.module.css.
+          {
+            "--progress-percent": `${progressPercent}%`,
+          } as ProgressBarStyleVars
+        }
       />
     </div>
   );
