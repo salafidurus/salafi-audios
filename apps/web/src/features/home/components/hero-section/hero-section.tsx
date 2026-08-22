@@ -43,20 +43,19 @@ export function HeroSection({
             title: featuredContent.title,
             scholarName: featuredContent.scholarName,
           }
-        : {
-            id: "nullifiers-of-islam",
-            slug: "nullifiers-of-islam",
-            title: "Nullifiers of Islam",
-            scholarName: "Salih ibn Fawzan al-Fawzan",
-          };
+        : null;
 
-  const { play: playHero } = usePlayListing({
-    id: heroItem.id,
-    slug: heroItem.slug,
-    title: heroItem.title,
-    format: "single",
-    scholarName: heroItem.scholarName,
-  });
+  const { play: playHero } = usePlayListing(
+    heroItem
+      ? {
+          id: heroItem.id,
+          slug: heroItem.slug,
+          title: heroItem.title,
+          format: "single",
+          scholarName: heroItem.scholarName,
+        }
+      : null,
+  );
 
   const handleStart = () => {
     if (hasHistory && recentProgress) {
@@ -87,11 +86,39 @@ export function HeroSection({
     );
   }
 
-  const title = heroItem?.title ?? "Featured Lecture";
-  const scholarName = heroItem?.scholarName ?? "Salafi Scholar";
+  if (!heroItem) {
+    return (
+      <section className={styles.hero} data-testid="home-empty-state">
+        <div className={styles.marginalia} aria-hidden="true">
+          <span className={styles.arabicText}>دروس</span>
+        </div>
+        <div className={styles.bookmark} aria-hidden="true" />
+        <div className={styles.content}>
+          <p className={styles.eyebrow}>{t("home.empty.eyebrow", "A library for steady study")}</p>
+          <h1 className={styles.title} data-testid="home-hero-title">
+            {t("home.empty.title", "Find your next lesson")}
+          </h1>
+          <p className={styles.subtitle}>
+            {t(
+              "home.empty.description",
+              "Browse lessons, scholars, and topics to begin building your listening path.",
+            )}
+          </p>
+          <div className={styles.ctaRow}>
+            <Link href={routes.explore.index} className={styles.startBtn}>
+              <span>{t("home.empty.action", "Explore lessons")}</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const title = heroItem.title;
+  const scholarName = heroItem.scholarName;
 
   return (
-    <section className={styles.hero} data-testid="home-hero-section">
+    <section className={styles.hero}>
       <div className={styles.marginalia} aria-hidden="true">
         <span className={styles.arabicText}>دروس</span>
       </div>

@@ -50,10 +50,7 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
 
   const featuredContent = promoData?.hero ?? items[0] ?? null;
   const hasHistory = Boolean(recentProgress);
-  const isHeroLoading =
-    !hasHistory &&
-    Boolean(featuredContent) &&
-    (isProgressLoading || isExploreLoading || isPromosLoading);
+  const isHeroLoading = !hasHistory && (isProgressLoading || isExploreLoading || isPromosLoading);
 
   return (
     <ScreenView
@@ -83,23 +80,35 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
         </button>
       </div>
 
-      <HeroSection
-        recentProgress={recentProgress}
-        featuredContent={featuredContent}
-        isLoading={isHeroLoading}
-        onResume={onContinueListening}
-        hasHistory={hasHistory}
-      />
-      <CategoryChips />
-      <ScholarMedallions />
-      <RecentlyAddedSection />
       {recentProgress && (
-        <ContinueListeningCard
-          recentProgress={recentProgress}
-          onContinueListening={onContinueListening}
-        />
+        <div data-testid="home-continue-listening-section">
+          <ContinueListeningCard
+            recentProgress={recentProgress}
+            onContinueListening={onContinueListening}
+          />
+        </div>
       )}
-      <MobileDownloadSection availability={MOBILE_APP_AVAILABILITY} />
+      <div data-testid="home-hero-section">
+        <HeroSection
+          recentProgress={recentProgress}
+          featuredContent={featuredContent}
+          isLoading={isHeroLoading}
+          onResume={onContinueListening}
+          hasHistory={hasHistory}
+        />
+      </div>
+      <div data-testid="home-category-section">
+        <CategoryChips />
+      </div>
+      <div data-testid="home-scholars-section">
+        <ScholarMedallions />
+      </div>
+      <div data-testid="home-recent-section">
+        <RecentlyAddedSection />
+      </div>
+      <div data-testid="home-mobile-section">
+        <MobileDownloadSection availability={MOBILE_APP_AVAILABILITY} />
+      </div>
     </ScreenView>
   );
 }
