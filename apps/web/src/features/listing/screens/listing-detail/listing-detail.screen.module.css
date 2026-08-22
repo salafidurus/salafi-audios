@@ -1,3 +1,32 @@
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-scale-xs);
+  margin-bottom: var(--space-component-gap-sm);
+  color: var(--content-muted);
+  font-size: var(--typo-caption-font-size);
+}
+
+.breadcrumbs a {
+  color: var(--content-muted);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover,
+.breadcrumbs a:focus-visible {
+  color: var(--content-strong);
+  text-decoration: underline;
+}
+
+.breadcrumbs [aria-current="page"] {
+  overflow: hidden;
+  color: var(--content-strong);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .backButton {
   display: inline-flex;
   align-items: center;

@@ -98,7 +98,9 @@ describe("ListingDetailScreen", () => {
 
     render(<ListingDetailScreen slug="tawheed-lecture" />);
     expect(screen.getAllByText("Kitab At-Tawheed Lecture").length).toBeGreaterThan(0);
-    expect(screen.getByText("Ibn Baz")).toBeTruthy();
+    expect(screen.getAllByText("Ibn Baz").length).toBeGreaterThan(0);
+    expect(screen.getByRole("navigation", { name: "Breadcrumbs" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
     expect(screen.getAllByText("Play").length).toBeGreaterThan(0);
   });
 

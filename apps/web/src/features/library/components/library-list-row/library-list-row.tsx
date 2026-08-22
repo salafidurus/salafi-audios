@@ -10,6 +10,7 @@ import React from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { Card } from "@/shared/components/ui/card";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
@@ -61,46 +62,48 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
   }
 
   return (
-    <Link href={`/listings/${item.listingSlug}`} className={`${styles.row} listRow`}>
-      <div className={styles.avatarSection}>
-        <div className={styles.avatarFallback} aria-hidden="true">
-          {initial}
-        </div>
-      </div>
-
-      <div className={styles.centerSection}>
-        <div className={styles.title}>{title}</div>
-        <div className={styles.metadata}>
-          {scholarName}
-          {item.seriesTitle && ` · ${item.seriesTitle}`}
-        </div>
-        {variant === "progress" && progress !== null && (
-          <div
-            className={styles.progressBarContainer}
-            aria-hidden="true"
-            data-testid="progress-bar-container"
-          >
-            <div
-              className={styles.progressBar}
-              style={{ width: `${progress}%` }}
-              data-testid="progress-bar"
-            />
+    <Card size="sm" className={styles.card}>
+      <Link href={`/listings/${item.listingSlug}`} className={`${styles.row} listRow`}>
+        <div className={styles.avatarSection}>
+          <div className={styles.avatarFallback} aria-hidden="true">
+            {initial}
           </div>
-        )}
-      </div>
+        </div>
 
-      <div className={styles.rightSection}>
-        {rightLabelText && (
-          <span className={styles.caption} suppressHydrationWarning>
-            {rightLabelText}
-          </span>
-        )}
-        {isRtl ? (
-          <ChevronLeft className={styles.chevron} size={20} />
-        ) : (
-          <ChevronRight className={styles.chevron} size={20} />
-        )}
-      </div>
-    </Link>
+        <div className={styles.centerSection}>
+          <div className={styles.title}>{title}</div>
+          <div className={styles.metadata}>
+            {scholarName}
+            {item.seriesTitle && ` · ${item.seriesTitle}`}
+          </div>
+          {variant === "progress" && progress !== null && (
+            <div
+              className={styles.progressBarContainer}
+              aria-hidden="true"
+              data-testid="progress-bar-container"
+            >
+              <div
+                className={styles.progressBar}
+                style={{ width: `${progress}%` }}
+                data-testid="progress-bar"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className={styles.rightSection}>
+          {rightLabelText && (
+            <span className={styles.caption} suppressHydrationWarning>
+              {rightLabelText}
+            </span>
+          )}
+          {isRtl ? (
+            <ChevronLeft className={styles.chevron} size={20} />
+          ) : (
+            <ChevronRight className={styles.chevron} size={20} />
+          )}
+        </div>
+      </Link>
+    </Card>
   );
 }

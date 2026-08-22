@@ -6,6 +6,39 @@
   width: 100%;
 }
 
+.chipsRow [data-slot="tabs-list"] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-component-gap-sm);
+  width: 100%;
+  background: transparent;
+}
+
+.chipsRow [data-slot="tabs-trigger"] {
+  display: inline-flex;
+  min-height: 40px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  background: var(--surface-default);
+  padding: 8px 16px;
+  color: var(--content-muted);
+  font-family: var(--typo-label-md-font-family);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: var(--typo-label-md-line-height);
+  text-decoration: none;
+}
+
+.chipsRow [data-slot="tabs-trigger"][data-state="active"] {
+  border-color: var(--action-primary);
+  background: var(--action-primary);
+  color: var(--content-on-primary);
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -72,6 +105,12 @@
   .chipsRow::-webkit-scrollbar {
     display: none;
   }
+
+  .chipsRow [data-slot="tabs-list"] {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: max-content;
+  }
 }
 
 /* Skeleton styles */
@@ -107,4 +146,3 @@
     animation: none;
   }
 }
-

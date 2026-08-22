@@ -37,6 +37,15 @@ test.describe("Navigation — sidebar & routing", () => {
       await expect(page).toHaveURL(/\/explore/);
       expect(await page.title()).toBeTruthy();
     });
+
+    test("settings exposes accessible general and profile tabs", async ({ page }) => {
+      await page.goto("/settings");
+
+      const tabs = page.getByRole("tablist", { name: "Settings sections" });
+      await expect(tabs).toBeVisible();
+      await expect(tabs.getByRole("tab", { name: "General" })).toBeVisible();
+      await expect(tabs.getByRole("tab", { name: "Profile" })).toBeVisible();
+    });
   });
 
   test.describe("mobile viewport", () => {
