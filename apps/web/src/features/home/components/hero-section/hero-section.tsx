@@ -1,6 +1,7 @@
 import type { FeedContentItemDto, RecentProgressDto } from "@sd/core-contracts";
 
 import { routes } from "@sd/core-contracts";
+import { useFormatScholarName } from "@sd/domain-content";
 import { Sparkles, Play, Shield, Scale, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
@@ -28,6 +29,7 @@ export function HeroSection({
   hasHistory = false,
 }: HeroSectionProps) {
   const { t } = useTranslation();
+  const formatScholarName = useFormatScholarName();
 
   const heroItem =
     hasHistory && recentProgress
@@ -37,6 +39,7 @@ export function HeroSection({
           title: recentProgress.lectureTitle,
           scholarName: recentProgress.scholarName,
           scholarSlug: recentProgress.scholarSlug,
+          scholarTitle: undefined,
           format: recentProgress.format,
           artworkUrl: recentProgress.artworkUrl,
           scholarImageUrl: recentProgress.scholarImageUrl,
@@ -48,6 +51,7 @@ export function HeroSection({
             title: featuredContent.title,
             scholarName: featuredContent.scholarName,
             scholarSlug: featuredContent.scholarSlug,
+            scholarTitle: featuredContent.scholarTitle,
             format: featuredContent.kind,
             artworkUrl: featuredContent.thumbnailUrl ?? undefined,
             scholarImageUrl: featuredContent.scholarImageUrl,
@@ -131,7 +135,10 @@ export function HeroSection({
   }
 
   const title = heroItem.title;
-  const scholarName = heroItem.scholarName;
+  const scholarName = formatScholarName({
+    name: heroItem.scholarName,
+    title: heroItem.scholarTitle,
+  });
 
   return (
     <section className={styles.hero}>
@@ -154,7 +161,7 @@ export function HeroSection({
         </h1>
         <p className={styles.subtitle}>
           <Link href={routes.scholars.detail(heroItem.scholarSlug)} className={styles.scholarLink}>
-            {`Shaykh ${scholarName}`}
+            {scholarName}
           </Link>
         </p>
         {!hasHistory && (

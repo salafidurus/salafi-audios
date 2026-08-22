@@ -1,7 +1,7 @@
 "use client";
 
 import { routes } from "@sd/core-contracts";
-import { useInfiniteScholarsList } from "@sd/domain-content";
+import { useFormatScholarName, useInfiniteScholarsList } from "@sd/domain-content";
 import Link from "next/link";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -30,6 +30,7 @@ type ScholarMedallionsProps = {
 
 export function ScholarMedallions({ featuredScholarSlug }: ScholarMedallionsProps) {
   const { t } = useTranslation();
+  const formatScholarName = useFormatScholarName();
   const { data, isLoading } = useInfiniteScholarsList();
   const scholars = data?.pages.flatMap((page) => page.items) ?? [];
   const featuredScholar = featuredScholarSlug
@@ -79,7 +80,9 @@ export function ScholarMedallions({ featuredScholarSlug }: ScholarMedallionsProp
         <div className={styles.featuredScholar}>
           <div className={styles.featuredCopy}>
             <p className={styles.featuredEyebrow}>FEATURED SENIOR SCHOLAR</p>
-            <h3 className={styles.featuredName}>{featuredScholar.name}</h3>
+            <h3 className={styles.featuredName}>
+              {formatScholarName({ name: featuredScholar.name, title: featuredScholar.title })}
+            </h3>
             <p className={styles.featuredMetadata}>
               {featuredScholar.lectureCount} lectures
               {featuredScholar.mainLanguage && (

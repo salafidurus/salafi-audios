@@ -1,6 +1,7 @@
 "use client";
 
 import { routes, type FeedContentItemDto, type ListingFormat } from "@sd/core-contracts";
+import { useFormatScholarName } from "@sd/domain-content";
 import { useSearchCatalog } from "@sd/domain-search";
 import { Play } from "lucide-react";
 import Link from "next/link";
@@ -93,6 +94,7 @@ export function TopicDiscoverySection({
                   title={listing.title}
                   scholarName={listing.scholarName}
                   scholarSlug={listing.scholarSlug}
+                  scholarTitle={listing.scholarTitle}
                   slug={listing.slug}
                   id={listing.id}
                   format={listing.format}
@@ -118,6 +120,7 @@ type TopicListingCardProps = {
   title: string;
   scholarName: string;
   scholarSlug: string;
+  scholarTitle?: string | null;
   format: ListingFormat;
   lectureCount: number;
   durationSeconds?: number;
@@ -130,11 +133,14 @@ function TopicListingCard({
   title,
   scholarName,
   scholarSlug,
+  scholarTitle,
   format,
   lectureCount,
   durationSeconds,
   onNavigate,
 }: TopicListingCardProps) {
+  const formatScholarName = useFormatScholarName();
+  const displayScholarName = formatScholarName({ name: scholarName, title: scholarTitle });
   const { play } = usePlayListing({
     id,
     slug,
@@ -150,7 +156,7 @@ function TopicListingCard({
       <p className={styles.cardType}>{format}</p>
       <h3>{title}</h3>
       <p className={styles.cardMeta}>
-        {scholarName} · {lectureCount} {lectureCount === 1 ? "lesson" : "lessons"}
+        {displayScholarName} · {lectureCount} {lectureCount === 1 ? "lesson" : "lessons"}
         {durationSeconds ? ` · ${Math.round(durationSeconds / 60)} min` : ""}
       </p>
       <div className={styles.cardActions}>

@@ -85,6 +85,7 @@ export function CuratedExplorationSection({
             category={featured.kind}
             scholarName={featured.scholarName}
             scholarSlug={featured.scholarSlug}
+            scholarTitle={featured.scholarTitle}
             duration={
               featured.durationSeconds ? `${Math.round(featured.durationSeconds / 60)} min` : ""
             }
@@ -102,6 +103,7 @@ export function CuratedExplorationSection({
             category={item.kind}
             scholarName={item.scholarName}
             scholarSlug={item.scholarSlug}
+            scholarTitle={item.scholarTitle}
             duration={item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
             progress={0}
             totalLessons={1}

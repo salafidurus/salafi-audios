@@ -1892,6 +1892,7 @@ export class ListingRepository {
                 select: {
                   name: true,
                   slug: true,
+                  title: true,
                   imageUrl: true,
                   mainLanguage: true,
                   translations: {
@@ -1919,6 +1920,7 @@ export class ListingRepository {
                 select: {
                   name: true,
                   slug: true,
+                  title: true,
                   mainLanguage: true,
                   translations: {
                     where: { locale, status: 'published' },
@@ -1974,6 +1976,7 @@ export class ListingRepository {
         slug: l.slug,
         scholarName,
         scholarSlug: l.scholar!.slug,
+        scholarTitle: l.scholar!.title ?? undefined,
         scholarImageUrl: l.scholar!.imageUrl ?? undefined,
         thumbnailUrl: thumbnailUrl ?? null,
         durationSeconds: durationSeconds ?? 0,

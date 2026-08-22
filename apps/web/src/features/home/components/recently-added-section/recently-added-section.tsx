@@ -109,6 +109,7 @@ function RecentlyAddedSectionContent({
             category={featured.kind}
             scholarName={featured.scholarName}
             scholarSlug={featured.scholarSlug}
+            scholarTitle={featured.scholarTitle}
             duration={
               featured.durationSeconds ? `${Math.round(featured.durationSeconds / 60)} min` : ""
             }

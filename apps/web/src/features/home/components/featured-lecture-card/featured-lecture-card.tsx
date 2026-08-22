@@ -1,3 +1,7 @@
+import type { ScholarTitle } from "@sd/core-contracts";
+
+import { useFormatScholarName } from "@sd/domain-content";
+
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
@@ -9,6 +13,7 @@ type FeaturedLectureCardProps = {
   category: string;
   scholarName: string;
   scholarSlug?: string;
+  scholarTitle?: ScholarTitle | string | null;
   duration: string;
   progress: number;
   totalLessons: number;
@@ -22,6 +27,7 @@ export function FeaturedLectureCard({
   category,
   scholarName,
   scholarSlug,
+  scholarTitle,
   duration,
   progress,
   totalLessons,
@@ -29,7 +35,11 @@ export function FeaturedLectureCard({
   onPlay,
   eyebrow = "Editor’s pick this week",
 }: FeaturedLectureCardProps) {
-  const displayScholar = useFormattedScholarName(scholarName, scholarSlug);
+  const formatScholarName = useFormatScholarName();
+  const formattedScholarFallback = useFormattedScholarName(scholarName, scholarSlug);
+  const displayScholar = scholarTitle
+    ? formatScholarName({ name: scholarName, title: scholarTitle })
+    : formattedScholarFallback;
   const done = Math.round(progress * totalLessons);
   const t = totalLessons;
 

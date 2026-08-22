@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
+import { ScholarTitleSchema } from "./scholar.types";
 
 export const SearchCatalogParamsSchema = z.object({
   q: z.string().optional(),
@@ -19,6 +20,7 @@ export const SearchCatalogItemDtoSchema = z.object({
   title: z.string(),
   scholarName: z.string(),
   scholarSlug: z.string(),
+  scholarTitle: ScholarTitleSchema.optional(),
   coverImageUrl: z.string().optional(),
   scholarImageUrl: z.string().optional(),
   lectureCount: z.number(),
