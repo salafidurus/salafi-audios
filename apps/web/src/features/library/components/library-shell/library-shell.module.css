@@ -10,7 +10,6 @@
   justify-content: space-between;
   gap: var(--space-component-gap-lg);
   padding-block: var(--space-layout-page-y) var(--space-layout-section-y);
-  border-bottom: 1px solid var(--border-subtle);
 }
 
 .intro {

@@ -9,6 +9,7 @@ import {
 } from "@/features/library/components/library-tabs/library-tabs";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { Separator } from "@/shared/components/ui/separator";
 
 import styles from "./library-shell.module.css";
 
@@ -36,6 +37,7 @@ export function LibraryShell({ activeTab, children }: LibraryShellProps) {
           </div>
           <LibraryTabs activeTab={activeTab} />
         </header>
+        <Separator />
         <main className={styles.content}>{children}</main>
         <ScrollToTopButton />
       </div>

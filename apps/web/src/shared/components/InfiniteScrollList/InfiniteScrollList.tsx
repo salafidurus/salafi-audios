@@ -1,5 +1,11 @@
-import { useEffect, useRef, Fragment, type ReactNode } from "react";
+import { BookOpen, CircleAlert } from "lucide-react";
+import { Fragment, useEffect, useRef, type ReactNode } from "react";
 import { z } from "zod";
+
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import { Button } from "@/shared/components/ui/button";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from "@/shared/components/ui/empty";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 
 import { List } from "../List";
 import styles from "./InfiniteScrollList.module.css";
@@ -65,32 +71,39 @@ export function InfiniteScrollList<TData>({
 
   if (isError && data.length === 0) {
     return (
-      <div className={styles.error} role="alert">
-        <span>{errorMessage}</span>
+      <Alert variant="destructive" className={styles.error}>
+        <CircleAlert aria-hidden="true" />
+        <AlertDescription>{errorMessage}</AlertDescription>
         {onRetry && (
-          <button type="button" className={styles.retryButton} onClick={onRetry}>
+          <Button type="button" variant="outline" size="sm" onClick={onRetry}>
             Try again
-          </button>
+          </Button>
         )}
-      </div>
+      </Alert>
     );
   }
 
   if (isLoading && data.length === 0) {
     return (
-      <div className={styles.skeletonContainer} aria-hidden="true">
+      <div className={styles.skeletonContainer} role="status" aria-label="Loading content">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={`list-skeleton-${i}`}
-            className={`${styles.skeletonLine} ${styles.skeletonRow}`}
-          />
+          <Skeleton key={`list-skeleton-${i}`} className={styles.skeletonRow} />
         ))}
       </div>
     );
   }
 
   if (data.length === 0) {
-    return <div className={styles.empty}>{emptyMessage}</div>;
+    return (
+      <Empty className={styles.empty}>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <BookOpen aria-hidden="true" />
+          </EmptyMedia>
+          <EmptyDescription>{emptyMessage}</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    );
   }
 
   // Render all items in a List with intersection observer for loading more

@@ -18,6 +18,7 @@ export function LibraryTabs({ activeTab }: LibraryTabsProps) {
   return (
     <Tabs value={activeTab} orientation="horizontal">
       <TabsList
+        variant="line"
         className="max-w-full overflow-x-auto"
         aria-label={t("navigation.subnav.library.label", "Library sections")}
       >

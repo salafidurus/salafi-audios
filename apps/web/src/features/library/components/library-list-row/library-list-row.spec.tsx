@@ -75,7 +75,7 @@ describe("LibraryListRow", () => {
     expect(screen.getByText(/50% listened/)).toBeInTheDocument();
     const progressBar = screen.getByTestId("progress-bar");
     expect(progressBar).toBeInTheDocument();
-    expect((progressBar as HTMLElement).style.width).toBe("50%");
+    expect(progressBar).toHaveAttribute("aria-valuenow", "50");
   });
 
   it("explains the row status and series progress", () => {

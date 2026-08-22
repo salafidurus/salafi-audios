@@ -1,7 +1,6 @@
 "use client";
 
 import { routes, type LibraryItemDto } from "@sd/core-contracts";
-
 import { pickContentField } from "@sd/core-i18n";
 import { getLibraryItemPercent } from "@sd/domain-content";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -10,7 +9,10 @@ import React from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { Card } from "@/shared/components/ui/card";
+import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
+import { Badge } from "@/shared/components/ui/badge";
+import { Card, CardContent } from "@/shared/components/ui/card";
+import { Progress } from "@/shared/components/ui/progress";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
@@ -76,57 +78,64 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
 
   return (
     <Card size="sm" className={styles.card}>
-      <Link
-        href={routes.listings.detail(item.listingSlug)}
-        className={`${styles.row} listRow`}
-        aria-label={`${title} — ${statusLabel}`}
-      >
-        <div className={styles.avatarSection}>
-          <div className={styles.avatarFallback} aria-hidden="true">
-            {initial}
+      <CardContent className={styles.cardContent}>
+        <Link
+          href={routes.listings.detail(item.listingSlug)}
+          className={`${styles.row} listRow`}
+          aria-label={`${title} — ${statusLabel}`}
+        >
+          <div className={styles.avatarSection}>
+            <Avatar size="lg" aria-hidden="true">
+              <AvatarFallback>{initial}</AvatarFallback>
+            </Avatar>
           </div>
-        </div>
 
-        <div className={styles.centerSection}>
-          <div className={styles.title}>{title}</div>
-          <div className={styles.metadata}>
-            <span>
-              {scholarName}
-              {item.seriesTitle && ` · ${item.seriesTitle}`}
-            </span>
-            <span className={styles.status} data-variant={variant}>
-              {statusLabel}
-            </span>
-          </div>
-          {seriesProgress && <div className={styles.seriesProgress}>{seriesProgress}</div>}
-          {variant === "progress" && progress !== null && (
-            <div
-              className={styles.progressBarContainer}
-              aria-hidden="true"
-              data-testid="progress-bar-container"
-            >
-              <div
+          <div className={styles.centerSection}>
+            <div className={styles.title}>{title}</div>
+            <div className={styles.metadata}>
+              <span>
+                {scholarName}
+                {item.seriesTitle && ` · ${item.seriesTitle}`}
+              </span>
+              <Badge
+                variant={
+                  variant === "progress"
+                    ? "default"
+                    : variant === "completed"
+                      ? "secondary"
+                      : "outline"
+                }
+              >
+                {statusLabel}
+              </Badge>
+            </div>
+            {seriesProgress && <div className={styles.seriesProgress}>{seriesProgress}</div>}
+            {variant === "progress" && progress !== null && (
+              <Progress
+                value={progress}
                 className={styles.progressBar}
-                style={{ width: `${progress}%` }}
+                aria-label={t("library.progressLabel", "{{percent}}% listened", {
+                  percent: progress,
+                })}
                 data-testid="progress-bar"
               />
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        <div className={styles.rightSection}>
-          {rightLabelText && (
-            <span className={styles.caption} suppressHydrationWarning>
-              {rightLabelText}
-            </span>
-          )}
-          {isRtl ? (
-            <ChevronLeft className={styles.chevron} size={20} />
-          ) : (
-            <ChevronRight className={styles.chevron} size={20} />
-          )}
-        </div>
-      </Link>
+          <div className={styles.rightSection}>
+            {rightLabelText && (
+              <span className={styles.caption} suppressHydrationWarning>
+                {rightLabelText}
+              </span>
+            )}
+            {isRtl ? (
+              <ChevronLeft className={styles.chevron} size={20} />
+            ) : (
+              <ChevronRight className={styles.chevron} size={20} />
+            )}
+          </div>
+        </Link>
+      </CardContent>
     </Card>
   );
 }
