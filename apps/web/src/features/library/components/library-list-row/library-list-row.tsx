@@ -1,6 +1,6 @@
 "use client";
 
-import type { LibraryItemDto } from "@sd/core-contracts";
+import { routes, type LibraryItemDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
 import { getLibraryItemPercent } from "@sd/domain-content";
@@ -32,6 +32,19 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
   const initial = scholarName ? scholarName.trim().charAt(0).toUpperCase() : "?";
 
   const progress = getLibraryItemPercent(item);
+  const statusLabel =
+    variant === "progress"
+      ? t("library.status.progress", "In progress")
+      : variant === "saved"
+        ? t("library.status.saved", "Saved")
+        : t("library.status.completed", "Completed");
+  const seriesProgress =
+    item.totalLeafCount && item.totalLeafCount > 0
+      ? t("library.seriesProgress", "{{completed}} of {{total}} lessons", {
+          completed: item.completedLeafCount ?? 0,
+          total: item.totalLeafCount,
+        })
+      : null;
 
   const savedAtFormatted = useFormattedDate(item.savedAt || "", {
     year: "numeric",
@@ -63,7 +76,11 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
 
   return (
     <Card size="sm" className={styles.card}>
-      <Link href={`/listings/${item.listingSlug}`} className={`${styles.row} listRow`}>
+      <Link
+        href={routes.listings.detail(item.listingSlug)}
+        className={`${styles.row} listRow`}
+        aria-label={`${title} — ${statusLabel}`}
+      >
         <div className={styles.avatarSection}>
           <div className={styles.avatarFallback} aria-hidden="true">
             {initial}
@@ -73,9 +90,15 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
         <div className={styles.centerSection}>
           <div className={styles.title}>{title}</div>
           <div className={styles.metadata}>
-            {scholarName}
-            {item.seriesTitle && ` · ${item.seriesTitle}`}
+            <span>
+              {scholarName}
+              {item.seriesTitle && ` · ${item.seriesTitle}`}
+            </span>
+            <span className={styles.status} data-variant={variant}>
+              {statusLabel}
+            </span>
           </div>
+          {seriesProgress && <div className={styles.seriesProgress}>{seriesProgress}</div>}
           {variant === "progress" && progress !== null && (
             <div
               className={styles.progressBarContainer}

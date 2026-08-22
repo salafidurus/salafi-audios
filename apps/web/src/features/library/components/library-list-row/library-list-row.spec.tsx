@@ -6,8 +6,14 @@ import React from "react";
 
 import { LibraryListRow } from "./library-list-row";
 
+const mockUseIsRtl = vi.fn(() => false);
+
 vi.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: () => false,
+}));
+
+vi.mock("@/shared/hooks/use-is-rtl", () => ({
+  useIsRtl: () => mockUseIsRtl(),
 }));
 
 vi.mock("@/core/i18n/use-translation", () => ({
@@ -55,12 +61,12 @@ describe("LibraryListRow", () => {
 
   it("renders saved date when variant is saved", () => {
     render(<LibraryListRow item={mockItem} variant="saved" />);
-    expect(screen.getByText(/Saved/)).toBeInTheDocument();
+    expect(screen.getByText(/^Saved /)).toBeInTheDocument();
   });
 
   it("renders completed date when variant is completed", () => {
     render(<LibraryListRow item={mockItem} variant="completed" />);
-    expect(screen.getByText(/Completed/)).toBeInTheDocument();
+    expect(screen.getByText(/^Completed /)).toBeInTheDocument();
   });
 
   it("renders progress percentage and bar when variant is progress", () => {
@@ -70,5 +76,29 @@ describe("LibraryListRow", () => {
     const progressBar = screen.getByTestId("progress-bar");
     expect(progressBar).toBeInTheDocument();
     expect((progressBar as HTMLElement).style.width).toBe("50%");
+  });
+
+  it("explains the row status and series progress", () => {
+    render(
+      <LibraryListRow
+        item={{ ...mockItem, completedLeafCount: 2, totalLeafCount: 5 }}
+        variant="progress"
+      />,
+    );
+
+    expect(screen.getByText("In progress")).toBeInTheDocument();
+    expect(screen.getByText("2 of 5 lessons")).toBeInTheDocument();
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "aria-label",
+      "Explanation of Three Principles — In progress",
+    );
+  });
+
+  it("points the directional affordance inward for RTL layouts", () => {
+    mockUseIsRtl.mockReturnValue(true);
+    render(<LibraryListRow item={mockItem} variant="saved" />);
+
+    expect(screen.getByRole("link").querySelector("svg")).toHaveClass("lucide-chevron-left");
+    mockUseIsRtl.mockReturnValue(false);
   });
 });
