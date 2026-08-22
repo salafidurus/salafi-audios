@@ -19,7 +19,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { authClient, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -64,6 +64,18 @@ function SearchControl() {
   const router = useRouter();
   const label = t("navigation.searchAnything", "Search anything");
 
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        router.push(routes.search);
+      }
+    };
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, [router]);
+
   return (
     <Button
       type="button"
@@ -75,6 +87,7 @@ function SearchControl() {
     >
       <Search aria-hidden="true" size={16} />
       <span>{label}</span>
+      <kbd aria-hidden="true">⌘K</kbd>
     </Button>
   );
 }
@@ -255,6 +268,21 @@ function AccountMenu() {
   );
 }
 
+function UtilityControls({
+  hasAdminAccess,
+  isAdminWorkspace,
+}: {
+  hasAdminAccess: boolean;
+  isAdminWorkspace: boolean;
+}) {
+  return (
+    <div className={styles.utilityControls}>
+      <AccountMenu />
+      <WorkspaceSwitch isAdminWorkspace={isAdminWorkspace} hasAdminAccess={hasAdminAccess} />
+    </div>
+  );
+}
+
 export function PublicNavigation() {
   const { t, i18n } = useTranslation();
   const { isMobile, isTablet } = useResponsive();
@@ -317,9 +345,13 @@ export function PublicNavigation() {
         ) : (
           <div className={styles.actions}>
             <NavigationLinks items={items} pathname={pathname} ariaLabel={mainNavLabel} />
-            <SearchControl />
-            <AccountMenu />
-            <WorkspaceSwitch isAdminWorkspace={isAdminWorkspace} hasAdminAccess={hasAdminAccess} />
+            <div className={styles.rightActions}>
+              <SearchControl />
+              <UtilityControls
+                hasAdminAccess={hasAdminAccess}
+                isAdminWorkspace={isAdminWorkspace}
+              />
+            </div>
           </div>
         )}
       </div>
