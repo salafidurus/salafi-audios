@@ -41,7 +41,6 @@ export function ContinueListeningCard({
         <div className={styles.loadingCard} data-testid="continue-listening-skeleton">
           <div className={`${styles.skeleton} ${styles.skeletonArtwork}`} />
           <div className={styles.skeletonContent}>
-            <div className={`${styles.skeleton} ${styles.skeletonEyebrow}`} />
             <div className={`${styles.skeleton} ${styles.skeletonTitle}`} />
             <div className={`${styles.skeleton} ${styles.skeletonMeta}`} />
             <div className={`${styles.skeleton} ${styles.skeletonProgress}`} />
@@ -129,7 +128,6 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
 
         <div className={styles.content}>
           <div className={styles.contentHeader}>
-            <p className={styles.eyebrow}>{t("home.continue.eyebrow", "CONTINUE YOUR STUDY")}</p>
             {progress !== null && (
               <span className={styles.percent}>
                 {t("home.continue.complete", "{{percent}}% complete", { percent: progress })}

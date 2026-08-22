@@ -38,10 +38,6 @@ describe("HomePage Route", () => {
 
     const { push } = useRouter();
 
-    // Test search callback
-    props.onOpenSearch();
-    expect(push).toHaveBeenCalledWith(routes.search);
-
     // Test continue listening callback
     props.onContinueListening("lecture-abc");
     expect(push).toHaveBeenCalledWith(routes.listings.detail("lecture-abc"));

@@ -7,7 +7,6 @@ import { useContinueListening } from "@sd/domain-search";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { Search } from "@/shared/components/Search";
 
 import { ContinueListeningCard } from "../../components/continue-listening-card/continue-listening-card";
 import { CuratedExplorationSection } from "../../components/curated-exploration-section/curated-exploration-section";
@@ -21,7 +20,6 @@ import { MOBILE_APP_AVAILABILITY } from "./home.constants";
 import styles from "./home.screen.module.css";
 
 export type HomeScreenProps = {
-  onOpenSearch?: () => void;
   onContinueListening?: (lectureId: string) => void;
 };
 
@@ -31,7 +29,7 @@ function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
   return item.kind !== "scholar_row" && item.kind !== "topic_row";
 }
 
-export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProps) {
+export function HomeScreen({ onContinueListening }: HomeScreenProps) {
   const { recentProgress, isLoading: isProgressLoading } = useContinueListening();
   const { data: promoData, isLoading: isPromosLoading } = useHomePromotions();
   const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen({
@@ -80,14 +78,6 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
             <p>
               {t("home.intro", "Return to a lesson or find a thoughtful place to begin today.")}
             </p>
-          </div>
-          <div className={styles.searchPanel}>
-            <Search.Button
-              label={t("home.searchLabel", "What do you want to listen to?")}
-              onClick={onOpenSearch}
-              inputWrapperClassName={styles.searchInputWrapper}
-              placeholderClassName={styles.searchPlaceholder}
-            />
           </div>
         </header>
 

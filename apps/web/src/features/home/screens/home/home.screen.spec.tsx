@@ -31,7 +31,6 @@ vi.mock("../../hooks/use-home-promotions", () => ({
 }));
 
 describe("HomeScreen", () => {
-  const mockOnOpenSearch = vi.fn();
   const mockOnContinueListening = vi.fn();
 
   beforeEach(() => {
@@ -50,19 +49,13 @@ describe("HomeScreen", () => {
     });
   });
 
-  it("renders hero header, subtitle and search button", () => {
-    render(
-      <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
-    );
+  it("renders the hero header and subtitle without a search bar", () => {
+    render(<HomeScreen onContinueListening={mockOnContinueListening} />);
 
     const heroTitle = screen.getByTestId("home-hero-title");
     expect(heroTitle).toBeTruthy();
 
-    const searchBtn = screen.getByText("What do you want to listen to?");
-    expect(searchBtn).toBeTruthy();
-
-    fireEvent.click(searchBtn);
-    expect(mockOnOpenSearch).toHaveBeenCalled();
+    expect(screen.queryByText("What do you want to listen to?")).toBeNull();
   });
 
   it("renders continue listening section when recentProgress is provided", () => {
@@ -78,9 +71,7 @@ describe("HomeScreen", () => {
       isLoading: false,
     });
 
-    render(
-      <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
-    );
+    render(<HomeScreen onContinueListening={mockOnContinueListening} />);
 
     expect(screen.getByTestId("continue-listening-section")).toBeTruthy();
 
@@ -208,17 +199,13 @@ describe("HomeScreen", () => {
       isLoading: false,
     });
 
-    render(
-      <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
-    );
+    render(<HomeScreen onContinueListening={mockOnContinueListening} />);
 
     expect(screen.queryByTestId("continue-listening-section")).toBeNull();
   });
 
   it("renders an explicit browse state when there is no recent progress or content", () => {
-    render(
-      <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
-    );
+    render(<HomeScreen onContinueListening={mockOnContinueListening} />);
 
     expect(screen.getByTestId("home-empty-state")).toBeTruthy();
   });
@@ -252,9 +239,7 @@ describe("HomeScreen", () => {
   });
 
   it("renders mobile app download section", () => {
-    render(
-      <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
-    );
+    render(<HomeScreen onContinueListening={mockOnContinueListening} />);
 
     expect(screen.getByTestId("mobile-download-section")).toBeTruthy();
   });

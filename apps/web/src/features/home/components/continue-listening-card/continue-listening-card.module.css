@@ -81,17 +81,9 @@
   width: 100%;
 }
 
-.eyebrow {
-  margin: 0;
-  color: var(--action-primary);
-  font-size: 0.68rem;
-  font-weight: 750;
-  letter-spacing: 0.12em;
-}
-
 .percent {
   color: var(--content-muted);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -104,7 +96,7 @@
   overflow: hidden;
   color: var(--content-strong);
   font-family: var(--font-display), "Fraunces", Georgia, serif;
-  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  font-size: clamp(1.6rem, 2.8vw, 2.3rem);
   font-weight: 600;
   line-height: 1.15;
   -webkit-box-orient: vertical;
@@ -114,7 +106,7 @@
 .scholar {
   margin: 0;
   color: var(--content-secondary);
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
@@ -142,7 +134,7 @@
 
 .timeRow {
   color: var(--content-muted);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -155,7 +147,7 @@
   border-radius: var(--radius-full);
   background: var(--action-primary);
   color: var(--content-on-primary);
-  font-size: 0.8rem;
+  font-size: 0.92rem;
   font-weight: 700;
 }
 
@@ -178,7 +170,6 @@
 }
 
 .skeletonArtwork { aspect-ratio: 1; }
-.skeletonEyebrow { width: 10rem; height: 0.7rem; }
 .skeletonTitle { width: min(75%, 28rem); height: 2.8rem; }
 .skeletonMeta { width: 12rem; height: 0.9rem; }
 .skeletonProgress { width: 100%; height: 0.4rem; margin-top: 0.5rem; }
@@ -201,7 +192,7 @@
   }
 
   .artwork { width: 6.5rem; }
-  .title { font-size: 1.25rem; }
+  .title { font-size: 1.45rem; }
   .resumeAction { align-self: stretch; justify-content: center; }
 }
 
