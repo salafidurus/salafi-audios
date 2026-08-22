@@ -13,7 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/shared/components/ui/sheet";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { ToggleGroup, ToggleGroupItem } from "@/shared/components/ui/toggle-group";
 
 import type { FilterOption } from "../filter-select/filter-select";
 
@@ -79,8 +79,6 @@ export function ExploreFilterToolbar({
   onClearFilter,
   onClearAll,
 }: ExploreFilterToolbarProps) {
-  const isDesktop = useIsDesktop();
-
   const filterFields = (
     <>
       {scholarOptions.length > 0 && (
@@ -94,19 +92,6 @@ export function ExploreFilterToolbar({
           searchPlaceholder={filterSearchPlaceholder}
           emptyLabel={noOptionsLabel}
           onChange={(value) => onFilterChange("scholar", value)}
-        />
-      )}
-      {topicOptions.length > 0 && (
-        <ExploreFilterField
-          id="explore-topic"
-          label={labels.topic}
-          options={topicOptions}
-          value={filters.topic}
-          mode="combobox"
-          allLabel={allLabel}
-          searchPlaceholder={filterSearchPlaceholder}
-          emptyLabel={noOptionsLabel}
-          onChange={(value) => onFilterChange("topic", value)}
         />
       )}
       <ExploreFilterField
@@ -137,25 +122,41 @@ export function ExploreFilterToolbar({
   );
 
   return (
-    <search className={styles.toolbar} aria-label={activeFiltersLabel}>
-      <Search.Bar placeholder={searchPlaceholder} value={query} onChange={onQueryChange} />
-      {isDesktop ? (
-        <FieldGroup className={styles.filters}>{filterFields}</FieldGroup>
-      ) : (
+    <section className={styles.toolbar} aria-label={activeFiltersLabel}>
+      <div className={styles.discoveryControls}>
+        <ToggleGroup
+          type="single"
+          value={filters.topic || "all"}
+          onValueChange={(value) => value && onFilterChange("topic", value === "all" ? "" : value)}
+          aria-label={labels.topic}
+          className={styles.topicGroup}
+        >
+          <ToggleGroupItem value="all" variant="outline" size="sm">
+            {allLabel}
+          </ToggleGroupItem>
+          {topicOptions.map((option) => (
+            <ToggleGroupItem key={option.id} value={option.id} variant="outline" size="sm">
+              {option.label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
         <Sheet>
           <SheetTrigger asChild>
-            <Button type="button" variant="outline" className={styles.filterTrigger}>
+            <Button type="button" variant="outline" size="sm" className={styles.filterTrigger}>
               {filtersLabel}
             </Button>
           </SheetTrigger>
-          <SheetContent side="bottom" className={styles.mobileFilters}>
+          <SheetContent side="right" className={styles.mobileFilters}>
             <SheetHeader>
               <SheetTitle>{filtersLabel}</SheetTitle>
             </SheetHeader>
-            <FieldGroup className={styles.mobileFilterFields}>{filterFields}</FieldGroup>
+            <div className={styles.refineContent}>
+              <Search.Bar placeholder={searchPlaceholder} value={query} onChange={onQueryChange} />
+              <FieldGroup className={styles.mobileFilterFields}>{filterFields}</FieldGroup>
+            </div>
           </SheetContent>
         </Sheet>
-      )}
+      </div>
       <div className={styles.summary} aria-live="polite">
         <span className={styles.summaryLabel}>{activeFiltersLabel}</span>
         {summaries.length === 0 ? (
@@ -188,6 +189,6 @@ export function ExploreFilterToolbar({
           {clearAllLabel}
         </Button>
       </div>
-    </search>
+    </section>
   );
 }

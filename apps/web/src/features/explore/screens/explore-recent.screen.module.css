@@ -4,6 +4,16 @@
   width: 100%;
 }
 
+.exploreTabs {
+  width: 100%;
+}
+
+.viewTabs {
+  width: 100%;
+  justify-content: flex-start;
+  overflow-x: auto;
+}
+
 .hero {
   margin-bottom: var(--space-component-gap-lg);
 }

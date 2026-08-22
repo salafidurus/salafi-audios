@@ -161,12 +161,12 @@ describe("FeedRecentScreen", () => {
   it("renders the default feed and the complete catalog filter surface", () => {
     render(<FeedRecentScreen />);
 
-    expect(screen.getByRole("heading", { name: "Listings Catalog" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Explore" })).toBeInTheDocument();
     expect(screen.getByTestId("topic-feed-row")).toHaveTextContent("Aqeedah");
-    expect(document.querySelector("search")).toHaveAttribute("aria-label", "Active filters");
-    expect(screen.getByText("Content type")).toBeInTheDocument();
-    expect(screen.getByText("Language")).toBeInTheDocument();
-    expect(screen.getByText("Sort")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Active filters" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Everything" })).toHaveAttribute("data-state", "active");
+    expect(screen.getByRole("button", { name: "Refine" })).toBeInTheDocument();
+    expect(screen.getByRole("radiogroup", { name: "Topic" })).toBeInTheDocument();
   });
 
   it("shows the persisted filter summary and filtered catalog results", () => {
@@ -202,6 +202,27 @@ describe("FeedRecentScreen", () => {
     expect(screen.getByText(/Topic: Aqeedah/)).toBeInTheDocument();
     expect(screen.getByText(/Sort: Title A–Z/)).toBeInTheDocument();
     expect(screen.getByText("Aqeedah Primer")).toBeInTheDocument();
+  });
+
+  it("switches to scholar discovery without rendering catalog results", () => {
+    render(<FeedRecentScreen />);
+
+    const scholarsTab = screen.getByRole("tab", { name: "Scholars" });
+    fireEvent.mouseDown(scholarsTab);
+    fireEvent.click(scholarsTab);
+
+    expect(screen.getByTestId("scholar-feed-row")).toBeInTheDocument();
+    expect(screen.queryByTestId("topic-feed-row")).not.toBeInTheDocument();
+  });
+
+  it("steers discovery when a topic is selected", () => {
+    const updateFilter = vi.fn();
+    currentExploreFilters = exploreHookValue({ updateFilter });
+    render(<FeedRecentScreen />);
+
+    fireEvent.click(screen.getByRole("radio", { name: "Aqeedah" }));
+
+    expect(updateFilter).toHaveBeenCalledWith("topic", "aqeedah");
   });
 
   it("covers loading and empty result states", () => {

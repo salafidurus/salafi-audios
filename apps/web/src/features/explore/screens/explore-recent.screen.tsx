@@ -6,7 +6,7 @@ import { useAudio, useProgressStore } from "@sd/domain-audio";
 import { useExploreRecentScreen, useScholarsList } from "@sd/domain-content";
 import { useInfiniteSearch, useTopicsList } from "@sd/domain-search";
 import { useRouter } from "next/navigation";
-import React, { useRef, useEffect, useMemo, type ReactNode } from "react";
+import React, { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -19,9 +19,9 @@ import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { Button } from "@/shared/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/shared/components/ui/empty";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
-import { useResponsive } from "@/shared/hooks/use-responsive";
 
 import {
   ExploreFilterToolbar,
@@ -38,6 +38,12 @@ export type FeedRecentScreenProps = {
   onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
+
+type ExploreView = "everything" | "listings" | "scholars";
+
+function isExploreView(value: string): value is ExploreView {
+  return value === "everything" || value === "listings" || value === "scholars";
+}
 
 function formatDuration(durationSeconds?: number | null): string {
   if (!durationSeconds || durationSeconds <= 0) return "";
@@ -135,7 +141,7 @@ export function FeedRecentScreen({
   onNavigateToListing,
   onNavigateToScholar,
 }: FeedRecentScreenProps) {
-  const { isMobile } = useResponsive();
+  const [activeView, setActiveView] = useState<ExploreView>("everything");
   const { i18n, t } = useTranslation();
   const { user } = useAuth();
   const router = useRouter();
@@ -247,6 +253,10 @@ export function FeedRecentScreen({
   });
 
   const recentItems = recentData?.pages.flatMap((p) => p.items) ?? [];
+  const visibleRecentItems =
+    activeView === "listings"
+      ? recentItems.filter((item) => item.kind !== "scholar_row" && item.kind !== "topic_row")
+      : recentItems;
   const searchItems = useMemo(() => {
     const items = searchData?.pages.flatMap((p) => p.items) ?? [];
     return sortExploreItems(items, filters.sort, locale);
@@ -273,9 +283,11 @@ export function FeedRecentScreen({
   }, [hasActiveFilterOrSearch, hasRecentNextPage, isRecentFetching, fetchRecentNextPage]);
 
   let body: ReactNode;
-  const feedTitle = isMobile
-    ? t("explore.recentTitleMobile", "Listings")
-    : t("explore.recentTitleWide", "Listings Catalog");
+  const feedTitle = t("explore.title", "Explore");
+  const scholarItems = (scholarsData?.scholars ?? []).map((scholar) => ({
+    ...scholar,
+    imageUrl: scholar.imageUrl ?? null,
+  }));
 
   const activeFilters: ExploreFilterSummary[] = [
     filters.query.trim() && {
@@ -306,7 +318,7 @@ export function FeedRecentScreen({
 
   if (!isHydrated) {
     body = <FeedSkeleton />;
-  } else if (hasActiveFilterOrSearch) {
+  } else if (activeView !== "scholars" && hasActiveFilterOrSearch) {
     if (isSearchError) {
       body = (
         <div className={styles.state} role="alert">
@@ -352,7 +364,23 @@ export function FeedRecentScreen({
         </div>
       );
     }
-  } else if (isRecentError && recentItems.length === 0) {
+  } else if (activeView === "scholars") {
+    body =
+      scholarItems.length > 0 ? (
+        <section className={styles.section}>
+          <FeedScholarRow scholars={scholarItems} onScholarPress={handleNavigateToScholar} />
+        </section>
+      ) : (
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>{t("explore.noScholarsTitle", "No scholars found")}</EmptyTitle>
+            <EmptyDescription>
+              {t("explore.noScholars", "Scholar discovery is not available yet.")}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      );
+  } else if (isRecentError && visibleRecentItems.length === 0) {
     body = (
       <div className={styles.state} role="alert">
         <span>{getErrorStateText("feed", t)}</span>
@@ -361,9 +389,9 @@ export function FeedRecentScreen({
         </Button>
       </div>
     );
-  } else if (isRecentFetching && recentItems.length === 0) {
+  } else if (isRecentFetching && visibleRecentItems.length === 0) {
     body = <FeedSkeleton />;
-  } else if (recentItems.length === 0) {
+  } else if (visibleRecentItems.length === 0) {
     body = (
       <Empty>
         <EmptyHeader>
@@ -390,7 +418,7 @@ export function FeedRecentScreen({
       cards = [];
     };
 
-    recentItems.forEach((item) => {
+    visibleRecentItems.forEach((item) => {
       if (item.kind === "scholar_row") {
         flushGrid();
         const rowKey = item.scholars[0]?.slug ?? "scholars";
@@ -448,49 +476,64 @@ export function FeedRecentScreen({
 
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
-      <StickyHeaderLayout>
-        <StickyHeaderLayout.Header>
-          <PageHeader title={feedTitle} />
-          <ExploreFilterToolbar
-            query={query}
-            onQueryChange={setQuery}
-            filters={filters}
-            scholarOptions={scholarChips}
-            topicOptions={topicChips}
-            formatOptions={formatChips}
-            languageOptions={languageOptions}
-            sortOptions={sortOptions}
-            summaries={activeFilters}
-            allLabel={t("search.filterAll", "All")}
-            searchPlaceholder={t("search.placeholder", "Search lectures, scholars, or topics...")}
-            activeFiltersLabel={t("search.activeFilters", "Active filters")}
-            clearAllLabel={t("search.clearFilters", "Clear all")}
-            filtersLabel={t("search.filters", "Filters")}
-            filterSearchPlaceholder={t("search.filterSearch", "Search options...")}
-            noOptionsLabel={t("search.noFilterOptions", "No options found")}
-            removeFilterLabel={t("search.removeFilter", "Remove")}
-            labels={{
-              scholar: t("search.filterScholar", "Scholar"),
-              topic: t("search.filterTopic", "Topic"),
-              contentType: t("search.filterFormat", "Content type"),
-              language: t("search.filterLanguage", "Language"),
-              sort: t("search.filterSort", "Sort"),
-            }}
-            onFilterChange={(key, value) => {
-              if (key === "sort") {
-                updateFilter(key, isExploreSort(value) ? value : "recent");
-              } else {
-                updateFilter(key, value);
-              }
-            }}
-            onClearFilter={clearFilter}
-            onClearAll={clearAll}
-          />
-        </StickyHeaderLayout.Header>
-        <StickyHeaderLayout.Content>
-          <div className={styles.page}>{body}</div>
-        </StickyHeaderLayout.Content>
-      </StickyHeaderLayout>
+      <Tabs
+        value={activeView}
+        onValueChange={(value) => {
+          if (isExploreView(value)) setActiveView(value);
+        }}
+        className={styles.exploreTabs}
+      >
+        <StickyHeaderLayout>
+          <StickyHeaderLayout.Header>
+            <PageHeader title={feedTitle} />
+            <TabsList variant="line" className={styles.viewTabs}>
+              <TabsTrigger value="everything">{t("explore.everything", "Everything")}</TabsTrigger>
+              <TabsTrigger value="listings">{t("explore.listings", "Listings")}</TabsTrigger>
+              <TabsTrigger value="scholars">{t("explore.scholars", "Scholars")}</TabsTrigger>
+            </TabsList>
+            <ExploreFilterToolbar
+              query={query}
+              onQueryChange={setQuery}
+              filters={filters}
+              scholarOptions={scholarChips}
+              topicOptions={topicChips}
+              formatOptions={formatChips}
+              languageOptions={languageOptions}
+              sortOptions={sortOptions}
+              summaries={activeFilters}
+              allLabel={t("search.filterAll", "All")}
+              searchPlaceholder={t("search.placeholder", "Search lectures, scholars, or topics...")}
+              activeFiltersLabel={t("search.activeFilters", "Active filters")}
+              clearAllLabel={t("search.clearFilters", "Clear all")}
+              filtersLabel={t("search.refine", "Refine")}
+              filterSearchPlaceholder={t("search.filterSearch", "Search options...")}
+              noOptionsLabel={t("search.noFilterOptions", "No options found")}
+              removeFilterLabel={t("search.removeFilter", "Remove")}
+              labels={{
+                scholar: t("search.filterScholar", "Scholar"),
+                topic: t("search.filterTopic", "Topic"),
+                contentType: t("search.filterFormat", "Content type"),
+                language: t("search.filterLanguage", "Language"),
+                sort: t("search.filterSort", "Sort"),
+              }}
+              onFilterChange={(key, value) => {
+                if (key === "sort") {
+                  updateFilter(key, isExploreSort(value) ? value : "recent");
+                } else {
+                  updateFilter(key, value);
+                }
+              }}
+              onClearFilter={clearFilter}
+              onClearAll={clearAll}
+            />
+          </StickyHeaderLayout.Header>
+          <StickyHeaderLayout.Content>
+            <TabsContent value={activeView} className={styles.page}>
+              {body}
+            </TabsContent>
+          </StickyHeaderLayout.Content>
+        </StickyHeaderLayout>
+      </Tabs>
       <ScrollToTopButton />
     </ScreenView>
   );
