@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ScholarChipDtoSchema, ContentSuggestionDtoSchema } from "./home.types";
 import { ListingFormatSchema } from "./listing.types";
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
+import { ScholarTitleSchema } from "./scholar.types";
 
 export const FeedContentItemDtoSchema = z.object({
   kind: ListingFormatSchema,
@@ -11,6 +12,7 @@ export const FeedContentItemDtoSchema = z.object({
   slug: z.string(),
   scholarName: z.string(),
   scholarSlug: z.string(),
+  scholarTitle: ScholarTitleSchema.optional(),
   scholarImageUrl: z.string().optional(),
   thumbnailUrl: z.string().nullable(),
   durationSeconds: z.number().nullable(),

@@ -1,3 +1,6 @@
+import type { ScholarTitle } from "@sd/core-contracts";
+
+import { useFormatScholarName } from "@sd/domain-content";
 import { ChevronRight } from "lucide-react";
 
 import { AppAvatar } from "@/shared/components/app-avatar";
@@ -10,6 +13,7 @@ type LectureRowProps = {
   category: string;
   scholarName: string;
   scholarSlug?: string;
+  scholarTitle?: ScholarTitle | string | null;
   scholarImageUrl?: string | null;
   listingArtwork?: string | null;
   duration: string;
@@ -23,6 +27,7 @@ export function LectureRow({
   title,
   category,
   scholarName,
+  scholarTitle,
   scholarImageUrl,
   listingArtwork,
   duration,
@@ -31,6 +36,8 @@ export function LectureRow({
   onClick,
   className,
 }: LectureRowProps) {
+  const formatScholarName = useFormatScholarName();
+  const displayScholarName = formatScholarName({ name: scholarName, title: scholarTitle });
   const done = Math.round(progress * totalLessons);
   const t = totalLessons;
 
@@ -53,7 +60,7 @@ export function LectureRow({
         </span>
         <span className={styles.info}>
           <span className={styles.title}>{title}</span>
-          {scholarName ? <span className={styles.scholar}>{scholarName}</span> : null}
+          {displayScholarName ? <span className={styles.scholar}>{displayScholarName}</span> : null}
           {metaText ? <span className={styles.meta}>{metaText}</span> : null}
         </span>
         <span className={styles.chevron}>

@@ -39,6 +39,7 @@ export class RecentListingsRepo {
           select: {
             name: true,
             slug: true,
+            title: true,
             imageUrl: true,
             mainLanguage: true,
             translations: {
@@ -84,6 +85,7 @@ export class RecentListingsRepo {
         slug: r.slug,
         scholarName,
         scholarSlug: r.scholar!.slug,
+        scholarTitle: r.scholar!.title ?? undefined,
         scholarImageUrl: r.scholar!.imageUrl ?? undefined,
         thumbnailUrl: thumbnailUrl ?? null,
         durationSeconds: durationSeconds ?? 0,
