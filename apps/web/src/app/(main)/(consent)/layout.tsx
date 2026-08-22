@@ -3,7 +3,7 @@
 import { MiniPlayer } from "@/features/audio";
 import { CookieConsentGate, AnalyticsScripts } from "@/features/legal";
 import { Footer } from "@/features/navigation/components/footer/footer";
-import { Sidebar } from "@/features/navigation/components/sidebar/sidebar";
+import { PublicNavigation } from "@/features/navigation/components/public-navigation/public-navigation";
 
 export default function ConsentLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,7 +12,7 @@ export default function ConsentLayout({ children }: { children: React.ReactNode 
       <AnalyticsScripts />
       <div className="appFrame">
         <div className="appConsentShell">
-          <Sidebar />
+          <PublicNavigation />
           <div className="appConsentMain">
             <div className="appConsentContent">{children}</div>
             <MiniPlayer />
