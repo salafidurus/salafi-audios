@@ -44,9 +44,10 @@ function ModalFooter({ children, alignment = "right", border = true }: { childre
 function ModalTabItem(_props: ModalTabProps) { return null; }
 function ModalTabs({ children, errorTabs = [] }: { children?: ReactNode; errorTabs?: string[] }) {
   const tabs = Children.toArray(children).filter(isModalTab);
+  const errorTabSet = new Set(errorTabs);
   return <TabsList className="w-full justify-start overflow-x-auto">{tabs.map((tab) => {
     const props = tab.props;
-    return <TabsTrigger key={props.id} value={props.id} disabled={props.disabled} aria-invalid={props.hasError || errorTabs.includes(props.id) || undefined}>{props.children}</TabsTrigger>;
+    return <TabsTrigger key={props.id} value={props.id} disabled={props.disabled} aria-invalid={props.hasError || errorTabSet.has(props.id) || undefined}>{props.children}</TabsTrigger>;
   })}</TabsList>;
 }
 function ModalContentItem(_props: ModalContentProps) { return null; }
@@ -55,7 +56,7 @@ function ModalContent({ children }: { children?: ReactNode }) {
   return <>{items.map((item) => <TabsContent key={item.props.id} value={item.props.id} forceMount>{item.props.children}</TabsContent>)}</>;
 }
 
-function Modal({ isOpen, onClose, title, children, footer, size = "md", width = "standard", hideFooter, footerAlignment = "right", footerBorder = true, loading, multiTab = false, requireReview = false, activeTab: controlledActiveTab, onActiveTabChange, defaultActiveTab = "en", reviewTabId = "review", saveFormId, saving = false, saveLabel, savingLabel, reviewLabel, cancelLabel }: ModalProps) {
+function ModalRoot({ isOpen, onClose, title, children, footer, size = "md", width = "standard", hideFooter, footerAlignment = "right", footerBorder = true, loading, multiTab = false, requireReview = false, activeTab: controlledActiveTab, onActiveTabChange, defaultActiveTab = "en", reviewTabId = "review", saveFormId, saving = false, saveLabel, savingLabel, reviewLabel, cancelLabel }: ModalProps) {
   const { t } = useTranslation();
   const [uncontrolledActiveTab, setUncontrolledActiveTab] = useState(defaultActiveTab);
   const activeTab = controlledActiveTab ?? uncontrolledActiveTab;
@@ -87,5 +88,18 @@ function ModalConfirmText({ isOpen, onClose, onConfirm, title, message, confirmL
   return <div data-testid={modalTestId}><Modal isOpen={isOpen} onClose={onClose} title={title} loading={loading} footer={<><Button variant="outline" size="sm" onClick={onClose} disabled={loading} data-testid={cancelTestId}>Cancel</Button><Button variant={confirmVariant === "danger" ? "danger" : "primary"} size="sm" onClick={onConfirm} disabled={!valid} data-testid={testId}>{confirmLabel}</Button></>}><ModalBody><p>{message}</p><label className="mt-4 block text-sm" htmlFor="confirm-text-input">Type <strong>{confirmWord}</strong> to confirm</label><input id="confirm-text-input" className="mt-2 min-h-12 w-full rounded-lg border bg-background px-3" placeholder={`Type "${confirmWord}" to confirm`} value={inputValue} onChange={(event) => setInputValue(event.target.value)} disabled={loading} /></ModalBody></Modal></div>;
 }
 
-const ModalWithParts = Object.assign(Modal, { Header: ModalHeader, Body: ModalBody, Footer: ModalFooter, ConfirmDialog: ModalConfirmDialog, ConfirmText: ModalConfirmText, Tabs: ModalTabs, TabItem: ModalTabItem, Content: ModalContent, ContentItem: ModalContentItem });
-export { ModalWithParts as Modal, ModalBody, ModalFooter, ModalHeader, ModalConfirmDialog, ModalConfirmText };
+export function Modal(props: ModalProps) { return <ModalRoot {...props} />; }
+
+export namespace Modal {
+  export const Header = ModalHeader;
+  export const Body = ModalBody;
+  export const Footer = ModalFooter;
+  export const ConfirmDialog = ModalConfirmDialog;
+  export const ConfirmText = ModalConfirmText;
+  export const Tabs = ModalTabs;
+  export const TabItem = ModalTabItem;
+  export const Content = ModalContent;
+  export const ContentItem = ModalContentItem;
+}
+
+export { ModalBody, ModalFooter, ModalHeader, ModalConfirmDialog, ModalConfirmText };
