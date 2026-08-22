@@ -28,11 +28,12 @@ Two **category** roles:
 - `bug`: something is broken
 - `enhancement`: new feature or improvement
 
-Five **state** roles:
+Six **state** roles:
 
 - `needs-triage`: maintainer needs to evaluate
 - `needs-info`: waiting on reporter for more information
 - `ready-for-agent`: fully specified, ready for an AFK agent
+- `in-progress`: implementation has started
 - `ready-for-human`: needs human implementation
 - `wontfix`: will not be actioned
 
@@ -40,9 +41,15 @@ For a PR, the same states read against the attached code: `ready-for-agent` mean
 
 Every triaged issue should carry exactly one category role and one state role. If state roles conflict, flag it and ask the maintainer before doing anything else.
 
+Completed specification exception: a `spec` issue is an umbrella record for
+linked `ticket` issues. When it has at least one linked ticket and all linked
+tickets are closed, it may be closed as completed. Remove active state labels
+and preserve `spec`; do not apply `wontfix`, because completion is not a
+rejection. The `close-completed-specs` workflow performs this transition.
+
 These are canonical role names. The actual label strings used in the issue tracker may differ. The mapping should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
 
-State transitions: an unlabeled issue normally goes to `needs-triage` first; from there it moves to `needs-info`, `ready-for-agent`, `ready-for-human`, or `wontfix`. `needs-info` returns to `needs-triage` once the reporter replies. The maintainer can override at any time; flag transitions that look unusual and ask before proceeding.
+State transitions: an unlabeled issue normally goes to `needs-triage` first; from there it moves to `needs-info`, `ready-for-agent`, `ready-for-human`, or `wontfix`. A `ready-for-agent` or `ready-for-human` issue moves to `in-progress` when implementation starts. `needs-info` returns to `needs-triage` once the reporter replies. The maintainer can override at any time; flag transitions that look unusual and ask before proceeding.
 
 ## Invocation
 
