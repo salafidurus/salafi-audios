@@ -125,6 +125,9 @@ describe("PublicNavigation", () => {
     expect(screen.getByRole("button", { name: "Account: Admin User" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Admin Dashboard" })).toHaveAttribute("href", "/admin");
     fireEvent.click(screen.getByRole("button", { name: "Account: Admin User" }));
+    fireEvent.pointerDown(document.body);
+    expect(screen.queryByRole("menuitem", { name: "Sign Out" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Account: Admin User" }));
     fireEvent.click(screen.getByRole("menuitem", { name: "Sign Out" }));
     expect(
       screen.getByRole("heading", { name: "Are you sure you want to sign out?" }),
@@ -174,7 +177,7 @@ describe("PublicNavigation", () => {
 
     render(<PublicNavigation />);
 
-    expect(screen.getByRole("link", { name: "Back to app" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Back to App" })).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "Dashboard" })).not.toHaveAttribute("aria-current");
     expect(screen.getByRole("link", { name: "Contents" })).toHaveAttribute(
       "href",

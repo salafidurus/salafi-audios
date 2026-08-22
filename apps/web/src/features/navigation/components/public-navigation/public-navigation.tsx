@@ -19,7 +19,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { authClient, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -102,7 +102,7 @@ function WorkspaceSwitch({
   const { t } = useTranslation();
   const href = isAdminWorkspace ? routes.home : routes.admin.index;
   const label = isAdminWorkspace
-    ? t("navigation.backToApp", "Back to app")
+    ? t("navigation.backToApp", "Back to App")
     : t("navigation.adminDashboard", "Admin Dashboard");
 
   if (!isAdminWorkspace && !hasAdminAccess) return null;
@@ -143,17 +143,19 @@ function NavigationLinks({
   items,
   pathname,
   ariaLabel,
+  isAdminWorkspace = false,
   onNavigate,
   closeWithSheet = false,
 }: {
   items: PublicNavItem[];
   pathname: string;
   ariaLabel: string;
+  isAdminWorkspace?: boolean;
   onNavigate?: () => void;
   closeWithSheet?: boolean;
 }) {
   return (
-    <nav className={styles.nav} aria-label={ariaLabel}>
+    <nav className={clsx(styles.nav, isAdminWorkspace && styles.adminNav)} aria-label={ariaLabel}>
       {items.map(({ label, href, Icon }) => {
         const isActive = isActivePath(pathname, href);
         const link = (
@@ -187,6 +189,21 @@ function AccountMenu() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      // SAFETY: PointerEvent targets are DOM nodes when dispatched by the document.
+      if (!accountMenuRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
+  }, [isOpen]);
 
   if (isLoading) {
     return <span className={styles.accountLoading} aria-hidden="true" />;
@@ -213,7 +230,7 @@ function AccountMenu() {
   };
 
   return (
-    <div className={styles.accountMenu}>
+    <div ref={accountMenuRef} className={styles.accountMenu}>
       <Button
         type="button"
         variant="ghost"
@@ -337,6 +354,7 @@ export function PublicNavigation() {
                   items={items}
                   pathname={pathname}
                   ariaLabel={mainNavLabel}
+                  isAdminWorkspace={isAdminWorkspace}
                   closeWithSheet
                 />
               </SheetContent>
@@ -344,7 +362,12 @@ export function PublicNavigation() {
           </div>
         ) : (
           <div className={styles.actions}>
-            <NavigationLinks items={items} pathname={pathname} ariaLabel={mainNavLabel} />
+            <NavigationLinks
+              items={items}
+              pathname={pathname}
+              ariaLabel={mainNavLabel}
+              isAdminWorkspace={isAdminWorkspace}
+            />
             <div className={styles.rightActions}>
               <SearchControl />
               <UtilityControls
