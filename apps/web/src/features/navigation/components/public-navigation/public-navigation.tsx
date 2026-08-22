@@ -64,7 +64,7 @@ function SearchControl() {
   return (
     <Link href={routes.search} className={styles.searchControl}>
       <Search aria-hidden="true" size={16} />
-      {t("authStrip.search", "Search")}
+      <span>{t("navigation.searchAnything", "Search anything")}</span>
     </Link>
   );
 }

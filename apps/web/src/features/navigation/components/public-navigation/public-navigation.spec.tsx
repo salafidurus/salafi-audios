@@ -88,7 +88,10 @@ describe("PublicNavigation", () => {
     const mainNavigation = screen.getByRole("navigation", { name: "Main" });
     expect(mainNavigation).toBeInTheDocument();
     expect(within(mainNavigation).queryByRole("link", { name: "Search" })).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Search" })).toHaveAttribute("href", "/search");
+    expect(screen.getByRole("link", { name: "Search anything" })).toHaveAttribute(
+      "href",
+      "/search",
+    );
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
     expect(screen.queryByTestId("sidebar")).not.toBeInTheDocument();
   });

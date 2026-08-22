@@ -88,6 +88,13 @@
     border-color 150ms ease;
 }
 
+.searchControl {
+  width: clamp(15rem, 22vw, 19rem);
+  justify-content: flex-start;
+  border-color: var(--border-subtle);
+  background: var(--surface-subtle);
+}
+
 .searchControl:hover,
 .searchControl:focus-visible,
 .accountControl:hover,
@@ -256,6 +263,20 @@
 
   .navLink svg {
     display: none;
+  }
+
+  .searchControl {
+    width: 2.25rem;
+    padding-inline: 0;
+  }
+
+  .searchControl span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 }
 
