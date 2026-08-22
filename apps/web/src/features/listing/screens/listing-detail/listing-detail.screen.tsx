@@ -26,6 +26,81 @@ export type ListingDetailScreenProps = {
   slug: string;
 };
 
+type ListingContents = NonNullable<ReturnType<typeof useListingContents>["data"]>;
+type Translation = ReturnType<typeof useTranslation>;
+type FormatScholarName = ReturnType<typeof useFormatScholarName>;
+
+type ListingContentSectionProps = {
+  contents: ListingContents;
+  contentCount: number;
+  contentHeading: string;
+  filteredSingleOrSeriesItems: React.ComponentProps<typeof ContentList>["items"];
+  filteredModules: React.ComponentProps<typeof CollectionContentLayout>["modules"];
+  formatScholarName: FormatScholarName;
+  highlightItemId: string | undefined;
+  listing: NonNullable<ReturnType<typeof useListingDetail>["data"]>;
+  t: Translation["t"];
+};
+
+function ListingContentSection({
+  contents,
+  contentCount,
+  contentHeading,
+  filteredSingleOrSeriesItems,
+  filteredModules,
+  formatScholarName,
+  highlightItemId,
+  listing,
+  t,
+}: ListingContentSectionProps) {
+  return (
+    <section aria-labelledby="listing-content-heading" className={styles.contentRegion}>
+      <div className={styles.contentIntro}>
+        <div>
+          <p className={styles.eyebrow}>{t("listing.catalogLabel", "Study path")}</p>
+          <h2 id="listing-content-heading" className={styles.contentHeading}>
+            {contentHeading}
+          </h2>
+        </div>
+        <span className={styles.contentCount}>
+          {contentCount} {t("listing.items", "items")}
+        </span>
+      </div>
+
+      {contents.format === "single" && (
+        <ContentList
+          items={filteredSingleOrSeriesItems}
+          format="single"
+          scholarName={formatScholarName(listing.scholar)}
+          scholarSlug={listing.scholar.slug}
+        />
+      )}
+
+      {contents.format === "series" && (
+        <ContentList
+          items={filteredSingleOrSeriesItems}
+          format="series"
+          scholarName={formatScholarName(listing.scholar)}
+          scholarSlug={listing.scholar.slug}
+          seriesId={listing.id}
+          seriesTitle={listing.title}
+          highlightItemId={highlightItemId}
+        />
+      )}
+
+      {contents.format === "collection" && (
+        <CollectionContentLayout
+          modules={filteredModules}
+          scholarName={formatScholarName(listing.scholar)}
+          scholarSlug={listing.scholar.slug}
+          collectionId={listing.id}
+          highlightItemId={highlightItemId}
+        />
+      )}
+    </section>
+  );
+}
+
 export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -103,6 +178,15 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
     }
     return result;
   }, [contents, query]);
+
+  const contentCount =
+    contents?.format === "collection" ? filteredModules.length : filteredSingleOrSeriesItems.length;
+  const contentHeading =
+    listing?.format === "single"
+      ? t("listing.listenNow", "Listen now")
+      : listing?.format === "collection"
+        ? t("listing.modules", "Modules")
+        : t("listing.lessons", "Lessons");
 
   if (isListingError && !listing) {
     return (
@@ -268,34 +352,17 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
               <AppText variant="bodySm">{t("lecture.loading", "Loading lessons…")}</AppText>
             )}
 
-            {contents?.format === "single" && (
-              <ContentList
-                items={filteredSingleOrSeriesItems}
-                format="single"
-                scholarName={formatScholarName(listing.scholar)}
-                scholarSlug={listing.scholar.slug}
-              />
-            )}
-
-            {contents?.format === "series" && (
-              <ContentList
-                items={filteredSingleOrSeriesItems}
-                format="series"
-                scholarName={formatScholarName(listing.scholar)}
-                scholarSlug={listing.scholar.slug}
-                seriesId={listing.id}
-                seriesTitle={listing.title}
+            {contents && (
+              <ListingContentSection
+                contents={contents}
+                contentCount={contentCount}
+                contentHeading={contentHeading}
+                filteredSingleOrSeriesItems={filteredSingleOrSeriesItems}
+                filteredModules={filteredModules}
+                formatScholarName={formatScholarName}
                 highlightItemId={highlightItemId}
-              />
-            )}
-
-            {contents?.format === "collection" && (
-              <CollectionContentLayout
-                modules={filteredModules}
-                scholarName={formatScholarName(listing.scholar)}
-                scholarSlug={listing.scholar.slug}
-                collectionId={listing.id}
-                highlightItemId={highlightItemId}
+                listing={listing}
+                t={t}
               />
             )}
 

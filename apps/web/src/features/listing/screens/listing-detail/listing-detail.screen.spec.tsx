@@ -101,6 +101,8 @@ describe("ListingDetailScreen", () => {
     expect(screen.getAllByText("Ibn Baz").length).toBeGreaterThan(0);
     expect(screen.getByRole("navigation", { name: "Breadcrumbs" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
+    expect(screen.getByRole("region", { name: "Listen now" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Listen now" })).toBeTruthy();
     expect(screen.getAllByText("Play").length).toBeGreaterThan(0);
   });
 
@@ -110,6 +112,28 @@ describe("ListingDetailScreen", () => {
 
     render(<ListingDetailScreen slug="tawheed-lecture" />);
     expect(screen.getAllByText("Kitab At-Tawheed Lecture").length).toBeGreaterThan(0);
+  });
+
+  it("summarizes collection modules rather than nested lessons", () => {
+    mockUseListingDetail.mockReturnValue({
+      data: { ...mockSingleListing, format: "collection" },
+      isFetching: false,
+    });
+    mockUseListingContents.mockReturnValue({
+      data: {
+        format: "collection",
+        modules: [
+          { id: "m1", title: "Module One", lessons: [] },
+          { id: "m2", title: "Module Two", lessons: [] },
+        ],
+      },
+      isFetching: false,
+    });
+
+    render(<ListingDetailScreen slug="collection" />);
+
+    expect(screen.getByRole("heading", { name: "Modules" })).toBeTruthy();
+    expect(screen.getByText("2 items")).toBeTruthy();
   });
 
   it("shows a loading guard instead of the wrong content when the resolved listing is nested", () => {

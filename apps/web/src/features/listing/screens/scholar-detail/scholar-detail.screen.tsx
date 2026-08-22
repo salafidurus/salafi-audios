@@ -254,27 +254,43 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
         </StickyHeaderLayout.Header>
 
         <StickyHeaderLayout.Content>
-          <div className={styles.contentList}>
-            {filteredItems.length > 0 ? (
-              filteredItems.map((item) => (
-                <LectureRow
-                  key={item.id}
-                  title={pickContentField(item.title, item.original?.title, showOriginal)}
-                  category={item.type}
-                  scholarName={scholar.name}
-                  scholarSlug={scholar.slug}
-                  duration={formatDuration(item.durationSeconds)}
-                  totalLessons={item.lectureCount ?? 0}
-                  progress={0}
-                  onClick={() => navigateToListing(item.slug)}
-                />
-              ))
-            ) : (
-              <p className={styles.empty}>
-                {t("scholarContent.empty", "No published content found.")}
-              </p>
-            )}
-          </div>
+          <section aria-labelledby="scholar-content-heading" className={styles.contentRegion}>
+            <div className={styles.contentIntro}>
+              <div>
+                <p className={styles.eyebrow}>
+                  {t("scholarContent.catalogLabel", "Scholar catalog")}
+                </p>
+                <h2 id="scholar-content-heading" className={styles.contentHeading}>
+                  {t("scholarContent.publishedContent", "Published content")}
+                </h2>
+              </div>
+              <span className={styles.contentCount}>
+                {filteredItems.length} {t("scholarContent.items", "items")}
+              </span>
+            </div>
+
+            <div className={styles.contentList}>
+              {filteredItems.length > 0 ? (
+                filteredItems.map((item) => (
+                  <LectureRow
+                    key={item.id}
+                    title={pickContentField(item.title, item.original?.title, showOriginal)}
+                    category={item.type}
+                    scholarName={scholar.name}
+                    scholarSlug={scholar.slug}
+                    duration={formatDuration(item.durationSeconds)}
+                    totalLessons={item.lectureCount ?? 0}
+                    progress={0}
+                    onClick={() => navigateToListing(item.slug)}
+                  />
+                ))
+              ) : (
+                <p className={styles.empty}>
+                  {t("scholarContent.empty", "No published content found.")}
+                </p>
+              )}
+            </div>
+          </section>
         </StickyHeaderLayout.Content>
       </StickyHeaderLayout>
     </ScreenView>

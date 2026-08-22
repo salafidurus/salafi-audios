@@ -168,6 +168,8 @@ describe("ScholarDetailScreen", () => {
     >);
     render(<ScholarDetailScreen slug="ibn-baz" />);
     expect(screen.getByTestId("scholar-header")).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Published content" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Published content" })).toBeTruthy();
     expect(screen.getAllByTestId("lecture-row")).toHaveLength(2);
   });
 
