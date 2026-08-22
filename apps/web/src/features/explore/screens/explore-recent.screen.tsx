@@ -6,7 +6,7 @@ import { useAudio, useProgressStore } from "@sd/domain-audio";
 import { useExploreRecentScreen, useScholarsList } from "@sd/domain-content";
 import { useInfiniteSearch, useTopicsList } from "@sd/domain-search";
 import { useRouter } from "next/navigation";
-import React, { useRef, useEffect, useState, useMemo, type ReactNode } from "react";
+import React, { useRef, useEffect, useMemo, type ReactNode } from "react";
 
 import { useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -16,27 +16,20 @@ import { LectureCard } from "@/features/home/components/lecture-card/lecture-car
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
-import { Search } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import { useDebouncedSearch } from "@/shared/hooks";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 
+import {
+  ExploreFilterToolbar,
+  type ExploreFilterSummary,
+} from "../components/explore-filter-toolbar/explore-filter-toolbar";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
-import { FilterSelect } from "../components/filter-select/filter-select";
-import {
-  DEFAULT_EXPLORE_FILTERS,
-  exploreFiltersStorageKey,
-  EXPLORE_SORT_OPTIONS,
-  isExploreSort,
-  readExploreFilters,
-  sortExploreItems,
-  type ExploreFilters,
-  writeExploreFilters,
-} from "../utils/explore-filters";
+import { useExploreFilters } from "../hooks/use-explore-filters";
+import { EXPLORE_SORT_OPTIONS, isExploreSort, sortExploreItems } from "../utils/explore-filters";
 import styles from "./explore-recent.screen.module.css";
 
 export type FeedRecentScreenProps = {
@@ -150,43 +143,17 @@ export function FeedRecentScreen({
     onNavigateToScholar ?? ((slug) => router.push(routes.scholars.detail(slug)));
 
   // Search & Filtering State
-  const { query, setQuery: setSearchQuery, debouncedQuery } = useDebouncedSearch();
   const locale = i18n.language === "ar" ? "ar" : "en";
-  const storageKey = exploreFiltersStorageKey(locale, user?.id);
-  const [filters, setFilters] = useState<ExploreFilters>(DEFAULT_EXPLORE_FILTERS);
-
-  useEffect(() => {
-    let storage: Storage;
-    try {
-      storage = window.localStorage;
-    } catch {
-      return;
-    }
-    const storedFilters = readExploreFilters(storage, storageKey);
-    setFilters(storedFilters);
-    setSearchQuery(storedFilters.query);
-  }, [setSearchQuery, storageKey]);
-
-  const updateFilter = <K extends keyof ExploreFilters>(key: K, value: ExploreFilters[K]) => {
-    setFilters((current) => {
-      const next = { ...current, [key]: value };
-      try {
-        writeExploreFilters(window.localStorage, storageKey, next);
-      } catch {
-        // Storage can be unavailable during server rendering or restricted browsing.
-      }
-      return next;
-    });
-  };
-
-  const setQuery = (value: string) => {
-    setSearchQuery(value);
-    updateFilter("query", value);
-  };
-
-  const selectedScholar = filters.scholar;
-  const selectedTopic = filters.topic;
-  const selectedFormat = filters.format;
+  const {
+    filters,
+    query,
+    debouncedQuery,
+    isHydrated,
+    setQuery,
+    updateFilter,
+    clearFilter,
+    clearAll,
+  } = useExploreFilters({ locale, userId: user?.id });
 
   // Fetch Metadata for Filters
   const { data: scholarsData } = useScholarsList();
@@ -244,12 +211,13 @@ export function FeedRecentScreen({
   );
 
   const hasActiveFilterOrSearch =
-    !!debouncedQuery.trim() ||
-    !!selectedScholar ||
-    !!selectedTopic ||
-    !!selectedFormat ||
-    !!filters.language ||
-    filters.sort !== "recent";
+    isHydrated &&
+    (!!debouncedQuery.trim() ||
+      !!filters.scholar ||
+      !!filters.topic ||
+      !!filters.format ||
+      !!filters.language ||
+      filters.sort !== "recent");
 
   // Recent feed data (default)
   const {
@@ -269,9 +237,9 @@ export function FeedRecentScreen({
     refetch: refetchSearch,
   } = useInfiniteSearch({
     query: debouncedQuery,
-    scholarSlug: selectedScholar || undefined,
-    topicSlugs: selectedTopic ? [selectedTopic] : undefined,
-    format: selectedFormat || undefined,
+    scholarSlug: filters.scholar || undefined,
+    topicSlugs: filters.topic ? [filters.topic] : undefined,
+    format: filters.format || undefined,
     language: filters.language || undefined,
     enabled: hasActiveFilterOrSearch,
   });
@@ -307,7 +275,7 @@ export function FeedRecentScreen({
     ? t("explore.recentTitleMobile", "Listings")
     : t("explore.recentTitleWide", "Listings Catalog");
 
-  const activeFilters = [
+  const activeFilters: ExploreFilterSummary[] = [
     filters.query.trim() && {
       key: "query",
       label: `${t("search.query", "Search")}: ${filters.query.trim()}`,
@@ -332,9 +300,11 @@ export function FeedRecentScreen({
       key: "sort",
       label: `${t("search.filterSort", "Sort")}: ${sortOptions.find((o) => o.id === filters.sort)?.label ?? filters.sort}`,
     },
-  ].filter((value): value is { key: keyof ExploreFilters; label: string } => Boolean(value));
+  ].filter((value): value is ExploreFilterSummary => Boolean(value));
 
-  if (hasActiveFilterOrSearch) {
+  if (!isHydrated) {
+    body = <FeedSkeleton />;
+  } else if (hasActiveFilterOrSearch) {
     if (isSearchError) {
       body = (
         <div className={styles.state} role="alert">
@@ -475,90 +445,37 @@ export function FeedRecentScreen({
       <StickyHeaderLayout>
         <StickyHeaderLayout.Header>
           <PageHeader title={feedTitle} />
-          <div className={styles.searchContainer}>
-            <Search.Bar
-              placeholder={t("search.placeholder", "Search lectures, scholars, or topics...")}
-              value={query}
-              onChange={setQuery}
-            />
-            <div className={styles.filterBar}>
-              {scholarChips.length > 0 && (
-                <FilterSelect
-                  label={t("search.filterScholar", "Scholar:")}
-                  options={scholarChips}
-                  value={selectedScholar}
-                  onChange={(value) => updateFilter("scholar", value)}
-                  searchable
-                />
-              )}
-              {topicChips.length > 0 && (
-                <FilterSelect
-                  label={t("search.filterTopic", "Topic:")}
-                  options={topicChips}
-                  value={selectedTopic}
-                  onChange={(value) => updateFilter("topic", value)}
-                  searchable
-                />
-              )}
-              <FilterSelect
-                label={t("search.filterFormat", "Format:")}
-                options={formatChips}
-                value={selectedFormat}
-                onChange={(value) => updateFilter("format", value)}
-              />
-              <FilterSelect
-                label={t("search.filterLanguage", "Language:")}
-                options={languageOptions}
-                value={filters.language}
-                onChange={(value) => updateFilter("language", value)}
-              />
-              <FilterSelect
-                label={t("search.filterSort", "Sort:")}
-                options={sortOptions}
-                value={filters.sort}
-                onChange={(value) => updateFilter("sort", isExploreSort(value) ? value : "recent")}
-                allLabel={t("explore.sort.recent", "Most recent")}
-              />
-            </div>
-            {activeFilters.length > 0 && (
-              <div
-                className={styles.activeFilters}
-                aria-label={t("search.activeFilters", "Active filters")}
-              >
-                <span className={styles.activeFiltersLabel}>
-                  {t("search.activeFilters", "Active filters")}
-                </span>
-                {activeFilters.map((filter) => (
-                  <button
-                    key={filter.key}
-                    type="button"
-                    className={styles.activeFilter}
-                    onClick={() => {
-                      updateFilter(filter.key, filter.key === "sort" ? "recent" : "");
-                      if (filter.key === "query") setSearchQuery("");
-                    }}
-                  >
-                    {filter.label} ×
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  className={styles.clearFilters}
-                  onClick={() => {
-                    setFilters(DEFAULT_EXPLORE_FILTERS);
-                    setSearchQuery("");
-                    try {
-                      writeExploreFilters(window.localStorage, storageKey, DEFAULT_EXPLORE_FILTERS);
-                    } catch {
-                      // Storage can be unavailable during server rendering or restricted browsing.
-                    }
-                  }}
-                >
-                  {t("search.clearFilters", "Clear all")}
-                </button>
-              </div>
-            )}
-          </div>
+          <ExploreFilterToolbar
+            query={query}
+            onQueryChange={setQuery}
+            filters={filters}
+            scholarOptions={scholarChips}
+            topicOptions={topicChips}
+            formatOptions={formatChips}
+            languageOptions={languageOptions}
+            sortOptions={sortOptions}
+            summaries={activeFilters}
+            allLabel={t("search.filterAll", "All")}
+            searchPlaceholder={t("search.placeholder", "Search lectures, scholars, or topics...")}
+            activeFiltersLabel={t("search.activeFilters", "Active filters")}
+            clearAllLabel={t("search.clearFilters", "Clear all")}
+            labels={{
+              scholar: t("search.filterScholar", "Scholar"),
+              topic: t("search.filterTopic", "Topic"),
+              contentType: t("search.filterFormat", "Content type"),
+              language: t("search.filterLanguage", "Language"),
+              sort: t("search.filterSort", "Sort"),
+            }}
+            onFilterChange={(key, value) => {
+              if (key === "sort") {
+                updateFilter(key, isExploreSort(value) ? value : "recent");
+              } else {
+                updateFilter(key, value);
+              }
+            }}
+            onClearFilter={clearFilter}
+            onClearAll={clearAll}
+          />
         </StickyHeaderLayout.Header>
         <StickyHeaderLayout.Content>
           <div className={styles.page}>{body}</div>
