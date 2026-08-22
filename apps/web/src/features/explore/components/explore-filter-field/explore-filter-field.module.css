@@ -1,0 +1,8 @@
+.field {
+  min-width: 0;
+}
+
+.field [data-slot="select-trigger"],
+.field [data-slot="input-group"] {
+  width: 100%;
+}

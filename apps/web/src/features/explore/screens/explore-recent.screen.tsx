@@ -459,6 +459,10 @@ export function FeedRecentScreen({
             searchPlaceholder={t("search.placeholder", "Search lectures, scholars, or topics...")}
             activeFiltersLabel={t("search.activeFilters", "Active filters")}
             clearAllLabel={t("search.clearFilters", "Clear all")}
+            filtersLabel={t("search.filters", "Filters")}
+            filterSearchPlaceholder={t("search.filterSearch", "Search options...")}
+            noOptionsLabel={t("search.noFilterOptions", "No options found")}
+            removeFilterLabel={t("search.removeFilter", "Remove")}
             labels={{
               scholar: t("search.filterScholar", "Scholar"),
               topic: t("search.filterTopic", "Topic"),

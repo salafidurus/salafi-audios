@@ -85,8 +85,8 @@ vi.mock("@/shared/components/Search", () => ({
     ),
   },
 }));
-vi.mock("../components/filter-select/filter-select", () => ({
-  FilterSelect: ({ label }: { label: string }) => <span>{label}</span>,
+vi.mock("../components/explore-filter-field/explore-filter-field", () => ({
+  ExploreFilterField: ({ label }: { label: string }) => <span>{label}</span>,
 }));
 vi.mock("../components/feed-skeleton/feed-skeleton", () => ({
   FeedSkeleton: () => <div data-testid="feed-skeleton">Loading catalog</div>,

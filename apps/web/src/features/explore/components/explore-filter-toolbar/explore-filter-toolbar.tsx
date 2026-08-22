@@ -1,10 +1,23 @@
 "use client";
 
+import { XIcon } from "lucide-react";
+
 import { Search } from "@/shared/components/Search";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/shared/components/ui/sheet";
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
+
+import type { FilterOption } from "../filter-select/filter-select";
 
 import { isExploreSort, type ExploreFilters } from "../../utils/explore-filters";
-import { FilterSelect, type FilterOption } from "../filter-select/filter-select";
+import { ExploreFilterField } from "../explore-filter-field/explore-filter-field";
 import styles from "./explore-filter-toolbar.module.css";
 
 export type ExploreFilterSummary = {
@@ -26,6 +39,10 @@ type ExploreFilterToolbarProps = {
   searchPlaceholder: string;
   activeFiltersLabel: string;
   clearAllLabel: string;
+  filtersLabel: string;
+  filterSearchPlaceholder: string;
+  noOptionsLabel: string;
+  removeFilterLabel: string;
   labels: {
     scholar: string;
     topic: string;
@@ -52,72 +69,111 @@ export function ExploreFilterToolbar({
   searchPlaceholder,
   activeFiltersLabel,
   clearAllLabel,
+  filtersLabel,
+  filterSearchPlaceholder,
+  noOptionsLabel,
+  removeFilterLabel,
   labels,
   onFilterChange,
   onClearFilter,
   onClearAll,
 }: ExploreFilterToolbarProps) {
+  const isDesktop = useIsDesktop();
+
+  const filterFields = (
+    <>
+      {scholarOptions.length > 0 && (
+        <ExploreFilterField
+          id="explore-scholar"
+          label={labels.scholar}
+          options={scholarOptions}
+          value={filters.scholar}
+          mode="combobox"
+          allLabel={allLabel}
+          searchPlaceholder={filterSearchPlaceholder}
+          emptyLabel={noOptionsLabel}
+          onChange={(value) => onFilterChange("scholar", value)}
+        />
+      )}
+      {topicOptions.length > 0 && (
+        <ExploreFilterField
+          id="explore-topic"
+          label={labels.topic}
+          options={topicOptions}
+          value={filters.topic}
+          mode="combobox"
+          allLabel={allLabel}
+          searchPlaceholder={filterSearchPlaceholder}
+          emptyLabel={noOptionsLabel}
+          onChange={(value) => onFilterChange("topic", value)}
+        />
+      )}
+      <ExploreFilterField
+        id="explore-content-type"
+        label={labels.contentType}
+        options={formatOptions}
+        value={filters.format}
+        allLabel={allLabel}
+        onChange={(value) => onFilterChange("format", value)}
+      />
+      <ExploreFilterField
+        id="explore-language"
+        label={labels.language}
+        options={languageOptions}
+        value={filters.language}
+        allLabel={allLabel}
+        onChange={(value) => onFilterChange("language", value)}
+      />
+      <ExploreFilterField
+        id="explore-sort"
+        label={labels.sort}
+        options={sortOptions}
+        value={filters.sort}
+        allLabel={allLabel}
+        onChange={(value) => onFilterChange("sort", isExploreSort(value) ? value : "recent")}
+      />
+    </>
+  );
+
   return (
     <search className={styles.toolbar} aria-label={activeFiltersLabel}>
       <Search.Bar placeholder={searchPlaceholder} value={query} onChange={onQueryChange} />
-      <div className={styles.filters}>
-        {scholarOptions.length > 0 && (
-          <FilterSelect
-            label={labels.scholar}
-            options={scholarOptions}
-            value={filters.scholar}
-            onChange={(value) => onFilterChange("scholar", value)}
-            searchable
-            allLabel={allLabel}
-          />
-        )}
-        {topicOptions.length > 0 && (
-          <FilterSelect
-            label={labels.topic}
-            options={topicOptions}
-            value={filters.topic}
-            onChange={(value) => onFilterChange("topic", value)}
-            searchable
-            allLabel={allLabel}
-          />
-        )}
-        <FilterSelect
-          label={labels.contentType}
-          options={formatOptions}
-          value={filters.format}
-          onChange={(value) => onFilterChange("format", value)}
-          allLabel={allLabel}
-        />
-        <FilterSelect
-          label={labels.language}
-          options={languageOptions}
-          value={filters.language}
-          onChange={(value) => onFilterChange("language", value)}
-          allLabel={allLabel}
-        />
-        <FilterSelect
-          label={labels.sort}
-          options={sortOptions}
-          value={filters.sort}
-          onChange={(value) => onFilterChange("sort", isExploreSort(value) ? value : "recent")}
-          allLabel={allLabel}
-        />
-      </div>
+      {isDesktop ? (
+        <div className={styles.filters}>{filterFields}</div>
+      ) : (
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button type="button" variant="outline" className={styles.filterTrigger}>
+              {filtersLabel}
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className={styles.mobileFilters}>
+            <SheetHeader>
+              <SheetTitle>{filtersLabel}</SheetTitle>
+            </SheetHeader>
+            <div className={styles.mobileFilterFields}>{filterFields}</div>
+          </SheetContent>
+        </Sheet>
+      )}
       <div className={styles.summary} aria-live="polite">
         <span className={styles.summaryLabel}>{activeFiltersLabel}</span>
         {summaries.length === 0 ? (
           <span className={styles.noFilters}>{allLabel}</span>
         ) : (
           summaries.map((summary) => (
-            <button
-              key={summary.key}
-              type="button"
-              className={styles.filterChip}
-              aria-label={`Remove ${summary.label}`}
-              onClick={() => onClearFilter(summary.key)}
-            >
-              {summary.label} <span aria-hidden="true">×</span>
-            </button>
+            <Badge key={summary.key} variant="outline" className={styles.filterChip}>
+              {summary.label}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                className={styles.removeFilter}
+                aria-label={`${removeFilterLabel}: ${summary.label}`}
+                onClick={() => onClearFilter(summary.key)}
+              >
+                <XIcon aria-hidden="true" />
+              </Button>
+            </Badge>
           ))
         )}
         <Button
