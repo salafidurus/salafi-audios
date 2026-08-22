@@ -134,7 +134,7 @@ function getAdminNavItems(t: (key: string, fallback: string) => string): PublicN
 }
 
 function isActivePath(pathname: string, href: string) {
-  return href === routes.home
+  return href === routes.home || href === routes.admin.index
     ? pathname === href
     : pathname === href || pathname.startsWith(`${href}/`);
 }

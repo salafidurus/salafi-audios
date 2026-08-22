@@ -175,9 +175,11 @@ describe("PublicNavigation", () => {
     render(<PublicNavigation />);
 
     expect(screen.getByRole("link", { name: "Back to app" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Dashboard" })).not.toHaveAttribute("aria-current");
     expect(screen.getByRole("link", { name: "Contents" })).toHaveAttribute(
       "href",
       "/admin/contents",
     );
+    expect(screen.getByRole("link", { name: "Contents" })).toHaveAttribute("aria-current", "page");
   });
 });

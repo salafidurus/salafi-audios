@@ -79,8 +79,8 @@
 .nav {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  flex: 0 1 35%;
+  justify-content: center;
+  flex: 1 1 35%;
   min-width: 0;
   gap: var(--space-component-gap-xl);
 }
