@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 5rem;
+  min-height: 5.5rem;
   gap: var(--space-component-gap-lg);
   padding: var(--space-component-gap-sm) var(--space-layout-page-x);
   border-block: 1px solid var(--border-subtle);
@@ -25,7 +25,7 @@
   align-items: center;
   flex: 0 1 15%;
   min-width: 12rem;
-  gap: var(--space-md);
+  gap: var(--space-component-gap-md);
   color: var(--content-strong);
   font-family: var(--font-display), serif;
   font-size: var(--typo-title-md-font-size);
@@ -49,7 +49,7 @@
 }
 
 .workspaceBadge {
-  padding: var(--space-xs) var(--space-sm);
+  padding: var(--space-sm) var(--space-component-gap-md);
   border: 1px solid color-mix(in srgb, var(--action-primary) 35%, var(--border-subtle));
   border-radius: var(--radius-component-chip);
   color: var(--action-primary);
@@ -82,7 +82,7 @@
   justify-content: flex-start;
   flex: 0 1 35%;
   min-width: 0;
-  gap: var(--space-component-gap-lg);
+  gap: var(--space-component-gap-xl);
 }
 
 .navLink,
@@ -105,9 +105,9 @@
 
 .navLink {
   position: relative;
-  min-height: 2.75rem;
+  min-height: 3rem;
   padding: var(--space-sm) var(--space-md) calc(var(--space-sm) + var(--space-xs));
-  font-size: var(--typo-body-md-font-size);
+  font-size: var(--typo-body-lg-font-size);
   white-space: nowrap;
 }
 
@@ -146,8 +146,8 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  gap: var(--space-sm);
-  min-height: 2.75rem;
+  gap: var(--space-component-gap-md);
+  min-height: 3rem;
   padding: var(--space-sm) var(--space-md);
   border: 1px solid transparent;
   border-radius: var(--radius-component-chip);
@@ -210,7 +210,7 @@
 }
 
 .accountMenu .accountControl {
-  gap: var(--space-md);
+  gap: var(--space-component-gap-md);
   max-width: 13rem;
   border-color: transparent;
   background: transparent;
@@ -225,7 +225,7 @@
 }
 
 .workspaceSwitch {
-  gap: var(--space-md);
+  gap: var(--space-component-gap-md);
   padding-inline: var(--space-component-gap-md);
 }
 
