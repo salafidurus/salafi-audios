@@ -138,6 +138,65 @@ describe("HomeScreen", () => {
     }
   });
 
+  it("builds an editorial hierarchy from one recent feed snapshot", () => {
+    const item = (slug: string, title: string) => ({
+      kind: "single",
+      id: slug,
+      title,
+      slug,
+      scholarName: "Shaykh Salih al-Fawzan",
+      scholarSlug: "salih-al-fawzan",
+      thumbnailUrl: null,
+      durationSeconds: 1800,
+      publishedAt: "2026-08-22T00:00:00.000Z",
+    });
+
+    (useExploreRecentScreen as unknown as Mock<any>).mockReturnValue({
+      data: {
+        pages: [{ items: [item("recent-lesson", "Recently published lesson")] }],
+      },
+      isLoading: false,
+    });
+    (useHomePromotions as unknown as Mock<any>).mockReturnValue({
+      data: {
+        hero: item("featured-lesson", "Featured study path"),
+        editorsPicks: [{ listing: item("curated-lesson", "Curated lesson") }],
+      },
+      isLoading: false,
+    });
+
+    render(<HomeScreen />);
+
+    expect(screen.getByTestId("home-study-header")).toBeTruthy();
+    expect(screen.getByTestId("home-featured-section")).toBeTruthy();
+    expect(screen.getByTestId("home-discovery-section")).toBeTruthy();
+    expect(screen.getByTestId("home-recent-section")).toBeTruthy();
+    expect(screen.getByTestId("home-curated-section")).toBeTruthy();
+    expect(screen.getByText("Recently published lesson")).toBeTruthy();
+    expect(screen.getByText("Curated lesson")).toBeTruthy();
+    expect(useExploreRecentScreen).toHaveBeenCalledTimes(1);
+
+    const landmarks = [
+      screen.getByTestId("home-study-header"),
+      screen.getByTestId("home-featured-section"),
+      screen.getByTestId("home-discovery-section"),
+      screen.getByTestId("home-recent-section"),
+      screen.getByTestId("home-curated-section"),
+      screen.getByTestId("home-mobile-section"),
+    ];
+
+    for (let index = 1; index < landmarks.length; index += 1) {
+      const previous = landmarks[index - 1];
+      const current = landmarks[index];
+      if (!previous || !current) {
+        throw new Error("Expected every Home hierarchy landmark to be present");
+      }
+      expect(
+        Boolean(previous.compareDocumentPosition(current) & Node.DOCUMENT_POSITION_FOLLOWING),
+      ).toBe(true);
+    }
+  });
+
   it("hides continue listening section when recentProgress is null", () => {
     (useContinueListening as unknown as Mock<any>).mockReturnValue({
       recentProgress: null,
@@ -164,6 +223,8 @@ describe("HomeScreen", () => {
 
     expect(screen.getByTestId("home-empty-state")).toBeTruthy();
     expect(screen.queryByTestId("home-hero-start")).toBeNull();
+    expect(screen.getByTestId("home-recent-empty")).toBeTruthy();
+    expect(screen.getByTestId("home-curated-empty")).toBeTruthy();
   });
 
   it("shows the hero loading state while optional home data is loading", () => {

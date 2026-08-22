@@ -1,26 +1,23 @@
 .hero {
   position: relative;
-  border-radius: 16px;
+  min-height: 250px;
+  display: flex;
+  align-items: stretch;
+  border-radius: var(--radius-component-card);
   border: 1px solid var(--border-default);
-  padding: 24px 28px 24px 44px;
-  background-color: var(--surface-default);
-  background-image: radial-gradient(
-    circle at 1px 1px,
-    color-mix(in srgb, var(--action-primary) 15%, transparent) 1px,
-    transparent 0
-  );
-  background-size: 18px 18px;
+  padding: 2rem 3rem 2.25rem 4.5rem;
+  background: linear-gradient(135deg, var(--surface-default) 0%, var(--surface-subtle) 100%);
   overflow: hidden;
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-sm);
 }
 
 .marginalia {
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 0;
   bottom: 0;
   width: 26px;
-  border-right: 1px solid var(--border-default);
+  border-inline-end: 1px solid var(--border-default);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -40,7 +37,7 @@
 .bookmark {
   position: absolute;
   top: 0;
-  right: 36px;
+  inset-inline-end: 36px;
   width: 32px;
   height: 48px;
   background: linear-gradient(180deg, var(--content-primary-strong), var(--action-primary));
@@ -54,6 +51,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-width: 60rem;
 }
 
 .eyebrow {
@@ -67,7 +65,7 @@
 
 .title {
   font-family: var(--font-display), "Fraunces", Georgia, serif;
-  font-size: clamp(24px, 3.2vw, 32px);
+  font-size: clamp(1.8rem, 4vw, 3.4rem);
   font-weight: 600;
   line-height: 1.25;
   margin: 0;
@@ -94,7 +92,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .startBtn {
@@ -132,7 +130,7 @@
   height: 34px;
   padding: 0 14px;
   border-radius: 999px;
-  background: var(--surface-default);
+  background: color-mix(in srgb, var(--surface-default) 75%, transparent);
   border: 1px solid var(--border-default);
   color: var(--content-strong);
   font-size: 13px;
@@ -148,7 +146,8 @@
 
 @media (max-width: 640px) {
   .hero {
-    padding: 20px 20px 20px 36px;
+    min-height: 220px;
+    padding: 1.5rem 1.25rem 1.5rem 3.25rem;
   }
 
   .title {
@@ -165,6 +164,7 @@
 /* RTL Support */
 [dir="rtl"] .hero {
   direction: rtl;
+  padding-inline: 3.25rem 1.25rem;
 }
 
 /* Skeleton loader styles */
@@ -218,4 +218,3 @@
     animation: none;
   }
 }
-

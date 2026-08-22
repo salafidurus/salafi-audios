@@ -1,7 +1,97 @@
-.topBar {
+.homeLayout {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  width: 100%;
+}
+
+.homeHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.72fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: end;
+  padding: clamp(0.5rem, 2vw, 1.25rem) 0;
+}
+
+.welcomeCopy,
+.sectionIntro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.welcomeCopy h1,
+.sectionIntro h2 {
+  max-width: 14ch;
+  margin: 0;
+  color: var(--content-strong);
+  font-family: var(--typo-display-lg-font-family), serif;
+  font-size: clamp(2rem, 5vw, 4.25rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+
+.sectionIntro h2 {
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  line-height: 1.08;
+}
+
+.welcomeCopy p:last-child,
+.sectionIntro p:last-child {
+  max-width: 42rem;
+  margin: 0;
+  color: var(--content-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--action-primary);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+}
+
+.searchPanel {
+  min-width: 0;
+}
+
+.continuitySection {
+  position: relative;
+  padding-inline-start: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.continuitySection::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--action-primary);
+  content: "";
+}
+
+.featuredSection {
+  min-width: 0;
+}
+
+.discoverySection,
+.mobileSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-lg);
+}
+
+.discoverySection {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-block: 1px solid var(--border-subtle);
+}
+
+.discoveryGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.25rem, 4vw, 3rem);
 }
 
 .searchWrapper {
@@ -33,23 +123,22 @@
   font-weight: 500 !important;
 }
 
-.userButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: var(--surface-default);
-  border: 1px solid var(--border-default);
-  color: var(--content-muted);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
 @media (max-width: 640px) {
-  .searchWrapper {
-    width: 100%;
+  .homeHeader {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .welcomeCopy h1 {
+    font-size: clamp(2.1rem, 11vw, 3.2rem);
+  }
+
+  .discoveryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .homeLayout {
+    gap: 2.5rem;
   }
 
   .searchInputWrapper {

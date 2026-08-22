@@ -1,7 +1,7 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-lg);
+  gap: var(--space-component-gap-md);
   width: 100%;
 }
 
@@ -37,7 +37,7 @@
 
 .scrollRow {
   display: flex;
-  gap: var(--space-component-gap-lg);
+  gap: var(--space-component-gap-md);
   overflow-x: auto;
   padding-bottom: 4px;
   scrollbar-width: none;
@@ -69,7 +69,7 @@
   border-radius: 50%;
   background: radial-gradient(circle at 30% 25%, var(--border-primary-strong), var(--surface-subtle));
   border: 2px solid var(--action-primary);
-  box-shadow: 0 0 0 3px var(--surface-canvas), 0 4px 14px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 3px var(--surface-canvas), var(--shadow-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,4 +154,3 @@
     animation: none;
   }
 }
-

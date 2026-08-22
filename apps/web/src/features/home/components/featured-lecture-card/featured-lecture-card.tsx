@@ -14,6 +14,7 @@ type FeaturedLectureCardProps = {
   duration: string;
   progress: number;
   totalLessons: number;
+  eyebrow?: string;
   onClick?: () => void;
   onPlay?: () => void;
 };
@@ -28,6 +29,7 @@ export function FeaturedLectureCard({
   totalLessons,
   onClick,
   onPlay,
+  eyebrow = "Editor’s pick this week",
 }: FeaturedLectureCardProps) {
   const displayScholar = useFormattedScholarName(scholarName, scholarSlug);
   const done = Math.round(progress * totalLessons);
@@ -72,7 +74,7 @@ export function FeaturedLectureCard({
           >
             {category.toUpperCase()}
           </span>
-          <span className={styles.editorPick}>Editor&rsquo;s pick this week</span>
+          <span className={styles.editorPick}>{eyebrow}</span>
         </span>
         <h3 className={styles.title}>{title}</h3>
         <p className={styles.meta}>

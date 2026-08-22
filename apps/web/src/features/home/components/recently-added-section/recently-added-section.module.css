@@ -21,6 +21,23 @@
   line-height: var(--typo-title-md-line-height);
 }
 
+.sectionEyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--action-primary);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.emptyState {
+  margin: 0;
+  padding: 1.25rem;
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-component-card);
+  color: var(--content-muted);
+  line-height: 1.6;
+}
+
 .seeAllLink {
   font-size: 13.5px;
   font-weight: 600;
@@ -82,4 +99,3 @@
     animation: none;
   }
 }
-
