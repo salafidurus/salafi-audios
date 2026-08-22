@@ -80,6 +80,22 @@
   border-radius: 50%;
   background: var(--surface-subtle);
   box-shadow: var(--shadow-xs);
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 180ms ease;
+}
+
+.visualFrame:hover,
+.titleLink:hover,
+.scholarLink:hover {
+  opacity: 0.82;
+}
+
+.visualFrame:focus-visible,
+.titleLink:focus-visible,
+.scholarLink:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 3px;
 }
 
 .artworkImage {
@@ -120,13 +136,7 @@
 .scholarLink {
   color: inherit;
   text-decoration: none;
-}
-
-.titleLink:hover,
-.scholarLink:hover {
-  text-decoration: underline;
-  text-decoration-color: var(--action-primary);
-  text-underline-offset: 0.16em;
+  transition: opacity 180ms ease;
 }
 
 .subtitle {
