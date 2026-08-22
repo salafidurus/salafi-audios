@@ -127,9 +127,10 @@ body {
   overflow: hidden;
 }
 
-/* Consent-required layout (sidebar + main content) */
+/* Consent-required layout (Public workspace top navigation + content) */
 .appConsentShell {
   display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
 }
@@ -138,7 +139,6 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding-inline-start: 244px;
   padding-top: 0;
   min-height: 0;
   width: 100%;
@@ -186,31 +186,6 @@ body {
 @media (max-width: 1200px) {
   .appNoConsentShell {
     grid-template-columns: 1fr;
-  }
-}
-
-/* Tablet: collapsed sidebar (641px - 900px) */
-@media (min-width: 641px) and (max-width: 900px) {
-  .appConsentShell {
-    flex-direction: row;
-  }
-
-  .appConsentMain {
-    padding-inline-start: 244px;
-    padding-bottom: 0;
-  }
-}
-
-/* Mobile: header at top, drawer navigation (<= 640px) */
-@media (max-width: 640px) {
-  .appConsentShell {
-    flex-direction: column;
-  }
-
-  .appConsentMain {
-    padding-inline-start: 0;
-    padding-top: calc(var(--mobile-header-height) + env(safe-area-inset-top));
-    padding-bottom: 0;
   }
 }
 

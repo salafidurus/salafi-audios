@@ -1,5 +1,9 @@
-import { BookOpen, Play } from "lucide-react";
+import type { ScholarTitle } from "@sd/core-contracts";
 
+import { useFormatScholarName } from "@sd/domain-content";
+
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
@@ -11,9 +15,11 @@ type FeaturedLectureCardProps = {
   category: string;
   scholarName: string;
   scholarSlug?: string;
+  scholarTitle?: ScholarTitle | string | null;
   duration: string;
   progress: number;
   totalLessons: number;
+  eyebrow?: string;
   onClick?: () => void;
   onPlay?: () => void;
 };
@@ -23,13 +29,19 @@ export function FeaturedLectureCard({
   category,
   scholarName,
   scholarSlug,
+  scholarTitle,
   duration,
   progress,
   totalLessons,
   onClick,
   onPlay,
+  eyebrow = "Editor’s pick this week",
 }: FeaturedLectureCardProps) {
-  const displayScholar = useFormattedScholarName(scholarName, scholarSlug);
+  const formatScholarName = useFormatScholarName();
+  const formattedScholarFallback = useFormattedScholarName(scholarName, scholarSlug);
+  const displayScholar = scholarTitle
+    ? formatScholarName({ name: scholarName, title: scholarTitle })
+    : formattedScholarFallback;
   const done = Math.round(progress * totalLessons);
   const t = totalLessons;
 
@@ -51,18 +63,10 @@ export function FeaturedLectureCard({
       }}
     >
       <span className={styles.corner} aria-hidden="true" />
-      <span
-        className={styles.iconBox}
-        style={{
-          background: "var(--surface-default)",
-          border: "1px solid var(--border-default)",
-        }}
-      >
-        <BookOpen size={30} color="var(--action-primary)" strokeWidth={1.3} />
-      </span>
       <CardContent className={styles.body}>
         <span className={styles.topRow}>
-          <span
+          <Badge
+            variant="outline"
             className={styles.catBadge}
             style={{
               color: "var(--content-secondary)",
@@ -71,8 +75,8 @@ export function FeaturedLectureCard({
             }}
           >
             {category.toUpperCase()}
-          </span>
-          <span className={styles.editorPick}>Editor&rsquo;s pick this week</span>
+          </Badge>
+          <span className={styles.editorPick}>{eyebrow}</span>
         </span>
         <h3 className={styles.title}>{title}</h3>
         <p className={styles.meta}>
@@ -85,11 +89,12 @@ export function FeaturedLectureCard({
           </span>
         </span>
       </CardContent>
-      <button
+      <Button
         type="button"
         className={styles.playBtn}
-        style={{ background: "var(--action-primary)" }}
         aria-label={`Play ${title}`}
+        variant="primary"
+        size="lg"
         onClick={(e) => {
           e.stopPropagation();
           if (onPlay) {
@@ -99,8 +104,8 @@ export function FeaturedLectureCard({
           }
         }}
       >
-        <Play size={17} fill="currentColor" />
-      </button>
+        Play
+      </Button>
     </Card>
   );
 }

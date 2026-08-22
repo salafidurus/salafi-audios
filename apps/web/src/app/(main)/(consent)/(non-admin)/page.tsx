@@ -11,10 +11,7 @@ export default function HomePage() {
 
   return (
     <main className="flex flex-1 min-h-full flex-col">
-      <HomeScreen
-        onOpenSearch={() => push(routes.search)}
-        onContinueListening={(lectureId) => push(routes.listings.detail(lectureId))}
-      />
+      <HomeScreen onContinueListening={(lectureId) => push(routes.listings.detail(lectureId))} />
     </main>
   );
 }

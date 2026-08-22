@@ -1,6 +1,6 @@
 import { test, expect } from "./test-base";
 
-test("home page loads search landing", async ({ page }) => {
+test("home page loads the study landing", async ({ page }) => {
   await page.goto("/");
 
   await expect(page).toHaveTitle(/./);
@@ -10,10 +10,8 @@ test("home page loads search landing", async ({ page }) => {
   await heading.waitFor({ state: "visible", timeout: 30_000 });
   await expect(heading).not.toHaveText("");
 
-  // Check the search button
-  const searchButton = page.getByRole("button", { name: "What do you want to listen to?" });
-  await searchButton.waitFor({ state: "visible", timeout: 30_000 });
-  await expect(searchButton).toBeVisible();
+  // The home page intentionally keeps search in the global navigation.
+  await expect(page.getByRole("button", { name: "What do you want to listen to?" })).toHaveCount(0);
 
   await expect(page.getByRole("tablist", { name: "Browse by topic" })).toBeVisible();
 });
