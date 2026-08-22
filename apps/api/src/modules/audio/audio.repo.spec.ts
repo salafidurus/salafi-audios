@@ -304,6 +304,30 @@ describe('AudioRepository', () => {
       expect(redis.eval).toHaveBeenCalledTimes(2);
     });
 
+    it('skips malformed due members without aborting the flush', async () => {
+      redis.enabled = true;
+      redis.set.mockResolvedValue('OK');
+      redis.zrangebyscore.mockResolvedValue([
+        JSON.stringify({ userId: 'user1', listingId: 'listing1' }),
+        'not-json',
+      ]);
+      redis.mget.mockResolvedValue([
+        JSON.stringify({
+          version: 'version-1',
+          userId: 'user1',
+          listingId: 'listing1',
+          positionSeconds: 120,
+          isCompleted: false,
+          updatedAt: '2026-08-10T10:00:00.000Z',
+        }),
+      ]);
+      prisma.listing.findMany.mockResolvedValue([{ id: 'listing1', durationSeconds: 300 }]);
+
+      await repo.flushBufferedProgress();
+
+      expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+    });
+
     it('retains pending Redis data when PostgreSQL fails', async () => {
       redis.enabled = true;
       redis.set.mockResolvedValue('OK');

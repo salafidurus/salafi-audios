@@ -341,11 +341,17 @@ export class AudioRepository {
     });
     if (members.length === 0) return [];
     const values = await this.redis.mget(
-      members.map((member) => {
-        // SAFETY: members were originally enqueued by this repository with the
-        // same `{ userId, listingId }` JSON shape.
-        const parsed = progressMemberSchema.parse(member);
-        return this.progressPendingKey(parsed.userId, parsed.listingId);
+      members.flatMap((member) => {
+        try {
+          // SAFETY: members were originally enqueued by this repository with the
+          // same `{ userId, listingId }` JSON shape. ZRANGEBYSCORE returns the
+          // raw member string, so it must be decoded before schema validation.
+          // A malformed member is skipped so one bad entry cannot stall the flush.
+          const parsed = progressMemberSchema.parse(JSON.parse(member));
+          return [this.progressPendingKey(parsed.userId, parsed.listingId)];
+        } catch {
+          return [];
+        }
       }),
     );
     return values.flatMap((value) => {
@@ -353,7 +359,7 @@ export class AudioRepository {
       try {
         // SAFETY: the pending payload is serialized by `enqueueProgress` using
         // the `PendingProgress` contract owned by this repository.
-        return [pendingProgressSchema.parse(value)];
+        return [pendingProgressSchema.parse(JSON.parse(value))];
       } catch {
         return [];
       }
