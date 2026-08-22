@@ -108,10 +108,6 @@ export function SettingsGeneralScreen() {
     }
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem(NOTIF_KEY, JSON.stringify(notif));
-  }, [notif]);
-
   const handleNotifChange = useCallback(
     (key: keyof NotificationState) => (checked: boolean) => {
       setNotif((prev) => ({ ...prev, [key]: checked }));
@@ -126,7 +122,11 @@ export function SettingsGeneralScreen() {
 
   return (
     <ScreenView>
-      <h1 className={styles.settingsTitle}>{t("settings.general.title", "Settings")}</h1>
+      <div className={styles.settingsIntro}>
+        <p className={styles.eyebrow}>{t("settings.general.eyebrow")}</p>
+        <h1 className={styles.settingsTitle}>{t("settings.general.title", "Settings")}</h1>
+        <p className={styles.settingsDescription}>{t("settings.general.description")}</p>
+      </div>
 
       {/* Sub-navigation tabs bar matching prototype ScreenSettings */}
       <Tabs
@@ -183,12 +183,12 @@ export function SettingsGeneralScreen() {
               />
             </SettingsRow>
           )}
-          <div style={{ margin: "10px 0 16px" }}>
+          <div className={styles.accentPicker}>
             <AccentThemePicker value={accentTheme} onChange={handleAccentThemeChange} />
           </div>
 
           <p className={styles.sectionLabel}>{t("settings.general.mobileSection", "MOBILE")}</p>
-          <div style={{ margin: "8px 0 16px" }}>
+          <div className={styles.downloadCard}>
             <DownloadAppCard />
           </div>
 

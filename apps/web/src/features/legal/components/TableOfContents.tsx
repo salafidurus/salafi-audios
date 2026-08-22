@@ -69,8 +69,8 @@ export function TableOfContents({ sections }: TableOfContentsProps) {
   };
 
   return (
-    <nav className={styles.nav}>
-      <div className={styles.header}>Contents</div>
+    <nav className={styles.nav} aria-label="Legal document contents">
+      <h2 className={styles.header}>Contents</h2>
       <ul className={styles.list}>
         {sections.map((section) => (
           <li key={section.id}>

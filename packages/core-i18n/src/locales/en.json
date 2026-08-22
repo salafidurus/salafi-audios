@@ -29,7 +29,10 @@
       "noAccount": "Don't have an account? Create one",
       "noAccountSplit": "Don't have an account?",
       "noAccountLink": "Create one",
-      "failed": "Sign in failed"
+      "failed": "Sign in failed",
+      "eyebrow": "Your study, in sync",
+      "privacyNote": "By continuing, you agree to our",
+      "and": "and"
     }
   },
   "validation": {
@@ -138,6 +141,8 @@
   "settings": {
     "general": {
       "title": "Settings",
+      "eyebrow": "Personal space",
+      "description": "Shape your reading experience, notifications, and account preferences.",
       "languageSection": "Language",
       "languageDesc": "Configure app and content language.",
       "appLanguage": "App Language",
@@ -175,6 +180,12 @@
   },
   "support": {
     "title": "Support",
+    "subtitle": "Find answers and reach the team when you need help.",
+    "faqEyebrow": "Answers",
+    "contactEyebrow": "Talk to us",
+    "faqDescription": "Quick answers to common listening questions.",
+    "contactCopy": "We aim to respond within 48 hours.",
+    "legalPrompt": "You can also review:",
     "faqSection": "Frequently Asked Questions",
     "contactSection": "Contact Us",
     "faq": {

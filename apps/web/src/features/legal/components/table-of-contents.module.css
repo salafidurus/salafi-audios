@@ -36,7 +36,7 @@
 .link {
   display: block;
   width: 100%;
-  text-align: left;
+  text-align: start;
   padding: var(--space-component-gap-sm) var(--space-component-gap-md);
   margin: 0;
   border: none;
@@ -58,13 +58,39 @@
   background-color: var(--surface-selected);
   color: var(--action-primary);
   font-weight: 600;
-  border-left: 3px solid var(--action-primary);
-  padding-left: calc(var(--space-component-gap-md) - 3px);
+  border-inline-start: 3px solid var(--action-primary);
+  padding-inline-start: calc(var(--space-component-gap-md) - 3px);
 }
 
 @media (max-width: 1200px) {
   .nav {
-    display: none;
+    position: static;
+    width: auto;
+    max-height: 12rem;
+    order: -1;
+  }
+
+  .list {
+    display: flex;
+    gap: var(--space-scale-xs);
+    overflow-x: auto;
+    padding: var(--space-component-gap-sm);
+  }
+
+  .list li {
+    flex: 0 0 auto;
+  }
+
+  .link {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .link.active {
+    border-inline-start: 0;
+    border-block-end: 3px solid var(--action-primary);
+    padding-inline-start: var(--space-component-gap-md);
+    padding-block-end: calc(var(--space-component-gap-sm) - 3px);
   }
 }
 

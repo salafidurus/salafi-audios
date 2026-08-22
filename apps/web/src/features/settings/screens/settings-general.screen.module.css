@@ -1,9 +1,30 @@
+.settingsIntro {
+  margin-bottom: var(--space-component-gap-lg);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-scale-xs);
+  color: var(--action-primary);
+  font-size: var(--typo-caption-font-size);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .settingsTitle {
-  margin: 0 0 6px 0;
+  margin: 0;
   font-family: var(--font-display), "Fraunces", Georgia, serif;
   font-size: 26px;
   font-weight: 600;
   color: var(--content-strong);
+}
+
+.settingsDescription {
+  max-width: 38rem;
+  margin: var(--space-scale-sm) 0 0;
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
 }
 
 .tabBar {
@@ -24,7 +45,9 @@
   color: var(--content-muted);
   border-bottom: 2px solid transparent;
   cursor: pointer;
-  transition: color 150ms ease, border-color 150ms ease;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease;
 }
 
 .tabButtonActive {
@@ -54,4 +77,9 @@
 
 .sectionWrap {
   max-width: 640px;
+}
+
+.accentPicker,
+.downloadCard {
+  margin-block: var(--space-scale-sm) var(--space-scale-lg);
 }

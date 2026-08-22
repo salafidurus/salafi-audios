@@ -26,6 +26,15 @@
   font-weight: var(--typo-title-lg-font-weight);
 }
 
+.eyebrow {
+  margin: 0 0 var(--space-scale-xs);
+  color: var(--action-primary);
+  font-size: var(--typo-caption-font-size);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .header {
   display: flex;
   flex-direction: column;
@@ -55,6 +64,24 @@
   flex-direction: column;
   gap: var(--space-component-gap-lg);
   margin-top: var(--space-component-gap-lg);
+}
+
+.privacyNote {
+  margin: var(--space-component-gap-lg) 0 0;
+  color: var(--content-muted);
+  font-family: var(--typo-caption-font-family), sans-serif;
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
+  text-align: center;
+}
+
+.privacyNote a {
+  color: var(--action-primary);
+  text-underline-offset: 0.2em;
+}
+
+.privacyNote a:hover {
+  text-decoration: underline;
 }
 
 .socialStack,
@@ -218,5 +245,9 @@
   .page {
     align-items: flex-start;
     padding-top: var(--space-component-gap-lg);
+  }
+
+  .card {
+    padding: var(--space-scale-xl) var(--space-scale-lg);
   }
 }

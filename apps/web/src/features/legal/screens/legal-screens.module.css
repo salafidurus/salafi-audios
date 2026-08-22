@@ -17,6 +17,20 @@
   margin-bottom: var(--space-scale-xl);
 }
 
+.lastUpdated {
+  margin: calc(var(--space-scale-sm) * -1) 0 var(--space-scale-xl);
+  color: var(--content-muted);
+  font-size: var(--typo-caption-font-size);
+}
+
+.introduction {
+  max-width: 48rem;
+  margin: 0 0 var(--space-scale-2xl);
+  color: var(--content-default);
+  font-size: var(--typo-body-lg-font-size, var(--typo-body-md-font-size));
+  line-height: 1.75;
+}
+
 .section:last-child {
   margin-bottom: 0;
 }
@@ -64,6 +78,11 @@
 .container h4 {
   font-size: calc(var(--typo-title-lg-font-size) * 1.1);
   font-weight: 600;
+}
+
+.container section,
+.container > div[id^="cookies-"] {
+  scroll-margin-block-start: var(--space-scale-xl);
 }
 
 /* Mobile-specific adjustments */

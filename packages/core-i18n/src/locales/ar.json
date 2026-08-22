@@ -29,7 +29,10 @@
       "noAccount": "ليس لديك حساب؟ أنشئ حسابًا",
       "noAccountSplit": "ليس لديك حساب؟",
       "noAccountLink": "أنشئ حسابًا",
-      "failed": "فشل تسجيل الدخول"
+      "failed": "فشل تسجيل الدخول",
+      "eyebrow": "دراستك متزامنة دائمًا",
+      "privacyNote": "بالمتابعة، أنت توافق على",
+      "and": "و"
     }
   },
   "validation": {
@@ -138,6 +141,8 @@
   "settings": {
     "general": {
       "title": "الإعدادات",
+      "eyebrow": "مساحتك الشخصية",
+      "description": "خصّص تجربة القراءة والإشعارات وتفضيلات حسابك.",
       "languageSection": "اللغة",
       "languageDesc": "ضبط لغة التطبيق والمحتوى.",
       "appLanguage": "لغة التطبيق",
@@ -175,6 +180,12 @@
   },
   "support": {
     "title": "الدعم",
+    "subtitle": "اعثر على إجابات وتواصل مع الفريق عندما تحتاج إلى المساعدة.",
+    "faqEyebrow": "إجابات",
+    "contactEyebrow": "تواصل معنا",
+    "faqDescription": "إجابات سريعة عن الأسئلة الشائعة حول الاستماع.",
+    "contactCopy": "نسعى إلى الرد خلال 48 ساعة.",
+    "legalPrompt": "يمكنك أيضًا مراجعة:",
     "faqSection": "الأسئلة الشائعة",
     "contactSection": "تواصل معنا",
     "faq": {

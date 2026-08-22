@@ -1,0 +1,100 @@
+.container {
+  width: min(100%, 62rem);
+  margin-inline: auto;
+  padding-block: var(--space-layout-page-y);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.75fr);
+  gap: var(--space-layout-section-y);
+  align-items: start;
+}
+
+.faqCard,
+.contactCard {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-panel);
+  background: color-mix(in srgb, var(--surface-default) 88%, transparent);
+  box-shadow: var(--shadow-sm);
+}
+
+.faqCard {
+  padding: var(--space-component-card-padding);
+}
+
+.contactCard {
+  position: sticky;
+  top: var(--space-layout-page-y);
+  padding: var(--space-scale-xl);
+}
+
+.sectionHeader {
+  margin-bottom: var(--space-component-gap-md);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-scale-xs);
+  color: var(--action-primary);
+  font-size: var(--typo-caption-font-size);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--content-strong);
+  font-family: var(--typo-title-md-font-family), serif;
+  font-size: var(--typo-title-md-font-size);
+  line-height: var(--typo-title-md-line-height);
+}
+
+.accordion {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.contactCopy {
+  margin: var(--space-component-gap-md) 0;
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+}
+
+.emailLink,
+.legalLinks a {
+  color: var(--action-primary);
+  font-weight: 600;
+  text-underline-offset: 0.2em;
+}
+
+.emailLink:hover,
+.legalLinks a:hover {
+  text-decoration: underline;
+}
+
+.legalLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-sm);
+  margin-top: var(--space-scale-2xl);
+  padding-top: var(--space-scale-lg);
+  border-top: 1px solid var(--border-subtle);
+  color: var(--content-muted);
+  font-size: var(--typo-caption-font-size);
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-block: var(--space-scale-lg);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-scale-lg);
+  }
+
+  .contactCard {
+    position: static;
+  }
+}
