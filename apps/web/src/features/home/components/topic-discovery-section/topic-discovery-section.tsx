@@ -1,9 +1,9 @@
 "use client";
 
-import type { ListingFormat } from "@sd/core-contracts";
-
+import { routes, type ListingFormat } from "@sd/core-contracts";
 import { useSearchCatalog } from "@sd/domain-search";
 import { Play } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -40,12 +40,21 @@ export function TopicDiscoverySection() {
           <p className={styles.eyebrow}>{t("home.discovery.eyebrow", "EXPLORE THE LIBRARY")}</p>
           <h2>{t("home.discovery.title", "Find your next direction")}</h2>
         </div>
-        <p>
-          {t(
-            "home.discovery.description",
-            "Choose a topic and stay right here to browse its lessons.",
-          )}
-        </p>
+        <div className={styles.headingAside}>
+          <p>
+            {t(
+              "home.discovery.description",
+              "Choose a topic and stay right here to browse its lessons.",
+            )}
+          </p>
+          <Link
+            href={routes.explore.index}
+            className={styles.exploreLink}
+            data-testid="home-explore-link"
+          >
+            {t("home.discovery.explore", "Explore the library")}
+          </Link>
+        </div>
       </div>
       <CategoryChips value={selectedTopic} onValueChange={setSelectedTopic} />
       <div className={styles.rail} data-testid="topic-listings-rail" aria-live="polite">
@@ -123,7 +132,7 @@ function TopicListingCard({
           <Play size={14} fill="currentColor" />
         </button>
         <button type="button" className={styles.open} onClick={() => onNavigate(slug)}>
-          View lesson
+          View Listing
         </button>
       </div>
     </article>

@@ -20,11 +20,29 @@
   line-height: 1.1;
 }
 
-.heading > p {
+.headingAside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
   max-width: 24rem;
+}
+
+.headingAside p {
   margin: 0;
   color: var(--content-muted);
   line-height: 1.55;
+}
+
+.exploreLink {
+  color: var(--action-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.exploreLink:hover {
+  text-decoration: underline;
 }
 
 .eyebrow,
@@ -115,11 +133,16 @@
 }
 
 .cardActions .open {
+  flex: 1;
   padding-inline: 0.8rem;
   background: var(--surface-subtle);
   color: var(--content-strong);
   font-size: 0.78rem;
   font-weight: 650;
+}
+
+.cardActions .open:hover {
+  background: var(--surface-hover);
 }
 
 .skeleton {

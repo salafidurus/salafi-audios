@@ -171,6 +171,7 @@ describe("HomeScreen", () => {
     expect(screen.getByTestId("home-study-header")).toBeTruthy();
     expect(screen.getByTestId("home-featured-section")).toBeTruthy();
     expect(screen.getByTestId("home-discovery-section")).toBeTruthy();
+    expect(screen.getByTestId("home-explore-link").getAttribute("href")).toBe("/explore");
     expect(screen.getByTestId("home-recent-section")).toBeTruthy();
     expect(screen.getByTestId("home-curated-section")).toBeTruthy();
     expect(screen.getByText("Recently published lesson")).toBeTruthy();
