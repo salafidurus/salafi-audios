@@ -10,6 +10,8 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { usePlayListing } from "@/features/audio";
 import { AppAvatar } from "@/shared/components/app-avatar";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { Button } from "@/shared/components/ui/button";
+import { Progress } from "@/shared/components/ui/progress";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 
@@ -150,9 +152,11 @@ function RichResumeCard({ recentProgress, onContinueListening, isMobile }: RichR
             <Link href={routes.scholars.detail(recentProgress.scholarSlug)}>{scholarName}</Link>
           </p>
           <div className={styles.progressBlock}>
-            <div className={styles.progressTrack} aria-hidden="true">
-              <div className={styles.progressFill} style={{ width: `${progress ?? 0}%` }} />
-            </div>
+            <Progress
+              value={progress ?? 0}
+              className={styles.progressTrack}
+              aria-label={t("audio.progress", "Listening progress")}
+            />
             <div className={styles.timeRow}>
               <span data-testid="continue-listening-progress-text">
                 {formatDuration(recentProgress.positionSeconds)}
@@ -160,16 +164,19 @@ function RichResumeCard({ recentProgress, onContinueListening, isMobile }: RichR
               <span>{formatDuration(recentProgress.durationSeconds)}</span>
             </div>
           </div>
-          <button
+          <Button
             type="button"
             className={styles.resumeAction}
             onClick={() => void play()}
             disabled={isResumeLoading}
             aria-busy={isResumeLoading}
+            icon={<Play fill="currentColor" aria-hidden="true" />}
+            size="lg"
+            variant="primary"
+            fullWidth={isMobile}
           >
-            <Play size={14} fill="currentColor" aria-hidden="true" />
             {isResumeLoading ? "Starting…" : t("audio.resume", "Resume listening")}
-          </button>
+          </Button>
         </div>
       </div>
     </section>

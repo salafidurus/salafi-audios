@@ -9,6 +9,8 @@ import { useMemo, useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { usePlayListing } from "@/features/audio";
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
@@ -157,19 +159,32 @@ function TopicListingCard({
   return (
     <article className={styles.card}>
       <div className={styles.cardMark} aria-hidden="true" />
-      <p className={styles.cardType}>{format}</p>
+      <Badge variant="outline" className={styles.cardType}>
+        {format}
+      </Badge>
       <h3>{title}</h3>
       <p className={styles.cardMeta}>
         {displayScholarName} · {lectureCount} {lectureCount === 1 ? "lesson" : "lessons"}
         {durationSeconds ? ` · ${Math.round(durationSeconds / 60)} min` : ""}
       </p>
       <div className={styles.cardActions}>
-        <button type="button" onClick={() => void play()} aria-label={`Play ${title}`}>
-          <Play size={14} fill="currentColor" />
-        </button>
-        <button type="button" className={styles.open} onClick={() => onNavigate(slug)}>
+        <Button
+          type="button"
+          size="icon-lg"
+          variant="primary"
+          onClick={() => void play()}
+          aria-label={`Play ${title}`}
+          icon={<Play fill="currentColor" aria-hidden="true" />}
+        />
+        <Button
+          type="button"
+          size="lg"
+          variant="surface"
+          className={styles.open}
+          onClick={() => onNavigate(slug)}
+        >
           View Listing
-        </button>
+        </Button>
       </div>
     </article>
   );

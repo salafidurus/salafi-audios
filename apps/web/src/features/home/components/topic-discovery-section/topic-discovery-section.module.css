@@ -63,6 +63,13 @@
   text-transform: uppercase;
 }
 
+.cardType {
+  align-self: flex-start;
+  border-color: var(--border-primary);
+  color: var(--action-primary);
+  background: transparent;
+}
+
 .rail {
   display: flex;
   min-width: 0;
@@ -148,11 +155,14 @@
   cursor: pointer;
 }
 
+.cardActions > button:first-child {
+  min-width: 2.75rem;
+}
+
 .cardActions .open {
   flex: 1;
+  min-height: 2.75rem;
   padding-inline: 0.8rem;
-  background: var(--surface-subtle);
-  color: var(--content-strong);
   font-size: 0.86rem;
   font-weight: 650;
 }

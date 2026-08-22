@@ -2,6 +2,8 @@ import type { ScholarTitle } from "@sd/core-contracts";
 
 import { useFormatScholarName } from "@sd/domain-content";
 
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
@@ -63,7 +65,8 @@ export function FeaturedLectureCard({
       <span className={styles.corner} aria-hidden="true" />
       <CardContent className={styles.body}>
         <span className={styles.topRow}>
-          <span
+          <Badge
+            variant="outline"
             className={styles.catBadge}
             style={{
               color: "var(--content-secondary)",
@@ -72,7 +75,7 @@ export function FeaturedLectureCard({
             }}
           >
             {category.toUpperCase()}
-          </span>
+          </Badge>
           <span className={styles.editorPick}>{eyebrow}</span>
         </span>
         <h3 className={styles.title}>{title}</h3>
@@ -86,11 +89,12 @@ export function FeaturedLectureCard({
           </span>
         </span>
       </CardContent>
-      <button
+      <Button
         type="button"
         className={styles.playBtn}
-        style={{ background: "var(--action-primary)" }}
         aria-label={`Play ${title}`}
+        variant="primary"
+        size="lg"
         onClick={(e) => {
           e.stopPropagation();
           if (onPlay) {
@@ -101,7 +105,7 @@ export function FeaturedLectureCard({
         }}
       >
         Play
-      </button>
+      </Button>
     </Card>
   );
 }

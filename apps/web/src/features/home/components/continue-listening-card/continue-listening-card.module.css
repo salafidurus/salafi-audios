@@ -151,13 +151,11 @@
 .progressTrack {
   width: 100%;
   height: 6px;
-  overflow: hidden;
   border-radius: var(--radius-full);
   background: var(--border-subtle);
 }
 
-.progressFill {
-  height: 100%;
+.progressTrack [data-slot="progress-indicator"] {
   border-radius: inherit;
   background: var(--action-primary);
 }
@@ -169,28 +167,11 @@
 }
 
 .resumeAction {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
   margin-top: 0.25rem;
-  padding: 0.72rem 1.1rem;
   border-radius: var(--radius-full);
-  background: var(--action-primary);
-  color: var(--content-on-primary);
   font-size: 1rem;
   font-weight: 700;
-  border: 0;
-  cursor: pointer;
-  transition: opacity 180ms ease;
-}
-
-.resumeAction:hover:not(:disabled) {
-  opacity: 0.88;
-}
-
-.resumeAction:disabled {
-  cursor: wait;
-  opacity: 0.7;
+  min-height: 46px;
 }
 
 .loadingCard {

@@ -2,12 +2,13 @@ import type { FeedContentItemDto, RecentProgressDto } from "@sd/core-contracts";
 
 import { routes } from "@sd/core-contracts";
 import { useFormatScholarName } from "@sd/domain-content";
-import { Sparkles, Play, Shield, Scale, MessageSquare } from "lucide-react";
+import { Sparkles, Play } from "lucide-react";
 import Link from "next/link";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { usePlayListing } from "@/features/audio";
 import { AppAvatar } from "@/shared/components/app-avatar";
+import { Button } from "@/shared/components/ui/button";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
 import styles from "./hero-section.module.css";
@@ -131,9 +132,9 @@ export function HeroSection({
             )}
           </p>
           <div className={styles.ctaRow}>
-            <Link href={routes.explore.index} className={styles.startBtn}>
-              <span>{t("home.empty.action", "Explore lessons")}</span>
-            </Link>
+            <Button asChild variant="primary" size="lg" className={styles.startBtn}>
+              <Link href={routes.explore.index}>{t("home.empty.action", "Explore lessons")}</Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -176,35 +177,30 @@ export function HeroSection({
           </p>
         )}
         <div className={styles.ctaRow}>
-          <button
+          <Button
             type="button"
             className={styles.startBtn}
             onClick={handleStart}
             data-testid={hasHistory ? "home-hero-resume" : "home-hero-start"}
+            variant="primary"
+            size="lg"
+            icon={<Play fill="currentColor" aria-hidden="true" />}
           >
-            <Play size={14} fill="currentColor" />
-            <span>
-              {hasHistory
-                ? t("home.hero.resume", "Resume")
-                : t("home.hero.start", "Start listening")}
-            </span>
-          </button>
+            {hasHistory ? t("home.hero.resume", "Resume") : t("home.hero.start", "Start listening")}
+          </Button>
 
           {!hasHistory && (
             <div className={styles.topicRail}>
               <span className={styles.browseLabel}>Explore by topic:</span>
-              <Link href={`${routes.search}?topic=aqeedah`} className={styles.categoryPill}>
-                <Shield size={13} color="var(--action-primary)" />
-                <span>Aqeedah</span>
-              </Link>
-              <Link href={`${routes.search}?topic=fiqh`} className={styles.categoryPill}>
-                <Scale size={13} color="var(--action-primary)" />
-                <span>Fiqh</span>
-              </Link>
-              <Link href={`${routes.search}?topic=hadith`} className={styles.categoryPill}>
-                <MessageSquare size={13} color="var(--action-primary)" />
-                <span>Hadith</span>
-              </Link>
+              <Button asChild variant="outline" size="sm" className={styles.categoryPill}>
+                <Link href={`${routes.search}?topic=aqeedah`}>Aqeedah</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm" className={styles.categoryPill}>
+                <Link href={`${routes.search}?topic=fiqh`}>Fiqh</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm" className={styles.categoryPill}>
+                <Link href={`${routes.search}?topic=hadith`}>Hadith</Link>
+              </Button>
             </div>
           )}
         </div>
