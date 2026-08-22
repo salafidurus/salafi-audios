@@ -93,9 +93,14 @@
   justify-content: space-between;
 }
 
+.sectionHeader > span:first-child {
+  font-size: calc(var(--typo-title-md-font-size) * 1.5);
+  line-height: 1.15;
+}
+
 .percent {
   color: var(--content-muted);
-  font-size: 0.8rem;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
