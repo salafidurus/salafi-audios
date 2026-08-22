@@ -1,3 +1,7 @@
+import { BookOpen, CircleAlert, LoaderCircle } from "lucide-react";
+
+import { Card, CardContent } from "@/shared/components/ui/card";
+
 import styles from "./EmptyState.module.css";
 
 export type EmptyStateVariant = "empty" | "loading" | "error";
@@ -8,9 +12,19 @@ export type EmptyStateProps = {
 };
 
 export function EmptyState({ message, variant = "empty" }: EmptyStateProps) {
+  const Icon = variant === "error" ? CircleAlert : variant === "loading" ? LoaderCircle : BookOpen;
+
   return (
-    <div data-variant={variant} className={styles.emptyState}>
-      {message}
-    </div>
+    <Card
+      data-variant={variant}
+      className={styles.emptyState}
+      role={variant === "error" ? "alert" : "status"}
+      aria-live={variant === "error" ? "assertive" : "polite"}
+    >
+      <CardContent className={styles.content}>
+        <Icon className={styles.icon} aria-hidden="true" />
+        <p className={styles.message}>{message}</p>
+      </CardContent>
+    </Card>
   );
 }

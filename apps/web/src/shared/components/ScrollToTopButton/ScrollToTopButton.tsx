@@ -4,6 +4,7 @@ import { ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { Button } from "@/shared/components/ui/button";
 
 import styles from "./scroll-to-top-button.module.css";
 
@@ -37,7 +38,9 @@ export function ScrollToTopButton() {
   const label = t("common.scrollToTop", "Return to top");
 
   return (
-    <button
+    <Button
+      variant="default"
+      size="lg"
       className={styles.button}
       onClick={scrollToTop}
       aria-label={label}
@@ -46,6 +49,6 @@ export function ScrollToTopButton() {
     >
       <ArrowUp size={20} />
       <span>{label}</span>
-    </button>
+    </Button>
   );
 }

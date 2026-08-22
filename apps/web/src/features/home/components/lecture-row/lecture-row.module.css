@@ -12,6 +12,20 @@
   transition: filter 150ms ease;
 }
 
+.main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+  padding: 0;
+  color: inherit;
+  text-align: start;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
 .row:hover {
   filter: brightness(1.05);
 }

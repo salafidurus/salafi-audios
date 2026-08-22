@@ -5,7 +5,8 @@ import { useInfiniteScholarsList } from "@sd/domain-content";
 import Link from "next/link";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 
 import styles from "./scholar-medallions.module.css";
 
@@ -28,9 +29,9 @@ export function ScholarMedallions() {
         <div className={styles.scrollRow}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={`scholar-skeleton-${i}`} className={styles.skeletonMedallion}>
-              <div className={`${styles.skeletonLine} ${styles.skeletonAvatar}`} />
-              <div className={`${styles.skeletonLine} ${styles.skeletonName}`} />
-              <div className={`${styles.skeletonLine} ${styles.skeletonCount}`} />
+              <Skeleton className={`${styles.skeletonLine} ${styles.skeletonAvatar}`} />
+              <Skeleton className={`${styles.skeletonLine} ${styles.skeletonName}`} />
+              <Skeleton className={`${styles.skeletonLine} ${styles.skeletonCount}`} />
             </div>
           ))}
         </div>
@@ -59,7 +60,10 @@ export function ScholarMedallions() {
             data-testid="scholar-medallion"
           >
             <span className={styles.avatarWrap}>
-              <UserAvatar image={scholar.imageUrl ?? null} name={scholar.name} size={64} />
+              <Avatar size="lg" className={styles.avatar}>
+                {scholar.imageUrl && <AvatarImage src={scholar.imageUrl} alt="" />}
+                <AvatarFallback>{scholar.name.charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
             </span>
             <span className={styles.name}>{scholar.name}</span>
             <span className={styles.count}>{scholar.lectureCount} lectures</span>

@@ -1,5 +1,6 @@
 import { BookOpen, Play } from "lucide-react";
 
+import { Card, CardContent } from "@/shared/components/ui/card";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
 import { SanadChain } from "../sanad-chain/sanad-chain";
@@ -33,7 +34,7 @@ export function FeaturedLectureCard({
   const t = totalLessons;
 
   return (
-    <div
+    <Card
       role="region"
       aria-label={title}
       tabIndex={0}
@@ -59,7 +60,7 @@ export function FeaturedLectureCard({
       >
         <BookOpen size={30} color="var(--action-primary)" strokeWidth={1.3} />
       </span>
-      <span className={styles.body}>
+      <CardContent className={styles.body}>
         <span className={styles.topRow}>
           <span
             className={styles.catBadge}
@@ -83,7 +84,7 @@ export function FeaturedLectureCard({
             {t} {t === 1 ? "lesson" : "lessons"}
           </span>
         </span>
-      </span>
+      </CardContent>
       <button
         type="button"
         className={styles.playBtn}
@@ -100,6 +101,6 @@ export function FeaturedLectureCard({
       >
         <Play size={17} fill="currentColor" />
       </button>
-    </div>
+    </Card>
   );
 }
