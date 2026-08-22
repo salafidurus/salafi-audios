@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { usePlayListing } from "@/features/audio";
 import { AppAvatar } from "@/shared/components/app-avatar";
+import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
 import styles from "./hero-section.module.css";
 
@@ -57,6 +58,11 @@ export function HeroSection({
             scholarImageUrl: featuredContent.scholarImageUrl,
           }
         : null;
+
+  const formattedScholarFallback = useFormattedScholarName(
+    heroItem?.scholarName,
+    heroItem?.scholarSlug,
+  );
 
   const { play: playHero } = usePlayListing(
     heroItem
@@ -135,10 +141,9 @@ export function HeroSection({
   }
 
   const title = heroItem.title;
-  const scholarName = formatScholarName({
-    name: heroItem.scholarName,
-    title: heroItem.scholarTitle,
-  });
+  const scholarName = heroItem.scholarTitle
+    ? formatScholarName({ name: heroItem.scholarName, title: heroItem.scholarTitle })
+    : formattedScholarFallback;
 
   return (
     <section className={styles.hero}>
@@ -152,7 +157,7 @@ export function HeroSection({
             ? "AS-SALAMU 'ALAYKUM · CONTINUE YOUR DURUS"
             : headline
               ? headline.toUpperCase()
-              : "AS-SALAMU 'ALAYKUM · FEATURED LESSON"}
+              : "AS-SALAMU 'ALAYKUM · FEATURED LISTING"}
         </p>
         <h1 className={styles.title} data-testid="home-hero-title">
           <Link href={routes.listings.detail(heroItem.slug)} className={styles.titleLink}>
