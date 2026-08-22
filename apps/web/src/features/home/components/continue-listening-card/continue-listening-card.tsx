@@ -2,11 +2,14 @@
 
 import type { RecentProgressDto } from "@sd/core-contracts";
 
+import { routes } from "@sd/core-contracts";
 import { Play } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { usePlayListing } from "@/features/audio";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
@@ -75,6 +78,15 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
   );
   const progress = getProgress(recentProgress.positionSeconds, recentProgress.durationSeconds);
   const initials = getInitials(scholarName);
+  const { play, isLoading: isResumeLoading } = usePlayListing({
+    id: recentProgress.lectureId,
+    slug: recentProgress.lectureSlug,
+    title: recentProgress.lectureTitle,
+    format: recentProgress.format,
+    scholarName,
+    scholarSlug: recentProgress.scholarSlug,
+    artworkUrl: recentProgress.artworkUrl,
+  });
 
   const handleArtworkError = () => {
     setArtworkStage((stage) => {
@@ -101,43 +113,49 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
           </span>
         )}
       </div>
-      <button
-        type="button"
-        data-testid="continue-listening-card"
-        onClick={() => onContinueListening?.(recentProgress.lectureSlug)}
-        className={styles.continueCard}
-        aria-label={`${t("audio.resumePlayback", "Resume playback")}: ${recentProgress.lectureTitle}`}
-      >
-        <div className={styles.artwork} aria-hidden="true">
-          {artworkStage === "listing" && recentProgress.artworkUrl ? (
-            <Image
-              src={recentProgress.artworkUrl}
-              alt=""
-              fill
-              sizes="(max-width: 640px) 112px, 152px"
-              unoptimized
-              className={styles.artworkImage}
-              onError={handleArtworkError}
-            />
-          ) : artworkStage === "scholar" && recentProgress.scholarImageUrl ? (
-            <Avatar className={styles.scholarArtwork}>
-              <AvatarImage
-                src={recentProgress.scholarImageUrl}
+      <div data-testid="continue-listening-card" className={styles.continueCard}>
+        <Link
+          href={routes.listings.detail(recentProgress.lectureSlug)}
+          className={styles.artworkLink}
+          aria-label={`Open ${recentProgress.lectureTitle}`}
+          onClick={() => onContinueListening?.(recentProgress.lectureSlug)}
+        >
+          <div className={styles.artwork}>
+            {artworkStage === "listing" && recentProgress.artworkUrl ? (
+              <Image
+                src={recentProgress.artworkUrl}
                 alt=""
+                fill
+                sizes="(max-width: 640px) 112px, 152px"
+                unoptimized
+                className={styles.artworkImage}
                 onError={handleArtworkError}
               />
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
-          ) : (
-            <Avatar className={styles.scholarArtwork}>
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
-          )}
-        </div>
+            ) : artworkStage === "scholar" && recentProgress.scholarImageUrl ? (
+              <Avatar className={styles.scholarArtwork}>
+                <AvatarImage
+                  src={recentProgress.scholarImageUrl}
+                  alt=""
+                  onError={handleArtworkError}
+                />
+                <AvatarFallback>{initials}</AvatarFallback>
+              </Avatar>
+            ) : (
+              <Avatar className={styles.scholarArtwork}>
+                <AvatarFallback>{initials}</AvatarFallback>
+              </Avatar>
+            )}
+          </div>
+        </Link>
 
         <div className={styles.content}>
           <h3 className={styles.title} data-testid="continue-listening-lecture-title">
-            {recentProgress.lectureTitle}
+            <Link
+              href={routes.listings.detail(recentProgress.lectureSlug)}
+              onClick={() => onContinueListening?.(recentProgress.lectureSlug)}
+            >
+              {getResumeTitle(recentProgress)}
+            </Link>
           </h3>
           {getResumeContext(recentProgress).map((contextLine) => (
             <p
@@ -149,7 +167,7 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
             </p>
           ))}
           <p className={styles.scholar} data-testid="continue-listening-scholar-name">
-            {scholarName}
+            <Link href={routes.scholars.detail(recentProgress.scholarSlug)}>{scholarName}</Link>
           </p>
           <div className={styles.progressBlock}>
             <div className={styles.progressTrack} aria-hidden="true">
@@ -162,12 +180,18 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
               <span>{formatDuration(recentProgress.durationSeconds)}</span>
             </div>
           </div>
-          <span className={styles.resumeAction}>
+          <button
+            type="button"
+            className={styles.resumeAction}
+            onClick={() => void play()}
+            disabled={isResumeLoading}
+            aria-busy={isResumeLoading}
+          >
             <Play size={14} fill="currentColor" aria-hidden="true" />
-            {t("audio.resume", "Resume listening")}
-          </span>
+            {isResumeLoading ? "Starting…" : t("audio.resume", "Resume listening")}
+          </button>
         </div>
-      </button>
+      </div>
     </section>
   );
 }
@@ -191,15 +215,19 @@ function getInitials(name: string): string {
 function getResumeContext(progress: RecentProgressDto): string[] {
   if (progress.format !== "single" || !progress.seriesContext) return [];
 
-  const parentTitle = progress.seriesContext?.seriesTitle;
-  const lessonNumber =
-    progress.orderIndex === undefined ? null : String(progress.orderIndex).padStart(2, "0");
-  const lessonContext = [lessonNumber, parentTitle].filter(Boolean).join(" · ");
   if (progress.rootFormat === "collection" && progress.rootListing) {
-    return [lessonContext, progress.rootListing.title];
+    return [progress.rootListing.title];
   }
 
-  return [lessonContext];
+  return [];
+}
+
+function getResumeTitle(progress: RecentProgressDto): string {
+  if (progress.format !== "single" || !progress.seriesContext) {
+    return progress.lectureTitle;
+  }
+
+  return `${progress.lectureTitle} · ${progress.seriesContext.seriesTitle}`;
 }
 
 function formatDuration(seconds: number): string {

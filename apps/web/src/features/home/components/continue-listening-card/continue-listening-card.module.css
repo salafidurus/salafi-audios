@@ -21,25 +21,36 @@
   overflow: hidden;
   background: transparent;
   color: inherit;
-  cursor: pointer;
   border: 0;
+}
+
+.artworkLink:focus-visible,
+.title a:focus-visible,
+.scholar a:focus-visible,
+.resumeAction:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 3px;
+}
+
+.artworkLink {
+  display: block;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
   transition: opacity 180ms ease;
 }
 
-.continueCard:hover {
-  opacity: 0.9;
-}
-
-.continueCard:focus-visible {
-  outline: 2px solid var(--border-focus);
-  outline-offset: 3px;
+.artworkLink:hover,
+.title a:hover,
+.scholar a:hover {
+  opacity: 0.82;
 }
 
 .artwork {
   position: relative;
   width: 100%;
-  min-height: 10rem;
-  align-self: stretch;
+  aspect-ratio: 1;
+  align-self: center;
   overflow: hidden;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-scale-md);
@@ -105,6 +116,12 @@
   -webkit-line-clamp: 2;
 }
 
+.title a,
+.scholar a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .scholar {
   margin: 0;
   color: var(--content-secondary);
@@ -158,6 +175,18 @@
   color: var(--content-on-primary);
   font-size: 0.92rem;
   font-weight: 700;
+  border: 0;
+  cursor: pointer;
+  transition: opacity 180ms ease;
+}
+
+.resumeAction:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.resumeAction:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .loadingCard {
@@ -189,7 +218,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .continueCard { transition: none; }
   .skeleton { animation: none; }
 }
 

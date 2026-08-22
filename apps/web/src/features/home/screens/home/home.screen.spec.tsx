@@ -72,6 +72,7 @@ describe("HomeScreen", () => {
           seriesSlug: "foundations-of-tawheed",
         },
         scholarName: "Shaikh Salih al-Fawzan",
+        scholarSlug: "salih-al-fawzan",
         durationSeconds: 1800,
         positionSeconds: 600,
       },
@@ -86,11 +87,8 @@ describe("HomeScreen", () => {
     expect(sectionTitle.textContent).toBe("Continue Listening");
 
     const lectureTitle = screen.getByTestId("continue-listening-lecture-title");
-    expect(lectureTitle.textContent).toBe("Tauheed Explained");
-
-    expect(screen.getByTestId("continue-listening-context").textContent).toBe(
-      "02 · Foundations of Tawheed",
-    );
+    expect(lectureTitle.textContent).toBe("Tauheed Explained · Foundations of Tawheed");
+    expect(screen.queryByTestId("continue-listening-context")).toBeNull();
 
     const scholarName = screen.getByTestId("continue-listening-scholar-name");
     expect(scholarName.textContent).toBe("Shaikh Salih al-Fawzan");
@@ -103,7 +101,9 @@ describe("HomeScreen", () => {
 
     const card = screen.getByTestId("continue-listening-card");
     expect(card).toBeTruthy();
-    fireEvent.click(card);
+    fireEvent.click(
+      screen.getByRole("link", { name: "Tauheed Explained · Foundations of Tawheed" }),
+    );
 
     expect(mockOnContinueListening).toHaveBeenCalledWith("tauheed-explained");
   });
@@ -172,11 +172,11 @@ describe("HomeScreen", () => {
 
     render(<HomeScreen />);
 
+    expect(screen.getByTestId("continue-listening-lecture-title").textContent).toBe(
+      "The Meaning of Worship · Kitab al-Tawhid",
+    );
     const contextLines = screen.getAllByTestId("continue-listening-context");
-    expect(contextLines.map((line) => line.textContent)).toEqual([
-      "Kitab al-Tawhid",
-      "Foundations of Tawhid",
-    ]);
+    expect(contextLines.map((line) => line.textContent)).toEqual(["Foundations of Tawhid"]);
   });
 
   it("does not add context metadata to a standalone single", () => {
