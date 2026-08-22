@@ -8,10 +8,9 @@
 .loadingCard {
   position: relative;
   display: grid;
-  grid-template-columns: 9.5rem minmax(0, 46rem);
+  grid-template-columns: minmax(9rem, 14%) minmax(0, 1fr);
   gap: clamp(1.25rem, 3vw, 2rem);
   width: 100%;
-  max-width: 74rem;
   padding: clamp(1rem, 2.5vw, 1.5rem);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-component-card);
@@ -41,8 +40,9 @@
 
 .artwork {
   position: relative;
-  width: 9.5rem;
-  aspect-ratio: 1;
+  width: 100%;
+  min-height: 10rem;
+  align-self: stretch;
   overflow: hidden;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-scale-md);
@@ -91,7 +91,7 @@
 
 .title {
   display: -webkit-box;
-  max-width: 30ch;
+  max-width: 100%;
   margin: 0;
   overflow: hidden;
   color: var(--content-strong);
@@ -191,8 +191,8 @@
     gap: 1rem;
   }
 
-  .artwork { width: 6.5rem; }
-  .title { font-size: 1.45rem; }
+  .artwork { width: 100%; min-height: 6.5rem; }
+  .title { max-width: 100%; font-size: 1.45rem; }
   .resumeAction { align-self: stretch; justify-content: center; }
 }
 
@@ -203,7 +203,7 @@
     padding: 0.9rem;
   }
 
-  .artwork { width: 5.5rem; }
+  .artwork { width: 100%; min-height: 5.5rem; }
   .percent { display: none; }
   .scholar { font-size: 0.8rem; }
 }

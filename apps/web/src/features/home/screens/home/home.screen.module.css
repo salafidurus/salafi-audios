@@ -7,8 +7,7 @@
 
 .homeHeader {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.72fr);
-  gap: clamp(1.5rem, 5vw, 4rem);
+  grid-template-columns: minmax(0, 1fr);
   align-items: end;
   padding: clamp(0.5rem, 2vw, 1.25rem) 0;
 }
@@ -22,7 +21,7 @@
 
 .welcomeCopy h1,
 .sectionIntro h2 {
-  max-width: 14ch;
+  max-width: 18ch;
   margin: 0;
   color: var(--content-strong);
   font-family: var(--typo-display-lg-font-family), serif;
@@ -39,7 +38,7 @@
 
 .welcomeCopy p:last-child,
 .sectionIntro p:last-child {
-  max-width: 42rem;
+  max-width: 56rem;
   margin: 0;
   color: var(--content-muted);
   font-size: 1rem;
@@ -101,7 +100,6 @@
 @media (max-width: 640px) {
   .homeHeader {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
   }
 
   .welcomeCopy h1 {

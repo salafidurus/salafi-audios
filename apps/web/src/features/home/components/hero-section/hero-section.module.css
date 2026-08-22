@@ -51,7 +51,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 60rem;
+  width: 100%;
 }
 
 .eyebrow {
@@ -64,6 +64,7 @@
 }
 
 .title {
+  max-width: 68%;
   font-family: var(--font-display), "Fraunces", Georgia, serif;
   font-size: clamp(1.8rem, 4vw, 3.4rem);
   font-weight: 600;
@@ -151,6 +152,7 @@
   }
 
   .title {
+    max-width: 100%;
     font-size: 24px;
   }
 
