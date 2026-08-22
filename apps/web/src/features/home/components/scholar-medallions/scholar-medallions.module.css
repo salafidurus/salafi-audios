@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: var(--space-component-gap-md);
   width: 100%;
+  min-width: 0;
 }
 
 .sectionHeader {
@@ -37,39 +38,45 @@
 
 .scrollRow {
   display: flex;
-  gap: var(--space-component-gap-md);
+  gap: 0.75rem;
   overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: none;
+  padding: 0.25rem 0.25rem 0.75rem;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-primary) transparent;
   width: 100%;
-}
-
-.scrollRow::-webkit-scrollbar {
-  display: none;
 }
 
 .medallion {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  width: 108px;
+  align-items: flex-start;
+  gap: 0.65rem;
+  width: 9.5rem;
+  min-height: 10.5rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-default);
   flex-shrink: 0;
   text-decoration: none;
-  transition: transform 180ms ease;
+  scroll-snap-align: start;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .medallion:hover {
   transform: translateY(-2px);
+  border-color: var(--border-primary);
+  box-shadow: var(--shadow-sm);
 }
 
 .avatarWrap {
-  width: 76px;
-  height: 76px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 25%, var(--border-primary-strong), var(--surface-subtle));
   border: 2px solid var(--action-primary);
-  box-shadow: 0 0 0 3px var(--surface-canvas), var(--shadow-sm);
+  box-shadow: 0 0 0 3px var(--surface-default), 0 0 0 4px var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,15 +85,15 @@
 }
 
 .avatar {
-  width: 64px;
-  height: 64px;
+  width: 52px;
+  height: 52px;
 }
 
 .name {
   font-size: var(--typo-body-sm-font-size);
   font-weight: 600;
   color: var(--content-strong);
-  text-align: center;
+  text-align: start;
   line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -95,9 +102,12 @@
 }
 
 .count {
-  font-size: 11px;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  font-size: 10.5px;
   color: var(--content-muted);
-  text-align: center;
+  text-align: start;
   margin-top: 2px;
 }
 
@@ -105,15 +115,19 @@
 .skeletonMedallion {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  width: 108px;
+  width: 9.5rem;
+  min-height: 10.5rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
   flex-shrink: 0;
 }
 
 .skeletonAvatar {
-  width: 76px;
-  height: 76px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
 }
 

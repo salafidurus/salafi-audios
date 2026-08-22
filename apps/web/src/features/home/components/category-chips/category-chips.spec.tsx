@@ -31,11 +31,12 @@ describe("CategoryChips", () => {
     expect(chips[1]!.textContent).toBe("Fiqh");
   });
 
-  it("links each chip to the search route with the topic slug", () => {
+  it("selects a topic in place instead of linking away from Home", () => {
     render(<CategoryChips />);
 
     const chips = screen.getAllByTestId("category-chip");
-    expect(chips[0]!.getAttribute("href")).toBe("/search?topic=aqeedah");
-    expect(chips[1]!.getAttribute("href")).toBe("/search?topic=fiqh");
+    expect(chips[0]!.getAttribute("href")).toBeNull();
+    expect(chips[1]!.getAttribute("href")).toBeNull();
+    expect(chips[0]!.getAttribute("role")).toBe("tab");
   });
 });

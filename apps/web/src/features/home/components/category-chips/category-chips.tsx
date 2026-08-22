@@ -1,4 +1,3 @@
-import { routes } from "@sd/core-contracts";
 import { getLocalizedName } from "@sd/core-i18n";
 import { useTopicsList } from "@sd/domain-search";
 import {
@@ -11,7 +10,6 @@ import {
   Shield,
   SpellCheck2,
 } from "lucide-react";
-import Link from "next/link";
 import { useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -35,7 +33,12 @@ function isTopicIconKey(value: string): value is TopicIconKey {
   return value in TOPIC_ICONS;
 }
 
-export function CategoryChips() {
+export type CategoryChipsProps = {
+  value?: string;
+  onValueChange?: (value: string) => void;
+};
+
+export function CategoryChips({ value, onValueChange }: CategoryChipsProps = {}) {
   const { i18n, t } = useTranslation();
   const { data: topics = [], isLoading } = useTopicsList();
 
@@ -61,11 +64,9 @@ export function CategoryChips() {
         aria-label={t("home.categories.label", "Browse by topic")}
       >
         <TabsList aria-label={t("home.categories.label", "Browse by topic")}>
-          <TabsTrigger value="all" asChild>
-            <Link href={routes.search} data-testid="category-chip-all">
-              <BookOpen size={15} strokeWidth={2} aria-hidden="true" />
-              {t("home.categories.all", "All")}
-            </Link>
+          <TabsTrigger value="all" data-testid="category-chip-all">
+            <BookOpen size={15} strokeWidth={2} aria-hidden="true" />
+            {t("home.categories.all", "All")}
           </TabsTrigger>
           {Array.from({ length: 5 }).map((_, i) => (
             <div
@@ -82,24 +83,22 @@ export function CategoryChips() {
   return (
     <Tabs
       defaultValue="all"
+      value={value}
+      onValueChange={onValueChange}
       className={styles.chipsRow}
       aria-label={t("home.categories.label", "Browse by topic")}
     >
       <TabsList aria-label={t("home.categories.label", "Browse by topic")}>
-        <TabsTrigger value="all" asChild>
-          <Link href={routes.search} data-testid="category-chip-all">
-            <BookOpen size={15} strokeWidth={2} aria-hidden="true" />
-            {t("home.categories.all", "All")}
-          </Link>
+        <TabsTrigger value="all" data-testid="category-chip-all">
+          <BookOpen size={15} strokeWidth={2} aria-hidden="true" />
+          {t("home.categories.all", "All")}
         </TabsTrigger>
         {chips.map((chip) => {
           const Icon = chip.Icon;
           return (
-            <TabsTrigger key={chip.slug} value={chip.slug} asChild>
-              <Link href={`${routes.search}?topic=${chip.slug}`} data-testid="category-chip">
-                {Icon && <Icon size={15} strokeWidth={2} aria-hidden="true" />}
-                {chip.label}
-              </Link>
+            <TabsTrigger key={chip.slug} value={chip.slug} data-testid="category-chip">
+              {Icon && <Icon size={15} strokeWidth={2} aria-hidden="true" />}
+              {chip.label}
             </TabsTrigger>
           );
         })}

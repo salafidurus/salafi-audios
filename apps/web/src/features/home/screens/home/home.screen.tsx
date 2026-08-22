@@ -9,13 +9,13 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Search } from "@/shared/components/Search";
 
-import { CategoryChips } from "../../components/category-chips/category-chips";
 import { ContinueListeningCard } from "../../components/continue-listening-card/continue-listening-card";
 import { CuratedExplorationSection } from "../../components/curated-exploration-section/curated-exploration-section";
 import { HeroSection } from "../../components/hero-section/hero-section";
 import { MobileDownloadSection } from "../../components/mobile-download-section/mobile-download-section";
 import { RecentlyAddedSectionContent } from "../../components/recently-added-section/recently-added-section";
 import { ScholarMedallions } from "../../components/scholar-medallions/scholar-medallions";
+import { TopicDiscoverySection } from "../../components/topic-discovery-section/topic-discovery-section";
 import { useHomePromotions } from "../../hooks/use-home-promotions";
 import { MOBILE_APP_AVAILABILITY } from "./home.constants";
 import styles from "./home.screen.module.css";
@@ -116,23 +116,11 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
         </section>
 
         <section className={styles.discoverySection} data-testid="home-discovery-section">
-          <div className={styles.sectionIntro}>
-            <p className={styles.eyebrow}>{t("home.discovery.eyebrow", "EXPLORE THE LIBRARY")}</p>
-            <h2>{t("home.discovery.title", "Find your next direction")}</h2>
-            <p>
-              {t(
-                "home.discovery.description",
-                "Browse by topic or scholar when you are ready to explore.",
-              )}
-            </p>
+          <div data-testid="home-category-section">
+            <TopicDiscoverySection />
           </div>
-          <div className={styles.discoveryGrid}>
-            <div data-testid="home-category-section">
-              <CategoryChips />
-            </div>
-            <div data-testid="home-scholars-section">
-              <ScholarMedallions />
-            </div>
+          <div data-testid="home-scholars-section">
+            <ScholarMedallions />
           </div>
         </section>
 

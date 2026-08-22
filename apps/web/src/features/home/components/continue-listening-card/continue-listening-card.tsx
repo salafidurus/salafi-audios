@@ -2,6 +2,8 @@
 
 import type { RecentProgressDto } from "@sd/core-contracts";
 
+import { Play } from "lucide-react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
@@ -69,6 +71,10 @@ export function ContinueListeningCard({
             </span>
           </AppText>
         </div>
+        <span className={styles.resumeAction}>
+          <span>{t("audio.resume", "Resume listening")}</span>
+          <Play size={13} fill="currentColor" aria-hidden="true" />
+        </span>
       </button>
     </section>
   );

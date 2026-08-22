@@ -17,6 +17,7 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("@sd/domain-search", () => ({
   useContinueListening: vi.fn(),
+  useSearchCatalog: vi.fn(() => ({ data: undefined, isLoading: false })),
   useTopicsList: () => ({ data: [] }),
 }));
 

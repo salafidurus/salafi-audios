@@ -119,19 +119,28 @@ function RecentlyAddedSectionContent({
             onPlay={() => void playFeatured()}
           />
         )}
-        {rest.map((item) => (
-          <LectureRow
-            key={item.id}
-            title={item.title}
-            category={item.kind}
-            scholarName={item.scholarName}
-            scholarSlug={item.scholarSlug}
-            duration={item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
-            progress={0}
-            totalLessons={1}
-            onClick={() => navigateToListing(item.slug)}
-          />
-        ))}
+        {rest.length > 0 && (
+          <div
+            className={styles.restRail}
+            aria-label={t("home.recent.more", "More recently added")}
+          >
+            {rest.map((item) => (
+              <LectureRow
+                key={item.id}
+                title={item.title}
+                category={item.kind}
+                scholarName={item.scholarName}
+                scholarSlug={item.scholarSlug}
+                duration={
+                  item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""
+                }
+                progress={0}
+                totalLessons={1}
+                onClick={() => navigateToListing(item.slug)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
