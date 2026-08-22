@@ -11,6 +11,7 @@ import { usePlayListing } from "@/features/audio";
 import { AppAvatar } from "@/shared/components/app-avatar";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 
 import styles from "./continue-listening-card.module.css";
 
@@ -26,6 +27,7 @@ export function ContinueListeningCard({
   onContinueListening,
 }: ContinueListeningCardProps) {
   const { t } = useTranslation();
+  const { isMobile } = useResponsive();
 
   if (isLoading && !recentProgress) {
     return (
@@ -42,7 +44,7 @@ export function ContinueListeningCard({
           </AppText>
         </div>
         <div className={styles.loadingCard} data-testid="continue-listening-skeleton">
-          <div className={`${styles.skeleton} ${styles.skeletonArtwork}`} />
+          {!isMobile && <div className={`${styles.skeleton} ${styles.skeletonArtwork}`} />}
           <div className={styles.skeletonContent}>
             <div className={`${styles.skeleton} ${styles.skeletonTitle}`} />
             <div className={`${styles.skeleton} ${styles.skeletonMeta}`} />
@@ -56,16 +58,21 @@ export function ContinueListeningCard({
   if (!recentProgress) return null;
 
   return (
-    <RichResumeCard recentProgress={recentProgress} onContinueListening={onContinueListening} />
+    <RichResumeCard
+      recentProgress={recentProgress}
+      onContinueListening={onContinueListening}
+      isMobile={isMobile}
+    />
   );
 }
 
 type RichResumeCardProps = {
   recentProgress: RecentProgressDto;
   onContinueListening?: (lectureId: string) => void;
+  isMobile: boolean;
 };
 
-function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardProps) {
+function RichResumeCard({ recentProgress, onContinueListening, isMobile }: RichResumeCardProps) {
   const { t } = useTranslation();
   const scholarName = useFormattedScholarName(
     recentProgress.scholarName,
@@ -101,23 +108,25 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
         )}
       </div>
       <div data-testid="continue-listening-card" className={styles.continueCard}>
-        <Link
-          href={routes.listings.detail(recentProgress.lectureSlug)}
-          className={styles.artworkLink}
-          aria-label={`Open ${recentProgress.lectureTitle}`}
-          onClick={() => onContinueListening?.(recentProgress.lectureSlug)}
-        >
-          <div className={styles.artwork}>
-            <AppAvatar
-              listingArtwork={recentProgress.artworkUrl}
-              scholarImageUrl={recentProgress.scholarImageUrl}
-              text={scholarName}
-              fill
-              sizes="(max-width: 640px) 112px, 152px"
-              className={recentProgress.artworkUrl ? styles.artworkImage : styles.scholarArtwork}
-            />
-          </div>
-        </Link>
+        {!isMobile && (
+          <Link
+            href={routes.listings.detail(recentProgress.lectureSlug)}
+            className={styles.artworkLink}
+            aria-label={`Open ${recentProgress.lectureTitle}`}
+            onClick={() => onContinueListening?.(recentProgress.lectureSlug)}
+          >
+            <div className={styles.artwork}>
+              <AppAvatar
+                listingArtwork={recentProgress.artworkUrl}
+                scholarImageUrl={recentProgress.scholarImageUrl}
+                text={scholarName}
+                fill
+                sizes="(max-width: 640px) 112px, 152px"
+                className={recentProgress.artworkUrl ? styles.artworkImage : styles.scholarArtwork}
+              />
+            </div>
+          </Link>
+        )}
 
         <div className={styles.content}>
           <h3 className={styles.title} data-testid="continue-listening-lecture-title">

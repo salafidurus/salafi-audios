@@ -228,24 +228,21 @@
 @media (max-width: 760px) {
   .continueCard,
   .loadingCard {
-    grid-template-columns: 6.5rem minmax(0, 1fr);
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.1rem;
     padding-top: 0.25rem;
   }
 
-  .artwork { width: 100%; min-height: 6.5rem; }
-  .title { max-width: 100%; font-size: 1.45rem; }
-  .resumeAction { align-self: stretch; justify-content: center; }
+  .title { max-width: 100%; font-size: 1.55rem; }
+  .resumeAction { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 480px) {
   .continueCard,
   .loadingCard {
-    grid-template-columns: 5.5rem minmax(0, 1fr);
     padding-top: 0.25rem;
   }
 
-  .artwork { width: 100%; min-height: 5.5rem; }
   .context,
   .scholar { font-size: 0.8rem; }
 }

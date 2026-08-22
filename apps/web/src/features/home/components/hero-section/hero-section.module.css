@@ -225,8 +225,7 @@
   }
 
   .content {
-    max-width: 100%;
-    order: 1;
+    display: contents;
   }
 
   .visualRegion {
@@ -243,11 +242,21 @@
     height: 10rem;
   }
 
+  .eyebrow { order: 1; }
+  .title { order: 3; }
+  .subtitle { order: 4; }
+  .recommendation { order: 5; }
+
   .ctaRow {
+    order: 6;
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
+}
+
+@media (max-width: 380px) {
+  .visualRegion { display: none; }
 }
 
 /* RTL Support */
