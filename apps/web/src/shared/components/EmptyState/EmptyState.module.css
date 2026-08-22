@@ -53,6 +53,18 @@
   color: var(--state-danger-content);
 }
 
+/* Denied variant */
+.emptyState[data-variant="denied"] {
+  color: var(--content-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-card, 12px);
+  background-color: var(--surface-default);
+}
+
+.emptyState[data-variant="denied"] .icon {
+  color: var(--content-subtle);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .emptyState[data-variant="loading"] .icon {
     animation: none;

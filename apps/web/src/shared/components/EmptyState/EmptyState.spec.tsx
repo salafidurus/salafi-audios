@@ -17,4 +17,11 @@ describe("EmptyState", () => {
 
     expect(screen.getByRole("alert")).toHaveTextContent("Unable to load.");
   });
+
+  it("exposes denied content as an assertive alert", () => {
+    render(<EmptyState message="You do not have access." variant="denied" />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("You do not have access.");
+    expect(screen.getByRole("alert")).toHaveAttribute("aria-live", "assertive");
+  });
 });
