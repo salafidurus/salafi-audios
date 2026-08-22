@@ -137,6 +137,9 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
           <h3 className={styles.title} data-testid="continue-listening-lecture-title">
             {recentProgress.lectureTitle}
           </h3>
+          <p className={styles.context} data-testid="continue-listening-context">
+            {getResumeContext(recentProgress)}
+          </p>
           <p className={styles.scholar} data-testid="continue-listening-scholar-name">
             {scholarName}
           </p>
@@ -175,6 +178,31 @@ function getInitials(name: string): string {
       .join("")
       .toUpperCase() || "?"
   );
+}
+
+function getResumeContext(progress: RecentProgressDto): string {
+  if (progress.format === "collection") {
+    return formatContainerContext("Collection", progress.publishedLectureCount);
+  }
+  if (progress.format === "series") {
+    return formatContainerContext("Series", progress.publishedLectureCount);
+  }
+
+  const lessonNumber = progress.orderIndex
+    ? `Lesson ${String(progress.orderIndex).padStart(2, "0")}`
+    : "Lesson";
+  const parentTitle = progress.seriesContext?.seriesTitle;
+  const rootTitle =
+    progress.rootFormat === "collection" && progress.rootListing
+      ? progress.rootListing.title
+      : null;
+
+  return [lessonNumber, parentTitle, rootTitle].filter(Boolean).join(" · ");
+}
+
+function formatContainerContext(label: string, lessonCount?: number): string {
+  if (!lessonCount || lessonCount < 1) return label;
+  return `${label} · ${lessonCount} ${lessonCount === 1 ? "lesson" : "lessons"}`;
 }
 
 function formatDuration(seconds: number): string {

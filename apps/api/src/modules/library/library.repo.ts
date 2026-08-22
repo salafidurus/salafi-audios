@@ -364,6 +364,9 @@ export class LibraryRepository {
             id: true,
             title: true,
             slug: true,
+            format: true,
+            orderIndex: true,
+            publishedLectureCount: true,
             language: true,
             durationSeconds: true,
             coverImageUrl: true,
@@ -387,8 +390,34 @@ export class LibraryRepository {
             },
             parent: {
               select: {
+                id: true,
+                title: true,
+                slug: true,
+                format: true,
+                orderIndex: true,
+                language: true,
+                parentId: true,
+                translations: {
+                  where: { locale, status: 'published' },
+                  select: { title: true },
+                  take: 1,
+                },
                 coverImageUrl: true,
-                parent: { select: { coverImageUrl: true } },
+                parent: {
+                  select: {
+                    id: true,
+                    title: true,
+                    slug: true,
+                    format: true,
+                    language: true,
+                    translations: {
+                      where: { locale, status: 'published' },
+                      select: { title: true },
+                      take: 1,
+                    },
+                    coverImageUrl: true,
+                  },
+                },
               },
             },
           },
@@ -416,16 +445,55 @@ export class LibraryRepository {
       record.listing.parent?.coverImageUrl ??
       record.listing.parent?.parent?.coverImageUrl;
 
+    const parent = record.listing.parent;
+    const grandparent = parent?.parent;
+    const seriesContext = parent
+      ? {
+          seriesId: parent.id,
+          seriesTitle: resolveContentTranslation({
+            base: { title: parent.title },
+            originalLanguage: parent.language,
+            targetLocale: locale,
+            publishedTranslation: parent.translations[0] ?? null,
+          }).fields.title,
+          seriesSlug: parent.slug,
+        }
+      : null;
+    const rootListing = grandparent
+      ? {
+          id: grandparent.id,
+          slug: grandparent.slug,
+          title: resolveContentTranslation({
+            base: { title: grandparent.title },
+            originalLanguage: grandparent.language,
+            targetLocale: locale,
+            publishedTranslation: grandparent.translations[0] ?? null,
+          }).fields.title,
+        }
+      : parent
+        ? {
+            id: parent.id,
+            slug: parent.slug,
+            title: seriesContext?.seriesTitle ?? parent.title,
+          }
+        : null;
+
     return {
       lectureId: record.listing.id,
       lectureTitle: listingTitle,
       lectureSlug: record.listing.slug,
+      format: record.listing.format,
+      orderIndex: record.listing.orderIndex ?? undefined,
+      publishedLectureCount: record.listing.publishedLectureCount ?? undefined,
       scholarName,
       scholarSlug: record.listing.scholar.slug,
       durationSeconds: record.listing.durationSeconds ?? 0,
       positionSeconds: record.positionSeconds,
       artworkUrl: artworkKey ? this.toPublicUrl(artworkKey) : undefined,
       scholarImageUrl: record.listing.scholar.imageUrl ?? undefined,
+      seriesContext,
+      rootListing,
+      rootFormat: grandparent?.format ?? parent?.format,
     };
   }
 

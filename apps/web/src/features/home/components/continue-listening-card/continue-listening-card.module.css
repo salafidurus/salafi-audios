@@ -110,6 +110,13 @@
   font-weight: 600;
 }
 
+.context {
+  margin: -0.15rem 0 0;
+  color: var(--content-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 .progressBlock {
   display: flex;
   flex-direction: column;
@@ -205,5 +212,6 @@
 
   .artwork { width: 100%; min-height: 5.5rem; }
   .percent { display: none; }
+  .context,
   .scholar { font-size: 0.8rem; }
 }

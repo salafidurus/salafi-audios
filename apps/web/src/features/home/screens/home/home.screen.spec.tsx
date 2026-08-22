@@ -64,6 +64,13 @@ describe("HomeScreen", () => {
         lectureId: "lecture-123",
         lectureTitle: "Tauheed Explained",
         lectureSlug: "tauheed-explained",
+        format: "single",
+        orderIndex: 2,
+        seriesContext: {
+          seriesId: "series-123",
+          seriesTitle: "Foundations of Tawheed",
+          seriesSlug: "foundations-of-tawheed",
+        },
         scholarName: "Shaikh Salih al-Fawzan",
         durationSeconds: 1800,
         positionSeconds: 600,
@@ -80,6 +87,10 @@ describe("HomeScreen", () => {
 
     const lectureTitle = screen.getByTestId("continue-listening-lecture-title");
     expect(lectureTitle.textContent).toBe("Tauheed Explained");
+
+    expect(screen.getByTestId("continue-listening-context").textContent).toBe(
+      "Lesson 02 · Foundations of Tawheed",
+    );
 
     const scholarName = screen.getByTestId("continue-listening-scholar-name");
     expect(scholarName.textContent).toBe("Shaikh Salih al-Fawzan");
