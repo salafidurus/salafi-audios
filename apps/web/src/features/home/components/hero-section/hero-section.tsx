@@ -227,6 +227,7 @@ function HeroArtwork({ artworkUrl, scholarImageUrl, scholarName }: HeroArtworkPr
       listingArtwork={artworkUrl}
       scholarImageUrl={scholarImageUrl}
       text={scholarName}
+      fill
       sizes="(max-width: 640px) 42vw, 24vw"
       className={artworkUrl ? styles.artworkImage : styles.scholarArtwork}
     />

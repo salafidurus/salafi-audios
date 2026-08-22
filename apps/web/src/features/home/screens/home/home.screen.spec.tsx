@@ -240,7 +240,6 @@ describe("HomeScreen", () => {
 
     const landmarks = [
       screen.getByTestId("home-study-header"),
-      screen.getByTestId("home-featured-section"),
       screen.getByTestId("home-discovery-section"),
       screen.getByTestId("home-recent-section"),
       screen.getByTestId("home-curated-section"),

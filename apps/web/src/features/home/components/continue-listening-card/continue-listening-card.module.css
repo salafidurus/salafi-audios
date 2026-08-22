@@ -50,9 +50,9 @@
   aspect-ratio: 1;
   align-self: center;
   overflow: hidden;
-  border: 1px solid var(--border-default);
+  border: 0;
   border-radius: 50%;
-  background: var(--surface-subtle);
+  background: transparent;
 }
 
 .artworkImage {

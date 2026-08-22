@@ -112,6 +112,7 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
               listingArtwork={recentProgress.artworkUrl}
               scholarImageUrl={recentProgress.scholarImageUrl}
               text={scholarName}
+              fill
               sizes="(max-width: 640px) 112px, 152px"
               className={recentProgress.artworkUrl ? styles.artworkImage : styles.scholarArtwork}
             />

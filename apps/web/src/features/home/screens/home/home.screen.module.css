@@ -67,10 +67,6 @@
   content: "";
 }
 
-.featuredSection {
-  min-width: 0;
-}
-
 .discoverySection,
 .scholarsSection,
 .mobileSection {
@@ -80,7 +76,7 @@
 }
 
 .discoverySection {
-  padding: clamp(1.25rem, 3vw, 2rem);
+  padding: clamp(2rem, 5vw, 4rem) clamp(1.25rem, 3vw, 2rem);
   border-block: 1px solid var(--border-subtle);
 }
 

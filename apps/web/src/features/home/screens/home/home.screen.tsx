@@ -10,7 +10,6 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 import { ContinueListeningCard } from "../../components/continue-listening-card/continue-listening-card";
 import { CuratedExplorationSection } from "../../components/curated-exploration-section/curated-exploration-section";
-import { HeroSection } from "../../components/hero-section/hero-section";
 import { MobileDownloadSection } from "../../components/mobile-download-section/mobile-download-section";
 import { RecentlyAddedSectionContent } from "../../components/recently-added-section/recently-added-section";
 import { ScholarMedallions } from "../../components/scholar-medallions/scholar-medallions";
@@ -94,22 +93,12 @@ export function HomeScreen({ onContinueListening }: HomeScreenProps) {
           </section>
         )}
 
-        <section className={styles.featuredSection} data-testid="home-featured-section">
-          <div data-testid="home-hero-section">
-            <HeroSection
-              recentProgress={null}
-              featuredContent={featuredContent}
-              isLoading={isHeroLoading}
-              onResume={onContinueListening}
-              hasHistory={false}
-            />
-          </div>
-        </section>
-
         <section className={styles.discoverySection} data-testid="home-discovery-section">
-          <div data-testid="home-category-section">
-            <TopicDiscoverySection />
-          </div>
+          <TopicDiscoverySection
+            featuredContent={featuredContent}
+            isFeaturedLoading={isHeroLoading}
+            onResume={onContinueListening}
+          />
         </section>
 
         <section className={styles.scholarsSection} data-testid="home-scholars-section">

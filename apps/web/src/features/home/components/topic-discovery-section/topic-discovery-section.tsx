@@ -1,6 +1,6 @@
 "use client";
 
-import { routes, type ListingFormat } from "@sd/core-contracts";
+import { routes, type FeedContentItemDto, type ListingFormat } from "@sd/core-contracts";
 import { useSearchCatalog } from "@sd/domain-search";
 import { Play } from "lucide-react";
 import Link from "next/link";
@@ -11,9 +11,20 @@ import { usePlayListing } from "@/features/audio";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 import { CategoryChips } from "../category-chips/category-chips";
+import { HeroSection } from "../hero-section/hero-section";
 import styles from "./topic-discovery-section.module.css";
 
-export function TopicDiscoverySection() {
+type TopicDiscoverySectionProps = {
+  featuredContent?: FeedContentItemDto | null;
+  isFeaturedLoading?: boolean;
+  onResume?: (lectureSlug: string) => void;
+};
+
+export function TopicDiscoverySection({
+  featuredContent,
+  isFeaturedLoading = false,
+  onResume,
+}: TopicDiscoverySectionProps) {
   const { t } = useTranslation();
   const { navigateToListing } = useListingNavigation();
   const [selectedTopic, setSelectedTopic] = useState("all");
@@ -56,31 +67,46 @@ export function TopicDiscoverySection() {
           </Link>
         </div>
       </div>
-      <CategoryChips value={selectedTopic} onValueChange={setSelectedTopic} />
+      <div className={styles.featured} data-testid="home-featured-section">
+        <div data-testid="home-hero-section">
+          <HeroSection
+            recentProgress={null}
+            featuredContent={featuredContent}
+            isLoading={isFeaturedLoading}
+            onResume={onResume}
+            hasHistory={false}
+          />
+        </div>
+      </div>
+      <div data-testid="home-category-section">
+        <CategoryChips value={selectedTopic} onValueChange={setSelectedTopic} />
+      </div>
       <div className={styles.rail} data-testid="topic-listings-rail" aria-live="polite">
-        {isLoading && listings.length === 0
-          ? Array.from({ length: 4 }).map((_, index) => (
-              <div key={`topic-skeleton-${index}`} className={styles.skeleton} />
-            ))
-          : listings.map((listing) => (
-              <TopicListingCard
-                key={listing.id}
-                title={listing.title}
-                scholarName={listing.scholarName}
-                scholarSlug={listing.scholarSlug}
-                slug={listing.slug}
-                id={listing.id}
-                format={listing.format}
-                lectureCount={listing.lectureCount}
-                durationSeconds={listing.durationSeconds}
-                onNavigate={navigateToListing}
-              />
-            ))}
-        {!isLoading && listings.length === 0 && (
-          <p className={styles.empty}>
-            {t("home.discovery.empty", "No lessons are available for this topic yet.")}
-          </p>
-        )}
+        <div className={styles.track}>
+          {isLoading && listings.length === 0
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <div key={`topic-skeleton-${index}`} className={styles.skeleton} />
+              ))
+            : listings.map((listing) => (
+                <TopicListingCard
+                  key={listing.id}
+                  title={listing.title}
+                  scholarName={listing.scholarName}
+                  scholarSlug={listing.scholarSlug}
+                  slug={listing.slug}
+                  id={listing.id}
+                  format={listing.format}
+                  lectureCount={listing.lectureCount}
+                  durationSeconds={listing.durationSeconds}
+                  onNavigate={navigateToListing}
+                />
+              ))}
+          {!isLoading && listings.length === 0 && (
+            <p className={styles.empty}>
+              {t("home.discovery.empty", "No lessons are available for this topic yet.")}
+            </p>
+          )}
+        </div>
       </div>
     </section>
   );
