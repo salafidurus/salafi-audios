@@ -17,7 +17,7 @@ mock.module("./utils/npm", () => ({
   fetchLatestVersion: mock((name: string) => {
     const versions: Record<string, string> = {
       zod: "4.4.3",
-      bun: "1.3.14",
+      bun: "1.4.0",
       expo: "57.0.6",
       "@nestjs/core": "11.2.0",
       prisma: "7.4.1",
@@ -228,7 +228,7 @@ describe("checkBun", () => {
   });
 
   it("returns null when bun is current", async () => {
-    const dir = createTempPkg({ packageManager: "bun@1.3.14" });
+    const dir = createTempPkg({ packageManager: "bun@1.4.0" });
     const result = await checkBun(dir);
     expect(result).toBeNull();
   });

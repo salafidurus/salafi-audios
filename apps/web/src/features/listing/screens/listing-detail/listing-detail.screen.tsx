@@ -1,7 +1,9 @@
 "use client";
 
+import { routes } from "@sd/core-contracts";
 import { useListingDetail, useListingContents } from "@sd/domain-content";
 import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState, useRef, useEffect, useMemo } from "react";
 
@@ -219,6 +221,20 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
       <StickyHeaderLayout>
         <StickyHeaderLayout.Header>
           <div ref={headerContentRef}>
+            <nav
+              className={styles.breadcrumbs}
+              aria-label={t("navigation.breadcrumbs", "Breadcrumbs")}
+            >
+              <Link href={routes.home}>{t("navigation.home", "Home")}</Link>
+              <span aria-hidden="true">/</span>
+              <Link href={routes.explore.index}>{t("navigation.explore", "Explore")}</Link>
+              <span aria-hidden="true">/</span>
+              <Link href={`/scholars/${listing.scholar.slug}`}>
+                {formatScholarName(listing.scholar)}
+              </Link>
+              <span aria-hidden="true">/</span>
+              <span aria-current="page">{listing.title}</span>
+            </nav>
             <button
               type="button"
               className={styles.backButton}

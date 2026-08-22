@@ -20,7 +20,7 @@
 #   and drop web/native/infra entirely. This is the repo's established
 #   deployment strategy (scripts/deploy/* and docs/policies/deployment.md).
 # ============================================================
-FROM oven/bun:1.3.14 AS pruner
+FROM oven/bun:1.4.0 AS pruner
 WORKDIR /repo
 COPY . .
 # Pin Turbo to the repo's devDependency version (turbo.json v2).
@@ -29,7 +29,7 @@ RUN bunx turbo@2.10.5 prune api --docker
 # ============================================================
 # Stage 2: dependency install + build
 # ============================================================
-FROM oven/bun:1.3.14 AS builder
+FROM oven/bun:1.4.0 AS builder
 WORKDIR /app
 
 # Build-time ONLY — never carried into the runtime image.
@@ -82,7 +82,7 @@ RUN rm -rf node_modules apps/*/node_modules packages/*/node_modules \
 # ============================================================
 # Stage 3: runtime (minimal, non-root, production only)
 # ============================================================
-FROM oven/bun:1.3.14 AS runtime
+FROM oven/bun:1.4.0 AS runtime
 
 # Install curl so Dokploy's container healthcheck (exec'd inside this image)
 # can probe the API. Debian-based oven/bun image; done before the non-root

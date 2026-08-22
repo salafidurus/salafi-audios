@@ -24,6 +24,7 @@ describe("CategoryChips", () => {
   it("renders a chip per topic with a localized label", () => {
     render(<CategoryChips />);
 
+    expect(screen.getByRole("tablist", { name: "Browse by topic" })).toBeInTheDocument();
     const chips = screen.getAllByTestId("category-chip");
     expect(chips).toHaveLength(2);
     expect(chips[0]!.textContent).toBe("Aqeedah");

@@ -11,11 +11,11 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { AuthModal } from "@/features/auth";
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
 import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
-import { Button } from "@/shared/components/Button/Button";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { Modal } from "@/shared/components/Modal";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { Button } from "@/shared/components/ui/button";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
@@ -144,11 +144,7 @@ function ProfileContent() {
                 <Button variant="outline" onClick={handleCancel} disabled={isUpdatingProfile}>
                   {t("account.profile.cancel", "Cancel")}
                 </Button>
-                <Button
-                  disabled={!isDirty || isUpdatingProfile}
-                  onClick={handleSave}
-                  loading={isUpdatingProfile}
-                >
+                <Button disabled={!isDirty || isUpdatingProfile} onClick={handleSave}>
                   {isUpdatingProfile
                     ? t("account.profile.saving", "Saving…")
                     : t("account.profile.save", "Save")}
@@ -200,11 +196,10 @@ function ProfileContent() {
           {t("account.signOut", "Sign Out")}
         </Button>
         <Button
-          variant="danger"
+          variant="destructive"
           data-testid="delete-account-trigger"
           onClick={() => setShowDeleteAccountModal(true)}
           disabled={isDeletingAccount}
-          loading={isDeletingAccount}
         >
           {isDeletingAccount
             ? t("account.profile.deleting", "Deleting…")
@@ -278,7 +273,7 @@ function SignInCta() {
           </div>
         ))}
       </div>
-      <Button variant="primary" style={{ width: "100%" }} onClick={() => setShowModal(true)}>
+      <Button className="w-full" onClick={() => setShowModal(true)}>
         {t("account.profile.signIn", "Sign In")}
       </Button>
       <AuthModal

@@ -20,6 +20,7 @@ import { SettingsRow } from "@/features/settings/components/SettingsRow/Settings
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Toggle } from "@/shared/components/Toggle";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
 import styles from "./settings-general.screen.module.css";
@@ -79,7 +80,7 @@ function loadAccentThemePreference(): AccentThemePickerValue {
 
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<"General" | "Profile">("General");
+  const [activeTab, setActiveTab] = useState<"general" | "profile">("general");
   const [themePreference, setThemePreference] = useState<ThemePreference>(loadThemePreference);
   const [accentTheme, setAccentTheme] = useState<AccentThemePickerValue>(loadAccentThemePreference);
   const [notif, setNotif] = useState<NotificationState>(loadNotifState);
@@ -128,24 +129,23 @@ export function SettingsGeneralScreen() {
       <h1 className={styles.settingsTitle}>{t("settings.general.title", "Settings")}</h1>
 
       {/* Sub-navigation tabs bar matching prototype ScreenSettings */}
-      <div className={styles.tabBar}>
-        <button
-          type="button"
-          className={`${styles.tabButton} ${activeTab === "General" ? styles.tabButtonActive : ""}`}
-          onClick={() => setActiveTab("General")}
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => {
+          // SAFETY: only the two values declared by this TabsList can be emitted by Radix Tabs.
+          setActiveTab(value as "general" | "profile");
+        }}
+      >
+        <TabsList
+          className={styles.tabBar}
+          aria-label={t("settings.tabs.label", "Settings sections")}
         >
-          {t("settings.tabs.general", "General")}
-        </button>
-        <button
-          type="button"
-          className={`${styles.tabButton} ${activeTab === "Profile" ? styles.tabButtonActive : ""}`}
-          onClick={() => setActiveTab("Profile")}
-        >
-          {t("settings.tabs.profile", "Profile")}
-        </button>
-      </div>
+          <TabsTrigger value="general">{t("settings.tabs.general", "General")}</TabsTrigger>
+          <TabsTrigger value="profile">{t("settings.tabs.profile", "Profile")}</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
-      {activeTab === "General" ? (
+      {activeTab === "general" ? (
         <div className={styles.sectionWrap}>
           <p className={styles.sectionLabel}>{t("settings.general.languageSection", "LANGUAGE")}</p>
           <SettingsRow
