@@ -2,35 +2,32 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-component-gap-sm);
+  padding-top: clamp(1rem, 2vw, 1.5rem);
+  border-top: 1px solid var(--border-default);
 }
 
 .continueCard,
 .loadingCard {
-  position: relative;
   display: grid;
   grid-template-columns: minmax(9rem, 14%) minmax(0, 1fr);
   gap: clamp(1.25rem, 3vw, 2rem);
   width: 100%;
-  padding: clamp(1rem, 2.5vw, 1.5rem);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-component-card);
+  padding: 0.5rem 0 0;
   box-sizing: border-box;
   text-align: start;
 }
 
 .continueCard {
   overflow: hidden;
-  background: var(--surface-default);
+  background: transparent;
   color: inherit;
   cursor: pointer;
-  box-shadow: var(--shadow-xs);
-  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+  border: 0;
+  transition: opacity 180ms ease;
 }
 
 .continueCard:hover {
-  border-color: var(--border-primary);
-  background: var(--surface-subtle);
-  box-shadow: var(--shadow-sm);
+  opacity: 0.9;
 }
 
 .continueCard:focus-visible {
@@ -72,7 +69,7 @@
   min-width: 0;
 }
 
-.contentHeader,
+.sectionHeader,
 .timeRow {
   display: flex;
   align-items: center;
@@ -81,12 +78,17 @@
   width: 100%;
 }
 
+.sectionHeader {
+  justify-content: space-between;
+}
+
 .percent {
   color: var(--content-muted);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-align: end;
 }
 
 .title {
@@ -159,7 +161,7 @@
 }
 
 .loadingCard {
-  background: var(--surface-default);
+  background: transparent;
 }
 
 .skeletonContent {
@@ -196,6 +198,7 @@
   .loadingCard {
     grid-template-columns: 6.5rem minmax(0, 1fr);
     gap: 1rem;
+    padding-top: 0.25rem;
   }
 
   .artwork { width: 100%; min-height: 6.5rem; }
@@ -207,11 +210,10 @@
   .continueCard,
   .loadingCard {
     grid-template-columns: 5.5rem minmax(0, 1fr);
-    padding: 0.9rem;
+    padding-top: 0.25rem;
   }
 
   .artwork { width: 100%; min-height: 5.5rem; }
-  .percent { display: none; }
   .context,
   .scholar { font-size: 0.8rem; }
 }

@@ -33,11 +33,13 @@ export function ContinueListeningCard({
         aria-label={t("audio.resumePlayback", "Resume playback")}
         data-testid="continue-listening-section"
       >
-        <AppText variant="titleMd">
-          <span data-testid="continue-listening-title">
-            {t("search.continueListening", "Continue Listening")}
-          </span>
-        </AppText>
+        <div className={styles.sectionHeader}>
+          <AppText variant="titleMd">
+            <span data-testid="continue-listening-title">
+              {t("search.continueListening", "Continue Listening")}
+            </span>
+          </AppText>
+        </div>
         <div className={styles.loadingCard} data-testid="continue-listening-skeleton">
           <div className={`${styles.skeleton} ${styles.skeletonArtwork}`} />
           <div className={styles.skeletonContent}>
@@ -87,11 +89,18 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
       aria-label={t("audio.resumePlayback", "Resume playback")}
       data-testid="continue-listening-section"
     >
-      <AppText variant="titleMd">
-        <span data-testid="continue-listening-title">
-          {t("search.continueListening", "Continue Listening")}
-        </span>
-      </AppText>
+      <div className={styles.sectionHeader}>
+        <AppText variant="titleMd">
+          <span data-testid="continue-listening-title">
+            {t("search.continueListening", "Continue Listening")}
+          </span>
+        </AppText>
+        {progress !== null && (
+          <span className={styles.percent}>
+            {t("home.continue.complete", "{{percent}}% complete", { percent: progress })}
+          </span>
+        )}
+      </div>
       <button
         type="button"
         data-testid="continue-listening-card"
@@ -127,19 +136,18 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
         </div>
 
         <div className={styles.content}>
-          <div className={styles.contentHeader}>
-            {progress !== null && (
-              <span className={styles.percent}>
-                {t("home.continue.complete", "{{percent}}% complete", { percent: progress })}
-              </span>
-            )}
-          </div>
           <h3 className={styles.title} data-testid="continue-listening-lecture-title">
             {recentProgress.lectureTitle}
           </h3>
-          <p className={styles.context} data-testid="continue-listening-context">
-            {getResumeContext(recentProgress)}
-          </p>
+          {getResumeContext(recentProgress).map((contextLine) => (
+            <p
+              key={contextLine}
+              className={styles.context}
+              data-testid="continue-listening-context"
+            >
+              {contextLine}
+            </p>
+          ))}
           <p className={styles.scholar} data-testid="continue-listening-scholar-name">
             {scholarName}
           </p>
@@ -180,29 +188,15 @@ function getInitials(name: string): string {
   );
 }
 
-function getResumeContext(progress: RecentProgressDto): string {
-  if (progress.format === "collection") {
-    return formatContainerContext("Collection", progress.publishedLectureCount);
-  }
-  if (progress.format === "series") {
-    return formatContainerContext("Series", progress.publishedLectureCount);
-  }
+function getResumeContext(progress: RecentProgressDto): string[] {
+  if (progress.format !== "single" || !progress.seriesContext) return [];
 
-  const lessonNumber = progress.orderIndex
-    ? `Lesson ${String(progress.orderIndex).padStart(2, "0")}`
-    : "Lesson";
   const parentTitle = progress.seriesContext?.seriesTitle;
-  const rootTitle =
-    progress.rootFormat === "collection" && progress.rootListing
-      ? progress.rootListing.title
-      : null;
+  if (progress.rootFormat === "collection" && progress.rootListing) {
+    return [`Module · ${parentTitle}`, `Collection · ${progress.rootListing.title}`];
+  }
 
-  return [lessonNumber, parentTitle, rootTitle].filter(Boolean).join(" · ");
-}
-
-function formatContainerContext(label: string, lessonCount?: number): string {
-  if (!lessonCount || lessonCount < 1) return label;
-  return `${label} · ${lessonCount} ${lessonCount === 1 ? "lesson" : "lessons"}`;
+  return [`Series · ${parentTitle}`];
 }
 
 function formatDuration(seconds: number): string {

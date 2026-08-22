@@ -89,7 +89,7 @@ describe("HomeScreen", () => {
     expect(lectureTitle.textContent).toBe("Tauheed Explained");
 
     expect(screen.getByTestId("continue-listening-context").textContent).toBe(
-      "Lesson 02 · Foundations of Tawheed",
+      "Series · Foundations of Tawheed",
     );
 
     const scholarName = screen.getByTestId("continue-listening-scholar-name");
@@ -142,6 +142,61 @@ describe("HomeScreen", () => {
         Boolean(previous.compareDocumentPosition(current) & Node.DOCUMENT_POSITION_FOLLOWING),
       ).toBe(true);
     }
+  });
+
+  it("renders module and collection context for a collection lesson", () => {
+    (useContinueListening as unknown as Mock<any>).mockReturnValue({
+      recentProgress: {
+        lectureId: "lesson-123",
+        lectureTitle: "The Meaning of Worship",
+        lectureSlug: "the-meaning-of-worship",
+        format: "single",
+        scholarName: "Shaikh Salih al-Fawzan",
+        scholarSlug: "salih-al-fawzan",
+        durationSeconds: 1800,
+        positionSeconds: 600,
+        seriesContext: {
+          seriesId: "module-123",
+          seriesTitle: "Kitab al-Tawhid",
+          seriesSlug: "kitab-al-tawhid",
+        },
+        rootListing: {
+          id: "collection-123",
+          title: "Foundations of Tawhid",
+          slug: "foundations-of-tawhid",
+        },
+        rootFormat: "collection",
+      },
+      isLoading: false,
+    });
+
+    render(<HomeScreen />);
+
+    const contextLines = screen.getAllByTestId("continue-listening-context");
+    expect(contextLines.map((line) => line.textContent)).toEqual([
+      "Module · Kitab al-Tawhid",
+      "Collection · Foundations of Tawhid",
+    ]);
+  });
+
+  it("does not add context metadata to a standalone single", () => {
+    (useContinueListening as unknown as Mock<any>).mockReturnValue({
+      recentProgress: {
+        lectureId: "single-123",
+        lectureTitle: "A Standalone Lesson",
+        lectureSlug: "a-standalone-lesson",
+        format: "single",
+        scholarName: "Shaikh Salih al-Fawzan",
+        scholarSlug: "salih-al-fawzan",
+        durationSeconds: 1800,
+        positionSeconds: 600,
+      },
+      isLoading: false,
+    });
+
+    render(<HomeScreen />);
+
+    expect(screen.queryByTestId("continue-listening-context")).toBeNull();
   });
 
   it("builds an editorial hierarchy from one recent feed snapshot", () => {
