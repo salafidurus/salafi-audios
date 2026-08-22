@@ -39,7 +39,26 @@ vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
 }));
 
 vi.mock("@/shared/components/PageHeader", () => ({
-  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
+  PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
+    <>
+      <h1>{title}</h1>
+      {actions}
+    </>
+  ),
+}));
+
+vi.mock("@/features/library/components/library-tabs/library-tabs", () => ({
+  LibraryTabs: ({ activeTab }: { activeTab: string }) => (
+    <nav aria-label="Library sections">
+      <a href="/library">Started</a>
+      <a href="/library/saved" aria-current={activeTab === "saved" ? "page" : undefined}>
+        Saved
+      </a>
+      <a href="/library/completed" aria-current={activeTab === "completed" ? "page" : undefined}>
+        Completed
+      </a>
+    </nav>
+  ),
 }));
 
 vi.mock("../components/library-list-row/library-list-row", () => ({
@@ -108,6 +127,16 @@ describe("Library screens", () => {
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view your progress")).toBeInTheDocument();
     });
+
+    it("exposes Saved and Completed as distinct Library tabs", () => {
+      renderWithQueryClient(<LibraryScreen />);
+
+      expect(screen.getByRole("link", { name: "Saved" })).toHaveAttribute("href", "/library/saved");
+      expect(screen.getByRole("link", { name: "Completed" })).toHaveAttribute(
+        "href",
+        "/library/completed",
+      );
+    });
   });
 
   describe("LibrarySavedScreen (Saved)", () => {
@@ -131,6 +160,19 @@ describe("Library screens", () => {
       renderWithQueryClient(<LibrarySavedScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view saved lectures")).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Completed" })).toHaveAttribute(
+        "href",
+        "/library/completed",
+      );
+    });
+
+    it("keeps Completed available from the Saved tab", () => {
+      renderWithQueryClient(<LibrarySavedScreen />);
+
+      expect(screen.getByRole("link", { name: "Completed" })).toHaveAttribute(
+        "href",
+        "/library/completed",
+      );
     });
   });
 
@@ -155,6 +197,13 @@ describe("Library screens", () => {
       renderWithQueryClient(<LibraryCompletedScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view completed history")).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Saved" })).toHaveAttribute("href", "/library/saved");
+    });
+
+    it("keeps Saved available from the Completed tab", () => {
+      renderWithQueryClient(<LibraryCompletedScreen />);
+
+      expect(screen.getByRole("link", { name: "Saved" })).toHaveAttribute("href", "/library/saved");
     });
   });
 });
