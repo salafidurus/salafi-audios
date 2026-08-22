@@ -20,6 +20,11 @@ or managing.
 **Access grant**:
 A durable assignment of a Capability to a User for a defined target and scope.
 
+**Administrative access**:
+The presence of at least one backend-recognized Capability or system-level
+Role that permits a User to enter an administrative client workspace. It is an
+entry condition, not permission to perform every administrative action.
+
 **Scope**:
 The boundary within which an Access grant applies, such as globally, for a
 Scholar, or for a Locale.
@@ -32,8 +37,9 @@ Unknown identity never widens access and never falls back to a broader grant.
 A named set of broad responsibilities or system-level authority associated
 with a User. A Role does not eliminate per-action policy checks.
 
-_Avoid_: UI gating as authorization; a session as authorization; global access
-when the grant is Scholar- or Locale-scoped.
+_Avoid_: UI gating as authorization; a session as authorization; “admin” as a
+synonym for superadmin; global access when the grant is Scholar- or
+Locale-scoped.
 
 ## Editorial lifecycle
 

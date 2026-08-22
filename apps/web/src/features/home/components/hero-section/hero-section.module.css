@@ -1,26 +1,27 @@
 .hero {
   position: relative;
-  border-radius: 16px;
+  min-height: 250px;
+  display: flex;
+  align-items: stretch;
+  border-radius: var(--radius-component-card);
   border: 1px solid var(--border-default);
-  padding: 24px 28px 24px 44px;
-  background-color: var(--surface-default);
-  background-image: radial-gradient(
-    circle at 1px 1px,
-    color-mix(in srgb, var(--action-primary) 15%, transparent) 1px,
-    transparent 0
-  );
-  background-size: 18px 18px;
+  padding: 2rem 3rem 2.25rem 4.5rem;
+  background: linear-gradient(135deg, var(--surface-default) 0%, var(--surface-subtle) 100%);
   overflow: hidden;
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-sm);
+}
+
+.hero:not(:has(.visualRegion)) .content {
+  max-width: 100%;
 }
 
 .marginalia {
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 0;
   bottom: 0;
   width: 26px;
-  border-right: 1px solid var(--border-default);
+  border-inline-end: 1px solid var(--border-default);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -31,16 +32,16 @@
 .arabicText {
   writing-mode: vertical-rl;
   font-family: var(--typo-display-lg-font-family), serif;
-  font-size: 14px;
+  font-size: 16px;
   letter-spacing: 2px;
   color: var(--action-primary);
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
 .bookmark {
   position: absolute;
   top: 0;
-  right: 36px;
+  inset-inline-end: clamp(2rem, 5vw, 5rem);
   width: 32px;
   height: 48px;
   background: linear-gradient(180deg, var(--content-primary-strong), var(--action-primary));
@@ -54,6 +55,62 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
+  max-width: 65%;
+}
+
+.visualRegion {
+  position: absolute;
+  inset-block: 2rem 2.25rem;
+  inset-inline-end: clamp(2rem, 5vw, 5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(27%, 18rem);
+  z-index: 0;
+}
+
+.visualFrame {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  max-height: 100%;
+  overflow: hidden;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 180ms ease;
+}
+
+.visualFrame:hover,
+.titleLink:hover,
+.scholarLink:hover {
+  opacity: 0.82;
+}
+
+.visualFrame:focus-visible,
+.titleLink:focus-visible,
+.scholarLink:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 3px;
+}
+
+.artworkImage {
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.scholarArtwork {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-primary-subtle-surface);
+  color: var(--content-primary-strong);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
 }
 
 .eyebrow {
@@ -66,47 +123,56 @@
 }
 
 .title {
+  max-width: 68%;
   font-family: var(--font-display), "Fraunces", Georgia, serif;
-  font-size: clamp(24px, 3.2vw, 32px);
+  font-size: clamp(1.8rem, 4vw, 3.4rem);
   font-weight: 600;
   line-height: 1.25;
   margin: 0;
   color: var(--content-strong);
 }
 
+.titleLink,
+.scholarLink {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 180ms ease;
+}
+
 .subtitle {
   margin: 0;
-  color: var(--content-muted);
-  font-size: 13.5px;
+  color: var(--content-secondary);
+  font-size: 1.15rem;
+  font-weight: 600;
 }
 
 .recommendation {
-  margin: 2px 0 0 0;
+  margin: 2px 0 0;
   color: var(--content-muted);
-  font-size: 12.5px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
 .ctaRow {
-  margin-top: 12px;
+  margin-top: 1.25rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .startBtn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 40px;
+  height: 46px;
   padding: 0 22px;
   border-radius: 999px;
   background: var(--action-primary);
   color: var(--content-on-primary);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   border: none;
   cursor: pointer;
@@ -120,22 +186,26 @@
 }
 
 .browseLabel {
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--content-muted);
   margin-left: 4px;
+}
+
+.topicRail {
+  display: contents;
 }
 
 .categoryPill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 34px;
+  height: 38px;
   padding: 0 14px;
   border-radius: 999px;
-  background: var(--surface-default);
-  border: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--surface-default) 75%, transparent);
+  border: 1px solid var(--border-subtle);
   color: var(--content-strong);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: border-color 150ms ease, background-color 150ms ease;
@@ -148,23 +218,80 @@
 
 @media (max-width: 640px) {
   .hero {
-    padding: 20px 20px 20px 36px;
+    min-height: 220px;
+    padding: 1.5rem 1.25rem 1.5rem 3.25rem;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .title {
+    max-width: 100%;
     font-size: 24px;
   }
 
+  .content {
+    display: contents;
+  }
+
+  .visualRegion {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 10rem;
+    margin-top: 0.5rem;
+    order: 2;
+  }
+
+  .visualFrame {
+    width: 10rem;
+    height: 10rem;
+  }
+
+  .eyebrow,
+  .title,
+  .subtitle,
+  .recommendation,
+  .ctaRow,
+  .visualRegion { align-self: center; }
+
+  .eyebrow { order: 1; }
+  .title { order: 3; }
+  .subtitle { order: 4; }
+  .recommendation { order: 5; }
+
   .ctaRow {
+    order: 6;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    width: 100%;
     gap: 10px;
   }
+
+  .topicRail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .topicRail::-webkit-scrollbar { display: none; }
+  .browseLabel,
+  .categoryPill { flex: 0 0 auto; }
+  .browseLabel { margin-left: 0; }
+}
+
+@media (max-width: 380px) {
+  .visualRegion { display: none; }
 }
 
 /* RTL Support */
 [dir="rtl"] .hero {
   direction: rtl;
+  padding-inline: 3.25rem 1.25rem;
 }
 
 /* Skeleton loader styles */
@@ -189,6 +316,11 @@
   width: 140px;
   border-radius: 999px;
   margin-top: 8px;
+}
+
+.skeletonArtwork {
+  width: 100%;
+  height: 100%;
 }
 
 .skeletonLine {
@@ -218,4 +350,3 @@
     animation: none;
   }
 }
-

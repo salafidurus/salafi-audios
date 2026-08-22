@@ -8,7 +8,6 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { usePlayListing } from "@/features/audio";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
-import { useHomePromotions } from "../../hooks/use-home-promotions";
 import { FeaturedLectureCard } from "../featured-lecture-card/featured-lecture-card";
 import { LectureRow } from "../lecture-row/lecture-row";
 import styles from "./recently-added-section.module.css";
@@ -19,26 +18,18 @@ function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
 
 const MAX_RECENT_ITEMS = 10;
 
-export function RecentlyAddedSection() {
+export type RecentlyAddedSectionContentProps = {
+  items: FeedContentItemDto[];
+  isLoading?: boolean;
+};
+
+function RecentlyAddedSectionContent({
+  items,
+  isLoading = false,
+}: RecentlyAddedSectionContentProps) {
   const { t } = useTranslation();
   const { navigateToListing } = useListingNavigation();
-  const { data: promoData, isLoading: isPromosLoading } = useHomePromotions();
-  const { data, isLoading: isExploreLoading } = useExploreRecentScreen({ limit: MAX_RECENT_ITEMS });
-
-  const items: FeedContentItemDto[] = [];
-  for (const page of data?.pages ?? []) {
-    for (const item of page.items) {
-      if (isContentItem(item)) {
-        items.push(item);
-      }
-    }
-  }
-
-  const picks = promoData?.editorsPicks?.map((pick) => pick.listing) ?? [];
-  const itemsToUse = picks.length > 0 ? picks : items;
-  const [featured, ...rest] = itemsToUse;
-
-  const isLoading = isPromosLoading || isExploreLoading;
+  const [featured, ...rest] = items;
 
   const { play: playFeatured } = usePlayListing(
     featured
@@ -56,7 +47,11 @@ export function RecentlyAddedSection() {
 
   if (isLoading && items.length === 0) {
     return (
-      <section className={styles.section} aria-label={t("home.recent.label", "Recently added")}>
+      <section
+        className={styles.section}
+        aria-label={t("home.recent.label", "Recently added")}
+        data-testid="home-recent-loading"
+      >
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
           <Link href={routes.explore.index} className={styles.seeAllLink}>
@@ -77,13 +72,32 @@ export function RecentlyAddedSection() {
   }
 
   if (items.length === 0) {
-    return null;
+    return (
+      <section
+        className={styles.section}
+        aria-label={t("home.recent.label", "Recently added")}
+        data-testid="home-recent-empty"
+      >
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
+          <Link href={routes.explore.index} className={styles.seeAllLink}>
+            {t("common.seeAll", "See all")}
+          </Link>
+        </div>
+        <p className={styles.emptyState}>
+          {t("home.recent.empty", "New lessons will appear here as they are published.")}
+        </p>
+      </section>
+    );
   }
 
   return (
     <section className={styles.section} aria-label={t("home.recent.label", "Recently added")}>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
+        <div>
+          <p className={styles.sectionEyebrow}>{t("home.recent.eyebrow", "KEEP EXPLORING")}</p>
+          <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
+        </div>
         <Link href={routes.explore.index} className={styles.seeAllLink}>
           {t("common.seeAll", "See all")}
         </Link>
@@ -95,29 +109,60 @@ export function RecentlyAddedSection() {
             category={featured.kind}
             scholarName={featured.scholarName}
             scholarSlug={featured.scholarSlug}
+            scholarTitle={featured.scholarTitle}
             duration={
               featured.durationSeconds ? `${Math.round(featured.durationSeconds / 60)} min` : ""
             }
             progress={0}
             totalLessons={1}
+            eyebrow={t("home.recent.featured", "Recently added")}
             onClick={() => navigateToListing(featured.slug)}
             onPlay={() => void playFeatured()}
           />
         )}
-        {rest.map((item) => (
-          <LectureRow
-            key={item.id}
-            title={item.title}
-            category={item.kind}
-            scholarName={item.scholarName}
-            scholarSlug={item.scholarSlug}
-            duration={item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
-            progress={0}
-            totalLessons={1}
-            onClick={() => navigateToListing(item.slug)}
-          />
-        ))}
+        {rest.length > 0 && (
+          <div
+            className={styles.restRail}
+            aria-label={t("home.recent.more", "More recently added")}
+          >
+            {rest.map((item) => (
+              <LectureRow
+                key={item.id}
+                title={item.title}
+                category={item.kind}
+                scholarName={item.scholarName}
+                scholarSlug={item.scholarSlug}
+                scholarTitle={item.scholarTitle}
+                scholarImageUrl={item.scholarImageUrl}
+                listingArtwork={item.thumbnailUrl}
+                duration={
+                  item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""
+                }
+                progress={0}
+                totalLessons={1}
+                onClick={() => navigateToListing(item.slug)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
+}
+
+export { RecentlyAddedSectionContent };
+
+export function RecentlyAddedSection() {
+  const { data, isLoading: isExploreLoading } = useExploreRecentScreen({ limit: MAX_RECENT_ITEMS });
+
+  const items: FeedContentItemDto[] = [];
+  for (const page of data?.pages ?? []) {
+    for (const item of page.items) {
+      if (isContentItem(item)) {
+        items.push(item);
+      }
+    }
+  }
+
+  return <RecentlyAddedSectionContent items={items} isLoading={isExploreLoading} />;
 }

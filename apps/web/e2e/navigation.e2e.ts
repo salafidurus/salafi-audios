@@ -1,32 +1,47 @@
 import { test, expect } from "./test-base";
 
-test.describe("Navigation — sidebar & routing", () => {
+test.describe("Navigation — public workspace & routing", () => {
   test.describe("desktop viewport", () => {
     test.use({ viewport: { width: 1280, height: 800 } });
 
-    test("sidebar is visible", async ({ page }) => {
+    test("public navigation is visible without the global sidebar", async ({ page }) => {
       await page.goto("/");
-      await expect(page.getByTestId("sidebar")).toBeVisible();
+      await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
+      await expect(page.getByTestId("sidebar")).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Search anything" })).toBeVisible();
+    });
+
+    test("search trigger navigates to the search page", async ({ page }) => {
+      await page.goto("/");
+      await page.getByRole("button", { name: "Search anything" }).click();
+      await expect(page).toHaveURL(/\/search/);
     });
 
     test("brand link navigates to home", async ({ page }) => {
       await page.goto("/explore");
-      await expect(page.getByTestId("brand-link")).toBeVisible();
-      await page.getByTestId("brand-link").click();
+      const brandLink = page.getByRole("link", { name: "Salafi Durus" }).first();
+      await expect(brandLink).toBeVisible();
+      await brandLink.click();
       await expect(page).toHaveURL("/");
     });
 
-    test("clicking Scholars sidebar link navigates to /scholars", async ({ page }) => {
+    test("clicking Scholars public navigation link navigates to /scholars", async ({ page }) => {
       await page.goto("/");
-      await expect(page.getByTestId("nav-link-scholars")).toBeVisible();
-      await page.getByTestId("nav-link-scholars").click();
+      const scholarsLink = page.getByRole("navigation", { name: "Main" }).getByRole("link", {
+        name: "Scholars",
+      });
+      await expect(scholarsLink).toBeVisible();
+      await scholarsLink.click();
       await expect(page).toHaveURL(/\/scholars/);
     });
 
-    test("clicking Library sidebar link navigates to /library", async ({ page }) => {
+    test("clicking Library public navigation link navigates to /library", async ({ page }) => {
       await page.goto("/");
-      await expect(page.getByTestId("nav-link-library")).toBeVisible();
-      await page.getByTestId("nav-link-library").click();
+      const libraryLink = page.getByRole("navigation", { name: "Main" }).getByRole("link", {
+        name: "Library",
+      });
+      await expect(libraryLink).toBeVisible();
+      await libraryLink.click();
       await expect(page).toHaveURL(/\/library/);
     });
 
