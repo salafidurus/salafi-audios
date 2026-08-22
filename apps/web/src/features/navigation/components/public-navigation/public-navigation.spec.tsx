@@ -116,11 +116,8 @@ describe("PublicNavigation", () => {
     render(<PublicNavigation />);
 
     expect(screen.getByRole("button", { name: "Account" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Admin workspace" })).toHaveAttribute("href", "/admin");
     fireEvent.click(screen.getByRole("button", { name: "Account" }));
-    expect(screen.getByRole("menuitem", { name: "Admin workspace" })).toHaveAttribute(
-      "href",
-      "/admin",
-    );
     fireEvent.click(screen.getByRole("menuitem", { name: "Sign Out" }));
     expect(
       screen.getByRole("heading", { name: "Are you sure you want to sign out?" }),

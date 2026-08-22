@@ -3,19 +3,25 @@
   inset-block-start: 0;
   z-index: 20;
   flex: 0 0 auto;
-  border-bottom: 1px solid var(--border-subtle);
-  background: color-mix(in srgb, var(--surface-canvas) 94%, transparent);
-  backdrop-filter: blur(12px);
+  padding: var(--space-component-gap-md) var(--space-layout-page-x) 0;
+  background: transparent;
+  pointer-events: none;
 }
 
 .inner {
   display: flex;
   align-items: center;
-  width: min(var(--space-layout-content-max), 100%);
-  min-height: 4rem;
+  width: min(100%, 90rem);
+  min-height: 4.5rem;
   margin-inline: auto;
   gap: var(--space-component-gap-md);
-  padding: var(--space-component-gap-sm) var(--space-layout-page-x);
+  padding: var(--space-component-gap-sm) var(--space-component-gap-md);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-panel);
+  background: color-mix(in srgb, var(--surface-default) 96%, transparent);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(16px);
+  pointer-events: auto;
 }
 
 .brand {
@@ -28,17 +34,32 @@
   font-size: var(--typo-title-md-font-size);
   font-weight: 700;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .brandMark {
   display: grid;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   place-items: center;
+  border: 1px solid color-mix(in srgb, var(--action-primary) 28%, var(--border-subtle));
+  border-radius: var(--radius-component-panel);
+  background: color-mix(in srgb, var(--action-primary) 8%, var(--surface-subtle));
 }
 
 .brandMark img {
   object-fit: contain;
+}
+
+.workspaceBadge {
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid color-mix(in srgb, var(--action-primary) 35%, var(--border-subtle));
+  border-radius: var(--radius-component-chip);
+  color: var(--action-primary);
+  font-family: var(--font-body), sans-serif;
+  font-size: var(--typo-caption-font-size);
+  font-weight: 700;
+  letter-spacing: 0.06em;
 }
 
 .nav {
@@ -47,7 +68,7 @@
   justify-content: center;
   flex: 1;
   gap: var(--space-xs);
-  padding: 0;
+  min-width: 0;
 }
 
 .navLink,
@@ -64,63 +85,8 @@
   text-decoration: none;
   transition:
     color 150ms ease,
-    background-color 150ms ease;
-}
-
-.searchControl,
-.accountControl {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  gap: var(--space-sm);
-  min-height: 2.25rem;
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid transparent;
-  border-radius: var(--radius-component-chip);
-  color: var(--content-muted);
-  font-size: var(--typo-body-sm-font-size);
-  font-weight: 500;
-  text-decoration: none;
-  transition:
-    color 150ms ease,
     background-color 150ms ease,
     border-color 150ms ease;
-}
-
-.searchControl {
-  width: clamp(15rem, 22vw, 19rem);
-  min-height: 2.5rem;
-  justify-content: flex-start;
-  padding: var(--space-sm) var(--space-md);
-  border-color: var(--input-border-rest);
-  border-radius: var(--radius-scale-full);
-  background: var(--input-surface-rest);
-  color: var(--content-muted);
-}
-
-.searchControl:hover,
-.searchControl:focus-visible,
-.accountMenu .accountControl:hover,
-.accountMenu .accountControl:focus-visible,
-.accountMenu .accountControl[aria-expanded="true"] {
-  border-color: var(--input-border-focus);
-  color: var(--content-strong);
-  background: var(--input-surface-focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-focus-ring) 24%, transparent);
-}
-
-.accountMenu .accountControl {
-  border-color: transparent;
-  background: transparent;
-}
-
-.accountMenu .accountControl:hover,
-.accountMenu .accountControl:focus-visible,
-.accountMenu .accountControl[aria-expanded="true"] {
-  border-color: var(--border-subtle);
-  background: var(--surface-hover);
-  box-shadow: none;
 }
 
 .navLink {
@@ -146,13 +112,18 @@
   display: none;
 }
 
-.backToApp {
+.searchControl,
+.accountControl,
+.workspaceSwitch {
   display: inline-flex;
-  flex: 0 0 auto;
   align-items: center;
-  padding: var(--space-component-gap-sm) var(--space-component-gap-md);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-component-panel);
+  justify-content: center;
+  flex: 0 0 auto;
+  gap: var(--space-sm);
+  min-height: 2.5rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-component-chip);
   color: var(--content-muted);
   font-size: var(--typo-body-sm-font-size);
   font-weight: 600;
@@ -160,11 +131,49 @@
   transition:
     color 150ms ease,
     background-color 150ms ease,
-    border-color 150ms ease;
+    border-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
-.backToApp:hover,
-.backToApp:focus-visible {
+.searchControl {
+  width: clamp(15rem, 22vw, 19rem);
+  justify-content: flex-start;
+  border-color: var(--input-border-rest);
+  border-radius: var(--radius-scale-full);
+  background: var(--input-surface-rest);
+}
+
+.searchControl:hover,
+.searchControl:focus-visible {
+  border-color: var(--input-border-focus);
+  color: var(--content-strong);
+  background: var(--input-surface-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-focus-ring) 24%, transparent);
+}
+
+.accountMenu .accountControl {
+  max-width: 13rem;
+  border-color: transparent;
+  background: transparent;
+}
+
+.accountMenu .accountControl:hover,
+.accountMenu .accountControl:focus-visible,
+.accountMenu .accountControl[aria-expanded="true"] {
+  border-color: var(--border-subtle);
+  color: var(--content-strong);
+  background: var(--surface-hover);
+}
+
+.workspaceSwitch {
+  border-color: var(--border-default);
+  color: var(--content-default);
+  background: transparent;
+  white-space: nowrap;
+}
+
+.workspaceSwitch:hover,
+.workspaceSwitch:focus-visible {
   border-color: var(--border-hover);
   color: var(--content-strong);
   background: var(--surface-hover);
@@ -173,10 +182,6 @@
 .accountMenu {
   position: relative;
   flex: 0 0 auto;
-}
-
-.accountTrigger {
-  max-width: 13rem;
 }
 
 .accountName {
@@ -188,7 +193,7 @@
 
 .accountPopover {
   position: absolute;
-  inset-block-start: calc(100% + 0.5rem);
+  inset-block-start: calc(100% + var(--space-sm));
   inset-inline-end: 0;
   display: flex;
   flex-direction: column;
@@ -247,8 +252,6 @@
   align-items: stretch;
   justify-content: flex-start;
   padding: 0 var(--space-layout-page-x);
-  border: 0;
-  background: transparent;
 }
 
 .sheet .navLink {
@@ -261,31 +264,36 @@
   display: block;
 }
 
-.sheet .backToApp {
+.sheet .workspaceSwitch {
   margin: 0 var(--space-layout-page-x) var(--space-component-gap-sm);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .inner {
-    min-height: 3.75rem;
-    padding-block: var(--space-component-gap-sm);
-  }
-
-  .nav {
-    gap: 0;
+    gap: var(--space-component-gap-sm);
   }
 
   .navLink {
-    padding-inline: var(--space-component-gap-sm);
-    font-size: var(--typo-body-sm-font-size);
-  }
-
-  .navLink svg {
-    display: none;
+    padding-inline: var(--space-sm);
   }
 
   .searchControl {
-    width: 2.25rem;
+    width: 15rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .header {
+    padding-block-start: var(--space-sm);
+  }
+
+  .inner {
+    min-height: 4rem;
+    padding: var(--space-sm);
+  }
+
+  .searchControl {
+    width: 2.75rem;
     border-radius: var(--radius-component-chip);
     padding-inline: 0;
   }
@@ -301,8 +309,13 @@
 }
 
 @media (max-width: 640px) {
+  .header {
+    padding-inline: var(--space-sm);
+  }
+
   .inner {
-    padding-inline: var(--space-layout-page-x);
+    min-height: 3.75rem;
+    padding-inline: var(--space-sm);
   }
 
   .brand {
@@ -310,7 +323,11 @@
   }
 
   .brandMark {
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .workspaceBadge {
+    display: none;
   }
 }

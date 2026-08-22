@@ -69,6 +69,28 @@ function SearchControl() {
   );
 }
 
+function WorkspaceSwitch({
+  isAdminWorkspace,
+  hasAdminAccess,
+}: {
+  isAdminWorkspace: boolean;
+  hasAdminAccess: boolean;
+}) {
+  const { t } = useTranslation();
+  const href = isAdminWorkspace ? routes.home : routes.admin.index;
+  const label = isAdminWorkspace
+    ? t("navigation.backToApp", "Back to app")
+    : t("navigation.adminWorkspace", "Admin workspace");
+
+  if (!isAdminWorkspace && !hasAdminAccess) return null;
+
+  return (
+    <Link href={href} className={styles.workspaceSwitch}>
+      {label}
+    </Link>
+  );
+}
+
 function getAdminNavItems(t: (key: string, fallback: string) => string): PublicNavItem[] {
   return [
     { label: t("navigation.admin.home", "Dashboard"), href: routes.admin.index, Icon: Home },
@@ -135,7 +157,7 @@ function NavigationLinks({
   );
 }
 
-function AccountMenu({ hasAdminAccess }: { hasAdminAccess: boolean }) {
+function AccountMenu() {
   const { t } = useTranslation();
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
@@ -195,11 +217,6 @@ function AccountMenu({ hasAdminAccess }: { hasAdminAccess: boolean }) {
             <strong>{user.name || t("account.defaultUser", "User")}</strong>
             <span>{user.email}</span>
           </div>
-          {hasAdminAccess && (
-            <Link href={routes.admin.index} role="menuitem" onClick={closeMenu}>
-              {t("navigation.adminWorkspace", "Admin workspace")}
-            </Link>
-          )}
           <Link href={routes.settings.index} role="menuitem" onClick={closeMenu}>
             {t("navigation.settings", "Settings")}
           </Link>
@@ -254,12 +271,15 @@ export function PublicNavigation() {
             <Image src="/logo/logo_72.png" alt="" width={30} height={30} priority />
           </span>
           <span>{t("navigation.siteTitle", "Salafi Durus")}</span>
+          {isAdminWorkspace && (
+            <span className={styles.workspaceBadge}>{t("navigation.adminSection", "ADMIN")}</span>
+          )}
         </Link>
 
         {isCompact ? (
           <div className={styles.mobileActions}>
             <SearchControl />
-            <AccountMenu hasAdminAccess={hasAdminAccess} />
+            <AccountMenu />
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="surface" size="icon" aria-label={t("navigation.mainNav", "Main")}>
@@ -271,10 +291,8 @@ export function PublicNavigation() {
                   <SheetTitle>{t("navigation.siteTitle", "Salafi Durus")}</SheetTitle>
                   <LanguageSwitch direction="down" />
                 </SheetHeader>
-                {isAdminWorkspace && (
-                  <Link className={styles.backToApp} href={routes.home}>
-                    {t("navigation.backToApp", "Back to app")}
-                  </Link>
+                {(isAdminWorkspace || hasAdminAccess) && (
+                  <WorkspaceSwitch isAdminWorkspace hasAdminAccess={hasAdminAccess} />
                 )}
                 <NavigationLinks
                   items={items}
@@ -287,14 +305,10 @@ export function PublicNavigation() {
           </div>
         ) : (
           <>
-            {isAdminWorkspace && (
-              <Link className={styles.backToApp} href={routes.home}>
-                {t("navigation.backToApp", "Back to app")}
-              </Link>
-            )}
             <NavigationLinks items={items} pathname={pathname} ariaLabel={mainNavLabel} />
             <SearchControl />
-            <AccountMenu hasAdminAccess={hasAdminAccess} />
+            <AccountMenu />
+            <WorkspaceSwitch isAdminWorkspace={isAdminWorkspace} hasAdminAccess={hasAdminAccess} />
           </>
         )}
       </div>
