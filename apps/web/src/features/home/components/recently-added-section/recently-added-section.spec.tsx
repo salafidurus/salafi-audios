@@ -86,11 +86,12 @@ describe("RecentlyAddedSection", () => {
     expect(screen.getByText("Recently Added")).toBeTruthy();
   });
 
-  it("renders nothing when there is no data", () => {
+  it("renders an intentional empty state when there is no data", () => {
     mockUseExploreRecentScreen.mockReturnValue({ data: undefined });
 
     render(<RecentlyAddedSection />);
 
-    expect(screen.queryByText("Recently Added")).toBeNull();
+    expect(screen.getByText("Recently Added")).toBeTruthy();
+    expect(screen.getByTestId("home-recent-empty")).toBeTruthy();
   });
 });

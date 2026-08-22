@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ListingFormatSchema } from "./listing.types";
+import { ListingFormatSchema, RootListingDtoSchema, SeriesContextDtoSchema } from "./listing.types";
 import {
   ContentOriginalFieldsSchema,
   LocaleSchema,
@@ -35,10 +35,18 @@ export const RecentProgressDtoSchema = z.object({
   lectureId: z.string(),
   lectureTitle: z.string(),
   lectureSlug: z.string(),
+  format: ListingFormatSchema,
+  orderIndex: z.number().optional(),
+  publishedLectureCount: z.number().optional(),
   scholarName: z.string(),
   scholarSlug: z.string(),
   durationSeconds: z.number(),
   positionSeconds: z.number(),
+  artworkUrl: z.string().optional(),
+  scholarImageUrl: z.string().optional(),
+  seriesContext: SeriesContextDtoSchema.nullable().optional(),
+  rootListing: RootListingDtoSchema.nullable().optional(),
+  rootFormat: ListingFormatSchema.optional(),
 });
 export type RecentProgressDto = z.infer<typeof RecentProgressDtoSchema>;
 

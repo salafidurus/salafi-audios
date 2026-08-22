@@ -30,15 +30,25 @@ describe("interaction primitives", () => {
   });
 
   it("keeps migrated button callers on shadcn variants while supporting loading state", () => {
-    render(
-      <Button variant="primary" size="md" label="Save" loading data-testid="button" />,
-    );
+    render(<Button variant="primary" size="md" label="Save" loading data-testid="button" />);
 
     const button = screen.getByTestId("button");
     expect(button).toHaveAttribute("data-variant", "default");
     expect(button).toHaveAttribute("data-size", "default");
     expect(button).toHaveAttribute("aria-busy", "true");
     expect(button).toBeDisabled();
+  });
+
+  it("preserves the child element when rendered with asChild", () => {
+    render(
+      <Button asChild variant="primary">
+        <a href="/explore">Explore</a>
+      </Button>,
+    );
+
+    const link = screen.getByRole("link", { name: "Explore" });
+    expect(link).toHaveAttribute("data-slot", "button");
+    expect(link).toHaveAttribute("data-variant", "default");
   });
 
   it("associates field labels, descriptions, and errors with controls", () => {

@@ -1,7 +1,7 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-lg);
+  gap: clamp(2rem, 4vw, 3.5rem);
   width: 100%;
 }
 
@@ -21,6 +21,23 @@
   line-height: var(--typo-title-md-line-height);
 }
 
+.sectionEyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--action-primary);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.emptyState {
+  margin: 0;
+  padding: 1.25rem;
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-component-card);
+  color: var(--content-muted);
+  line-height: 1.6;
+}
+
 .seeAllLink {
   font-size: 13.5px;
   font-weight: 600;
@@ -38,8 +55,22 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-sm);
+  gap: clamp(2rem, 4vw, 3.25rem);
   width: 100%;
+}
+
+.restRail {
+  display: flex;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  min-width: 0;
+  overflow-x: auto;
+  padding: 0.35rem 0.1rem 1.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-primary) transparent;
+}
+
+.restRail > * {
+  flex: 0 0 min(19rem, 78vw);
 }
 
 /* Skeleton Styles */
@@ -82,4 +113,3 @@
     animation: none;
   }
 }
-
