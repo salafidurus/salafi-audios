@@ -58,6 +58,14 @@
   text-overflow: ellipsis;
 }
 
+.scholar {
+  overflow: hidden;
+  color: var(--content-muted);
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .meta {
   font-size: 11.5px;
   color: var(--content-muted);

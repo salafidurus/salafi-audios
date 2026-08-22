@@ -22,6 +22,7 @@ type LectureRowProps = {
 export function LectureRow({
   title,
   category,
+  scholarName,
   scholarImageUrl,
   listingArtwork,
   duration,
@@ -52,6 +53,7 @@ export function LectureRow({
         </span>
         <span className={styles.info}>
           <span className={styles.title}>{title}</span>
+          {scholarName ? <span className={styles.scholar}>{scholarName}</span> : null}
           {metaText ? <span className={styles.meta}>{metaText}</span> : null}
         </span>
         <span className={styles.chevron}>
