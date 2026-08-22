@@ -8,6 +8,26 @@ not an authority in its own right.
 
 ## 2. Structure
 
+### Workspace vocabulary
+
+The web client has two presentation workspaces over the same authenticated
+identity:
+
+- **Public workspace**: discovery, listening continuity, Library, account, and
+  support surfaces.
+- **Admin workspace**: editorial, catalog, user-access, and operational
+  surfaces available to Users with backend-recognized administrative access.
+
+The workspace boundary is a navigation and orientation boundary, not a
+security boundary. The API remains authoritative for every protected route and
+action. A User may enter the Admin workspace while still seeing only the
+sections allowed by their capabilities and scope.
+
+Explore filter preferences may persist in browser storage until explicitly
+cleared. Persistence is scoped by route and locale, and by User identity when a
+filter affects authenticated state. The client must provide a visible clear-all
+action and must not let one User inherit another User's preferences.
+
 ### Layered Structure
 
 - **Composition (`apps/web/src/app`)**: App Router routes, layouts, metadata, and route-level composition.
