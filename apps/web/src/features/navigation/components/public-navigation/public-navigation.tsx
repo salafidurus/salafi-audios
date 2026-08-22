@@ -5,6 +5,7 @@ import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
 import clsx from "clsx";
 import {
   Bookmark,
+  ArrowLeftRight,
   ChevronDown,
   Compass,
   GraduationCap,
@@ -60,12 +61,21 @@ function getPublicNavItems(t: (key: string, fallback: string) => string): Public
 
 function SearchControl() {
   const { t } = useTranslation();
+  const router = useRouter();
+  const label = t("navigation.searchAnything", "Search anything");
 
   return (
-    <Link href={routes.search} className={styles.searchControl}>
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className={styles.searchControl}
+      aria-label={label}
+      onClick={() => router.push(routes.search)}
+    >
       <Search aria-hidden="true" size={16} />
-      <span>{t("navigation.searchAnything", "Search anything")}</span>
-    </Link>
+      <span>{label}</span>
+    </Button>
   );
 }
 
@@ -80,12 +90,13 @@ function WorkspaceSwitch({
   const href = isAdminWorkspace ? routes.home : routes.admin.index;
   const label = isAdminWorkspace
     ? t("navigation.backToApp", "Back to app")
-    : t("navigation.adminWorkspace", "Admin workspace");
+    : t("navigation.adminDashboard", "Admin Dashboard");
 
   if (!isAdminWorkspace && !hasAdminAccess) return null;
 
   return (
     <Link href={href} className={styles.workspaceSwitch}>
+      <ArrowLeftRight aria-hidden="true" size={16} />
       {label}
     </Link>
   );
@@ -197,10 +208,10 @@ function AccountMenu() {
         className={clsx(styles.accountControl, styles.accountTrigger)}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        aria-label={t("navigation.account", "Account")}
+        aria-label={`${t("navigation.account", "Account")}: ${user.name || user.email}`}
         onClick={() => setIsOpen((open) => !open)}
       >
-        <Avatar size="sm" aria-hidden="true">
+        <Avatar size="default" aria-hidden="true">
           {user.image ? <AvatarImage src={user.image} alt="" /> : null}
           <AvatarFallback>{userInitial}</AvatarFallback>
         </Avatar>
@@ -304,12 +315,12 @@ export function PublicNavigation() {
             </Sheet>
           </div>
         ) : (
-          <>
+          <div className={styles.actions}>
             <NavigationLinks items={items} pathname={pathname} ariaLabel={mainNavLabel} />
             <SearchControl />
             <AccountMenu />
             <WorkspaceSwitch isAdminWorkspace={isAdminWorkspace} hasAdminAccess={hasAdminAccess} />
-          </>
+          </div>
         )}
       </div>
     </header>

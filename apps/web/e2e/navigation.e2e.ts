@@ -8,6 +8,13 @@ test.describe("Navigation — public workspace & routing", () => {
       await page.goto("/");
       await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
       await expect(page.getByTestId("sidebar")).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Search anything" })).toBeVisible();
+    });
+
+    test("search trigger navigates to the search page", async ({ page }) => {
+      await page.goto("/");
+      await page.getByRole("button", { name: "Search anything" }).click();
+      await expect(page).toHaveURL(/\/search/);
     });
 
     test("brand link navigates to home", async ({ page }) => {

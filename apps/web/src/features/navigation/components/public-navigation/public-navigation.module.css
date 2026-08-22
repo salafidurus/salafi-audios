@@ -14,8 +14,8 @@
   width: min(100%, 90rem);
   min-height: 4.5rem;
   margin-inline: auto;
-  gap: var(--space-component-gap-md);
-  padding: var(--space-component-gap-sm) var(--space-component-gap-md);
+  gap: var(--space-component-gap-lg);
+  padding: var(--space-component-gap-sm) var(--space-component-gap-lg);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-component-panel);
   background: color-mix(in srgb, var(--surface-default) 96%, transparent);
@@ -62,12 +62,20 @@
   letter-spacing: 0.06em;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: var(--space-component-gap-lg);
+}
+
 .nav {
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 1;
-  gap: var(--space-xs);
+  gap: var(--space-component-gap-sm);
   min-width: 0;
 }
 
@@ -90,7 +98,9 @@
 }
 
 .navLink {
-  padding: var(--space-sm) var(--space-md);
+  position: relative;
+  min-height: 2.75rem;
+  padding: var(--space-sm) var(--space-md) calc(var(--space-sm) + var(--space-xs));
   white-space: nowrap;
 }
 
@@ -103,9 +113,19 @@
 }
 
 .active {
+  position: relative;
   color: var(--action-primary);
-  background: var(--surface-subtle);
   font-weight: 600;
+}
+
+.active::after {
+  position: absolute;
+  inset-inline: var(--space-md);
+  inset-block-end: 0;
+  height: 2px;
+  border-radius: var(--radius-scale-full);
+  background: var(--action-primary);
+  content: "";
 }
 
 .navLink > svg {
@@ -120,7 +140,7 @@
   justify-content: center;
   flex: 0 0 auto;
   gap: var(--space-sm);
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: var(--space-sm) var(--space-md);
   border: 1px solid transparent;
   border-radius: var(--radius-component-chip);
@@ -136,7 +156,8 @@
 }
 
 .searchControl {
-  width: clamp(15rem, 22vw, 19rem);
+  width: clamp(16rem, 24vw, 20rem);
+  min-width: 16rem;
   justify-content: flex-start;
   border-color: var(--input-border-rest);
   border-radius: var(--radius-scale-full);
@@ -149,6 +170,13 @@
   color: var(--content-strong);
   background: var(--input-surface-focus);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-focus-ring) 24%, transparent);
+}
+
+.searchControl:active,
+.accountMenu .accountControl:active,
+.workspaceSwitch:active,
+.navLink:active {
+  background: var(--surface-subtle);
 }
 
 .accountMenu .accountControl {
@@ -165,6 +193,14 @@
   background: var(--surface-hover);
 }
 
+.accountTrigger > svg {
+  transition: transform 150ms ease;
+}
+
+.accountTrigger[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+
 .workspaceSwitch {
   border-color: var(--border-default);
   color: var(--content-default);
@@ -177,6 +213,14 @@
   border-color: var(--border-hover);
   color: var(--content-strong);
   background: var(--surface-hover);
+}
+
+.searchControl:focus-visible,
+.accountMenu .accountControl:focus-visible,
+.workspaceSwitch:focus-visible,
+.navLink:focus-visible {
+  outline: 2px solid var(--accent-focus-ring);
+  outline-offset: 2px;
 }
 
 .accountMenu {
@@ -273,12 +317,17 @@
     gap: var(--space-component-gap-sm);
   }
 
+  .actions {
+    gap: var(--space-component-gap-md);
+  }
+
   .navLink {
     padding-inline: var(--space-sm);
   }
 
   .searchControl {
-    width: 15rem;
+    width: 16rem;
+    min-width: 14rem;
   }
 }
 

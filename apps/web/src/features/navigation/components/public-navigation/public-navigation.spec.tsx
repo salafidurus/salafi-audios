@@ -27,10 +27,11 @@ vi.mock("@/core/i18n/use-translation", () => ({
 }));
 
 const mockUsePathname = vi.fn(() => "/");
+const mockRouterPush = vi.fn();
 
 vi.mock("next/navigation", () => ({
   usePathname: mockUsePathname,
-  useRouter: vi.fn(() => ({ push: vi.fn() })),
+  useRouter: vi.fn(() => ({ push: mockRouterPush })),
 }));
 
 vi.mock("@/shared/hooks/use-responsive", () => ({
@@ -71,6 +72,7 @@ vi.mock("next/link", () => ({
 describe("PublicNavigation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRouterPush.mockReset();
     mockUsePathname.mockReturnValue("/");
     (useResponsive as Mock<any>).mockReturnValue({ isMobile: false, isTablet: false, isWeb: true });
     (useAuth as Mock<any>).mockReturnValue({
@@ -88,12 +90,17 @@ describe("PublicNavigation", () => {
     const mainNavigation = screen.getByRole("navigation", { name: "Main" });
     expect(mainNavigation).toBeInTheDocument();
     expect(within(mainNavigation).queryByRole("link", { name: "Search" })).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Search anything" })).toHaveAttribute(
-      "href",
-      "/search",
-    );
+    expect(screen.getByRole("button", { name: "Search anything" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
     expect(screen.queryByTestId("sidebar")).not.toBeInTheDocument();
+  });
+
+  it("opens search from the search trigger", () => {
+    render(<PublicNavigation />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Search anything" }));
+
+    expect(mockRouterPush).toHaveBeenCalledWith("/search");
   });
 
   it("keeps account controls clear for signed-out visitors", () => {
@@ -103,7 +110,7 @@ describe("PublicNavigation", () => {
     expect(screen.queryByRole("button", { name: "Account" })).not.toBeInTheDocument();
   });
 
-  it("exposes Admin workspace only when backend-derived access exists", () => {
+  it("exposes Admin Dashboard only when backend-derived access exists", () => {
     (useAuth as Mock<any>).mockReturnValue({
       isAuthenticated: true,
       isLoading: false,
@@ -115,9 +122,9 @@ describe("PublicNavigation", () => {
 
     render(<PublicNavigation />);
 
-    expect(screen.getByRole("button", { name: "Account" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Admin workspace" })).toHaveAttribute("href", "/admin");
-    fireEvent.click(screen.getByRole("button", { name: "Account" }));
+    expect(screen.getByRole("button", { name: "Account: Admin User" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Admin Dashboard" })).toHaveAttribute("href", "/admin");
+    fireEvent.click(screen.getByRole("button", { name: "Account: Admin User" }));
     fireEvent.click(screen.getByRole("menuitem", { name: "Sign Out" }));
     expect(
       screen.getByRole("heading", { name: "Are you sure you want to sign out?" }),
