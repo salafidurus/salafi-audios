@@ -1,7 +1,7 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-lg);
+  gap: clamp(2rem, 4vw, 3.5rem);
   width: 100%;
 }
 
@@ -55,16 +55,16 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-sm);
+  gap: clamp(2rem, 4vw, 3.25rem);
   width: 100%;
 }
 
 .restRail {
   display: flex;
-  gap: var(--space-component-gap-sm);
+  gap: clamp(1.25rem, 2.5vw, 2rem);
   min-width: 0;
   overflow-x: auto;
-  padding: 0.1rem 0.1rem 0.75rem;
+  padding: 0.35rem 0.1rem 1.25rem;
   scrollbar-width: thin;
   scrollbar-color: var(--border-primary) transparent;
 }
