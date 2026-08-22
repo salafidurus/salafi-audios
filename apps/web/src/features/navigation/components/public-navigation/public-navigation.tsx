@@ -9,6 +9,7 @@ import {
   Compass,
   GraduationCap,
   Home,
+  BarChart3,
   Menu,
   Search,
   Settings2,
@@ -22,7 +23,7 @@ import { useState } from "react";
 import { authClient, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { LanguageSwitch } from "@/features/settings";
-import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import {
@@ -46,7 +47,6 @@ type PublicNavItem = {
 function getPublicNavItems(t: (key: string, fallback: string) => string): PublicNavItem[] {
   return [
     { label: t("navigation.home", "Home"), href: routes.home, Icon: Home },
-    { label: t("authStrip.search", "Search"), href: routes.search, Icon: Search },
     { label: t("navigation.explore", "Explore"), href: routes.explore.index, Icon: Compass },
     {
       label: t("navigation.scholars", "Scholars"),
@@ -55,6 +55,35 @@ function getPublicNavItems(t: (key: string, fallback: string) => string): Public
     },
     { label: t("navigation.library", "Library"), href: routes.library.index, Icon: Bookmark },
     { label: t("navigation.settings", "Settings"), href: routes.settings.index, Icon: Settings2 },
+  ];
+}
+
+function SearchControl() {
+  const { t } = useTranslation();
+
+  return (
+    <Link href={routes.search} className={styles.searchControl}>
+      <Search aria-hidden="true" size={16} />
+      {t("authStrip.search", "Search")}
+    </Link>
+  );
+}
+
+function getAdminNavItems(t: (key: string, fallback: string) => string): PublicNavItem[] {
+  return [
+    { label: t("navigation.admin.home", "Dashboard"), href: routes.admin.index, Icon: Home },
+    { label: t("navigation.admin.stats", "Stats"), href: routes.admin.stats, Icon: BarChart3 },
+    {
+      label: t("navigation.admin.scholars", "Scholars"),
+      href: routes.admin.scholars,
+      Icon: GraduationCap,
+    },
+    {
+      label: t("navigation.admin.contents", "Contents"),
+      href: routes.admin.contents,
+      Icon: Bookmark,
+    },
+    { label: t("navigation.admin.users", "Users"), href: routes.admin.users, Icon: Settings2 },
   ];
 }
 
@@ -119,7 +148,7 @@ function AccountMenu({ hasAdminAccess }: { hasAdminAccess: boolean }) {
 
   if (!isAuthenticated || !user) {
     return (
-      <Link href={routes.signIn} className={styles.signInLink}>
+      <Link href={routes.signIn} className={styles.accountControl}>
         {t("authStrip.signIn", "Sign In")}
       </Link>
     );
@@ -141,15 +170,16 @@ function AccountMenu({ hasAdminAccess }: { hasAdminAccess: boolean }) {
     <div className={styles.accountMenu}>
       <Button
         type="button"
-        variant="surface"
+        variant="ghost"
         size="sm"
-        className={styles.accountTrigger}
+        className={clsx(styles.accountControl, styles.accountTrigger)}
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label={t("navigation.account", "Account")}
         onClick={() => setIsOpen((open) => !open)}
       >
         <Avatar size="sm" aria-hidden="true">
+          {user.image ? <AvatarImage src={user.image} alt="" /> : null}
           <AvatarFallback>{userInitial}</AvatarFallback>
         </Avatar>
         <span className={styles.accountName}>{user.name || user.email}</span>
@@ -203,7 +233,9 @@ export function PublicNavigation() {
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
-  const items = getPublicNavItems(t);
+  const isAdminWorkspace =
+    pathname === routes.admin.index || pathname.startsWith(`${routes.admin.index}/`);
+  const items = isAdminWorkspace ? getAdminNavItems(t) : getPublicNavItems(t);
   const mainNavLabel = t("navigation.mainNav", "Main");
   const hasAdminAccess = isAuthenticated && hasAnyAdminAccess(ability);
 
@@ -214,16 +246,19 @@ export function PublicNavigation() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <Link
-          href={routes.home}
+          href={isAdminWorkspace ? routes.admin.index : routes.home}
           className={styles.brand}
           aria-label={t("navigation.siteTitle", "Salafi Durus")}
         >
-          <Image src="/logo/logo_72.png" alt="" width={30} height={30} priority />
+          <span className={styles.brandMark}>
+            <Image src="/logo/logo_72.png" alt="" width={30} height={30} priority />
+          </span>
           <span>{t("navigation.siteTitle", "Salafi Durus")}</span>
         </Link>
 
         {isCompact ? (
           <div className={styles.mobileActions}>
+            <SearchControl />
             <AccountMenu hasAdminAccess={hasAdminAccess} />
             <Sheet>
               <SheetTrigger asChild>
@@ -236,6 +271,11 @@ export function PublicNavigation() {
                   <SheetTitle>{t("navigation.siteTitle", "Salafi Durus")}</SheetTitle>
                   <LanguageSwitch direction="down" />
                 </SheetHeader>
+                {isAdminWorkspace && (
+                  <Link className={styles.backToApp} href={routes.home}>
+                    {t("navigation.backToApp", "Back to app")}
+                  </Link>
+                )}
                 <NavigationLinks
                   items={items}
                   pathname={pathname}
@@ -247,7 +287,13 @@ export function PublicNavigation() {
           </div>
         ) : (
           <>
+            {isAdminWorkspace && (
+              <Link className={styles.backToApp} href={routes.home}>
+                {t("navigation.backToApp", "Back to app")}
+              </Link>
+            )}
             <NavigationLinks items={items} pathname={pathname} ariaLabel={mainNavLabel} />
+            <SearchControl />
             <AccountMenu hasAdminAccess={hasAdminAccess} />
           </>
         )}

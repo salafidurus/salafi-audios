@@ -1,6 +1,6 @@
 import { createMongoAbility } from "@casl/ability";
 import { useAbility } from "@sd/domain-account";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi, type Mock } from "bun:test";
 import React from "react";
 
@@ -26,8 +26,10 @@ vi.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 
+const mockUsePathname = vi.fn(() => "/");
+
 vi.mock("next/navigation", () => ({
-  usePathname: vi.fn(() => "/"),
+  usePathname: mockUsePathname,
   useRouter: vi.fn(() => ({ push: vi.fn() })),
 }));
 
@@ -39,14 +41,37 @@ vi.mock("@/features/settings", () => ({
   LanguageSwitch: () => <button type="button">Language</button>,
 }));
 
-vi.mock("next/image", () => ({ default: () => <span aria-hidden="true" /> }));
+vi.mock("@/shared/components/ui/avatar", () => ({
+  Avatar: ({ children }: React.PropsWithChildren) => <span>{children}</span>,
+  AvatarImage: ({ src, alt }: { src: string; alt: string }) => (
+    <img data-testid="avatar-image" src={src} alt={alt} />
+  ),
+  AvatarFallback: ({ children }: React.PropsWithChildren) => <span>{children}</span>,
+}));
+
+vi.mock("next/image", () => ({
+  default: ({
+    alt,
+    priority: _priority,
+    ...props
+  }: React.ComponentProps<"img"> & {
+    priority?: boolean;
+  }) => <img alt={alt ?? ""} {...props} />,
+}));
 vi.mock("next/link", () => ({
-  default: ({ children, ...props }: React.ComponentProps<"a">) => <a {...props}>{children}</a>,
+  default: React.forwardRef<HTMLAnchorElement, React.ComponentProps<"a">>(
+    ({ children, ...props }, ref) => (
+      <a ref={ref} {...props}>
+        {children}
+      </a>
+    ),
+  ),
 }));
 
 describe("PublicNavigation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUsePathname.mockReturnValue("/");
     (useResponsive as Mock<any>).mockReturnValue({ isMobile: false, isTablet: false, isWeb: true });
     (useAuth as Mock<any>).mockReturnValue({
       isAuthenticated: false,
@@ -60,7 +85,10 @@ describe("PublicNavigation", () => {
     render(<PublicNavigation />);
 
     expect(screen.getByRole("banner")).toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: "Main" })).toBeInTheDocument();
+    const mainNavigation = screen.getByRole("navigation", { name: "Main" });
+    expect(mainNavigation).toBeInTheDocument();
+    expect(within(mainNavigation).queryByRole("link", { name: "Search" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Search" })).toHaveAttribute("href", "/search");
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
     expect(screen.queryByTestId("sidebar")).not.toBeInTheDocument();
   });
@@ -96,6 +124,25 @@ describe("PublicNavigation", () => {
     ).toBeInTheDocument();
   });
 
+  it("uses the authenticated user's avatar image when available", () => {
+    (useAuth as Mock<any>).mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: {
+        name: "Reader User",
+        email: "reader@example.com",
+        image: "https://example.com/avatar.png",
+      },
+    });
+
+    render(<PublicNavigation />);
+
+    expect(screen.getByTestId("avatar-image")).toHaveAttribute(
+      "src",
+      "https://example.com/avatar.png",
+    );
+  });
+
   it("uses a mobile Sheet for the same public destinations", () => {
     (useResponsive as Mock<any>).mockReturnValue({ isMobile: true, isTablet: false, isWeb: false });
 
@@ -105,5 +152,25 @@ describe("PublicNavigation", () => {
     fireEvent.click(screen.getByRole("button", { name: "Main" }));
     expect(screen.getByRole("navigation", { name: "Main" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
+  });
+
+  it("switches to the admin workspace navigation with a back-to-app link", () => {
+    mockUsePathname.mockReturnValue("/admin/contents");
+    (useAuth as Mock<any>).mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { name: "Admin User", email: "admin@example.com" },
+    });
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Listing" }]),
+    });
+
+    render(<PublicNavigation />);
+
+    expect(screen.getByRole("link", { name: "Back to app" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Contents" })).toHaveAttribute(
+      "href",
+      "/admin/contents",
+    );
   });
 });

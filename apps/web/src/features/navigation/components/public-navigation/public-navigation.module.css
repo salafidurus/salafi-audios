@@ -1,15 +1,19 @@
 .header {
-  position: relative;
+  position: sticky;
+  inset-block-start: 0;
   z-index: 20;
   flex: 0 0 auto;
   border-bottom: 1px solid var(--border-subtle);
-  background: color-mix(in srgb, var(--surface-default) 94%, transparent);
-  backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--surface-canvas) 94%, transparent);
+  backdrop-filter: blur(12px);
 }
 
 .inner {
   display: flex;
   align-items: center;
+  width: min(var(--space-layout-content-max), 100%);
+  min-height: 4rem;
+  margin-inline: auto;
   gap: var(--space-component-gap-md);
   padding: var(--space-component-gap-sm) var(--space-layout-page-x);
 }
@@ -20,13 +24,20 @@
   flex: 0 0 auto;
   gap: var(--space-sm);
   color: var(--content-strong);
-  font-family: var(--typo-title-md-font-family), serif;
+  font-family: var(--font-display), serif;
   font-size: var(--typo-title-md-font-size);
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
 }
 
-.brand img {
+.brandMark {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+}
+
+.brandMark img {
   object-fit: contain;
 }
 
@@ -35,11 +46,11 @@
   align-items: center;
   justify-content: center;
   flex: 1;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
+  padding: 0;
 }
 
 .navLink,
-.signInLink,
 .accountPopover a,
 .accountPopover button {
   display: inline-flex;
@@ -56,8 +67,38 @@
     background-color 150ms ease;
 }
 
+.searchControl,
+.accountControl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  gap: var(--space-sm);
+  min-height: 2.25rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-component-chip);
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.searchControl:hover,
+.searchControl:focus-visible,
+.accountControl:hover,
+.accountControl:focus-visible {
+  border-color: var(--border-subtle);
+  color: var(--content-strong);
+  background: var(--surface-hover);
+}
+
 .navLink {
-  padding: var(--space-component-gap-sm) var(--space-component-gap-md);
+  padding: var(--space-sm) var(--space-md);
   white-space: nowrap;
 }
 
@@ -70,8 +111,37 @@
 }
 
 .active {
-  color: var(--content-strong);
+  color: var(--action-primary);
+  background: var(--surface-subtle);
   font-weight: 600;
+}
+
+.navLink > svg {
+  display: none;
+}
+
+.backToApp {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: var(--space-component-gap-sm) var(--space-component-gap-md);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-panel);
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.backToApp:hover,
+.backToApp:focus-visible {
+  border-color: var(--border-hover);
+  color: var(--content-strong);
+  background: var(--surface-hover);
 }
 
 .accountMenu {
@@ -134,20 +204,6 @@
   background: var(--surface-subtle);
 }
 
-.signInLink {
-  padding: var(--space-component-gap-sm) var(--space-component-gap-md);
-  color: var(--content-on-primary);
-  background: var(--action-primary);
-  font-size: var(--typo-body-sm-font-size);
-  font-weight: 600;
-}
-
-.signInLink:hover,
-.signInLink:focus-visible {
-  color: var(--content-on-primary);
-  background: color-mix(in srgb, var(--action-primary) 88%, var(--surface-default));
-}
-
 .mobileActions {
   display: flex;
   align-items: center;
@@ -155,25 +211,46 @@
   margin-inline-start: auto;
 }
 
+.mobileActions > :global(button),
+.mobileActions > :global(a) {
+  min-height: 2.75rem;
+}
+
 .sheet .nav {
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
   padding: 0 var(--space-layout-page-x);
+  border: 0;
+  background: transparent;
 }
 
 .sheet .navLink {
   width: 100%;
   padding: var(--space-component-gap-md);
+  border-radius: var(--radius-component-panel);
+}
+
+.sheet .navLink > svg {
+  display: block;
+}
+
+.sheet .backToApp {
+  margin: 0 var(--space-layout-page-x) var(--space-component-gap-sm);
 }
 
 @media (max-width: 900px) {
   .inner {
+    min-height: 3.75rem;
     padding-block: var(--space-component-gap-sm);
   }
 
+  .nav {
+    gap: 0;
+  }
+
   .navLink {
-    padding-inline: var(--space-component-gap-xs);
+    padding-inline: var(--space-component-gap-sm);
     font-size: var(--typo-body-sm-font-size);
   }
 
@@ -185,5 +262,14 @@
 @media (max-width: 640px) {
   .inner {
     padding-inline: var(--space-layout-page-x);
+  }
+
+  .brand {
+    font-size: var(--typo-body-lg-font-size);
+  }
+
+  .brandMark {
+    width: 1.75rem;
+    height: 1.75rem;
   }
 }
