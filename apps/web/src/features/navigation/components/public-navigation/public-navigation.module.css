@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 9rem;
+  min-height: 7.2rem;
   gap: var(--space-component-gap-lg);
   padding: var(--space-component-gap-sm) var(--space-layout-page-x);
   border-block: 1px solid var(--border-subtle);
@@ -107,7 +107,7 @@
   position: relative;
   min-height: 3rem;
   padding: var(--space-sm) var(--space-md) calc(var(--space-sm) + var(--space-xs));
-  font-size: var(--typo-body-lg-font-size);
+  font-size: calc(var(--typo-body-lg-font-size) + var(--space-scale-xs));
   white-space: nowrap;
 }
 
@@ -152,7 +152,7 @@
   border: 1px solid transparent;
   border-radius: var(--radius-component-chip);
   color: var(--content-muted);
-  font-size: var(--typo-body-sm-font-size);
+  font-size: var(--typo-body-md-font-size);
   font-weight: 600;
   text-decoration: none;
   transition:
