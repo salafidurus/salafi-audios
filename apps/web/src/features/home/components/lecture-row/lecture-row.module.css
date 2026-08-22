@@ -31,15 +31,14 @@
 }
 
 .iconWrap {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   flex-shrink: 0;
-  background: color-mix(in srgb, var(--action-primary) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--action-primary) 20%, transparent);
 }
 
 .info {

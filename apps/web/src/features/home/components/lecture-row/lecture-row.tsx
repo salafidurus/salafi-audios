@@ -1,4 +1,6 @@
-import { BookOpen, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+
+import { AppAvatar } from "@/shared/components/app-avatar";
 
 import { SanadChain } from "../sanad-chain/sanad-chain";
 import styles from "./lecture-row.module.css";
@@ -8,6 +10,8 @@ type LectureRowProps = {
   category: string;
   scholarName: string;
   scholarSlug?: string;
+  scholarImageUrl?: string | null;
+  listingArtwork?: string | null;
   duration: string;
   totalLessons: number;
   progress?: number;
@@ -18,6 +22,8 @@ type LectureRowProps = {
 export function LectureRow({
   title,
   category,
+  scholarImageUrl,
+  listingArtwork,
   duration,
   totalLessons,
   progress = 0,
@@ -37,7 +43,12 @@ export function LectureRow({
     <div className={`${styles.row} ${className ?? ""}`}>
       <button type="button" onClick={onClick} className={styles.main}>
         <span className={styles.iconWrap}>
-          <BookOpen size={17} color="var(--action-primary)" strokeWidth={1.5} />
+          <AppAvatar
+            listingArtwork={listingArtwork}
+            scholarImageUrl={scholarImageUrl}
+            text={title}
+            fill
+          />
         </span>
         <span className={styles.info}>
           <span className={styles.title}>{title}</span>

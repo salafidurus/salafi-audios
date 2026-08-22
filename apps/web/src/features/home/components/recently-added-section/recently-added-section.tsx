@@ -131,6 +131,8 @@ function RecentlyAddedSectionContent({
                 category={item.kind}
                 scholarName={item.scholarName}
                 scholarSlug={item.scholarSlug}
+                scholarImageUrl={item.scholarImageUrl}
+                listingArtwork={item.thumbnailUrl}
                 duration={
                   item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""
                 }
