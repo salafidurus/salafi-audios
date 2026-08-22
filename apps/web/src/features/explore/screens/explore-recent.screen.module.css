@@ -62,18 +62,6 @@
   color: var(--content-muted);
 }
 
-.loading {
-  padding: var(--space-component-gap-xl) var(--space-component-gap-md);
-  text-align: center;
-  color: var(--content-muted);
-}
-
-.empty {
-  padding: var(--space-component-gap-xl) var(--space-component-gap-md);
-  text-align: center;
-  color: var(--content-muted);
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

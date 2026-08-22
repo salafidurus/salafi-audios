@@ -5,6 +5,7 @@ import { XIcon } from "lucide-react";
 import { Search } from "@/shared/components/Search";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import { FieldGroup } from "@/shared/components/ui/field";
 import {
   Sheet,
   SheetContent,
@@ -139,7 +140,7 @@ export function ExploreFilterToolbar({
     <search className={styles.toolbar} aria-label={activeFiltersLabel}>
       <Search.Bar placeholder={searchPlaceholder} value={query} onChange={onQueryChange} />
       {isDesktop ? (
-        <div className={styles.filters}>{filterFields}</div>
+        <FieldGroup className={styles.filters}>{filterFields}</FieldGroup>
       ) : (
         <Sheet>
           <SheetTrigger asChild>
@@ -151,7 +152,7 @@ export function ExploreFilterToolbar({
             <SheetHeader>
               <SheetTitle>{filtersLabel}</SheetTitle>
             </SheetHeader>
-            <div className={styles.mobileFilterFields}>{filterFields}</div>
+            <FieldGroup className={styles.mobileFilterFields}>{filterFields}</FieldGroup>
           </SheetContent>
         </Sheet>
       )}
@@ -171,7 +172,7 @@ export function ExploreFilterToolbar({
                 aria-label={`${removeFilterLabel}: ${summary.label}`}
                 onClick={() => onClearFilter(summary.key)}
               >
-                <XIcon aria-hidden="true" />
+                <XIcon aria-hidden="true" data-icon="inline-start" />
               </Button>
             </Badge>
           ))

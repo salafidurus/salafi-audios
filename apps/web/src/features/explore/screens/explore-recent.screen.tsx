@@ -17,6 +17,8 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { Button } from "@/shared/components/ui/button";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/shared/components/ui/empty";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 import { useResponsive } from "@/shared/hooks/use-responsive";
@@ -309,22 +311,23 @@ export function FeedRecentScreen({
       body = (
         <div className={styles.state} role="alert">
           <span>{getErrorStateText("feed", t)}</span>
-          <button
-            type="button"
-            className={`${styles.button} ${styles.retryButton}`}
-            onClick={() => refetchSearch()}
-          >
+          <Button type="button" variant="outline" size="sm" onClick={() => refetchSearch()}>
             {t("feed.retry", "Try Again")}
-          </button>
+          </Button>
         </div>
       );
     } else if (isSearchLoading) {
       body = <FeedSkeleton />;
     } else if (searchItems.length === 0) {
       body = (
-        <p className={styles.empty}>
-          {t("explore.noContent", "No listings found matching your filters.")}
-        </p>
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>{t("explore.noResultsTitle", "No listings found")}</EmptyTitle>
+            <EmptyDescription>
+              {t("explore.noContent", "No listings found matching your filters.")}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       );
     } else {
       body = (
@@ -353,20 +356,23 @@ export function FeedRecentScreen({
     body = (
       <div className={styles.state} role="alert">
         <span>{getErrorStateText("feed", t)}</span>
-        <button
-          type="button"
-          className={`${styles.button} ${styles.retryButton}`}
-          onClick={() => refetchRecent()}
-        >
+        <Button type="button" variant="outline" size="sm" onClick={() => refetchRecent()}>
           {t("feed.retry", "Try Again")}
-        </button>
+        </Button>
       </div>
     );
   } else if (isRecentFetching && recentItems.length === 0) {
     body = <FeedSkeleton />;
   } else if (recentItems.length === 0) {
     body = (
-      <p className={styles.empty}>{t("explore.noContent", "No content yet. Check back soon.")}</p>
+      <Empty>
+        <EmptyHeader>
+          <EmptyTitle>{t("explore.noContentTitle", "No content yet")}</EmptyTitle>
+          <EmptyDescription>
+            {t("explore.noContent", "No content yet. Check back soon.")}
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     );
   } else {
     // Render Recent items using Grid Cards!
