@@ -52,7 +52,7 @@ function ModalTabs({ children, errorTabs = [] }: { children?: ReactNode; errorTa
 function ModalContentItem(_props: ModalContentProps) { return null; }
 function ModalContent({ children }: { children?: ReactNode }) {
   const items = Children.toArray(children).filter(isModalContentItem);
-  return <>{items.map((item) => <TabsContent key={item.props.id} value={item.props.id}>{item.props.children}</TabsContent>)}</>;
+  return <>{items.map((item) => <TabsContent key={item.props.id} value={item.props.id} forceMount>{item.props.children}</TabsContent>)}</>;
 }
 
 function Modal({ isOpen, onClose, title, children, footer, size = "md", width = "standard", hideFooter, footerAlignment = "right", footerBorder = true, loading, multiTab = false, requireReview = false, activeTab: controlledActiveTab, onActiveTabChange, defaultActiveTab = "en", reviewTabId = "review", saveFormId, saving = false, saveLabel, savingLabel, reviewLabel, cancelLabel }: ModalProps) {
@@ -66,7 +66,7 @@ function Modal({ isOpen, onClose, title, children, footer, size = "md", width = 
   return <Dialog open={isOpen} onOpenChange={(open) => !open && !loading && onClose()}>
     <DialogContent className={maxWidth} data-size={size}>
       {title && <ModalHeader>{title}</ModalHeader>}
-      <DialogDescription className="sr-only">{title ?? "Dialog"}</DialogDescription>
+      <DialogDescription className="sr-only">Dialog content</DialogDescription>
       {content}
       {!hideFooter && (requireReview ? <ModalFooter alignment={footerAlignment} border={footerBorder}>
         <Button variant="outline" size="sm" onClick={onClose} disabled={loading || saving}>{cancelLabel ?? t("common.cancel", "Cancel")}</Button>
@@ -84,7 +84,7 @@ function ModalConfirmDialog({ isOpen, onClose, onConfirm, title, confirmLabel = 
 
 function ModalConfirmText({ isOpen, onClose, onConfirm, title, message, confirmLabel, confirmVariant = "default", confirmWord, loading = false, testId, modalTestId, cancelTestId }: { isOpen: boolean; onClose: () => void; onConfirm: () => void | Promise<void>; title: string; message: string; confirmLabel: string; confirmVariant?: "default" | "danger"; confirmWord: string; loading?: boolean; testId?: string; modalTestId?: string; cancelTestId?: string }) {
   const [inputValue, setInputValue] = useState(""); const valid = inputValue === confirmWord && !loading;
-  return <div data-testid={modalTestId}><Modal isOpen={isOpen} onClose={onClose} title={title} loading={loading} footer={<><Button variant="outline" size="sm" onClick={onClose} disabled={loading} data-testid={cancelTestId}>Cancel</Button><Button variant={confirmVariant === "danger" ? "danger" : "primary"} size="sm" onClick={onConfirm} disabled={!valid} data-testid={testId}>{confirmLabel}</Button></>}><ModalBody><p>{message}</p><label className="mt-4 block text-sm" htmlFor="confirm-text-input">Type <strong>{confirmWord}</strong> to confirm</label><input id="confirm-text-input" className="mt-2 min-h-12 w-full rounded-lg border bg-background px-3" value={inputValue} onChange={(event) => setInputValue(event.target.value)} disabled={loading} /></ModalBody></Modal></div>;
+  return <div data-testid={modalTestId}><Modal isOpen={isOpen} onClose={onClose} title={title} loading={loading} footer={<><Button variant="outline" size="sm" onClick={onClose} disabled={loading} data-testid={cancelTestId}>Cancel</Button><Button variant={confirmVariant === "danger" ? "danger" : "primary"} size="sm" onClick={onConfirm} disabled={!valid} data-testid={testId}>{confirmLabel}</Button></>}><ModalBody><p>{message}</p><label className="mt-4 block text-sm" htmlFor="confirm-text-input">Type <strong>{confirmWord}</strong> to confirm</label><input id="confirm-text-input" className="mt-2 min-h-12 w-full rounded-lg border bg-background px-3" placeholder={`Type "${confirmWord}" to confirm`} value={inputValue} onChange={(event) => setInputValue(event.target.value)} disabled={loading} /></ModalBody></Modal></div>;
 }
 
 const ModalWithParts = Object.assign(Modal, { Header: ModalHeader, Body: ModalBody, Footer: ModalFooter, ConfirmDialog: ModalConfirmDialog, ConfirmText: ModalConfirmText, Tabs: ModalTabs, TabItem: ModalTabItem, Content: ModalContent, ContentItem: ModalContentItem });
