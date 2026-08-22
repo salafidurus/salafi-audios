@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Param,
@@ -33,6 +34,7 @@ import type { AbilityInput } from '../../core/auth/ability/ability.types';
 import { subject } from '@casl/ability';
 import { PrismaService } from '../../core/db/prisma.service';
 import { ListingService } from './listing.service';
+import { ListingEditorialService } from './listing-editorial.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDetailsDto } from './dto/update-listing-details.dto';
 import { UpdateListingMediaDto } from './dto/update-listing-media.dto';
@@ -45,6 +47,7 @@ import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 export class AdminListingsController {
   constructor(
     private readonly service: ListingService,
+    private readonly editorial: ListingEditorialService,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -125,7 +128,7 @@ export class AdminListingsController {
     @Body() dto: ArrangeCommitDto,
     @Req() req: { user?: { id: string } },
   ): Promise<ArrangeCommitResultDto> {
-    return this.service.arrangeCommit(id, dto, req.user?.id);
+    return this.editorial.arrange(id, dto, req.user?.id);
   }
 
   @Post()
@@ -147,6 +150,7 @@ export class AdminListingsController {
   async bulkAction(
     @Body() dto: BulkActionDto,
     @CurrentUser() user: AbilityInput,
+    @Req() req: { user?: { id: string } },
   ): Promise<BulkActionResultDto> {
     // The decorator above only confirms the caller has SOME publish/archive
     // capability. Bulk targets multiple listings that may belong to
@@ -168,7 +172,7 @@ export class AdminListingsController {
         );
       }
     }
-    return this.service.bulkAction(dto);
+    return this.editorial.bulkStatus(dto, req.user?.id);
   }
 
   @Put(':id/details')
@@ -193,7 +197,7 @@ export class AdminListingsController {
     @Body() updateDto: UpdateListingMediaDto,
     @Req() req: { user?: { id: string } },
   ): Promise<AdminListingActionDto> {
-    const res = await this.service.updateListingMedia(id, updateDto, req.user?.id);
+    const res = await this.editorial.replace(id, updateDto, req.user?.id);
     return { ...res, message: 'Listing media updated successfully' };
   }
 
@@ -201,8 +205,11 @@ export class AdminListingsController {
   @CheckPolicy('publish', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Publish a listing' })
   @ApiOkResponse({ description: 'Listing published successfully' })
-  async publishListing(@Param('id') id: string): Promise<AdminListingActionDto> {
-    const res = await this.service.publishListing(id);
+  async publishListing(
+    @Param('id') id: string,
+    @Req() req: { user?: { id: string } },
+  ): Promise<AdminListingActionDto> {
+    const res = await this.editorial.publish(id, req.user?.id);
     return { ...res, message: 'Listing published successfully' };
   }
 
@@ -210,8 +217,23 @@ export class AdminListingsController {
   @CheckPolicy('delete', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Archive a listing' })
   @ApiOkResponse({ description: 'Listing archived successfully' })
-  async archiveListing(@Param('id') id: string): Promise<AdminListingActionDto> {
-    const res = await this.service.archiveListing(id);
+  async archiveListing(
+    @Param('id') id: string,
+    @Req() req: { user?: { id: string } },
+  ): Promise<AdminListingActionDto> {
+    const res = await this.editorial.archive(id, req.user?.id);
     return { ...res, message: 'Listing archived successfully' };
+  }
+
+  @Delete(':id')
+  @CheckPolicy('delete', 'Listing', resolveListingScholarId())
+  @ApiOperation({ summary: 'Delete a listing' })
+  @ApiOkResponse({ description: 'Listing deleted successfully' })
+  async deleteListing(
+    @Param('id') id: string,
+    @Req() req: { user?: { id: string } },
+  ): Promise<AdminListingActionDto> {
+    const res = await this.editorial.remove(id, req.user?.id);
+    return { ...res, message: 'Listing deleted successfully' };
   }
 }
