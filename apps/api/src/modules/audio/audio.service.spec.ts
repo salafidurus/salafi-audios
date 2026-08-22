@@ -46,7 +46,7 @@ describe('AudioService', () => {
                 ) => Promise<boolean>
               >(),
             bulkSync: vi.fn<(userId: string, items: any[]) => Promise<void>>(),
-            findListingBySlug: vi.fn<(id: string) => Promise<any>>(),
+            findListingBySlug: vi.fn<(slug: string) => Promise<any>>(),
             findPrimaryAsset: vi.fn<(listingId: string) => Promise<any>>(),
             findFirstAsset: vi.fn<(listingId: string) => Promise<any>>(),
           } satisfies Partial<Mocked<AudioRepository>>,

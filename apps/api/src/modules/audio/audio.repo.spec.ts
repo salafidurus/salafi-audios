@@ -265,13 +265,15 @@ describe('AudioRepository', () => {
   });
 
   describe('findListingBySlug', () => {
-    it('resolves strictly by slug', async () => {
+    it('resolves strictly by slug through the published-only seam', async () => {
       prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
 
       await repo.findListingBySlug('tafsir-al-fatiha');
 
+      // The stream route is public discovery — a draft or archived Listing
+      // must resolve as not found, never by internal-ID compatibility.
       expect(prisma.listing.findFirst).toHaveBeenCalledWith({
-        where: { slug: 'tafsir-al-fatiha' },
+        where: { slug: 'tafsir-al-fatiha', deletedAt: null, status: 'published' },
         select: { id: true, durationSeconds: true },
       });
     });

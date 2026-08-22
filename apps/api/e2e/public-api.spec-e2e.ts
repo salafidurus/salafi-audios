@@ -254,6 +254,9 @@ describe('Public API (e2e)', () => {
       await request(server).get(`/listings/${ARCHIVED_SLUG}`).expect(404);
       await request(server).get(`/listings/${DRAFT_SLUG}/contents`).expect(404);
       await request(server).get(`/listings/${ARCHIVED_SLUG}/contents`).expect(404);
+      // Stream resolution is public discovery too.
+      await request(server).get(`/audio/listings/${DRAFT_SLUG}/stream`).expect(404);
+      await request(server).get(`/audio/listings/${ARCHIVED_SLUG}/stream`).expect(404);
 
       const feed = await request(server).get('/listings/recent').expect(200);
       const feedSlugs = feed.body.items.map((item: { slug: string }) => item.slug);

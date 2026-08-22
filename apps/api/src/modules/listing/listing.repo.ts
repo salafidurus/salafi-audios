@@ -33,6 +33,7 @@ import type {
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
+import { publishedListingSlugWhere } from '../../shared/utils/published-listing-slug-where';
 
 @Injectable()
 export class ListingRepository {
@@ -46,22 +47,12 @@ export class ListingRepository {
     return listing?.id ?? null;
   }
 
-  /**
-   * The public Catalog identity rule: a route value resolves exactly one
-   * Listing, by its public slug, only when that Listing is published and not
-   * deleted. Route values are never matched against internal IDs — an
-   * ID-shaped value simply matches no slug and resolves as not found.
-   */
-  private publishedSlugWhere(slug: string): Prisma.ListingWhereInput {
-    return { slug, deletedAt: null, status: Status.published };
-  }
-
   async findDetailBySlug(slug: string): Promise<ListingDetailDto | null> {
     const locale = getRequestLocale();
 
     const listing = await this.prisma.listing.findFirst({
       where: {
-        ...this.publishedSlugWhere(slug),
+        ...publishedListingSlugWhere(slug),
         scholar: { isActive: true },
       },
       select: {
@@ -284,7 +275,7 @@ export class ListingRepository {
 
     const listing = await this.prisma.listing.findFirst({
       where: {
-        ...this.publishedSlugWhere(slug),
+        ...publishedListingSlugWhere(slug),
         scholar: { isActive: true },
       },
       select: {
@@ -472,7 +463,7 @@ export class ListingRepository {
 
   async findLastPlayedLesson(slug: string, userId: string): Promise<LastPlayedLessonDto | null> {
     const targetListing = await this.prisma.listing.findFirst({
-      where: this.publishedSlugWhere(slug),
+      where: publishedListingSlugWhere(slug),
       select: { id: true },
     });
 
@@ -510,14 +501,18 @@ export class ListingRepository {
     };
   }
 
-  /** Public/HTTP path — the client always supplies the public slug, resolved
-   * through the same published-only identity seam as every Catalog read. */
+  /**
+   * Read-time aggregate of a user's progress across a Listing's playable
+   * leaves, computed on demand from `UserListingProgress` — not stored.
+   * Public/HTTP path — the client always supplies the public slug, resolved
+   * through the same published-only identity seam as every Catalog read.
+   */
   async getProgressSummary(
     slug: string,
     userId: string,
   ): Promise<ListingProgressSummaryDto | null> {
     const listing = await this.prisma.listing.findFirst({
-      where: this.publishedSlugWhere(slug),
+      where: publishedListingSlugWhere(slug),
       select: { id: true, format: true },
     });
     if (!listing) return null;
@@ -603,7 +598,7 @@ export class ListingRepository {
     // The related surface is discovery too — an unpublished or deleted target
     // resolves as empty through the same identity seam, never by internal ID.
     const listing = await this.prisma.listing.findFirst({
-      where: this.publishedSlugWhere(slug),
+      where: publishedListingSlugWhere(slug),
       select: {
         id: true,
         scholarId: true,
