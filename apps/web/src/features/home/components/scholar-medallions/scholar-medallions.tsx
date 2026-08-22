@@ -12,6 +12,18 @@ import styles from "./scholar-medallions.module.css";
 
 const MAX_SCHOLARS = 8;
 
+const SCHOLAR_TITLE_LABELS = {
+  allamah: "Allamah",
+  sheikh: "Shaykh",
+  ustadh: "Ustadh",
+  akh: "Brother",
+} as const;
+
+const LANGUAGE_LABELS = {
+  ar: "Arabic",
+  en: "English",
+} as const;
+
 export function ScholarMedallions() {
   const { t } = useTranslation();
   const { data, isLoading } = useInfiniteScholarsList();
@@ -65,8 +77,18 @@ export function ScholarMedallions() {
                 <AvatarFallback>{scholar.name.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
             </span>
-            <span className={styles.name}>{scholar.name}</span>
-            <span className={styles.count}>{scholar.lectureCount} lectures</span>
+            <span className={styles.profileCopy}>
+              {scholar.title && (
+                <span className={styles.honorific}>{SCHOLAR_TITLE_LABELS[scholar.title]}</span>
+              )}
+              <span className={styles.name}>{scholar.name}</span>
+              <span className={styles.metadata}>
+                <span>{scholar.lectureCount} lectures</span>
+                {scholar.mainLanguage && (
+                  <span>{LANGUAGE_LABELS[scholar.mainLanguage] ?? scholar.mainLanguage}</span>
+                )}
+              </span>
+            </span>
           </Link>
         ))}
       </div>

@@ -77,6 +77,7 @@
 }
 
 .discoverySection,
+.scholarsSection,
 .mobileSection {
   display: flex;
   flex-direction: column;
@@ -86,6 +87,13 @@
 .discoverySection {
   padding: clamp(1.25rem, 3vw, 2rem);
   border-block: 1px solid var(--border-subtle);
+}
+
+.scholarsSection {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  background: color-mix(in srgb, var(--surface-subtle) 68%, var(--surface-canvas));
 }
 
 .discoveryGrid {

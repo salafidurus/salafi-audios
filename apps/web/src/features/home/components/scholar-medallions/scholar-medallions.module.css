@@ -51,10 +51,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.65rem;
-  width: 9.5rem;
-  min-height: 10.5rem;
-  padding: 0.85rem;
+  gap: 0.8rem;
+  width: min(17rem, 78vw);
+  min-height: 14rem;
+  padding: 1.15rem;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-component-card);
   background: var(--surface-default);
@@ -71,8 +71,8 @@
 }
 
 .avatarWrap {
-  width: 62px;
-  height: 62px;
+  width: 82px;
+  height: 82px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 25%, var(--border-primary-strong), var(--surface-subtle));
   border: 2px solid var(--action-primary);
@@ -85,8 +85,24 @@
 }
 
 .avatar {
-  width: 52px;
-  height: 52px;
+  width: 70px;
+  height: 70px;
+}
+
+.profileCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.honorific {
+  color: var(--action-primary);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .name {
@@ -101,14 +117,19 @@
   overflow: hidden;
 }
 
-.count {
-  padding: 0.2rem 0.45rem;
-  border-radius: 999px;
-  background: var(--surface-subtle);
-  font-size: 10.5px;
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
   color: var(--content-muted);
-  text-align: start;
-  margin-top: 2px;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.metadata span + span::before {
+  margin-inline-end: 0.4rem;
+  color: var(--border-primary);
+  content: "•";
 }
 
 /* Skeleton Styles */
@@ -117,17 +138,17 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
-  width: 9.5rem;
-  min-height: 10.5rem;
-  padding: 0.85rem;
+  width: min(17rem, 78vw);
+  min-height: 14rem;
+  padding: 1.15rem;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-component-card);
   flex-shrink: 0;
 }
 
 .skeletonAvatar {
-  width: 62px;
-  height: 62px;
+  width: 82px;
+  height: 82px;
   border-radius: 50%;
 }
 

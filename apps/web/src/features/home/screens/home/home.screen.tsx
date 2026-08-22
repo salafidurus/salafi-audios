@@ -119,9 +119,10 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
           <div data-testid="home-category-section">
             <TopicDiscoverySection />
           </div>
-          <div data-testid="home-scholars-section">
-            <ScholarMedallions />
-          </div>
+        </section>
+
+        <section className={styles.scholarsSection} data-testid="home-scholars-section">
+          <ScholarMedallions />
         </section>
 
         <section data-testid="home-recent-section">
