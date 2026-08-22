@@ -37,6 +37,20 @@ describe('defineAbilityFor aggregate access', () => {
     expect(ability.can('delete', subject('Listing', { scholarSlug: 'a' } as never))).toBe(false);
   });
 
+  it('scopes scholar grants by the slug identity field of a Scholar subject', () => {
+    const ability = defineAbilityFor(
+      baseInput({
+        accessGrants: [{ target: 'scholar', capability: 'write', scholarSlug: 'a', locale: null }],
+      }),
+    );
+
+    // PolicyGuard resolves Scholar resources to `{ slug }` via
+    // normalizePolicyResource — the rule must not demand other fields.
+    expect(ability.can('update', subject('Scholar', { slug: 'a' } as never))).toBe(true);
+    expect(ability.can('create', subject('Scholar', { slug: 'a' } as never))).toBe(true);
+    expect(ability.can('update', subject('Scholar', { slug: 'b' } as never))).toBe(false);
+  });
+
   it('maps media write access to upload without granting delete', () => {
     const ability = defineAbilityFor(
       baseInput({
