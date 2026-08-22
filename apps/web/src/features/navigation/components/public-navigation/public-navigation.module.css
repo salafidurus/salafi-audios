@@ -25,7 +25,7 @@
   align-items: center;
   flex: 0 1 15%;
   min-width: 12rem;
-  gap: var(--space-sm);
+  gap: var(--space-md);
   color: var(--content-strong);
   font-family: var(--font-display), serif;
   font-size: var(--typo-title-md-font-size);
@@ -82,7 +82,7 @@
   justify-content: flex-start;
   flex: 0 1 35%;
   min-width: 0;
-  gap: var(--space-component-gap-sm);
+  gap: var(--space-component-gap-lg);
 }
 
 .navLink,
@@ -107,6 +107,7 @@
   position: relative;
   min-height: 2.75rem;
   padding: var(--space-sm) var(--space-md) calc(var(--space-sm) + var(--space-xs));
+  font-size: var(--typo-body-md-font-size);
   white-space: nowrap;
 }
 
@@ -162,9 +163,9 @@
 }
 
 .searchControl {
-  width: clamp(16rem, 22vw, 20rem);
+  width: clamp(15rem, 18vw, 17.5rem);
   min-width: 15rem;
-  flex: 1 1 22%;
+  flex: 0 1 18%;
   justify-content: flex-start;
   padding-inline: var(--space-component-gap-md);
   border-color: var(--input-border-rest);
@@ -209,6 +210,7 @@
 }
 
 .accountMenu .accountControl {
+  gap: var(--space-md);
   max-width: 13rem;
   border-color: transparent;
   background: transparent;
@@ -220,6 +222,11 @@
   flex: 0 1 auto;
   gap: var(--space-component-gap-md);
   min-width: max-content;
+}
+
+.workspaceSwitch {
+  gap: var(--space-md);
+  padding-inline: var(--space-component-gap-md);
 }
 
 .accountMenu .accountControl:hover,
@@ -364,16 +371,16 @@
 
   .nav {
     flex-basis: 40%;
-    gap: var(--space-xs);
+    gap: var(--space-component-gap-md);
   }
 
   .navLink {
     padding-inline: var(--space-sm);
   }
 
-  .searchControl {
-    width: 15rem;
-    min-width: 14rem;
+    .searchControl {
+      width: 15rem;
+      min-width: 14rem;
   }
 }
 
