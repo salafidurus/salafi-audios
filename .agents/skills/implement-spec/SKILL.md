@@ -10,6 +10,11 @@ The goal is a PR which implements the entire spec on a single branch.
 
 The tickets are not a list of steps. They are a **task graph** with blocking relationships between them. This means there is always a **frontier** of tickets which are ready to be grabbed.
 
+Before editing, read the repository instructions in `AGENT.md`, the nearest
+app/package `AGENT.md`, `.agents/rules/tdd-rules.md`, and
+`.agents/rules/worktree-rules.md`. Every implementer and merger must follow
+those canonical rules for its own worktree and commits.
+
 Communication to and from subagents should be sparse. Communicate primarily through **context pointers**: to the spec, tickets, research notes, and previous commits. Don't duplicate information already available via pointers.
 
 **Implementer subagents** should be run in the background where possible for **maximum concurrency**.
@@ -20,7 +25,8 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 
 2. (optional) Use an **exploration subagent** to conduct any exploration required by the tickets - relevant codebase files or external documentation. Ensure the exploration subagent can save files - it should save its markdown notes in a directory outside the repo, accessible by all future subagents. This lets **implementer subagents** focus on implementation rather than exploration.
 
-3. Create a branch, and a draft PR. The PR should be marked as 'closing' the spec issue and tickets.
+3. Create a branch, and a draft PR. The PR body must contain GitHub closing
+   references such as `Closes #123` for the spec issue and tickets.
 
 4. Use **implementer subagents** to implement each ticket. Each implementer subagent should work in its own worktree, on its own branch.
 
@@ -32,4 +38,10 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 
 8. Mark the PR as ready for review.
 
-9. Clean up all **implementer subagent** worktrees.
+9. After merge, verify that the spec issue and tickets are closed. For every
+   completed issue, remove `ready-for-agent` with `gh issue edit <number>
+--remove-label ready-for-agent`. If a merged PR did not close an issue
+   automatically, close it manually with `gh issue close` and comment with the
+   merged PR number. Then fast-forward local `main`, clean up all
+   **implementer subagent** worktrees and local branches, and verify the final
+   Git state according to `.agents/rules/worktree-rules.md`.

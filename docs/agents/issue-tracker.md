@@ -10,6 +10,9 @@ Issues and specs for this repository live as GitHub issues. Use the `gh` CLI for
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
 - **Apply or remove labels**: `gh issue edit <number> --add-label "..."` or `--remove-label "..."`.
 - **Close an issue**: `gh issue close <number> --comment "..."`
+- **Complete an implementation issue**: remove the active `ready-for-agent`
+  label, close the issue, and verify both state and labels with
+  `gh issue view <number> --json state,labels`.
 
 ## Completed specs
 

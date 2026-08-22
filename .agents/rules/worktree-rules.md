@@ -62,19 +62,33 @@ After post-work verification passes, push the branch matching the naming convent
 
 ```bash
 git push -u origin <branch-name>
-gh pr create --title "Short description of change" --body "Sufficient context of what was done and why"
+gh pr create --title "Short description of change" --body-file <pr-body-file>
 ```
+
+The PR body must include a GitHub closing reference (`Closes #<issue>`) for
+each implementation issue.
 
 ## Cleanup & Deletion Workflow
 
 1. **PR Merged**: Confirm the PR has been merged on the remote.
 2. **Pull merged code into local main**: After merge confirmation, pull the merged code into local main:
-3. **Pull merged code into local main**: After merge confirmation, pull the merged code into local main:
    ```bash
    git checkout main && git pull
    ```
-4. **Clean up**: Once merged and pulled locally, delete the local resources:
+3. **Close issues and remove ready labels**: Verify each implementation issue
+   is closed. Remove its active `ready-for-agent` label, even when the issue
+   was closed automatically by a merged PR:
+   ```bash
+   gh issue edit <issue-number> --remove-label ready-for-agent
+   gh issue view <issue-number> --json state,labels
+   ```
+   If the issue is still open after merge, close it manually with
+   `gh issue close <issue-number> --comment "Implemented and merged in PR #<pr-number>."`.
+4. **Clean up**: Once merged, pulled locally, and issue state is verified, delete the local resources:
    ```bash
    git worktree remove .worktrees/<name>
    git branch -d <branch-name>
    ```
+5. **Final verification**: Confirm the completed worktree is absent, the local
+   branch is deleted, `main` is clean and up to date, and unrelated worktrees
+   remain unchanged.
