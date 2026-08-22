@@ -70,6 +70,7 @@
 
 .track {
   display: flex;
+  flex: 0 0 auto;
   justify-content: center;
   gap: clamp(1.25rem, 2.5vw, 2.25rem);
   width: max-content;

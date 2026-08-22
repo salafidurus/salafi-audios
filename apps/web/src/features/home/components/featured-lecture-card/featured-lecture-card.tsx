@@ -1,5 +1,3 @@
-import { BookOpen, Play } from "lucide-react";
-
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
@@ -53,15 +51,6 @@ export function FeaturedLectureCard({
       }}
     >
       <span className={styles.corner} aria-hidden="true" />
-      <span
-        className={styles.iconBox}
-        style={{
-          background: "var(--surface-default)",
-          border: "1px solid var(--border-default)",
-        }}
-      >
-        <BookOpen size={30} color="var(--action-primary)" strokeWidth={1.3} />
-      </span>
       <CardContent className={styles.body}>
         <span className={styles.topRow}>
           <span
@@ -101,7 +90,7 @@ export function FeaturedLectureCard({
           }
         }}
       >
-        <Play size={17} fill="currentColor" />
+        Play
       </button>
     </Card>
   );

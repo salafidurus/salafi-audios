@@ -1,37 +1,11 @@
 import { getLocalizedName } from "@sd/core-i18n";
 import { useTopicsList } from "@sd/domain-search";
-import {
-  BookOpen,
-  type LucideIcon,
-  Footprints,
-  GraduationCap,
-  MessageSquareText,
-  Scale,
-  Shield,
-  SpellCheck2,
-} from "lucide-react";
 import { useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 
 import styles from "./category-chips.module.css";
-
-const TOPIC_ICONS = {
-  aqeedah: Shield,
-  fiqh: Scale,
-  hadith: MessageSquareText,
-  nahw: SpellCheck2,
-  seerah: Footprints,
-  tafsir: BookOpen,
-  "da'wah": GraduationCap,
-} satisfies Record<string, LucideIcon>;
-
-type TopicIconKey = keyof typeof TOPIC_ICONS;
-
-function isTopicIconKey(value: string): value is TopicIconKey {
-  return value in TOPIC_ICONS;
-}
 
 export type CategoryChipsProps = {
   value?: string;
@@ -52,7 +26,6 @@ export function CategoryChips({ value, onValueChange }: CategoryChipsProps = {})
       .map((topic) => ({
         slug: topic.slug,
         label: getLocalizedName(topic.name, i18n.language),
-        Icon: isTopicIconKey(topic.slug) ? TOPIC_ICONS[topic.slug] : undefined,
       }));
   }, [topics, i18n.language]);
 
@@ -65,7 +38,6 @@ export function CategoryChips({ value, onValueChange }: CategoryChipsProps = {})
       >
         <TabsList aria-label={t("home.categories.label", "Browse by topic")}>
           <TabsTrigger value="all" data-testid="category-chip-all">
-            <BookOpen size={15} strokeWidth={2} aria-hidden="true" />
             {t("home.categories.all", "All")}
           </TabsTrigger>
           {Array.from({ length: 5 }).map((_, i) => (
@@ -90,18 +62,13 @@ export function CategoryChips({ value, onValueChange }: CategoryChipsProps = {})
     >
       <TabsList aria-label={t("home.categories.label", "Browse by topic")}>
         <TabsTrigger value="all" data-testid="category-chip-all">
-          <BookOpen size={15} strokeWidth={2} aria-hidden="true" />
           {t("home.categories.all", "All")}
         </TabsTrigger>
-        {chips.map((chip) => {
-          const Icon = chip.Icon;
-          return (
-            <TabsTrigger key={chip.slug} value={chip.slug} data-testid="category-chip">
-              {Icon && <Icon size={15} strokeWidth={2} aria-hidden="true" />}
-              {chip.label}
-            </TabsTrigger>
-          );
-        })}
+        {chips.map((chip) => (
+          <TabsTrigger key={chip.slug} value={chip.slug} data-testid="category-chip">
+            {chip.label}
+          </TabsTrigger>
+        ))}
       </TabsList>
     </Tabs>
   );
