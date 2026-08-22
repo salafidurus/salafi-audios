@@ -1,3 +1,27 @@
+.accordion {
+  min-width: 72px;
+}
+
+.item {
+  border: 0;
+}
+
+.trigger {
+  align-items: center;
+  padding: 0;
+  text-decoration: none;
+}
+
+.summaryCard {
+  min-width: 180px;
+}
+
+.summaryContent {
+  padding: var(--space-component-gap-sm);
+  color: var(--content-muted);
+  font-size: var(--typo-caption-font-size);
+}
+
 .root {
   display: inline-flex;
   align-items: center;

@@ -4,6 +4,8 @@ import { Check } from "lucide-react";
 
 import { lightWebTheme, type AccentThemeId } from "@/core/styles/theme";
 import { ACCENT_PALETTES } from "@/core/styles/theme/variants";
+import { Card } from "@/shared/components/ui/card";
+import { cn } from "@/shared/utils";
 
 import styles from "./accent-theme-picker.module.css";
 
@@ -54,56 +56,77 @@ export interface AccentThemePickerProps {
 }
 
 export function AccentThemePicker({ value, onChange, title, description }: AccentThemePickerProps) {
+  const titleId = title ? "accent-theme-picker-title" : undefined;
+
   return (
     <div className={styles.wrap}>
       {(title || description) && (
         <div className={styles.header}>
-          {title && <span className={styles.title}>{title}</span>}
+          {title && (
+            <span id={titleId} className={styles.title}>
+              {title}
+            </span>
+          )}
           {description && <p className={styles.description}>{description}</p>}
         </div>
       )}
-      <div className={styles.list} role="radiogroup" aria-label={title}>
+      <div
+        className={styles.list}
+        role="radiogroup"
+        aria-label={title ? undefined : "Accent theme"}
+        aria-labelledby={titleId}
+      >
         {ACCENT_OPTIONS.map((option) => {
           const active = option.id === value;
           return (
-            <button
+            <Card
               key={option.id}
-              type="button"
-              role="radio"
-              aria-checked={active}
-              aria-label={`${option.name} — ${option.description}`}
-              onClick={() => onChange(option.id)}
-              className={styles.card}
-              style={{ borderColor: active ? option.accent : undefined }}
+              className={cn(
+                styles.cardShell,
+                "bg-card text-card-foreground",
+                active && "ring-2 ring-primary",
+              )}
             >
-              <div className={styles.topRow}>
-                <span className={styles.swatches}>
-                  {option.swatches.map((swatch, index) => (
-                    <span key={index} className={styles.swatch} style={{ background: swatch }} />
-                  ))}
-                </span>
-                <span className={styles.copy}>
-                  <span className={styles.nameRow}>
-                    <span className={styles.name}>{option.name}</span>
-                    {active && (
-                      <span className={styles.check} style={{ background: option.accent }}>
-                        <Check size={11} color={option.onAccent} />
-                      </span>
-                    )}
+              <button
+                type="button"
+                role="radio"
+                aria-checked={active}
+                aria-label={`${option.name} — ${option.description}`}
+                onClick={() => onChange(option.id)}
+                className={cn(styles.card, "text-start")}
+              >
+                <div className={styles.topRow}>
+                  <span className={styles.swatches}>
+                    {option.swatches.map((swatch, index) => (
+                      <span key={index} className={styles.swatch} style={{ background: swatch }} />
+                    ))}
                   </span>
-                  <span className={styles.optionDescription}>{option.description}</span>
-                </span>
-              </div>
-              <div className={styles.previewRow}>
-                <span
-                  className={styles.previewBtn}
-                  style={{ background: option.accent, color: option.onAccent }}
-                >
-                  Preview
-                </span>
-                <span className={styles.aaBtn}>Aa</span>
-              </div>
-            </button>
+                  <span className={styles.copy}>
+                    <span className={styles.nameRow}>
+                      <span className={styles.name}>{option.name}</span>
+                      {active && (
+                        <span className={styles.check} style={{ background: option.accent }}>
+                          <Check size={11} color={option.onAccent} />
+                        </span>
+                      )}
+                    </span>
+                    <span className={styles.optionDescription}>{option.description}</span>
+                  </span>
+                </div>
+                <div className={styles.previewRow}>
+                  <span
+                    className={styles.previewBtn}
+                    style={{
+                      background: option.accent,
+                      color: option.onAccent,
+                    }}
+                  >
+                    Preview
+                  </span>
+                  <span className={styles.aaBtn}>Aa</span>
+                </div>
+              </button>
+            </Card>
           );
         })}
       </div>

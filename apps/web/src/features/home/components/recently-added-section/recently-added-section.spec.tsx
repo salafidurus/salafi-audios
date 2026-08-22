@@ -76,8 +76,8 @@ describe("RecentlyAddedSection", () => {
     render(<RecentlyAddedSection />);
 
     expect(screen.getByText("Recently Added")).toBeTruthy();
-    const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBe(14);
+    expect(screen.getAllByText(/Recent Lecture/)).toHaveLength(14);
+    expect(screen.getByRole("button", { name: "Play Recent Lecture 0" })).toBeTruthy();
   });
 
   it("renders a featured card plus rows", () => {

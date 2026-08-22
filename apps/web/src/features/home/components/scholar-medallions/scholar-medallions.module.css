@@ -77,6 +77,11 @@
   overflow: hidden;
 }
 
+.avatar {
+  width: 64px;
+  height: 64px;
+}
+
 .name {
   font-size: var(--typo-body-sm-font-size);
   font-weight: 600;
@@ -149,5 +154,4 @@
     animation: none;
   }
 }
-
 
