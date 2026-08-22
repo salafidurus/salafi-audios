@@ -1,6 +1,6 @@
 "use client";
 
-import { Children, isValidElement, useState, type ReactElement, type ReactNode } from "react";
+import { Children, isValidElement, useEffect, useState, type ReactElement, type ReactNode } from "react";
 import { z } from "zod";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -58,9 +58,11 @@ function ModalContent({ children }: { children?: ReactNode }) {
 
 function ModalRoot({ isOpen, onClose, title, children, footer, size = "md", width = "standard", hideFooter, footerAlignment = "right", footerBorder = true, loading, multiTab = false, requireReview = false, activeTab: controlledActiveTab, onActiveTabChange, defaultActiveTab = "en", reviewTabId = "review", saveFormId, saving = false, saveLabel, savingLabel, reviewLabel, cancelLabel }: ModalProps) {
   const { t } = useTranslation();
-  const [uncontrolledActiveTab, setUncontrolledActiveTab] = useState(defaultActiveTab);
-  const activeTab = controlledActiveTab ?? uncontrolledActiveTab;
-  const setActiveTab = (value: string) => { onActiveTabChange?.(value); if (!onActiveTabChange) setUncontrolledActiveTab(value); };
+  const [activeTab, setActiveTabState] = useState(controlledActiveTab ?? defaultActiveTab);
+  useEffect(() => {
+    if (controlledActiveTab !== undefined) setActiveTabState(controlledActiveTab);
+  }, [controlledActiveTab]);
+  const setActiveTab = (value: string) => { setActiveTabState(value); onActiveTabChange?.(value); };
   const content = multiTab ? <Tabs value={activeTab} onValueChange={setActiveTab}>{children}</Tabs> : children;
   const parsedWidth = z.union([modalWidthSchema, z.string()]).safeParse(width);
   const maxWidth = parsedWidth.success && isModalWidth(parsedWidth.data) ? widthClasses[parsedWidth.data] : undefined;
