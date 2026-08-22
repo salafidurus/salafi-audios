@@ -94,7 +94,10 @@ describe("HomeScreen", () => {
     expect(scholarName.textContent).toBe("Shaikh Salih al-Fawzan");
 
     const progressText = screen.getByTestId("continue-listening-progress-text");
-    expect(progressText.textContent).toBe("10:00 / 30:00");
+    expect(progressText.textContent).toBe("10:00");
+    expect(screen.getByText("30:00")).toBeTruthy();
+    expect(screen.getByText("33% complete")).toBeTruthy();
+    expect(screen.getByText("Resume listening")).toBeTruthy();
 
     const card = screen.getByTestId("continue-listening-card");
     expect(card).toBeTruthy();

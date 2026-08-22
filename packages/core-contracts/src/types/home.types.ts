@@ -39,6 +39,8 @@ export const RecentProgressDtoSchema = z.object({
   scholarSlug: z.string(),
   durationSeconds: z.number(),
   positionSeconds: z.number(),
+  artworkUrl: z.string().optional(),
+  scholarImageUrl: z.string().optional(),
 });
 export type RecentProgressDto = z.infer<typeof RecentProgressDtoSchema>;
 

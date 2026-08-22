@@ -91,13 +91,14 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
           </div>
         </header>
 
-        {recentProgress && (
+        {(recentProgress || isProgressLoading) && (
           <section
             className={styles.continuitySection}
             data-testid="home-continue-listening-section"
           >
             <ContinueListeningCard
               recentProgress={recentProgress}
+              isLoading={isProgressLoading}
               onContinueListening={onContinueListening}
             />
           </section>

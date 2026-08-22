@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { Prisma } from '@sd/core-db';
 import type {
   Locale,
@@ -12,6 +12,7 @@ import { PrismaService } from '../../core/db/prisma.service';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { ListingRepository } from '../listing/listing.repo';
+import { ConfigService } from '../../core/config/config.service';
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -88,6 +89,7 @@ export class LibraryRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly listingRepo: ListingRepository,
+    @Optional() private readonly config?: ConfigService,
   ) {}
 
   async findInProgress(
@@ -364,6 +366,7 @@ export class LibraryRepository {
             slug: true,
             language: true,
             durationSeconds: true,
+            coverImageUrl: true,
             translations: {
               where: { locale, status: 'published' },
               select: { title: true },
@@ -374,11 +377,18 @@ export class LibraryRepository {
                 slug: true,
                 name: true,
                 mainLanguage: true,
+                imageUrl: true,
                 translations: {
                   where: { locale, status: 'published' },
                   select: { name: true },
                   take: 1,
                 },
+              },
+            },
+            parent: {
+              select: {
+                coverImageUrl: true,
+                parent: { select: { coverImageUrl: true } },
               },
             },
           },
@@ -401,6 +411,11 @@ export class LibraryRepository {
       publishedTranslation: record.listing.scholar.translations[0] ?? null,
     }).fields.name;
 
+    const artworkKey =
+      record.listing.coverImageUrl ??
+      record.listing.parent?.coverImageUrl ??
+      record.listing.parent?.parent?.coverImageUrl;
+
     return {
       lectureId: record.listing.id,
       lectureTitle: listingTitle,
@@ -409,7 +424,16 @@ export class LibraryRepository {
       scholarSlug: record.listing.scholar.slug,
       durationSeconds: record.listing.durationSeconds ?? 0,
       positionSeconds: record.positionSeconds,
+      artworkUrl: artworkKey ? this.toPublicUrl(artworkKey) : undefined,
+      scholarImageUrl: record.listing.scholar.imageUrl ?? undefined,
     };
+  }
+
+  private toPublicUrl(value: string): string {
+    if (/^[a-z]+:\/\//i.test(value)) return value;
+    const base = this.config?.ASSET_CDN_BASE_URL;
+    if (!base) return value;
+    return `${base.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
   }
 
   /** Shared resolution of the translatable listing relation shared by the
