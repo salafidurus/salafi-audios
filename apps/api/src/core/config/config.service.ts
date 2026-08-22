@@ -34,15 +34,15 @@ export class ConfigService {
     return this.env.DATABASE_URL;
   }
 
-  get NEON_API_KEY(): string {
+  get NEON_API_KEY(): string | undefined {
     return this.env.NEON_API_KEY;
   }
 
-  get NEON_PROJECT_ID(): string {
+  get NEON_PROJECT_ID(): string | undefined {
     return this.env.NEON_PROJECT_ID;
   }
 
-  get NEON_ENDPOINT_ID(): string {
+  get NEON_ENDPOINT_ID(): string | undefined {
     return this.env.NEON_ENDPOINT_ID;
   }
 
