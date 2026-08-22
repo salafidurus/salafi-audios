@@ -13,10 +13,10 @@ export const endpoints = {
     topics: (slug: string) => `/scholars/${slug}/topics`,
   },
   listings: {
-    detail: (id: string) => `/listings/${id}`,
-    contents: (id: string) => `/listings/${id}/contents`,
-    lastPlayed: (id: string) => `/listings/${id}/last-played`,
-    progressSummary: (id: string) => `/listings/${id}/progress-summary`,
+    detail: (slug: string) => `/listings/${slug}`,
+    contents: (slug: string) => `/listings/${slug}/contents`,
+    lastPlayed: (slug: string) => `/listings/${slug}/last-played`,
+    progressSummary: (slug: string) => `/listings/${slug}/progress-summary`,
     recent: "/listings/recent",
     promotions: "/listings/promotions",
   },
@@ -27,7 +27,7 @@ export const endpoints = {
     completed: "/me/library/completed",
     progress: "/me/library/progress",
     recentProgress: "/me/library/recent-progress",
-    saveListing: (listingId: string) => `/me/library/save/${listingId}`,
+    saveListing: (slug: string) => `/me/library/save/${slug}`,
   },
   account: {
     profile: "/account/profile",
@@ -37,10 +37,10 @@ export const endpoints = {
     progress: {
       get: "/audio/progress",
       sync: "/audio/progress/sync",
-      update: (listingId: string) => `/audio/progress/${listingId}`,
+      update: (slug: string) => `/audio/progress/${slug}`,
     },
     listings: {
-      stream: (id: string) => `/audio/listings/${id}/stream`,
+      stream: (slug: string) => `/audio/listings/${slug}/stream`,
     },
   },
   admin: {
@@ -93,11 +93,12 @@ export const endpoints = {
       unpublish: (id: string, locale: string) => `/scholars/${id}/translations/${locale}/unpublish`,
     },
     listings: {
-      list: (id: string) => `/listings/${id}/translations`,
-      save: (id: string) => `/listings/${id}/translations`,
-      update: (id: string, locale: string) => `/listings/${id}/translations/${locale}`,
-      publish: (id: string, locale: string) => `/listings/${id}/translations/${locale}/publish`,
-      unpublish: (id: string, locale: string) => `/listings/${id}/translations/${locale}/unpublish`,
+      list: (slug: string) => `/listings/${slug}/translations`,
+      save: (slug: string) => `/listings/${slug}/translations`,
+      update: (slug: string, locale: string) => `/listings/${slug}/translations/${locale}`,
+      publish: (slug: string, locale: string) => `/listings/${slug}/translations/${locale}/publish`,
+      unpublish: (slug: string, locale: string) =>
+        `/listings/${slug}/translations/${locale}/unpublish`,
     },
     topics: {
       list: (id: string) => `/topics/${id}/translations`,
