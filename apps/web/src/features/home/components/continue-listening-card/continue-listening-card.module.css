@@ -39,14 +39,6 @@
   outline-offset: 3px;
 }
 
-.continueCard::before {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
-  background: var(--action-primary);
-  content: "";
-}
-
 .artwork {
   position: relative;
   width: 9.5rem;
@@ -223,8 +215,4 @@
   .artwork { width: 5.5rem; }
   .percent { display: none; }
   .scholar { font-size: 0.8rem; }
-}
-
-[dir="rtl"] .continueCard::before {
-  inset-inline: auto 0;
 }
