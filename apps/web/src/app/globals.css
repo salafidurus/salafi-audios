@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 /* Include shared package sources so desktop-web utility classes are emitted in the app build. */
 @source "../../../../packages/**/*.{js,jsx,ts,tsx}";
 
@@ -43,8 +45,26 @@
   --text-h1: var(--typo-display-lg-font-size);
   --text-h2: var(--typo-title-lg-font-size);
   --text-caption: var(--typo-caption-font-size);
-  --font-sans: var(--typo-body-md-font-family);
+  --font-sans: var(--font-body);
   --typo-display-lg-font-family: var(--typo-display-lg-font-family);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--border-focus);
+  --color-sidebar-border: var(--border-default);
+  --color-sidebar-accent-foreground: var(--content-strong);
+  --color-sidebar-accent: var(--surface-hover);
+  --color-sidebar-primary-foreground: var(--content-on-primary);
+  --color-sidebar-primary: var(--action-primary);
+  --color-sidebar-foreground: var(--content-default);
+  --color-sidebar: var(--surface-default);
+  --color-chart-5: var(--action-danger);
+  --color-chart-4: var(--action-warning);
+  --color-chart-3: var(--action-success);
+  --color-chart-2: var(--action-info);
+  --color-chart-1: var(--action-primary);
+  --radius-xl: var(--radius-component-panel);
+  --radius-2xl: var(--radius-component-panel);
+  --radius-3xl: var(--radius-component-panel);
+  --radius-4xl: var(--radius-component-panel);
 }
 
 /* =============================================
@@ -243,4 +263,16 @@ button.listRow:hover,
 a.listRow:hover,
 [role="button"].listRow:hover {
   background-color: var(--surface-hover);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }

@@ -179,7 +179,7 @@ export default function RootLayout({
       lang="en"
       dir="ltr"
       suppressHydrationWarning
-      className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable} ${alexandria.variable} ${ibmPlexSansArabic.variable}`}
+      className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable} ${alexandria.variable} ${ibmPlexSansArabic.variable} font-sans`}
     >
       {/* lang/dir defaults — overridden beforeInteractive by the script below.
           Keeping root layout static avoids forcing every route to be dynamic. */}

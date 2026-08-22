@@ -1,19 +1,18 @@
+import { describe, expect, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-
-import { describe, expect, it } from "bun:test";
 
 import { cn } from "../shared/utils/cn";
 
 const root = resolve(import.meta.dir, "../..");
 const globalsCss = readFileSync(resolve(root, "src/app/globals.css"), "utf8");
-const componentsConfig = JSON.parse(
-  readFileSync(resolve(root, "components.json"), "utf8"),
-) as { aliases: Record<string, string> };
+const componentsConfig = JSON.parse(readFileSync(resolve(root, "components.json"), "utf8")) as {
+  aliases: Record<string, string>;
+};
 
 describe("shadcn foundation", () => {
   it("uses the existing shared component location as the only UI boundary", () => {
-    expect(componentsConfig.aliases.ui).toBe("@/shared/components");
+    expect(componentsConfig.aliases.ui).toBe("@/shared/components/ui");
     expect(componentsConfig.aliases.components).toBe("@/shared/components");
   });
 
@@ -30,8 +29,6 @@ describe("shadcn foundation", () => {
   });
 
   it("provides the shared class utility used by generated primitives", () => {
-    expect(cn("bg-background", undefined, "text-foreground")).toBe(
-      "bg-background text-foreground",
-    );
+    expect(cn("bg-background", undefined, "text-foreground")).toBe("bg-background text-foreground");
   });
 });
