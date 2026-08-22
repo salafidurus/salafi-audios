@@ -6,7 +6,7 @@ import React from "react";
 
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
 
-import { Modal } from "@/shared/components/Modal";
+import { Modal } from "@/shared/components/ui/modal";
 
 import styles from "./listing-modal.module.css";
 import { ListingGeneralSection } from "./ListingGeneralSection";

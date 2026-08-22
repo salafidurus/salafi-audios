@@ -15,7 +15,7 @@ import {
   translationTargetKey,
   type ClientTranslationTarget,
 } from "@/features/admin/components/Translation";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";

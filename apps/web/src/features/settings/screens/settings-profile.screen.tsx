@@ -12,7 +12,7 @@ import { AuthModal } from "@/features/auth";
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
 import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
 import { EmptyState } from "@/shared/components/EmptyState";
-import { Modal } from "@/shared/components/Modal";
+import { Modal } from "@/shared/components/ui/modal";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Button } from "@/shared/components/ui/button";

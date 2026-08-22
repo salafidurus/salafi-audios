@@ -9,7 +9,7 @@ import {
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
-} from "@/shared/components/Dropdown";
+} from "@/shared/components/ui/dropdown";
 
 import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
 

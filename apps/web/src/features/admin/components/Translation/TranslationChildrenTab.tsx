@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 
 import type { TranslationEntityConfig, TranslationChildSummary } from "./translation-entities";
 

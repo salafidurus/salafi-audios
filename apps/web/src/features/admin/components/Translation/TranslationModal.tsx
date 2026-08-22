@@ -9,7 +9,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { useTranslationForm } from "@/features/admin/hooks/Translation/useTranslationForm";
 import { getSecondaryLocales, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { computeLocalesToSave } from "@/features/admin/utils/translation-save";
-import { Modal } from "@/shared/components/Modal";
+import { Modal } from "@/shared/components/ui/modal";
 
 import {
   translationEntities,

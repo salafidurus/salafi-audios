@@ -11,8 +11,8 @@ import type {
 import { useTranslation } from "@/core/i18n/use-translation";
 import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
 import { resolveLinksToMetadata } from "@/features/admin/utils/resolve-import-urls";
-import { Button } from "@/shared/components/Button";
-import { InputField } from "@/shared/components/InputField";
+import { Button } from "@/shared/components/ui/button";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import styles from "./upload-arrange.module.css";
 

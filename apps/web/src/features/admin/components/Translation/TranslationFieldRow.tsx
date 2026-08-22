@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { InputField } from "@/shared/components/InputField";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import styles from "./translation-modal.module.css";
 

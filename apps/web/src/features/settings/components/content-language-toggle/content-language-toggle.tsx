@@ -4,7 +4,7 @@ import {
   setShowOriginalContent,
   useShowOriginalContent,
 } from "@/features/settings/content-preference";
-import { Toggle } from "@/shared/components/Toggle";
+import { Switch as Toggle } from "@/shared/components/ui/switch";
 
 export function ContentLanguageToggle() {
   const showOriginal = useShowOriginalContent();

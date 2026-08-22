@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRef, useEffect } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Button } from "@/shared/components/Button/Button";
+import { Button } from "@/shared/components/ui/button";
 
 import { useCookieConsent } from "../hooks/use-cookie-consent";
 import styles from "./cookie-consent-gate.module.css";

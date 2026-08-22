@@ -15,9 +15,9 @@ import {
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
-} from "@/shared/components/Dropdown";
+} from "@/shared/components/ui/dropdown";
 import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
-import { InputField } from "@/shared/components/InputField";
+import { InputField } from "@/shared/components/ui/input-field";
 import { Search } from "@/shared/components/Search";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 

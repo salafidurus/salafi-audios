@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 
 import styles from "./error.module.css";
 

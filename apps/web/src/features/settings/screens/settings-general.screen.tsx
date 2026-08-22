@@ -19,7 +19,7 @@ import { SegmentedControl } from "@/features/settings/components/SegmentedContro
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { Toggle } from "@/shared/components/Toggle";
+import { Switch as Toggle } from "@/shared/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { hasWindow } from "@/shared/lib/runtime-guards";
 

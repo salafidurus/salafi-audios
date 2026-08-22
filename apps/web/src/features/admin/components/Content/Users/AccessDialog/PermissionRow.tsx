@@ -1,7 +1,7 @@
 import type { AccessCapability, AccessTarget } from "@sd/core-contracts";
 import type { ReactNode } from "react";
 
-import { Toggle } from "@/shared/components/Toggle";
+import { Switch as Toggle } from "@/shared/components/ui/switch";
 
 import styles from "./AccessDialog.module.css";
 import { ScopeSelector } from "./ScopeSelector";

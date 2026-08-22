@@ -9,9 +9,9 @@ import {
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
-} from "@/shared/components/Dropdown";
+} from "@/shared/components/ui/dropdown";
 import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
-import { InputField } from "@/shared/components/InputField";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
 

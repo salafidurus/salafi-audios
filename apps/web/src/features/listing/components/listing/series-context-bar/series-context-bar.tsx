@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { audioService } from "@/features/audio";
 import { AppText } from "@/shared/components/AppText/AppText";
-import { Button } from "@/shared/components/Button/Button";
+import { Button } from "@/shared/components/ui/button";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 
 import styles from "./series-context-bar.module.css";

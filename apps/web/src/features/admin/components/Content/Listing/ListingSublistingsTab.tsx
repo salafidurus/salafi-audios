@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { fetchArrangeData, updateListingDetails } from "@/features/admin/api/admin-lectures.api";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 
 import styles from "./listing-modal.module.css";
 import { ListingSublistingDetail } from "./ListingSublistingDetail";

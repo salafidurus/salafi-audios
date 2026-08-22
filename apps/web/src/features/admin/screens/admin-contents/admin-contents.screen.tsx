@@ -12,7 +12,7 @@ import { Content } from "@/features/admin/components/Content";
 import { ListingsContent } from "@/features/admin/components/Content/Listing";
 import { PromotionsContent } from "@/features/admin/components/Content/Promotions/PromotionsContent";
 import { TopicsContent } from "@/features/admin/components/Content/Topic";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";

@@ -18,14 +18,14 @@ import {
   type UploadItem,
 } from "@/features/admin/hooks/Content/useUploadArrangeState";
 import { deriveChildSlug } from "@/features/admin/utils/upload-filename";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
-} from "@/shared/components/Dropdown";
-import { InputField } from "@/shared/components/InputField";
+} from "@/shared/components/ui/dropdown";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import modalStyles from "../listing-modal.module.css";
 import styles from "./upload-arrange.module.css";

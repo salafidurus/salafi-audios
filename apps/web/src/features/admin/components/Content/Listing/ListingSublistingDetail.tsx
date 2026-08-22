@@ -11,8 +11,8 @@ import {
   fetchListingFormData,
   updateListingDetails,
 } from "@/features/admin/api/admin-lectures.api";
-import { Button } from "@/shared/components/Button";
-import { InputField } from "@/shared/components/InputField";
+import { Button } from "@/shared/components/ui/button";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import styles from "./listing-modal.module.css";
 import { ListingStatusOrderFields } from "./ListingStatusOrderFields";
