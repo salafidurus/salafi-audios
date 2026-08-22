@@ -15,7 +15,7 @@ import { RecentlyAddedSectionContent } from "../../components/recently-added-sec
 import { ScholarMedallions } from "../../components/scholar-medallions/scholar-medallions";
 import { TopicDiscoverySection } from "../../components/topic-discovery-section/topic-discovery-section";
 import { useHomePromotions } from "../../hooks/use-home-promotions";
-import { MOBILE_APP_AVAILABILITY } from "./home.constants";
+import { FEATURED_SENIOR_SCHOLAR_SLUG, MOBILE_APP_AVAILABILITY } from "./home.constants";
 import styles from "./home.screen.module.css";
 
 export type HomeScreenProps = {
@@ -102,7 +102,7 @@ export function HomeScreen({ onContinueListening }: HomeScreenProps) {
         </section>
 
         <section className={styles.scholarsSection} data-testid="home-scholars-section">
-          <ScholarMedallions />
+          <ScholarMedallions featuredScholarSlug={FEATURED_SENIOR_SCHOLAR_SLUG} />
         </section>
 
         <section data-testid="home-recent-section">
