@@ -8,6 +8,7 @@ without updating this index.
 
 - [`product/`](product/): product requirements and non-goals
 - [`architecture.md`](architecture.md): complete platform map
+- [`adr/`](adr/): durable architectural decisions
 - [`clients/`](clients/): web and mobile architecture
 - [`backend/`](backend/): API boundaries and contracts
 - [`data/`](data/): database, storage, and synchronization
