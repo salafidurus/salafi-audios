@@ -1,0 +1,54 @@
+import { describe, expect, it } from 'bun:test';
+import { getApiEnv } from './env';
+
+const baseDevEnv = {
+  NODE_ENV: 'development',
+  DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+  BETTER_AUTH_SECRET: '01234567890123456789012345678901',
+  BETTER_AUTH_URL: 'http://localhost:4000',
+  GOOGLE_CLIENT_ID: 'dummy-google-id',
+  GOOGLE_CLIENT_SECRET: 'dummy-google-secret',
+  APPLE_CLIENT_ID: 'dummy-apple-id',
+  APPLE_CLIENT_SECRET: 'dummy-apple-secret',
+  R2_ACCOUNT_ID: 'dummy-r2-account',
+  R2_ACCESS_KEY_ID: 'dummy-r2-key',
+  R2_SECRET_ACCESS_KEY: 'dummy-r2-secret',
+  R2_BUCKET_NAME: 'dummy-r2-bucket',
+  R2_PUBLIC_BASE_URL: 'http://localhost:9000',
+};
+
+describe('getApiEnv — Neon control-plane credentials', () => {
+  it('parses successfully in development without any NEON_* variables', () => {
+    const env = getApiEnv({ ...baseDevEnv });
+
+    expect(env.NEON_API_KEY).toBeUndefined();
+    expect(env.NEON_PROJECT_ID).toBeUndefined();
+    expect(env.NEON_ENDPOINT_ID).toBeUndefined();
+  });
+
+  it('rejects a partial NEON_* set regardless of environment', () => {
+    const partial = {
+      ...baseDevEnv,
+      NEON_API_KEY: 'key-only',
+    };
+
+    expect(() => getApiEnv(partial)).toThrow(/provided together/);
+  });
+
+  it('rejects missing NEON_* variables outside development', () => {
+    const prod = { ...baseDevEnv, NODE_ENV: 'production' };
+
+    expect(() => getApiEnv(prod)).toThrow(/required unless NODE_ENV=development/);
+  });
+
+  it('accepts a complete NEON_* set', () => {
+    const complete = {
+      ...baseDevEnv,
+      NEON_API_KEY: 'neon-key',
+      NEON_PROJECT_ID: 'neon-project',
+      NEON_ENDPOINT_ID: 'ep-neon-endpoint',
+    };
+
+    expect(getApiEnv(complete).NEON_ENDPOINT_ID).toBe('ep-neon-endpoint');
+  });
+});

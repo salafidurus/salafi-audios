@@ -31,6 +31,19 @@ describe('DbHealthIndicator', () => {
     });
   });
 
+  it('skips the Neon control-plane check when credentials are not configured', async () => {
+    indicator = new DbHealthIndicator({
+      NEON_API_KEY: undefined,
+      NEON_PROJECT_ID: undefined,
+      NEON_ENDPOINT_ID: undefined,
+    } as unknown as ConfigService);
+
+    await expect(indicator.pingCheck('database')).resolves.toEqual({
+      database: { status: 'up', currentState: 'unknown', neonConfigured: false },
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('fails when Neon is unavailable or returns an invalid response', async () => {
     fetchMock.mockResolvedValue(new Response('not found', { status: 404 }));
     await expect(indicator.pingCheck('database')).rejects.toThrow('Database check failed');

@@ -1,38 +1,68 @@
 import { z } from 'zod';
 
-const ApiEnvSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.coerce.number().int().min(1).max(65535).default(4000),
-  CORS_ORIGIN: z.string().default('http://localhost:3000'),
-  CORS_ORIGINS_NATIVE: z.string().optional().default('salafidurus-dev://,exp://'),
-  DATABASE_URL: z.url(),
-  NEON_API_KEY: z.string().min(1),
-  NEON_PROJECT_ID: z.string().min(1),
-  NEON_ENDPOINT_ID: z.string().regex(/^ep-[a-z0-9-]{1,60}$/),
-  PRISMA_LOG_QUERIES: z
-    .preprocess((val) => val === 'true' || val === true, z.boolean())
-    .default(false),
-  ASSET_CDN_BASE_URL: z.url().optional(),
-  SITEMAP_BASE_URL: z.url().optional(),
-  BETTER_AUTH_SECRET: z.string().min(32),
-  BETTER_AUTH_URL: z.url(),
-  COOKIE_DOMAIN: z.string().default('salafidurus.com'),
-  GOOGLE_CLIENT_ID: z.string(),
-  GOOGLE_CLIENT_SECRET: z.string(),
-  APPLE_CLIENT_ID: z.string(),
-  APPLE_CLIENT_SECRET: z.string(),
-  REDIS_URL: z.url().optional(),
+const ApiEnvSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    PORT: z.coerce.number().int().min(1).max(65535).default(4000),
+    CORS_ORIGIN: z.string().default('http://localhost:3000'),
+    CORS_ORIGINS_NATIVE: z.string().optional().default('salafidurus-dev://,exp://'),
+    DATABASE_URL: z.url(),
+    // Neon control-plane credentials power the /health compute-endpoint check.
+    // Optional in development/test; required together and required in prod.
+    NEON_API_KEY: z.string().min(1).optional(),
+    NEON_PROJECT_ID: z.string().min(1).optional(),
+    NEON_ENDPOINT_ID: z
+      .string()
+      .regex(/^ep-[a-z0-9-]{1,60}$/)
+      .optional(),
+    PRISMA_LOG_QUERIES: z
+      .preprocess((val) => val === 'true' || val === true, z.boolean())
+      .default(false),
+    ASSET_CDN_BASE_URL: z.url().optional(),
+    SITEMAP_BASE_URL: z.url().optional(),
+    BETTER_AUTH_SECRET: z.string().min(32),
+    BETTER_AUTH_URL: z.url(),
+    COOKIE_DOMAIN: z.string().default('salafidurus.com'),
+    GOOGLE_CLIENT_ID: z.string(),
+    GOOGLE_CLIENT_SECRET: z.string(),
+    APPLE_CLIENT_ID: z.string(),
+    APPLE_CLIENT_SECRET: z.string(),
+    REDIS_URL: z.url().optional(),
 
-  R2_ACCOUNT_ID: z.string().min(1),
-  R2_ACCESS_KEY_ID: z.string().min(1),
-  R2_SECRET_ACCESS_KEY: z.string().min(1),
-  R2_BUCKET_NAME: z.string().min(1),
-  R2_PUBLIC_BASE_URL: z.url(),
-  R2_PRESIGN_EXPIRES_SECONDS: z.coerce.number().int().positive().default(3600),
-  DISABLE_THROTTLER: z
-    .preprocess((val) => val === 'true' || val === true, z.boolean())
-    .default(false),
-});
+    R2_ACCOUNT_ID: z.string().min(1),
+    R2_ACCESS_KEY_ID: z.string().min(1),
+    R2_SECRET_ACCESS_KEY: z.string().min(1),
+    R2_BUCKET_NAME: z.string().min(1),
+    R2_PUBLIC_BASE_URL: z.url(),
+    R2_PRESIGN_EXPIRES_SECONDS: z.coerce.number().int().positive().default(3600),
+    DISABLE_THROTTLER: z
+      .preprocess((val) => val === 'true' || val === true, z.boolean())
+      .default(false),
+  })
+  .superRefine((env, ctx) => {
+    const providedNeonVars = [env.NEON_API_KEY, env.NEON_PROJECT_ID, env.NEON_ENDPOINT_ID].filter(
+      (value) => value !== undefined,
+    ).length;
+
+    if (providedNeonVars > 0 && providedNeonVars < 3) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['NEON_API_KEY'],
+        message: 'NEON_API_KEY, NEON_PROJECT_ID, and NEON_ENDPOINT_ID must be provided together',
+      });
+    }
+
+    // Preview and production deploy with NODE_ENV=production, so gate on
+    // "not development" rather than "is production".
+    if (env.NODE_ENV !== 'development' && providedNeonVars < 3) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['NEON_API_KEY'],
+        message:
+          'NEON_API_KEY, NEON_PROJECT_ID, and NEON_ENDPOINT_ID are required unless NODE_ENV=development',
+      });
+    }
+  });
 
 export type ApiEnv = z.infer<typeof ApiEnvSchema>;
 

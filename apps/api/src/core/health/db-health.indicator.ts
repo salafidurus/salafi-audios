@@ -16,6 +16,18 @@ export class DbHealthIndicator extends HealthIndicator {
   }
 
   async pingCheck(key: string, options?: { timeout?: number }): Promise<HealthIndicatorResult> {
+    const apiKey = this.config.NEON_API_KEY;
+    const projectId = this.config.NEON_PROJECT_ID;
+    const endpointId = this.config.NEON_ENDPOINT_ID;
+
+    // Local/dev deployments run without Neon control-plane credentials; the
+    // env schema still requires them outside development, so a skip here
+    // never masks a misconfigured deployment. Real connectivity is
+    // exercised by every Prisma-backed request.
+    if (!apiKey || !projectId || !endpointId) {
+      return this.getStatus(key, true, { currentState: 'unknown', neonConfigured: false });
+    }
+
     const timeout = options?.timeout ?? 1000;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeout);
