@@ -9,6 +9,7 @@ import { useMemo, useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { usePlayListing } from "@/features/audio";
+import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 import { CategoryChips } from "../category-chips/category-chips";
@@ -140,7 +141,10 @@ function TopicListingCard({
   onNavigate,
 }: TopicListingCardProps) {
   const formatScholarName = useFormatScholarName();
-  const displayScholarName = formatScholarName({ name: scholarName, title: scholarTitle });
+  const formattedScholarFallback = useFormattedScholarName(scholarName, scholarSlug);
+  const displayScholarName = scholarTitle
+    ? formatScholarName({ name: scholarName, title: scholarTitle })
+    : formattedScholarFallback;
   const { play } = usePlayListing({
     id,
     slug,

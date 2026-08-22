@@ -4,6 +4,7 @@ import { useFormatScholarName } from "@sd/domain-content";
 import { ChevronRight } from "lucide-react";
 
 import { AppAvatar } from "@/shared/components/app-avatar";
+import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
 import { SanadChain } from "../sanad-chain/sanad-chain";
 import styles from "./lecture-row.module.css";
@@ -27,6 +28,7 @@ export function LectureRow({
   title,
   category,
   scholarName,
+  scholarSlug,
   scholarTitle,
   scholarImageUrl,
   listingArtwork,
@@ -37,7 +39,10 @@ export function LectureRow({
   className,
 }: LectureRowProps) {
   const formatScholarName = useFormatScholarName();
-  const displayScholarName = formatScholarName({ name: scholarName, title: scholarTitle });
+  const formattedScholarFallback = useFormattedScholarName(scholarName, scholarSlug);
+  const displayScholarName = scholarTitle
+    ? formatScholarName({ name: scholarName, title: scholarTitle })
+    : formattedScholarFallback;
   const done = Math.round(progress * totalLessons);
   const t = totalLessons;
 
