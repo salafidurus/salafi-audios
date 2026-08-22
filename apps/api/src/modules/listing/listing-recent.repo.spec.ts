@@ -21,10 +21,6 @@ describe('RecentListingsRepo', () => {
     };
 
     repo = new RecentListingsRepo(prisma, config);
-
-    vi.mock('../../shared/i18n/locale-context', () => ({
-      getRequestLocale: () => 'en',
-    }));
   });
 
   describe('getRecentListings', () => {
