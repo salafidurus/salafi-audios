@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { Prisma } from '@sd/core-db';
 import type {
   Locale,
@@ -12,6 +12,7 @@ import { PrismaService } from '../../core/db/prisma.service';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { ListingRepository } from '../listing/listing.repo';
+import { ConfigService } from '../../core/config/config.service';
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -88,6 +89,7 @@ export class LibraryRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly listingRepo: ListingRepository,
+    @Optional() private readonly config?: ConfigService,
   ) {}
 
   async findInProgress(
@@ -362,8 +364,12 @@ export class LibraryRepository {
             id: true,
             title: true,
             slug: true,
+            format: true,
+            orderIndex: true,
+            publishedLectureCount: true,
             language: true,
             durationSeconds: true,
+            coverImageUrl: true,
             translations: {
               where: { locale, status: 'published' },
               select: { title: true },
@@ -374,10 +380,43 @@ export class LibraryRepository {
                 slug: true,
                 name: true,
                 mainLanguage: true,
+                imageUrl: true,
                 translations: {
                   where: { locale, status: 'published' },
                   select: { name: true },
                   take: 1,
+                },
+              },
+            },
+            parent: {
+              select: {
+                id: true,
+                title: true,
+                slug: true,
+                format: true,
+                orderIndex: true,
+                language: true,
+                parentId: true,
+                translations: {
+                  where: { locale, status: 'published' },
+                  select: { title: true },
+                  take: 1,
+                },
+                coverImageUrl: true,
+                parent: {
+                  select: {
+                    id: true,
+                    title: true,
+                    slug: true,
+                    format: true,
+                    language: true,
+                    translations: {
+                      where: { locale, status: 'published' },
+                      select: { title: true },
+                      take: 1,
+                    },
+                    coverImageUrl: true,
+                  },
                 },
               },
             },
@@ -401,15 +440,68 @@ export class LibraryRepository {
       publishedTranslation: record.listing.scholar.translations[0] ?? null,
     }).fields.name;
 
+    const artworkKey =
+      record.listing.coverImageUrl ??
+      record.listing.parent?.coverImageUrl ??
+      record.listing.parent?.parent?.coverImageUrl;
+
+    const parent = record.listing.parent;
+    const grandparent = parent?.parent;
+    const seriesContext = parent
+      ? {
+          seriesId: parent.id,
+          seriesTitle: resolveContentTranslation({
+            base: { title: parent.title },
+            originalLanguage: parent.language,
+            targetLocale: locale,
+            publishedTranslation: parent.translations[0] ?? null,
+          }).fields.title,
+          seriesSlug: parent.slug,
+        }
+      : null;
+    const rootListing = grandparent
+      ? {
+          id: grandparent.id,
+          slug: grandparent.slug,
+          title: resolveContentTranslation({
+            base: { title: grandparent.title },
+            originalLanguage: grandparent.language,
+            targetLocale: locale,
+            publishedTranslation: grandparent.translations[0] ?? null,
+          }).fields.title,
+        }
+      : parent
+        ? {
+            id: parent.id,
+            slug: parent.slug,
+            title: seriesContext?.seriesTitle ?? parent.title,
+          }
+        : null;
+
     return {
       lectureId: record.listing.id,
       lectureTitle: listingTitle,
       lectureSlug: record.listing.slug,
+      format: record.listing.format,
+      orderIndex: record.listing.orderIndex ?? undefined,
+      publishedLectureCount: record.listing.publishedLectureCount ?? undefined,
       scholarName,
       scholarSlug: record.listing.scholar.slug,
       durationSeconds: record.listing.durationSeconds ?? 0,
       positionSeconds: record.positionSeconds,
+      artworkUrl: artworkKey ? this.toPublicUrl(artworkKey) : undefined,
+      scholarImageUrl: record.listing.scholar.imageUrl ?? undefined,
+      seriesContext,
+      rootListing,
+      rootFormat: grandparent?.format ?? parent?.format,
     };
+  }
+
+  private toPublicUrl(value: string): string {
+    if (/^[a-z]+:\/\//i.test(value)) return value;
+    const base = this.config?.ASSET_CDN_BASE_URL;
+    if (!base) return value;
+    return `${base.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
   }
 
   /** Shared resolution of the translatable listing relation shared by the

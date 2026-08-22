@@ -1,62 +1,229 @@
 .continueSection {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-md);
+  gap: var(--space-component-gap-sm);
+}
+
+.continueCard,
+.loadingCard {
+  display: grid;
+  grid-template-columns: minmax(9rem, 14%) minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2rem);
+  width: 100%;
+  padding: 0.5rem 0 0;
+  box-sizing: border-box;
+  text-align: start;
 }
 
 .continueCard {
-  all: unset;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-component-gap-md);
-  padding: var(--space-component-card-padding);
-  border: none;
-  border-radius: 24px;
-  background: var(--surface-default);
-  cursor: pointer;
-  transition:
-    transform 150ms ease,
-    box-shadow 150ms ease;
-  text-align: start;
-  box-sizing: border-box;
+  overflow: hidden;
+  background: transparent;
+  color: inherit;
+  border: 0;
+}
+
+.artworkLink:focus-visible,
+.title a:focus-visible,
+.scholar a:focus-visible,
+.resumeAction:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 3px;
+}
+
+.artworkLink {
+  display: block;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 180ms ease;
+}
+
+.artworkLink:hover,
+.title a:hover,
+.scholar a:hover {
+  opacity: 0.82;
+}
+
+.artwork {
+  position: relative;
   width: 100%;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  aspect-ratio: 1;
+  align-self: center;
+  overflow: hidden;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
 }
 
-.continueCard:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  transform: translateY(-4px);
+.artworkImage {
+  object-fit: cover;
+  border-radius: 50%;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .continueCard:hover {
-    transform: none;
-  }
+.scholarArtwork {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-primary-subtle-surface);
+  color: var(--content-primary-strong);
+  font-size: 1.8rem;
+  font-weight: 700;
 }
 
-.continueHeader {
+.content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-scale-xs);
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.55rem;
+  min-width: 0;
 }
 
-.progressRow {
+.sectionHeader,
+.timeRow {
   display: flex;
   align-items: center;
-  gap: var(--space-component-gap-md);
+  justify-content: space-between;
+  gap: 1rem;
   width: 100%;
+}
+
+.sectionHeader {
+  justify-content: space-between;
+}
+
+.sectionHeader > span:first-child {
+  font-size: calc(var(--typo-title-md-font-size) * 1.5);
+  line-height: 1.15;
+}
+
+.percent {
+  color: var(--content-muted);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: end;
+}
+
+.title {
+  display: -webkit-box;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: var(--content-strong);
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: clamp(1.6rem, 2.8vw, 2.3rem);
+  font-weight: 600;
+  line-height: 1.15;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.title a,
+.scholar a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.scholar {
+  margin: 0;
+  color: var(--content-secondary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.context {
+  margin: -0.15rem 0 0;
+  color: var(--content-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.progressBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  margin-top: 0.35rem;
 }
 
 .progressTrack {
-  flex: 1;
-  height: 4px;
-  background: var(--border-subtle);
+  width: 100%;
+  height: 6px;
   border-radius: var(--radius-full);
-  overflow: hidden;
+  background: var(--border-subtle);
 }
 
-.progressFill {
-  height: 100%;
+.progressTrack [data-slot="progress-indicator"] {
+  border-radius: inherit;
   background: var(--action-primary);
+}
+
+.timeRow {
+  color: var(--content-muted);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.resumeAction {
+  margin-top: 0.25rem;
   border-radius: var(--radius-full);
+  font-size: 1rem;
+  font-weight: 700;
+  min-height: 46px;
+}
+
+.loadingCard {
+  background: transparent;
+}
+
+.skeletonContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.skeleton {
+  border-radius: var(--radius-scale-sm);
+  background: linear-gradient(90deg, var(--surface-subtle), var(--surface-hover), var(--surface-subtle));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonArtwork { aspect-ratio: 1; }
+.skeletonTitle { width: min(75%, 28rem); height: 2.8rem; }
+.skeletonMeta { width: 12rem; height: 0.9rem; }
+.skeletonProgress { width: 100%; height: 0.4rem; margin-top: 0.5rem; }
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
+
+@media (max-width: 760px) {
+  .continueCard,
+  .loadingCard {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.1rem;
+    padding-top: 0.25rem;
+  }
+
+  .title { max-width: 100%; font-size: 1.55rem; }
+  .resumeAction { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .continueCard,
+  .loadingCard {
+    padding-top: 0.25rem;
+  }
+
+  .context,
+  .scholar { font-size: 0.8rem; }
 }

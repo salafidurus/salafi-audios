@@ -29,7 +29,13 @@ function Button({
   }) {
   const Comp = asChild ? Slot.Root : "button";
   const normalizedVariant: ButtonVariantProps["variant"] =
-    variant === "primary" ? "default" : variant === "surface" ? "secondary" : variant === "danger" ? "destructive" : variant;
+    variant === "primary"
+      ? "default"
+      : variant === "surface"
+        ? "secondary"
+        : variant === "danger"
+          ? "destructive"
+          : variant;
   const normalizedSize: ButtonVariantProps["size"] = size === "md" ? "default" : size;
   const content = label ?? props.children;
 
@@ -38,13 +44,21 @@ function Button({
       data-slot="button"
       data-variant={normalizedVariant}
       data-size={normalizedSize}
-      className={cn(buttonVariants({ variant: normalizedVariant, size: normalizedSize, className }), fullWidth && "w-full")}
+      className={cn(
+        buttonVariants({ variant: normalizedVariant, size: normalizedSize, className }),
+        fullWidth && "w-full",
+      )}
       {...props}
       aria-busy={loading || undefined}
       disabled={loading || props.disabled}
     >
-      {loading ? (
-        <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      {asChild ? (
+        props.children
+      ) : loading ? (
+        <span
+          aria-hidden="true"
+          className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+        />
       ) : (
         <>
           {icon && iconPosition === "left" && icon}

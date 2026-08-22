@@ -1,7 +1,7 @@
 .chipsRow {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: var(--space-component-gap-sm);
   width: 100%;
 }
@@ -9,7 +9,7 @@
 .chipsRow [data-slot="tabs-list"] {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: var(--space-component-gap-sm);
   width: 100%;
   background: transparent;
@@ -31,12 +31,19 @@
   font-weight: 600;
   line-height: var(--typo-label-md-line-height);
   text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
 .chipsRow [data-slot="tabs-trigger"][data-state="active"] {
   border-color: var(--action-primary);
   background: var(--action-primary);
   color: var(--content-on-primary);
+}
+
+.chipsRow [data-slot="tabs-trigger"]:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 .chip {

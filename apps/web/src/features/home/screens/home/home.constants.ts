@@ -5,3 +5,7 @@ export const MOBILE_APP_AVAILABILITY: MobileAvailability = false;
 
 export const APP_STORE_URL: string | undefined = undefined;
 export const GOOGLE_PLAY_URL: string | undefined = undefined;
+
+// Explicit editorial curation; this is intentionally not inferred from title,
+// lecture count, popularity, or the API response order.
+export const FEATURED_SENIOR_SCHOLAR_SLUG = "fawzan";
