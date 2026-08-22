@@ -5,10 +5,11 @@ import { ListingTranslationsController } from './listing-translations.controller
 import { ListingService } from './listing.service';
 import { ListingRepository } from './listing.repo';
 import { RecentListingsRepo } from './listing-recent.repo';
+import { ListingEditorialService } from './listing-editorial.service';
 
 @Module({
   controllers: [ListingController, AdminListingsController, ListingTranslationsController],
-  providers: [ListingService, ListingRepository, RecentListingsRepo],
+  providers: [ListingService, ListingEditorialService, ListingRepository, RecentListingsRepo],
   exports: [ListingService, ListingRepository],
 })
 export class ListingModule {}

@@ -34,6 +34,10 @@ import { resolveContentTranslation } from '../../shared/i18n/resolve-content-tra
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { publishedListingSlugWhere } from '../../shared/utils/published-listing-slug-where';
+import {
+  assertListingTransition,
+  type ListingEditorialTransition,
+} from './listing-editorial.transitions';
 
 @Injectable()
 export class ListingRepository {
@@ -1720,13 +1724,46 @@ export class ListingRepository {
     }
   }
 
+  async transitionListingStatus(
+    id: string,
+    action: ListingEditorialTransition,
+    updatedBy?: string,
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      const listing = await tx.listing.findUnique({
+        where: { id },
+        select: { parentId: true, status: true, deletedAt: true },
+      });
+
+      if (!listing || listing.deletedAt) throw new NotFoundException(`Listing "${id}" not found`);
+
+      assertListingTransition(action, listing.status);
+      const status = action === 'publish' ? Status.published : Status.archived;
+      const updateData: Prisma.ListingUpdateInput = {
+        status,
+        updatedAt: new Date(),
+        updatedBy,
+      };
+      if (action === 'publish') updateData.publishedAt = new Date();
+
+      await tx.listing.update({
+        where: { id },
+        data: updateData,
+      });
+
+      if (listing.parentId) await this.syncListingCounters(listing.parentId, tx);
+    });
+  }
+
   async deleteListing(id: string, deletedBy?: string): Promise<boolean> {
     try {
       await this.prisma.$transaction(async (tx) => {
         const original = await tx.listing.findUnique({
           where: { id },
-          select: { parentId: true },
+          select: { parentId: true, deletedAt: true },
         });
+
+        if (!original || original.deletedAt) throw new Error('Not found');
 
         await tx.listing.update({
           where: { id },
