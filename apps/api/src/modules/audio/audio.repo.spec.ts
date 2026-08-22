@@ -264,11 +264,11 @@ describe('AudioRepository', () => {
     });
   });
 
-  describe('findListingById', () => {
+  describe('findListingBySlug', () => {
     it('resolves strictly by slug', async () => {
       prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
 
-      await repo.findListingById('tafsir-al-fatiha');
+      await repo.findListingBySlug('tafsir-al-fatiha');
 
       expect(prisma.listing.findFirst).toHaveBeenCalledWith({
         where: { slug: 'tafsir-al-fatiha' },

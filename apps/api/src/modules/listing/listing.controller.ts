@@ -46,56 +46,56 @@ export class ListingController {
     return this.service.getPromotions();
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get listing detail by ID or slug' })
+  @Get(':slug')
+  @ApiOperation({ summary: 'Get listing detail by public slug' })
   @ApiOkResponse({
     description: 'Listing detail with scholar, topics, audio, and series context',
   })
-  getById(@Param('id') id: string): Promise<ListingDetailDto> {
-    return this.service.getById(id);
+  getBySlug(@Param('slug') slug: string): Promise<ListingDetailDto> {
+    return this.service.getBySlug(slug);
   }
 
-  @Get(':id/contents')
-  @ApiOperation({ summary: 'Get contents tree for a listing' })
+  @Get(':slug/contents')
+  @ApiOperation({ summary: 'Get contents tree for a listing by public slug' })
   @ApiOkResponse({
     description: 'Flat or sectioned content tree for single, series, or collection',
   })
-  getContents(@Param('id') id: string): Promise<ListingContentsDto> {
-    return this.service.getContents(id);
+  getContents(@Param('slug') slug: string): Promise<ListingContentsDto> {
+    return this.service.getContents(slug);
   }
 
-  @Get(':id/last-played')
+  @Get(':slug/last-played')
   @ApiOperation({ summary: 'Get last played lesson in series or collection for user' })
   @ApiOkResponse({
     description: 'Last played lesson progress or null',
   })
   getLastPlayedLesson(
-    @Param('id') id: string,
+    @Param('slug') slug: string,
     @CurrentUser() user?: { id: string },
   ): Promise<LastPlayedLessonDto | null> {
     if (!user?.id) return Promise.resolve(null);
-    return this.service.getLastPlayedLesson(id, user.id);
+    return this.service.getLastPlayedLesson(slug, user.id);
   }
 
-  @Get(':id/progress-summary')
+  @Get(':slug/progress-summary')
   @ApiOperation({ summary: "Get a user's progress rollup across a listing's playable leaves" })
   @ApiOkResponse({
     description: 'Total/completed leaf counts, percent complete, and completion state',
   })
   getProgressSummary(
-    @Param('id') id: string,
+    @Param('slug') slug: string,
     @CurrentUser() user?: { id: string },
   ): Promise<ListingProgressSummaryDto | null> {
     if (!user?.id) return Promise.resolve(null);
-    return this.service.getProgressSummary(id, user.id);
+    return this.service.getProgressSummary(slug, user.id);
   }
 
-  @Get(':id/related')
+  @Get(':slug/related')
   @ApiOperation({ summary: 'Get related listings' })
   @ApiOkResponse({
     description: 'Related listings based on scholar, topics, and series',
   })
-  getRelated(@Param('id') id: string): Promise<RelatedListingDto[]> {
-    return this.service.getRelated(id);
+  getRelated(@Param('slug') slug: string): Promise<RelatedListingDto[]> {
+    return this.service.getRelated(slug);
   }
 }

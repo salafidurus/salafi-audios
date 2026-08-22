@@ -397,7 +397,7 @@ export class AudioRepository {
     return `${this.redis.namespace}progress:flush-lock`;
   }
 
-  async findListingById(slug: string) {
+  async findListingBySlug(slug: string) {
     return this.prisma.listing.findFirst({
       where: { slug },
       select: { id: true, durationSeconds: true }, // Only fetch fields needed for stream response

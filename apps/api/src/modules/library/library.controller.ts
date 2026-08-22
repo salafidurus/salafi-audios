@@ -68,23 +68,17 @@ export class LibraryController {
     return this.library.bulkSyncSaved(user.id, body.items ?? []);
   }
 
-  @Post('save/:listingId')
-  @ApiOperation({ summary: 'Save a listing' })
+  @Post('save/:slug')
+  @ApiOperation({ summary: 'Save a listing by public slug' })
   @ApiOkResponse({ description: 'Listing saved' })
-  saveListing(
-    @CurrentUser() user: { id: string },
-    @Param('listingId') listingId: string,
-  ): Promise<void> {
-    return this.library.saveListing(user.id, listingId);
+  saveListing(@CurrentUser() user: { id: string }, @Param('slug') slug: string): Promise<void> {
+    return this.library.saveListing(user.id, slug);
   }
 
-  @Delete('save/:listingId')
-  @ApiOperation({ summary: 'Unsave a listing' })
+  @Delete('save/:slug')
+  @ApiOperation({ summary: 'Unsave a listing by public slug' })
   @ApiOkResponse({ description: 'Listing unsaved' })
-  unsaveListing(
-    @CurrentUser() user: { id: string },
-    @Param('listingId') listingId: string,
-  ): Promise<void> {
-    return this.library.unsaveListing(user.id, listingId);
+  unsaveListing(@CurrentUser() user: { id: string }, @Param('slug') slug: string): Promise<void> {
+    return this.library.unsaveListing(user.id, slug);
   }
 }

@@ -31,12 +31,12 @@ export class AudioController {
     return this.audio.bulkSync(user.id, body.items ?? []);
   }
 
-  @Put('progress/:listingId')
-  @ApiOperation({ summary: 'Update listing progress' })
+  @Put('progress/:slug')
+  @ApiOperation({ summary: 'Update listing progress by public slug' })
   @ApiOkResponse({ description: 'Progress updated' })
   upsertProgress(
     @CurrentUser() user: { id: string },
-    @Param('listingId') listingId: string,
+    @Param('slug') slug: string,
     @Body()
     body: {
       positionSeconds: number;
@@ -46,7 +46,7 @@ export class AudioController {
   ): Promise<void> {
     return this.audio.upsertProgress(
       user.id,
-      listingId,
+      slug,
       body.positionSeconds,
       body.durationSeconds,
       body.isCompleted,
@@ -54,12 +54,12 @@ export class AudioController {
   }
 
   @Public()
-  @Get('listings/:listingId/stream')
+  @Get('listings/:slug/stream')
   @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
   @CacheTTL(3 * 24 * 60 * 60 * 1000) // Stream metadata almost never changes; writes clear cache
-  @ApiOperation({ summary: 'Resolve a listing primary audio stream' })
+  @ApiOperation({ summary: 'Resolve a listing primary audio stream by public slug' })
   @ApiOkResponse({ description: 'Primary audio asset URL and duration' })
-  getListingStream(@Param('listingId') listingId: string): Promise<StreamResponseDto> {
-    return this.audio.resolveStreamUrl(listingId);
+  getListingStream(@Param('slug') slug: string): Promise<StreamResponseDto> {
+    return this.audio.resolveStreamUrl(slug);
   }
 }
