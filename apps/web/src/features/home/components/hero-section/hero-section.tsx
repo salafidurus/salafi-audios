@@ -191,7 +191,7 @@ export function HeroSection({
           </button>
 
           {!hasHistory && (
-            <>
+            <div className={styles.topicRail}>
               <span className={styles.browseLabel}>Explore by topic:</span>
               <Link href={`${routes.search}?topic=aqeedah`} className={styles.categoryPill}>
                 <Shield size={13} color="var(--action-primary)" />
@@ -205,7 +205,7 @@ export function HeroSection({
                 <MessageSquare size={13} color="var(--action-primary)" />
                 <span>Hadith</span>
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -80,7 +80,7 @@ export function TopicDiscoverySection({
           />
         </div>
       </div>
-      <div data-testid="home-category-section">
+      <div className={styles.categorySection} data-testid="home-category-section">
         <CategoryChips value={selectedTopic} onValueChange={setSelectedTopic} />
       </div>
       <div className={styles.rail} data-testid="topic-listings-rail" aria-live="polite">

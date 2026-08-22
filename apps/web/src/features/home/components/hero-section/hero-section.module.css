@@ -191,6 +191,10 @@
   margin-left: 4px;
 }
 
+.topicRail {
+  display: contents;
+}
+
 .categoryPill {
   display: inline-flex;
   align-items: center;
@@ -217,6 +221,8 @@
     min-height: 220px;
     padding: 1.5rem 1.25rem 1.5rem 3.25rem;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .title {
@@ -242,6 +248,13 @@
     height: 10rem;
   }
 
+  .eyebrow,
+  .title,
+  .subtitle,
+  .recommendation,
+  .ctaRow,
+  .visualRegion { align-self: center; }
+
   .eyebrow { order: 1; }
   .title { order: 3; }
   .subtitle { order: 4; }
@@ -250,9 +263,25 @@
   .ctaRow {
     order: 6;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    width: 100%;
     gap: 10px;
   }
+
+  .topicRail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .topicRail::-webkit-scrollbar { display: none; }
+  .browseLabel,
+  .categoryPill { flex: 0 0 auto; }
+  .browseLabel { margin-left: 0; }
 }
 
 @media (max-width: 380px) {
