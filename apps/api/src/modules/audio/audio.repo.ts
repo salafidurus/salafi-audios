@@ -6,6 +6,7 @@ import { ConfigService } from '../../core/config/config.service';
 import { RedisService } from '../../core/redis/redis.service';
 import { Status } from '@sd/core-db';
 import type { Prisma } from '@sd/core-db';
+import { publishedListingSlugWhere } from '../../shared/utils/published-listing-slug-where';
 import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
 import { z } from 'zod';
 
@@ -207,6 +208,14 @@ export class AudioRepository {
     }
   }
 
+  /**
+   * Personal-state WRITE path — deliberately NOT the published-only Catalog
+   * seam. Progress belongs to the user, not to discovery: a listener who is
+   * mid-Track when a Listing is archived (or whose offline outbox flushes
+   * after publication changes) must still record progress against any
+   * non-deleted Listing. Publication filtering stays on Catalog reads and
+   * stream resolution.
+   */
   private async findProgressListingBySlug(
     slug: string,
   ): Promise<{ id: string; durationSeconds: number | null } | null> {
@@ -397,9 +406,13 @@ export class AudioRepository {
     return `${this.redis.namespace}progress:flush-lock`;
   }
 
-  async findListingById(slug: string) {
+  /**
+   * Stream-route resolution shares the Catalog identity seam — the route is
+   * public, so an unpublished or ID-shaped slug value yields no stream.
+   */
+  async findListingBySlug(slug: string) {
     return this.prisma.listing.findFirst({
-      where: { slug },
+      where: publishedListingSlugWhere(slug),
       select: { id: true, durationSeconds: true }, // Only fetch fields needed for stream response
     });
   }

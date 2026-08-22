@@ -40,9 +40,9 @@ export const queryKeys = {
   },
   listings: {
     all: ["listings"] as const,
-    detail: (id: string, slug?: string) => [...queryKeys.listings.all, "detail", id, slug] as const,
-    contents: (id: string) => [...queryKeys.listings.all, "contents", id] as const,
-    lastPlayed: (id: string) => [...queryKeys.listings.all, "last-played", id] as const,
+    detail: (slug: string) => [...queryKeys.listings.all, "detail", slug] as const,
+    contents: (slug: string) => [...queryKeys.listings.all, "contents", slug] as const,
+    lastPlayed: (slug: string) => [...queryKeys.listings.all, "last-played", slug] as const,
     recent: (cursor?: string) => [...queryKeys.listings.all, "recent", cursor] as const,
   },
   topics: {

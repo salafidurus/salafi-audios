@@ -33,6 +33,7 @@ import type {
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
+import { publishedListingSlugWhere } from '../../shared/utils/published-listing-slug-where';
 
 @Injectable()
 export class ListingRepository {
@@ -46,14 +47,12 @@ export class ListingRepository {
     return listing?.id ?? null;
   }
 
-  async findDetailById(id: string): Promise<ListingDetailDto | null> {
+  async findDetailBySlug(slug: string): Promise<ListingDetailDto | null> {
     const locale = getRequestLocale();
 
     const listing = await this.prisma.listing.findFirst({
       where: {
-        slug: id,
-        deletedAt: null,
-        status: Status.published,
+        ...publishedListingSlugWhere(slug),
         scholar: { isActive: true },
       },
       select: {
@@ -202,7 +201,7 @@ export class ListingRepository {
    * about direct siblings, so it silently failed to cross Module boundaries
    * inside a Collection. Real prev/next playback navigation is derived
    * client-side from the full ordered play queue (built from
-   * `findContentsById`) instead.
+   * `findContentsBySlug`) instead.
    */
   private async resolveAncestry(
     parentId: string | null,
@@ -271,14 +270,12 @@ export class ListingRepository {
     };
   }
 
-  async findContentsById(id: string): Promise<ListingContentsDto | null> {
+  async findContentsBySlug(slug: string): Promise<ListingContentsDto | null> {
     const locale = getRequestLocale();
 
     const listing = await this.prisma.listing.findFirst({
       where: {
-        slug: id,
-        deletedAt: null,
-        status: Status.published,
+        ...publishedListingSlugWhere(slug),
         scholar: { isActive: true },
       },
       select: {
@@ -464,12 +461,9 @@ export class ListingRepository {
     return null;
   }
 
-  async findLastPlayedLesson(id: string, userId: string): Promise<LastPlayedLessonDto | null> {
+  async findLastPlayedLesson(slug: string, userId: string): Promise<LastPlayedLessonDto | null> {
     const targetListing = await this.prisma.listing.findFirst({
-      where: {
-        slug: id,
-        deletedAt: null,
-      },
+      where: publishedListingSlugWhere(slug),
       select: { id: true },
     });
 
@@ -508,17 +502,17 @@ export class ListingRepository {
   }
 
   /**
-   * Read-time aggregate of a user's progress across a Listing's playable leaves.
-   * Computed on demand from `UserListingProgress` — not separately stored, so it
-   * always reflects the current set of published children.
+   * Read-time aggregate of a user's progress across a Listing's playable
+   * leaves, computed on demand from `UserListingProgress` — not stored.
+   * Public/HTTP path — the client always supplies the public slug, resolved
+   * through the same published-only identity seam as every Catalog read.
    */
-  /** Public/HTTP path — client always supplies the slug. */
   async getProgressSummary(
     slug: string,
     userId: string,
   ): Promise<ListingProgressSummaryDto | null> {
     const listing = await this.prisma.listing.findFirst({
-      where: { slug, deletedAt: null },
+      where: publishedListingSlugWhere(slug),
       select: { id: true, format: true },
     });
     if (!listing) return null;
@@ -599,10 +593,12 @@ export class ListingRepository {
     };
   }
 
-  async findRelated(id: string, limit = 6): Promise<RelatedListingDto[]> {
+  async findRelated(slug: string, limit = 6): Promise<RelatedListingDto[]> {
     const locale = getRequestLocale();
+    // The related surface is discovery too — an unpublished or deleted target
+    // resolves as empty through the same identity seam, never by internal ID.
     const listing = await this.prisma.listing.findFirst({
-      where: { slug: id, deletedAt: null },
+      where: publishedListingSlugWhere(slug),
       select: {
         id: true,
         scholarId: true,

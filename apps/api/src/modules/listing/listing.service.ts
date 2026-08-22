@@ -37,14 +37,14 @@ export class ListingService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async getById(id: string): Promise<ListingDetailDto> {
-    const listing = await this.repo.findDetailById(id);
-    if (!listing) throw new NotFoundException(`Listing "${id}" not found`);
+  async getBySlug(slug: string): Promise<ListingDetailDto> {
+    const listing = await this.repo.findDetailBySlug(slug);
+    if (!listing) throw new NotFoundException(`Listing "${slug}" not found`);
     return listing;
   }
 
-  async getRelated(id: string): Promise<RelatedListingDto[]> {
-    return this.repo.findRelated(id);
+  async getRelated(slug: string): Promise<RelatedListingDto[]> {
+    return this.repo.findRelated(slug);
   }
 
   async getRecentListings(cursor?: string, limit?: number): Promise<FeedPageDto> {
@@ -59,18 +59,21 @@ export class ListingService {
     return this.repo.updatePromotions(body);
   }
 
-  async getContents(id: string): Promise<ListingContentsDto> {
-    const contents = await this.repo.findContentsById(id);
-    if (!contents) throw new NotFoundException(`Listing "${id}" not found`);
+  async getContents(slug: string): Promise<ListingContentsDto> {
+    const contents = await this.repo.findContentsBySlug(slug);
+    if (!contents) throw new NotFoundException(`Listing "${slug}" not found`);
     return contents;
   }
 
-  async getLastPlayedLesson(id: string, userId: string): Promise<LastPlayedLessonDto | null> {
-    return this.repo.findLastPlayedLesson(id, userId);
+  async getLastPlayedLesson(slug: string, userId: string): Promise<LastPlayedLessonDto | null> {
+    return this.repo.findLastPlayedLesson(slug, userId);
   }
 
-  async getProgressSummary(id: string, userId: string): Promise<ListingProgressSummaryDto | null> {
-    return this.repo.getProgressSummary(id, userId);
+  async getProgressSummary(
+    slug: string,
+    userId: string,
+  ): Promise<ListingProgressSummaryDto | null> {
+    return this.repo.getProgressSummary(slug, userId);
   }
 
   listAdmin(params: {

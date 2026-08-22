@@ -13,20 +13,20 @@ export class AudioService {
 
   async upsertProgress(
     userId: string,
-    listingId: string,
+    slug: string,
     positionSeconds: number,
     durationSeconds?: number,
     isCompleted?: boolean,
   ): Promise<void> {
     const found = await this.repo.upsertProgress(
       userId,
-      listingId,
+      slug,
       positionSeconds,
       durationSeconds,
       isCompleted,
     );
     if (!found) {
-      throw new NotFoundException(`Listing ${listingId} not found`);
+      throw new NotFoundException(`Listing ${slug} not found`);
     }
   }
 
@@ -34,14 +34,14 @@ export class AudioService {
     await this.repo.bulkSync(userId, items);
   }
 
-  async resolveStreamUrl(listingId: string): Promise<StreamResponseDto> {
-    const listing = await this.repo.findListingById(listingId);
+  async resolveStreamUrl(slug: string): Promise<StreamResponseDto> {
+    const listing = await this.repo.findListingBySlug(slug);
 
     if (!listing) {
-      throw new NotFoundException(`Listing with ID ${listingId} not found`);
+      throw new NotFoundException(`Listing "${slug}" not found`);
     }
 
-    // Use the resolved id from here on — `listingId` may have been a slug.
+    // Use the resolved internal id from here on — the route identity was a slug.
     let asset = await this.repo.findPrimaryAsset(listing.id);
 
     if (!asset) {
@@ -49,7 +49,7 @@ export class AudioService {
     }
 
     if (!asset) {
-      throw new NotFoundException(`No audio assets found for listing ${listingId}`);
+      throw new NotFoundException(`No audio assets found for listing ${listing.id}`);
     }
 
     return {

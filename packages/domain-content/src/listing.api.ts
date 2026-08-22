@@ -8,38 +8,42 @@ import {
   type LastPlayedLessonDto,
 } from "@sd/core-contracts";
 
-export function useListingDetail(id: string) {
+/**
+ * Catalog reads resolve Listings through their public slug — the only external
+ * identity a Listing route accepts. An ID-shaped value resolves as not found.
+ */
+export function useListingDetail(slug: string) {
   return useApiQuery(
-    queryKeys.listings.detail(id, id),
+    queryKeys.listings.detail(slug),
     () =>
       httpClient<ListingDetailDto>({
-        url: endpoints.listings.detail(id),
+        url: endpoints.listings.detail(slug),
         method: "GET",
       }),
-    { enabled: !!id },
+    { enabled: !!slug },
   );
 }
 
-export function useListingContents(id: string) {
+export function useListingContents(slug: string) {
   return useApiQuery(
-    queryKeys.listings.contents(id),
+    queryKeys.listings.contents(slug),
     () =>
       httpClient<ListingContentsDto>({
-        url: endpoints.listings.contents(id),
+        url: endpoints.listings.contents(slug),
         method: "GET",
       }),
-    { enabled: !!id },
+    { enabled: !!slug },
   );
 }
 
-export function useLastPlayedLesson(id: string, enabled = true) {
+export function useLastPlayedLesson(slug: string, enabled = true) {
   return useApiQuery(
-    queryKeys.listings.lastPlayed(id),
+    queryKeys.listings.lastPlayed(slug),
     () =>
       httpClient<LastPlayedLessonDto | null>({
-        url: endpoints.listings.lastPlayed(id),
+        url: endpoints.listings.lastPlayed(slug),
         method: "GET",
       }),
-    { enabled: !!id && enabled },
+    { enabled: !!slug && enabled },
   );
 }

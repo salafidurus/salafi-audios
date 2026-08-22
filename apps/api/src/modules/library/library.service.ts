@@ -34,17 +34,17 @@ export class LibraryService {
     return this.repo.getRecentProgress(userId);
   }
 
-  async saveListing(userId: string, listingId: string): Promise<void> {
-    const found = await this.repo.saveLecture(userId, listingId);
+  async saveListing(userId: string, slug: string): Promise<void> {
+    const found = await this.repo.saveLecture(userId, slug);
     if (!found) {
-      throw new NotFoundException(`Listing ${listingId} not found`);
+      throw new NotFoundException(`Listing ${slug} not found`);
     }
   }
 
-  async unsaveListing(userId: string, listingId: string): Promise<void> {
-    const found = await this.repo.unsaveLecture(userId, listingId);
+  async unsaveListing(userId: string, slug: string): Promise<void> {
+    const found = await this.repo.unsaveLecture(userId, slug);
     if (!found) {
-      throw new NotFoundException(`Listing ${listingId} not found`);
+      throw new NotFoundException(`Listing ${slug} not found`);
     }
   }
 
