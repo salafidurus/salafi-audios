@@ -23,11 +23,7 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-scale-full, 50%);
-  background: linear-gradient(
-    135deg,
-    var(--surface-subtle),
-    var(--accent-primary-subtle-surface)
-  );
+  background: linear-gradient(135deg, var(--surface-subtle), var(--accent-primary-subtle-surface));
   color: var(--content-primary-strong);
   display: flex;
   align-items: center;
@@ -110,4 +106,31 @@
 .row:hover .chevron {
   color: var(--content-primary-strong);
   transform: translateX(2px);
+}
+
+@media (max-width: 640px) {
+  .row {
+    align-items: flex-start;
+    gap: var(--space-component-gap-sm, 8px);
+  }
+
+  .avatarFallback {
+    width: 36px;
+    height: 36px;
+  }
+
+  .rightSection {
+    align-self: center;
+  }
+
+  .caption {
+    max-width: 7.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+:global([dir="rtl"]) .row:hover .chevron {
+  transform: translateX(-2px);
 }
