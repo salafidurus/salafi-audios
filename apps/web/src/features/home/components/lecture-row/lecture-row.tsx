@@ -34,22 +34,24 @@ export function LectureRow({
   const metaText = metaParts.join(" · ");
 
   return (
-    <button type="button" onClick={onClick} className={`${styles.row} ${className ?? ""}`}>
-      <span className={styles.iconWrap}>
-        <BookOpen size={17} color="var(--action-primary)" strokeWidth={1.5} />
-      </span>
-      <span className={styles.info}>
-        <span className={styles.title}>{title}</span>
-        {metaText ? <span className={styles.meta}>{metaText}</span> : null}
-      </span>
+    <div className={`${styles.row} ${className ?? ""}`}>
+      <button type="button" onClick={onClick} className={styles.main}>
+        <span className={styles.iconWrap}>
+          <BookOpen size={17} color="var(--action-primary)" strokeWidth={1.5} />
+        </span>
+        <span className={styles.info}>
+          <span className={styles.title}>{title}</span>
+          {metaText ? <span className={styles.meta}>{metaText}</span> : null}
+        </span>
+        <span className={styles.chevron}>
+          <ChevronRight size={16} color="var(--content-muted)" />
+        </span>
+      </button>
       {t > 1 ? (
         <span className={styles.progress}>
           <SanadChain total={t} completed={done} />
         </span>
       ) : null}
-      <span className={styles.chevron}>
-        <ChevronRight size={16} color="var(--content-muted)" />
-      </span>
-    </button>
+    </div>
   );
 }
