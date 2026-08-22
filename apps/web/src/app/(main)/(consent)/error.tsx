@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 
 import styles from "./error.module.css";
 

@@ -13,7 +13,7 @@ import {
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
-} from "@/shared/components/Dropdown";
+} from "@/shared/components/ui/dropdown";
 
 import styles from "./language-switch.module.css";
 

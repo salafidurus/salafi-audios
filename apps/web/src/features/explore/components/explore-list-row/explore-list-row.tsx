@@ -12,7 +12,7 @@ import React from "react";
 import { useToast } from "@/core/toast";
 import { audioService, usePlayListing } from "@/features/audio";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";

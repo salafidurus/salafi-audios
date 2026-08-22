@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/shared/components/Button/Button";
+import { Button } from "@/shared/components/ui/button";
 
 export type AuthRequiredStateDesktopProps = {
   title: string;

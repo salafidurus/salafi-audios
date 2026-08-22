@@ -29,6 +29,18 @@ describe("interaction primitives", () => {
     expect(button).toHaveClass("min-h-12");
   });
 
+  it("keeps migrated button callers on shadcn variants while supporting loading state", () => {
+    render(
+      <Button variant="primary" size="md" label="Save" loading data-testid="button" />,
+    );
+
+    const button = screen.getByTestId("button");
+    expect(button).toHaveAttribute("data-variant", "default");
+    expect(button).toHaveAttribute("data-size", "default");
+    expect(button).toHaveAttribute("aria-busy", "true");
+    expect(button).toBeDisabled();
+  });
+
   it("associates field labels, descriptions, and errors with controls", () => {
     render(
       <Field data-invalid="true">

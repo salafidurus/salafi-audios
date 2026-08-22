@@ -5,7 +5,7 @@ import React, { useState } from "react";
 
 import { useAuth } from "@/core/auth";
 import { AuthModal } from "@/features/auth";
-import { Button } from "@/shared/components/Button/Button";
+import { Button } from "@/shared/components/ui/button";
 
 import styles from "./LectureSaveButton.module.css";
 

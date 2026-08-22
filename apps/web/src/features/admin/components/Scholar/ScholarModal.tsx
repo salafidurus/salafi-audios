@@ -10,8 +10,8 @@ import { fetchScholarFormData } from "@/features/admin/api/admin.api";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { slugify } from "@/features/admin/utils/slugify";
-import { InputField } from "@/shared/components/InputField";
-import { Modal } from "@/shared/components/Modal";
+import { InputField } from "@/shared/components/ui/input-field";
+import { Modal } from "@/shared/components/ui/modal";
 
 import { useSaveScholar } from "../../hooks/Scholar/useSaveScholar";
 import { useScholarForm } from "../../hooks/Scholar/useScholarForm";

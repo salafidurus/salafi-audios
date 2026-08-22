@@ -5,7 +5,7 @@ import { Pencil, Upload, Languages, Headphones } from "lucide-react";
 import Image from "next/image";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";

@@ -8,8 +8,8 @@ import {
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
-} from "@/shared/components/Dropdown";
-import { InputField } from "@/shared/components/InputField";
+} from "@/shared/components/ui/dropdown";
+import { InputField } from "@/shared/components/ui/input-field";
 import { validateLectureStatus, type LectureStatus } from "@/shared/types/form-types";
 
 import styles from "./listing-modal.module.css";

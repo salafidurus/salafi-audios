@@ -5,7 +5,7 @@ import { useAbility } from "@sd/domain-account";
 import { Pencil, Trash2, Languages } from "lucide-react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { useResponsive } from "@/shared/hooks/use-responsive";

@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { FormSection } from "@/features/admin/components/FormSection";
-import { InputField } from "@/shared/components/InputField";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
 

@@ -7,7 +7,7 @@ import { useListingContents } from "@sd/domain-content";
 import React from "react";
 
 import { audioService } from "@/features/audio";
-import { Button } from "@/shared/components/Button/Button";
+import { Button } from "@/shared/components/ui/button";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./LecturePlayButton.module.css";

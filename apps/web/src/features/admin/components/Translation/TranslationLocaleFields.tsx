@@ -12,7 +12,7 @@ import {
   type TranslationFormAction,
   type TranslationFormState,
 } from "@/features/admin/hooks/Translation/useTranslationForm";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 
 import type { TranslationEntityConfig } from "./translation-entities";
 

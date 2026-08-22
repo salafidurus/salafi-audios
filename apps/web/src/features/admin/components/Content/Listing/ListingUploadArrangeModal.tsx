@@ -10,7 +10,7 @@ import {
   localSlugConflicts,
   useUploadArrangeState,
 } from "@/features/admin/hooks/Content/useUploadArrangeState";
-import { Modal } from "@/shared/components/Modal";
+import { Modal } from "@/shared/components/ui/modal";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 
 import styles from "./listing-modal.module.css";

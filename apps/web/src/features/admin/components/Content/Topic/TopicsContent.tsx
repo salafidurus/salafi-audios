@@ -13,7 +13,7 @@ import {
   type ClientTranslationTarget,
 } from "@/features/admin/components/Translation";
 import { List } from "@/shared/components/List";
-import { Modal } from "@/shared/components/Modal";
+import { Modal } from "@/shared/components/ui/modal";
 
 import styles from "../../../screens/admin-contents/admin-contents.screen.module.css";
 import { Content } from "../Content";

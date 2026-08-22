@@ -9,7 +9,7 @@ import React from "react";
 
 import { useAuth } from "@/core/auth";
 import { audioService } from "@/features/audio";
-import { Button } from "@/shared/components/Button/Button";
+import { Button } from "@/shared/components/ui/button";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import { LectureSaveButton } from "../lecture-save-button/LectureSaveButton";

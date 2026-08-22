@@ -17,7 +17,7 @@ import { fetchListingFormData } from "@/features/admin/api/admin-lectures.api";
 import { useListingForm } from "@/features/admin/hooks/Content/useListingForm";
 import { useSaveListing } from "@/features/admin/hooks/Content/useSaveListing";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
-import { Modal } from "@/shared/components/Modal";
+import { Modal } from "@/shared/components/ui/modal";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 
 import styles from "./listing-modal.module.css";

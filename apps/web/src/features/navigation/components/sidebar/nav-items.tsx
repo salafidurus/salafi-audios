@@ -24,8 +24,8 @@ import { useState } from "react";
 import { useAuth, authClient } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { LanguageSwitch } from "@/features/settings";
-import { Button } from "@/shared/components/Button/Button";
-import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/components/ui/button";
+import { Modal } from "@/shared/components/ui/modal";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { hasWindow } from "@/shared/lib/runtime-guards";
 

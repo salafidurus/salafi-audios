@@ -5,7 +5,7 @@ import { useAbility } from "@sd/domain-account";
 import { ShieldCog } from "lucide-react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 import { List } from "@/shared/components/List";
 import { UserAvatar } from "@/shared/components/user-avatar";
 import { useResponsive } from "@/shared/hooks/use-responsive";

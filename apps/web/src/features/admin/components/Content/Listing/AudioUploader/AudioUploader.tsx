@@ -7,8 +7,8 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
 import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
 import { importSingleLineWithProgress } from "@/features/admin/utils/resolve-import-urls";
-import { Button } from "@/shared/components/Button";
-import { InputField } from "@/shared/components/InputField";
+import { Button } from "@/shared/components/ui/button";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import styles from "./audio-uploader.module.css";
 

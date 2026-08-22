@@ -14,9 +14,9 @@ import { useAccountProfile } from "@sd/domain-account";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { fetchUserAccess, replaceUserAccess } from "@/features/admin/api/admin.api";
-import { Button } from "@/shared/components/Button";
-import { Modal } from "@/shared/components/Modal/Modal";
-import { Toggle } from "@/shared/components/Toggle";
+import { Button } from "@/shared/components/ui/button";
+import { Modal } from "@/shared/components/ui/modal";
+import { Switch as Toggle } from "@/shared/components/ui/switch";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./AccessDialog.module.css";

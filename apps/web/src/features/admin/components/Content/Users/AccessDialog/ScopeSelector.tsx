@@ -7,7 +7,7 @@ import {
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
-} from "@/shared/components/Dropdown";
+} from "@/shared/components/ui/dropdown";
 
 import styles from "./AccessDialog.module.css";
 
