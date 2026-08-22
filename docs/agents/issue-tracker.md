@@ -21,9 +21,11 @@ Specs are umbrella issues labelled `spec`; implementation issues are labelled
 `close-completed-specs` workflow closes an open spec automatically after it has
 at least one linked ticket and every linked ticket is closed.
 
-The workflow removes active triage-state labels from the completed spec,
-preserves the `spec` label, and posts a completion comment. It does not apply
-`wontfix`: completion is distinct from rejection. A completed spec may
+When a ticket closes, the `close-completed-specs` workflow removes its
+`ready-for-agent` label before evaluating the parent spec. When all linked
+tickets are closed, it removes active triage-state labels from the completed
+spec, preserves the `spec` label, and posts a completion comment. It does not
+apply `wontfix`: completion is distinct from rejection. A completed spec may
 therefore be closed without a state-role label.
 
 Infer the repository from `git remote -v`; `gh` does this automatically inside the clone.
