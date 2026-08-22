@@ -23,7 +23,7 @@ not make authoritative policy decisions.
 
 ## Development
 
-Requirements: Node.js 22.x and Bun 1.3.x (`bun@1.3.14`).
+Requirements: Node.js 22.x and Bun 1.4.x (`bun@1.4.0`).
 
 ```bash
 bun install

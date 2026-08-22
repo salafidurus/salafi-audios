@@ -168,12 +168,12 @@ describe("applyBunUpdate", () => {
       type: "bun",
       packageName: "bun",
       currentVersion: "bun@1.2.5",
-      latestVersion: "bun@1.3.14",
+      latestVersion: "bun@1.4.0",
     };
     await applyBunUpdate(candidate, tmpDir);
 
     const bunVersion = readFileSync(join(tmpDir, ".bun-version"), "utf-8").trim();
-    expect(bunVersion).toBe("1.3.14");
+    expect(bunVersion).toBe("1.4.0");
   });
 });
 
