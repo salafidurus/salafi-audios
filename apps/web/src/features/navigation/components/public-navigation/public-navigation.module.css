@@ -85,13 +85,6 @@
   gap: var(--space-component-gap-xl);
 }
 
-.adminNav {
-  padding: var(--space-xs) var(--space-component-gap-sm);
-  border-block: 1px solid var(--border-subtle);
-  border-radius: var(--radius-component-panel);
-  background: color-mix(in srgb, var(--surface-subtle) 42%, transparent);
-}
-
 .navLink,
 .accountPopover a,
 .accountPopover button {
@@ -113,21 +106,15 @@
 .navLink {
   position: relative;
   min-height: 3rem;
-  padding: var(--space-sm) var(--space-md) calc(var(--space-sm) + var(--space-xs));
+  padding: var(--space-component-gap-lg) var(--space-component-gap-xl);
+  border: 1px solid transparent;
+  border-radius: var(--radius-scale-sm);
   font-family: var(--font-body), sans-serif;
-  font-size: calc(var(--typo-body-lg-font-size) + var(--space-scale-xs));
+  font-size: var(--typo-body-lg-font-size);
   font-weight: var(--typo-body-lg-font-weight);
   letter-spacing: var(--typo-body-lg-letter-spacing);
   line-height: var(--typo-body-lg-line-height);
   white-space: nowrap;
-}
-
-.adminNav .navLink {
-  font-weight: 500;
-}
-
-.adminNav .active {
-  font-weight: 700;
 }
 
 .navLink:hover,
@@ -140,18 +127,10 @@
 
 .active {
   position: relative;
+  border-color: var(--border-subtle);
   color: var(--action-primary);
   font-weight: 600;
-}
-
-.active::after {
-  position: absolute;
-  inset-inline: var(--space-md);
-  inset-block-end: 0;
-  height: 2px;
-  border-radius: var(--radius-scale-full);
-  background: var(--action-primary);
-  content: "";
+  background: color-mix(in srgb, var(--surface-hover) 56%, var(--surface-default));
 }
 
 .navLink > svg {
@@ -361,12 +340,6 @@
   padding: 0 var(--space-layout-page-x);
 }
 
-.sheet .adminNav {
-  padding: 0 var(--space-layout-page-x);
-  border: 0;
-  background: transparent;
-}
-
 .sheet .navLink {
   width: 100%;
   padding: var(--space-component-gap-md);
@@ -400,7 +373,7 @@
   }
 
   .navLink {
-    padding-inline: var(--space-sm);
+    padding-inline: var(--space-component-gap-md);
   }
 
     .searchControl {
