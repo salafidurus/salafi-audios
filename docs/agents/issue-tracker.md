@@ -11,6 +11,18 @@ Issues and specs for this repository live as GitHub issues. Use the `gh` CLI for
 - **Apply or remove labels**: `gh issue edit <number> --add-label "..."` or `--remove-label "..."`.
 - **Close an issue**: `gh issue close <number> --comment "..."`
 
+## Completed specs
+
+Specs are umbrella issues labelled `spec`; implementation issues are labelled
+`ticket` and begin their body with `Part of #<spec-number>`. The
+`close-completed-specs` workflow closes an open spec automatically after it has
+at least one linked ticket and every linked ticket is closed.
+
+The workflow removes active triage-state labels from the completed spec,
+preserves the `spec` label, and posts a completion comment. It does not apply
+`wontfix`: completion is distinct from rejection. A completed spec may
+therefore be closed without a state-role label.
+
 Infer the repository from `git remote -v`; `gh` does this automatically inside the clone.
 
 ## Pull requests as a triage surface
