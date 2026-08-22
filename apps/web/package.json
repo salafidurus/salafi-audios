@@ -20,6 +20,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@base-ui/react": "^1.7.0",
     "@casl/ability": "catalog:",
     "@sd/core-api": "workspace:*",
     "@sd/core-contracts": "workspace:*",
