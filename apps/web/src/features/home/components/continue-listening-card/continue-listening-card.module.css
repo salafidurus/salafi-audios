@@ -51,12 +51,13 @@
   align-self: center;
   overflow: hidden;
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-scale-md);
+  border-radius: 50%;
   background: var(--surface-subtle);
 }
 
 .artworkImage {
   object-fit: cover;
+  border-radius: 50%;
 }
 
 .scholarArtwork {
@@ -128,7 +129,7 @@
 .scholar {
   margin: 0;
   color: var(--content-secondary);
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 600;
 }
 
@@ -163,7 +164,7 @@
 
 .timeRow {
   color: var(--content-muted);
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -172,11 +173,11 @@
   align-items: center;
   gap: 0.45rem;
   margin-top: 0.25rem;
-  padding: 0.6rem 0.9rem;
+  padding: 0.72rem 1.1rem;
   border-radius: var(--radius-full);
   background: var(--action-primary);
   color: var(--content-on-primary);
-  font-size: 0.92rem;
+  font-size: 1rem;
   font-weight: 700;
   border: 0;
   cursor: pointer;

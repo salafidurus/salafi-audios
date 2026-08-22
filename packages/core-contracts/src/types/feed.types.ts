@@ -11,6 +11,7 @@ export const FeedContentItemDtoSchema = z.object({
   slug: z.string(),
   scholarName: z.string(),
   scholarSlug: z.string(),
+  scholarImageUrl: z.string().optional(),
   thumbnailUrl: z.string().nullable(),
   durationSeconds: z.number().nullable(),
   publishedLectureCount: z.number().optional(),

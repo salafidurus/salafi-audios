@@ -4,14 +4,12 @@ import type { RecentProgressDto } from "@sd/core-contracts";
 
 import { routes } from "@sd/core-contracts";
 import { Play } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { usePlayListing } from "@/features/audio";
+import { AppAvatar } from "@/shared/components/app-avatar";
 import { AppText } from "@/shared/components/AppText/AppText";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
 import styles from "./continue-listening-card.module.css";
@@ -73,11 +71,7 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
     recentProgress.scholarName,
     recentProgress.scholarSlug,
   );
-  const [artworkStage, setArtworkStage] = useState<"listing" | "scholar" | "fallback">(
-    recentProgress.artworkUrl ? "listing" : recentProgress.scholarImageUrl ? "scholar" : "fallback",
-  );
   const progress = getProgress(recentProgress.positionSeconds, recentProgress.durationSeconds);
-  const initials = getInitials(scholarName);
   const { play, isLoading: isResumeLoading } = usePlayListing({
     id: recentProgress.lectureId,
     slug: recentProgress.lectureSlug,
@@ -87,13 +81,6 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
     scholarSlug: recentProgress.scholarSlug,
     artworkUrl: recentProgress.artworkUrl,
   });
-
-  const handleArtworkError = () => {
-    setArtworkStage((stage) => {
-      if (stage === "listing" && recentProgress.scholarImageUrl) return "scholar";
-      return "fallback";
-    });
-  };
 
   return (
     <section
@@ -121,30 +108,13 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
           onClick={() => onContinueListening?.(recentProgress.lectureSlug)}
         >
           <div className={styles.artwork}>
-            {artworkStage === "listing" && recentProgress.artworkUrl ? (
-              <Image
-                src={recentProgress.artworkUrl}
-                alt=""
-                fill
-                sizes="(max-width: 640px) 112px, 152px"
-                unoptimized
-                className={styles.artworkImage}
-                onError={handleArtworkError}
-              />
-            ) : artworkStage === "scholar" && recentProgress.scholarImageUrl ? (
-              <Avatar className={styles.scholarArtwork}>
-                <AvatarImage
-                  src={recentProgress.scholarImageUrl}
-                  alt=""
-                  onError={handleArtworkError}
-                />
-                <AvatarFallback>{initials}</AvatarFallback>
-              </Avatar>
-            ) : (
-              <Avatar className={styles.scholarArtwork}>
-                <AvatarFallback>{initials}</AvatarFallback>
-              </Avatar>
-            )}
+            <AppAvatar
+              listingArtwork={recentProgress.artworkUrl}
+              scholarImageUrl={recentProgress.scholarImageUrl}
+              text={scholarName}
+              sizes="(max-width: 640px) 112px, 152px"
+              className={recentProgress.artworkUrl ? styles.artworkImage : styles.scholarArtwork}
+            />
           </div>
         </Link>
 
@@ -199,17 +169,6 @@ function RichResumeCard({ recentProgress, onContinueListening }: RichResumeCardP
 function getProgress(positionSeconds: number, durationSeconds: number): number | null {
   if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) return null;
   return Math.min(100, Math.max(0, Math.round((positionSeconds / durationSeconds) * 100)));
-}
-
-function getInitials(name: string): string {
-  const words = name.trim().split(/\s+/).filter(Boolean);
-  return (
-    words
-      .slice(0, 2)
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase() || "?"
-  );
 }
 
 function getResumeContext(progress: RecentProgressDto): string[] {

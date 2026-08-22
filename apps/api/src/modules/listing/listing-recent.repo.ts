@@ -39,6 +39,7 @@ export class RecentListingsRepo {
           select: {
             name: true,
             slug: true,
+            imageUrl: true,
             mainLanguage: true,
             translations: {
               where: { locale, status: TranslationStatus.published },
@@ -83,6 +84,7 @@ export class RecentListingsRepo {
         slug: r.slug,
         scholarName,
         scholarSlug: r.scholar!.slug,
+        scholarImageUrl: r.scholar!.imageUrl ?? undefined,
         thumbnailUrl: thumbnailUrl ?? null,
         durationSeconds: durationSeconds ?? 0,
         publishedLectureCount,

@@ -11,6 +11,10 @@
   box-shadow: var(--shadow-sm);
 }
 
+.hero:not(:has(.visualRegion)) .content {
+  max-width: 100%;
+}
+
 .marginalia {
   position: absolute;
   inset-inline-start: 0;
@@ -28,16 +32,16 @@
 .arabicText {
   writing-mode: vertical-rl;
   font-family: var(--typo-display-lg-font-family), serif;
-  font-size: 14px;
+  font-size: 16px;
   letter-spacing: 2px;
   color: var(--action-primary);
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
 .bookmark {
   position: absolute;
   top: 0;
-  inset-inline-end: 36px;
+  inset-inline-end: clamp(2rem, 5vw, 5rem);
   width: 32px;
   height: 48px;
   background: linear-gradient(180deg, var(--content-primary-strong), var(--action-primary));
@@ -52,6 +56,45 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
+  max-width: 65%;
+}
+
+.visualRegion {
+  position: absolute;
+  inset-block: 2rem 2.25rem;
+  inset-inline-end: clamp(2rem, 5vw, 5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(27%, 18rem);
+  z-index: 0;
+}
+
+.visualFrame {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+  border-radius: 50%;
+  background: var(--surface-subtle);
+  box-shadow: var(--shadow-xs);
+}
+
+.artworkImage {
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.scholarArtwork {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-primary-subtle-surface);
+  color: var(--content-primary-strong);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
 }
 
 .eyebrow {
@@ -73,23 +116,37 @@
   color: var(--content-strong);
 }
 
+.titleLink,
+.scholarLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.titleLink:hover,
+.scholarLink:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--action-primary);
+  text-underline-offset: 0.16em;
+}
+
 .subtitle {
   margin: 0;
-  color: var(--content-muted);
-  font-size: 13.5px;
+  color: var(--content-secondary);
+  font-size: 1.15rem;
+  font-weight: 600;
 }
 
 .recommendation {
-  margin: 2px 0 0 0;
+  margin: 2px 0 0;
   color: var(--content-muted);
-  font-size: 12.5px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
 .ctaRow {
-  margin-top: 12px;
+  margin-top: 1.25rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -100,12 +157,12 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 40px;
+  height: 46px;
   padding: 0 22px;
   border-radius: 999px;
   background: var(--action-primary);
   color: var(--content-on-primary);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   border: none;
   cursor: pointer;
@@ -119,7 +176,7 @@
 }
 
 .browseLabel {
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--content-muted);
   margin-left: 4px;
 }
@@ -128,13 +185,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 34px;
+  height: 38px;
   padding: 0 14px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--surface-default) 75%, transparent);
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--border-subtle);
   color: var(--content-strong);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: border-color 150ms ease, background-color 150ms ease;
@@ -149,11 +206,26 @@
   .hero {
     min-height: 220px;
     padding: 1.5rem 1.25rem 1.5rem 3.25rem;
+    flex-direction: column;
   }
 
   .title {
     max-width: 100%;
     font-size: 24px;
+  }
+
+  .content {
+    max-width: 100%;
+    order: 1;
+  }
+
+  .visualRegion {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 10rem;
+    margin-top: 0.5rem;
+    order: 2;
   }
 
   .ctaRow {
@@ -191,6 +263,11 @@
   width: 140px;
   border-radius: 999px;
   margin-top: 8px;
+}
+
+.skeletonArtwork {
+  width: 100%;
+  height: 100%;
 }
 
 .skeletonLine {

@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { usePlayListing } from "@/features/audio";
+import { AppAvatar } from "@/shared/components/app-avatar";
 
 import styles from "./hero-section.module.css";
 
@@ -35,6 +36,10 @@ export function HeroSection({
           slug: recentProgress.lectureSlug,
           title: recentProgress.lectureTitle,
           scholarName: recentProgress.scholarName,
+          scholarSlug: recentProgress.scholarSlug,
+          format: recentProgress.format,
+          artworkUrl: recentProgress.artworkUrl,
+          scholarImageUrl: recentProgress.scholarImageUrl,
         }
       : featuredContent
         ? {
@@ -42,6 +47,10 @@ export function HeroSection({
             slug: featuredContent.slug,
             title: featuredContent.title,
             scholarName: featuredContent.scholarName,
+            scholarSlug: featuredContent.scholarSlug,
+            format: featuredContent.kind,
+            artworkUrl: featuredContent.thumbnailUrl ?? undefined,
+            scholarImageUrl: featuredContent.scholarImageUrl,
           }
         : null;
 
@@ -51,8 +60,10 @@ export function HeroSection({
           id: heroItem.id,
           slug: heroItem.slug,
           title: heroItem.title,
-          format: "single",
+          format: heroItem.format,
           scholarName: heroItem.scholarName,
+          scholarSlug: heroItem.scholarSlug,
+          artworkUrl: heroItem.artworkUrl,
         }
       : null,
   );
@@ -81,6 +92,11 @@ export function HeroSection({
           <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
           <div className={`${styles.skeletonLine} ${styles.skeletonSubtitle}`} />
           <div className={`${styles.skeletonLine} ${styles.skeletonCta}`} />
+        </div>
+        <div className={styles.visualRegion} aria-hidden="true">
+          <div className={styles.visualFrame}>
+            <div className={`${styles.skeletonLine} ${styles.skeletonArtwork}`} />
+          </div>
         </div>
       </section>
     );
@@ -132,9 +148,15 @@ export function HeroSection({
               : "AS-SALAMU 'ALAYKUM · FEATURED LESSON"}
         </p>
         <h1 className={styles.title} data-testid="home-hero-title">
-          {title}
+          <Link href={routes.listings.detail(heroItem.slug)} className={styles.titleLink}>
+            {title}
+          </Link>
         </h1>
-        <p className={styles.subtitle}>{`Shaykh ${scholarName}`}</p>
+        <p className={styles.subtitle}>
+          <Link href={routes.scholars.detail(heroItem.scholarSlug)} className={styles.scholarLink}>
+            {`Shaykh ${scholarName}`}
+          </Link>
+        </p>
         {!hasHistory && (
           <p className={styles.recommendation}>
             <Sparkles size={13} color="var(--action-primary)" /> Recommended starting point for new
@@ -175,6 +197,38 @@ export function HeroSection({
           )}
         </div>
       </div>
+      <div className={styles.visualRegion}>
+        <Link
+          href={routes.listings.detail(heroItem.slug)}
+          className={styles.visualFrame}
+          aria-label={`Open ${title}`}
+        >
+          <HeroArtwork
+            key={heroItem.id}
+            artworkUrl={heroItem.artworkUrl}
+            scholarImageUrl={heroItem.scholarImageUrl}
+            scholarName={scholarName}
+          />
+        </Link>
+      </div>
     </section>
+  );
+}
+
+type HeroArtworkProps = {
+  artworkUrl?: string;
+  scholarImageUrl?: string;
+  scholarName: string;
+};
+
+function HeroArtwork({ artworkUrl, scholarImageUrl, scholarName }: HeroArtworkProps) {
+  return (
+    <AppAvatar
+      listingArtwork={artworkUrl}
+      scholarImageUrl={scholarImageUrl}
+      text={scholarName}
+      sizes="(max-width: 640px) 42vw, 24vw"
+      className={artworkUrl ? styles.artworkImage : styles.scholarArtwork}
+    />
   );
 }
