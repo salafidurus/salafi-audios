@@ -87,6 +87,38 @@
   gap: var(--space-component-gap-sm, 12px);
 }
 
+.activeFilters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-component-gap-xs, 8px);
+}
+
+.activeFiltersLabel {
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.activeFilter,
+.clearFilters {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-control);
+  background: var(--surface-default);
+  color: var(--content-default);
+  cursor: pointer;
+  font-size: var(--typo-body-sm-font-size);
+  padding: var(--space-scale-2xs, 4px) var(--space-scale-xs, 8px);
+}
+
+.activeFilter:hover,
+.clearFilters:hover {
+  background: var(--surface-hover);
+}
+
+.clearFilters {
+  color: var(--content-accent);
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
