@@ -90,18 +90,37 @@
 
 .searchControl {
   width: clamp(15rem, 22vw, 19rem);
+  min-height: 2.5rem;
   justify-content: flex-start;
-  border-color: var(--border-subtle);
-  background: var(--surface-subtle);
+  padding: var(--space-sm) var(--space-md);
+  border-color: var(--input-border-rest);
+  border-radius: var(--radius-scale-full);
+  background: var(--input-surface-rest);
+  color: var(--content-muted);
 }
 
 .searchControl:hover,
 .searchControl:focus-visible,
-.accountControl:hover,
-.accountControl:focus-visible {
-  border-color: var(--border-subtle);
+.accountMenu .accountControl:hover,
+.accountMenu .accountControl:focus-visible,
+.accountMenu .accountControl[aria-expanded="true"] {
+  border-color: var(--input-border-focus);
   color: var(--content-strong);
+  background: var(--input-surface-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-focus-ring) 24%, transparent);
+}
+
+.accountMenu .accountControl {
+  border-color: transparent;
+  background: transparent;
+}
+
+.accountMenu .accountControl:hover,
+.accountMenu .accountControl:focus-visible,
+.accountMenu .accountControl[aria-expanded="true"] {
+  border-color: var(--border-subtle);
   background: var(--surface-hover);
+  box-shadow: none;
 }
 
 .navLink {
@@ -267,6 +286,7 @@
 
   .searchControl {
     width: 2.25rem;
+    border-radius: var(--radius-component-chip);
     padding-inline: 0;
   }
 
