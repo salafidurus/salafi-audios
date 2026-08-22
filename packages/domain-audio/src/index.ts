@@ -17,6 +17,8 @@ export {
 } from "./progress/progress.sync";
 export { usePlaybackStore } from "./store/playback.store";
 export { DurusAudioService } from "./service/audio.service";
+export { ListeningSession } from "./session/listening.session";
+export type { ListeningPlayOptions } from "./session/listening.session";
 export { useAudio } from "./hooks/use-audio";
 export { useListingProgress } from "./hooks/use-listing-progress";
 export { useQueue } from "./hooks/use-queue";
