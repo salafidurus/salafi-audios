@@ -192,11 +192,14 @@ function getResumeContext(progress: RecentProgressDto): string[] {
   if (progress.format !== "single" || !progress.seriesContext) return [];
 
   const parentTitle = progress.seriesContext?.seriesTitle;
+  const lessonNumber =
+    progress.orderIndex === undefined ? null : String(progress.orderIndex).padStart(2, "0");
+  const lessonContext = [lessonNumber, parentTitle].filter(Boolean).join(" · ");
   if (progress.rootFormat === "collection" && progress.rootListing) {
-    return [`Module · ${parentTitle}`, `Collection · ${progress.rootListing.title}`];
+    return [lessonContext, progress.rootListing.title];
   }
 
-  return [`Series · ${parentTitle}`];
+  return [lessonContext];
 }
 
 function formatDuration(seconds: number): string {

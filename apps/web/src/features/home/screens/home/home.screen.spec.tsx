@@ -89,7 +89,7 @@ describe("HomeScreen", () => {
     expect(lectureTitle.textContent).toBe("Tauheed Explained");
 
     expect(screen.getByTestId("continue-listening-context").textContent).toBe(
-      "Series · Foundations of Tawheed",
+      "02 · Foundations of Tawheed",
     );
 
     const scholarName = screen.getByTestId("continue-listening-scholar-name");
@@ -174,8 +174,8 @@ describe("HomeScreen", () => {
 
     const contextLines = screen.getAllByTestId("continue-listening-context");
     expect(contextLines.map((line) => line.textContent)).toEqual([
-      "Module · Kitab al-Tawhid",
-      "Collection · Foundations of Tawhid",
+      "Kitab al-Tawhid",
+      "Foundations of Tawhid",
     ]);
   });
 
