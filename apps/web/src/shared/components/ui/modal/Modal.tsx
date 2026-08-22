@@ -1,6 +1,6 @@
 "use client";
 
-import { Children, isValidElement, useEffect, useState, type ReactElement, type ReactNode } from "react";
+import { Children, createContext, isValidElement, useCallback, useContext, useState, type ReactElement, type ReactNode } from "react";
 import { z } from "zod";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -19,6 +19,7 @@ export type ModalWidthVariant = "wide" | "standard" | "narrow" | "auto";
 export type ModalHeightVariant = "long" | "standard" | "short" | "auto";
 export interface ModalProps {
   isOpen: boolean; onClose: () => void; title?: string; children?: ReactNode; footer?: ReactNode;
+  modal?: boolean;
   size?: "sm" | "md" | "lg" | "xl"; width?: ModalWidthVariant | string | number; height?: ModalHeightVariant | string | number;
   hideFooter?: boolean; footerAlignment?: "left" | "right" | "center" | "space-between"; footerBorder?: boolean; loading?: boolean;
   multiTab?: boolean; requireReview?: boolean; activeTab?: string; onActiveTabChange?: (id: string) => void; defaultActiveTab?: string;
@@ -33,6 +34,7 @@ const modalWidthSchema = z.enum(["wide", "standard", "narrow", "auto"]);
 function isModalTab(child: ReactNode): child is ReactElement<ModalTabProps> { return isValidElement<ModalTabProps>(child) && modalIdSchema.safeParse(child.props).success; }
 function isModalContentItem(child: ReactNode): child is ReactElement<ModalContentProps> { return isValidElement<ModalContentProps>(child) && modalIdSchema.safeParse(child.props).success; }
 function isModalWidth(value: string): value is ModalWidthVariant { return modalWidthSchema.safeParse(value).success; }
+const modalTabChangeContext = createContext<((value: string) => void) | null>(null);
 
 function ModalBody({ children }: { children: ReactNode }) { return <div className="max-h-[min(70vh,48rem)] overflow-y-auto py-2">{children}</div>; }
 function ModalHeader({ children }: { children: ReactNode }) { return <DialogHeader><DialogTitle>{children}</DialogTitle></DialogHeader>; }
@@ -45,28 +47,27 @@ function ModalTabItem(_props: ModalTabProps) { return null; }
 function ModalTabs({ children, errorTabs = [] }: { children?: ReactNode; errorTabs?: string[] }) {
   const tabs = Children.toArray(children).filter(isModalTab);
   const errorTabSet = new Set(errorTabs);
+  const onTabChange = useContext(modalTabChangeContext);
   return <TabsList className="w-full justify-start overflow-x-auto">{tabs.map((tab) => {
     const props = tab.props;
-    return <TabsTrigger key={props.id} value={props.id} disabled={props.disabled} aria-invalid={props.hasError || errorTabSet.has(props.id) || undefined}>{props.children}</TabsTrigger>;
+    return <TabsTrigger key={props.id} value={props.id} disabled={props.disabled} onClick={() => onTabChange?.(props.id)} aria-invalid={props.hasError || errorTabSet.has(props.id) || undefined}>{props.children}</TabsTrigger>;
   })}</TabsList>;
 }
 function ModalContentItem(_props: ModalContentProps) { return null; }
 function ModalContent({ children }: { children?: ReactNode }) {
   const items = Children.toArray(children).filter(isModalContentItem);
-  return <>{items.map((item) => <TabsContent key={item.props.id} value={item.props.id} forceMount>{item.props.children}</TabsContent>)}</>;
+  return <>{items.map((item) => <TabsContent key={item.props.id} value={item.props.id}>{item.props.children}</TabsContent>)}</>;
 }
 
-function ModalRoot({ isOpen, onClose, title, children, footer, size = "md", width = "standard", hideFooter, footerAlignment = "right", footerBorder = true, loading, multiTab = false, requireReview = false, activeTab: controlledActiveTab, onActiveTabChange, defaultActiveTab = "en", reviewTabId = "review", saveFormId, saving = false, saveLabel, savingLabel, reviewLabel, cancelLabel }: ModalProps) {
+function ModalRoot({ isOpen, onClose, title, children, footer, size = "md", width = "standard", modal = true, hideFooter, footerAlignment = "right", footerBorder = true, loading, multiTab = false, requireReview = false, activeTab: controlledActiveTab, onActiveTabChange, defaultActiveTab = "en", reviewTabId = "review", saveFormId, saving = false, saveLabel, savingLabel, reviewLabel, cancelLabel }: ModalProps) {
   const { t } = useTranslation();
-  const [activeTab, setActiveTabState] = useState(controlledActiveTab ?? defaultActiveTab);
-  useEffect(() => {
-    if (controlledActiveTab !== undefined) setActiveTabState(controlledActiveTab);
-  }, [controlledActiveTab]);
-  const setActiveTab = (value: string) => { setActiveTabState(value); onActiveTabChange?.(value); };
-  const content = multiTab ? <Tabs value={activeTab} onValueChange={setActiveTab}>{children}</Tabs> : children;
+  const [uncontrolledActiveTab, setUncontrolledActiveTab] = useState(defaultActiveTab);
+  const activeTab = controlledActiveTab ?? uncontrolledActiveTab;
+  const setActiveTab = useCallback((value: string) => { onActiveTabChange?.(value); if (!onActiveTabChange) setUncontrolledActiveTab(value); }, [onActiveTabChange]);
+  const content = multiTab ? <modalTabChangeContext.Provider value={setActiveTab}><Tabs value={activeTab} onValueChange={setActiveTab}>{children}</Tabs></modalTabChangeContext.Provider> : children;
   const parsedWidth = z.union([modalWidthSchema, z.string()]).safeParse(width);
   const maxWidth = parsedWidth.success && isModalWidth(parsedWidth.data) ? widthClasses[parsedWidth.data] : undefined;
-  return <Dialog open={isOpen} onOpenChange={(open) => !open && !loading && onClose()}>
+  return <Dialog open={isOpen} modal={modal} onOpenChange={(open) => !open && !loading && onClose()}>
     <DialogContent className={maxWidth} data-size={size}>
       {title && <ModalHeader>{title}</ModalHeader>}
       <DialogDescription className="sr-only">Dialog content</DialogDescription>
@@ -82,7 +83,7 @@ function ModalRoot({ isOpen, onClose, title, children, footer, size = "md", widt
 function ModalConfirmDialog({ isOpen, onClose, onConfirm, title, confirmLabel = "Confirm", confirmVariant = "default", children, loading = false, testId, cancelTestId, modalTestId }: { isOpen: boolean; onClose: () => void; onConfirm: () => void | Promise<void>; title: string; confirmLabel?: string; confirmVariant?: "default" | "danger"; children?: ReactNode; loading?: boolean; testId?: string; cancelTestId?: string; modalTestId?: string }) {
   const [internalLoading, setInternalLoading] = useState(false); const isLoading = loading || internalLoading;
   const confirm = async () => { setInternalLoading(true); try { await onConfirm(); onClose(); } finally { setInternalLoading(false); } };
-  return <div data-testid={modalTestId}><Modal isOpen={isOpen} onClose={onClose} title={title} loading={isLoading} footer={<><Button variant="outline" size="sm" onClick={onClose} disabled={isLoading} data-testid={cancelTestId}>Cancel</Button><Button variant={confirmVariant === "danger" ? "danger" : "primary"} size="sm" onClick={confirm} loading={isLoading} data-testid={testId}>{confirmLabel}</Button></>}><ModalBody>{children}</ModalBody></Modal></div>;
+  return <div data-testid={modalTestId}><Modal isOpen={isOpen} modal={false} onClose={onClose} title={title} loading={isLoading} footer={<><Button variant="outline" size="sm" onClick={onClose} disabled={isLoading} data-testid={cancelTestId}>Cancel</Button><Button variant={confirmVariant === "danger" ? "danger" : "primary"} size="sm" onClick={confirm} loading={isLoading} data-testid={testId}>{confirmLabel}</Button></>}><ModalBody>{children}</ModalBody></Modal></div>;
 }
 
 function ModalConfirmText({ isOpen, onClose, onConfirm, title, message, confirmLabel, confirmVariant = "default", confirmWord, loading = false, testId, modalTestId, cancelTestId }: { isOpen: boolean; onClose: () => void; onConfirm: () => void | Promise<void>; title: string; message: string; confirmLabel: string; confirmVariant?: "default" | "danger"; confirmWord: string; loading?: boolean; testId?: string; modalTestId?: string; cancelTestId?: string }) {
