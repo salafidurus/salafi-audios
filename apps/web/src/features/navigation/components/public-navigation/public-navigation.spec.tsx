@@ -19,6 +19,15 @@ vi.mock("@sd/domain-account", () => ({
   hasAnyAdminAccess: (ability: { rules: unknown[] }) => ability.rules.length > 0,
 }));
 
+vi.mock("@sd/domain-search", () => ({
+  useSearchCatalog: vi.fn(() => ({ data: undefined, isLoading: false })),
+  useTopicsList: vi.fn(() => ({ data: [], isLoading: false })),
+}));
+
+vi.mock("@sd/domain-content", () => ({
+  useInfiniteScholarsList: vi.fn(() => ({ data: undefined, isLoading: false })),
+}));
+
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     t: (_key: string, fallback?: string) => fallback || _key,
@@ -90,17 +99,17 @@ describe("PublicNavigation", () => {
     const mainNavigation = screen.getByRole("navigation", { name: "Main" });
     expect(mainNavigation).toBeInTheDocument();
     expect(within(mainNavigation).queryByRole("link", { name: "Search" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Search anything" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Search catalog" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
     expect(screen.queryByTestId("sidebar")).not.toBeInTheDocument();
   });
 
-  it("opens search from the search trigger", () => {
+  it("opens the catalog palette from the search trigger", () => {
     render(<PublicNavigation />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Search anything" }));
+    fireEvent.click(screen.getByRole("button", { name: "Search catalog" }));
 
-    expect(mockRouterPush).toHaveBeenCalledWith("/search");
+    expect(screen.getByRole("dialog", { name: "Search catalog" })).toBeInTheDocument();
   });
 
   it("keeps account controls clear for signed-out visitors", () => {
