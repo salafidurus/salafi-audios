@@ -5,7 +5,7 @@
   flex: 0 0 auto;
   width: 100%;
   border-block-end: 1px solid var(--border-subtle);
-  background: var(--chrome-surface);
+  background: var(--chrome-surface-strong);
 }
 
 .inner {
@@ -112,6 +112,15 @@
     color 150ms ease,
     background-color 150ms ease,
     border-color 150ms ease;
+}
+
+.accountPopover .workspaceSwitch {
+  justify-content: flex-start;
+  min-height: 2.5rem;
+  border: 0;
+  border-radius: var(--radius-component-chip);
+  color: var(--content-default);
+  background: transparent;
 }
 
 .navLink {

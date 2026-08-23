@@ -5,15 +5,17 @@ import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
 import clsx from "clsx";
 import {
   Bookmark,
-  ArrowLeftRight,
+  ArrowLeft,
   ChevronDown,
   Compass,
   GraduationCap,
   Home,
   BarChart3,
+  LayoutDashboard,
+  LibraryBig,
   Menu,
   Search,
-  Settings2,
+  UsersRound,
   UserRound,
   type LucideIcon,
 } from "lucide-react";
@@ -122,7 +124,11 @@ function WorkspaceSwitch({
 
   return (
     <Link href={href} className={styles.workspaceSwitch} role={menuItem ? "menuitem" : undefined}>
-      <ArrowLeftRight aria-hidden="true" size={16} />
+      {isAdminWorkspace ? (
+        <ArrowLeft aria-hidden="true" size={16} />
+      ) : (
+        <LayoutDashboard aria-hidden="true" size={16} />
+      )}
       {label}
     </Link>
   );
@@ -130,7 +136,11 @@ function WorkspaceSwitch({
 
 function getAdminNavItems(t: (key: string, fallback: string) => string): AdminNavItem[] {
   return [
-    { label: t("navigation.admin.home", "Dashboard"), href: routes.admin.index, Icon: Home },
+    {
+      label: t("navigation.admin.home", "Dashboard"),
+      href: routes.admin.index,
+      Icon: LayoutDashboard,
+    },
     { label: t("navigation.admin.stats", "Stats"), href: routes.admin.stats, Icon: BarChart3 },
     {
       label: t("navigation.admin.scholars", "Scholars"),
@@ -141,13 +151,13 @@ function getAdminNavItems(t: (key: string, fallback: string) => string): AdminNa
     {
       label: t("navigation.admin.contents", "Contents"),
       href: routes.admin.contents,
-      Icon: Bookmark,
+      Icon: LibraryBig,
       isVisible: (ability) => ability.can("read", "Listing") || ability.can("read", "Topic"),
     },
     {
       label: t("navigation.admin.users", "Users"),
       href: routes.admin.users,
-      Icon: Settings2,
+      Icon: UsersRound,
       isVisible: (ability) => ability.can("manage", "UserAccess"),
     },
   ];
