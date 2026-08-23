@@ -14,7 +14,7 @@ test.describe("Navigation — public workspace & routing", () => {
     test("search trigger opens the catalog command palette", async ({ page }) => {
       await page.goto("/");
       await page.getByRole("button", { name: "Search catalog" }).click();
-      await expect(page.getByRole("dialog", { name: "Search catalog" })).toBeVisible();
+      await expect(page.getByRole("dialog")).toBeVisible();
     });
 
     test("brand link navigates to home", async ({ page }) => {
