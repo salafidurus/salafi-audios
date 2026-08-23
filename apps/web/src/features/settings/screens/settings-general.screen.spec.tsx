@@ -64,8 +64,8 @@ vi.mock("@/features/settings/components/accent-theme-picker/AccentThemePicker", 
   AccentThemePicker: ({ value, onChange }: { value: string; onChange: (id: string) => void }) => (
     <div>
       <span data-testid="accent-picker-value">{value}</span>
-      <button type="button" onClick={() => onChange("ember")}>
-        choose-ember
+      <button type="button" onClick={() => onChange("midnight")}>
+        choose-midnight
       </button>
     </div>
   ),
@@ -115,6 +115,12 @@ describe("SettingsGeneralScreen", () => {
   it("renders Notifications section", () => {
     render(<SettingsGeneralScreen />);
     expect(screen.getByText("Notifications")).toBeInTheDocument();
+  });
+
+  it("does not render the mobile section", () => {
+    render(<SettingsGeneralScreen />);
+    expect(screen.queryByText("MOBILE")).not.toBeInTheDocument();
+    expect(screen.queryByText("Download the app")).not.toBeInTheDocument();
   });
 
   it("renders LanguageSwitch and ContentLanguageToggle", () => {
@@ -170,7 +176,7 @@ describe("SettingsGeneralScreen", () => {
     render(<SettingsGeneralScreen />);
     await act(async () => {});
 
-    fireEvent.click(screen.getByRole("button", { name: "choose-ember" }));
+    fireEvent.click(screen.getByRole("button", { name: "choose-midnight" }));
 
     expect(screen.queryByRole("button", { name: "Dark" })).not.toBeInTheDocument();
   });
@@ -179,8 +185,8 @@ describe("SettingsGeneralScreen", () => {
     render(<SettingsGeneralScreen />);
     await act(async () => {});
 
-    fireEvent.click(screen.getByRole("button", { name: "choose-ember" }));
+    fireEvent.click(screen.getByRole("button", { name: "choose-midnight" }));
 
-    expect(localStorageMock.getItem("accent-theme:v1")).toBe("ember");
+    expect(localStorageMock.getItem("accent-theme:v1")).toBe("midnight");
   });
 });

@@ -33,17 +33,21 @@ const SYSTEM_OPTION: Omit<AccentThemeOption, "id"> & { id: "system" } = {
   isSystem: true,
 };
 
+const SELECTABLE_ACCENT_THEME_IDS = ["parchment", "midnight"] as const;
+
 const ACCENT_OPTIONS = [
   SYSTEM_OPTION,
-  ...Object.entries(ACCENT_PALETTES).map(([id, palette]) => ({
-    // SAFETY: ACCENT_PALETTES is keyed by AccentThemeId.
-    id: id as AccentThemeId,
-    name: palette.label,
-    description: palette.description,
-    swatches: palette.swatches,
-    accent: palette.gold,
-    onAccent: palette.onGold,
-  })),
+  ...SELECTABLE_ACCENT_THEME_IDS.map((id) => {
+    const palette = ACCENT_PALETTES[id];
+    return {
+      id,
+      name: palette.label,
+      description: palette.description,
+      swatches: palette.swatches,
+      accent: palette.gold,
+      onAccent: palette.onGold,
+    };
+  }),
 ] satisfies AccentThemeOption[];
 
 export type AccentThemePickerValue = "system" | AccentThemeId;

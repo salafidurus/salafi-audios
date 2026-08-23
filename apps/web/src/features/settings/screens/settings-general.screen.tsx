@@ -7,13 +7,8 @@ import type { ThemePreference } from "@/core/styles/ThemeSync";
 import type { AccentThemePickerValue } from "@/features/settings/components/accent-theme-picker/AccentThemePicker";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import {
-  getDefaultAccentTheme,
-  isAccentThemeId,
-  setAccentThemePreference,
-} from "@/core/styles/theme/accent-theme";
+import { getDefaultAccentTheme, setAccentThemePreference } from "@/core/styles/theme/accent-theme";
 import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
-import { DownloadAppCard } from "@/features/home/components/download-app-card/download-app-card";
 import { AccentThemePicker } from "@/features/settings/components/accent-theme-picker/AccentThemePicker";
 import { SegmentedControl } from "@/features/settings/components/SegmentedControl/SegmentedControl";
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
@@ -71,8 +66,11 @@ function loadAccentThemePreference(): AccentThemePickerValue {
   }
 
   const stored = window.localStorage.getItem("accent-theme:v1");
-  if (stored && isAccentThemeId(stored)) {
+  if (stored === "parchment" || stored === "midnight") {
     return stored;
+  }
+  if (stored === "manuscript" || stored === "ember") {
+    return "midnight";
   }
 
   return "system";
@@ -192,11 +190,6 @@ export function SettingsGeneralScreen() {
           )}
           <div className={styles.accentPicker}>
             <AccentThemePicker value={accentTheme} onChange={handleAccentThemeChange} />
-          </div>
-
-          <p className={styles.sectionLabel}>{t("settings.general.mobileSection", "MOBILE")}</p>
-          <div className={styles.downloadCard}>
-            <DownloadAppCard />
           </div>
 
           <p className={styles.sectionLabel}>

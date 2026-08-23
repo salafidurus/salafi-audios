@@ -81,8 +81,7 @@
   width: 100%;
 }
 
-.accentPicker,
-.downloadCard {
+.accentPicker {
   margin-block: var(--space-scale-sm) var(--space-scale-lg);
 }
 
