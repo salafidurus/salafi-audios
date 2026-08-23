@@ -9,11 +9,12 @@ import { useRouter } from "next/navigation";
 import { setLocaleCookie } from "@/core/i18n/locale-cookie";
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownContent,
-  DropdownItem,
-} from "@/shared/components/ui/dropdown";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 
 import styles from "./language-switch.module.css";
 
@@ -51,32 +52,28 @@ export function LanguageSwitch({ direction = "down", collapsed = false }: Langua
   };
 
   return (
-    <Dropdown
-      value={activeLocale}
-      onValueChange={handleSelect}
-      direction={direction}
-      className={clsx(styles.languageSwitch, collapsed && styles.collapsed)}
-    >
-      <DropdownTrigger
-        ariaLabel={t("navigation.languageSwitch", "Language")}
-        className={styles.trigger}
+    <Select value={activeLocale} onValueChange={handleSelect}>
+      <SelectTrigger
+        aria-label={t("navigation.languageSwitch", "Language")}
+        size="sm"
+        className={clsx(styles.trigger, styles.languageSwitch, collapsed && styles.collapsed)}
       >
         {collapsed ? (
           <Languages size={18} />
         ) : (
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <Globe size={14} color="var(--action-primary)" />
+          <SelectValue aria-label={LOCALE_LABELS[activeLocale]}>
+            <Globe aria-hidden="true" size={14} />
             <span>{LOCALE_LABELS[activeLocale]}</span>
-          </div>
+          </SelectValue>
         )}
-      </DropdownTrigger>
-      <DropdownContent>
+      </SelectTrigger>
+      <SelectContent side={direction === "up" ? "top" : "bottom"}>
         {SUPPORTED_LOCALES.map((locale) => (
-          <DropdownItem key={locale} value={locale}>
+          <SelectItem key={locale} value={locale}>
             {LOCALE_LABELS[locale]}
-          </DropdownItem>
+          </SelectItem>
         ))}
-      </DropdownContent>
-    </Dropdown>
+      </SelectContent>
+    </Select>
   );
 }

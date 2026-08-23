@@ -3,6 +3,8 @@
 }
 
 .sectionTitle {
+  counter-increment: legal-section;
+  counter-reset: legal-subsection;
   margin: var(--space-component-gap-lg) 0 var(--space-component-gap-md);
   font-size: calc(var(--typo-h3-font-size) * 1.1);
   font-weight: 700;
@@ -11,7 +13,14 @@
   scroll-margin-top: 120px;
 }
 
+.sectionTitle::before {
+  content: counter(legal-section) ". ";
+  font-variant-numeric: tabular-nums;
+}
+
 .subsectionTitle {
+  counter-increment: legal-subsection;
+  counter-reset: legal-subsubsection;
   margin: var(--space-component-gap-md) 0 var(--space-component-gap-sm);
   font-size: var(--typo-body-lg-font-size);
   font-weight: 600;
@@ -19,12 +28,23 @@
   color: var(--content-strong);
 }
 
+.subsectionTitle::before {
+  content: counter(legal-section) "." counter(legal-subsection) " ";
+  font-variant-numeric: tabular-nums;
+}
+
 .subsubsectionTitle {
+  counter-increment: legal-subsubsection;
   margin: var(--space-component-gap-md) 0 var(--space-component-gap-sm);
   font-size: var(--typo-body-md-font-size);
   font-weight: 600;
   line-height: var(--typo-body-md-line-height);
   color: var(--content-strong);
+}
+
+.subsubsectionTitle::before {
+  content: counter(legal-section) "." counter(legal-subsection) "." counter(legal-subsubsection) " ";
+  font-variant-numeric: tabular-nums;
 }
 
 .paragraph {
@@ -34,10 +54,37 @@
   color: var(--content-default);
 }
 
-.definitionList {
+.romanList {
+  counter-reset: legal-list-item;
   list-style: none;
-  padding: 0;
   margin: 0 0 var(--space-component-gap-md);
+  padding: 0;
+}
+
+.romanList li {
+  counter-increment: legal-list-item;
+  position: relative;
+  margin-bottom: var(--space-component-gap-sm);
+  padding-inline-start: var(--space-component-gap-xl);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--content-default);
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.romanList li::before {
+  position: absolute;
+  inset-inline-start: 0;
+  content: "(" counter(legal-list-item, lower-roman) ")";
+  color: var(--content-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.definitionList {
+  list-style: disc;
+  margin: 0 0 var(--space-component-gap-md);
+  padding-inline-start: var(--space-component-gap-xl);
 }
 
 .definitionList li {
@@ -49,8 +96,8 @@
 
 .bulletList {
   list-style: disc;
-  margin-left: var(--space-component-gap-lg);
-  padding-left: var(--space-component-gap-md);
+  margin-inline-start: var(--space-component-gap-lg);
+  padding-inline-start: var(--space-component-gap-md);
   margin-bottom: var(--space-component-gap-md);
 }
 
@@ -61,15 +108,23 @@
   color: var(--content-default);
 }
 
+.bulletList li p {
+  margin: 0 0 var(--space-component-gap-sm);
+}
+
+.bulletList li p:last-child {
+  margin-bottom: 0;
+}
+
 .definitionList strong {
   color: var(--content-strong);
   font-weight: 600;
 }
 
 .contactList {
-  list-style: none;
-  padding: 0;
+  list-style: disc;
   margin: var(--space-component-gap-md) 0;
+  padding-inline-start: var(--space-component-gap-xl);
 }
 
 .contactList li {

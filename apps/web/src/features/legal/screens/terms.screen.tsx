@@ -9,8 +9,10 @@ import styles from "./legal-screens.module.css";
 export function TermsScreen() {
   return (
     <ScreenView>
-      <div className={styles.container}>
-        <h1 className={styles.title}>Terms and Conditions</h1>
+      <article id="legal-document" className={styles.container} aria-labelledby="terms-title">
+        <h1 id="terms-title" className={styles.title}>
+          Terms of Service
+        </h1>
         <p className={styles.lastUpdated}>Last updated: {TERMS_LAST_UPDATE_DATE}</p>
         <p className={styles.introduction}>
           Please read these terms and conditions carefully before using Our Service.
@@ -40,12 +42,6 @@ export function TermsScreen() {
         <section id="terms-disputes">
           <TermsSections.DisputeResolution />
         </section>
-        <section id="terms-eu-users">
-          <TermsSections.EUUsers />
-        </section>
-        <section id="terms-us-compliance">
-          <TermsSections.USCompliance />
-        </section>
         <section id="terms-severability">
           <TermsSections.SeverabilityAndWaiver />
         </section>
@@ -58,7 +54,7 @@ export function TermsScreen() {
         <section id="terms-contact">
           <TermsSections.ContactUs />
         </section>
-      </div>
+      </article>
     </ScreenView>
   );
 }

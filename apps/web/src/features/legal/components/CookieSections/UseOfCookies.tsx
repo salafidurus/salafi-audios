@@ -1,3 +1,4 @@
+import { ExternalLink } from "../ExternalLink";
 import styles from "../legal-sections.module.css";
 
 export function UseOfCookies() {
@@ -19,7 +20,7 @@ export function UseOfCookies() {
       <p className={styles.paragraph}>
         We use both session and persistent Cookies for the purposes set out below:
       </p>
-      <ul className={styles.paragraph}>
+      <ul className={styles.bulletList}>
         <li>
           <p>
             <strong>Necessary / Essential Cookies</strong>
@@ -76,46 +77,34 @@ export function UseOfCookies() {
         If You&apos;d like to delete Cookies or instruct your web browser to delete or refuse
         Cookies, please visit the help pages of your web browser.
       </p>
-      <ul className={styles.paragraph}>
+      <ul className={styles.bulletList}>
         <li>
           For the Chrome web browser, please visit this page from Google:{" "}
-          <a
+          <ExternalLink
             href="https://support.google.com/accounts/answer/32050"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            https://support.google.com/accounts/answer/32050
-          </a>
+            title="Google cookie settings"
+          />
         </li>
         <li>
           For the Microsoft Edge browser, please visit this page from Microsoft:{" "}
-          <a
+          <ExternalLink
             href="https://support.microsoft.com/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            https://support.microsoft.com/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09
-          </a>
+            title="Microsoft Edge cookie settings"
+          />
         </li>
         <li>
           For the Firefox web browser, please visit this page from Mozilla:{" "}
-          <a
+          <ExternalLink
             href="https://support.mozilla.org/en-US/kb/delete-cookies-remove-info-websites-stored"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            https://support.mozilla.org/en-US/kb/delete-cookies-remove-info-websites-stored
-          </a>
+            title="Firefox cookie settings"
+          />
         </li>
         <li>
           For the Safari web browser, please visit this page from Apple:{" "}
-          <a
+          <ExternalLink
             href="https://support.apple.com/guide/safari/manage-cookies-and-website-data-sfri11471/mac"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            https://support.apple.com/guide/safari/manage-cookies-and-website-data-sfri11471/mac
-          </a>
+            title="Safari cookie settings"
+          />
         </li>
       </ul>
       <p className={styles.paragraph}>

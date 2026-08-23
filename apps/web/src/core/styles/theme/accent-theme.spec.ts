@@ -4,6 +4,7 @@ import {
   ACCENT_THEME_CHANGE_EVENT,
   ACCENT_THEME_KEY,
   getAccentThemePreference,
+  getDefaultAccentTheme,
   isAccentThemeId,
   setAccentThemePreference,
 } from "./accent-theme";
@@ -20,6 +21,11 @@ describe("accent-theme preference store", () => {
   it("returns a stored valid accent id", () => {
     window.localStorage.setItem(ACCENT_THEME_KEY, "midnight");
     expect(getAccentThemePreference()).toBe("midnight");
+  });
+
+  it("resolves dark mode to midnight", () => {
+    window.localStorage.setItem("theme-preference:v1", "dark");
+    expect(getDefaultAccentTheme()).toBe("midnight");
   });
 
   it("falls back to system-based theme for an unknown stored value", () => {

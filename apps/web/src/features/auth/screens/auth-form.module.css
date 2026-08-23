@@ -43,11 +43,11 @@
 
 .tagline {
   margin: 0.25rem 0 0;
-  color: var(--content-muted);
-  font-family: var(--typo-body-sm-font-family), sans-serif;
-  font-size: var(--typo-body-sm-font-size);
-  line-height: var(--typo-body-sm-line-height);
-  letter-spacing: var(--typo-body-sm-letter-spacing);
+  color: var(--content-secondary);
+  font-family: var(--typo-body-md-font-family), sans-serif;
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  letter-spacing: var(--typo-body-md-letter-spacing);
 }
 
 .stack {
@@ -55,6 +55,25 @@
   flex-direction: column;
   gap: var(--space-component-gap-lg);
   margin-top: var(--space-component-gap-lg);
+}
+
+.privacyNote {
+  margin: var(--space-component-gap-lg) 0 0;
+  color: var(--content-secondary);
+  font-family: var(--typo-body-sm-font-family), sans-serif;
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  text-align: center;
+}
+
+.privacyNote a {
+  color: var(--action-primary);
+  font-weight: 600;
+  text-underline-offset: 0.2em;
+}
+
+.privacyNote a:hover {
+  text-decoration: underline;
 }
 
 .socialStack,
@@ -218,5 +237,9 @@
   .page {
     align-items: flex-start;
     padding-top: var(--space-component-gap-lg);
+  }
+
+  .card {
+    padding: var(--space-scale-xl) var(--space-scale-lg);
   }
 }

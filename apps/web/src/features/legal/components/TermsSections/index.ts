@@ -6,8 +6,6 @@ export { LimitationOfLiability } from "./LimitationOfLiability";
 export { DisclaimerSection } from "./DisclaimerSection";
 export { GoverningLaw } from "./GoverningLaw";
 export { DisputeResolution } from "./DisputeResolution";
-export { EUUsers } from "./EUUsers";
-export { USCompliance } from "./USCompliance";
 export { SeverabilityAndWaiver } from "./SeverabilityAndWaiver";
 export { TranslationInterpretation } from "./TranslationInterpretation";
 export { Changes } from "./Changes";

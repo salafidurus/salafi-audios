@@ -60,17 +60,6 @@ vi.mock("@/features/settings/components/SegmentedControl/SegmentedControl", () =
   ),
 }));
 
-vi.mock("@/features/settings/components/accent-theme-picker/AccentThemePicker", () => ({
-  AccentThemePicker: ({ value, onChange }: { value: string; onChange: (id: string) => void }) => (
-    <div>
-      <span data-testid="accent-picker-value">{value}</span>
-      <button type="button" onClick={() => onChange("ember")}>
-        choose-ember
-      </button>
-    </div>
-  ),
-}));
-
 describe("SettingsGeneralScreen", () => {
   const localStorageMock = (() => {
     let store: Record<string, string> = {};
@@ -117,6 +106,12 @@ describe("SettingsGeneralScreen", () => {
     expect(screen.getByText("Notifications")).toBeInTheDocument();
   });
 
+  it("does not render the mobile section", () => {
+    render(<SettingsGeneralScreen />);
+    expect(screen.queryByText("MOBILE")).not.toBeInTheDocument();
+    expect(screen.queryByText("Download the app")).not.toBeInTheDocument();
+  });
+
   it("renders LanguageSwitch and ContentLanguageToggle", () => {
     render(<SettingsGeneralScreen />);
     expect(screen.getByTestId("language-switch")).toBeInTheDocument();
@@ -156,31 +151,8 @@ describe("SettingsGeneralScreen", () => {
     expect(screen.queryByText("New Lectures")).not.toBeInTheDocument();
   });
 
-  it("renders the accent theme picker with system as default", () => {
-    render(<SettingsGeneralScreen />);
-    expect(screen.getByTestId("accent-picker-value")).toHaveTextContent("system");
-  });
-
-  it("shows the mode control while the accent theme is system", () => {
+  it("keeps the mode control available", () => {
     render(<SettingsGeneralScreen />);
     expect(screen.getByRole("button", { name: "Dark" })).toBeInTheDocument();
-  });
-
-  it("hides the mode control once a named accent is selected", async () => {
-    render(<SettingsGeneralScreen />);
-    await act(async () => {});
-
-    fireEvent.click(screen.getByRole("button", { name: "choose-ember" }));
-
-    expect(screen.queryByRole("button", { name: "Dark" })).not.toBeInTheDocument();
-  });
-
-  it("persists the selected accent theme", async () => {
-    render(<SettingsGeneralScreen />);
-    await act(async () => {});
-
-    fireEvent.click(screen.getByRole("button", { name: "choose-ember" }));
-
-    expect(localStorageMock.getItem("accent-theme:v1")).toBe("ember");
   });
 });

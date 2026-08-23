@@ -4,17 +4,9 @@ import { useState, useCallback, useEffect } from "react";
 import { z } from "zod";
 
 import type { ThemePreference } from "@/core/styles/ThemeSync";
-import type { AccentThemePickerValue } from "@/features/settings/components/accent-theme-picker/AccentThemePicker";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import {
-  getDefaultAccentTheme,
-  isAccentThemeId,
-  setAccentThemePreference,
-} from "@/core/styles/theme/accent-theme";
 import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
-import { DownloadAppCard } from "@/features/home/components/download-app-card/download-app-card";
-import { AccentThemePicker } from "@/features/settings/components/accent-theme-picker/AccentThemePicker";
 import { SegmentedControl } from "@/features/settings/components/SegmentedControl/SegmentedControl";
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
@@ -65,24 +57,10 @@ function loadThemePreference(): ThemePreference {
   return "system";
 }
 
-function loadAccentThemePreference(): AccentThemePickerValue {
-  if (!hasWindow()) {
-    return "system";
-  }
-
-  const stored = window.localStorage.getItem("accent-theme:v1");
-  if (stored && isAccentThemeId(stored)) {
-    return stored;
-  }
-
-  return "system";
-}
-
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"general" | "profile">("general");
   const [themePreference, setThemePreference] = useState<ThemePreference>(loadThemePreference);
-  const [accentTheme, setAccentTheme] = useState<AccentThemePickerValue>(loadAccentThemePreference);
   const [notif, setNotif] = useState<NotificationState>(loadNotifState);
 
   const themeOptions: { value: ThemePreference; label: string }[] = [
@@ -96,21 +74,6 @@ export function SettingsGeneralScreen() {
     localStorage.setItem(THEME_KEY, value);
     window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }, []);
-
-  const handleAccentThemeChange = useCallback((value: AccentThemePickerValue) => {
-    setAccentTheme(value);
-    if (value === "system") {
-      window.localStorage.removeItem("accent-theme:v1");
-      void getDefaultAccentTheme();
-      window.dispatchEvent(new Event("accent-theme-change"));
-    } else {
-      setAccentThemePreference(value);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(NOTIF_KEY, JSON.stringify(notif));
-  }, [notif]);
 
   const handleNotifChange = useCallback(
     (key: keyof NotificationState) => (checked: boolean) => {
@@ -126,24 +89,35 @@ export function SettingsGeneralScreen() {
 
   return (
     <ScreenView>
-      <h1 className={styles.settingsTitle}>{t("settings.general.title", "Settings")}</h1>
+      <div className={styles.settingsIntro}>
+        <p className={styles.eyebrow}>{t("settings.general.eyebrow")}</p>
+        <h1 className={styles.settingsTitle}>{t("settings.general.title", "Settings")}</h1>
+        <p className={styles.settingsDescription}>{t("settings.general.description")}</p>
+      </div>
 
-      {/* Sub-navigation tabs bar matching prototype ScreenSettings */}
-      <Tabs
-        value={activeTab}
-        onValueChange={(value) => {
-          // SAFETY: only the two values declared by this TabsList can be emitted by Radix Tabs.
-          setActiveTab(value as "general" | "profile");
-        }}
-      >
-        <TabsList
-          className={styles.tabBar}
-          aria-label={t("settings.tabs.label", "Settings sections")}
+      <div className={styles.tabsViewport}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => {
+            // SAFETY: only the two values declared by this TabsList can be emitted by Radix Tabs.
+            setActiveTab(value as "general" | "profile");
+          }}
+          className={styles.tabs}
         >
-          <TabsTrigger value="general">{t("settings.tabs.general", "General")}</TabsTrigger>
-          <TabsTrigger value="profile">{t("settings.tabs.profile", "Profile")}</TabsTrigger>
-        </TabsList>
-      </Tabs>
+          <TabsList
+            variant="line"
+            className={styles.tabList}
+            aria-label={t("settings.tabs.label", "Settings sections")}
+          >
+            <TabsTrigger value="general" className={styles.tabTrigger}>
+              {t("settings.tabs.general", "General")}
+            </TabsTrigger>
+            <TabsTrigger value="profile" className={styles.tabTrigger}>
+              {t("settings.tabs.profile", "Profile")}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
       {activeTab === "general" ? (
         <div className={styles.sectionWrap}>
@@ -170,27 +144,17 @@ export function SettingsGeneralScreen() {
               "Try each theme and keep whichever feels most comfortable — this updates the whole app live.",
             )}
           </p>
-          {accentTheme === "system" && (
-            <SettingsRow
-              label={t("settings.general.theme", "Theme")}
-              sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
-            >
-              <SegmentedControl
-                options={themeOptions}
-                value={themePreference}
-                onChange={handleThemeChange}
-                ariaLabel={t("settings.general.themeAria", "Theme preference")}
-              />
-            </SettingsRow>
-          )}
-          <div style={{ margin: "10px 0 16px" }}>
-            <AccentThemePicker value={accentTheme} onChange={handleAccentThemeChange} />
-          </div>
-
-          <p className={styles.sectionLabel}>{t("settings.general.mobileSection", "MOBILE")}</p>
-          <div style={{ margin: "8px 0 16px" }}>
-            <DownloadAppCard />
-          </div>
+          <SettingsRow
+            label={t("settings.general.theme", "Theme")}
+            sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
+          >
+            <SegmentedControl
+              options={themeOptions}
+              value={themePreference}
+              onChange={handleThemeChange}
+              ariaLabel={t("settings.general.themeAria", "Theme preference")}
+            />
+          </SettingsRow>
 
           <p className={styles.sectionLabel}>
             {t("settings.general.notifSection", "NOTIFICATIONS")}

@@ -22,8 +22,6 @@ export const TERMS_SECTIONS = [
   { id: "terms-disclaimer", title: '"AS IS" and "AS AVAILABLE" Disclaimer' },
   { id: "terms-governing-law", title: "Governing Law" },
   { id: "terms-disputes", title: "Disputes Resolution" },
-  { id: "terms-eu-users", title: "For European Union (EU) Users" },
-  { id: "terms-us-compliance", title: "United States Legal Compliance" },
   { id: "terms-severability", title: "Severability and Waiver" },
   { id: "terms-translation", title: "Translation Interpretation" },
   { id: "terms-changes", title: "Changes to These Terms and Conditions" },

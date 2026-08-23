@@ -21,14 +21,24 @@ export function DisclaimerSection() {
       </p>
       <p className={styles.paragraph}>
         Without limiting the foregoing, neither the Company nor any of the company's provider makes
-        any representation or warranty of any kind, express or implied: (i) as to the operation or
-        availability of the Service, or the information, content, and materials or products included
-        thereon; (ii) that the Service will be uninterrupted or error-free; (iii) as to the
-        accuracy, reliability, or currency of any information or content provided through the
-        Service; or (iv) that the Service, its servers, the content, or e-mails sent from or on
-        behalf of the Company are free of viruses, scripts, trojan horses, worms, malware, timebombs
-        or other harmful components.
+        any representation or warranty of any kind, express or implied:
       </p>
+      <ol className={styles.romanList}>
+        <li>
+          As to the operation or availability of the Service, or the information, content, and
+          materials or products included thereon.
+        </li>
+        <li>That the Service will be uninterrupted or error-free.</li>
+        <li>
+          As to the accuracy, reliability, or currency of any information or content provided
+          through the Service.
+        </li>
+        <li>
+          That the Service, its servers, the content, or e-mails sent from or on behalf of the
+          Company are free of viruses, scripts, trojan horses, worms, malware, timebombs or other
+          harmful components.
+        </li>
+      </ol>
       <p className={styles.paragraph}>
         Some jurisdictions do not allow the exclusion of certain types of warranties or limitations
         on applicable statutory rights of a consumer, so some or all of the above exclusions and

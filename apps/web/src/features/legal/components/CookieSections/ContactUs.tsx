@@ -10,7 +10,7 @@ export function ContactUs() {
       <p className={styles.paragraph}>
         If you have any questions about this Cookies Policy, You can contact us:
       </p>
-      <ul className={styles.paragraph}>
+      <ul className={styles.contactList}>
         <li>
           By visiting this page on our website:{" "}
           <Link href={routes.support} className={styles.link}>

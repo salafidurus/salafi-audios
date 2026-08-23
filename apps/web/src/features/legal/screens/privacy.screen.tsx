@@ -9,8 +9,10 @@ import styles from "./legal-screens.module.css";
 export function PrivacyScreen() {
   return (
     <ScreenView>
-      <div className={styles.container}>
-        <h1 className={styles.title}>Privacy Policy</h1>
+      <article id="legal-document" className={styles.container} aria-labelledby="privacy-title">
+        <h1 id="privacy-title" className={styles.title}>
+          Privacy Policy
+        </h1>
         <p className={styles.lastUpdated}>Last updated: {PRIVACY_LAST_UPDATE_DATE}</p>
         <p className={styles.introduction}>
           This Privacy Policy describes Our policies and procedures on the collection, use and
@@ -56,7 +58,7 @@ export function PrivacyScreen() {
         <section id="privacy-contact">
           <PrivacySections.ContactUs />
         </section>
-      </div>
+      </article>
     </ScreenView>
   );
 }

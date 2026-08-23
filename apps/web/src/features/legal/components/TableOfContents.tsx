@@ -1,6 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from "@/shared/components/ui/sidebar";
 
 import styles from "./table-of-contents.module.css";
 
@@ -14,25 +27,27 @@ interface TableOfContentsProps {
 }
 
 export function TableOfContents({ sections }: TableOfContentsProps) {
+  const { t } = useTranslation();
   const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
-    const container = document.querySelector<HTMLElement>(".appNoConsentContent");
+    const container = document.querySelector<HTMLElement>(".appConsentContent");
     if (!container) return;
 
     const handleScroll = () => {
       const containerRect = container.getBoundingClientRect();
-      const visibleSections = sections.reduce<
-        Array<{ id: string; element: HTMLElement; rect: DOMRect }>
-      >((acc, s) => {
-        const element = document.getElementById(s.id);
-        if (!element) return acc;
-        const rect = element.getBoundingClientRect();
-        if (rect.top <= containerRect.bottom && rect.bottom >= containerRect.top) {
-          acc.push({ id: s.id, element, rect });
-        }
-        return acc;
-      }, []);
+      const visibleSections = sections.reduce<Array<{ id: string; rect: DOMRect }>>(
+        (acc, section) => {
+          const element = document.getElementById(section.id);
+          if (!element) return acc;
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= containerRect.bottom && rect.bottom >= containerRect.top) {
+            acc.push({ id: section.id, rect });
+          }
+          return acc;
+        },
+        [],
+      );
 
       if (visibleSections.length > 0) {
         const mostVisibleSection = visibleSections.reduce((prev, current) => {
@@ -56,34 +71,56 @@ export function TableOfContents({ sections }: TableOfContentsProps) {
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
-    const container = document.querySelector<HTMLElement>(".appNoConsentContent");
+    const container = document.querySelector<HTMLElement>(".appConsentContent");
 
     if (element && container) {
       const elementTop =
         element.getBoundingClientRect().top -
         container.getBoundingClientRect().top +
         container.scrollTop;
-      container.scrollTo({ top: elementTop, behavior: "smooth" });
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      container.scrollTo({
+        top: elementTop,
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+      });
       setActiveSection(id);
     }
   };
 
   return (
-    <nav className={styles.nav}>
-      <div className={styles.header}>Contents</div>
-      <ul className={styles.list}>
-        {sections.map((section) => (
-          <li key={section.id}>
-            <button
-              type="button"
-              className={`${styles.link} ${activeSection === section.id ? styles.active : ""}`}
-              onClick={() => scrollToSection(section.id)}
-            >
-              {section.title}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <SidebarProvider className={styles.provider}>
+      <nav aria-label={t("legal.contents", "Legal document contents")} className={styles.nav}>
+        <Sidebar collapsible="none" side="right" className={styles.container}>
+          <SidebarContent className={styles.content}>
+            <SidebarGroup className={styles.group}>
+              <SidebarGroupLabel className={styles.title}>
+                {t("legal.contentsTitle", "On this page")}
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {sections.map((section, index) => (
+                    <SidebarMenuItem key={section.id}>
+                      <SidebarMenuButton
+                        type="button"
+                        size="sm"
+                        className={styles.link}
+                        isActive={activeSection === section.id}
+                        aria-current={activeSection === section.id ? "location" : undefined}
+                        onClick={() => scrollToSection(section.id)}
+                      >
+                        <span className={styles.number} aria-hidden="true">
+                          {index + 1}.
+                        </span>
+                        {section.title}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
+      </nav>
+    </SidebarProvider>
   );
 }

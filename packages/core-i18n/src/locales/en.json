@@ -29,7 +29,9 @@
       "noAccount": "Don't have an account? Create one",
       "noAccountSplit": "Don't have an account?",
       "noAccountLink": "Create one",
-      "failed": "Sign in failed"
+      "failed": "Sign in failed",
+      "privacyNote": "By continuing, you agree to our",
+      "and": "and"
     }
   },
   "validation": {
@@ -138,6 +140,8 @@
   "settings": {
     "general": {
       "title": "Settings",
+      "eyebrow": "Personal space",
+      "description": "Shape your reading experience, notifications, and account preferences.",
       "languageSection": "Language",
       "languageDesc": "Configure app and content language.",
       "appLanguage": "App Language",
@@ -175,8 +179,31 @@
   },
   "support": {
     "title": "Support",
+    "subtitle": "Find answers and reach the team when you need help.",
+    "faqEyebrow": "Answers",
+    "contactEyebrow": "Talk to us",
+    "faqDescription": "Quick answers to common listening questions.",
+    "contactCopy": "We aim to respond within 48 hours.",
+    "legalPrompt": "You can also review:",
     "faqSection": "Frequently Asked Questions",
     "contactSection": "Contact Us",
+    "formEyebrow": "Send a message",
+    "formSection": "Report an issue",
+    "formDescription": "Tell the maintainers what happened and we will review your message.",
+    "form": {
+      "name": "Your name",
+      "email": "Email address",
+      "category": "What can we help with?",
+      "technical": "Technical issue",
+      "content": "Content issue",
+      "account": "Account or access",
+      "other": "Something else",
+      "subject": "Subject",
+      "message": "What happened?",
+      "messageHint": "Please include the page, device, and steps to reproduce if relevant.",
+      "submit": "Send to maintainers",
+      "comingSoon": "Submitting reports will be available when the support service is connected."
+    },
     "faq": {
       "whatIs": {
         "q": "What is Salafi Durus?",
@@ -370,6 +397,9 @@
     "completingSignIn": "Completing sign-in..."
   },
   "legal": {
+    "contents": "Legal document contents",
+    "contentsTitle": "On this page",
+    "skipToDocument": "Skip to document",
     "privacy": {
       "title": "Privacy Policy",
       "sections": {
@@ -435,8 +465,9 @@
     }
   },
   "cookieConsent": {
-    "message": "We use cookies to track site traffic and performance. We do not collect personal data, do not personalize content from cookies, and do not use cookies for marketing or advertisements. By continuing, you accept our use of tracking cookies.",
-    "accept": "Accept",
+    "title": "Cookies and analytics",
+    "message": "We use cookies to understand site traffic and performance. Continuing to use the website indicates your acceptance of these tracking technologies.",
+    "close": "Close",
     "policyLink": "Cookie Policy"
   },
   "role": {

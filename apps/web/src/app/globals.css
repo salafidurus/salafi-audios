@@ -155,40 +155,6 @@ body {
   flex-direction: column;
 }
 
-/* No-consent layout (two-column grid with sidebar nav) */
-.appNoConsentShell {
-  display: grid;
-  grid-template-columns: 1fr 240px;
-  gap: var(--space-component-gap-xl);
-  align-items: stretch;
-  padding: var(--space-layout-page-y) var(--space-layout-page-x);
-  flex: 1;
-  min-height: 0;
-  height: 100%;
-}
-
-.appNoConsentContent {
-  grid-column: 1;
-  min-height: 0;
-  overflow-x: clip;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.appNoConsentContent::-webkit-scrollbar {
-  display: none;
-}
-
-/* Responsive: hide sidebar on tablet and below */
-@media (max-width: 1200px) {
-  .appNoConsentShell {
-    grid-template-columns: 1fr;
-  }
-}
-
 h1,
 h2,
 h3,
