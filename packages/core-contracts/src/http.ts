@@ -14,8 +14,10 @@ export type HttpClientConfig = {
    * Primary auth is via cookies (credentials: 'include'). */
   getAccessToken?: () => string | undefined | null;
   /** (Required for native) Session cookie provider. RN fetch has no cookie jar,
-   * so must manually forward session cookie via Cookie header. */
-  getCookie?: () => string | undefined | null;
+   * so must manually forward session cookie via Cookie header.
+   * May return a promise: @better-auth/expo >= 1.7 reads SecureStore
+   * asynchronously (`client.getCookie(): Promise<string>`). */
+  getCookie?: () => string | undefined | null | Promise<string | undefined | null>;
   /** Active content locale; sent as `Accept-Language` so the API resolves
    * translations to the user's selected language. */
   getLocale?: () => string | undefined | null;
@@ -64,7 +66,7 @@ export async function httpClient<T>(options: {
   }
 
   const token = config.getAccessToken?.() ?? undefined;
-  const cookie = config.getCookie?.() ?? undefined;
+  const cookie = (await config.getCookie?.()) ?? undefined;
   const locale = config.getLocale?.() ?? undefined;
 
   const endpoint = new URL(`${config.baseUrl}${options.url}`);

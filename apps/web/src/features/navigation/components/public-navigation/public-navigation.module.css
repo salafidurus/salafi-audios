@@ -137,7 +137,6 @@
   display: none;
 }
 
-.searchControl,
 .accountControl,
 .workspaceSwitch {
   display: inline-flex;
@@ -160,47 +159,6 @@
     box-shadow 150ms ease;
 }
 
-.searchControl {
-  width: clamp(15rem, 18vw, 17.5rem);
-  min-width: 15rem;
-  flex: 0 1 18%;
-  justify-content: flex-start;
-  padding-inline: var(--space-component-gap-md);
-  border-color: var(--input-border-rest);
-  border-radius: var(--radius-scale-full);
-  background: var(--input-surface-rest);
-}
-
-.searchControl span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.searchControl kbd {
-  flex: 0 0 auto;
-  margin-inline-start: auto;
-  padding: var(--space-xs) var(--space-sm);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-scale-sm);
-  color: var(--content-muted);
-  background: var(--surface-subtle);
-  font-family: var(--font-body), sans-serif;
-  font-size: var(--typo-caption-font-size);
-  font-weight: 600;
-  line-height: 1;
-}
-
-.searchControl:hover,
-.searchControl:focus-visible {
-  border-color: var(--input-border-focus);
-  color: var(--content-strong);
-  background: var(--input-surface-focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-focus-ring) 24%, transparent);
-}
-
-.searchControl:active,
 .accountMenu .accountControl:active,
 .workspaceSwitch:active,
 .navLink:active {
@@ -257,7 +215,6 @@
   background: var(--surface-hover);
 }
 
-.searchControl:focus-visible,
 .accountMenu .accountControl:focus-visible,
 .workspaceSwitch:focus-visible,
 .navLink:focus-visible {
@@ -375,11 +332,6 @@
   .navLink {
     padding-inline: var(--space-component-gap-md);
   }
-
-    .searchControl {
-      width: 15rem;
-      min-width: 14rem;
-  }
 }
 
 @media (max-width: 900px) {
@@ -390,27 +342,6 @@
   .inner {
     min-height: 4rem;
     padding: var(--space-sm);
-  }
-
-  .searchControl {
-    width: 2.75rem;
-    min-width: 2.75rem;
-    flex: 0 0 2.75rem;
-    border-radius: var(--radius-component-chip);
-    padding-inline: 0;
-  }
-
-  .searchControl span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-  }
-
-  .searchControl kbd {
-    display: none;
   }
 }
 

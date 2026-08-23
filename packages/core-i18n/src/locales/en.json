@@ -94,6 +94,18 @@
     "primarySidebar": "Primary sidebar",
     "mainNav": "Main",
     "searchAnything": "Search anything",
+    "searchCatalog": "Search catalog",
+    "searchCatalogDescription": "Find topics, scholars, and listings.",
+    "searchCatalogPlaceholder": "Search topics, scholars, or listings",
+    "searchCatalogLoading": "Loading catalog",
+    "searchCatalogEmpty": "No catalog results",
+    "searchCatalogHint": "Type to search public catalog content",
+    "searchCatalogScholarMetadata": "{{count}} listings",
+    "searchCatalogType": {
+      "topic": "Topic",
+      "scholar": "Scholar",
+      "listing": "Listing"
+    },
     "backToApp": "Back to App",
     "adminDashboard": "Admin Dashboard",
     "adminWorkspace": "Admin workspace",
