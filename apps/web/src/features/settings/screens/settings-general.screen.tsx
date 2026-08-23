@@ -128,22 +128,29 @@ export function SettingsGeneralScreen() {
         <p className={styles.settingsDescription}>{t("settings.general.description")}</p>
       </div>
 
-      {/* Sub-navigation tabs bar matching prototype ScreenSettings */}
-      <Tabs
-        value={activeTab}
-        onValueChange={(value) => {
-          // SAFETY: only the two values declared by this TabsList can be emitted by Radix Tabs.
-          setActiveTab(value as "general" | "profile");
-        }}
-      >
-        <TabsList
-          className={styles.tabBar}
-          aria-label={t("settings.tabs.label", "Settings sections")}
+      <div className={styles.tabsViewport}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => {
+            // SAFETY: only the two values declared by this TabsList can be emitted by Radix Tabs.
+            setActiveTab(value as "general" | "profile");
+          }}
+          className={styles.tabs}
         >
-          <TabsTrigger value="general">{t("settings.tabs.general", "General")}</TabsTrigger>
-          <TabsTrigger value="profile">{t("settings.tabs.profile", "Profile")}</TabsTrigger>
-        </TabsList>
-      </Tabs>
+          <TabsList
+            variant="line"
+            className={styles.tabList}
+            aria-label={t("settings.tabs.label", "Settings sections")}
+          >
+            <TabsTrigger value="general" className={styles.tabTrigger}>
+              {t("settings.tabs.general", "General")}
+            </TabsTrigger>
+            <TabsTrigger value="profile" className={styles.tabTrigger}>
+              {t("settings.tabs.profile", "Profile")}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
       {activeTab === "general" ? (
         <div className={styles.sectionWrap}>
