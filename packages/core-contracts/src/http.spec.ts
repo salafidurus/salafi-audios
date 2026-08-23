@@ -196,6 +196,24 @@ describe("httpClient – configured", () => {
     expect(getHeader(init, "Cookie")).toBe("better-auth.session_token=abc");
   });
 
+  it("awaits an async getCookie provider and injects the resolved cookie", async () => {
+    // @better-auth/expo >= 1.7 returns Promise<string> from client.getCookie().
+    configureApiClient({
+      baseUrl: BASE,
+      getCookie: () => Promise.resolve("better-auth.session_token=abc"),
+    });
+    await httpClient({ url: "/secure", method: "GET" });
+    const init = lastFetchInit();
+    expect(getHeader(init, "Cookie")).toBe("better-auth.session_token=abc");
+  });
+
+  it("omits Cookie header when getCookie resolves to undefined", async () => {
+    configureApiClient({ baseUrl: BASE, getCookie: () => Promise.resolve(undefined) });
+    await httpClient({ url: "/public", method: "GET" });
+    const init = lastFetchInit();
+    expect(getHeader(init, "Cookie")).toBeUndefined();
+  });
+
   it("omits Cookie header when getCookie returns undefined", async () => {
     configureApiClient({ baseUrl: BASE, getCookie: () => undefined });
     await httpClient({ url: "/public", method: "GET" });
