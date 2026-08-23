@@ -5,11 +5,7 @@
   gap: var(--space-scale-lg);
   padding: var(--space-component-gap-md);
   border-radius: var(--radius-component-panel);
-  background: linear-gradient(
-    120deg,
-    var(--surface-subtle) 0%,
-    var(--surface-default) 70%
-  );
+  background: linear-gradient(120deg, var(--surface-subtle) 0%, var(--surface-default) 70%);
   border: 1px solid var(--border-default);
 }
 
@@ -31,7 +27,11 @@
   width: 92px;
   height: 92px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 25%, var(--border-primary-strong), var(--surface-subtle));
+  background: radial-gradient(
+    circle at 30% 25%,
+    var(--border-primary-strong),
+    var(--surface-subtle)
+  );
   color: var(--content-primary-strong);
   display: flex;
   align-items: center;
@@ -41,7 +41,9 @@
   font-weight: 600;
   flex-shrink: 0;
   border: 2px solid var(--action-primary);
-  box-shadow: 0 0 0 3px var(--surface-canvas), 0 4px 14px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 0 0 3px var(--surface-canvas),
+    0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .infoColumn {
@@ -79,22 +81,6 @@
 .followButton {
   flex-shrink: 0;
   align-self: flex-start;
-  padding: var(--space-scale-sm) var(--space-component-gap-md);
-  border: 1px solid var(--action-primary);
-  border-radius: var(--radius-component-chip);
-  background: transparent;
-  color: var(--content-primary-strong);
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    background 150ms ease,
-    color 150ms ease;
-}
-
-.followButton:hover {
-  background: var(--action-primary);
-  color: var(--content-on-primary);
 }
 
 @media (max-width: 640px) {
@@ -113,6 +99,5 @@
   .followButton {
     align-self: auto;
     width: 100%;
-    text-align: center;
   }
 }

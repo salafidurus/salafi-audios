@@ -2,7 +2,7 @@
 
 import type { TopicRefDto } from "@sd/core-contracts";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { Badge } from "@/shared/components/ui/badge";
 
 import styles from "./topic-chips.module.css";
 
@@ -17,9 +17,9 @@ export function TopicChips({ topics }: TopicChipsProps) {
   return (
     <div className={styles.container}>
       {topics.map((topic) => (
-        <span key={topic.id} className={styles.chip}>
-          <AppText variant="caption">{topic.name}</AppText>
-        </span>
+        <Badge key={topic.id} variant="outline">
+          {topic.name}
+        </Badge>
       ))}
     </div>
   );

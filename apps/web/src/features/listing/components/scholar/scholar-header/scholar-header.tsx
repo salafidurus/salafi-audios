@@ -5,6 +5,7 @@ import type { ScholarDetailDto } from "@sd/core-contracts";
 import Image from "next/image";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { Button } from "@/shared/components/ui/button";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./scholar-header.module.css";
@@ -54,9 +55,15 @@ export function ScholarHeader({ scholar, onFollow }: ScholarHeaderProps) {
       </div>
 
       {onFollow && (
-        <button type="button" className={styles.followButton} onClick={onFollow}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className={styles.followButton}
+          onClick={onFollow}
+        >
           {t("scholarContent.follow", "Follow")}
-        </button>
+        </Button>
       )}
     </div>
   );

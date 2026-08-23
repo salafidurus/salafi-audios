@@ -9,11 +9,13 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { LectureRow } from "@/features/home/components/lecture-row/lecture-row";
 import { ScholarHeader } from "@/features/listing/components/scholar/scholar-header/scholar-header";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Search, type FilterChip } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { Button } from "@/shared/components/ui/button";
+import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@/shared/components/ui/empty";
 import { Separator } from "@/shared/components/ui/separator";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 import styles from "./scholar-detail.screen.module.css";
@@ -101,28 +103,16 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   if (isScholarError && !scholar) {
     return (
       <ScreenView center>
-        <div
-          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}
-        >
-          <AppText variant="titleMd">
-            {t("scholarContent.error", "Failed to load scholar details")}
-          </AppText>
-          <button
-            type="button"
-            onClick={() => refetchScholar()}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "999px",
-              background: "var(--action-primary)",
-              color: "var(--content-on-primary)",
-              border: "none",
-              cursor: "pointer",
-              fontWeight: 600,
-            }}
-          >
-            {t("common.retry", "Try again")}
-          </button>
-        </div>
+        <Empty className={styles.state}>
+          <EmptyHeader>
+            <EmptyTitle>{t("scholarContent.error", "Failed to load scholar details")}</EmptyTitle>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button type="button" variant="outline" onClick={() => refetchScholar()}>
+              {t("common.retry", "Try again")}
+            </Button>
+          </EmptyContent>
+        </Empty>
       </ScreenView>
     );
   }
@@ -134,58 +124,32 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
           <StickyHeaderLayout.Header>
             <div>
               <div className={styles.backBar}>
-                <button type="button" className={styles.backButton} onClick={handleBack}>
-                  <ChevronLeft size={15} />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className={styles.backButton}
+                  onClick={handleBack}
+                >
+                  <ChevronLeft data-icon="inline-start" />
                   {t("scholars.backToScholars", "Back to Scholars")}
-                </button>
+                </Button>
               </div>
 
-              <div
-                className={styles.headerContent}
-                style={{ display: "flex", gap: "16px", alignItems: "center", padding: "16px 0" }}
-              >
-                <div
-                  style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: "50%",
-                    background: "var(--surface-subtle)",
-                  }}
-                />
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
-                  <div
-                    style={{
-                      width: "160px",
-                      height: "20px",
-                      borderRadius: "4px",
-                      background: "var(--surface-subtle)",
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: "100px",
-                      height: "14px",
-                      borderRadius: "4px",
-                      background: "var(--surface-subtle)",
-                    }}
-                  />
+              <div className={styles.loadingScholar}>
+                <Skeleton className={styles.loadingAvatar} />
+                <div className={styles.loadingScholarText}>
+                  <Skeleton className={styles.loadingName} />
+                  <Skeleton className={styles.loadingStats} />
                 </div>
               </div>
             </div>
           </StickyHeaderLayout.Header>
 
           <StickyHeaderLayout.Content>
-            <div className={styles.contentList}>
+            <div className={styles.contentList} aria-label={t("common.loading", "Loading…")}>
               {Array.from({ length: 5 }).map((_, i) => (
-                <div
-                  key={`scholar-detail-skeleton-${i}`}
-                  style={{
-                    height: "56px",
-                    width: "100%",
-                    borderRadius: "8px",
-                    background: "var(--surface-subtle)",
-                  }}
-                />
+                <Skeleton key={`scholar-detail-skeleton-${i}`} className={styles.loadingRow} />
               ))}
             </div>
           </StickyHeaderLayout.Content>
@@ -197,7 +161,11 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   if (!scholar) {
     return (
       <ScreenView center>
-        <AppText variant="titleMd">{t("scholarContent.notFound", "Scholar not found")}</AppText>
+        <Empty className={styles.state}>
+          <EmptyHeader>
+            <EmptyTitle>{t("scholarContent.notFound", "Scholar not found")}</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       </ScreenView>
     );
   }
@@ -221,10 +189,16 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
         <StickyHeaderLayout.Header>
           <div ref={headerContentRef}>
             <div className={styles.backBar}>
-              <button type="button" className={styles.backButton} onClick={handleBack}>
-                <ChevronLeft size={15} />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className={styles.backButton}
+                onClick={handleBack}
+              >
+                <ChevronLeft data-icon="inline-start" />
                 {t("scholars.backToScholars", "Back to Scholars")}
-              </button>
+              </Button>
             </div>
 
             <div className={styles.headerContent}>

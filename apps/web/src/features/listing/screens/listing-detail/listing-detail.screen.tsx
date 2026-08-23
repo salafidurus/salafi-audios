@@ -8,11 +8,21 @@ import { useRouter } from "next/navigation";
 import React, { useState, useRef, useEffect, useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Search } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/shared/components/ui/breadcrumb";
+import { Button } from "@/shared/components/ui/button";
+import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@/shared/components/ui/empty";
 import { Separator } from "@/shared/components/ui/separator";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import { CollectionContentLayout } from "../../components/listing/CollectionContentLayout/CollectionContentLayout";
@@ -210,28 +220,16 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   if (isListingError && !listing) {
     return (
       <ScreenView center>
-        <div
-          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}
-        >
-          <AppText variant="titleMd">
-            {t("lecture.error", "Failed to load content details")}
-          </AppText>
-          <button
-            type="button"
-            onClick={() => refetchListing()}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "999px",
-              background: "var(--action-primary)",
-              color: "var(--content-on-primary)",
-              border: "none",
-              cursor: "pointer",
-              fontWeight: 600,
-            }}
-          >
-            {t("common.retry", "Try again")}
-          </button>
-        </div>
+        <Empty className={styles.state}>
+          <EmptyHeader>
+            <EmptyTitle>{t("lecture.error", "Failed to load content details")}</EmptyTitle>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button type="button" variant="outline" onClick={() => refetchListing()}>
+              {t("common.retry", "Try again")}
+            </Button>
+          </EmptyContent>
+        </Empty>
       </ScreenView>
     );
   }
@@ -242,55 +240,29 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
         <StickyHeaderLayout>
           <StickyHeaderLayout.Header>
             <div>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 className={styles.backButton}
                 onClick={() => router.back()}
                 aria-label={t("navigation.back", "Back")}
               >
-                <ChevronLeft size={14} />
-                <span>{t("navigation.back", "Back")}</span>
-              </button>
+                <ChevronLeft data-icon="inline-start" />
+                {t("navigation.back", "Back")}
+              </Button>
 
-              <div
-                className={styles.headerTopRow}
-                style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "16px 0" }}
-              >
-                <div
-                  style={{
-                    width: "60%",
-                    height: "24px",
-                    borderRadius: "4px",
-                    background: "var(--surface-subtle)",
-                  }}
-                />
-                <div
-                  style={{
-                    width: "35%",
-                    height: "14px",
-                    borderRadius: "4px",
-                    background: "var(--surface-subtle)",
-                  }}
-                />
+              <div className={styles.loadingHeader}>
+                <Skeleton className={styles.loadingTitle} />
+                <Skeleton className={styles.loadingSubtitle} />
               </div>
             </div>
           </StickyHeaderLayout.Header>
 
           <StickyHeaderLayout.Content>
-            <div
-              className={styles.contentWrapper}
-              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
-            >
+            <div className={styles.contentWrapper}>
               {Array.from({ length: 4 }).map((_, i) => (
-                <div
-                  key={`listing-detail-skeleton-${i}`}
-                  style={{
-                    height: "56px",
-                    width: "100%",
-                    borderRadius: "8px",
-                    background: "var(--surface-subtle)",
-                  }}
-                />
+                <Skeleton key={`listing-detail-skeleton-${i}`} className={styles.loadingRow} />
               ))}
             </div>
           </StickyHeaderLayout.Content>
@@ -302,7 +274,11 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   if (!listing) {
     return (
       <ScreenView center>
-        <AppText variant="titleMd">{t("lecture.notFound", "Content not found")}</AppText>
+        <Empty className={styles.state}>
+          <EmptyHeader>
+            <EmptyTitle>{t("lecture.notFound", "Content not found")}</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       </ScreenView>
     );
   }
@@ -314,7 +290,11 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
     // rare case a client-side cache serves stale data past that redirect.
     return (
       <ScreenView center>
-        <AppText variant="bodyMd">{t("lecture.loading", "Loading content…")}</AppText>
+        <Empty className={styles.state}>
+          <EmptyHeader>
+            <EmptyTitle>{t("lecture.loading", "Loading content…")}</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       </ScreenView>
     );
   }
@@ -324,29 +304,47 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
       <StickyHeaderLayout>
         <StickyHeaderLayout.Header>
           <div ref={headerContentRef}>
-            <nav
+            <Breadcrumb
               className={styles.breadcrumbs}
               aria-label={t("navigation.breadcrumbs", "Breadcrumbs")}
             >
-              <Link href={routes.home}>{t("navigation.home", "Home")}</Link>
-              <span aria-hidden="true">/</span>
-              <Link href={routes.explore.index}>{t("navigation.explore", "Explore")}</Link>
-              <span aria-hidden="true">/</span>
-              <Link href={`/scholars/${listing.scholar.slug}`}>
-                {formatScholarName(listing.scholar)}
-              </Link>
-              <span aria-hidden="true">/</span>
-              <span aria-current="page">{listing.title}</span>
-            </nav>
-            <button
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href={routes.home}>{t("navigation.home", "Home")}</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href={routes.explore.index}>{t("navigation.explore", "Explore")}</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href={`/scholars/${listing.scholar.slug}`}>
+                      {formatScholarName(listing.scholar)}
+                    </Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className={styles.breadcrumbPage}>{listing.title}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               className={styles.backButton}
               onClick={() => router.back()}
               aria-label={t("navigation.back", "Back")}
             >
-              <ChevronLeft size={14} />
-              <span>{t("navigation.back", "Back")}</span>
-            </button>
+              <ChevronLeft data-icon="inline-start" />
+              {t("navigation.back", "Back")}
+            </Button>
 
             <div className={styles.headerTopRow}>
               <MetaDataSection listing={listing} />
@@ -368,7 +366,10 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
         <StickyHeaderLayout.Content>
           <div className={styles.contentWrapper}>
             {isFetchingContents && !contents && (
-              <AppText variant="bodySm">{t("lecture.loading", "Loading lessons…")}</AppText>
+              <div className={styles.contentLoading} role="status">
+                <Skeleton className={styles.loadingRow} />
+                <span className="sr-only">{t("lecture.loading", "Loading lessons…")}</span>
+              </div>
             )}
 
             {contents && (

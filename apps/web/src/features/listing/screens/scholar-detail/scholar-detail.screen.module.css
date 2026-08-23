@@ -3,20 +3,7 @@
 }
 
 .backButton {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-scale-xs);
-  background: none;
-  border: none;
-  color: var(--action-primary);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-}
-
-.backButton:hover {
-  text-decoration: underline;
+  margin-bottom: var(--space-scale-xs);
 }
 
 .headerContent {
@@ -43,6 +30,46 @@
   flex-direction: column;
   gap: var(--space-component-gap-sm);
   padding-bottom: var(--space-layout-section-y);
+}
+
+.state {
+  width: min(100%, 28rem);
+}
+
+.loadingScholar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-lg);
+  padding: var(--space-component-gap-md) 0;
+}
+
+.loadingAvatar {
+  width: 92px;
+  height: 92px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+}
+
+.loadingScholarText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+}
+
+.loadingName {
+  width: 10rem;
+  height: var(--space-scale-lg);
+}
+
+.loadingStats {
+  width: 6.25rem;
+  height: var(--space-scale-sm);
+}
+
+.loadingRow {
+  width: 100%;
+  height: 56px;
 }
 
 .contentRegion {
@@ -90,6 +117,11 @@
 }
 
 @media (max-width: 640px) {
+  .loadingAvatar {
+    width: 80px;
+    height: 80px;
+  }
+
   .contentIntro {
     align-items: flex-start;
     flex-direction: column;
