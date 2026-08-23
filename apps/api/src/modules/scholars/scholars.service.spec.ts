@@ -21,7 +21,9 @@ describe('ScholarsService', () => {
   const mockScholarDetail: ScholarDetailDto & {
     lectureCount: number;
     seriesCount: number;
+    collectionCount: number;
     totalDurationSeconds: number;
+    totalContentDurationSeconds: number;
   } = {
     id: 's1',
     slug: 'ibn-uthaymeen',
@@ -39,7 +41,9 @@ describe('ScholarsService', () => {
     updatedAt: new Date().toISOString(),
     lectureCount: 50,
     seriesCount: 5,
+    collectionCount: 2,
     totalDurationSeconds: 18000,
+    totalContentDurationSeconds: 54000,
   };
 
   const mockScholarContent: ScholarContentUnifiedDto = {

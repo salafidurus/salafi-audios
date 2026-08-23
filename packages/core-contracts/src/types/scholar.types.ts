@@ -64,6 +64,15 @@ export const ScholarDetailDtoSchema = z.object({
 });
 export type ScholarDetailDto = z.infer<typeof ScholarDetailDtoSchema>;
 
+export const ScholarDetailStatsSchema = z.object({
+  lectureCount: z.number(),
+  seriesCount: z.number(),
+  collectionCount: z.number(),
+  totalDurationSeconds: z.number(),
+  totalContentDurationSeconds: z.number(),
+});
+export type ScholarDetailStats = z.infer<typeof ScholarDetailStatsSchema>;
+
 export const ScholarStatsDtoSchema = z.object({
   seriesCount: z.number(),
   lecturesCount: z.number(),

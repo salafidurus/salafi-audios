@@ -4,6 +4,7 @@ import type { Cache } from 'cache-manager';
 import type {
   ScholarListItemDto,
   ScholarDetailDto,
+  ScholarDetailStats,
   ScholarContentUnifiedDto,
   ScholarTopicsDto,
   TranslationViewDto,
@@ -35,13 +36,7 @@ export class ScholarsService {
     return this.repo.adminList(cursor, search, accessibleScholarIds);
   }
 
-  async getBySlug(slug: string): Promise<
-    ScholarDetailDto & {
-      lectureCount: number;
-      seriesCount: number;
-      totalDurationSeconds: number;
-    }
-  > {
+  async getBySlug(slug: string): Promise<ScholarDetailDto & ScholarDetailStats> {
     const found = await this.repo.findBySlug(slug);
     if (!found) throw new NotFoundException(`Scholar "${slug}" not found`);
     return found;
