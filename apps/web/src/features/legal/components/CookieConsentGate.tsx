@@ -2,7 +2,6 @@
 
 import { routes } from "@sd/core-contracts";
 import Link from "next/link";
-import { useRef, useEffect } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Button } from "@/shared/components/ui/button";
@@ -13,40 +12,21 @@ import styles from "./cookie-consent-gate.module.css";
 export function CookieConsentGate() {
   const { hasAccepted, accept } = useCookieConsent();
   const { t } = useTranslation();
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    if (!hasAccepted && dialogRef.current) {
-      dialogRef.current.showModal();
-    }
-  }, [hasAccepted]);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    const handleCancel = (e: Event) => {
-      e.preventDefault();
-    };
-
-    dialog.addEventListener("cancel", handleCancel);
-    return () => dialog.removeEventListener("cancel", handleCancel);
-  }, []);
 
   if (hasAccepted) {
     return null;
   }
 
   return (
-    <dialog ref={dialogRef} className={styles.dialog} aria-labelledby="consent-title">
+    <aside className={styles.banner} aria-labelledby="consent-title" role="region">
       <div className={styles.content}>
         <div className={styles.message}>
-          <h1 id="consent-title" className={styles.title}>
+          <p id="consent-title" className={styles.title}>
             {t(
               "cookieConsent.message",
               "We use cookies and analytics to improve your experience and understand how you use our service. By continuing, you accept our use of tracking technologies.",
             )}
-          </h1>
+          </p>
           <p className={styles.policyLink}>
             <Link href={routes.cookiePolicy} className={styles.link}>
               {t("cookieConsent.readPolicy", "Read our Cookie Policy for details")}
@@ -59,6 +39,6 @@ export function CookieConsentGate() {
           </Button>
         </div>
       </div>
-    </dialog>
+    </aside>
   );
 }

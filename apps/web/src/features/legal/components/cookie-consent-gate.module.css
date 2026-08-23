@@ -1,20 +1,13 @@
-.dialog {
+.banner {
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
+  inset-inline: 0;
   z-index: 9999;
   background-color: var(--surface-elevated);
   border-top: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-lg);
-  padding: var(--space-component-gap-lg);
+  padding: var(--space-component-gap-lg) var(--space-layout-page-x);
   width: 100%;
-  border: none;
-  margin: 0;
-}
-
-.dialog::backdrop {
-  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .content {
@@ -73,8 +66,8 @@
 }
 
 @media (max-width: 900px) {
-  .dialog {
-    padding: var(--space-component-gap-md);
+  .banner {
+    padding: var(--space-component-gap-md) var(--space-layout-page-x);
   }
 
   .content {
