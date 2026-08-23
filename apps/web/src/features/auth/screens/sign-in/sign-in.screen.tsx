@@ -36,7 +36,6 @@ export function SignInResponsiveScreen({ redirectTo }: SignInScreenProps) {
               priority
             />
           </div>
-          <p className={styles.eyebrow}>{t("auth.signIn.eyebrow")}</p>
           <h1 className={styles.title}>Salafi Durus</h1>
           <p className={styles.tagline}>
             {t("auth.signIn.tagline", "Join the community of learners")}
