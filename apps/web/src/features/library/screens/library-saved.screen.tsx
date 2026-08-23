@@ -4,56 +4,48 @@ import { useInfiniteLibrarySaved } from "@sd/domain-content";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { LibraryListRow } from "@/features/library/components/library-list-row/library-list-row";
-import { LibraryTabs } from "@/features/library/components/library-tabs/library-tabs";
-import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
-import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
-import { PageHeader } from "@/shared/components/PageHeader";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
-import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { LibraryListSection } from "@/features/library/components/library-list-section/library-list-section";
+import { LibraryShell } from "@/features/library/components/library-shell/library-shell";
 
 export function LibrarySavedScreen() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { t } = useTranslation();
-
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteLibrarySaved();
-
-  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
+  const { data, isLoading, isError, refetch, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteLibrarySaved({ enabled: isAuthenticated });
+  const items = data?.pages.flatMap((page) => page.items) ?? [];
 
   return (
-    <ScreenView contentStyle={{ flex: 1 }}>
-      <StickyHeaderLayout>
-        <StickyHeaderLayout.Header>
-          <PageHeader
-            title={t("library.saved", "Saved")}
-            actions={<LibraryTabs activeTab="saved" />}
-          />
-        </StickyHeaderLayout.Header>
-        <StickyHeaderLayout.Content>
-          {isAuthenticated ? (
-            <InfiniteScrollList
-              data={allItems}
-              isLoading={isLoading}
-              hasMore={hasNextPage ?? false}
-              onLoadMore={() => fetchNextPage()}
-              isFetchingNextPage={isFetchingNextPage}
-              renderItem={(item) => <LibraryListRow item={item} variant="saved" />}
-              emptyMessage={t(
-                "library.emptySaved",
-                "No saved lectures yet. Save lectures to keep track of them.",
-              )}
-            />
-          ) : (
-            <AuthRequiredState
-              title={t("library.authSavedTitle", "Sign in to view saved lectures")}
-              description={t("library.authSavedDesc", "Save lectures to revisit them later")}
-            />
-          )}
-        </StickyHeaderLayout.Content>
-      </StickyHeaderLayout>
-      <ScrollToTopButton />
-    </ScreenView>
+    <LibraryShell activeTab="saved">
+      <LibraryListSection
+        title={t("library.saved", "Saved")}
+        description={t(
+          "library.savedDescription",
+          "Keep lessons here when you want to return to them later.",
+        )}
+        variant="saved"
+        authState={isAuthLoading ? "loading" : isAuthenticated ? "authenticated" : "unauthenticated"}
+        query={{
+          items,
+          isLoading,
+          isError,
+          onRetry: () => void refetch(),
+          hasMore: hasNextPage ?? false,
+          onLoadMore: () => void fetchNextPage(),
+          isFetchingNextPage,
+          emptyMessage: t(
+            "library.emptySaved",
+            "Your saved lessons will appear here when you bookmark them.",
+          ),
+        }}
+        authCopy={{
+          title: t("library.authSavedTitle", "Sign in to view your saved lessons"),
+          description: t(
+            "library.authSavedDesc",
+            "Save lessons to build a personal list you can return to anytime.",
+          ),
+          loadingMessage: t("library.authLoading", "Checking your library…"),
+        }}
+      />
+    </LibraryShell>
   );
 }

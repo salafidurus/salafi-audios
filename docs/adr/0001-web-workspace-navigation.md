@@ -36,10 +36,17 @@ navigation problem.
 - Make Home resume-first, followed by relevant discovery and recently added
   content; defer habit mechanics until they have separate product and data
   decisions.
-- Make Explore a feed/catalog hybrid with topic, Scholar, content-type,
-  language, and sort filters. Persist filter state until the User clears it,
-  scope persistence by route, locale, and User where relevant, and provide a
-  first-class clear-all action.
+- Make Explore one continuous discovery-first feed. Topic selection steers the
+  feed without becoming a strict result filter. Advanced content-type and
+  language refinements remain available behind a Sheet rather than occupying
+  the primary canvas; do not add mode tabs for Everything, Listings, or
+  Scholars.
+- The API composes a cursor-paginated mixed stream of Listings and discovery
+  modules. It owns topic weighting, deduplication, and exhaustion; clients do
+  not independently assemble or randomize the stream.
+- Keep Topic URL-addressable. Persist Topic state only within the documented
+  route/locale/User scope. Do not infer personalization from listening history
+  without a separate event contract.
 - Use a catalog-only command palette for Topics, Scholars, Listings, and
   related content destinations. Keep account and administrative actions in
   their dedicated controls.

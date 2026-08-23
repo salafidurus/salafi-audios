@@ -6,6 +6,7 @@ import type {
   CountryCode,
   ScholarListItemDto,
   ScholarDetailDto,
+  ScholarDetailStats,
   ScholarContentUnifiedDto,
   ScholarContentItemDto,
   ScholarTopicsDto,
@@ -90,14 +91,7 @@ export class ScholarsRepository {
     return { scholars: result.items, nextCursor: result.nextCursor, hasMore: result.hasMore };
   }
 
-  async findBySlug(slug: string): Promise<
-    | (ScholarDetailDto & {
-        lectureCount: number;
-        seriesCount: number;
-        totalDurationSeconds: number;
-      })
-    | null
-  > {
+  async findBySlug(slug: string): Promise<(ScholarDetailDto & ScholarDetailStats) | null> {
     const locale = getRequestLocale();
     const record = await this.prisma.scholar.findFirst({
       where: { slug, isActive: true },
@@ -108,6 +102,7 @@ export class ScholarsRepository {
         bio: true,
         country: true,
         mainLanguage: true,
+        title: true,
         imageUrl: true,
         isActive: true,
         socialTwitter: true,
@@ -133,27 +128,44 @@ export class ScholarsRepository {
       publishedTranslation: record.translations[0] ?? null,
     });
 
-    const [lectureStats, seriesCount] = await Promise.all([
-      this.prisma.listing.aggregate({
-        where: {
-          scholarId: record.id,
-          format: 'single',
-          status: Status.published,
-          deletedAt: null,
-        },
-        _count: { id: true },
-        _sum: { durationSeconds: true },
-      }),
-      this.prisma.listing.count({
-        where: {
-          scholarId: record.id,
-          format: 'series',
-          parentId: null,
-          status: Status.published,
-          deletedAt: null,
-        },
-      }),
-    ]);
+    const publishedListingWhere = {
+      scholarId: record.id,
+      status: Status.published,
+      deletedAt: null,
+    } as const;
+    const [lectureStats, seriesCount, collectionCount, singleDuration, aggregateDuration] =
+      await Promise.all([
+        this.prisma.listing.aggregate({
+          where: {
+            ...publishedListingWhere,
+            format: 'single',
+          },
+          _count: { id: true },
+          _sum: { durationSeconds: true },
+        }),
+        this.prisma.listing.count({
+          where: {
+            ...publishedListingWhere,
+            format: 'series',
+            parentId: null,
+          },
+        }),
+        this.prisma.listing.count({
+          where: { ...publishedListingWhere, format: 'collection', parentId: null },
+        }),
+        this.prisma.listing.aggregate({
+          where: { ...publishedListingWhere, format: 'single', parentId: null },
+          _sum: { durationSeconds: true },
+        }),
+        this.prisma.listing.aggregate({
+          where: {
+            ...publishedListingWhere,
+            format: { in: ['series', 'collection'] },
+            parentId: null,
+          },
+          _sum: { publishedDurationSeconds: true },
+        }),
+      ]);
 
     return {
       id: record.id,
@@ -162,6 +174,7 @@ export class ScholarsRepository {
       bio: resolved.fields.bio ?? undefined,
       country: normalizeCountryCode(record.country),
       mainLanguage: record.mainLanguage ?? undefined,
+      title: record.title ?? undefined,
       originalLanguage: resolved.originalLanguage,
       original: resolved.original
         ? {
@@ -179,7 +192,11 @@ export class ScholarsRepository {
       updatedAt: record.updatedAt?.toISOString(),
       lectureCount: lectureStats._count.id,
       seriesCount,
+      collectionCount,
       totalDurationSeconds: lectureStats._sum.durationSeconds ?? 0,
+      totalContentDurationSeconds:
+        (singleDuration._sum.durationSeconds ?? 0) +
+        (aggregateDuration._sum.publishedDurationSeconds ?? 0),
     };
   }
 

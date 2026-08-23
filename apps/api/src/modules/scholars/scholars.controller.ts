@@ -9,6 +9,7 @@ import { CacheControlInterceptor } from '../../shared/interceptors/cache-control
 import type {
   ScholarListItemDto,
   ScholarDetailDto,
+  ScholarDetailStats,
   ScholarContentUnifiedDto,
   ScholarTopicsDto,
 } from '@sd/core-contracts';
@@ -34,13 +35,7 @@ export class ScholarsController {
   @Get(':slug')
   @ApiOperation({ summary: 'Get scholar detail by slug' })
   @ApiOkResponse({ description: 'Scholar detail with stats' })
-  getBySlug(@Param('slug') slug: string): Promise<
-    ScholarDetailDto & {
-      lectureCount: number;
-      seriesCount: number;
-      totalDurationSeconds: number;
-    }
-  > {
+  getBySlug(@Param('slug') slug: string): Promise<ScholarDetailDto & ScholarDetailStats> {
     return this.scholars.getBySlug(slug);
   }
 

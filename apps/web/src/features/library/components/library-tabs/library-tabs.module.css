@@ -1,0 +1,43 @@
+.viewport {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs {
+  width: max-content;
+  min-width: max-content;
+  gap: 0;
+}
+
+.list {
+  max-width: none;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.trigger {
+  min-width: 6rem;
+  flex: 0 0 auto;
+  padding-inline: var(--space-component-gap-md, 1rem);
+}
+
+@media (max-width: 900px) {
+  .viewport {
+    width: 100%;
+  }
+
+  .tabs {
+    min-width: 100%;
+  }
+
+  .list {
+    min-width: 100%;
+  }
+}

@@ -46,6 +46,14 @@ export class ListingRepository {
     private readonly config?: ConfigService,
   ) {}
 
+  private toPublicAssetUrl(value?: string | null): string | undefined {
+    if (!value) return undefined;
+    if (/^[a-z]+:\/\//i.test(value)) return value;
+    const base = this.config?.ASSET_CDN_BASE_URL;
+    if (!base) return value;
+    return `${base.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
+  }
+
   async findIdBySlug(slug: string): Promise<string | null> {
     const listing = await this.prisma.listing.findUnique({ where: { slug }, select: { id: true } });
     return listing?.id ?? null;
@@ -65,8 +73,11 @@ export class ListingRepository {
         title: true,
         description: true,
         format: true,
+        coverImageUrl: true,
         language: true,
         durationSeconds: true,
+        publishedLectureCount: true,
+        publishedDurationSeconds: true,
         publishedAt: true,
         parentId: true,
         translations: {
@@ -79,6 +90,7 @@ export class ListingRepository {
             id: true,
             slug: true,
             name: true,
+            title: true,
             mainLanguage: true,
             imageUrl: true,
             translations: {
@@ -143,6 +155,7 @@ export class ListingRepository {
       title: resolved.fields.title,
       description: resolved.fields.description ?? undefined,
       format: listing.format,
+      coverImageUrl: this.toPublicAssetUrl(listing.coverImageUrl),
       language: listing.language ?? undefined,
       originalLanguage: resolved.originalLanguage,
       original: resolved.original
@@ -152,12 +165,15 @@ export class ListingRepository {
           }
         : undefined,
       durationSeconds: listing.durationSeconds ?? undefined,
+      publishedLectureCount: listing.publishedLectureCount ?? undefined,
+      publishedDurationSeconds: listing.publishedDurationSeconds ?? undefined,
       publishedAt: listing.publishedAt?.toISOString(),
       scholar: {
         id: listing.scholar.id,
         slug: listing.scholar.slug,
         name: scholarName,
         imageUrl: listing.scholar.imageUrl ?? undefined,
+        title: listing.scholar.title ?? undefined,
       },
       topics: listing.topics.map((lt) => ({
         id: lt.topic.id,

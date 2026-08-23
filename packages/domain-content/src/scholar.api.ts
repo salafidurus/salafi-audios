@@ -6,6 +6,7 @@ import {
   queryKeys,
   useApiQuery,
   type ScholarDetailDto,
+  type ScholarDetailStats,
   type ScholarContentItemDto,
   type ScholarContentUnifiedDto,
   type ScholarListItemDto,
@@ -41,13 +42,7 @@ export function useScholarDetail(slug: string) {
   return useApiQuery(
     queryKeys.scholars.detail(slug),
     () =>
-      httpClient<
-        ScholarDetailDto & {
-          lectureCount: number;
-          seriesCount: number;
-          totalDurationSeconds: number;
-        }
-      >({
+      httpClient<ScholarDetailDto & ScholarDetailStats>({
         url: endpoints.scholars.detail(slug),
         method: "GET",
       }),

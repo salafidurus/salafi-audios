@@ -46,5 +46,6 @@ export type FeedItemDto = z.infer<typeof FeedItemDtoSchema>;
 export const FeedPageDtoSchema = z.object({
   items: z.array(FeedItemDtoSchema),
   nextCursor: z.string().optional(),
+  exhausted: z.boolean(),
 });
 export type FeedPageDto = z.infer<typeof FeedPageDtoSchema>;
