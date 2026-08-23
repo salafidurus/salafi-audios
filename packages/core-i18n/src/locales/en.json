@@ -187,6 +187,23 @@
     "legalPrompt": "You can also review:",
     "faqSection": "Frequently Asked Questions",
     "contactSection": "Contact Us",
+    "formEyebrow": "Send a message",
+    "formSection": "Report an issue",
+    "formDescription": "Tell the maintainers what happened and we will review your message.",
+    "form": {
+      "name": "Your name",
+      "email": "Email address",
+      "category": "What can we help with?",
+      "technical": "Technical issue",
+      "content": "Content issue",
+      "account": "Account or access",
+      "other": "Something else",
+      "subject": "Subject",
+      "message": "What happened?",
+      "messageHint": "Please include the page, device, and steps to reproduce if relevant.",
+      "submit": "Send to maintainers",
+      "comingSoon": "Submitting reports will be available when the support service is connected."
+    },
     "faq": {
       "whatIs": {
         "q": "What is Salafi Durus?",
@@ -365,6 +382,9 @@
     "completingSignIn": "Completing sign-in..."
   },
   "legal": {
+    "contents": "Legal document contents",
+    "contentsTitle": "On this page",
+    "skipToDocument": "Skip to document",
     "privacy": {
       "title": "Privacy Policy",
       "sections": {

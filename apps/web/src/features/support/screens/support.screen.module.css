@@ -4,13 +4,14 @@
   padding-block: var(--space-layout-page-y);
 }
 
-.grid {
+.layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.75fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.85fr);
   gap: var(--space-layout-section-y);
   align-items: start;
 }
 
+.formCard,
 .faqCard,
 .contactCard {
   border: 1px solid var(--border-subtle);
@@ -23,6 +24,10 @@
   padding: var(--space-component-card-padding);
 }
 
+.formCard {
+  padding: var(--space-component-card-padding);
+}
+
 .contactCard {
   position: sticky;
   top: var(--space-layout-page-y);
@@ -31,6 +36,19 @@
 
 .sectionHeader {
   margin-bottom: var(--space-component-gap-md);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-lg);
+}
+
+.formNotice {
+  margin: calc(var(--space-component-gap-lg) * -0.5) 0 0;
+  color: var(--content-muted);
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
 }
 
 .eyebrow {
@@ -89,7 +107,7 @@
     padding-block: var(--space-scale-lg);
   }
 
-  .grid {
+  .layout {
     grid-template-columns: 1fr;
     gap: var(--space-scale-lg);
   }

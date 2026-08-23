@@ -4,6 +4,17 @@ import { describe, expect, it } from "bun:test";
 import { SupportScreen } from "./support.screen";
 
 describe("SupportScreen", () => {
+  it("leads with an issue report form and keeps submission ready for the backend", () => {
+    render(<SupportScreen />);
+
+    expect(screen.getByText("Report an issue")).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Your name" })).toBeRequired();
+    expect(screen.getByRole("textbox", { name: "Email address" })).toBeRequired();
+    expect(screen.getByRole("textbox", { name: "What happened?" })).toBeRequired();
+    expect(screen.getByRole("button", { name: "Send to maintainers" })).toBeDisabled();
+    expect(screen.getByText("Frequently Asked Questions")).toBeInTheDocument();
+  });
+
   it("exposes FAQ answers through keyboard-accessible disclosure controls", () => {
     render(<SupportScreen />);
 

@@ -9,8 +9,10 @@ import styles from "./legal-screens.module.css";
 export function CookiePolicyScreen() {
   return (
     <ScreenView>
-      <div className={styles.container}>
-        <h1 className={styles.title}>Cookies Policy</h1>
+      <article id="legal-document" className={styles.container} aria-labelledby="cookies-title">
+        <h1 id="cookies-title" className={styles.title}>
+          Cookie Policy
+        </h1>
         <p className={styles.lastUpdated}>Last updated: {COOKIES_LAST_UPDATE_DATE}</p>
         <p className={styles.introduction}>
           This Cookies Policy explains what Cookies are and how We use them. You should read this
@@ -43,7 +45,7 @@ export function CookiePolicyScreen() {
         <div id="cookies-contact">
           <CookieSections.ContactUs />
         </div>
-      </div>
+      </article>
     </ScreenView>
   );
 }
