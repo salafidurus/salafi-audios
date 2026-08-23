@@ -59,7 +59,7 @@ export function CollectionContentLayout({
           onLoadMore={() => {}}
           renderSectionHeader={(mod) => (
             <div className={styles.moduleHeader}>
-              <h2 className={styles.moduleTitle}>{mod.title}</h2>
+              <h3 className={styles.moduleTitle}>{mod.title}</h3>
             </div>
           )}
           renderItem={(lesson, _index, sectionKey) => {

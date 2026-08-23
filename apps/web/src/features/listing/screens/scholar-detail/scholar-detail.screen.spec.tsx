@@ -170,6 +170,7 @@ describe("ScholarDetailScreen", () => {
     expect(screen.getByTestId("scholar-header")).toBeTruthy();
     expect(screen.getByRole("region", { name: "Published content" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Published content" })).toBeTruthy();
+    expect(screen.getByText("2 items")).toBeTruthy();
     expect(screen.getAllByTestId("lecture-row")).toHaveLength(2);
   });
 

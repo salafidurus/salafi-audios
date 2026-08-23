@@ -13,6 +13,7 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Search, type FilterChip } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { Separator } from "@/shared/components/ui/separator";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 import styles from "./scholar-detail.screen.module.css";
@@ -265,9 +266,14 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
                 </h2>
               </div>
               <span className={styles.contentCount}>
-                {filteredItems.length} {t("scholarContent.items", "items")}
+                {filteredItems.length}{" "}
+                {t(
+                  filteredItems.length === 1 ? "scholarContent.item" : "scholarContent.items",
+                  filteredItems.length === 1 ? "item" : "items",
+                )}
               </span>
             </div>
+            <Separator />
 
             <div className={styles.contentList}>
               {filteredItems.length > 0 ? (

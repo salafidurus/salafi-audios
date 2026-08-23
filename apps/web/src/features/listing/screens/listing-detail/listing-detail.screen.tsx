@@ -12,6 +12,7 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Search } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { Separator } from "@/shared/components/ui/separator";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import { CollectionContentLayout } from "../../components/listing/CollectionContentLayout/CollectionContentLayout";
@@ -33,7 +34,8 @@ type FormatScholarName = ReturnType<typeof useFormatScholarName>;
 type ListingContentSectionProps = {
   contents: ListingContents;
   contentCount: number;
-  contentHeading: string;
+  contentCountLabel: string;
+  contentHeading: string | null;
   filteredSingleOrSeriesItems: React.ComponentProps<typeof ContentList>["items"];
   filteredModules: React.ComponentProps<typeof CollectionContentLayout>["modules"];
   formatScholarName: FormatScholarName;
@@ -45,6 +47,7 @@ type ListingContentSectionProps = {
 function ListingContentSection({
   contents,
   contentCount,
+  contentCountLabel,
   contentHeading,
   filteredSingleOrSeriesItems,
   filteredModules,
@@ -54,18 +57,24 @@ function ListingContentSection({
   t,
 }: ListingContentSectionProps) {
   return (
-    <section aria-labelledby="listing-content-heading" className={styles.contentRegion}>
-      <div className={styles.contentIntro}>
-        <div>
-          <p className={styles.eyebrow}>{t("listing.catalogLabel", "Study path")}</p>
+    <section
+      aria-label={contentHeading ? undefined : t("listing.collectionContent", "Collection content")}
+      aria-labelledby={contentHeading ? "listing-content-heading" : undefined}
+      className={styles.contentRegion}
+    >
+      <div
+        className={`${styles.contentIntro} ${contentHeading ? "" : styles.contentIntroCountOnly}`}
+      >
+        {contentHeading && (
           <h2 id="listing-content-heading" className={styles.contentHeading}>
             {contentHeading}
           </h2>
-        </div>
+        )}
         <span className={styles.contentCount}>
-          {contentCount} {t("listing.items", "items")}
+          {contentCount} {contentCountLabel}
         </span>
       </div>
+      <Separator />
 
       {contents.format === "single" && (
         <ContentList
@@ -184,9 +193,19 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const contentHeading =
     listing?.format === "single"
       ? t("listing.listenNow", "Listen now")
-      : listing?.format === "collection"
-        ? t("listing.modules", "Modules")
-        : t("listing.lessons", "Lessons");
+      : listing?.format === "series"
+        ? t("listing.lessons", "Lessons")
+        : null;
+  const contentCountLabel =
+    contents?.format === "collection"
+      ? t(
+          filteredModules.length === 1 ? "listing.module" : "listing.modules",
+          filteredModules.length === 1 ? "module" : "modules",
+        )
+      : t(
+          filteredSingleOrSeriesItems.length === 1 ? "listing.item" : "listing.items",
+          filteredSingleOrSeriesItems.length === 1 ? "item" : "items",
+        );
 
   if (isListingError && !listing) {
     return (
@@ -356,6 +375,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
               <ListingContentSection
                 contents={contents}
                 contentCount={contentCount}
+                contentCountLabel={contentCountLabel}
                 contentHeading={contentHeading}
                 filteredSingleOrSeriesItems={filteredSingleOrSeriesItems}
                 filteredModules={filteredModules}

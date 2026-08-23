@@ -280,7 +280,20 @@
     "showMore": "Show more",
     "statLectures": "Lectures",
     "statSeries": "Series",
-    "statTotal": "Total"
+    "statTotal": "Total",
+    "catalogLabel": "Scholar catalog",
+    "publishedContent": "Published content",
+    "item": "item",
+    "items": "items"
+  },
+  "listing": {
+    "listenNow": "Listen now",
+    "lessons": "Lessons",
+    "collectionContent": "Collection content",
+    "item": "item",
+    "items": "items",
+    "module": "module",
+    "modules": "modules"
   },
   "feed": {
     "newInTopic": "New in {{topic}}",

@@ -280,7 +280,20 @@
     "showMore": "عرض المزيد",
     "statLectures": "المحاضرات",
     "statSeries": "السلاسل",
-    "statTotal": "الإجمالي"
+    "statTotal": "الإجمالي",
+    "catalogLabel": "دليل العالم",
+    "publishedContent": "المحتوى المنشور",
+    "item": "عنصر",
+    "items": "عناصر"
+  },
+  "listing": {
+    "listenNow": "استمع الآن",
+    "lessons": "الدروس",
+    "collectionContent": "محتوى المجموعة",
+    "item": "عنصر",
+    "items": "عناصر",
+    "module": "وحدة",
+    "modules": "وحدات"
   },
   "feed": {
     "newInTopic": "جديد في {{topic}}",

@@ -132,8 +132,7 @@ describe("ListingDetailScreen", () => {
 
     render(<ListingDetailScreen slug="collection" />);
 
-    expect(screen.getByRole("heading", { name: "Modules" })).toBeTruthy();
-    expect(screen.getByText("2 items")).toBeTruthy();
+    expect(screen.getByText("2 modules")).toBeTruthy();
   });
 
   it("shows a loading guard instead of the wrong content when the resolved listing is nested", () => {
