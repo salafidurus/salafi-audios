@@ -65,6 +65,14 @@
   transition: color 0.15s ease;
 }
 
+.scholarTitle {
+  color: var(--content-primary-strong);
+  font-size: var(--typo-label-sm-font-size);
+  font-weight: var(--typo-label-sm-font-weight);
+  letter-spacing: var(--typo-label-sm-letter-spacing);
+  line-height: 1;
+}
+
 .scholarLink:hover {
   color: var(--content-primary-strong);
   text-decoration: underline;

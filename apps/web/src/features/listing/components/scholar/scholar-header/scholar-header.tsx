@@ -60,19 +60,14 @@ export function ScholarHeader({ scholar, onFollow, layout = "inline" }: ScholarH
       </div>
 
       <div className={styles.infoColumn}>
-        <h1 className={styles.name}>
-          {scholarTitle
-            ? `${scholarTitle} ${formatScholarName(scholar)}`
-            : formatScholarName(scholar)}
-        </h1>
+        {scholarTitle && <span className={styles.scholarTitle}>{scholarTitle}</span>}
+        <h1 className={styles.name}>{formatScholarName(scholar.name)}</h1>
         <p className={styles.stats}>{statsParts.join(" \u00B7 ")}</p>
         {scholar.bio && (
           <span className={cn(styles.bioDisclosure, bioExpanded && styles.bioDisclosureExpanded)}>
             <span className={cn(styles.bio, bioExpanded && styles.bioExpanded)}>{scholar.bio}</span>
-            <Button
+            <button
               type="button"
-              variant="link"
-              size="sm"
               className={styles.bioToggle}
               aria-expanded={bioExpanded}
               onClick={() => setBioExpanded((expanded) => !expanded)}
@@ -80,7 +75,7 @@ export function ScholarHeader({ scholar, onFollow, layout = "inline" }: ScholarH
               {bioExpanded
                 ? t("scholarContent.readLess", "Read less")
                 : t("scholarContent.readMore", "Read more")}
-            </Button>
+            </button>
           </span>
         )}
       </div>

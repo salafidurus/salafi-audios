@@ -64,6 +64,15 @@
   color: var(--content-strong);
 }
 
+.scholarTitle {
+  color: var(--content-primary-strong);
+  font-size: var(--typo-label-md-font-size);
+  font-weight: var(--typo-label-md-font-weight);
+  letter-spacing: var(--typo-label-md-letter-spacing);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 .stats {
   font-size: var(--typo-body-sm-font-size);
   color: var(--content-secondary);
@@ -96,13 +105,20 @@
   position: absolute;
   inset-inline-end: 0;
   bottom: 0;
-  height: auto;
+  border: 0;
+  color: var(--content-primary-strong);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
   padding: 0 0 0 var(--space-scale-sm);
-  background: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--surface-default) 0%, transparent),
-    var(--surface-default) 35%
-  );
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: var(--surface-default);
+}
+
+.bioToggle:hover {
+  color: var(--action-primary-hover);
 }
 
 .followButton {

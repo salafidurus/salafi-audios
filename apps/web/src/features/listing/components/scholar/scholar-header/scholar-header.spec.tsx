@@ -15,7 +15,8 @@ vi.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 vi.mock("@/shared/utils/format-scholar-name", () => ({
-  useFormatScholarName: () => (scholar: { name: string }) => scholar.name,
+  useFormatScholarName: () => (scholar: { name: string } | string) =>
+    typeof scholar === "string" ? scholar : scholar.name,
 }));
 
 const mockScholar: ScholarHeaderProps["scholar"] = {

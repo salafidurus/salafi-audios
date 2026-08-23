@@ -39,7 +39,6 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
   const formatScholarName = useFormatScholarName();
   const title = pickContentField(listing.title, listing.original?.title, showOriginal);
 
-  const imageUrl = listing.scholar.imageUrl;
   const durationStr = formatDuration(listing.publishedDurationSeconds ?? listing.durationSeconds);
   const languageLabel =
     listing.language === "ar"
@@ -60,7 +59,6 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
         <div className={styles.bookmarkRibbon} aria-hidden="true" />
         <AppAvatar
           listingArtwork={listing.coverImageUrl}
-          scholarImageUrl={imageUrl}
           name={listing.scholar.name}
           fill
           className={styles.artworkAvatar}
@@ -73,10 +71,9 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
 
         {/* Row 2: Scholar Name Link (Primary strong color Title Md) */}
         <Link href={`/scholars/${listing.scholar.slug}`} className={styles.scholarLink}>
+          {scholarTitle && <span className={styles.scholarTitle}>{scholarTitle}</span>}
           <AppText variant="titleMd" color="primary">
-            {scholarTitle
-              ? `${scholarTitle} ${formatScholarName(listing.scholar)}`
-              : formatScholarName(listing.scholar)}
+            {formatScholarName(listing.scholar.name)}
           </AppText>
         </Link>
 
