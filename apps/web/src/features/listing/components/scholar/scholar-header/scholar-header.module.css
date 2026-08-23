@@ -73,11 +73,6 @@
 .bioDisclosure {
   display: block;
   position: relative;
-  padding-inline-end: 4.75rem;
-}
-
-.bioDisclosureExpanded {
-  padding-inline-end: 0;
 }
 
 .bio {
@@ -102,8 +97,12 @@
   inset-inline-end: 0;
   bottom: 0;
   height: auto;
-  padding: 0 0 0 var(--space-scale-xs);
-  background: var(--surface-default);
+  padding: 0 0 0 var(--space-scale-sm);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--surface-default) 0%, transparent),
+    var(--surface-default) 35%
+  );
 }
 
 .followButton {
