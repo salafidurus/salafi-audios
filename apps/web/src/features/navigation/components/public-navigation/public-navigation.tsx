@@ -1,6 +1,6 @@
 "use client";
 
-import { routes } from "@sd/core-contracts";
+import { routes, type AppAbility } from "@sd/core-contracts";
 import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
 import clsx from "clsx";
 import {
@@ -37,6 +37,11 @@ import {
 } from "@/shared/components/ui/sheet";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 
+import {
+  getAdminReturnPath,
+  getBrowserStorage,
+  rememberAdminReturnPath,
+} from "../../utils/admin-workspace";
 import styles from "./public-navigation.module.css";
 
 type PublicNavItem = {
@@ -45,7 +50,11 @@ type PublicNavItem = {
   Icon: LucideIcon;
 };
 
-function getPublicNavItems(t: (key: string, fallback: string) => string): PublicNavItem[] {
+type AdminNavItem = PublicNavItem & {
+  isVisible?: (ability: AppAbility) => boolean;
+};
+
+function getPublicNavItems(t: (key: string, fallback: string) => string): AdminNavItem[] {
   return [
     { label: t("navigation.home", "Home"), href: routes.home, Icon: Home },
     { label: t("navigation.explore", "Explore"), href: routes.explore.index, Icon: Compass },
@@ -95,12 +104,14 @@ function SearchControl() {
 function WorkspaceSwitch({
   isAdminWorkspace,
   hasAdminAccess,
+  returnPath,
 }: {
   isAdminWorkspace: boolean;
   hasAdminAccess: boolean;
+  returnPath: string;
 }) {
   const { t } = useTranslation();
-  const href = isAdminWorkspace ? routes.home : routes.admin.index;
+  const href = isAdminWorkspace ? returnPath : routes.admin.index;
   const label = isAdminWorkspace
     ? t("navigation.backToApp", "Back to App")
     : t("navigation.adminDashboard", "Admin Dashboard");
@@ -115,7 +126,7 @@ function WorkspaceSwitch({
   );
 }
 
-function getAdminNavItems(t: (key: string, fallback: string) => string): PublicNavItem[] {
+function getAdminNavItems(t: (key: string, fallback: string) => string): AdminNavItem[] {
   return [
     { label: t("navigation.admin.home", "Dashboard"), href: routes.admin.index, Icon: Home },
     { label: t("navigation.admin.stats", "Stats"), href: routes.admin.stats, Icon: BarChart3 },
@@ -123,13 +134,20 @@ function getAdminNavItems(t: (key: string, fallback: string) => string): PublicN
       label: t("navigation.admin.scholars", "Scholars"),
       href: routes.admin.scholars,
       Icon: GraduationCap,
+      isVisible: (ability) => ability.can("read", "Scholar"),
     },
     {
       label: t("navigation.admin.contents", "Contents"),
       href: routes.admin.contents,
       Icon: Bookmark,
+      isVisible: (ability) => ability.can("read", "Listing") || ability.can("read", "Topic"),
     },
-    { label: t("navigation.admin.users", "Users"), href: routes.admin.users, Icon: Settings2 },
+    {
+      label: t("navigation.admin.users", "Users"),
+      href: routes.admin.users,
+      Icon: Settings2,
+      isVisible: (ability) => ability.can("manage", "UserAccess"),
+    },
   ];
 }
 
@@ -147,7 +165,7 @@ function NavigationLinks({
   onNavigate,
   closeWithSheet = false,
 }: {
-  items: PublicNavItem[];
+  items: AdminNavItem[];
   pathname: string;
   ariaLabel: string;
   isAdminWorkspace?: boolean;
@@ -288,14 +306,20 @@ function AccountMenu() {
 function UtilityControls({
   hasAdminAccess,
   isAdminWorkspace,
+  returnPath,
 }: {
   hasAdminAccess: boolean;
   isAdminWorkspace: boolean;
+  returnPath: string;
 }) {
   return (
     <div className={styles.utilityControls}>
       <AccountMenu />
-      <WorkspaceSwitch isAdminWorkspace={isAdminWorkspace} hasAdminAccess={hasAdminAccess} />
+      <WorkspaceSwitch
+        isAdminWorkspace={isAdminWorkspace}
+        hasAdminAccess={hasAdminAccess}
+        returnPath={returnPath}
+      />
     </div>
   );
 }
@@ -308,9 +332,27 @@ export function PublicNavigation() {
   const { ability } = useAbility({ isAuthenticated });
   const isAdminWorkspace =
     pathname === routes.admin.index || pathname.startsWith(`${routes.admin.index}/`);
-  const items = isAdminWorkspace ? getAdminNavItems(t) : getPublicNavItems(t);
   const mainNavLabel = t("navigation.mainNav", "Main");
   const hasAdminAccess = isAuthenticated && hasAnyAdminAccess(ability);
+  const [returnPath, setReturnPath] = useState<string>(routes.home);
+
+  useEffect(() => {
+    const storage = getBrowserStorage();
+    if (isAdminWorkspace) {
+      setReturnPath(getAdminReturnPath(storage));
+      return;
+    }
+
+    rememberAdminReturnPath(pathname, storage);
+    setReturnPath(pathname);
+  }, [isAdminWorkspace, pathname]);
+
+  const items = (isAdminWorkspace ? getAdminNavItems(t) : getPublicNavItems(t)).filter(
+    (item) => !isAdminWorkspace || !item.isVisible || item.isVisible(ability),
+  );
+  const activeAdminItem = isAdminWorkspace
+    ? items.find((item) => isActivePath(pathname, item.href))
+    : undefined;
 
   const isCompact = isMobile || isTablet;
   const isRtl = i18n.dir() === "rtl";
@@ -348,7 +390,11 @@ export function PublicNavigation() {
                   <LanguageSwitch direction="down" />
                 </SheetHeader>
                 {(isAdminWorkspace || hasAdminAccess) && (
-                  <WorkspaceSwitch isAdminWorkspace hasAdminAccess={hasAdminAccess} />
+                  <WorkspaceSwitch
+                    isAdminWorkspace={isAdminWorkspace}
+                    hasAdminAccess={hasAdminAccess}
+                    returnPath={returnPath}
+                  />
                 )}
                 <NavigationLinks
                   items={items}
@@ -373,11 +419,21 @@ export function PublicNavigation() {
               <UtilityControls
                 hasAdminAccess={hasAdminAccess}
                 isAdminWorkspace={isAdminWorkspace}
+                returnPath={returnPath}
               />
             </div>
           </div>
         )}
       </div>
+      {isAdminWorkspace && (
+        <nav className={styles.breadcrumbs} aria-label={t("navigation.breadcrumbs", "Breadcrumbs")}>
+          <Link href={routes.admin.index}>{t("navigation.adminWorkspace", "Admin workspace")}</Link>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">
+            {activeAdminItem?.label ?? t("navigation.admin.home", "Dashboard")}
+          </span>
+        </nav>
+      )}
     </header>
   );
 }

@@ -7,6 +7,7 @@ import React from "react";
 import { useAuth } from "@/core/auth";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 
+import { ADMIN_RETURN_PATH_KEY } from "../../utils/admin-workspace";
 import { PublicNavigation } from "./public-navigation";
 
 vi.mock("@/core/auth", () => ({
@@ -184,5 +185,49 @@ describe("PublicNavigation", () => {
       "/admin/contents",
     );
     expect(screen.getByRole("link", { name: "Contents" })).toHaveAttribute("aria-current", "page");
+    const breadcrumbs = screen.getByRole("navigation", { name: "Breadcrumbs" });
+    expect(within(breadcrumbs).getByRole("link", { name: "Admin workspace" })).toHaveAttribute(
+      "href",
+      "/admin",
+    );
+    expect(within(breadcrumbs).getByText("Contents")).toHaveAttribute("aria-current", "page");
+  });
+
+  it("shows only admin destinations supported by the user's capabilities", () => {
+    mockUsePathname.mockReturnValue("/admin");
+    (useAuth as Mock<any>).mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { name: "Scoped Editor", email: "editor@example.com" },
+    });
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Scholar" }]),
+    });
+
+    render(<PublicNavigation />);
+
+    expect(screen.getByRole("link", { name: "Scholars" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Users" })).not.toBeInTheDocument();
+  });
+
+  it("returns to the last safe public path from the admin workspace", () => {
+    window.sessionStorage.setItem(ADMIN_RETURN_PATH_KEY, "/library/saved");
+    mockUsePathname.mockReturnValue("/admin");
+    (useAuth as Mock<any>).mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { name: "Admin User", email: "admin@example.com" },
+    });
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Listing" }]),
+    });
+
+    render(<PublicNavigation />);
+
+    expect(screen.getByRole("link", { name: "Back to App" })).toHaveAttribute(
+      "href",
+      "/library/saved",
+    );
+    window.sessionStorage.removeItem(ADMIN_RETURN_PATH_KEY);
   });
 });

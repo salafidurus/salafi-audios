@@ -20,6 +20,34 @@
   backdrop-filter: blur(12px);
 }
 
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-sm);
+  min-height: 2.75rem;
+  padding: var(--space-component-gap-sm) var(--space-layout-page-x);
+  border-block-end: 1px solid var(--border-subtle);
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.breadcrumbs a {
+  color: var(--content-default);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover,
+.breadcrumbs a:focus-visible {
+  color: var(--action-primary);
+  text-decoration: underline;
+}
+
+.breadcrumbs span[aria-current="page"] {
+  color: var(--content-strong);
+  font-weight: 600;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -390,6 +418,10 @@
   .inner {
     min-height: 4rem;
     padding: var(--space-sm);
+  }
+
+  .breadcrumbs {
+    padding-inline: var(--space-sm);
   }
 
   .searchControl {
