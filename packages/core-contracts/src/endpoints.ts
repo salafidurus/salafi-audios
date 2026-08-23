@@ -44,6 +44,7 @@ export const endpoints = {
     },
   },
   admin: {
+    dashboard: "/admin/dashboard",
     users: {
       list: "/admin/users",
       access: (userId: string) => `/admin/users/${userId}/access`,

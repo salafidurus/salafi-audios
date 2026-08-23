@@ -1,11 +1,11 @@
 "use client";
 
-import type { AppActions, AppSubjectType } from "@sd/core-contracts";
-
-import { useAbility } from "@sd/domain-account";
+import { queryKeys, useApiQuery, type AppActions, type AppSubjectType } from "@sd/core-contracts";
+import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { fetchAdminDashboard } from "@/features/admin/api/admin-dashboard.api";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -18,15 +18,29 @@ type AdminSection = {
   description: string;
   descriptionMobile: string;
   href: string;
-  action: AppActions;
-  subject: AppSubjectType;
+  subjects: AppSubjectType[];
 };
+
+function canOpenAdminSection(
+  ability: ReturnType<typeof useAbility>["ability"],
+  section: AdminSection,
+) {
+  const adminActions: AppActions[] = ["read", "write", "publish", "delete", "create", "update"];
+  return section.subjects.some((subject) =>
+    subject === "User" || subject === "UserAccess"
+      ? ability.can("read", "User") || ability.can("manage", "UserAccess")
+      : adminActions.some((action) => ability.can(action, subject)),
+  );
+}
 
 export function AdminDashboardScreen() {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();
   const { isAuthenticated } = useAuth();
-  const { ability, isLoading } = useAbility({ isAuthenticated });
+  const { ability, isLoading: isAccessLoading } = useAbility({ isAuthenticated });
+  const dashboardQuery = useApiQuery(queryKeys.admin.dashboard(), fetchAdminDashboard, {
+    enabled: isAuthenticated && !isAccessLoading && hasAnyAdminAccess(ability),
+  });
 
   const adminSections: AdminSection[] = [
     {
@@ -37,8 +51,7 @@ export function AdminDashboardScreen() {
       ),
       descriptionMobile: t("admin.dashboard.scholarsDescMobile", "Manage scholars"),
       href: "/admin/scholars",
-      action: "read",
-      subject: "Scholar",
+      subjects: ["Scholar"],
     },
     {
       title: t("navigation.admin.contents", "Contents"),
@@ -48,20 +61,18 @@ export function AdminDashboardScreen() {
       ),
       descriptionMobile: t("admin.dashboard.contentsDescMobile", "Manage content"),
       href: "/admin/contents",
-      action: "read",
-      subject: "Listing",
+      subjects: ["Listing", "Topic"],
     },
     {
       title: t("navigation.admin.users", "Users"),
       description: t("admin.dashboard.usersDesc", "Manage admin users and access"),
       descriptionMobile: t("admin.dashboard.usersDescMobile", "Manage users"),
       href: "/admin/users",
-      action: "read",
-      subject: "User",
+      subjects: ["User", "UserAccess"],
     },
   ];
 
-  if (isLoading) {
+  if (isAccessLoading || dashboardQuery.isLoading) {
     return (
       <ScreenView>
         <PageHeader
@@ -76,7 +87,28 @@ export function AdminDashboardScreen() {
     );
   }
 
-  const visibleSections = adminSections.filter((s) => ability.can(s.action, s.subject));
+  if (dashboardQuery.isError) {
+    return (
+      <ScreenView>
+        <PageHeader
+          title={
+            !isMobile
+              ? t("admin.dashboard.title", "Admin Dashboard")
+              : t("admin.dashboard.titleMobile", "Admin")
+          }
+        />
+        <EmptyState
+          variant="error"
+          message={t(
+            "admin.dashboard.error",
+            "The dashboard is unavailable right now. Try again later.",
+          )}
+        />
+      </ScreenView>
+    );
+  }
+
+  const visibleSections = adminSections.filter((section) => canOpenAdminSection(ability, section));
 
   return (
     <ScreenView>
@@ -95,17 +127,81 @@ export function AdminDashboardScreen() {
               : t("admin.dashboard.noAccessMobile", "No admin access.")
           }
         />
+      ) : dashboardQuery.data ? (
+        <>
+          <div className={styles.metricsGrid}>
+            {visibleSections.map((section) => {
+              const metric = section.subjects.includes("Scholar")
+                ? dashboardQuery.data.metrics.scholars
+                : section.subjects.includes("Listing")
+                  ? dashboardQuery.data.metrics.listings
+                  : section.subjects.includes("Topic")
+                    ? dashboardQuery.data.metrics.topics
+                    : dashboardQuery.data.metrics.users;
+              return (
+                <a key={section.href} href={section.href} className={styles.sectionCard}>
+                  <span className={styles.metric}>{metric ?? "—"}</span>
+                  <h2 className={styles.sectionTitle}>{section.title}</h2>
+                  <p className={styles.sectionDescription}>
+                    {!isMobile ? section.description : section.descriptionMobile}
+                  </p>
+                </a>
+              );
+            })}
+          </div>
+
+          <div className={styles.columns}>
+            <section className={styles.panel} aria-labelledby="admin-pending-heading">
+              <h2 id="admin-pending-heading" className={styles.panelTitle}>
+                {t("admin.dashboard.pendingTitle", "Pending work")}
+              </h2>
+              {dashboardQuery.data.pendingWork.length === 0 ? (
+                <p className={styles.muted}>
+                  {t("admin.dashboard.pendingEmpty", "Nothing is waiting for review.")}
+                </p>
+              ) : (
+                <ul className={styles.activityList}>
+                  {dashboardQuery.data.pendingWork.map((item) => (
+                    <li key={item.id}>
+                      <a href={item.href} className={styles.activityLink}>
+                        <span>{item.title}</span>
+                        <small>
+                          {item.scholarName} · {item.status}
+                        </small>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+            <section className={styles.panel} aria-labelledby="admin-activity-heading">
+              <h2 id="admin-activity-heading" className={styles.panelTitle}>
+                {t("admin.dashboard.activityTitle", "Recent activity")}
+              </h2>
+              {dashboardQuery.data.activity.length === 0 ? (
+                <p className={styles.muted}>
+                  {t("admin.dashboard.activityEmpty", "No recent activity is available.")}
+                </p>
+              ) : (
+                <ul className={styles.activityList}>
+                  {dashboardQuery.data.activity.map((item) => (
+                    <li key={`${item.type}-${item.id}`}>
+                      <a href={item.href} className={styles.activityLink}>
+                        <span>{item.title}</span>
+                        <small>
+                          {item.subtitle ?? item.type}
+                          {item.status ? ` · ${item.status}` : ""}
+                        </small>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
+        </>
       ) : (
-        <div className={styles.grid}>
-          {visibleSections.map((section) => (
-            <a key={section.href} href={section.href} className={styles.sectionCard}>
-              <h2 className={styles.sectionTitle}>{section.title}</h2>
-              <p className={styles.sectionDescription}>
-                {!isMobile ? section.description : section.descriptionMobile}
-              </p>
-            </a>
-          ))}
-        </div>
+        <EmptyState message={t("admin.dashboard.empty", "No dashboard data is available.")} />
       )}
     </ScreenView>
   );
