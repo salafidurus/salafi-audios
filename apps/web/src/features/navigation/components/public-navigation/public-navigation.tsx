@@ -65,7 +65,6 @@ function getPublicNavItems(t: (key: string, fallback: string) => string): AdminN
       Icon: GraduationCap,
     },
     { label: t("navigation.library", "Library"), href: routes.library.index, Icon: Bookmark },
-    { label: t("navigation.settings", "Settings"), href: routes.settings.index, Icon: Settings2 },
   ];
 }
 
@@ -374,7 +373,7 @@ export function PublicNavigation() {
           <span className={styles.brandMark}>
             <Image src="/logo/logo_72.png" alt="" width={30} height={30} priority />
           </span>
-          <span>{t("navigation.siteTitle", "Salafi Durus")}</span>
+          <span className={styles.brandName}>{t("navigation.siteTitle", "Salafi Durus")}</span>
           {isAdminWorkspace && (
             <span className={styles.workspaceBadge}>{t("navigation.adminSection", "ADMIN")}</span>
           )}

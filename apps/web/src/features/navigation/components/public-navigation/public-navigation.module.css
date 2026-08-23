@@ -9,11 +9,15 @@
 
 .inner {
   display: grid;
-  grid-template-columns: minmax(11rem, 0.8fr) minmax(0, 3.2fr);
+  grid-template-columns: minmax(12rem, 1fr) minmax(18rem, 32rem) minmax(12rem, 1fr);
+  grid-template-areas:
+    "brand search utilities"
+    "nav nav nav";
   align-items: center;
   width: 100%;
   min-height: 5.5rem;
   gap: var(--space-component-gap-lg);
+  row-gap: var(--space-component-gap-md);
   padding: var(--space-component-gap-sm) var(--space-layout-page-x);
   border-block: 1px solid var(--border-subtle);
   background: color-mix(in srgb, var(--surface-default) 96%, transparent);
@@ -48,6 +52,12 @@
   object-fit: contain;
 }
 
+.brandName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .workspaceBadge {
   padding: var(--space-component-gap-sm) var(--space-component-gap-lg);
   border: 1px solid color-mix(in srgb, var(--action-primary) 35%, var(--border-subtle));
@@ -60,31 +70,34 @@
 }
 
 .actions {
-  display: grid;
-  grid-template-columns: minmax(13rem, 18rem) minmax(0, 1fr) auto;
-  align-items: center;
-  min-width: 0;
-  gap: var(--space-component-gap-lg);
+  display: contents;
 }
 
 .searchSlot {
+  grid-area: search;
   min-width: 0;
 }
 
 .rightActions {
+  grid-area: utilities;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   min-width: 0;
   gap: var(--space-component-gap-sm);
+  justify-self: end;
 }
 
 .nav {
+  grid-area: nav;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   min-width: 0;
-  gap: var(--space-component-gap-xs);
+  gap: var(--space-component-gap-sm);
+  width: 100%;
+  padding-block-start: var(--space-component-gap-sm);
+  border-block-start: 1px solid var(--border-subtle);
 }
 
 .navLink,
@@ -108,11 +121,11 @@
 .navLink {
   position: relative;
   min-height: 3rem;
-  padding: var(--space-component-gap-md) var(--space-component-gap-md);
+  padding: var(--space-component-gap-md) var(--space-component-gap-lg);
   border: 1px solid transparent;
   border-radius: var(--radius-scale-sm);
   font-family: var(--font-body), sans-serif;
-  font-size: var(--typo-body-md-font-size);
+  font-size: var(--typo-body-lg-font-size);
   font-weight: var(--typo-body-lg-font-weight);
   letter-spacing: var(--typo-body-lg-letter-spacing);
   line-height: var(--typo-body-lg-line-height);
@@ -345,6 +358,7 @@
 }
 
 .sheet .nav {
+  grid-area: auto;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
@@ -354,6 +368,8 @@
 
 .sheet .navLink {
   width: 100%;
+  padding-block-start: 0;
+  border-block-start: 0;
   min-height: 3.25rem;
   padding: var(--space-component-gap-md) var(--space-lg);
   border-radius: var(--radius-component-panel);
@@ -408,11 +424,6 @@
     font-size: var(--typo-body-lg-font-size);
   }
 
-  .brand > span:last-child {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
   .mobileActions {
     flex: 0 0 auto;
   }
@@ -463,8 +474,17 @@
   }
 
   .brand {
-    max-width: 11rem;
+    max-width: 3rem;
     font-size: var(--typo-body-md-font-size);
+  }
+
+  .brandName {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 
   .brandMark {
@@ -476,3 +496,5 @@
     display: none;
   }
 }
+  grid-area: brand;
+  overflow: hidden;

@@ -93,6 +93,7 @@ describe("PublicNavigation", () => {
     expect(within(mainNavigation).queryByRole("link", { name: "Search" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Search anything" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
+    expect(screen.queryByRole("link", { name: "Settings" })).not.toBeInTheDocument();
     expect(screen.queryByTestId("sidebar")).not.toBeInTheDocument();
   });
 
