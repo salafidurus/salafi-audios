@@ -7,7 +7,7 @@ import { LibraryCompletedScreen } from "./library-completed.screen";
 import { LibrarySavedScreen } from "./library-saved.screen";
 import { LibraryScreen } from "./library.screen";
 
-const mockUseAuth = vi.fn(() => ({ isAuthenticated: true }));
+const mockUseAuth = vi.fn(() => ({ isAuthenticated: true, isLoading: false }));
 
 const createTestQueryClient = () =>
   new QueryClient({
@@ -35,15 +35,6 @@ vi.mock("@/core/i18n/use-translation", () => ({
 vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
   ScreenView: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="screen-view">{children}</div>
-  ),
-}));
-
-vi.mock("@/shared/components/PageHeader", () => ({
-  PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
-    <>
-      <h1>{title}</h1>
-      {actions}
-    </>
   ),
 }));
 
@@ -102,7 +93,7 @@ vi.mock("@/shared/components/InfiniteScrollList", () => ({
 describe("Library screens", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
   });
 
   describe("LibraryScreen (Started)", () => {
@@ -118,14 +109,23 @@ describe("Library screens", () => {
 
     it("renders items", () => {
       renderWithQueryClient(<LibraryScreen />);
-      expect(screen.getAllByTestId("library-row")[0]).toHaveTextContent("Lecture Title 1");
+      expect(screen.getAllByTestId("library-row")).toHaveLength(1);
+      expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
-      mockUseAuth.mockReturnValue({ isAuthenticated: false });
+      mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
       renderWithQueryClient(<LibraryScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
-      expect(screen.getByText("Sign in to view your progress")).toBeInTheDocument();
+      expect(screen.getByText("Sign in to continue your study")).toBeInTheDocument();
+    });
+
+    it("does not flash the sign-in state while authentication is resolving", () => {
+      mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: true });
+      renderWithQueryClient(<LibraryScreen />);
+
+      expect(screen.getByText("Checking your library…")).toBeInTheDocument();
+      expect(screen.queryByText("Sign in to continue your study")).not.toBeInTheDocument();
     });
 
     it("exposes Saved and Completed as distinct Library tabs", () => {
@@ -156,10 +156,10 @@ describe("Library screens", () => {
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
-      mockUseAuth.mockReturnValue({ isAuthenticated: false });
+      mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
       renderWithQueryClient(<LibrarySavedScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
-      expect(screen.getByText("Sign in to view saved lectures")).toBeInTheDocument();
+      expect(screen.getByText("Sign in to view your saved lessons")).toBeInTheDocument();
       expect(screen.getByRole("link", { name: "Completed" })).toHaveAttribute(
         "href",
         "/library/completed",
@@ -193,10 +193,10 @@ describe("Library screens", () => {
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
-      mockUseAuth.mockReturnValue({ isAuthenticated: false });
+      mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
       renderWithQueryClient(<LibraryCompletedScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
-      expect(screen.getByText("Sign in to view completed history")).toBeInTheDocument();
+      expect(screen.getByText("Sign in to view completed lessons")).toBeInTheDocument();
       expect(screen.getByRole("link", { name: "Saved" })).toHaveAttribute("href", "/library/saved");
     });
 
