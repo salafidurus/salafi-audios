@@ -140,6 +140,8 @@ export function CommandPalette() {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.nativeEvent.isComposing) return;
+
     if (event.key === "ArrowDown") {
       event.preventDefault();
       setActiveIndex((index) => (results.length ? (index + 1) % results.length : -1));
