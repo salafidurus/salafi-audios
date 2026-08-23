@@ -85,6 +85,8 @@ export {
   ScholarViewDtoSchema,
   type ScholarDetailDto,
   ScholarDetailDtoSchema,
+  type ScholarDetailStats,
+  ScholarDetailStatsSchema,
   type ScholarStatsDto,
   ScholarStatsDtoSchema,
   type ScholarListItemDto,

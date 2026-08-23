@@ -278,6 +278,8 @@
     "lectureCount": "{{count}} lectures",
     "showLess": "Show less",
     "showMore": "Show more",
+    "readLess": "Read less",
+    "readMore": "Read more",
     "statLectures": "Lectures",
     "statSeries": "Series",
     "statTotal": "Total",

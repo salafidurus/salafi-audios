@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { StatusValueSchema } from "./common.types";
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
+import { ScholarTitleSchema } from "./scholar.types";
 import { TranslationViewDtoSchema } from "./translation.types";
 
 /**
@@ -64,6 +65,7 @@ export const ScholarRefDtoSchema = z.object({
   slug: z.string(),
   name: z.string(),
   imageUrl: z.string().optional(),
+  title: ScholarTitleSchema.optional(),
 });
 export type ScholarRefDto = z.infer<typeof ScholarRefDtoSchema>;
 
@@ -111,12 +113,15 @@ export const ListingDetailDtoSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
   format: ListingFormatSchema,
+  coverImageUrl: z.string().optional(),
   language: LocaleSchema.optional(),
   /** Language the original (untranslated) fields are written in. */
   originalLanguage: LocaleSchema.optional(),
   /** Original-language fields, set only when `title`/`description` are translated. */
   original: ContentOriginalFieldsSchema.optional(),
   durationSeconds: z.number().optional(),
+  publishedLectureCount: z.number().optional(),
+  publishedDurationSeconds: z.number().optional(),
   publishedAt: z.string().optional(),
   scholar: ScholarRefDtoSchema,
   topics: z.array(TopicRefDtoSchema),

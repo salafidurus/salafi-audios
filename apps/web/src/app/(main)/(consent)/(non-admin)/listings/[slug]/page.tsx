@@ -12,6 +12,9 @@ const ListingDetailSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string().nullable().optional(),
+  coverImageUrl: z.string().optional(),
+  publishedLectureCount: z.number().optional(),
+  publishedDurationSeconds: z.number().optional(),
   rootListing: z
     .object({
       slug: z.string(),

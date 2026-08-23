@@ -278,6 +278,8 @@
     "lectureCount": "{{count}} محاضرة",
     "showLess": "عرض أقل",
     "showMore": "عرض المزيد",
+    "readLess": "قراءة أقل",
+    "readMore": "قراءة المزيد",
     "statLectures": "المحاضرات",
     "statSeries": "السلاسل",
     "statTotal": "الإجمالي",

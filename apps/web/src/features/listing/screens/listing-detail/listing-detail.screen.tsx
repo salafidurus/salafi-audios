@@ -288,7 +288,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
           <MetaDataSection
             listing={listing}
             layout="sidebar"
-            moduleCount={contents?.format === "collection" ? filteredModules.length : undefined}
+            moduleCount={contents?.format === "collection" ? contents.modules.length : undefined}
           />
           <QuickButtonSection listing={listing} contents={contents} />
           {isMultiItem && (

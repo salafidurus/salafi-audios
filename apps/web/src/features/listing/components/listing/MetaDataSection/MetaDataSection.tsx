@@ -40,7 +40,7 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
   const title = pickContentField(listing.title, listing.original?.title, showOriginal);
 
   const imageUrl = listing.scholar.imageUrl;
-  const durationStr = formatDuration(listing.durationSeconds);
+  const durationStr = formatDuration(listing.publishedDurationSeconds ?? listing.durationSeconds);
   const languageLabel =
     listing.language === "ar"
       ? t("common.arabic", "Arabic")
@@ -48,12 +48,18 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
         ? t("common.english", "English")
         : listing.language;
   const hasModuleCount = moduleCount !== undefined;
+  const hasLessonCount = listing.format !== "single" && listing.publishedLectureCount !== undefined;
+  const hasMeta = Boolean(durationStr || languageLabel || hasLessonCount || hasModuleCount);
+  const scholarTitle = listing.scholar.title
+    ? t(`scholar.title.${listing.scholar.title}`, listing.scholar.title)
+    : undefined;
 
   return (
     <div className={cn(styles.container, layout === "sidebar" && styles.sidebar)}>
       <div className={styles.artworkContainer}>
         <div className={styles.bookmarkRibbon} aria-hidden="true" />
         <AppAvatar
+          listingArtwork={listing.coverImageUrl}
           scholarImageUrl={imageUrl}
           name={listing.scholar.name}
           fill
@@ -67,19 +73,20 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
 
         {/* Row 2: Scholar Name Link (Primary strong color Title Md) */}
         <Link href={`/scholars/${listing.scholar.slug}`} className={styles.scholarLink}>
-          <AppAvatar image={listing.scholar.imageUrl} name={listing.scholar.name} size={24} />
           <AppText variant="titleMd" color="primary">
-            {formatScholarName(listing.scholar)}
+            {scholarTitle
+              ? `${scholarTitle} ${formatScholarName(listing.scholar)}`
+              : formatScholarName(listing.scholar)}
           </AppText>
         </Link>
+
+        {listing.description && <p className={styles.description}>{listing.description}</p>}
 
         {/* Row 3: Meta info (topics, duration, language) */}
         <div className={styles.metaRow}>
           {listing.topics.length > 0 && <TopicChips topics={listing.topics} />}
 
-          {listing.topics.length > 0 && (durationStr || languageLabel || hasModuleCount) && (
-            <span className={styles.dot}>•</span>
-          )}
+          {listing.topics.length > 0 && hasMeta && <span className={styles.dot}>•</span>}
 
           {durationStr && (
             <AppText variant="bodySm" color="muted">
@@ -87,7 +94,7 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
             </AppText>
           )}
 
-          {durationStr && (languageLabel || hasModuleCount) && (
+          {durationStr && (languageLabel || hasLessonCount || hasModuleCount) && (
             <span className={styles.dot}>•</span>
           )}
 
@@ -97,7 +104,17 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
             </AppText>
           )}
 
-          {languageLabel && hasModuleCount && <span className={styles.dot}>•</span>}
+          {languageLabel && (hasLessonCount || hasModuleCount) && (
+            <span className={styles.dot}>•</span>
+          )}
+
+          {hasLessonCount && (
+            <Badge variant="outline">
+              {listing.publishedLectureCount} {t("listing.lessons", "lessons")}
+            </Badge>
+          )}
+
+          {hasLessonCount && hasModuleCount && <span className={styles.dot}>•</span>}
 
           {hasModuleCount && (
             <Badge variant="secondary">
