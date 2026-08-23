@@ -28,15 +28,12 @@ export function CollectionContentLayout({
   highlightItemId,
 }: CollectionContentLayoutProps) {
   const [isTocCollapsed, setIsTocCollapsed] = useState(false);
-  const [activeModuleId, setActiveModuleId] = useState<string | undefined>(modules[0]?.id);
+  const [selectedModuleId, setSelectedModuleId] = useState<string | undefined>(modules[0]?.id);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const pendingModuleId = useRef<string | null>(null);
-
-  useEffect(() => {
-    setActiveModuleId((current) =>
-      current && modules.some((module) => module.id === current) ? current : modules[0]?.id,
-    );
-  }, [modules]);
+  const activeModuleId = modules.some((module) => module.id === selectedModuleId)
+    ? selectedModuleId
+    : modules[0]?.id;
 
   useEffect(() => {
     const sections = modules
@@ -46,6 +43,12 @@ export function CollectionContentLayout({
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (
+          pendingModuleId.current &&
+          !modules.some((module) => module.id === pendingModuleId.current)
+        ) {
+          pendingModuleId.current = null;
+        }
         const pendingEntry = entries.find(
           (entry) => entry.target.id === pendingModuleId.current && entry.isIntersecting,
         );
@@ -56,7 +59,7 @@ export function CollectionContentLayout({
         const visible = entries
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if (visible) setActiveModuleId(visible.target.id);
+        if (visible) setSelectedModuleId(visible.target.id);
       },
       { rootMargin: "-18% 0px -65% 0px", threshold: 0 },
     );
@@ -70,7 +73,7 @@ export function CollectionContentLayout({
 
   const scrollToModule = (moduleId: string) => {
     pendingModuleId.current = moduleId;
-    setActiveModuleId(moduleId);
+    setSelectedModuleId(moduleId);
     const el = sectionRefs.current[moduleId];
     if (!el) return;
     el.scrollIntoView({ behavior: "smooth", block: "start" });
