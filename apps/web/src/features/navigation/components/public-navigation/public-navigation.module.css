@@ -414,7 +414,7 @@
     grid-template-columns: max-content 2.75rem minmax(0, 1fr) auto;
     gap: var(--space-component-gap-md);
     min-height: 4rem;
-    padding: var(--space-sm);
+    padding: var(--space-sm) var(--space-layout-page-x);
   }
   .brand {
     min-width: 0;
