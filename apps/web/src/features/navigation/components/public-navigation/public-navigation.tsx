@@ -14,7 +14,6 @@ import {
   LayoutDashboard,
   LibraryBig,
   Menu,
-  Search,
   UsersRound,
   UserRound,
   type LucideIcon,
@@ -45,6 +44,7 @@ import {
   getBrowserStorage,
   rememberAdminReturnPath,
 } from "../../utils/admin-workspace";
+import { CommandPalette } from "../command-palette/command-palette";
 import styles from "./public-navigation.module.css";
 
 type PublicNavItem = {
@@ -71,36 +71,7 @@ function getPublicNavItems(t: (key: string, fallback: string) => string): AdminN
 }
 
 function SearchControl() {
-  const { t } = useTranslation();
-  const router = useRouter();
-  const label = t("navigation.searchAnything", "Search anything");
-
-  useEffect(() => {
-    const handleShortcut = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        router.push(routes.search);
-      }
-    };
-
-    window.addEventListener("keydown", handleShortcut);
-    return () => window.removeEventListener("keydown", handleShortcut);
-  }, [router]);
-
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      className={styles.searchControl}
-      aria-label={label}
-      onClick={() => router.push(routes.search)}
-    >
-      <Search aria-hidden="true" size={16} />
-      <span>{label}</span>
-      <kbd aria-hidden="true">⌘K</kbd>
-    </Button>
-  );
+  return <CommandPalette />;
 }
 
 function WorkspaceSwitch({
