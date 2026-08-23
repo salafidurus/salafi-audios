@@ -6,19 +6,11 @@ import { AdminUsersController } from './admin-users.controller';
 import { UserDirectoryService } from './user-directory.service';
 import { UserDirectoryRepository } from './user-directory.repository';
 import { AccessService } from './access.service';
-import { AdminDashboardController } from './admin-dashboard.controller';
-import { AdminDashboardService } from './admin-dashboard.service';
 
 @Module({
   imports: [DbModule],
-  controllers: [AccountController, AdminUsersController, AdminDashboardController],
-  providers: [
-    AccountService,
-    UserDirectoryService,
-    UserDirectoryRepository,
-    AccessService,
-    AdminDashboardService,
-  ],
+  controllers: [AccountController, AdminUsersController],
+  providers: [AccountService, UserDirectoryService, UserDirectoryRepository, AccessService],
   exports: [UserDirectoryService],
 })
 export class AccountModule {}

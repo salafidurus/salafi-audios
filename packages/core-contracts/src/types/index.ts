@@ -240,13 +240,6 @@ export {
   AdminUserListDtoSchema,
 } from "./admin.types";
 export {
-  type AdminDashboardDto,
-  AdminDashboardDtoSchema,
-  AdminDashboardMetricSchema,
-  AdminDashboardActivitySchema,
-  AdminDashboardPendingWorkSchema,
-} from "./admin-dashboard.types";
-export {
   type ScholarChipDto,
   ScholarChipDtoSchema,
   type ContentSuggestionDto,
