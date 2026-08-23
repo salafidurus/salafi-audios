@@ -41,6 +41,13 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
 
   const imageUrl = listing.scholar.imageUrl;
   const durationStr = formatDuration(listing.durationSeconds);
+  const languageLabel =
+    listing.language === "ar"
+      ? t("common.arabic", "Arabic")
+      : listing.language === "en"
+        ? t("common.english", "English")
+        : listing.language;
+  const hasModuleCount = moduleCount !== undefined;
 
   return (
     <div className={cn(styles.container, layout === "sidebar" && styles.sidebar)}>
@@ -70,7 +77,7 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
         <div className={styles.metaRow}>
           {listing.topics.length > 0 && <TopicChips topics={listing.topics} />}
 
-          {listing.topics.length > 0 && (durationStr || listing.language) && (
+          {listing.topics.length > 0 && (durationStr || languageLabel || hasModuleCount) && (
             <span className={styles.dot}>•</span>
           )}
 
@@ -80,15 +87,19 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
             </AppText>
           )}
 
-          {durationStr && listing.language && <span className={styles.dot}>•</span>}
+          {durationStr && (languageLabel || hasModuleCount) && (
+            <span className={styles.dot}>•</span>
+          )}
 
-          {listing.language && (
+          {languageLabel && (
             <AppText variant="bodySm" color="muted">
-              {listing.language}
+              {languageLabel}
             </AppText>
           )}
 
-          {moduleCount !== undefined && (
+          {languageLabel && hasModuleCount && <span className={styles.dot}>•</span>}
+
+          {hasModuleCount && (
             <Badge variant="secondary">
               {moduleCount} {t("listing.modules", "modules")}
             </Badge>

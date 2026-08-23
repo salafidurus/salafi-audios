@@ -2,7 +2,7 @@
 
 import type { ListingModuleDto } from "@sd/core-contracts";
 
-import { BookOpen, Minimize2, Maximize2 } from "lucide-react";
+import { Minimize2, Maximize2 } from "lucide-react";
 import React from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -97,7 +97,6 @@ export function CollectionToc({
                           onClick={() => onSelect(mod.id)}
                           className={styles.moduleButton}
                         >
-                          <BookOpen aria-hidden="true" />
                           {!isCollapsed && <span>{mod.title}</span>}
                         </SidebarMenuButton>
                       </SidebarMenuItem>
