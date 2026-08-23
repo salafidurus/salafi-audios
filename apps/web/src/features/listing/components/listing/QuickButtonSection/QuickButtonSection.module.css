@@ -23,20 +23,20 @@
 
 @media (min-width: 768px) {
   .container {
-    flex-direction: column;
-    align-items: stretch;
-    width: 180px;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
     gap: var(--space-component-gap-sm, 12px);
     flex-shrink: 0;
   }
 
   .button {
     flex: initial;
-    width: 100%; /* equal full width vertically stacked on desktop/tablet */
+    width: auto;
   }
 
   .saveWrapper {
     flex: initial;
-    width: 100%;
+    width: auto;
   }
 }

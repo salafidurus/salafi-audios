@@ -285,7 +285,11 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
             <ChevronLeft data-icon="inline-start" />
             {t("navigation.back", "Back")}
           </Button>
-          <MetaDataSection listing={listing} layout="sidebar" />
+          <MetaDataSection
+            listing={listing}
+            layout="sidebar"
+            moduleCount={contents?.format === "collection" ? filteredModules.length : undefined}
+          />
           <QuickButtonSection listing={listing} contents={contents} />
           {isMultiItem && (
             <div className={styles.searchWrapper}>

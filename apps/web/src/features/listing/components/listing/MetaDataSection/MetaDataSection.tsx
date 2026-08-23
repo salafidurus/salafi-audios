@@ -3,13 +3,14 @@
 import type { ListingDetailDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
-import { BookOpen } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
+import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { AppAvatar } from "@/shared/components/app-avatar";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { Badge } from "@/shared/components/ui/badge";
 import { cn } from "@/shared/utils";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
@@ -29,9 +30,11 @@ function formatDuration(seconds?: number): string {
 export type MetaDataSectionProps = {
   listing: ListingDetailDto;
   layout?: "inline" | "sidebar";
+  moduleCount?: number;
 };
 
-export function MetaDataSection({ listing, layout = "inline" }: MetaDataSectionProps) {
+export function MetaDataSection({ listing, layout = "inline", moduleCount }: MetaDataSectionProps) {
+  const { t } = useTranslation();
   const showOriginal = useShowOriginalContent();
   const formatScholarName = useFormatScholarName();
   const title = pickContentField(listing.title, listing.original?.title, showOriginal);
@@ -43,20 +46,13 @@ export function MetaDataSection({ listing, layout = "inline" }: MetaDataSectionP
     <div className={cn(styles.container, layout === "sidebar" && styles.sidebar)}>
       <div className={styles.artworkContainer}>
         <div className={styles.bookmarkRibbon} aria-hidden="true" />
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={listing.scholar.name}
-            fill
-            sizes="(max-width: 640px) 96px, 128px"
-            unoptimized
-            className={styles.artwork}
-          />
-        ) : (
-          <div className={styles.artworkPlaceholder}>
-            <BookOpen size={38} color="var(--action-primary)" strokeWidth={1.3} />
-          </div>
-        )}
+        <AppAvatar
+          listingArtwork={listing.imageUrl}
+          scholarImageUrl={imageUrl}
+          name={listing.scholar.name}
+          fill
+          className={styles.artworkAvatar}
+        />
       </div>
 
       <div className={styles.textColumn}>
@@ -65,16 +61,7 @@ export function MetaDataSection({ listing, layout = "inline" }: MetaDataSectionP
 
         {/* Row 2: Scholar Name Link (Primary strong color Title Md) */}
         <Link href={`/scholars/${listing.scholar.slug}`} className={styles.scholarLink}>
-          {listing.scholar.imageUrl && (
-            <Image
-              src={listing.scholar.imageUrl}
-              alt={listing.scholar.name}
-              width={24}
-              height={24}
-              unoptimized
-              className={styles.scholarAvatar}
-            />
-          )}
+          <AppAvatar image={listing.scholar.imageUrl} name={listing.scholar.name} size={24} />
           <AppText variant="titleMd" color="primary">
             {formatScholarName(listing.scholar)}
           </AppText>
@@ -100,6 +87,12 @@ export function MetaDataSection({ listing, layout = "inline" }: MetaDataSectionP
             <AppText variant="bodySm" color="muted">
               {listing.language}
             </AppText>
+          )}
+
+          {moduleCount !== undefined && (
+            <Badge variant="secondary">
+              {moduleCount} {t("listing.modules", "modules")}
+            </Badge>
           )}
         </div>
       </div>

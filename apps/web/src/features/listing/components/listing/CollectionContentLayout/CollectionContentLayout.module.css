@@ -18,9 +18,13 @@
 }
 
 .moduleHeader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   padding: 16px 0 8px 0;
   margin-top: 16px;
   margin-bottom: 8px;
+  background: var(--surface-canvas);
   scroll-margin-top: calc(var(--sticky-header-height, 240px) + 32px);
 }
 
@@ -46,10 +50,10 @@
   .tocColumn {
     display: block;
     position: sticky;
-    top: calc(var(--sticky-header-height, 240px) + 32px);
+    top: var(--space-component-gap-lg, 24px);
     align-self: start;
     z-index: 5;
-    max-height: calc(100vh - var(--sticky-header-height, 240px) - 64px);
+    max-height: calc(100vh - var(--space-component-gap-xl, 32px) * 2);
     overflow-y: auto;
   }
 }

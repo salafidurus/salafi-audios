@@ -84,7 +84,6 @@ export function CollectionContentLayout({
       <aside className={styles.tocColumn}>
         <CollectionToc
           modules={modules}
-          lessonCount={modules.reduce((count, module) => count + module.lessons.length, 0)}
           onSelect={scrollToModule}
           isCollapsed={isTocCollapsed}
           onToggleCollapse={() => setIsTocCollapsed((prev) => !prev)}

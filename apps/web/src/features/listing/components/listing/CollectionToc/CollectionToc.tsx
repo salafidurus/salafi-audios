@@ -6,7 +6,6 @@ import { BookOpen, Minimize2, Maximize2 } from "lucide-react";
 import React from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Badge } from "@/shared/components/ui/badge";
 import {
   Sidebar,
   SidebarContent,
@@ -27,7 +26,6 @@ import styles from "./CollectionToc.module.css";
 
 export type CollectionTocProps = {
   modules: ListingModuleDto[];
-  lessonCount: number;
   onSelect: (moduleId: string) => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
@@ -35,7 +33,6 @@ export type CollectionTocProps = {
 
 export function CollectionToc({
   modules,
-  lessonCount,
   onSelect,
   isCollapsed = false,
   onToggleCollapse,
@@ -60,19 +57,11 @@ export function CollectionToc({
             className={cn(styles.container, isCollapsed && styles.collapsed)}
           >
             <SidebarHeader className={styles.header}>
-              <div className={styles.headerRow}>
-                {!isCollapsed && (
-                  <SidebarGroupLabel className={styles.title}>
-                    {t("listing.tableOfContents", "Table of Contents")}
-                  </SidebarGroupLabel>
-                )}
-                {!isCollapsed && (
-                  <Badge variant="secondary" className={styles.metadata}>
-                    {modules.length} {t("listing.modules", "modules")} · {lessonCount}{" "}
-                    {t("listing.items", "lessons")}
-                  </Badge>
-                )}
-              </div>
+              {!isCollapsed && (
+                <SidebarGroupLabel className={styles.title}>
+                  {t("listing.tableOfContents", "Table of Contents")}
+                </SidebarGroupLabel>
+              )}
               {onToggleCollapse && (
                 <SidebarGroupAction
                   type="button"
