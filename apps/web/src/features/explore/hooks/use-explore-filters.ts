@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { useDebouncedSearch } from "@/shared/hooks";
-
 import {
   DEFAULT_EXPLORE_FILTERS,
   exploreFiltersStorageKey,
@@ -24,7 +22,6 @@ function browserStorage(): Storage | null {
 }
 
 export function useExploreFilters({ locale, userId }: UseExploreFiltersOptions) {
-  const { query, setQuery: setSearchQuery, debouncedQuery } = useDebouncedSearch();
   const storageKey = exploreFiltersStorageKey(locale, userId);
   const [filters, setFilters] = useState<ExploreFilters>(DEFAULT_EXPLORE_FILTERS);
   const [hydratedStorageKey, setHydratedStorageKey] = useState<string | null>(null);
@@ -37,15 +34,19 @@ export function useExploreFilters({ locale, userId }: UseExploreFiltersOptions) 
     }
 
     const storedFilters = readExploreFilters(storage, storageKey);
-    setFilters(storedFilters);
-    setSearchQuery(storedFilters.query);
+    setFilters({ ...DEFAULT_EXPLORE_FILTERS, topic: storedFilters.topic });
     setHydratedStorageKey(storageKey);
-  }, [setSearchQuery, storageKey]);
+  }, [storageKey]);
 
   const persist = useCallback(
     (nextFilters: ExploreFilters) => {
       const storage = browserStorage();
-      if (storage) writeExploreFilters(storage, storageKey, nextFilters);
+      if (storage) {
+        writeExploreFilters(storage, storageKey, {
+          ...DEFAULT_EXPLORE_FILTERS,
+          topic: nextFilters.topic,
+        });
+      }
     },
     [storageKey],
   );
@@ -61,35 +62,25 @@ export function useExploreFilters({ locale, userId }: UseExploreFiltersOptions) 
     [persist],
   );
 
-  const setQuery = useCallback(
-    (value: string) => {
-      setSearchQuery(value);
-      updateFilter("query", value);
-    },
-    [setSearchQuery, updateFilter],
-  );
-
   const clearFilter = useCallback(
     (key: keyof ExploreFilters) => {
       updateFilter(key, key === "sort" ? "recent" : "");
-      if (key === "query") setSearchQuery("");
     },
-    [setSearchQuery, updateFilter],
+    [updateFilter],
   );
 
   const clearAll = useCallback(() => {
     setFilters(DEFAULT_EXPLORE_FILTERS);
-    setSearchQuery("");
     persist(DEFAULT_EXPLORE_FILTERS);
-  }, [persist, setSearchQuery]);
+  }, [persist]);
 
   return {
     filters,
-    query,
-    debouncedQuery,
+    query: "",
+    debouncedQuery: "",
     storageKey,
     isHydrated: hydratedStorageKey === storageKey,
-    setQuery,
+    setQuery: () => undefined,
     updateFilter,
     clearFilter,
     clearAll,

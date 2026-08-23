@@ -6,29 +6,18 @@ import { DEFAULT_EXPLORE_FILTERS } from "../utils/explore-filters";
 import { FeedRecentScreen } from "./explore-recent.screen";
 
 const mockUseExploreRecentScreen = vi.fn();
-const mockUseInfiniteSearch = vi.fn();
-const mockUseScholarsList = vi.fn();
 const mockUseTopicsList = vi.fn();
 const mockUseAuth = vi.fn();
 const mockUseExploreFilters = vi.fn();
 
-vi.mock("@sd/domain-content", () => ({
-  useExploreRecentScreen: mockUseExploreRecentScreen,
-  useScholarsList: mockUseScholarsList,
-}));
-vi.mock("@sd/domain-search", () => ({
-  useInfiniteSearch: mockUseInfiniteSearch,
-  useTopicsList: mockUseTopicsList,
-}));
+vi.mock("@sd/domain-content", () => ({ useExploreRecentScreen: mockUseExploreRecentScreen }));
+vi.mock("@sd/domain-search", () => ({ useTopicsList: mockUseTopicsList }));
 vi.mock("@/core/auth", () => ({ useAuth: mockUseAuth }));
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     i18n: { language: "en" },
     t: (_key: string, fallback: string) => fallback,
   }),
-}));
-vi.mock("@/shared/hooks/use-responsive", () => ({
-  useResponsive: () => ({ isMobile: false, isTablet: false, isWeb: true }),
 }));
 vi.mock("@/shared/hooks/use-formatted-scholar-name", () => ({
   useFormattedScholarName: (name: string) => name,
@@ -65,31 +54,8 @@ vi.mock("@/shared/components/ui/button", () => ({
     <button {...props}>{children}</button>
   ),
 }));
-vi.mock("@/shared/components/Search", () => ({
-  Search: {
-    Bar: ({
-      value,
-      onChange,
-      placeholder,
-    }: {
-      value: string;
-      onChange: (value: string) => void;
-      placeholder: string;
-    }) => (
-      <input
-        aria-label="Catalog search"
-        placeholder={placeholder}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      />
-    ),
-  },
-}));
-vi.mock("../components/explore-filter-field/explore-filter-field", () => ({
-  ExploreFilterField: ({ label }: { label: string }) => <span>{label}</span>,
-}));
 vi.mock("../components/feed-skeleton/feed-skeleton", () => ({
-  FeedSkeleton: () => <div data-testid="feed-skeleton">Loading catalog</div>,
+  FeedSkeleton: () => <div data-testid="feed-skeleton">Loading discovery</div>,
 }));
 vi.mock("../components/feed-scholar-row/feed-scholar-row", () => ({
   FeedScholarRow: () => <div data-testid="scholar-feed-row">Scholar discovery</div>,
@@ -99,9 +65,7 @@ vi.mock("../components/feed-topic-row/feed-topic-row", () => ({
     <div data-testid="topic-feed-row">{topicName}</div>
   ),
 }));
-vi.mock("../hooks/use-explore-filters", () => ({
-  useExploreFilters: mockUseExploreFilters,
-}));
+vi.mock("../hooks/use-explore-filters", () => ({ useExploreFilters: mockUseExploreFilters }));
 vi.mock("@/features/home/components/lecture-card/lecture-card", () => ({
   LectureCard: ({ title }: { title: string }) => <article>{title}</article>,
 }));
@@ -113,13 +77,8 @@ function filters(overrides: Partial<typeof DEFAULT_EXPLORE_FILTERS> = {}) {
 function exploreHookValue(overrides: Record<string, unknown> = {}) {
   return {
     filters: filters(),
-    query: "",
-    debouncedQuery: "",
     isHydrated: true,
-    setQuery: vi.fn(),
     updateFilter: vi.fn(),
-    clearFilter: vi.fn(),
-    clearAll: vi.fn(),
     ...overrides,
   };
 }
@@ -128,24 +87,40 @@ let currentExploreFilters = exploreHookValue();
 
 function setup() {
   mockUseAuth.mockReturnValue({ user: null });
-  mockUseScholarsList.mockReturnValue({
-    data: { scholars: [{ slug: "ibn-baz", name: "Ibn Baz" }] },
-  });
   mockUseTopicsList.mockReturnValue({
     data: [{ slug: "aqeedah", name: { en: "Aqeedah", ar: "العقيدة" } }],
   });
   mockUseExploreRecentScreen.mockReturnValue({
-    data: { pages: [{ items: [{ kind: "topic_row", topicName: "Aqeedah", items: [] }] }] },
+    data: {
+      pages: [
+        {
+          items: [
+            {
+              kind: "single",
+              id: "l1",
+              slug: "lesson-1",
+              title: "Lesson one",
+              scholarName: "Ibn Baz",
+              scholarSlug: "ibn-baz",
+              thumbnailUrl: null,
+              durationSeconds: 600,
+              publishedAt: "2026-08-22",
+            },
+            {
+              kind: "scholar_row",
+              scholars: [{ id: "s1", slug: "ibn-baz", name: "Ibn Baz", imageUrl: null }],
+            },
+            { kind: "topic_row", topicName: "Aqeedah", items: [] },
+          ],
+          exhausted: false,
+          nextCursor: "next",
+        },
+      ],
+    },
     isFetching: false,
     isError: false,
-    hasNextPage: false,
+    hasNextPage: true,
     fetchNextPage: vi.fn(),
-    refetch: vi.fn(),
-  });
-  mockUseInfiniteSearch.mockReturnValue({
-    data: { pages: [] },
-    isLoading: false,
-    isError: false,
     refetch: vi.fn(),
   });
   currentExploreFilters = exploreHookValue();
@@ -158,101 +133,31 @@ describe("FeedRecentScreen", () => {
     setup();
   });
 
-  it("renders the default feed and the complete catalog filter surface", () => {
+  it("renders mixed discovery modules without a search box", () => {
     render(<FeedRecentScreen />);
 
     expect(screen.getByRole("heading", { name: "Explore" })).toBeInTheDocument();
-    expect(screen.getByTestId("topic-feed-row")).toHaveTextContent("Aqeedah");
-    expect(screen.getByRole("region", { name: "Active filters" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Everything" })).toHaveAttribute("data-state", "active");
-    expect(screen.getByRole("button", { name: "Refine" })).toBeInTheDocument();
-    expect(screen.getByRole("radiogroup", { name: "Topic" })).toBeInTheDocument();
-  });
-
-  it("shows the persisted filter summary and filtered catalog results", () => {
-    currentExploreFilters = exploreHookValue({
-      filters: filters({ topic: "aqeedah", sort: "title-asc" }),
-    });
-    mockUseInfiniteSearch.mockReturnValue({
-      data: {
-        pages: [
-          {
-            items: [
-              {
-                id: "l1",
-                title: "Aqeedah Primer",
-                format: "series",
-                scholarName: "Ibn Baz",
-                scholarSlug: "ibn-baz",
-                slug: "aqeedah-primer",
-                imageUrl: null,
-                lectureCount: 4,
-              },
-            ],
-          },
-        ],
-      },
-      isLoading: false,
-      isError: false,
-      refetch: vi.fn(),
-    });
-
-    render(<FeedRecentScreen />);
-
-    expect(screen.getByText(/Topic: Aqeedah/)).toBeInTheDocument();
-    expect(screen.getByText(/Sort: Title A–Z/)).toBeInTheDocument();
-    expect(screen.getByText("Aqeedah Primer")).toBeInTheDocument();
-  });
-
-  it("switches to scholar discovery without rendering catalog results", () => {
-    render(<FeedRecentScreen />);
-
-    const scholarsTab = screen.getByRole("tab", { name: "Scholars" });
-    fireEvent.mouseDown(scholarsTab);
-    fireEvent.click(scholarsTab);
-
+    expect(screen.getByText("Lesson one")).toBeInTheDocument();
     expect(screen.getByTestId("scholar-feed-row")).toBeInTheDocument();
-    expect(screen.queryByTestId("topic-feed-row")).not.toBeInTheDocument();
+    expect(screen.getByTestId("topic-feed-row")).toHaveTextContent("Aqeedah");
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   });
 
-  it("steers discovery when a topic is selected", () => {
+  it("requests the selected Topic from the discovery API", () => {
     const updateFilter = vi.fn();
     currentExploreFilters = exploreHookValue({ updateFilter });
     render(<FeedRecentScreen />);
 
+    expect(mockUseExploreRecentScreen).toHaveBeenCalledWith({
+      topicSlug: undefined,
+    });
     fireEvent.click(screen.getByRole("radio", { name: "Aqeedah" }));
-
     expect(updateFilter).toHaveBeenCalledWith("topic", "aqeedah");
   });
 
-  it("covers loading and empty result states", () => {
+  it("renders the loading state before hydration", () => {
     currentExploreFilters = exploreHookValue({ isHydrated: false });
-    const { rerender } = render(<FeedRecentScreen />);
-    expect(screen.getByTestId("feed-skeleton")).toBeInTheDocument();
-
-    currentExploreFilters = exploreHookValue({
-      filters: filters({ language: "ar" }),
-      isHydrated: true,
-    });
-    mockUseInfiniteSearch.mockReturnValue({
-      data: { pages: [] },
-      isLoading: false,
-      isError: false,
-      refetch: vi.fn(),
-    });
-    rerender(<FeedRecentScreen />);
-    expect(screen.getByText("No listings found matching your filters.")).toBeInTheDocument();
-  });
-
-  it("delegates Clear all to the persistent filter state", () => {
-    const clearAll = vi.fn();
-    currentExploreFilters = exploreHookValue({
-      filters: filters({ format: "series" }),
-      clearAll,
-    });
     render(<FeedRecentScreen />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Clear all" }));
-    expect(clearAll).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("feed-skeleton")).toBeInTheDocument();
   });
 });

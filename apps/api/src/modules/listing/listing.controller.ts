@@ -28,14 +28,15 @@ export class ListingController {
 
   @Get('recent')
   @CacheTTL(3 * 60 * 60 * 1000) // Recent feed changes more often than catalog details
-  @ApiOperation({ summary: 'Get recent top-level listings' })
-  @ApiOkResponse({ description: 'Paginated recent listings feed (single, series, collection)' })
+  @ApiOperation({ summary: 'Get the Explore discovery feed' })
+  @ApiOkResponse({ description: 'Cursor-paginated mixed discovery feed' })
   async getRecentListings(
     @Query('cursor') cursor?: string,
     @Query('limit') limitStr?: string,
+    @Query('topic') topicSlug?: string,
   ): Promise<FeedPageDto> {
     const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
-    return this.service.getRecentListings(cursor, limit);
+    return this.service.getRecentListings(cursor, limit, topicSlug);
   }
 
   @Get('promotions')
