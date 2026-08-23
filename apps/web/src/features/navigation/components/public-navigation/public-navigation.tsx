@@ -1,18 +1,21 @@
 "use client";
 
-import { routes } from "@sd/core-contracts";
+import { routes, type AppAbility } from "@sd/core-contracts";
 import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
 import clsx from "clsx";
 import {
   Bookmark,
-  ArrowLeftRight,
+  ArrowLeft,
   ChevronDown,
   Compass,
   GraduationCap,
   Home,
   BarChart3,
+  LayoutDashboard,
+  LibraryBig,
   Menu,
-  Settings2,
+  UsersRound,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
@@ -22,6 +25,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { authClient, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AuthModal } from "@/features/auth";
 import { LanguageSwitch } from "@/features/settings";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
@@ -30,12 +34,18 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/shared/components/ui/sheet";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 
+import {
+  getAdminReturnPath,
+  getBrowserStorage,
+  rememberAdminReturnPath,
+} from "../../utils/admin-workspace";
 import { CommandPalette } from "../command-palette/command-palette";
 import styles from "./public-navigation.module.css";
 
@@ -45,7 +55,11 @@ type PublicNavItem = {
   Icon: LucideIcon;
 };
 
-function getPublicNavItems(t: (key: string, fallback: string) => string): PublicNavItem[] {
+type AdminNavItem = PublicNavItem & {
+  isVisible?: (ability: AppAbility) => boolean;
+};
+
+function getPublicNavItems(t: (key: string, fallback: string) => string): AdminNavItem[] {
   return [
     { label: t("navigation.home", "Home"), href: routes.home, Icon: Home },
     { label: t("navigation.explore", "Explore"), href: routes.explore.index, Icon: Compass },
@@ -55,7 +69,6 @@ function getPublicNavItems(t: (key: string, fallback: string) => string): Public
       Icon: GraduationCap,
     },
     { label: t("navigation.library", "Library"), href: routes.library.index, Icon: Bookmark },
-    { label: t("navigation.settings", "Settings"), href: routes.settings.index, Icon: Settings2 },
   ];
 }
 
@@ -66,12 +79,14 @@ function SearchControl() {
 function WorkspaceSwitch({
   isAdminWorkspace,
   hasAdminAccess,
+  returnPath,
 }: {
   isAdminWorkspace: boolean;
   hasAdminAccess: boolean;
+  returnPath: string;
 }) {
   const { t } = useTranslation();
-  const href = isAdminWorkspace ? routes.home : routes.admin.index;
+  const href = isAdminWorkspace ? returnPath : routes.admin.index;
   const label = isAdminWorkspace
     ? t("navigation.backToApp", "Back to App")
     : t("navigation.adminDashboard", "Admin Dashboard");
@@ -80,27 +95,42 @@ function WorkspaceSwitch({
 
   return (
     <Link href={href} className={styles.workspaceSwitch}>
-      <ArrowLeftRight aria-hidden="true" size={16} />
+      {isAdminWorkspace ? (
+        <ArrowLeft aria-hidden="true" size={16} />
+      ) : (
+        <LayoutDashboard aria-hidden="true" size={16} />
+      )}
       {label}
     </Link>
   );
 }
 
-function getAdminNavItems(t: (key: string, fallback: string) => string): PublicNavItem[] {
+function getAdminNavItems(t: (key: string, fallback: string) => string): AdminNavItem[] {
   return [
-    { label: t("navigation.admin.home", "Dashboard"), href: routes.admin.index, Icon: Home },
+    {
+      label: t("navigation.admin.home", "Home"),
+      href: routes.admin.index,
+      Icon: LayoutDashboard,
+    },
     { label: t("navigation.admin.stats", "Stats"), href: routes.admin.stats, Icon: BarChart3 },
     {
       label: t("navigation.admin.scholars", "Scholars"),
       href: routes.admin.scholars,
       Icon: GraduationCap,
+      isVisible: (ability) => ability.can("read", "Scholar"),
     },
     {
       label: t("navigation.admin.contents", "Contents"),
       href: routes.admin.contents,
-      Icon: Bookmark,
+      Icon: LibraryBig,
+      isVisible: (ability) => ability.can("read", "Listing") || ability.can("read", "Topic"),
     },
-    { label: t("navigation.admin.users", "Users"), href: routes.admin.users, Icon: Settings2 },
+    {
+      label: t("navigation.admin.users", "Users"),
+      href: routes.admin.users,
+      Icon: UsersRound,
+      isVisible: (ability) => ability.can("manage", "UserAccess"),
+    },
   ];
 }
 
@@ -118,7 +148,7 @@ function NavigationLinks({
   onNavigate,
   closeWithSheet = false,
 }: {
-  items: PublicNavItem[];
+  items: AdminNavItem[];
   pathname: string;
   ariaLabel: string;
   isAdminWorkspace?: boolean;
@@ -127,7 +157,7 @@ function NavigationLinks({
 }) {
   return (
     <nav className={clsx(styles.nav, isAdminWorkspace && styles.adminNav)} aria-label={ariaLabel}>
-      {items.map(({ label, href, Icon }) => {
+      {items.map(({ label, href }) => {
         const isActive = isActivePath(pathname, href);
         const link = (
           <Link
@@ -137,7 +167,6 @@ function NavigationLinks({
             aria-current={isActive ? "page" : undefined}
             onClick={onNavigate}
           >
-            <Icon aria-hidden="true" size={17} />
             <span>{label}</span>
           </Link>
         );
@@ -154,11 +183,12 @@ function NavigationLinks({
   );
 }
 
-function AccountMenu() {
+function AccountMenu({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation();
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
 
@@ -176,20 +206,60 @@ function AccountMenu() {
     return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
   }, [isOpen]);
 
+  const closeMenu = () => setIsOpen(false);
+
   if (isLoading) {
     return <span className={styles.accountLoading} aria-hidden="true" />;
   }
 
   if (!isAuthenticated || !user) {
     return (
-      <Link href={routes.signIn} className={styles.accountControl}>
-        {t("authStrip.signIn", "Sign In")}
-      </Link>
+      <div ref={accountMenuRef} className={styles.accountMenu}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className={clsx(
+            styles.accountControl,
+            styles.accountTrigger,
+            compact && styles.compactAccount,
+          )}
+          aria-haspopup="menu"
+          aria-expanded={isOpen}
+          aria-label={`${t("navigation.account", "Account")}: ${t("account.guest", "Guest")}`}
+          onClick={() => setIsOpen((open) => !open)}
+        >
+          <UserRound aria-hidden="true" size={18} />
+          <span className={styles.accountName}>{t("account.guest", "Guest")}</span>
+          <ChevronDown aria-hidden="true" size={15} />
+        </Button>
+        {isOpen && (
+          <div
+            className={styles.accountPopover}
+            role="menu"
+            aria-label={t("navigation.account", "Account")}
+          >
+            <Link href={routes.settings.index} role="menuitem" onClick={closeMenu}>
+              {t("navigation.settings", "Settings")}
+            </Link>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                closeMenu();
+                setIsAuthModalOpen(true);
+              }}
+            >
+              {t("authStrip.signIn", "Sign In")}
+            </button>
+          </div>
+        )}
+        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      </div>
     );
   }
 
   const userInitial = (user.name || user.email || "?").charAt(0).toUpperCase();
-  const closeMenu = () => setIsOpen(false);
 
   const signOut = async () => {
     closeMenu();
@@ -206,7 +276,11 @@ function AccountMenu() {
         type="button"
         variant="ghost"
         size="sm"
-        className={clsx(styles.accountControl, styles.accountTrigger)}
+        className={clsx(
+          styles.accountControl,
+          styles.accountTrigger,
+          compact && styles.compactAccount,
+        )}
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label={`${t("navigation.account", "Account")}: ${user.name || user.email}`}
@@ -259,36 +333,56 @@ function AccountMenu() {
 function UtilityControls({
   hasAdminAccess,
   isAdminWorkspace,
+  returnPath,
 }: {
   hasAdminAccess: boolean;
   isAdminWorkspace: boolean;
+  returnPath: string;
 }) {
   return (
     <div className={styles.utilityControls}>
       <AccountMenu />
-      <WorkspaceSwitch isAdminWorkspace={isAdminWorkspace} hasAdminAccess={hasAdminAccess} />
+      <WorkspaceSwitch
+        isAdminWorkspace={isAdminWorkspace}
+        hasAdminAccess={hasAdminAccess}
+        returnPath={returnPath}
+      />
     </div>
   );
 }
 
 export function PublicNavigation() {
   const { t, i18n } = useTranslation();
-  const { isMobile, isTablet } = useResponsive();
+  const { isMobile } = useResponsive();
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
   const isAdminWorkspace =
     pathname === routes.admin.index || pathname.startsWith(`${routes.admin.index}/`);
-  const items = isAdminWorkspace ? getAdminNavItems(t) : getPublicNavItems(t);
   const mainNavLabel = t("navigation.mainNav", "Main");
   const hasAdminAccess = isAuthenticated && hasAnyAdminAccess(ability);
+  const [returnPath, setReturnPath] = useState<string>(routes.home);
 
-  const isCompact = isMobile || isTablet;
+  useEffect(() => {
+    const storage = getBrowserStorage();
+    if (isAdminWorkspace) {
+      setReturnPath(getAdminReturnPath(storage));
+      return;
+    }
+
+    rememberAdminReturnPath(pathname, storage);
+    setReturnPath(pathname);
+  }, [isAdminWorkspace, pathname]);
+
+  const items = (isAdminWorkspace ? getAdminNavItems(t) : getPublicNavItems(t)).filter(
+    (item) => !isAdminWorkspace || !item.isVisible || item.isVisible(ability),
+  );
+  const isCompact = isMobile;
   const isRtl = i18n.dir() === "rtl";
 
   return (
     <header className={styles.header}>
-      <div className={styles.inner}>
+      <div className={clsx(styles.inner, isAdminWorkspace && styles.adminInner)}>
         <Link
           href={isAdminWorkspace ? routes.admin.index : routes.home}
           className={styles.brand}
@@ -297,7 +391,7 @@ export function PublicNavigation() {
           <span className={styles.brandMark}>
             <Image src="/logo/logo_72.png" alt="" width={30} height={30} priority />
           </span>
-          <span>{t("navigation.siteTitle", "Salafi Durus")}</span>
+          <span className={styles.brandName}>{t("navigation.siteTitle", "Salafi Durus")}</span>
           {isAdminWorkspace && (
             <span className={styles.workspaceBadge}>{t("navigation.adminSection", "ADMIN")}</span>
           )}
@@ -306,33 +400,59 @@ export function PublicNavigation() {
         {isCompact ? (
           <div className={styles.mobileActions}>
             <SearchControl />
-            <AccountMenu />
+            <AccountMenu compact />
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="surface" size="icon" aria-label={t("navigation.mainNav", "Main")}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={styles.menuTrigger}
+                  aria-label={t("navigation.mainNav", "Main")}
+                >
                   <Menu aria-hidden="true" />
                 </Button>
               </SheetTrigger>
               <SheetContent side={isRtl ? "left" : "right"} className={styles.sheet}>
-                <SheetHeader>
-                  <SheetTitle>{t("navigation.siteTitle", "Salafi Durus")}</SheetTitle>
-                  <LanguageSwitch direction="down" />
+                <SheetHeader className={styles.sheetHeader}>
+                  <div className={styles.sheetBrand}>
+                    <span className={styles.sheetBrandMark} aria-hidden="true">
+                      <Image src="/logo/logo_72.png" alt="" width={24} height={24} />
+                    </span>
+                    <div className={styles.sheetHeading}>
+                      <SheetTitle>{t("navigation.siteTitle", "Salafi Durus")}</SheetTitle>
+                      <SheetDescription>
+                        {t("navigation.mobileDescription", "Navigate your study space")}
+                      </SheetDescription>
+                    </div>
+                  </div>
                 </SheetHeader>
-                {(isAdminWorkspace || hasAdminAccess) && (
-                  <WorkspaceSwitch isAdminWorkspace hasAdminAccess={hasAdminAccess} />
-                )}
-                <NavigationLinks
-                  items={items}
-                  pathname={pathname}
-                  ariaLabel={mainNavLabel}
-                  isAdminWorkspace={isAdminWorkspace}
-                  closeWithSheet
-                />
+                <div className={styles.sheetNavigation}>
+                  {isAdminWorkspace && (
+                    <WorkspaceSwitch
+                      isAdminWorkspace={isAdminWorkspace}
+                      hasAdminAccess={hasAdminAccess}
+                      returnPath={returnPath}
+                    />
+                  )}
+                  <NavigationLinks
+                    items={items}
+                    pathname={pathname}
+                    ariaLabel={mainNavLabel}
+                    isAdminWorkspace={isAdminWorkspace}
+                    closeWithSheet
+                  />
+                </div>
+                <div className={styles.sheetLanguage}>
+                  <LanguageSwitch direction="down" />
+                </div>
               </SheetContent>
             </Sheet>
           </div>
         ) : (
           <div className={styles.actions}>
+            <div className={styles.searchSlot}>
+              <SearchControl />
+            </div>
             <NavigationLinks
               items={items}
               pathname={pathname}
@@ -340,10 +460,10 @@ export function PublicNavigation() {
               isAdminWorkspace={isAdminWorkspace}
             />
             <div className={styles.rightActions}>
-              <SearchControl />
               <UtilityControls
                 hasAdminAccess={hasAdminAccess}
                 isAdminWorkspace={isAdminWorkspace}
+                returnPath={returnPath}
               />
             </div>
           </div>

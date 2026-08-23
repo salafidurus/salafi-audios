@@ -7,6 +7,7 @@ import React from "react";
 import { useAuth } from "@/core/auth";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 
+import { ADMIN_RETURN_PATH_KEY } from "../../utils/admin-workspace";
 import { PublicNavigation } from "./public-navigation";
 
 vi.mock("@/core/auth", () => ({
@@ -33,6 +34,11 @@ vi.mock("@/core/i18n/use-translation", () => ({
     t: (_key: string, fallback?: string) => fallback || _key,
     i18n: { dir: () => "ltr" },
   }),
+}));
+
+vi.mock("@/features/auth", () => ({
+  AuthModal: ({ isOpen }: { isOpen: boolean }) =>
+    isOpen ? <div role="dialog" aria-label="Auth modal" /> : null,
 }));
 
 const mockUsePathname = vi.fn(() => "/");
@@ -101,6 +107,7 @@ describe("PublicNavigation", () => {
     expect(within(mainNavigation).queryByRole("link", { name: "Search" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Search catalog" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
+    expect(screen.queryByRole("link", { name: "Settings" })).not.toBeInTheDocument();
     expect(screen.queryByTestId("sidebar")).not.toBeInTheDocument();
   });
 
@@ -112,11 +119,22 @@ describe("PublicNavigation", () => {
     expect(screen.getByRole("dialog", { name: "Search catalog" })).toBeInTheDocument();
   });
 
-  it("keeps account controls clear for signed-out visitors", () => {
+  it("shows guest settings and sign-in actions for signed-out visitors", () => {
     render(<PublicNavigation />);
 
-    expect(screen.getByRole("link", { name: "Sign In" })).toHaveAttribute("href", "/sign-in");
-    expect(screen.queryByRole("button", { name: "Account" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Account: Guest" }));
+    expect(screen.getByRole("menuitem", { name: "Settings" })).toHaveAttribute("href", "/settings");
+    expect(screen.getByRole("menuitem", { name: "Sign In" })).toBeInTheDocument();
+  });
+
+  it("opens the auth modal from the guest account menu", () => {
+    render(<PublicNavigation />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Account: Guest" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Sign In" }));
+
+    expect(screen.getByRole("dialog", { name: "Auth modal" })).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "Sign In" })).not.toBeInTheDocument();
   });
 
   it("exposes Admin Dashboard only when backend-derived access exists", () => {
@@ -133,6 +151,8 @@ describe("PublicNavigation", () => {
 
     expect(screen.getByRole("button", { name: "Account: Admin User" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Admin Dashboard" })).toHaveAttribute("href", "/admin");
+    fireEvent.click(screen.getByRole("button", { name: "Account: Admin User" }));
+    expect(screen.queryByRole("menuitem", { name: "Admin Dashboard" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Account: Admin User" }));
     fireEvent.pointerDown(document.body);
     expect(screen.queryByRole("menuitem", { name: "Sign Out" })).not.toBeInTheDocument();
@@ -173,6 +193,20 @@ describe("PublicNavigation", () => {
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
   });
 
+  it("keeps the full navigation on narrow desktop widths", () => {
+    (useResponsive as Mock<any>).mockReturnValue({
+      isMobile: false,
+      isTablet: false,
+      isNarrowDesktop: true,
+      isWeb: true,
+    });
+
+    render(<PublicNavigation />);
+
+    expect(screen.getByRole("navigation", { name: "Main" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Main" })).not.toBeInTheDocument();
+  });
+
   it("switches to the admin workspace navigation with a back-to-app link", () => {
     mockUsePathname.mockReturnValue("/admin/contents");
     (useAuth as Mock<any>).mockReturnValue({
@@ -187,11 +221,50 @@ describe("PublicNavigation", () => {
     render(<PublicNavigation />);
 
     expect(screen.getByRole("link", { name: "Back to App" })).toHaveAttribute("href", "/");
-    expect(screen.getByRole("link", { name: "Dashboard" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: "Home" })).not.toHaveAttribute("aria-current");
     expect(screen.getByRole("link", { name: "Contents" })).toHaveAttribute(
       "href",
       "/admin/contents",
     );
     expect(screen.getByRole("link", { name: "Contents" })).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByRole("navigation", { name: "Breadcrumbs" })).not.toBeInTheDocument();
+  });
+
+  it("shows only admin destinations supported by the user's capabilities", () => {
+    mockUsePathname.mockReturnValue("/admin");
+    (useAuth as Mock<any>).mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { name: "Scoped Editor", email: "editor@example.com" },
+    });
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Scholar" }]),
+    });
+
+    render(<PublicNavigation />);
+
+    expect(screen.getByRole("link", { name: "Scholars" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Users" })).not.toBeInTheDocument();
+  });
+
+  it("returns to the last safe public path from the admin workspace", () => {
+    window.sessionStorage.setItem(ADMIN_RETURN_PATH_KEY, "/library/saved");
+    mockUsePathname.mockReturnValue("/admin");
+    (useAuth as Mock<any>).mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { name: "Admin User", email: "admin@example.com" },
+    });
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Listing" }]),
+    });
+
+    render(<PublicNavigation />);
+
+    expect(screen.getByRole("link", { name: "Back to App" })).toHaveAttribute(
+      "href",
+      "/library/saved",
+    );
+    window.sessionStorage.removeItem(ADMIN_RETURN_PATH_KEY);
   });
 });

@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { LanguageSwitch } from "@/features/settings";
+import { ThemeSwitch } from "@/features/settings/components/theme-switch/theme-switch";
 
 import styles from "./footer.module.css";
 
@@ -26,8 +27,9 @@ export function Footer() {
           <Link href={routes.cookiePolicy}>{t("footer.cookiePolicy")}</Link>
           <Link href={routes.support}>{t("footer.support")}</Link>
         </div>
-        <div className={styles.languageSwitchWrapper}>
+        <div className={styles.footerControls}>
           <LanguageSwitch direction="up" />
+          <ThemeSwitch className={styles.themeSwitch} />
         </div>
       </div>
     </footer>

@@ -23,6 +23,27 @@
   line-height: 1;
 }
 
+@media (max-width: 640px) {
+  .trigger {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    flex: 0 0 2.75rem;
+    justify-content: center;
+    padding-inline: 0;
+    border-radius: var(--radius-component-chip);
+  }
+
+  .trigger span,
+  .trigger kbd {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
 .dialog {
   top: 30%;
   width: 95vw;

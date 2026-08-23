@@ -77,7 +77,8 @@
 }
 
 .discoverySection {
-  padding: clamp(2rem, 5vw, 4rem) clamp(1.25rem, 3vw, 2rem);
+  padding-block: clamp(2rem, 5vw, 4rem);
+  padding-inline: 0;
   border-block: 1px solid var(--border-subtle);
 }
 

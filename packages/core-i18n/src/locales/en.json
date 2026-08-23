@@ -39,6 +39,7 @@
   },
   "account": {
     "title": "Account",
+    "guest": "Guest",
     "defaultUser": "User",
     "editProfile": "Edit Profile",
     "legal": "Legal",
@@ -113,6 +114,8 @@
     "collapseSidebar": "Collapse sidebar",
     "siteFooter": "Site footer",
     "languageSwitch": "Language switch",
+    "switchToDark": "Switch to dark mode",
+    "switchToLight": "Switch to light mode",
     "settings": "Settings",
     "keepYourPlace": "Keep your place",
     "keepYourPlaceDesc": "Sign in to sync progress and saved durus across your devices.",
