@@ -450,8 +450,9 @@
     }
   },
   "cookieConsent": {
-    "message": "We use cookies to track site traffic and performance. We do not collect personal data, do not personalize content from cookies, and do not use cookies for marketing or advertisements. By continuing, you accept our use of tracking cookies.",
-    "accept": "Accept",
+    "title": "Cookies and analytics",
+    "message": "We use cookies to understand site traffic and performance. Continuing to use the website indicates your acceptance of these tracking technologies.",
+    "close": "Close",
     "policyLink": "Cookie Policy"
   },
   "role": {

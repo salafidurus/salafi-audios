@@ -21,21 +21,22 @@ export function CookieConsentGate() {
     <aside className={styles.banner} aria-labelledby="consent-title" role="region">
       <div className={styles.content}>
         <div className={styles.message}>
+          <p className={styles.eyebrow}>{t("cookieConsent.title", "Cookies and analytics")}</p>
           <p id="consent-title" className={styles.title}>
             {t(
               "cookieConsent.message",
-              "We use cookies and analytics to improve your experience and understand how you use our service. By continuing, you accept our use of tracking technologies.",
+              "We use cookies to understand site traffic and performance. Continuing to use the website indicates your acceptance of these tracking technologies.",
             )}
           </p>
           <p className={styles.policyLink}>
             <Link href={routes.cookiePolicy} className={styles.link}>
-              {t("cookieConsent.readPolicy", "Read our Cookie Policy for details")}
+              {t("cookieConsent.policyLink", "Cookie Policy")}
             </Link>
           </p>
         </div>
         <div className={styles.actions}>
           <Button variant="primary" onClick={accept} size="md">
-            {t("cookieConsent.accept", "Accept")}
+            {t("cookieConsent.close", "Close")}
           </Button>
         </div>
       </div>
