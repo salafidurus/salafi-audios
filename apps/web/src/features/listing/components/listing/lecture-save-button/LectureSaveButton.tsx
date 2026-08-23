@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { useAuth } from "@/core/auth";
 import { AuthModal } from "@/features/auth";
 import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/shared/utils";
 
 import styles from "./LectureSaveButton.module.css";
 
@@ -41,7 +42,10 @@ export function LectureSaveButton({ lectureId, lectureSlug }: LectureSaveButtonP
         variant={isSaved ? "surface" : "outline"}
         size="lg"
         onClick={handleClick}
-        className={styles.button}
+        className={cn(
+          styles.button,
+          isSaved && "hover:bg-secondary hover:text-secondary-foreground",
+        )}
       >
         {isSaved ? "✓ Saved" : "Save"}
       </Button>
