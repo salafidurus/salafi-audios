@@ -522,7 +522,27 @@
     },
     "stats": {
       "title": "Admin Stats",
-      "desc": "Platform statistics and analytics will appear here."
+      "desc": "Operational data available to your account.",
+      "loadingLabel": "Loading admin statistics",
+      "loading": "Loading available statistics…",
+      "unavailable": "No authorized statistics are available.",
+      "summary": "Available data summary",
+      "scholars": "Scholars",
+      "listings": "Listings",
+      "users": "Users",
+      "contentHeading": "Accessible content",
+      "contentDescription": "Showing content returned for your current access.",
+      "content": "Content",
+      "scholar": "Scholar",
+      "format": "Format",
+      "status": "Status",
+      "created": "Created",
+      "filterStatus": "Filter status",
+      "allStatuses": "All statuses",
+      "contentTable": "Accessible content data",
+      "empty": "No accessible content matches this filter.",
+      "error": "Unable to load available statistics.",
+      "partialError": "Some available data could not be refreshed."
     },
     "scholars": {
       "manageTitle": "Manage Scholars",
