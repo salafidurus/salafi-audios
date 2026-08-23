@@ -71,8 +71,8 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
 
         {/* Row 2: Scholar Name Link (Primary strong color Title Md) */}
         <Link href={`/scholars/${listing.scholar.slug}`} className={styles.scholarLink}>
-          {scholarTitle && <span className={styles.scholarTitle}>{scholarTitle}</span>}
           <AppText variant="titleMd" color="primary">
+            {scholarTitle && <span className={styles.scholarTitle}>{scholarTitle} </span>}
             {formatScholarName(listing.scholar.name)}
           </AppText>
         </Link>
