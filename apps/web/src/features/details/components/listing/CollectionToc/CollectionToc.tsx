@@ -27,6 +27,7 @@ import styles from "./CollectionToc.module.css";
 export type CollectionTocProps = {
   modules: ListingModuleDto[];
   onSelect: (moduleId: string) => void;
+  activeModuleId?: string;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
 };
@@ -34,6 +35,7 @@ export type CollectionTocProps = {
 export function CollectionToc({
   modules,
   onSelect,
+  activeModuleId,
   isCollapsed = false,
   onToggleCollapse,
 }: CollectionTocProps) {
@@ -87,20 +89,31 @@ export function CollectionToc({
               <SidebarGroup className={styles.group}>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    {modules.map((mod) => (
-                      <SidebarMenuItem key={mod.id}>
-                        <SidebarMenuButton
-                          type="button"
-                          size="sm"
-                          tooltip={mod.title}
-                          aria-label={mod.title}
-                          onClick={() => onSelect(mod.id)}
-                          className={styles.moduleButton}
-                        >
-                          {!isCollapsed && <span>{mod.title}</span>}
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
+                    {modules.map((mod, index) => {
+                      const isActive = mod.id === activeModuleId;
+                      return (
+                        <SidebarMenuItem key={mod.id}>
+                          <SidebarMenuButton
+                            type="button"
+                            size="sm"
+                            tooltip={mod.title}
+                            aria-label={mod.title}
+                            aria-current={isActive ? "true" : undefined}
+                            isActive={isActive}
+                            onClick={() => onSelect(mod.id)}
+                            className={styles.moduleButton}
+                          >
+                            {isCollapsed ? (
+                              <span className={styles.moduleMarker} aria-hidden="true">
+                                {index + 1}
+                              </span>
+                            ) : (
+                              <span>{mod.title}</span>
+                            )}
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>

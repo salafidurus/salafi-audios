@@ -3,7 +3,7 @@
 import type { ListingModuleDto, ListingContentItemDto } from "@sd/core-contracts";
 
 import { buildTrackQueue, type Track } from "@sd/domain-audio";
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import { InfiniteSectionList, type SectionData } from "@/shared/components/InfiniteSectionList";
 
@@ -28,9 +28,49 @@ export function CollectionContentLayout({
   highlightItemId,
 }: CollectionContentLayoutProps) {
   const [isTocCollapsed, setIsTocCollapsed] = useState(false);
+  const [activeModuleId, setActiveModuleId] = useState<string | undefined>(modules[0]?.id);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const pendingModuleId = useRef<string | null>(null);
+
+  useEffect(() => {
+    setActiveModuleId((current) =>
+      current && modules.some((module) => module.id === current) ? current : modules[0]?.id,
+    );
+  }, [modules]);
+
+  useEffect(() => {
+    const sections = modules
+      .map((module) => sectionRefs.current[module.id])
+      .filter((section): section is HTMLElement => Boolean(section));
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const pendingEntry = entries.find(
+          (entry) => entry.target.id === pendingModuleId.current && entry.isIntersecting,
+        );
+        if (pendingModuleId.current) {
+          if (!pendingEntry) return;
+          pendingModuleId.current = null;
+        }
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (visible) setActiveModuleId(visible.target.id);
+      },
+      { rootMargin: "-18% 0px -65% 0px", threshold: 0 },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => {
+      sections.forEach((section) => observer.unobserve(section));
+      observer.disconnect();
+    };
+  }, [modules]);
 
   const scrollToModule = (moduleId: string) => {
+    pendingModuleId.current = moduleId;
+    setActiveModuleId(moduleId);
     const el = sectionRefs.current[moduleId];
     if (!el) return;
     el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -85,6 +125,7 @@ export function CollectionContentLayout({
         <CollectionToc
           modules={modules}
           onSelect={scrollToModule}
+          activeModuleId={activeModuleId}
           isCollapsed={isTocCollapsed}
           onToggleCollapse={() => setIsTocCollapsed((prev) => !prev)}
         />

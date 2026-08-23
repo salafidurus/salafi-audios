@@ -64,3 +64,13 @@
   min-width: 0;
   justify-content: flex-start;
 }
+
+.moduleMarker {
+  display: inline-flex;
+  width: 100%;
+  justify-content: center;
+  color: inherit;
+  font-size: var(--typo-label-sm-font-size);
+  font-weight: 700;
+  line-height: 1;
+}
