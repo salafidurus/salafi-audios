@@ -14,6 +14,7 @@ import {
   Menu,
   Search,
   Settings2,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
@@ -201,7 +202,7 @@ function NavigationLinks({
   );
 }
 
-function AccountMenu() {
+function AccountMenu({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation();
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
@@ -229,8 +230,13 @@ function AccountMenu() {
 
   if (!isAuthenticated || !user) {
     return (
-      <Link href={routes.signIn} className={styles.accountControl}>
-        {t("authStrip.signIn", "Sign In")}
+      <Link
+        href={routes.signIn}
+        className={clsx(styles.accountControl, compact && styles.compactAccount)}
+        aria-label={t("authStrip.signIn", "Sign In")}
+      >
+        <UserRound aria-hidden="true" size={18} />
+        <span className={styles.compactAccountLabel}>{t("authStrip.signIn", "Sign In")}</span>
       </Link>
     );
   }
@@ -253,7 +259,11 @@ function AccountMenu() {
         type="button"
         variant="ghost"
         size="sm"
-        className={clsx(styles.accountControl, styles.accountTrigger)}
+        className={clsx(
+          styles.accountControl,
+          styles.accountTrigger,
+          compact && styles.compactAccount,
+        )}
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label={`${t("navigation.account", "Account")}: ${user.name || user.email}`}
@@ -373,7 +383,7 @@ export function PublicNavigation() {
         {isCompact ? (
           <div className={styles.mobileActions}>
             <SearchControl />
-            <AccountMenu />
+            <AccountMenu compact />
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="surface" size="icon" aria-label={t("navigation.mainNav", "Main")}>
