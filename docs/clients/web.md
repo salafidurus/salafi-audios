@@ -23,10 +23,17 @@ security boundary. The API remains authoritative for every protected route and
 action. A User may enter the Admin workspace while still seeing only the
 sections allowed by their capabilities and scope.
 
-Explore filter preferences may persist in browser storage until explicitly
-cleared. Persistence is scoped by route and locale, and by User identity when a
-filter affects authenticated state. The client must provide a visible clear-all
-action and must not let one User inherit another User's preferences.
+Explore is a discovery-first feed rather than a query/results screen. It is one
+continuous mixed stream of listing cards and discovery modules, with Topic
+steering as its only primary mode. Advanced refinements remain available behind
+a Sheet and are not the main Explore canvas. The API owns the mixed feed
+composition, relevance, deduplication, cursor, and exhaustion decisions.
+
+Topic is URL-addressable so discovery paths can be shared and restored. Topic
+state may persist in browser storage until explicitly cleared, scoped by route,
+locale, and User where relevant. The client must never infer personalized
+discovery from listening history until a
+separate event contract defines that behavior.
 
 ### Layered Structure
 

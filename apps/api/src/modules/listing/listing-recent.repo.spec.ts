@@ -14,6 +14,9 @@ describe('RecentListingsRepo', () => {
       listing: {
         findMany: prismaFindManySpy,
       },
+      topic: {
+        findUnique: vi.fn().mockResolvedValue({ name: 'Aqeedah', translations: [] }),
+      },
     };
 
     config = {
@@ -24,6 +27,39 @@ describe('RecentListingsRepo', () => {
   });
 
   describe('getRecentListings', () => {
+    it('composes branching discovery modules for the continuous feed', async () => {
+      prismaFindManySpy.mockResolvedValue([
+        {
+          id: 'listing-1',
+          slug: 'listing-1',
+          title: 'Aqeedah lesson',
+          format: 'single' as const,
+          language: 'ar',
+          durationSeconds: 1800,
+          publishedDurationSeconds: null,
+          publishedLectureCount: null,
+          coverImageUrl: null,
+          publishedAt: new Date('2026-07-24'),
+          createdAt: new Date('2026-07-24'),
+          scholar: {
+            name: 'Scholar',
+            slug: 'scholar-1',
+            imageUrl: null,
+            mainLanguage: 'ar',
+            translations: [],
+          },
+          translations: [],
+        },
+      ]);
+
+      const result = await repo.getRecentListings(undefined, 20, 'aqeedah');
+
+      expect(result.items.map((item) => item.kind)).toEqual(['single', 'scholar_row', 'topic_row']);
+      expect(result.items[2]).toMatchObject({ kind: 'topic_row', topicName: 'Aqeedah' });
+      expect(result.nextCursor).toBeUndefined();
+      expect(result.exhausted).toBe(true);
+    });
+
     it('queries all three listing formats (single, series, collection)', async () => {
       await repo.getRecentListings();
 
@@ -102,15 +138,18 @@ describe('RecentListingsRepo', () => {
 
       prismaFindManySpy.mockResolvedValue(mockListings);
 
-      const result = await repo.getRecentListings();
+      const result = await repo.getRecentListings(undefined, 20);
 
-      expect(result.items).toHaveLength(2);
-      const item0 = result.items[0] as any;
+      const contentItems = result.items.filter(
+        (item) => item.kind === 'single' || item.kind === 'series',
+      );
+      expect(contentItems).toHaveLength(2);
+      const item0 = contentItems[0] as any;
       expect(item0?.kind).toBe('single');
       expect(item0?.durationSeconds).toBe(3600);
       expect(item0?.thumbnailUrl).toBe(null);
 
-      const item1 = result.items[1] as any;
+      const item1 = contentItems[1] as any;
       expect(item1?.kind).toBe('series');
       expect(item1?.durationSeconds).toBe(72000);
       expect(item1?.thumbnailUrl).toBeTruthy();
@@ -174,8 +213,9 @@ describe('RecentListingsRepo', () => {
 
       const result = await repo.getRecentListings(undefined, 20);
 
-      expect(result.items).toHaveLength(10);
+      expect(result.items.filter((item) => item.kind === 'single')).toHaveLength(10);
       expect(result.nextCursor).toBeUndefined();
+      expect(result.exhausted).toBe(true);
     });
   });
 });

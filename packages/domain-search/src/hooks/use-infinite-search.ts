@@ -6,6 +6,7 @@ import { buildSearchResultRows } from "../utils/build-search-result-rows";
 export interface UseInfiniteSearchOptions {
   query?: string;
   scholarSlug?: string;
+  language?: string;
   showOriginal?: boolean;
   enabled?: boolean;
   topicSlugs?: string[];
@@ -20,6 +21,7 @@ export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
     q: options.query?.trim() ? options.query.trim() : undefined,
     scholarSlug: options.scholarSlug,
     format: options.format,
+    language: options.language,
     limit: options.limit,
     topicSlugs: options.topicSlugs,
   };

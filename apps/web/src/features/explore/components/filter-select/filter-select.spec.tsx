@@ -71,8 +71,11 @@ describe("FilterSelect", () => {
       <FilterSelect label="Scholar" options={options} value="" onChange={() => {}} searchable />,
     );
 
-    openMenu();
+    fireEvent.click(screen.getByRole("button"));
 
-    expect(screen.getByPlaceholderText("Search")).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Scholar" })).toHaveAttribute(
+      "placeholder",
+      "Search",
+    );
   });
 });
