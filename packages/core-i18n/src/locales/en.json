@@ -39,6 +39,7 @@
   },
   "account": {
     "title": "Account",
+    "guest": "Guest",
     "defaultUser": "User",
     "editProfile": "Edit Profile",
     "legal": "Legal",

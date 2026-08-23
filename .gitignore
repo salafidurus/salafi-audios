@@ -3,6 +3,7 @@ node_modules/
 .turbo/
 **/.turbo/
 **/.playwright-mcp/
+.playwright-cli/
 **/node_modules/
 coverage/
 **/coverage/
@@ -86,4 +87,3 @@ apps/web/src/app/api/
 
 # Reference files (prototypes, design docs — never commit)
 _reference/
-

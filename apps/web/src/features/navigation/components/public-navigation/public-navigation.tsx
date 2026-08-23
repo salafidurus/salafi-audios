@@ -107,12 +107,10 @@ function WorkspaceSwitch({
   isAdminWorkspace,
   hasAdminAccess,
   returnPath,
-  menuItem = false,
 }: {
   isAdminWorkspace: boolean;
   hasAdminAccess: boolean;
   returnPath: string;
-  menuItem?: boolean;
 }) {
   const { t } = useTranslation();
   const href = isAdminWorkspace ? returnPath : routes.admin.index;
@@ -123,7 +121,7 @@ function WorkspaceSwitch({
   if (!isAdminWorkspace && !hasAdminAccess) return null;
 
   return (
-    <Link href={href} className={styles.workspaceSwitch} role={menuItem ? "menuitem" : undefined}>
+    <Link href={href} className={styles.workspaceSwitch}>
       {isAdminWorkspace ? (
         <ArrowLeft aria-hidden="true" size={16} />
       ) : (
@@ -137,7 +135,7 @@ function WorkspaceSwitch({
 function getAdminNavItems(t: (key: string, fallback: string) => string): AdminNavItem[] {
   return [
     {
-      label: t("navigation.admin.home", "Dashboard"),
+      label: t("navigation.admin.home", "Home"),
       href: routes.admin.index,
       Icon: LayoutDashboard,
     },
@@ -213,17 +211,7 @@ function NavigationLinks({
   );
 }
 
-function AccountMenu({
-  compact = false,
-  hasAdminAccess = false,
-  isAdminWorkspace = false,
-  returnPath = routes.home,
-}: {
-  compact?: boolean;
-  hasAdminAccess?: boolean;
-  isAdminWorkspace?: boolean;
-  returnPath?: string;
-}) {
+function AccountMenu({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation();
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
@@ -245,25 +233,52 @@ function AccountMenu({
     return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
   }, [isOpen]);
 
+  const closeMenu = () => setIsOpen(false);
+
   if (isLoading) {
     return <span className={styles.accountLoading} aria-hidden="true" />;
   }
 
   if (!isAuthenticated || !user) {
     return (
-      <Link
-        href={routes.signIn}
-        className={clsx(styles.accountControl, compact && styles.compactAccount)}
-        aria-label={t("authStrip.signIn", "Sign In")}
-      >
-        <UserRound aria-hidden="true" size={18} />
-        <span className={styles.compactAccountLabel}>{t("authStrip.signIn", "Sign In")}</span>
-      </Link>
+      <div ref={accountMenuRef} className={styles.accountMenu}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className={clsx(
+            styles.accountControl,
+            styles.accountTrigger,
+            compact && styles.compactAccount,
+          )}
+          aria-haspopup="menu"
+          aria-expanded={isOpen}
+          aria-label={`${t("navigation.account", "Account")}: ${t("account.guest", "Guest")}`}
+          onClick={() => setIsOpen((open) => !open)}
+        >
+          <UserRound aria-hidden="true" size={18} />
+          <span className={styles.accountName}>{t("account.guest", "Guest")}</span>
+          <ChevronDown aria-hidden="true" size={15} />
+        </Button>
+        {isOpen && (
+          <div
+            className={styles.accountPopover}
+            role="menu"
+            aria-label={t("navigation.account", "Account")}
+          >
+            <Link href={routes.settings.index} role="menuitem" onClick={closeMenu}>
+              {t("navigation.settings", "Settings")}
+            </Link>
+            <Link href={routes.signIn} role="menuitem" onClick={closeMenu}>
+              {t("authStrip.signIn", "Sign In")}
+            </Link>
+          </div>
+        )}
+      </div>
     );
   }
 
   const userInitial = (user.name || user.email || "?").charAt(0).toUpperCase();
-  const closeMenu = () => setIsOpen(false);
 
   const signOut = async () => {
     closeMenu();
@@ -310,14 +325,6 @@ function AccountMenu({
           <Link href={routes.settings.index} role="menuitem" onClick={closeMenu}>
             {t("navigation.settings", "Settings")}
           </Link>
-          {!isAdminWorkspace && hasAdminAccess && (
-            <WorkspaceSwitch
-              isAdminWorkspace={false}
-              hasAdminAccess
-              returnPath={returnPath}
-              menuItem
-            />
-          )}
           <button
             type="button"
             role="menuitem"
@@ -353,21 +360,19 @@ function UtilityControls({
 }) {
   return (
     <div className={styles.utilityControls}>
-      <AccountMenu
-        hasAdminAccess={hasAdminAccess}
+      <AccountMenu />
+      <WorkspaceSwitch
         isAdminWorkspace={isAdminWorkspace}
+        hasAdminAccess={hasAdminAccess}
         returnPath={returnPath}
       />
-      {isAdminWorkspace && (
-        <WorkspaceSwitch isAdminWorkspace hasAdminAccess={hasAdminAccess} returnPath={returnPath} />
-      )}
     </div>
   );
 }
 
 export function PublicNavigation() {
   const { t, i18n } = useTranslation();
-  const { isMobile, isTablet, isNarrowDesktop } = useResponsive();
+  const { isMobile } = useResponsive();
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
@@ -391,12 +396,12 @@ export function PublicNavigation() {
   const items = (isAdminWorkspace ? getAdminNavItems(t) : getPublicNavItems(t)).filter(
     (item) => !isAdminWorkspace || !item.isVisible || item.isVisible(ability),
   );
-  const isCompact = isMobile || isTablet || isNarrowDesktop === true;
+  const isCompact = isMobile;
   const isRtl = i18n.dir() === "rtl";
 
   return (
     <header className={styles.header}>
-      <div className={styles.inner}>
+      <div className={clsx(styles.inner, isAdminWorkspace && styles.adminInner)}>
         <Link
           href={isAdminWorkspace ? routes.admin.index : routes.home}
           className={styles.brand}
@@ -414,12 +419,7 @@ export function PublicNavigation() {
         {isCompact ? (
           <div className={styles.mobileActions}>
             <SearchControl />
-            <AccountMenu
-              compact
-              hasAdminAccess={hasAdminAccess}
-              isAdminWorkspace={isAdminWorkspace}
-              returnPath={returnPath}
-            />
+            <AccountMenu compact />
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="surface" size="icon" aria-label={t("navigation.mainNav", "Main")}>

@@ -4,12 +4,10 @@ import { useSyncExternalStore } from "react";
 
 const MOBILE_MAX = 640;
 export const TABLET_MAX = 900;
-export const COMPACT_NAV_MAX = 1280;
 
 type ResponsiveState = {
   isMobile: boolean;
   isTablet: boolean;
-  isNarrowDesktop: boolean;
   isWeb: boolean;
 };
 
@@ -27,10 +25,9 @@ export function useResponsive(): ResponsiveState {
 
   const isMobile = width <= MOBILE_MAX;
   const isTablet = width > MOBILE_MAX && width <= TABLET_MAX;
-  const isNarrowDesktop = width > TABLET_MAX && width <= COMPACT_NAV_MAX;
   const isWeb = width > TABLET_MAX;
 
-  return { isMobile, isTablet, isNarrowDesktop, isWeb };
+  return { isMobile, isTablet, isWeb };
 }
 
 /**

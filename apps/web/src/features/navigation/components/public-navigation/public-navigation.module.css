@@ -10,15 +10,27 @@
 
 .inner {
   display: grid;
-  grid-template-columns: minmax(12rem, 0.9fr) minmax(16rem, 24rem) minmax(0, 1fr) auto;
-  grid-template-areas:
-    "brand search nav utilities";
+  grid-template-columns: max-content minmax(16rem, 20rem) minmax(0, 1fr) auto;
+  grid-template-areas: "brand search nav utilities";
   align-items: center;
   width: min(var(--space-layout-content-max), 100%);
   min-height: 4.5rem;
   margin-inline: auto;
-  gap: var(--space-component-gap-lg);
+  gap: var(--space-component-gap-xl);
   padding: var(--space-sm) var(--space-layout-page-x);
+}
+
+.adminInner {
+  grid-template-columns: max-content minmax(14rem, 16rem) minmax(28rem, 1fr) auto;
+  gap: var(--space-component-gap-xl);
+}
+
+.adminInner .nav {
+  justify-content: flex-start;
+}
+
+.adminInner .brandName {
+  display: none;
 }
 
 .brand {
@@ -91,9 +103,18 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex: 0 1 auto;
   min-width: 0;
   gap: var(--space-component-gap-sm);
   width: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+
+.nav::-webkit-scrollbar {
+  display: none;
 }
 
 .navLink,
@@ -125,15 +146,16 @@
 
 .navLink {
   position: relative;
+  flex: 0 0 auto;
   min-height: 2.75rem;
-  padding: var(--space-component-gap-md) var(--space-component-gap-lg);
+  padding: var(--space-component-gap-sm) var(--space-component-gap-md);
   border: 1px solid transparent;
   border-radius: var(--radius-scale-sm);
   font-family: var(--font-body), sans-serif;
-  font-size: var(--typo-body-lg-font-size);
-  font-weight: var(--typo-body-lg-font-weight);
-  letter-spacing: var(--typo-body-lg-letter-spacing);
-  line-height: var(--typo-body-lg-line-height);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-font-weight);
+  letter-spacing: var(--typo-body-md-letter-spacing);
+  line-height: var(--typo-body-md-line-height);
   white-space: nowrap;
 }
 
@@ -411,44 +433,42 @@
   padding-block-end: var(--space-lg);
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1600px) and (min-width: 641px) {
   .header {
     padding-block-start: var(--space-sm);
   }
 
   .inner {
-    gap: var(--space-sm);
+    grid-template-columns: max-content 2.75rem minmax(0, 1fr) auto;
+    gap: var(--space-component-gap-md);
     min-height: 4rem;
     padding: var(--space-sm);
   }
 
   .brand {
     min-width: 0;
-    flex: 1 1 auto;
     gap: var(--space-sm);
     overflow: hidden;
-    font-size: var(--typo-body-lg-font-size);
+    font-size: var(--typo-body-md-font-size);
   }
 
-  .mobileActions {
-    flex: 0 0 auto;
+  .nav {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
 
-  .mobileActions > :global(button),
-  .mobileActions > :global(a) {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
+  .navLink {
+    padding-inline: var(--space-sm);
+    font-size: var(--typo-body-sm-font-size);
   }
 
-  .compactAccountLabel,
-  .compactAccount .accountName,
-  .compactAccount > svg {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
+  .rightActions {
+    gap: var(--space-component-gap-sm);
+  }
+
+  .accountName {
+    max-width: 7rem;
   }
 
   .searchControl {
@@ -499,6 +519,38 @@
   }
 
   .workspaceBadge {
+    display: none;
+  }
+
+  .compactAccountLabel,
+  .compactAccount .accountName,
+  .compactAccount > svg:last-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .searchControl {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    flex: 0 0 2.75rem;
+    border-radius: var(--radius-component-chip);
+    padding-inline: 0;
+  }
+
+  .searchControl span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .searchControl kbd {
     display: none;
   }
 }

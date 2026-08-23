@@ -105,11 +105,12 @@ describe("PublicNavigation", () => {
     expect(mockRouterPush).toHaveBeenCalledWith("/search");
   });
 
-  it("keeps account controls clear for signed-out visitors", () => {
+  it("shows guest settings and sign-in actions for signed-out visitors", () => {
     render(<PublicNavigation />);
 
-    expect(screen.getByRole("link", { name: "Sign In" })).toHaveAttribute("href", "/sign-in");
-    expect(screen.queryByRole("button", { name: "Account" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Account: Guest" }));
+    expect(screen.getByRole("menuitem", { name: "Settings" })).toHaveAttribute("href", "/settings");
+    expect(screen.getByRole("menuitem", { name: "Sign In" })).toHaveAttribute("href", "/sign-in");
   });
 
   it("exposes Admin Dashboard only when backend-derived access exists", () => {
@@ -125,12 +126,9 @@ describe("PublicNavigation", () => {
     render(<PublicNavigation />);
 
     expect(screen.getByRole("button", { name: "Account: Admin User" })).toBeInTheDocument();
-    expect(screen.queryByRole("menuitem", { name: "Admin Dashboard" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Admin Dashboard" })).toHaveAttribute("href", "/admin");
     fireEvent.click(screen.getByRole("button", { name: "Account: Admin User" }));
-    expect(screen.getByRole("menuitem", { name: "Admin Dashboard" })).toHaveAttribute(
-      "href",
-      "/admin",
-    );
+    expect(screen.queryByRole("menuitem", { name: "Admin Dashboard" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Account: Admin User" }));
     fireEvent.pointerDown(document.body);
     expect(screen.queryByRole("menuitem", { name: "Sign Out" })).not.toBeInTheDocument();
@@ -171,7 +169,7 @@ describe("PublicNavigation", () => {
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
   });
 
-  it("uses the compact Sheet before desktop navigation can overlap", () => {
+  it("keeps the full navigation on narrow desktop widths", () => {
     (useResponsive as Mock<any>).mockReturnValue({
       isMobile: false,
       isTablet: false,
@@ -181,9 +179,8 @@ describe("PublicNavigation", () => {
 
     render(<PublicNavigation />);
 
-    expect(screen.queryByRole("navigation", { name: "Main" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Main" }));
     expect(screen.getByRole("navigation", { name: "Main" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Main" })).not.toBeInTheDocument();
   });
 
   it("switches to the admin workspace navigation with a back-to-app link", () => {
@@ -200,7 +197,7 @@ describe("PublicNavigation", () => {
     render(<PublicNavigation />);
 
     expect(screen.getByRole("link", { name: "Back to App" })).toHaveAttribute("href", "/");
-    expect(screen.getByRole("link", { name: "Dashboard" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: "Home" })).not.toHaveAttribute("aria-current");
     expect(screen.getByRole("link", { name: "Contents" })).toHaveAttribute(
       "href",
       "/admin/contents",
