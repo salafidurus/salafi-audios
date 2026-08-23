@@ -47,7 +47,6 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
       <div className={styles.artworkContainer}>
         <div className={styles.bookmarkRibbon} aria-hidden="true" />
         <AppAvatar
-          listingArtwork={listing.imageUrl}
           scholarImageUrl={imageUrl}
           name={listing.scholar.name}
           fill
