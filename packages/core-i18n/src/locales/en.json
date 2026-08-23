@@ -564,7 +564,26 @@
       "titleMobile": "Users",
       "searchPlaceholder": "Search users by name or email...",
       "searchNoMatch": "No users match your search.",
-      "noUsersFound": "No users found."
+      "noUsersFound": "No users found.",
+      "noAccessGrants": "No access grants",
+      "unnamed": "Unnamed user",
+      "moreActions": "More actions for {{name}}",
+      "copyEmail": "Copy email",
+      "statusLabel": "Access status",
+      "status": {
+        "active": "Active access",
+        "none": "No admin access",
+        "activeFilter": "Has admin access",
+        "noneFilter": "No admin access"
+      },
+      "resultSummary": "{{shown}} shown · {{active}} with admin access",
+      "columnsLabel": "User management columns",
+      "columns": {
+        "user": "User",
+        "status": "Access status",
+        "roles": "Roles",
+        "actions": "Actions"
+      }
     },
     "access": {
       "title": "Manage Access",

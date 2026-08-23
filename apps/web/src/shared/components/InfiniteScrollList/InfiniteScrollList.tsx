@@ -95,14 +95,24 @@ export function InfiniteScrollList<TData>({
 
   if (data.length === 0) {
     return (
-      <Empty className={styles.empty}>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <BookOpen aria-hidden="true" />
-          </EmptyMedia>
-          <EmptyDescription>{emptyMessage}</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <>
+        <Empty className={styles.empty}>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <BookOpen aria-hidden="true" />
+            </EmptyMedia>
+            <EmptyDescription>{emptyMessage}</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+        {hasMore && (
+          <div
+            ref={observerTarget}
+            className={styles.sentinel}
+            data-testid="infinite-scroll-sentinel"
+          />
+        )}
+        {hasMore && isFetchingNextPage && <div className={styles.loadingMore}>Loading more…</div>}
+      </>
     );
   }
 
@@ -121,7 +131,11 @@ export function InfiniteScrollList<TData>({
       ))}
 
       {/* Intersection observer target for loading more */}
-      <div ref={observerTarget} className={styles.sentinel} />
+      <div
+        ref={observerTarget}
+        className={styles.sentinel}
+        data-testid="infinite-scroll-sentinel"
+      />
       {isFetchingNextPage && <div className={styles.loadingMore}>Loading more…</div>}
     </List>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { queryKeys } from "@sd/core-contracts";
+import { queryKeys, type AdminUserListItemDto } from "@sd/core-contracts";
 import { useInfiniteAdminUsers } from "@sd/domain-account";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, useCallback, type ReactNode, useMemo } from "react";
@@ -15,16 +15,17 @@ import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { Search } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { useDebouncedSearch } from "@/shared/hooks";
-import { useResponsive } from "@/shared/hooks/use-responsive";
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
 
 import styles from "./admin-users.screen.module.css";
 
 export function AdminUsersScreen(): ReactNode {
   const queryClient = useQueryClient();
-  const { isMobile } = useResponsive();
+  const isDesktop = useIsDesktop();
   const { t } = useTranslation();
   const { query: searchQuery, setQuery: setSearchQuery, debouncedQuery } = useDebouncedSearch();
   const [role, setRole] = useState("");
+  const [status, setStatus] = useState<"" | "active" | "none">("");
   const [accessUser, setAccessUser] = useState<{ id: string; name: string } | null>(null);
 
   const roleChips = useMemo(
@@ -39,6 +40,14 @@ export function AdminUsersScreen(): ReactNode {
     [t],
   );
 
+  const statusChips = useMemo(
+    () => [
+      { id: "active", label: t("admin.users.status.activeFilter", "Has admin access") },
+      { id: "none", label: t("admin.users.status.noneFilter", "No admin access") },
+    ],
+    [t],
+  );
+
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteAdminUsers(
     {
       search: debouncedQuery,
@@ -46,7 +55,13 @@ export function AdminUsersScreen(): ReactNode {
     },
   );
 
-  const allItems = data?.pages.flatMap((page: any) => page.items) ?? [];
+  const allItems: AdminUserListItemDto[] = data?.pages.flatMap((page) => page.items) ?? [];
+  const activeCount = allItems.filter((user) => user.roles.length > 0).length;
+  const visibleItems = allItems.filter((user) => {
+    if (status === "active") return user.roles.length > 0;
+    if (status === "none") return user.roles.length === 0;
+    return true;
+  });
 
   const handleAccessChange = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
@@ -59,7 +74,7 @@ export function AdminUsersScreen(): ReactNode {
           <StickyHeaderLayout.Header>
             <PageHeader
               title={
-                isMobile
+                isDesktop
                   ? t("admin.users.titleMobile", "Users")
                   : t("admin.users.title", "Manage Users")
               }
@@ -80,11 +95,45 @@ export function AdminUsersScreen(): ReactNode {
                 setRole(role === chipId ? "" : chipId);
               }}
             />
+
+            <div className={styles.statusFilter}>
+              <span className={styles.filterLabel}>
+                {t("admin.users.statusLabel", "Access status")}
+              </span>
+              <Search.Filter
+                chips={statusChips}
+                selected={status ? [status] : []}
+                onChipChange={(chipId: string) => {
+                  // SAFETY: status chips are created locally with only "active" and "none" IDs.
+                  setStatus(status === chipId ? "" : (chipId as "active" | "none"));
+                }}
+              />
+            </div>
+
+            <p className={styles.resultCount} aria-live="polite">
+              {t("admin.users.resultSummary", {
+                defaultValue: `${visibleItems.length} shown · ${activeCount} with admin access`,
+                shown: visibleItems.length,
+                active: activeCount,
+              })}
+            </p>
           </StickyHeaderLayout.Header>
 
           <StickyHeaderLayout.Content>
+            {isDesktop && (
+              <div
+                className={styles.desktopHeader}
+                role="row"
+                aria-label={t("admin.users.columnsLabel", "User management columns")}
+              >
+                <span>{t("admin.users.columns.user", "User")}</span>
+                <span>{t("admin.users.columns.status", "Access status")}</span>
+                <span>{t("admin.users.columns.roles", "Roles")}</span>
+                <span>{t("admin.users.columns.actions", "Actions")}</span>
+              </div>
+            )}
             <InfiniteScrollList
-              data={allItems}
+              data={visibleItems}
               isLoading={isLoading}
               hasMore={hasNextPage ?? false}
               onLoadMore={() => fetchNextPage()}
@@ -96,7 +145,7 @@ export function AdminUsersScreen(): ReactNode {
                 />
               )}
               emptyMessage={
-                debouncedQuery || role
+                debouncedQuery || role || status
                   ? t("admin.users.searchNoMatch", "No users match your search.")
                   : t("admin.users.noUsersFound", "No users found.")
               }

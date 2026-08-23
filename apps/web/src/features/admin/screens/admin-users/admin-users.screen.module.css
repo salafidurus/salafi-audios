@@ -25,6 +25,33 @@
   align-items: center;
 }
 
+.statusFilter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  margin-top: var(--space-scale-md);
+}
+
+.filterLabel {
+  color: var(--content-muted);
+  font-family: var(--font-sans);
+  font-size: var(--typo-caption-font-size);
+  font-weight: 600;
+}
+
+.desktopHeader {
+  display: grid;
+  grid-template-columns: minmax(18rem, 2fr) minmax(10rem, 1fr) minmax(12rem, 1fr) auto;
+  gap: var(--space-component-gap-lg);
+  padding: 0 var(--space-component-gap-xl) var(--space-scale-xs);
+  color: var(--content-muted);
+  font-family: var(--font-sans);
+  font-size: var(--typo-caption-font-size);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .toolbar {
   display: flex;
   flex-direction: column;

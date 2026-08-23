@@ -565,7 +565,26 @@
       "titleMobile": "المستخدمون",
       "searchPlaceholder": "البحث عن المستخدمين بالاسم أو البريد الإلكتروني...",
       "searchNoMatch": "لم يتم العثور على مستخدمين يطابقون بحثك.",
-      "noUsersFound": "لم يتم العثور على مستخدمين."
+      "noUsersFound": "لم يتم العثور على مستخدمين.",
+      "noAccessGrants": "لا توجد صلاحيات وصول",
+      "unnamed": "مستخدم بلا اسم",
+      "moreActions": "المزيد من الإجراءات لـ {{name}}",
+      "copyEmail": "نسخ البريد الإلكتروني",
+      "statusLabel": "حالة الوصول",
+      "status": {
+        "active": "وصول إداري فعال",
+        "none": "لا يوجد وصول إداري",
+        "activeFilter": "لديه وصول إداري",
+        "noneFilter": "لا يوجد وصول إداري"
+      },
+      "resultSummary": "{{shown}} معروض · {{active}} لديه وصول إداري",
+      "columnsLabel": "أعمدة إدارة المستخدمين",
+      "columns": {
+        "user": "المستخدم",
+        "status": "حالة الوصول",
+        "roles": "الأدوار",
+        "actions": "الإجراءات"
+      }
     },
     "access": {
       "title": "إدارة الوصول",
