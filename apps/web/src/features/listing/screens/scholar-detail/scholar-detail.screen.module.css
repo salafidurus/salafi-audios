@@ -1,5 +1,22 @@
+.pageLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-component-gap-xl, 32px);
+  align-items: start;
+}
+
+.detailsRail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md, 16px);
+}
+
+.contentColumn {
+  min-width: 0;
+}
+
 .backBar {
-  padding: var(--space-scale-sm) 0;
+  padding: 0;
 }
 
 .backButton {
@@ -107,6 +124,19 @@
   flex-shrink: 0;
   color: var(--content-muted);
   font-size: var(--typo-body-sm-font-size);
+}
+
+@media (min-width: 1024px) {
+  .pageLayout {
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  }
+
+  .detailsRail {
+    position: sticky;
+    top: var(--space-component-gap-lg, 24px);
+    max-height: calc(100vh - var(--space-component-gap-xl, 32px) * 2);
+    overflow-y: auto;
+  }
 }
 
 .empty {

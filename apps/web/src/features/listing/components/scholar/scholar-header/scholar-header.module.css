@@ -83,6 +83,24 @@
   align-self: flex-start;
 }
 
+.sidebar {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.sidebar .infoColumn {
+  width: 100%;
+}
+
+.sidebar .bio {
+  max-width: none;
+}
+
+.sidebar .followButton {
+  align-self: stretch;
+  width: 100%;
+}
+
 @media (max-width: 640px) {
   .root {
     flex-direction: column;

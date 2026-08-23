@@ -2,13 +2,32 @@
 
 import type { ListingModuleDto } from "@sd/core-contracts";
 
-import { Minimize2, Maximize2 } from "lucide-react";
+import { BookOpen, Minimize2, Maximize2 } from "lucide-react";
 import React from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+import { Badge } from "@/shared/components/ui/badge";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupAction,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from "@/shared/components/ui/sidebar";
+import { TooltipProvider } from "@/shared/components/ui/tooltip";
+import { cn } from "@/shared/utils";
 
 import styles from "./CollectionToc.module.css";
 
 export type CollectionTocProps = {
   modules: ListingModuleDto[];
+  lessonCount: number;
   onSelect: (moduleId: string) => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
@@ -16,47 +35,91 @@ export type CollectionTocProps = {
 
 export function CollectionToc({
   modules,
+  lessonCount,
   onSelect,
   isCollapsed = false,
   onToggleCollapse,
 }: CollectionTocProps) {
+  const { t } = useTranslation();
+
   if (modules.length === 0) return null;
 
   return (
-    <nav
-      className={`${styles.container} ${isCollapsed ? styles.collapsed : ""}`}
-      aria-label="Table of Contents"
-    >
-      <div className={styles.headerRow}>
-        {!isCollapsed && <div className={styles.title}>TABLE OF CONTENTS</div>}
-
-        {onToggleCollapse && (
-          <button
-            type="button"
-            onClick={onToggleCollapse}
-            className={styles.toggleButton}
-            aria-label={isCollapsed ? "Expand Table of Contents" : "Minimize Table of Contents"}
-            title={isCollapsed ? "Expand Table of Contents" : "Minimize Table of Contents"}
+    <TooltipProvider>
+      <SidebarProvider
+        open={!isCollapsed}
+        onOpenChange={(open) => {
+          if (open === isCollapsed) onToggleCollapse?.();
+        }}
+        className={styles.provider}
+      >
+        <nav aria-label={t("listing.tableOfContents", "Table of Contents")} className={styles.nav}>
+          <Sidebar
+            collapsible="none"
+            side="right"
+            className={cn(styles.container, isCollapsed && styles.collapsed)}
           >
-            {isCollapsed ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
-          </button>
-        )}
-      </div>
+            <SidebarHeader className={styles.header}>
+              <div className={styles.headerRow}>
+                {!isCollapsed && (
+                  <SidebarGroupLabel className={styles.title}>
+                    {t("listing.tableOfContents", "Table of Contents")}
+                  </SidebarGroupLabel>
+                )}
+                {!isCollapsed && (
+                  <Badge variant="secondary" className={styles.metadata}>
+                    {modules.length} {t("listing.modules", "modules")} · {lessonCount}{" "}
+                    {t("listing.items", "lessons")}
+                  </Badge>
+                )}
+              </div>
+              {onToggleCollapse && (
+                <SidebarGroupAction
+                  type="button"
+                  onClick={onToggleCollapse}
+                  aria-label={
+                    isCollapsed
+                      ? t("listing.expandTableOfContents", "Expand Table of Contents")
+                      : t("listing.collapseTableOfContents", "Collapse Table of Contents")
+                  }
+                  title={
+                    isCollapsed
+                      ? t("listing.expandTableOfContents", "Expand Table of Contents")
+                      : t("listing.collapseTableOfContents", "Collapse Table of Contents")
+                  }
+                  className={styles.toggleButton}
+                >
+                  {isCollapsed ? <Maximize2 /> : <Minimize2 />}
+                </SidebarGroupAction>
+              )}
+            </SidebarHeader>
 
-      {!isCollapsed && (
-        <div className={styles.moduleList}>
-          {modules.map((mod) => (
-            <button
-              key={mod.id}
-              type="button"
-              onClick={() => onSelect(mod.id)}
-              className={styles.moduleButton}
-            >
-              <span className={styles.moduleText}>{mod.title}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </nav>
+            <SidebarContent className={styles.content}>
+              <SidebarGroup className={styles.group}>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {modules.map((mod) => (
+                      <SidebarMenuItem key={mod.id}>
+                        <SidebarMenuButton
+                          type="button"
+                          size="sm"
+                          tooltip={mod.title}
+                          aria-label={mod.title}
+                          onClick={() => onSelect(mod.id)}
+                          className={styles.moduleButton}
+                        >
+                          <BookOpen aria-hidden="true" />
+                          {!isCollapsed && <span>{mod.title}</span>}
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
+        </nav>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }

@@ -103,6 +103,22 @@
   font-size: 0.85rem;
 }
 
+.sidebar {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-component-gap-md, 16px);
+}
+
+.sidebar .artworkContainer {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.sidebar .titleText {
+  font-size: 23px;
+}
+
 @media (max-width: 640px) {
   .container {
     gap: var(--space-component-gap-md, 16px);

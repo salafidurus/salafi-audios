@@ -1,97 +1,66 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-  border-radius: 16px;
-  background: var(--surface-subtle);
-  border: 1px solid var(--border-default);
-  max-height: calc(100vh - 180px);
-  overflow-y: auto;
-  transition:
-    width 0.2s ease,
-    padding 0.2s ease;
+.provider {
+  min-height: 0;
+  width: 100%;
 }
 
-.container.collapsed {
-  padding: 12px 8px;
-  align-items: center;
+.nav {
+  width: 100%;
+}
+
+.container {
+  max-height: calc(100vh - var(--sticky-header-height, 240px) - 64px);
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--sidebar-border);
+  border-radius: var(--radius-lg);
+  transition: width 0.2s ease;
+}
+
+.collapsed {
   width: 48px;
+}
+
+.header {
+  position: relative;
+  min-height: 48px;
 }
 
 .headerRow {
   display: flex;
+  min-width: 0;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.collapsed .headerRow {
-  flex-direction: column;
-  padding-bottom: 0;
-  justify-content: center;
+  gap: var(--space-scale-xs, 4px);
+  padding-inline-end: 28px;
 }
 
 .title {
-  font-size: 11.5px;
+  overflow: hidden;
+  min-width: 0;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.6px;
-  color: var(--content-muted);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
+.metadata {
+  flex-shrink: 0;
+  font-size: 10px;
+}
+
 .toggleButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  border: none;
-  background: transparent;
-  color: var(--content-muted);
-  cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
+  color: var(--sidebar-foreground);
 }
 
-.toggleButton:hover {
-  background: var(--surface-hover);
-  color: var(--content-strong);
+.content {
+  min-height: 0;
 }
 
-.moduleList {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 10px;
+.group {
+  padding-block-start: 0;
 }
 
 .moduleButton {
-  display: flex;
-  align-items: center;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: none;
-  background: transparent;
-  color: var(--content-muted);
-  text-align: left;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
-}
-
-.moduleButton:hover {
-  background: color-mix(in srgb, var(--action-primary) 12%, transparent);
-  color: var(--content-primary-strong);
-}
-
-.moduleText {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  justify-content: flex-start;
 }

@@ -3,7 +3,7 @@
 import { pickContentField } from "@sd/core-i18n";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
 import { ChevronLeft } from "lucide-react";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { LectureRow } from "@/features/home/components/lecture-row/lecture-row";
@@ -49,7 +49,6 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { navigateToListing } = useListingNavigation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
-  const headerContentRef = useRef<HTMLDivElement>(null);
 
   const {
     data: scholar,
@@ -59,27 +58,6 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   } = useScholarDetail(slug);
   const { data: contentData } = useScholarContent(slug);
   const { data: topicsData } = useScholarTopics(slug);
-
-  useEffect(() => {
-    const el = headerContentRef.current;
-    if (!el) return;
-
-    const updateHeight = () => {
-      // SAFETY: `StickyHeaderLayout` renders the measured content inside its sticky header shell,
-      // so the nearest matching ancestor is the layout's sticky header container when present.
-      const stickyHeaderEl = el.closest('[class*="stickyHeader"]') as HTMLElement | null;
-      const height = stickyHeaderEl
-        ? stickyHeaderEl.getBoundingClientRect().height
-        : el.getBoundingClientRect().height + 32;
-      document.documentElement.style.setProperty("--sticky-header-height", `${height}px`);
-    };
-
-    updateHeight();
-    const observer = new ResizeObserver(updateHeight);
-    observer.observe(el);
-
-    return () => observer.disconnect();
-  }, [scholar, contentData, topicsData]);
 
   const topicChips: FilterChip[] = useMemo(() => {
     if (!topicsData?.topics) return [];
@@ -185,94 +163,90 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
 
   return (
     <ScreenView>
-      <StickyHeaderLayout>
-        <StickyHeaderLayout.Header>
-          <div ref={headerContentRef}>
-            <div className={styles.backBar}>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className={styles.backButton}
-                onClick={handleBack}
-              >
-                <ChevronLeft data-icon="inline-start" />
-                {t("scholars.backToScholars", "Back to Scholars")}
-              </Button>
+      <div className={styles.pageLayout}>
+        <aside className={styles.detailsRail} aria-label={t("scholars.details", "Scholar details")}>
+          <div className={styles.backBar}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className={styles.backButton}
+              onClick={handleBack}
+            >
+              <ChevronLeft data-icon="inline-start" />
+              {t("scholars.backToScholars", "Back to Scholars")}
+            </Button>
+          </div>
+          <ScholarHeader scholar={scholar} onFollow={handleFollow} layout="sidebar" />
+          <div className={styles.searchFilterWrapper}>
+            <div className={styles.searchWrapper}>
+              <Search.Bar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder={t("scholarContent.searchPlaceholder", "Search scholar content…")}
+              />
             </div>
 
-            <div className={styles.headerContent}>
-              <ScholarHeader scholar={scholar} onFollow={handleFollow} />
-            </div>
-
-            <div className={styles.searchFilterWrapper}>
-              <div className={styles.searchWrapper}>
-                <Search.Bar
-                  value={searchQuery}
-                  onChange={setSearchQuery}
-                  placeholder={t("scholarContent.searchPlaceholder", "Search scholar content…")}
+            {topicChips.length > 0 && (
+              <div className={styles.filterWrapper}>
+                <Search.Filter
+                  chips={topicChips}
+                  selected={selectedTopicId ? [selectedTopicId] : []}
+                  onChipChange={handleChipChange}
+                  includeAllOption
                 />
               </div>
-
-              {topicChips.length > 0 && (
-                <div className={styles.filterWrapper}>
-                  <Search.Filter
-                    chips={topicChips}
-                    selected={selectedTopicId ? [selectedTopicId] : []}
-                    onChipChange={handleChipChange}
-                    includeAllOption
-                  />
-                </div>
-              )}
-            </div>
+            )}
           </div>
-        </StickyHeaderLayout.Header>
+        </aside>
 
-        <StickyHeaderLayout.Content>
-          <section aria-labelledby="scholar-content-heading" className={styles.contentRegion}>
-            <div className={styles.contentIntro}>
-              <div>
-                <p className={styles.eyebrow}>
-                  {t("scholarContent.catalogLabel", "Scholar catalog")}
-                </p>
-                <h2 id="scholar-content-heading" className={styles.contentHeading}>
-                  {t("scholarContent.publishedContent", "Published content")}
-                </h2>
+        <main className={styles.contentColumn}>
+          <StickyHeaderLayout>
+            <section aria-labelledby="scholar-content-heading" className={styles.contentRegion}>
+              <div className={styles.contentIntro}>
+                <div>
+                  <p className={styles.eyebrow}>
+                    {t("scholarContent.catalogLabel", "Scholar catalog")}
+                  </p>
+                  <h2 id="scholar-content-heading" className={styles.contentHeading}>
+                    {t("scholarContent.publishedContent", "Published content")}
+                  </h2>
+                </div>
+                <span className={styles.contentCount}>
+                  {filteredItems.length}{" "}
+                  {t(
+                    filteredItems.length === 1 ? "scholarContent.item" : "scholarContent.items",
+                    filteredItems.length === 1 ? "item" : "items",
+                  )}
+                </span>
               </div>
-              <span className={styles.contentCount}>
-                {filteredItems.length}{" "}
-                {t(
-                  filteredItems.length === 1 ? "scholarContent.item" : "scholarContent.items",
-                  filteredItems.length === 1 ? "item" : "items",
-                )}
-              </span>
-            </div>
-            <Separator />
+              <Separator />
 
-            <div className={styles.contentList}>
-              {filteredItems.length > 0 ? (
-                filteredItems.map((item) => (
-                  <LectureRow
-                    key={item.id}
-                    title={pickContentField(item.title, item.original?.title, showOriginal)}
-                    category={item.type}
-                    scholarName={scholar.name}
-                    scholarSlug={scholar.slug}
-                    duration={formatDuration(item.durationSeconds)}
-                    totalLessons={item.lectureCount ?? 0}
-                    progress={0}
-                    onClick={() => navigateToListing(item.slug)}
-                  />
-                ))
-              ) : (
-                <p className={styles.empty}>
-                  {t("scholarContent.empty", "No published content found.")}
-                </p>
-              )}
-            </div>
-          </section>
-        </StickyHeaderLayout.Content>
-      </StickyHeaderLayout>
+              <div className={styles.contentList}>
+                {filteredItems.length > 0 ? (
+                  filteredItems.map((item) => (
+                    <LectureRow
+                      key={item.id}
+                      title={pickContentField(item.title, item.original?.title, showOriginal)}
+                      category={item.type}
+                      scholarName={scholar.name}
+                      scholarSlug={scholar.slug}
+                      duration={formatDuration(item.durationSeconds)}
+                      totalLessons={item.lectureCount ?? 0}
+                      progress={0}
+                      onClick={() => navigateToListing(item.slug)}
+                    />
+                  ))
+                ) : (
+                  <p className={styles.empty}>
+                    {t("scholarContent.empty", "No published content found.")}
+                  </p>
+                )}
+              </div>
+            </section>
+          </StickyHeaderLayout>
+        </main>
+      </div>
     </ScreenView>
   );
 }

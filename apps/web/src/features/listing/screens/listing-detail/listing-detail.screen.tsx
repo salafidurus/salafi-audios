@@ -1,24 +1,14 @@
 "use client";
 
-import { routes } from "@sd/core-contracts";
 import { useListingDetail, useListingContents } from "@sd/domain-content";
 import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Search } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/shared/components/ui/breadcrumb";
 import { Button } from "@/shared/components/ui/button";
 import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@/shared/components/ui/empty";
 import { Separator } from "@/shared/components/ui/separator";
@@ -72,19 +62,23 @@ function ListingContentSection({
       aria-labelledby={contentHeading ? "listing-content-heading" : undefined}
       className={styles.contentRegion}
     >
-      <div
-        className={`${styles.contentIntro} ${contentHeading ? "" : styles.contentIntroCountOnly}`}
-      >
-        {contentHeading && (
-          <h2 id="listing-content-heading" className={styles.contentHeading}>
-            {contentHeading}
-          </h2>
-        )}
-        <span className={styles.contentCount}>
-          {contentCount} {contentCountLabel}
-        </span>
-      </div>
-      <Separator />
+      {contents.format !== "collection" && (
+        <>
+          <div
+            className={`${styles.contentIntro} ${contentHeading ? "" : styles.contentIntroCountOnly}`}
+          >
+            {contentHeading && (
+              <h2 id="listing-content-heading" className={styles.contentHeading}>
+                {contentHeading}
+              </h2>
+            )}
+            <span className={styles.contentCount}>
+              {contentCount} {contentCountLabel}
+            </span>
+          </div>
+          <Separator />
+        </>
+      )}
 
       {contents.format === "single" && (
         <ContentList
@@ -126,7 +120,6 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const formatScholarName = useFormatScholarName();
   const [searchQuery, setSearchQuery] = useState("");
   const [highlightItemId, setHighlightItemId] = useState<string | undefined>(undefined);
-  const headerContentRef = useRef<HTMLDivElement>(null);
 
   const {
     data: listing,
@@ -149,28 +142,6 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
       .getElementById(contentItemAnchorId(highlightItemId))
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [highlightItemId, contents]);
-
-  // Measure sticky header height dynamically (including outer padding) for scroll margin and TOC offset
-  useEffect(() => {
-    const el = headerContentRef.current;
-    if (!el) return;
-
-    const updateHeight = () => {
-      // SAFETY: `StickyHeaderLayout` renders the measured content inside its sticky header shell,
-      // so the nearest matching ancestor is the layout's sticky header container when present.
-      const stickyHeaderEl = el.closest('[class*="stickyHeader"]') as HTMLElement | null;
-      const height = stickyHeaderEl
-        ? stickyHeaderEl.getBoundingClientRect().height
-        : el.getBoundingClientRect().height + 32;
-      document.documentElement.style.setProperty("--sticky-header-height", `${height}px`);
-    };
-
-    updateHeight();
-    const observer = new ResizeObserver(updateHeight);
-    observer.observe(el);
-
-    return () => observer.disconnect();
-  }, [listing, contents]);
 
   const isMultiItem = listing?.format === "series" || listing?.format === "collection";
   const query = searchQuery.trim().toLowerCase();
@@ -301,98 +272,66 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
 
   return (
     <ScreenView>
-      <StickyHeaderLayout>
-        <StickyHeaderLayout.Header>
-          <div ref={headerContentRef}>
-            <Breadcrumb
-              className={styles.breadcrumbs}
-              aria-label={t("navigation.breadcrumbs", "Breadcrumbs")}
-            >
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href={routes.home}>{t("navigation.home", "Home")}</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href={routes.explore.index}>{t("navigation.explore", "Explore")}</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href={`/scholars/${listing.scholar.slug}`}>
-                      {formatScholarName(listing.scholar)}
-                    </Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage className={styles.breadcrumbPage}>{listing.title}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className={styles.backButton}
-              onClick={() => router.back()}
-              aria-label={t("navigation.back", "Back")}
-            >
-              <ChevronLeft data-icon="inline-start" />
-              {t("navigation.back", "Back")}
-            </Button>
-
-            <div className={styles.headerTopRow}>
-              <MetaDataSection listing={listing} />
-              <QuickButtonSection listing={listing} contents={contents} />
-            </div>
-
-            {isMultiItem && (
-              <div className={styles.searchWrapper}>
-                <Search.Bar
-                  value={searchQuery}
-                  onChange={setSearchQuery}
-                  placeholder={t("listing.searchPlaceholder", "Search lessons…")}
-                />
-              </div>
-            )}
-          </div>
-        </StickyHeaderLayout.Header>
-
-        <StickyHeaderLayout.Content>
-          <div className={styles.contentWrapper}>
-            {isFetchingContents && !contents && (
-              <div className={styles.contentLoading} role="status">
-                <Skeleton className={styles.loadingRow} />
-                <span className="sr-only">{t("lecture.loading", "Loading lessons…")}</span>
-              </div>
-            )}
-
-            {contents && (
-              <ListingContentSection
-                contents={contents}
-                contentCount={contentCount}
-                contentCountLabel={contentCountLabel}
-                contentHeading={contentHeading}
-                filteredSingleOrSeriesItems={filteredSingleOrSeriesItems}
-                filteredModules={filteredModules}
-                formatScholarName={formatScholarName}
-                highlightItemId={highlightItemId}
-                listing={listing}
-                t={t}
+      <div className={styles.pageLayout}>
+        <aside className={styles.detailsRail} aria-label={t("listing.details", "Listing details")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className={styles.backButton}
+            onClick={() => router.back()}
+            aria-label={t("navigation.back", "Back")}
+          >
+            <ChevronLeft data-icon="inline-start" />
+            {t("navigation.back", "Back")}
+          </Button>
+          <MetaDataSection listing={listing} layout="sidebar" />
+          <QuickButtonSection listing={listing} contents={contents} />
+          {isMultiItem && (
+            <div className={styles.searchWrapper}>
+              <Search.Bar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder={t("listing.searchPlaceholder", "Search lessons…")}
               />
-            )}
+            </div>
+          )}
+        </aside>
 
-            {listing.seriesContext && (
-              <SeriesContextBar seriesContext={listing.seriesContext} lectureId={listing.id} />
-            )}
-          </div>
-        </StickyHeaderLayout.Content>
-      </StickyHeaderLayout>
+        <main className={styles.contentColumn}>
+          <StickyHeaderLayout>
+            <StickyHeaderLayout.Content>
+              <div className={styles.contentWrapper}>
+                {isFetchingContents && !contents && (
+                  <div className={styles.contentLoading} role="status">
+                    <Skeleton className={styles.loadingRow} />
+                    <span className="sr-only">{t("lecture.loading", "Loading lessons…")}</span>
+                  </div>
+                )}
+
+                {contents && (
+                  <ListingContentSection
+                    contents={contents}
+                    contentCount={contentCount}
+                    contentCountLabel={contentCountLabel}
+                    contentHeading={contentHeading}
+                    filteredSingleOrSeriesItems={filteredSingleOrSeriesItems}
+                    filteredModules={filteredModules}
+                    formatScholarName={formatScholarName}
+                    highlightItemId={highlightItemId}
+                    listing={listing}
+                    t={t}
+                  />
+                )}
+
+                {listing.seriesContext && (
+                  <SeriesContextBar seriesContext={listing.seriesContext} lectureId={listing.id} />
+                )}
+              </div>
+            </StickyHeaderLayout.Content>
+          </StickyHeaderLayout>
+        </main>
+      </div>
     </ScreenView>
   );
 }

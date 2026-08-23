@@ -6,6 +6,7 @@ import Image from "next/image";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/shared/utils";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./scholar-header.module.css";
@@ -17,9 +18,10 @@ export type ScholarHeaderProps = {
     totalDurationSeconds: number;
   };
   onFollow?: () => void;
+  layout?: "inline" | "sidebar";
 };
 
-export function ScholarHeader({ scholar, onFollow }: ScholarHeaderProps) {
+export function ScholarHeader({ scholar, onFollow, layout = "inline" }: ScholarHeaderProps) {
   const { t } = useTranslation();
   const formatScholarName = useFormatScholarName();
   const initial = scholar.name?.trim().charAt(0).toUpperCase() || "?";
@@ -30,7 +32,7 @@ export function ScholarHeader({ scholar, onFollow }: ScholarHeaderProps) {
   ].filter(Boolean);
 
   return (
-    <div className={styles.root}>
+    <div className={cn(styles.root, layout === "sidebar" && styles.sidebar)}>
       <div className={styles.avatarSection}>
         {scholar.imageUrl ? (
           <Image

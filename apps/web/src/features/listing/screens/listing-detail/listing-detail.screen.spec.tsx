@@ -99,8 +99,6 @@ describe("ListingDetailScreen", () => {
     render(<ListingDetailScreen slug="tawheed-lecture" />);
     expect(screen.getAllByText("Kitab At-Tawheed Lecture").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Ibn Baz").length).toBeGreaterThan(0);
-    expect(screen.getByRole("navigation", { name: "Breadcrumbs" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
     expect(screen.getByRole("region", { name: "Listen now" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Listen now" })).toBeTruthy();
     expect(screen.getAllByText("Play").length).toBeGreaterThan(0);
@@ -132,7 +130,7 @@ describe("ListingDetailScreen", () => {
 
     render(<ListingDetailScreen slug="collection" />);
 
-    expect(screen.getByText("2 modules")).toBeTruthy();
+    expect(screen.getByText("2 modules · 0 lessons")).toBeTruthy();
   });
 
   it("shows a loading guard instead of the wrong content when the resolved listing is nested", () => {

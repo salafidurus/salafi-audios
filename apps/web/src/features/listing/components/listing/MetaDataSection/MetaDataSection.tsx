@@ -10,6 +10,7 @@ import React from "react";
 
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { cn } from "@/shared/utils";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import { TopicChips } from "../topic-chips/topic-chips";
@@ -27,9 +28,10 @@ function formatDuration(seconds?: number): string {
 
 export type MetaDataSectionProps = {
   listing: ListingDetailDto;
+  layout?: "inline" | "sidebar";
 };
 
-export function MetaDataSection({ listing }: MetaDataSectionProps) {
+export function MetaDataSection({ listing, layout = "inline" }: MetaDataSectionProps) {
   const showOriginal = useShowOriginalContent();
   const formatScholarName = useFormatScholarName();
   const title = pickContentField(listing.title, listing.original?.title, showOriginal);
@@ -38,7 +40,7 @@ export function MetaDataSection({ listing }: MetaDataSectionProps) {
   const durationStr = formatDuration(listing.durationSeconds);
 
   return (
-    <div className={styles.container}>
+    <div className={cn(styles.container, layout === "sidebar" && styles.sidebar)}>
       <div className={styles.artworkContainer}>
         <div className={styles.bookmarkRibbon} aria-hidden="true" />
         {imageUrl ? (
