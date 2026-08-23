@@ -1,3 +1,5 @@
+import { Skeleton } from "@/shared/components/ui/skeleton";
+
 import styles from "./feed-skeleton.module.css";
 
 export type FeedSkeletonProps = {
@@ -7,12 +9,12 @@ export type FeedSkeletonProps = {
 
 export function FeedSkeleton({ count = 6 }: FeedSkeletonProps) {
   return (
-    <div className={styles.grid} aria-hidden="true">
+    <div className={styles.grid} aria-busy="true" aria-label="Loading catalog">
       {Array.from({ length: count }).map((_, i) => (
         <div key={`feed-skeleton-${i}`} className={styles.card}>
-          <div className={`${styles.line} ${styles.lineTitle}`} />
-          <div className={`${styles.line} ${styles.lineMeta}`} />
-          <div className={`${styles.line} ${styles.lineSub}`} />
+          <Skeleton className={`${styles.line} ${styles.lineTitle}`} />
+          <Skeleton className={`${styles.line} ${styles.lineMeta}`} />
+          <Skeleton className={`${styles.line} ${styles.lineSub}`} />
         </div>
       ))}
     </div>

@@ -47,8 +47,12 @@ export class ListingService {
     return this.repo.findRelated(slug);
   }
 
-  async getRecentListings(cursor?: string, limit?: number): Promise<FeedPageDto> {
-    return this.recentRepo.getRecentListings(cursor, limit);
+  async getRecentListings(
+    cursor?: string,
+    limit?: number,
+    topicSlug?: string,
+  ): Promise<FeedPageDto> {
+    return this.recentRepo.getRecentListings(cursor, limit, topicSlug);
   }
 
   async getPromotions(): Promise<any> {

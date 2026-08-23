@@ -14,6 +14,9 @@ export const ScholarChipDtoSchema = z.object({
   imageUrl: z.string().nullable(),
   originalLanguage: LocaleSchema.optional(),
   original: ScholarOriginalFieldsSchema.optional(),
+  lectureCount: z.number().optional(),
+  seriesCount: z.number().optional(),
+  topicSlugs: z.array(z.string()).optional(),
 });
 export type ScholarChipDto = z.infer<typeof ScholarChipDtoSchema>;
 
