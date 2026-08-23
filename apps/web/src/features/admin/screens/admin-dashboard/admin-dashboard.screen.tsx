@@ -9,6 +9,14 @@ import { fetchAdminDashboard } from "@/features/admin/api/admin-dashboard.api";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { Badge } from "@/shared/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 
 import styles from "./admin-dashboard.screen.module.css";
@@ -134,70 +142,89 @@ export function AdminDashboardScreen() {
               const metric = section.subjects.includes("Scholar")
                 ? dashboardQuery.data.metrics.scholars
                 : section.subjects.includes("Listing")
-                  ? dashboardQuery.data.metrics.listings
+                  ? (dashboardQuery.data.metrics.listings ?? dashboardQuery.data.metrics.topics)
                   : section.subjects.includes("Topic")
                     ? dashboardQuery.data.metrics.topics
                     : dashboardQuery.data.metrics.users;
               return (
                 <a key={section.href} href={section.href} className={styles.sectionCard}>
-                  <span className={styles.metric}>{metric ?? "—"}</span>
-                  <h2 className={styles.sectionTitle}>{section.title}</h2>
-                  <p className={styles.sectionDescription}>
-                    {!isMobile ? section.description : section.descriptionMobile}
-                  </p>
+                  <Card size="sm">
+                    <CardHeader>
+                      <CardTitle>{section.title}</CardTitle>
+                      <CardDescription>
+                        {!isMobile ? section.description : section.descriptionMobile}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <span className={styles.metric}>{metric ?? "—"}</span>
+                    </CardContent>
+                  </Card>
                 </a>
               );
             })}
           </div>
 
           <div className={styles.columns}>
-            <section className={styles.panel} aria-labelledby="admin-pending-heading">
-              <h2 id="admin-pending-heading" className={styles.panelTitle}>
-                {t("admin.dashboard.pendingTitle", "Pending work")}
-              </h2>
-              {dashboardQuery.data.pendingWork.length === 0 ? (
-                <p className={styles.muted}>
-                  {t("admin.dashboard.pendingEmpty", "Nothing is waiting for review.")}
-                </p>
-              ) : (
-                <ul className={styles.activityList}>
-                  {dashboardQuery.data.pendingWork.map((item) => (
-                    <li key={item.id}>
-                      <a href={item.href} className={styles.activityLink}>
-                        <span>{item.title}</span>
-                        <small>
-                          {item.scholarName} · {item.status}
-                        </small>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-            <section className={styles.panel} aria-labelledby="admin-activity-heading">
-              <h2 id="admin-activity-heading" className={styles.panelTitle}>
-                {t("admin.dashboard.activityTitle", "Recent activity")}
-              </h2>
-              {dashboardQuery.data.activity.length === 0 ? (
-                <p className={styles.muted}>
-                  {t("admin.dashboard.activityEmpty", "No recent activity is available.")}
-                </p>
-              ) : (
-                <ul className={styles.activityList}>
-                  {dashboardQuery.data.activity.map((item) => (
-                    <li key={`${item.type}-${item.id}`}>
-                      <a href={item.href} className={styles.activityLink}>
-                        <span>{item.title}</span>
-                        <small>
-                          {item.subtitle ?? item.type}
-                          {item.status ? ` · ${item.status}` : ""}
-                        </small>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
+            <Card className={styles.panel}>
+              <CardHeader>
+                <CardTitle id="admin-pending-heading">
+                  {t("admin.dashboard.pendingTitle", "Pending work")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {dashboardQuery.data.pendingWork.length === 0 ? (
+                  <p className={styles.muted}>
+                    {t("admin.dashboard.pendingEmpty", "Nothing is waiting for review.")}
+                  </p>
+                ) : (
+                  <ul className={styles.activityList}>
+                    {dashboardQuery.data.pendingWork.map((item) => (
+                      <li key={item.id}>
+                        <a href={item.href} className={styles.activityLink}>
+                          <span>{item.title}</span>
+                          <small>
+                            {item.scholarName} · <Badge variant="secondary">{item.status}</Badge>
+                          </small>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+            <Card className={styles.panel}>
+              <CardHeader>
+                <CardTitle id="admin-activity-heading">
+                  {t("admin.dashboard.activityTitle", "Recent activity")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {dashboardQuery.data.activity.length === 0 ? (
+                  <p className={styles.muted}>
+                    {t("admin.dashboard.activityEmpty", "No recent activity is available.")}
+                  </p>
+                ) : (
+                  <ul className={styles.activityList}>
+                    {dashboardQuery.data.activity.map((item) => (
+                      <li key={`${item.type}-${item.id}`}>
+                        <a href={item.href} className={styles.activityLink}>
+                          <span>{item.title}</span>
+                          <small>
+                            {item.subtitle ?? item.type}
+                            {item.status ? (
+                              <>
+                                {" · "}
+                                <Badge variant="secondary">{item.status}</Badge>
+                              </>
+                            ) : null}
+                          </small>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </>
       ) : (
