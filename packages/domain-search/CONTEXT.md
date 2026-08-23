@@ -27,6 +27,24 @@ Listings or a classification such as Topic.
 An ordered discovery surface that presents eligible public content according to
 its own curation or recency rule.
 
+**Discovery feed**:
+The Explore feed: a cursor-paginated, mixed surface of Listing items and
+branching discovery modules. Its composition is authoritative in the API and
+may be steered by a Topic without becoming a strict result filter.
+
+**Topic steering**:
+A user's selected Topic preference for the discovery feed. It increases the
+share of related content while preserving a smaller amount of adjacent and
+serendipitous discovery.
+
+**Discovery module**:
+A non-listing branch in the discovery feed, such as a Scholar row or a Topic
+row. Modules are recommendations, not Catalog entities or search results.
+
+**Explored**:
+Content already displayed during the current discovery session. It is not a
+synonym for opened, listened to, saved, or completed.
+
 _Avoid_: feed as a synonym for the Catalog; search result as a synonym for a
 Listing.
 

@@ -1,0 +1,77 @@
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm);
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-scale-xs);
+  min-height: 2rem;
+}
+
+.summaryLabel,
+.noFilters {
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.filterChip {
+  gap: var(--space-scale-2xs);
+}
+
+.removeFilter {
+  margin-inline-end: -0.25rem;
+}
+
+.clearAll {
+  margin-inline-start: auto;
+}
+
+@media (max-width: 640px) {
+  .clearAll {
+    margin-inline-start: 0;
+    width: 100%;
+  }
+}
+
+.filterTrigger {
+  flex-shrink: 0;
+}
+
+.mobileFilters {
+  width: min(100%, 28rem);
+}
+
+.mobileFilterFields {
+  display: grid;
+  gap: var(--space-component-gap-sm);
+}
+
+.discoveryControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-sm);
+  min-width: 0;
+}
+
+.topicGroup {
+  min-width: 0;
+  overflow-x: auto;
+  justify-content: flex-start;
+  scrollbar-width: none;
+}
+
+.topicGroup::-webkit-scrollbar {
+  display: none;
+}
+
+.refineContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+  overflow-y: auto;
+  padding: 0 var(--space-scale-md) var(--space-scale-md);
+}
