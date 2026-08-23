@@ -23,6 +23,22 @@ security boundary. The API remains authoritative for every protected route and
 action. A User may enter the Admin workspace while still seeing only the
 sections allowed by their capabilities and scope.
 
+### Public navigation glossary
+
+- **Public primary navigation**: the persistent content destinations Home,
+  Explore, Scholars, and Library. It excludes Settings and administrative
+  actions.
+- **Utility actions**: account, theme, language, search, and capability-aware
+  Admin actions that support the public workspace without becoming catalog
+  destinations.
+- **Public navigation shell**: the contained, sticky, single-layer header that
+  frames public content. It is presentation, not an authorization boundary.
+- **Compact navigation**: the icon-first header and Sheet composition used when
+  the desktop zones no longer fit without overlap.
+- **Admin workspace**: the distinct contextual presentation for administrative
+  routes. Its visible destinations are filtered by backend-derived capability,
+  while backend authorization remains authoritative.
+
 Explore is a discovery-first feed rather than a query/results screen. It is one
 continuous mixed stream of listing cards and discovery modules, with Topic
 steering as its only primary mode. Advanced refinements remain available behind

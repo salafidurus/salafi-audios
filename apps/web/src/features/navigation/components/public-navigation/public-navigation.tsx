@@ -105,10 +105,12 @@ function WorkspaceSwitch({
   isAdminWorkspace,
   hasAdminAccess,
   returnPath,
+  menuItem = false,
 }: {
   isAdminWorkspace: boolean;
   hasAdminAccess: boolean;
   returnPath: string;
+  menuItem?: boolean;
 }) {
   const { t } = useTranslation();
   const href = isAdminWorkspace ? returnPath : routes.admin.index;
@@ -119,7 +121,7 @@ function WorkspaceSwitch({
   if (!isAdminWorkspace && !hasAdminAccess) return null;
 
   return (
-    <Link href={href} className={styles.workspaceSwitch}>
+    <Link href={href} className={styles.workspaceSwitch} role={menuItem ? "menuitem" : undefined}>
       <ArrowLeftRight aria-hidden="true" size={16} />
       {label}
     </Link>
@@ -201,7 +203,17 @@ function NavigationLinks({
   );
 }
 
-function AccountMenu({ compact = false }: { compact?: boolean }) {
+function AccountMenu({
+  compact = false,
+  hasAdminAccess = false,
+  isAdminWorkspace = false,
+  returnPath = routes.home,
+}: {
+  compact?: boolean;
+  hasAdminAccess?: boolean;
+  isAdminWorkspace?: boolean;
+  returnPath?: string;
+}) {
   const { t } = useTranslation();
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
@@ -288,6 +300,14 @@ function AccountMenu({ compact = false }: { compact?: boolean }) {
           <Link href={routes.settings.index} role="menuitem" onClick={closeMenu}>
             {t("navigation.settings", "Settings")}
           </Link>
+          {!isAdminWorkspace && hasAdminAccess && (
+            <WorkspaceSwitch
+              isAdminWorkspace={false}
+              hasAdminAccess
+              returnPath={returnPath}
+              menuItem
+            />
+          )}
           <button
             type="button"
             role="menuitem"
@@ -323,12 +343,14 @@ function UtilityControls({
 }) {
   return (
     <div className={styles.utilityControls}>
-      <AccountMenu />
-      <WorkspaceSwitch
-        isAdminWorkspace={isAdminWorkspace}
+      <AccountMenu
         hasAdminAccess={hasAdminAccess}
+        isAdminWorkspace={isAdminWorkspace}
         returnPath={returnPath}
       />
+      {isAdminWorkspace && (
+        <WorkspaceSwitch isAdminWorkspace hasAdminAccess={hasAdminAccess} returnPath={returnPath} />
+      )}
     </div>
   );
 }
@@ -382,7 +404,12 @@ export function PublicNavigation() {
         {isCompact ? (
           <div className={styles.mobileActions}>
             <SearchControl />
-            <AccountMenu compact />
+            <AccountMenu
+              compact
+              hasAdminAccess={hasAdminAccess}
+              isAdminWorkspace={isAdminWorkspace}
+              returnPath={returnPath}
+            />
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="surface" size="icon" aria-label={t("navigation.mainNav", "Main")}>
@@ -394,7 +421,7 @@ export function PublicNavigation() {
                   <SheetTitle>{t("navigation.siteTitle", "Salafi Durus")}</SheetTitle>
                   <LanguageSwitch direction="down" />
                 </SheetHeader>
-                {(isAdminWorkspace || hasAdminAccess) && (
+                {isAdminWorkspace && (
                   <WorkspaceSwitch
                     isAdminWorkspace={isAdminWorkspace}
                     hasAdminAccess={hasAdminAccess}
