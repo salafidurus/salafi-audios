@@ -336,7 +336,7 @@ function UtilityControls({
 
 export function PublicNavigation() {
   const { t, i18n } = useTranslation();
-  const { isMobile, isTablet } = useResponsive();
+  const { isMobile, isTablet, isNarrowDesktop } = useResponsive();
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
@@ -360,7 +360,7 @@ export function PublicNavigation() {
   const items = (isAdminWorkspace ? getAdminNavItems(t) : getPublicNavItems(t)).filter(
     (item) => !isAdminWorkspace || !item.isVisible || item.isVisible(ability),
   );
-  const isCompact = isMobile || isTablet;
+  const isCompact = isMobile || isTablet || isNarrowDesktop === true;
   const isRtl = i18n.dir() === "rtl";
 
   return (

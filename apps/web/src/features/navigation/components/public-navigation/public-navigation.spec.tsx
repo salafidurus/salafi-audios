@@ -165,6 +165,21 @@ describe("PublicNavigation", () => {
     expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
   });
 
+  it("uses the compact Sheet before desktop navigation can overlap", () => {
+    (useResponsive as Mock<any>).mockReturnValue({
+      isMobile: false,
+      isTablet: false,
+      isNarrowDesktop: true,
+      isWeb: true,
+    });
+
+    render(<PublicNavigation />);
+
+    expect(screen.queryByRole("navigation", { name: "Main" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Main" }));
+    expect(screen.getByRole("navigation", { name: "Main" })).toBeInTheDocument();
+  });
+
   it("switches to the admin workspace navigation with a back-to-app link", () => {
     mockUsePathname.mockReturnValue("/admin/contents");
     (useAuth as Mock<any>).mockReturnValue({
