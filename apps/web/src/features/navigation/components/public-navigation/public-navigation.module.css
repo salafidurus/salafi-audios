@@ -13,7 +13,10 @@
   grid-template-columns: max-content minmax(16rem, 20rem) minmax(0, 1fr) auto;
   grid-template-areas: "brand search nav utilities";
   align-items: center;
-  width: min(var(--space-layout-content-max), 100%);
+  width: min(
+    calc(var(--space-layout-content-max) + (2 * var(--space-layout-page-x))),
+    100%
+  );
   min-height: 4.5rem;
   margin-inline: auto;
   gap: var(--space-component-gap-xl);
@@ -186,6 +189,18 @@
 
 .navLink > svg {
   display: none;
+}
+
+.menuTrigger {
+  border: 0;
+  border-radius: 0;
+  color: var(--content-default);
+  background: transparent;
+}
+
+.menuTrigger:hover,
+.menuTrigger:focus-visible {
+  background: transparent;
 }
 
 .accountControl,
@@ -449,10 +464,31 @@
   }
 }
 
+@media (max-width: 1600px) and (min-width: 641px) {
+  .searchSlot :global([data-slot="button"]) {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    flex: 0 0 2.75rem;
+    justify-content: center;
+    padding-inline: 0;
+    border-radius: var(--radius-component-chip);
+  }
+
+  .searchSlot :global([data-slot="button"] span),
+  .searchSlot :global([data-slot="button"] kbd) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 640px) {
   .inner {
     min-height: 3.5rem;
-    padding-inline: var(--space-sm);
+    padding-inline: var(--space-layout-page-x);
   }
 
   .brand {

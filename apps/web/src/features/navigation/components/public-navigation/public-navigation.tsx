@@ -393,7 +393,12 @@ export function PublicNavigation() {
             <AccountMenu compact />
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="surface" size="icon" aria-label={t("navigation.mainNav", "Main")}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={styles.menuTrigger}
+                  aria-label={t("navigation.mainNav", "Main")}
+                >
                   <Menu aria-hidden="true" />
                 </Button>
               </SheetTrigger>

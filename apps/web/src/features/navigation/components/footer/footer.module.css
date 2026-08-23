@@ -10,7 +10,10 @@
 }
 
 .inner {
-  width: min(var(--space-layout-content-max), 100%);
+  width: min(
+    calc(var(--space-layout-content-max) + (2 * var(--space-layout-page-x))),
+    100%
+  );
   margin-inline: auto;
   padding: var(--space-scale-md) var(--space-layout-page-x);
   display: grid;
