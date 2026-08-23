@@ -6,8 +6,8 @@ import { ChevronLeft } from "lucide-react";
 import { useState, useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { ScholarHeader } from "@/features/details/components/scholar/scholar-header/scholar-header";
 import { LectureRow } from "@/features/home/components/lecture-row/lecture-row";
-import { ScholarHeader } from "@/features/listing/components/scholar/scholar-header/scholar-header";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Search, type FilterChip } from "@/shared/components/Search";

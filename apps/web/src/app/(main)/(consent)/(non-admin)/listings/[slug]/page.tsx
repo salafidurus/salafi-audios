@@ -6,7 +6,7 @@ import { cache } from "react";
 import { z } from "zod";
 
 import { getApiBaseUrl } from "@/core/config/env";
-import { ListingDetailScreen } from "@/features/listing/screens/listing-detail/listing-detail.screen";
+import { ListingDetailScreen } from "@/features/details/screens/listing-detail/listing-detail.screen";
 
 const ListingDetailSchema = z.object({
   id: z.string(),

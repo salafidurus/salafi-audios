@@ -29,7 +29,7 @@ vi.mock("@/shared/components/AppText/AppText", () => ({
   AppText: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
 }));
 
-vi.mock("@/features/listing/components/scholar/scholar-header/scholar-header", () => ({
+vi.mock("@/features/details/components/scholar/scholar-header/scholar-header", () => ({
   ScholarHeader: ({ scholar }: { scholar: { name: string } }) => (
     <div data-testid="scholar-header">Header:{scholar.name}</div>
   ),

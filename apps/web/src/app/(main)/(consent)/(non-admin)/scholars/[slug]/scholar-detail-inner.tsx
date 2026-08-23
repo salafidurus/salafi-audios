@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 
-import { ScholarDetailScreen } from "@/features/listing";
+import { ScholarDetailScreen } from "@/features/details";
 
 export default function ScholarDetailInner() {
   const params = useParams<{ slug: string }>();
