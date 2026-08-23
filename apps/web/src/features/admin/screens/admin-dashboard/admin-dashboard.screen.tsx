@@ -2,6 +2,7 @@
 
 import { queryKeys, useApiQuery, type AppActions, type AppSubjectType } from "@sd/core-contracts";
 import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
+import { ArrowUpRight, BookOpen, FileText, Users, type LucideIcon } from "lucide-react";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -12,6 +13,7 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Badge } from "@/shared/components/ui/badge";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -27,6 +29,7 @@ type AdminSection = {
   descriptionMobile: string;
   href: string;
   subjects: AppSubjectType[];
+  icon: LucideIcon;
 };
 
 function canOpenAdminSection(
@@ -60,6 +63,7 @@ export function AdminDashboardScreen() {
       descriptionMobile: t("admin.dashboard.scholarsDescMobile", "Manage scholars"),
       href: "/admin/scholars",
       subjects: ["Scholar"],
+      icon: BookOpen,
     },
     {
       title: t("navigation.admin.contents", "Contents"),
@@ -70,6 +74,7 @@ export function AdminDashboardScreen() {
       descriptionMobile: t("admin.dashboard.contentsDescMobile", "Manage content"),
       href: "/admin/contents",
       subjects: ["Listing", "Topic"],
+      icon: FileText,
     },
     {
       title: t("navigation.admin.users", "Users"),
@@ -77,6 +82,7 @@ export function AdminDashboardScreen() {
       descriptionMobile: t("admin.dashboard.usersDescMobile", "Manage users"),
       href: "/admin/users",
       subjects: ["User", "UserAccess"],
+      icon: Users,
     },
   ];
 
@@ -126,6 +132,10 @@ export function AdminDashboardScreen() {
             ? t("admin.dashboard.title", "Admin Dashboard")
             : t("admin.dashboard.titleMobile", "Admin")
         }
+        subtitle={t(
+          "admin.dashboard.subtitle",
+          "A focused view of the work and resources available to your role.",
+        )}
       />
       {visibleSections.length === 0 ? (
         <EmptyState
@@ -139,6 +149,7 @@ export function AdminDashboardScreen() {
         <>
           <div className={styles.metricsGrid}>
             {visibleSections.map((section) => {
+              const SectionIcon = section.icon;
               const metric = section.subjects.includes("Scholar")
                 ? dashboardQuery.data.metrics.scholars
                 : section.subjects.includes("Listing")
@@ -154,9 +165,19 @@ export function AdminDashboardScreen() {
                       <CardDescription>
                         {!isMobile ? section.description : section.descriptionMobile}
                       </CardDescription>
+                      <CardAction>
+                        <span className={styles.cardIcon} aria-hidden="true">
+                          <SectionIcon />
+                        </span>
+                      </CardAction>
                     </CardHeader>
                     <CardContent>
-                      <span className={styles.metric}>{metric ?? "—"}</span>
+                      <div className={styles.metricRow}>
+                        <span className={styles.metric}>{metric ?? "—"}</span>
+                        <span className={styles.cardLink} aria-hidden="true">
+                          <ArrowUpRight />
+                        </span>
+                      </div>
                     </CardContent>
                   </Card>
                 </a>
@@ -170,6 +191,9 @@ export function AdminDashboardScreen() {
                 <CardTitle id="admin-pending-heading">
                   {t("admin.dashboard.pendingTitle", "Pending work")}
                 </CardTitle>
+                <CardDescription>
+                  {t("admin.dashboard.pendingDescription", "Items that may need your attention.")}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {dashboardQuery.data.pendingWork.length === 0 ? (
@@ -181,7 +205,7 @@ export function AdminDashboardScreen() {
                     {dashboardQuery.data.pendingWork.map((item) => (
                       <li key={item.id}>
                         <a href={item.href} className={styles.activityLink}>
-                          <span>{item.title}</span>
+                          <span className={styles.activityTitle}>{item.title}</span>
                           <small>
                             {item.scholarName} · <Badge variant="secondary">{item.status}</Badge>
                           </small>
@@ -197,6 +221,9 @@ export function AdminDashboardScreen() {
                 <CardTitle id="admin-activity-heading">
                   {t("admin.dashboard.activityTitle", "Recent activity")}
                 </CardTitle>
+                <CardDescription>
+                  {t("admin.dashboard.activityDescription", "The latest changes in your scope.")}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {dashboardQuery.data.activity.length === 0 ? (
@@ -208,7 +235,7 @@ export function AdminDashboardScreen() {
                     {dashboardQuery.data.activity.map((item) => (
                       <li key={`${item.type}-${item.id}`}>
                         <a href={item.href} className={styles.activityLink}>
-                          <span>{item.title}</span>
+                          <span className={styles.activityTitle}>{item.title}</span>
                           <small>
                             {item.subtitle ?? item.type}
                             {item.status ? (
