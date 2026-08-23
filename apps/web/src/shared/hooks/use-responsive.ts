@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 
 const MOBILE_MAX = 640;
 export const TABLET_MAX = 900;
-export const COMPACT_NAV_MAX = 1100;
+export const COMPACT_NAV_MAX = 1280;
 
 type ResponsiveState = {
   isMobile: boolean;

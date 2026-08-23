@@ -9,15 +9,13 @@
 
 .inner {
   display: grid;
-  grid-template-columns: minmax(12rem, 1fr) minmax(18rem, 32rem) minmax(12rem, 1fr);
+  grid-template-columns: minmax(12rem, 0.9fr) minmax(16rem, 24rem) minmax(0, 1fr) auto;
   grid-template-areas:
-    "brand search utilities"
-    "nav nav nav";
+    "brand search nav utilities";
   align-items: center;
   width: 100%;
   min-height: 5.5rem;
   gap: var(--space-component-gap-lg);
-  row-gap: var(--space-component-gap-md);
   padding: var(--space-component-gap-sm) var(--space-layout-page-x);
   border-block: 1px solid var(--border-subtle);
   background: color-mix(in srgb, var(--surface-default) 96%, transparent);
@@ -30,6 +28,8 @@
   align-items: center;
   min-width: 0;
   gap: var(--space-component-gap-md);
+  grid-area: brand;
+  overflow: hidden;
   color: var(--content-strong);
   font-family: var(--font-display), serif;
   font-size: var(--typo-title-md-font-size);
@@ -92,12 +92,10 @@
   grid-area: nav;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   min-width: 0;
   gap: var(--space-component-gap-sm);
-  width: 100%;
-  padding-block-start: var(--space-component-gap-sm);
-  border-block-start: 1px solid var(--border-subtle);
+  width: auto;
 }
 
 .navLink,
@@ -368,8 +366,7 @@
 
 .sheet .navLink {
   width: 100%;
-  padding-block-start: 0;
-  border-block-start: 0;
+  width: 100%;
   min-height: 3.25rem;
   padding: var(--space-component-gap-md) var(--space-lg);
   border-radius: var(--radius-component-panel);
@@ -394,7 +391,7 @@
   padding-block-end: var(--space-lg);
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1280px) {
   .inner {
     display: flex;
     gap: var(--space-component-gap-sm);
@@ -405,7 +402,7 @@
   }
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1280px) {
   .header {
     padding-block-start: var(--space-sm);
   }
@@ -496,5 +493,3 @@
     display: none;
   }
 }
-  grid-area: brand;
-  overflow: hidden;
