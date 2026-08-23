@@ -414,6 +414,9 @@ export function PublicNavigation() {
           </div>
         ) : (
           <div className={styles.actions}>
+            <div className={styles.searchSlot}>
+              <SearchControl />
+            </div>
             <NavigationLinks
               items={items}
               pathname={pathname}
@@ -421,7 +424,6 @@ export function PublicNavigation() {
               isAdminWorkspace={isAdminWorkspace}
             />
             <div className={styles.rightActions}>
-              <SearchControl />
               <UtilityControls
                 hasAdminAccess={hasAdminAccess}
                 isAdminWorkspace={isAdminWorkspace}
