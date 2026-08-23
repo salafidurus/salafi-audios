@@ -25,6 +25,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { authClient, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AuthModal } from "@/features/auth";
 import { LanguageSwitch } from "@/features/settings";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
@@ -33,6 +34,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -155,7 +157,7 @@ function NavigationLinks({
 }) {
   return (
     <nav className={clsx(styles.nav, isAdminWorkspace && styles.adminNav)} aria-label={ariaLabel}>
-      {items.map(({ label, href, Icon }) => {
+      {items.map(({ label, href }) => {
         const isActive = isActivePath(pathname, href);
         const link = (
           <Link
@@ -165,7 +167,6 @@ function NavigationLinks({
             aria-current={isActive ? "page" : undefined}
             onClick={onNavigate}
           >
-            <Icon aria-hidden="true" size={17} />
             <span>{label}</span>
           </Link>
         );
@@ -187,6 +188,7 @@ function AccountMenu({ compact = false }: { compact?: boolean }) {
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
 
@@ -240,11 +242,19 @@ function AccountMenu({ compact = false }: { compact?: boolean }) {
             <Link href={routes.settings.index} role="menuitem" onClick={closeMenu}>
               {t("navigation.settings", "Settings")}
             </Link>
-            <Link href={routes.signIn} role="menuitem" onClick={closeMenu}>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                closeMenu();
+                setIsAuthModalOpen(true);
+              }}
+            >
               {t("authStrip.signIn", "Sign In")}
-            </Link>
+            </button>
           </div>
         )}
+        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       </div>
     );
   }
@@ -403,24 +413,38 @@ export function PublicNavigation() {
                 </Button>
               </SheetTrigger>
               <SheetContent side={isRtl ? "left" : "right"} className={styles.sheet}>
-                <SheetHeader>
-                  <SheetTitle>{t("navigation.siteTitle", "Salafi Durus")}</SheetTitle>
-                  <LanguageSwitch direction="down" />
+                <SheetHeader className={styles.sheetHeader}>
+                  <div className={styles.sheetBrand}>
+                    <span className={styles.sheetBrandMark} aria-hidden="true">
+                      <Image src="/logo/logo_72.png" alt="" width={24} height={24} />
+                    </span>
+                    <div className={styles.sheetHeading}>
+                      <SheetTitle>{t("navigation.siteTitle", "Salafi Durus")}</SheetTitle>
+                      <SheetDescription>
+                        {t("navigation.mobileDescription", "Navigate your study space")}
+                      </SheetDescription>
+                    </div>
+                  </div>
                 </SheetHeader>
-                {isAdminWorkspace && (
-                  <WorkspaceSwitch
+                <div className={styles.sheetNavigation}>
+                  {isAdminWorkspace && (
+                    <WorkspaceSwitch
+                      isAdminWorkspace={isAdminWorkspace}
+                      hasAdminAccess={hasAdminAccess}
+                      returnPath={returnPath}
+                    />
+                  )}
+                  <NavigationLinks
+                    items={items}
+                    pathname={pathname}
+                    ariaLabel={mainNavLabel}
                     isAdminWorkspace={isAdminWorkspace}
-                    hasAdminAccess={hasAdminAccess}
-                    returnPath={returnPath}
+                    closeWithSheet
                   />
-                )}
-                <NavigationLinks
-                  items={items}
-                  pathname={pathname}
-                  ariaLabel={mainNavLabel}
-                  isAdminWorkspace={isAdminWorkspace}
-                  closeWithSheet
-                />
+                </div>
+                <div className={styles.sheetLanguage}>
+                  <LanguageSwitch direction="down" />
+                </div>
               </SheetContent>
             </Sheet>
           </div>

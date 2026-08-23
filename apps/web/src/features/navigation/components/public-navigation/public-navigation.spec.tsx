@@ -36,6 +36,11 @@ vi.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 
+vi.mock("@/features/auth", () => ({
+  AuthModal: ({ isOpen }: { isOpen: boolean }) =>
+    isOpen ? <div role="dialog" aria-label="Auth modal" /> : null,
+}));
+
 const mockUsePathname = vi.fn(() => "/");
 const mockRouterPush = vi.fn();
 
@@ -119,7 +124,17 @@ describe("PublicNavigation", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Account: Guest" }));
     expect(screen.getByRole("menuitem", { name: "Settings" })).toHaveAttribute("href", "/settings");
-    expect(screen.getByRole("menuitem", { name: "Sign In" })).toHaveAttribute("href", "/sign-in");
+    expect(screen.getByRole("menuitem", { name: "Sign In" })).toBeInTheDocument();
+  });
+
+  it("opens the auth modal from the guest account menu", () => {
+    render(<PublicNavigation />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Account: Guest" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Sign In" }));
+
+    expect(screen.getByRole("dialog", { name: "Auth modal" })).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "Sign In" })).not.toBeInTheDocument();
   });
 
   it("exposes Admin Dashboard only when backend-derived access exists", () => {
