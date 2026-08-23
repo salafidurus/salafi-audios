@@ -20,10 +20,11 @@ describe("ThemeSync", () => {
     expect(document.documentElement).toHaveAttribute("data-accent-theme", "parchment");
   });
 
-  it("applies a stored accent theme on mount", () => {
+  it("resolves the accent theme from the stored light/dark mode", () => {
     setAccent("midnight");
+    setMode("light");
     render(<ThemeSync />);
-    expect(document.documentElement).toHaveAttribute("data-accent-theme", "midnight");
+    expect(document.documentElement).toHaveAttribute("data-accent-theme", "parchment");
   });
 
   it("keeps applying the light/dark mode preference", () => {
@@ -44,7 +45,8 @@ describe("ThemeSync", () => {
   it("re-applies the accent theme when an accent-theme-change event fires", () => {
     render(<ThemeSync />);
     setAccent("ember");
+    setMode("dark");
     window.dispatchEvent(new Event(ACCENT_THEME_CHANGE_EVENT));
-    expect(document.documentElement).toHaveAttribute("data-accent-theme", "ember");
+    expect(document.documentElement).toHaveAttribute("data-accent-theme", "midnight");
   });
 });

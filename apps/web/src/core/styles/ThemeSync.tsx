@@ -7,7 +7,6 @@ import { hasWindow } from "@/shared/lib/runtime-guards";
 import {
   ACCENT_THEME_CHANGE_EVENT,
   getDefaultAccentTheme,
-  getAccentThemePreference,
   isAccentThemeId,
 } from "./theme/accent-theme";
 
@@ -24,8 +23,7 @@ function applyTheme(preference: ThemePreference, mediaQuery: MediaQueryList) {
 }
 
 function applyAccentTheme() {
-  const preference = getAccentThemePreference();
-  document.documentElement.setAttribute("data-accent-theme", preference);
+  document.documentElement.setAttribute("data-accent-theme", getDefaultAccentTheme());
 }
 
 function syncAccentTheme() {

@@ -4,12 +4,9 @@ import { useState, useCallback, useEffect } from "react";
 import { z } from "zod";
 
 import type { ThemePreference } from "@/core/styles/ThemeSync";
-import type { AccentThemePickerValue } from "@/features/settings/components/accent-theme-picker/AccentThemePicker";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { getDefaultAccentTheme, setAccentThemePreference } from "@/core/styles/theme/accent-theme";
 import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
-import { AccentThemePicker } from "@/features/settings/components/accent-theme-picker/AccentThemePicker";
 import { SegmentedControl } from "@/features/settings/components/SegmentedControl/SegmentedControl";
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
@@ -60,27 +57,10 @@ function loadThemePreference(): ThemePreference {
   return "system";
 }
 
-function loadAccentThemePreference(): AccentThemePickerValue {
-  if (!hasWindow()) {
-    return "system";
-  }
-
-  const stored = window.localStorage.getItem("accent-theme:v1");
-  if (stored === "parchment" || stored === "midnight") {
-    return stored;
-  }
-  if (stored === "manuscript" || stored === "ember") {
-    return "midnight";
-  }
-
-  return "system";
-}
-
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"general" | "profile">("general");
   const [themePreference, setThemePreference] = useState<ThemePreference>(loadThemePreference);
-  const [accentTheme, setAccentTheme] = useState<AccentThemePickerValue>(loadAccentThemePreference);
   const [notif, setNotif] = useState<NotificationState>(loadNotifState);
 
   const themeOptions: { value: ThemePreference; label: string }[] = [
@@ -93,17 +73,6 @@ export function SettingsGeneralScreen() {
     setThemePreference(value);
     localStorage.setItem(THEME_KEY, value);
     window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
-  }, []);
-
-  const handleAccentThemeChange = useCallback((value: AccentThemePickerValue) => {
-    setAccentTheme(value);
-    if (value === "system") {
-      window.localStorage.removeItem("accent-theme:v1");
-      void getDefaultAccentTheme();
-      window.dispatchEvent(new Event("accent-theme-change"));
-    } else {
-      setAccentThemePreference(value);
-    }
   }, []);
 
   const handleNotifChange = useCallback(
@@ -175,22 +144,17 @@ export function SettingsGeneralScreen() {
               "Try each theme and keep whichever feels most comfortable — this updates the whole app live.",
             )}
           </p>
-          {accentTheme === "system" && (
-            <SettingsRow
-              label={t("settings.general.theme", "Theme")}
-              sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
-            >
-              <SegmentedControl
-                options={themeOptions}
-                value={themePreference}
-                onChange={handleThemeChange}
-                ariaLabel={t("settings.general.themeAria", "Theme preference")}
-              />
-            </SettingsRow>
-          )}
-          <div className={styles.accentPicker}>
-            <AccentThemePicker value={accentTheme} onChange={handleAccentThemeChange} />
-          </div>
+          <SettingsRow
+            label={t("settings.general.theme", "Theme")}
+            sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
+          >
+            <SegmentedControl
+              options={themeOptions}
+              value={themePreference}
+              onChange={handleThemeChange}
+              ariaLabel={t("settings.general.themeAria", "Theme preference")}
+            />
+          </SettingsRow>
 
           <p className={styles.sectionLabel}>
             {t("settings.general.notifSection", "NOTIFICATIONS")}

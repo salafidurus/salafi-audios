@@ -81,10 +81,6 @@
   width: 100%;
 }
 
-.accentPicker {
-  margin-block: var(--space-scale-sm) var(--space-scale-lg);
-}
-
 @media (max-width: 900px) {
   .tabsViewport {
     width: 100%;
