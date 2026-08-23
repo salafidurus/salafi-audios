@@ -1,6 +1,6 @@
 .metricsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-component-gap-md);
 }
 
@@ -14,49 +14,147 @@
 .panel {
   height: 100%;
 }
+
 .metric {
   display: block;
-  font-size: var(--typo-display-lg-font-size);
+  color: var(--content-strong);
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
+
+.metricRow {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: 3rem;
+}
+
+.cardIcon,
+.cardLink {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 0.75rem;
+}
+
+.cardIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--action-primary);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+}
+
+.cardIcon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  stroke-width: 1.75;
+}
+
+.cardLink {
+  color: var(--content-muted);
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.cardLink svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
 .muted {
   color: var(--content-muted);
 }
+
 .activityList {
   display: grid;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   list-style: none;
   margin: 0;
   padding: 0;
 }
+
 .activityLink {
   display: grid;
   gap: var(--space-xs);
+  padding: var(--space-sm);
+  border-radius: 0.75rem;
   color: inherit;
   text-decoration: none;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
 }
+
 .activityLink:hover {
-  color: var(--action-primary);
+  color: var(--content-strong);
+  background: var(--surface-hover);
 }
+
+.activityTitle {
+  color: var(--content-strong);
+  font-weight: 600;
+}
+
 .activityLink small {
   color: var(--content-muted);
 }
 
 .sectionCard {
   display: block;
-  text-decoration: none;
+  border-radius: 0.75rem;
   color: inherit;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.sectionCard:hover {
+  transform: translateY(-2px);
+}
+
+.sectionCard:hover .cardLink {
+  color: var(--action-primary);
+  transform: translate(2px, -2px);
+}
+
+.sectionCard:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 4px;
 }
 
 @media (max-width: 640px) {
   .metricsGrid {
-    display: flex;
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: var(--space-component-gap-sm);
   }
 
   .columns {
     grid-template-columns: 1fr;
     margin-top: var(--space-md);
+  }
+}
+
+@media (min-width: 641px) and (max-width: 960px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sectionCard,
+  .cardLink,
+  .activityLink {
+    transition: none;
+  }
+
+  .sectionCard:hover,
+  .sectionCard:hover .cardLink {
+    transform: none;
   }
 }
