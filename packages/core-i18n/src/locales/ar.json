@@ -94,6 +94,18 @@
     "primarySidebar": "الشريط الجانبي الرئيسي",
     "mainNav": "التنقل الرئيسي",
     "searchAnything": "ابحث عن أي شيء",
+    "searchCatalog": "البحث في الفهرس",
+    "searchCatalogDescription": "ابحث عن الموضوعات والعلماء والقوائم.",
+    "searchCatalogPlaceholder": "ابحث عن موضوع أو عالم أو قائمة",
+    "searchCatalogLoading": "جارٍ تحميل الفهرس",
+    "searchCatalogEmpty": "لا توجد نتائج في الفهرس",
+    "searchCatalogHint": "اكتب للبحث في محتوى الفهرس العام",
+    "searchCatalogScholarMetadata": "{{count}} قائمة",
+    "searchCatalogType": {
+      "topic": "موضوع",
+      "scholar": "عالم",
+      "listing": "قائمة"
+    },
     "backToApp": "العودة إلى التطبيق",
     "adminDashboard": "لوحة الإدارة",
     "adminWorkspace": "مساحة الإدارة",
