@@ -101,6 +101,8 @@
     "collapseSidebar": "طيّ الشريط الجانبي",
     "siteFooter": "تذييل الموقع",
     "languageSwitch": "تغيير اللغة",
+    "switchToDark": "التبديل إلى الوضع الداكن",
+    "switchToLight": "التبديل إلى الوضع الفاتح",
     "settings": "الإعدادات",
     "keepYourPlace": "احفظ مكانك",
     "keepYourPlaceDesc": "سجّل الدخول لمزامنة التقدّم والدروس المحفوظة عبر أجهزتك.",

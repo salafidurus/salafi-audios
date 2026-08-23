@@ -350,10 +350,6 @@ export function PublicNavigation() {
   const items = (isAdminWorkspace ? getAdminNavItems(t) : getPublicNavItems(t)).filter(
     (item) => !isAdminWorkspace || !item.isVisible || item.isVisible(ability),
   );
-  const activeAdminItem = isAdminWorkspace
-    ? items.find((item) => isActivePath(pathname, item.href))
-    : undefined;
-
   const isCompact = isMobile || isTablet;
   const isRtl = i18n.dir() === "rtl";
 
@@ -425,15 +421,6 @@ export function PublicNavigation() {
           </div>
         )}
       </div>
-      {isAdminWorkspace && (
-        <nav className={styles.breadcrumbs} aria-label={t("navigation.breadcrumbs", "Breadcrumbs")}>
-          <Link href={routes.admin.index}>{t("navigation.adminWorkspace", "Admin workspace")}</Link>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">
-            {activeAdminItem?.label ?? t("navigation.admin.home", "Dashboard")}
-          </span>
-        </nav>
-      )}
     </header>
   );
 }

@@ -185,12 +185,7 @@ describe("PublicNavigation", () => {
       "/admin/contents",
     );
     expect(screen.getByRole("link", { name: "Contents" })).toHaveAttribute("aria-current", "page");
-    const breadcrumbs = screen.getByRole("navigation", { name: "Breadcrumbs" });
-    expect(within(breadcrumbs).getByRole("link", { name: "Admin workspace" })).toHaveAttribute(
-      "href",
-      "/admin",
-    );
-    expect(within(breadcrumbs).getByText("Contents")).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByRole("navigation", { name: "Breadcrumbs" })).not.toBeInTheDocument();
   });
 
   it("shows only admin destinations supported by the user's capabilities", () => {
