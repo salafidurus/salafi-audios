@@ -120,4 +120,22 @@ describe("AccessDialog TDD Spec", () => {
     // Verify focus remains on the element (React should perform in-place updates, not remount)
     expect(document.activeElement).toBe(writeToggle);
   });
+
+  it("renders a selected scholar below the scope selector after selection", async () => {
+    render(<AccessDialog userId="u1" userName="User One" onClose={() => {}} onSaved={() => {}} />);
+
+    const scholarSelectors = await screen.findAllByLabelText("Allowed Scholars (none means all)");
+    expect(scholarSelectors.length).toBeGreaterThan(0);
+
+    const firstScholarSelector = scholarSelectors[0]!;
+    const scopeTrigger = firstScholarSelector.parentElement?.querySelector("button");
+    expect(scopeTrigger).not.toBeNull();
+    if (!scopeTrigger) throw new Error("Expected a scholar selector trigger");
+    fireEvent.click(scopeTrigger);
+    fireEvent.change(firstScholarSelector, { target: { value: "Scholar A" } });
+    const option = await screen.findByText("Scholar A");
+    fireEvent.click(option);
+
+    expect(screen.getAllByRole("button", { name: "Remove Scholar A" }).length).toBeGreaterThan(0);
+  });
 });

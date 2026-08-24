@@ -11,11 +11,13 @@ import {
   endpoints,
 } from "@sd/core-contracts";
 import { useAccountProfile } from "@sd/domain-account";
-import { useEffect, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 
 import { fetchUserAccess, replaceUserAccess } from "@/features/admin/api/admin.api";
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import { Separator } from "@/shared/components/ui/separator";
 import { Switch as Toggle } from "@/shared/components/ui/switch";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
@@ -205,8 +207,8 @@ export function AccessDialog({
         delete nextCaps[cap];
       }
       const hasCaps = Object.keys(nextCaps).length > 0;
+      nextState.enabled = hasCaps;
       if (!hasCaps) {
-        nextState.enabled = false;
         nextState.scholarSlugs = [];
         nextState.locales = [];
       }
@@ -282,7 +284,8 @@ export function AccessDialog({
       isOpen
       onClose={onClose}
       title={`Manage access — ${userName}`}
-      width="standard"
+      width="wide"
+      contentClassName={styles.dialog}
       footer={
         <div className={styles.footerActions}>
           <Button variant="ghost" onClick={onClose} disabled={saving}>
@@ -294,73 +297,83 @@ export function AccessDialog({
         </div>
       }
     >
-      {error && (
-        <p className={styles.error} role="alert">
-          {error}
-        </p>
-      )}
-      {!snapshot ? (
-        <p className={styles.loading}>Loading access…</p>
-      ) : showProtectedWarning ? (
-        <p className={styles.emptyText}>
-          Superadmin access is protected and cannot be edited here.
-        </p>
-      ) : (
-        <div className={styles.container}>
-          <RolesBanner roles={getPreviewRoles(uiState, targetIsSuperadmin)} />
+      <Modal.Body className={styles.body}>
+        {error && (
+          <Alert variant="destructive" className={styles.error}>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {!snapshot ? (
+          <p className={styles.loading}>Loading access…</p>
+        ) : showProtectedWarning ? (
+          <p className={styles.emptyText}>
+            Superadmin access is protected and cannot be edited here.
+          </p>
+        ) : (
+          <div className={styles.container}>
+            <RolesBanner roles={getPreviewRoles(uiState, targetIsSuperadmin)} />
 
-          {/* Superadmin toggle row */}
-          {currentUserIsSuperadmin && (
-            <div className={styles.row}>
-              <div className={styles.rowHeader}>
-                <div className={styles.rowMeta}>
-                  <div className={styles.rowLabelSection}>
-                    <span className={styles.rowTitle}>Super Admin (Full Access)</span>
-                    <span className={styles.rowDesc}>
-                      Grants unrestricted administrative access to the entire platform. Superadmins
-                      can modify other administrators and manage global system settings.
-                    </span>
+            {/* Superadmin toggle row */}
+            {currentUserIsSuperadmin && (
+              <div className={styles.row}>
+                <div className={styles.rowHeader}>
+                  <div className={styles.rowMeta}>
+                    <div className={styles.rowLabelSection}>
+                      <span className={styles.rowTitle}>Super Admin (Full Access)</span>
+                      <span className={styles.rowDesc}>
+                        Grants unrestricted administrative access to the entire platform.
+                        Superadmins can modify other administrators and manage global system
+                        settings.
+                      </span>
+                    </div>
                   </div>
+                  <Toggle
+                    checked={targetIsSuperadmin}
+                    onChange={setTargetIsSuperadmin}
+                    disabled={saving}
+                    aria-label="Toggle super admin access"
+                  />
                 </div>
-                <Toggle
-                  checked={targetIsSuperadmin}
-                  onChange={setTargetIsSuperadmin}
-                  disabled={saving}
-                  aria-label="Toggle super admin access"
-                />
               </div>
-            </div>
-          )}
+            )}
 
-          {targetRowConfigs.map((config) => {
-            const targetState = uiState[config.target];
-            return (
-              <PermissionRow
-                key={config.target}
-                title={config.title}
-                description={config.description}
-                target={config.target}
-                enabled={targetState.enabled}
-                capabilities={capabilitiesList(config.target)}
-                selectedCapabilities={targetState.capabilities}
-                scholarOptions={scholarOptions}
-                selectedScholars={targetState.scholarSlugs}
-                localeOptions={SUPPORTED_LOCALES}
-                selectedLocales={targetState.locales}
-                saving={saving}
-                onToggleTarget={(checked) => handleToggleTarget(config.target, checked)}
-                onToggleCapability={(cap, checked) =>
-                  handleToggleCapability(config.target, cap, checked)
-                }
-                onUpdateScholars={(slugs) =>
-                  handleUpdateScope(config.target, "scholarSlugs", slugs)
-                }
-                onUpdateLocales={(locales) => handleUpdateScope(config.target, "locales", locales)}
-              />
-            );
-          })}
-        </div>
-      )}
+            {currentUserIsSuperadmin && <Separator />}
+
+            {targetRowConfigs.map((config, index) => {
+              const targetState = uiState[config.target];
+              return (
+                <Fragment key={config.target}>
+                  <PermissionRow
+                    key={`${config.target}-${targetState.enabled}`}
+                    title={config.title}
+                    description={config.description}
+                    target={config.target}
+                    enabled={targetState.enabled}
+                    capabilities={capabilitiesList(config.target)}
+                    selectedCapabilities={targetState.capabilities}
+                    scholarOptions={scholarOptions}
+                    selectedScholars={targetState.scholarSlugs}
+                    localeOptions={SUPPORTED_LOCALES}
+                    selectedLocales={targetState.locales}
+                    saving={saving}
+                    onToggleTarget={(checked) => handleToggleTarget(config.target, checked)}
+                    onToggleCapability={(cap, checked) =>
+                      handleToggleCapability(config.target, cap, checked)
+                    }
+                    onUpdateScholars={(slugs) =>
+                      handleUpdateScope(config.target, "scholarSlugs", slugs)
+                    }
+                    onUpdateLocales={(locales) =>
+                      handleUpdateScope(config.target, "locales", locales)
+                    }
+                  />
+                  {index < targetRowConfigs.length - 1 && <Separator />}
+                </Fragment>
+              );
+            })}
+          </div>
+        )}
+      </Modal.Body>
     </Modal>
   );
 }

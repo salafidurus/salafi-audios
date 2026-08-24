@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Button } from "@/shared/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from "@/shared/components/ui/empty";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { Table, TableBody, TableHeader } from "@/shared/components/ui/table";
 
 import { List } from "../List";
 import styles from "./InfiniteScrollList.module.css";
@@ -31,6 +32,10 @@ export interface InfiniteScrollListProps<TData> {
   emptyMessage?: string;
   /** Message when an error occurs */
   errorMessage?: string;
+  /** Optional table layout for tabular data. */
+  layout?: "list" | "table";
+  /** Header row rendered when using the table layout. */
+  tableHeader?: ReactNode;
 }
 
 const ItemWithIdSchema = z.object({
@@ -49,6 +54,8 @@ export function InfiniteScrollList<TData>({
   isFetchingNextPage,
   emptyMessage = "No items found",
   errorMessage = "Failed to load content. Please try again.",
+  layout = "list",
+  tableHeader,
 }: InfiniteScrollListProps<TData>): ReactNode {
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -95,14 +102,52 @@ export function InfiniteScrollList<TData>({
 
   if (data.length === 0) {
     return (
-      <Empty className={styles.empty}>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <BookOpen aria-hidden="true" />
-          </EmptyMedia>
-          <EmptyDescription>{emptyMessage}</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <>
+        <Empty className={styles.empty}>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <BookOpen aria-hidden="true" />
+            </EmptyMedia>
+            <EmptyDescription>{emptyMessage}</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+        {hasMore && (
+          <div
+            ref={observerTarget}
+            className={styles.sentinel}
+            data-testid="infinite-scroll-sentinel"
+          />
+        )}
+        {hasMore && isFetchingNextPage && <div className={styles.loadingMore}>Loading more…</div>}
+      </>
+    );
+  }
+
+  if (layout === "table") {
+    return (
+      <>
+        <Table>
+          {tableHeader && <TableHeader>{tableHeader}</TableHeader>}
+          <TableBody>
+            {data.map((item, itemIndex) => (
+              <Fragment
+                key={(() => {
+                  const parsed = ItemWithIdSchema.safeParse(item);
+                  return parsed.success ? String(parsed.data.id) : String(itemIndex);
+                })()}
+              >
+                {renderItem(item, itemIndex)}
+              </Fragment>
+            ))}
+          </TableBody>
+        </Table>
+        <div
+          ref={observerTarget}
+          className={styles.sentinel}
+          data-testid="infinite-scroll-sentinel"
+        />
+        {isFetchingNextPage && <div className={styles.loadingMore}>Loading more…</div>}
+      </>
     );
   }
 
@@ -121,7 +166,11 @@ export function InfiniteScrollList<TData>({
       ))}
 
       {/* Intersection observer target for loading more */}
-      <div ref={observerTarget} className={styles.sentinel} />
+      <div
+        ref={observerTarget}
+        className={styles.sentinel}
+        data-testid="infinite-scroll-sentinel"
+      />
       {isFetchingNextPage && <div className={styles.loadingMore}>Loading more…</div>}
     </List>
   );
