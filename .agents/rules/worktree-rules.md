@@ -65,8 +65,9 @@ git push -u origin <branch-name>
 gh pr create --title "Short description of change" --body-file <pr-body-file>
 ```
 
-The PR body must include a GitHub closing reference (`Closes #<issue>`) for
-each implementation issue.
+When an implementation issue exists, the PR body must include a GitHub closing
+reference (`Closes #<issue>`) for each implementation issue. If no issue exists,
+omit the closing reference and state that no issue was available.
 
 ## Cleanup & Deletion Workflow
 

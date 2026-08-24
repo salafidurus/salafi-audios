@@ -20,14 +20,16 @@ minimal body:
 
 ## Issue/spec references
 
-Closes #<issue>
+<!-- Include `Closes #<issue>` when this work has an implementation issue. -->
 
 ## Risks, migrations, or follow-up work
 ```
 
-Use the actual issue/spec numbers and verify that the PR's head branch and
-commit match the intended worktree. If risks or follow-up work are identified,
-ask whether they should be drilled further into a new specification or ticket
+Use the actual issue/spec numbers. If an implementation issue exists, include
+`Closes #<issue>` for it; when no issue exists, omit the closing reference and
+state that no issue was available. Verify that the PR's head branch and commit
+match the intended worktree. If risks or follow-up work are identified, ask
+whether they should be drilled further into a new specification or ticket
 before finalizing the PR.
 
 Push and open or update the PR according to the repository worktree rules.
