@@ -4,17 +4,6 @@
   gap: var(--space-component-gap-md);
 }
 
-.columns {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-component-gap-md);
-  margin-top: var(--space-layout-section-y);
-}
-
-.panel {
-  height: 100%;
-}
-
 .metric {
   display: block;
   color: var(--content-strong);
@@ -66,44 +55,6 @@
   height: 1.1rem;
 }
 
-.muted {
-  color: var(--content-muted);
-}
-
-.activityList {
-  display: grid;
-  gap: var(--space-xs);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.activityLink {
-  display: grid;
-  gap: var(--space-xs);
-  padding: var(--space-sm);
-  border-radius: 0.75rem;
-  color: inherit;
-  text-decoration: none;
-  transition:
-    background-color 180ms ease,
-    color 180ms ease;
-}
-
-.activityLink:hover {
-  color: var(--content-strong);
-  background: var(--surface-hover);
-}
-
-.activityTitle {
-  color: var(--content-strong);
-  font-weight: 600;
-}
-
-.activityLink small {
-  color: var(--content-muted);
-}
-
 .sectionCard {
   display: block;
   border-radius: 0.75rem;
@@ -133,11 +84,6 @@
     grid-template-columns: 1fr;
     gap: var(--space-component-gap-sm);
   }
-
-  .columns {
-    grid-template-columns: 1fr;
-    margin-top: var(--space-md);
-  }
 }
 
 @media (min-width: 641px) and (max-width: 960px) {
@@ -148,8 +94,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sectionCard,
-  .cardLink,
-  .activityLink {
+  .cardLink {
     transition: none;
   }
 

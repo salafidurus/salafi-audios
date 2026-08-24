@@ -128,7 +128,7 @@ describe("AdminDashboardScreen", () => {
     expect(screen.queryByRole("link", { name: /users/i })).not.toBeInTheDocument();
   });
 
-  it("renders real pending work and recent activity", () => {
+  it("renders the dashboard metrics without auxiliary activity panels", () => {
     (useAbility as Mock<any>).mockReturnValue({
       ability: createMongoAbility([{ action: "read", subject: "Listing" }]),
       isLoading: false,
@@ -162,7 +162,8 @@ describe("AdminDashboardScreen", () => {
 
     render(<AdminDashboardScreen />);
 
-    expect(screen.getByText("Needs review")).toBeInTheDocument();
-    expect(screen.getByText("Recent lesson")).toBeInTheDocument();
+    expect(screen.getByText("1")).toBeInTheDocument();
+    expect(screen.queryByText("Needs review")).not.toBeInTheDocument();
+    expect(screen.queryByText("Recent lesson")).not.toBeInTheDocument();
   });
 });

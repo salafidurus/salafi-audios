@@ -10,7 +10,6 @@ import { fetchAdminDashboard } from "@/features/admin/api/admin-dashboard.api";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { Badge } from "@/shared/components/ui/badge";
 import {
   Card,
   CardAction,
@@ -183,75 +182,6 @@ export function AdminDashboardScreen() {
                 </a>
               );
             })}
-          </div>
-
-          <div className={styles.columns}>
-            <Card className={styles.panel}>
-              <CardHeader>
-                <CardTitle id="admin-pending-heading">
-                  {t("admin.dashboard.pendingTitle", "Pending work")}
-                </CardTitle>
-                <CardDescription>
-                  {t("admin.dashboard.pendingDescription", "Items that may need your attention.")}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {dashboardQuery.data.pendingWork.length === 0 ? (
-                  <p className={styles.muted}>
-                    {t("admin.dashboard.pendingEmpty", "Nothing is waiting for review.")}
-                  </p>
-                ) : (
-                  <ul className={styles.activityList}>
-                    {dashboardQuery.data.pendingWork.map((item) => (
-                      <li key={item.id}>
-                        <a href={item.href} className={styles.activityLink}>
-                          <span className={styles.activityTitle}>{item.title}</span>
-                          <small>
-                            {item.scholarName} · <Badge variant="secondary">{item.status}</Badge>
-                          </small>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </CardContent>
-            </Card>
-            <Card className={styles.panel}>
-              <CardHeader>
-                <CardTitle id="admin-activity-heading">
-                  {t("admin.dashboard.activityTitle", "Recent activity")}
-                </CardTitle>
-                <CardDescription>
-                  {t("admin.dashboard.activityDescription", "The latest changes in your scope.")}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {dashboardQuery.data.activity.length === 0 ? (
-                  <p className={styles.muted}>
-                    {t("admin.dashboard.activityEmpty", "No recent activity is available.")}
-                  </p>
-                ) : (
-                  <ul className={styles.activityList}>
-                    {dashboardQuery.data.activity.map((item) => (
-                      <li key={`${item.type}-${item.id}`}>
-                        <a href={item.href} className={styles.activityLink}>
-                          <span className={styles.activityTitle}>{item.title}</span>
-                          <small>
-                            {item.subtitle ?? item.type}
-                            {item.status ? (
-                              <>
-                                {" · "}
-                                <Badge variant="secondary">{item.status}</Badge>
-                              </>
-                            ) : null}
-                          </small>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </CardContent>
-            </Card>
           </div>
         </>
       ) : (
