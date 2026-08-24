@@ -1,47 +1,48 @@
 ---
 name: implement-spec
-description: "Implement a specification in code."
+description: "Study a specification, select its ticket frontier, and drive each ticket lifecycle."
 disable-model-invocation: true
 ---
 
-You have been provided a spec. This spec should have tickets associated with it, describing how to implement the spec.
+You have been provided a specification with implementation tickets. Study the
+specification and perform a deep context evaluation before selecting work.
 
-The goal is a PR which implements the entire spec on a single branch.
+The tickets form a task graph with blocking relationships. Maintain the
+frontier of unblocked tickets and process tickets in dependency order. This
+skill does not implement the specification as one undifferentiated task.
 
-The tickets are not a list of steps. They are a **task graph** with blocking relationships between them. This means there is always a **frontier** of tickets which are ready to be grabbed.
+Before editing, read the root and nearest workspace `AGENT.md` files, the `tdd`
+skill, and `.agents/rules/worktree-rules.md`. Every ticket cycle follows those
+canonical rules.
 
-Before editing, read the repository instructions in `AGENT.md`, the nearest
-app/package `AGENT.md`, `.agents/rules/tdd-rules.md`, and
-`.agents/rules/worktree-rules.md`. Every implementer and merger must follow
-those canonical rules for its own worktree and commits.
+## Workflow
 
-Communication to and from subagents should be sparse. Communicate primarily through **context pointers**: to the spec, tickets, research notes, and previous commits. Don't duplicate information already available via pointers.
+1. Read the specification, every relevant ticket and comment, labels,
+   acceptance criteria, and dependency edges.
+2. Evaluate the affected code, domain contexts, architecture documents, ADRs,
+   tests, package boundaries, and platform constraints.
+3. Select one unblocked implementation ticket.
+4. Run the complete ticket lifecycle:
 
-**Implementer subagents** should be run in the background where possible for **maximum concurrency**.
+   `pre-implement → implement → code-review → post-implement`
 
-## Steps
+   `pre-implement` studies the parent specification but plans only the selected
+   ticket. `implement` executes that approved plan in the correct checkout or
+   worktree. `code-review` reviews the result. `post-implement` prepares the PR
+   and performs cleanup only after merge.
 
-1. Read the spec and tickets. Read enough to understand the task graph.
+5. Recompute the frontier after the ticket completes, preserving context
+   pointers to its PR, commits, decisions, and follow-up work.
+6. Repeat until all required tickets are complete, then verify the
+   specification's acceptance criteria and final issue state.
 
-2. (optional) Use an **exploration subagent** to conduct any exploration required by the tickets - relevant codebase files or external documentation. Ensure the exploration subagent can save files - it should save its markdown notes in a directory outside the repo, accessible by all future subagents. This lets **implementer subagents** focus on implementation rather than exploration.
+Communication to and from subagents should be sparse. Use context pointers to
+the specification, tickets, research, plans, and previous commits instead of
+duplicating their contents.
 
-3. Create a branch, and a draft PR. The PR body must contain GitHub closing
-   references such as `Closes #123` for the spec issue and tickets.
+## Completion
 
-4. Use **implementer subagents** to implement each ticket. Each implementer subagent should work in its own worktree, on its own branch.
-
-5. Once an **implementer subagent** completes, merge its work to the PR branch with a **merger subagent**.
-
-6. If this changes the **frontier** of available tickets, kick off more **implementer subagents** to work on the new tickets. This allows for maximum concurrency.
-
-7. Once all tickets are complete, run /code-review on the PR branch. Fix all issues raised by the code review in a single **implementer subagent**.
-
-8. Mark the PR as ready for review.
-
-9. After merge, verify that the spec issue and tickets are closed. For every
-   completed issue, remove `ready-for-agent` with `gh issue edit <number>
---remove-label ready-for-agent`. If a merged PR did not close an issue
-   automatically, close it manually with `gh issue close` and comment with the
-   merged PR number. Then fast-forward local `main`, clean up all
-   **implementer subagent** worktrees and local branches, and verify the final
-   Git state according to `.agents/rules/worktree-rules.md`.
+Every required ticket has completed its own pre-implementation, implementation,
+review, and post-implementation lifecycle, and the specification's acceptance
+criteria have been verified. The specification umbrella is not itself treated
+as an executable ticket unless it explicitly has implementation scope.

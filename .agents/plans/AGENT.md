@@ -110,7 +110,7 @@ Define the checks that must happen after the last implementation stage. Examples
 
 ## Monorepo Rules
 
-See `.agents/rules/tdd-rules.md` for TDD workflow. See `.agents/skills/project-guardrails/SKILL.md` for architectural guardrails and package boundaries.
+See `.agents/skills/tdd/SKILL.md` for TDD workflow. See `.agents/skills/project-guardrails/SKILL.md` for architectural guardrails and package boundaries.
 
 ## Editing Discipline
 

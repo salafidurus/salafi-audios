@@ -40,7 +40,7 @@
 
 Foundational change first (theme layer), then its UI control (settings picker), then the app-wide restyle (chrome/shared, then screens), then verification. Each stage is independently reviewable and committable. Stages 4 and 5 may be split further during execution if they grow too large.
 
-**Working rules for every stage (TDD, per `.agents/rules/tdd-rules.md`):**
+**Working rules for every stage (TDD, per `.agents/skills/tdd/SKILL.md`):**
 
 - Red → green → refactor → commit. Write the failing spec before the implementation.
 - All new UI follows the repo conventions: CSS Modules + design-token CSS variables (never hardcoded colors/spacing/radius), named exports, no `Web`/`DesktopWeb` suffix, unified responsive pattern (`@media (max-width: 640px)` + `useIsDesktop()`), desktop-first.
