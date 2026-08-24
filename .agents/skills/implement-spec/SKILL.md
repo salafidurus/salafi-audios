@@ -11,9 +11,10 @@ The tickets form a task graph with blocking relationships. Maintain the
 frontier of unblocked tickets and process tickets in dependency order. This
 skill does not implement the specification as one undifferentiated task.
 
-Before editing, read the root and nearest workspace `AGENT.md` files, the `tdd`
-skill, and `.agents/rules/worktree-rules.md`. Every ticket cycle follows those
-canonical rules.
+Before editing, read the root and nearest workspace `AGENT.md` files and the
+`tdd` skill. Every ticket cycle follows the `pre-implement`, `implement`, and
+`post-implement` lifecycle skills for checkout, setup, verification, and
+delivery.
 
 ## Workflow
 
@@ -37,7 +38,7 @@ canonical rules.
    specification's acceptance criteria and final issue state.
 
 Communication to and from subagents should be sparse. Use context pointers to
-the specification, tickets, research, plans, and previous commits instead of
+the specification, tickets, research, and previous commits instead of
 duplicating their contents.
 
 ## Completion
