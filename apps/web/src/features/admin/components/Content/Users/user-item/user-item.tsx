@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { useAbility } from "@sd/domain-account";
 import { Copy, ShieldCog } from "lucide-react";
+import { useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { List } from "@/shared/components/List";
@@ -24,9 +25,13 @@ export type UserItemProps = {
 export function UserItem({ user, onManageAccess, layout = "list" }: UserItemProps): ReactNode {
   const { isMobile } = useResponsive();
   const isCompact = isMobile;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { ability } = useAbility();
   const displayName = user.name || t("admin.users.unnamed", "Unnamed user");
+  const joinDateFormatter = useMemo(
+    () => new Intl.DateTimeFormat(i18n.language, { timeZone: "UTC" }),
+    [i18n.language],
+  );
 
   const copyEmail = () => {
     void navigator.clipboard?.writeText(user.email);
@@ -85,7 +90,7 @@ export function UserItem({ user, onManageAccess, layout = "list" }: UserItemProp
     return (
       <TableRow>
         <TableCell className={styles.tableUserCell}>{userContent}</TableCell>
-        <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+        <TableCell>{joinDateFormatter.format(new Date(user.createdAt))}</TableCell>
         <TableCell>
           <div className={styles.rolesList}>{rolesContent}</div>
         </TableCell>

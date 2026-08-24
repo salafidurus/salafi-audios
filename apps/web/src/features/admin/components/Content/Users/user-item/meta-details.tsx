@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
 
+import { useMemo } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 
 import styles from "./meta-details.module.css";
@@ -16,7 +19,12 @@ type MetaDetailsProps = {
 };
 
 export function MetaDetails({ user, showJoinedDate = true }: MetaDetailsProps): ReactNode {
-  const joinDate = new Date(user.createdAt).toLocaleDateString();
+  const { i18n } = useTranslation();
+  const joinDateFormatter = useMemo(
+    () => new Intl.DateTimeFormat(i18n.language, { timeZone: "UTC" }),
+    [i18n.language],
+  );
+  const joinDate = joinDateFormatter.format(new Date(user.createdAt));
 
   return (
     <div className={styles.content}>
