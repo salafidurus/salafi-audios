@@ -510,7 +510,10 @@
     "dashboard": {
       "title": "Admin Dashboard",
       "titleMobile": "Admin",
+      "subtitle": "A focused view of the work and resources available to your role.",
       "loading": "Loading…",
+      "error": "The dashboard is unavailable right now. Try again later.",
+      "empty": "No dashboard data is available.",
       "noAccess": "You don't have any admin access.",
       "noAccessMobile": "No admin access.",
       "scholarsDesc": "Manage scholars, their profiles and visibility",

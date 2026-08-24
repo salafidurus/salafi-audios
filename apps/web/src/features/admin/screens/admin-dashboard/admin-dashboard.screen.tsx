@@ -1,14 +1,23 @@
 "use client";
 
-import type { AppActions, AppSubjectType } from "@sd/core-contracts";
-
-import { useAbility } from "@sd/domain-account";
+import { queryKeys, useApiQuery, type AppActions, type AppSubjectType } from "@sd/core-contracts";
+import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
+import { ArrowUpRight, BookOpen, FileText, Users, type LucideIcon } from "lucide-react";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { fetchAdminDashboard } from "@/features/admin/api/admin-dashboard.api";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 
 import styles from "./admin-dashboard.screen.module.css";
@@ -18,15 +27,30 @@ type AdminSection = {
   description: string;
   descriptionMobile: string;
   href: string;
-  action: AppActions;
-  subject: AppSubjectType;
+  subjects: AppSubjectType[];
+  icon: LucideIcon;
 };
+
+function canOpenAdminSection(
+  ability: ReturnType<typeof useAbility>["ability"],
+  section: AdminSection,
+) {
+  const adminActions: AppActions[] = ["read", "write", "publish", "delete", "create", "update"];
+  return section.subjects.some((subject) =>
+    subject === "User" || subject === "UserAccess"
+      ? ability.can("read", "User") || ability.can("manage", "UserAccess")
+      : adminActions.some((action) => ability.can(action, subject)),
+  );
+}
 
 export function AdminDashboardScreen() {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();
   const { isAuthenticated } = useAuth();
-  const { ability, isLoading } = useAbility({ isAuthenticated });
+  const { ability, isLoading: isAccessLoading } = useAbility({ isAuthenticated });
+  const dashboardQuery = useApiQuery(queryKeys.admin.dashboard(), fetchAdminDashboard, {
+    enabled: isAuthenticated && !isAccessLoading && hasAnyAdminAccess(ability),
+  });
 
   const adminSections: AdminSection[] = [
     {
@@ -37,8 +61,8 @@ export function AdminDashboardScreen() {
       ),
       descriptionMobile: t("admin.dashboard.scholarsDescMobile", "Manage scholars"),
       href: "/admin/scholars",
-      action: "read",
-      subject: "Scholar",
+      subjects: ["Scholar"],
+      icon: BookOpen,
     },
     {
       title: t("navigation.admin.contents", "Contents"),
@@ -48,20 +72,20 @@ export function AdminDashboardScreen() {
       ),
       descriptionMobile: t("admin.dashboard.contentsDescMobile", "Manage content"),
       href: "/admin/contents",
-      action: "read",
-      subject: "Listing",
+      subjects: ["Listing", "Topic"],
+      icon: FileText,
     },
     {
       title: t("navigation.admin.users", "Users"),
       description: t("admin.dashboard.usersDesc", "Manage admin users and access"),
       descriptionMobile: t("admin.dashboard.usersDescMobile", "Manage users"),
       href: "/admin/users",
-      action: "read",
-      subject: "User",
+      subjects: ["User", "UserAccess"],
+      icon: Users,
     },
   ];
 
-  if (isLoading) {
+  if (isAccessLoading || dashboardQuery.isLoading) {
     return (
       <ScreenView>
         <PageHeader
@@ -76,7 +100,28 @@ export function AdminDashboardScreen() {
     );
   }
 
-  const visibleSections = adminSections.filter((s) => ability.can(s.action, s.subject));
+  if (dashboardQuery.isError) {
+    return (
+      <ScreenView>
+        <PageHeader
+          title={
+            !isMobile
+              ? t("admin.dashboard.title", "Admin Dashboard")
+              : t("admin.dashboard.titleMobile", "Admin")
+          }
+        />
+        <EmptyState
+          variant="error"
+          message={t(
+            "admin.dashboard.error",
+            "The dashboard is unavailable right now. Try again later.",
+          )}
+        />
+      </ScreenView>
+    );
+  }
+
+  const visibleSections = adminSections.filter((section) => canOpenAdminSection(ability, section));
 
   return (
     <ScreenView>
@@ -86,6 +131,10 @@ export function AdminDashboardScreen() {
             ? t("admin.dashboard.title", "Admin Dashboard")
             : t("admin.dashboard.titleMobile", "Admin")
         }
+        subtitle={t(
+          "admin.dashboard.subtitle",
+          "A focused view of the work and resources available to your role.",
+        )}
       />
       {visibleSections.length === 0 ? (
         <EmptyState
@@ -95,17 +144,48 @@ export function AdminDashboardScreen() {
               : t("admin.dashboard.noAccessMobile", "No admin access.")
           }
         />
+      ) : dashboardQuery.data ? (
+        <>
+          <div className={styles.metricsGrid}>
+            {visibleSections.map((section) => {
+              const SectionIcon = section.icon;
+              const metric = section.subjects.includes("Scholar")
+                ? dashboardQuery.data.metrics.scholars
+                : section.subjects.includes("Listing")
+                  ? (dashboardQuery.data.metrics.listings ?? dashboardQuery.data.metrics.topics)
+                  : section.subjects.includes("Topic")
+                    ? dashboardQuery.data.metrics.topics
+                    : dashboardQuery.data.metrics.users;
+              return (
+                <a key={section.href} href={section.href} className={styles.sectionCard}>
+                  <Card size="sm">
+                    <CardHeader>
+                      <CardTitle>{section.title}</CardTitle>
+                      <CardDescription>
+                        {!isMobile ? section.description : section.descriptionMobile}
+                      </CardDescription>
+                      <CardAction>
+                        <span className={styles.cardIcon} aria-hidden="true">
+                          <SectionIcon />
+                        </span>
+                      </CardAction>
+                    </CardHeader>
+                    <CardContent>
+                      <div className={styles.metricRow}>
+                        <span className={styles.metric}>{metric ?? "—"}</span>
+                        <span className={styles.cardLink} aria-hidden="true">
+                          <ArrowUpRight />
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </a>
+              );
+            })}
+          </div>
+        </>
       ) : (
-        <div className={styles.grid}>
-          {visibleSections.map((section) => (
-            <a key={section.href} href={section.href} className={styles.sectionCard}>
-              <h2 className={styles.sectionTitle}>{section.title}</h2>
-              <p className={styles.sectionDescription}>
-                {!isMobile ? section.description : section.descriptionMobile}
-              </p>
-            </a>
-          ))}
-        </div>
+        <EmptyState message={t("admin.dashboard.empty", "No dashboard data is available.")} />
       )}
     </ScreenView>
   );
