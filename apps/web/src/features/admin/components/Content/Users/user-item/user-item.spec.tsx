@@ -53,7 +53,7 @@ describe("UserItem", () => {
     expect(screen.queryByRole("button", { name: "Manage Access" })).not.toBeInTheDocument();
   });
 
-  it("presents desktop user management as a dense row with status and secondary actions", () => {
+  it("presents desktop user management as a dense row with status and clear actions", () => {
     (useAbility as Mock<any>).mockReturnValue({
       ability: abilityWith((can) => can("manage", "UserAccess")),
       isLoading: false,
@@ -62,11 +62,7 @@ describe("UserItem", () => {
     render(<UserItem user={{ ...baseUser, roles: ["Editor"] }} onManageAccess={vi.fn()} />);
 
     expect(screen.getByTestId("admin-user-row")).toBeInTheDocument();
-    expect(screen.getByText("Active access")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Manage Access" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "More actions for Alice" })).toHaveAttribute(
-      "aria-haspopup",
-      "menu",
-    );
+    expect(screen.getByRole("button", { name: "Copy email for Alice" })).toBeInTheDocument();
   });
 });

@@ -12,9 +12,10 @@ type MetaDetailsProps = {
     roles: string[];
     createdAt: string;
   };
+  showJoinedDate?: boolean;
 };
 
-export function MetaDetails({ user }: MetaDetailsProps): ReactNode {
+export function MetaDetails({ user, showJoinedDate = true }: MetaDetailsProps): ReactNode {
   const joinDate = new Date(user.createdAt).toLocaleDateString();
 
   return (
@@ -30,7 +31,7 @@ export function MetaDetails({ user }: MetaDetailsProps): ReactNode {
           text={user.email}
           className="text-[var(--content-muted)] font-normal [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
         />
-        <div className={styles.joined}>Joined {joinDate}</div>
+        {showJoinedDate && <div className={styles.joined}>Joined {joinDate}</div>}
       </div>
     </div>
   );

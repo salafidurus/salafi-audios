@@ -585,6 +585,13 @@
     "users": {
       "title": "Manage Users",
       "titleMobile": "Users",
+      "description": "Review people and control who can manage the learning library.",
+      "filtersTitle": "Find users",
+      "filtersDescription": "Search by identity or narrow the list by role and access.",
+      "roleLabel": "Role",
+      "visibleUsers": "Visible users",
+      "adminAccess": "With admin access",
+      "directoryTitle": "User directory",
       "searchPlaceholder": "Search users by name or email...",
       "searchNoMatch": "No users match your search.",
       "noUsersFound": "No users found.",
@@ -592,6 +599,7 @@
       "unnamed": "Unnamed user",
       "moreActions": "More actions for {{name}}",
       "copyEmail": "Copy email",
+      "copyEmailFor": "Copy email for {{name}}",
       "statusLabel": "Access status",
       "status": {
         "active": "Active access",
@@ -603,6 +611,7 @@
       "columnsLabel": "User management columns",
       "columns": {
         "user": "User",
+        "joined": "Date joined",
         "status": "Access status",
         "roles": "Roles",
         "actions": "Actions"

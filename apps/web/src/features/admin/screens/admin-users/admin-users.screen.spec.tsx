@@ -42,19 +42,19 @@ vi.mock("@/shared/components/InfiniteScrollList", () => ({
     data,
     renderItem,
   }: {
-    data: unknown[];
+    data: { id: string }[];
     renderItem: (item: any) => React.ReactNode;
   }) => (
     <div>
-      {data.map((item, index) => (
-        <React.Fragment key={index}>{renderItem(item)}</React.Fragment>
+      {data.map((item) => (
+        <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
       ))}
     </div>
   ),
 }));
 
 describe("AdminUsersScreen", () => {
-  it("shows access status context and filters users without compressing the data model", () => {
+  it("keeps the user data intact while delegating role filtering to the query", () => {
     (useInfiniteAdminUsers as Mock<any>).mockReturnValue({
       data: {
         pages: [
@@ -74,11 +74,11 @@ describe("AdminUsersScreen", () => {
 
     render(<AdminUsersScreen />);
 
-    expect(screen.getByText("2 shown · 1 with admin access")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Filter by Has admin access" }));
+    expect(screen.getByRole("radio", { name: "Editor" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: "Editor" }));
 
-    expect(screen.getByText("1 shown · 1 with admin access")).toBeInTheDocument();
+    expect(useInfiniteAdminUsers).toHaveBeenLastCalledWith({ search: "", role: "editor" });
     expect(screen.getByText("Alice")).toBeInTheDocument();
-    expect(screen.queryByText("Bob")).not.toBeInTheDocument();
+    expect(screen.getByText("Bob")).toBeInTheDocument();
   });
 });

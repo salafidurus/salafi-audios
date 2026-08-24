@@ -5,7 +5,7 @@
 @media (min-width: 901px) {
   .item {
     display: grid;
-    grid-template-columns: minmax(18rem, 2fr) minmax(10rem, 1fr) minmax(12rem, 1fr) auto;
+    grid-template-columns: minmax(18rem, 2fr) minmax(12rem, 1fr) auto;
     align-items: center;
     gap: var(--space-component-gap-lg);
   }
@@ -46,67 +46,11 @@
   min-width: 0;
 }
 
-.status {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  padding: var(--space-scale-xs);
-  border-radius: var(--radius-scale-sm);
-  font-family: var(--font-sans);
-  font-size: var(--typo-xs-font-size);
-  font-weight: 600;
-}
-
-.statusActive {
-  color: var(--content-success);
-  background: var(--surface-success-subtle);
-}
-
-.statusInactive {
-  color: var(--content-muted);
-  background: var(--surface-subtle);
-}
-
-.secondaryActions {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.menu {
-  position: absolute;
-  z-index: 10;
-  inset-inline-end: 0;
-  top: calc(100% + var(--space-scale-xs));
-  padding: var(--space-scale-xs);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-scale-md);
-  background: var(--surface-default);
-  box-shadow: var(--shadow-md);
-}
-
-.menu button {
-  display: block;
-  width: 100%;
-  padding: var(--space-scale-xs) var(--space-scale-sm);
-  border: 0;
-  border-radius: var(--radius-scale-sm);
-  background: transparent;
-  color: var(--content-strong);
-  text-align: start;
-  cursor: pointer;
-}
-
-.menu button:hover,
-.menu button:focus-visible {
-  background: var(--surface-hover);
-  outline: none;
-}
-
 @media (max-width: 900px) {
   .item {
     flex-direction: column;
     align-items: flex-start;
+    gap: var(--space-scale-sm);
   }
 
   .actions {
@@ -117,11 +61,58 @@
   }
 }
 
+@media (min-width: 641px) and (max-width: 900px) {
+  .item {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-component-gap-md);
+    padding: var(--space-scale-md) var(--space-scale-lg);
+  }
+
+  .rolesList {
+    flex: 0 1 10rem;
+    margin-top: 0;
+  }
+
+  .actions {
+    width: auto;
+    margin-inline-start: 0;
+    margin-top: 0;
+    align-items: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-scale-sm);
+  }
+
+  .actions > :only-child {
+    grid-column: 1 / -1;
+  }
+}
+
 .rolesList {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-scale-xs);
   margin-top: var(--space-scale-xs);
+}
+
+.tableUserCell {
+  min-width: 18rem;
+}
+
+.tableActionsCell {
+  text-align: end;
+}
+
+.tableActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-scale-xs);
 }
 
 .roleBadge {
