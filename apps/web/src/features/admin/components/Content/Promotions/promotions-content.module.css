@@ -1,30 +1,34 @@
 .container {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-scale-2xl);
+  flex-wrap: wrap;
+  gap: var(--space-scale-lg);
+  width: min(100%, 960px);
   padding: var(--space-scale-md) 0;
-  max-width: 640px;
 }
 
 .section {
+  flex: 1 1 420px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-scale-md);
-  background: var(--surface-default);
+  background: var(--surface-subtle);
   border: var(--border-width-default) solid var(--border-default);
   border-radius: var(--radius-component-card);
-  padding: var(--space-scale-lg);
+  padding: var(--space-scale-xl);
+  box-shadow: var(--shadow-sm);
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
   gap: var(--space-scale-sm);
-  color: var(--content-strong);
+  color: var(--content-primary-strong);
+  padding-inline: 0;
 }
 
-.sectionHeader h2 {
-  font-size: var(--typo-title-md-font-size);
+.sectionHeader [data-slot="card-title"] {
+  font-size: var(--typo-title-lg-font-size);
   font-weight: 600;
   margin: 0;
 }
@@ -36,8 +40,17 @@
 .sectionDesc {
   font-size: var(--typo-body-sm-font-size);
   color: var(--content-muted);
+  max-width: 48ch;
   margin: -6px 0 var(--space-scale-xs) 0;
   line-height: 1.5;
+  padding-inline: 0;
+}
+
+.sectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-md);
+  padding-inline: 0;
 }
 
 .row {
@@ -73,8 +86,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-scale-md);
-  background: var(--surface-subtle);
-  border: var(--border-width-default) solid var(--border-subtle);
+  background: var(--surface-default);
+  border: var(--border-width-default) solid var(--border-default);
   border-radius: var(--radius-component-input);
   padding: var(--space-scale-md);
   margin: var(--space-scale-xs) 0;
@@ -120,10 +133,44 @@
 }
 
 .picksList {
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: var(--space-scale-xs);
   margin-top: var(--space-scale-xs);
+}
+
+.picksTable {
+  width: 100%;
+  margin-top: var(--space-scale-xs);
+}
+
+.picksTable th {
+  font-size: var(--typo-caption-font-size);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 2rem;
+  padding-inline: 0;
+  font-size: inherit;
+  font-weight: 700;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.picksTable .pickTitle,
+.picksTable .pickSub {
+  margin: 0;
+}
+
+.actionColumn {
+  width: 1%;
+  text-align: end;
+  white-space: nowrap;
 }
 
 .pickRow {
@@ -169,13 +216,7 @@
 }
 
 .removeButton {
-  background: transparent;
-  border: none;
   color: var(--content-muted);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: color 150ms ease, background-color 150ms ease;
 }
 
 .removeButton:hover {
@@ -193,15 +234,28 @@
 }
 
 .divider {
-  border: 0;
-  height: 1px;
-  background: var(--border-default);
-  margin: var(--space-scale-xs) 0;
+  flex: 0 0 100%;
+  margin: 0;
 }
 
 .footerActions {
+  flex: 0 0 100%;
   display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-md);
   margin-top: var(--space-scale-xs);
+  padding: var(--space-scale-md) 0 var(--space-scale-xl);
+}
+
+.feedback {
+  flex: 1;
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.feedback span {
+  display: block;
+  color: var(--state-danger-content);
 }
 
 .loading {
@@ -209,4 +263,51 @@
   color: var(--content-muted);
   text-align: center;
   padding: var(--space-scale-2xl);
+}
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-component-gap-md);
+  color: var(--state-danger-content);
+  text-align: center;
+  padding: var(--space-scale-2xl);
+}
+
+@media (max-width: 760px) {
+  .container {
+    gap: var(--space-scale-md);
+  }
+
+  .section {
+    flex-basis: 100%;
+    padding: var(--space-scale-lg);
+  }
+
+  .searchAddRow {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .searchAddRow :first-child {
+    flex: initial;
+  }
+
+  .picksTable {
+    display: none;
+  }
+
+  .picksList {
+    display: flex;
+  }
+
+  .footerActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .footerActions button {
+    width: 100%;
+  }
 }

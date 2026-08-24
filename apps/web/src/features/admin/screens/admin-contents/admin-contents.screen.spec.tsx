@@ -75,6 +75,42 @@ describe("AdminContentsScreen — topics tab access gates", () => {
     expect(screen.getByText("Add Topic")).toBeInTheDocument();
   });
 
+  it("exposes Content sections as accessible tabs", () => {
+    renderWithProviders(<AdminContentsScreen />);
+
+    expect(screen.getByRole("tablist", { name: "Content sections" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Listings" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel", { name: "Listings" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "Topics" }));
+
+    expect(screen.getByRole("tab", { name: "Topics" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel", { name: "Topics" })).toBeInTheDocument();
+  });
+
+  it("moves focus and selection with keyboard tab navigation", () => {
+    renderWithProviders(<AdminContentsScreen />);
+
+    const listingsTab = screen.getByRole("tab", { name: "Listings" });
+    fireEvent.keyDown(listingsTab, { key: "ArrowRight" });
+
+    const topicsTab = screen.getByRole("tab", { name: "Topics" });
+    expect(topicsTab).toHaveAttribute("aria-selected", "true");
+    expect(document.activeElement).toBe(topicsTab);
+  });
+
+  it("shows a denied state for Promotions when the user cannot write listings", () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Listing" }]),
+    });
+
+    renderWithProviders(<AdminContentsScreen />);
+    fireEvent.click(screen.getByRole("tab", { name: "Promotions" }));
+
+    expect(screen.getByRole("heading", { name: "Access Denied" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Save Curation" })).not.toBeInTheDocument();
+  });
+
   it("uses the correct query function to fetch topics", async () => {
     const { httpClient, endpoints, queryKeys } = require("@sd/core-contracts");
     (httpClient as Mock<any>).mockResolvedValue([]);
