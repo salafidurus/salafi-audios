@@ -4,7 +4,6 @@
  *
  * Skills / Plans — directory-level junctions:
  *   .agents/skills → .claude/skills, .opencode/skills, .gemini/skills (and per-app)
- *   .agents/plans  → .claude/plans,  .opencode/plans,  .gemini/plans  (and per-app)
  *   If the target already exists as a real directory, it is left in place (warn only).
  *
  * Rules — per-file symlinks inside existing dirs:
@@ -37,7 +36,6 @@ setPrefix("[SyncAgents]");
 const root = findMonorepoRoot();
 const AGENTS_DIR = join(root, ".agents");
 const SKILLS = join(AGENTS_DIR, "skills");
-const PLANS = join(AGENTS_DIR, "plans");
 const RULES = join(AGENTS_DIR, "rules");
 
 const TOOLS = [".claude", ".opencode", ".gemini"];
@@ -102,7 +100,6 @@ function linkDir(link, target) {
 // ── bootstrap ──────────────────────────────────────────────────────────────
 
 ensureDir(SKILLS);
-ensureDir(PLANS);
 ensureDir(RULES);
 
 // Root AGENT.md aliases
@@ -110,14 +107,14 @@ for (const alias of ["AGENTS.md", "CLAUDE.md", "GEMINI.md"]) {
   linkFile(join(root, alias), join(root, "AGENT.md"));
 }
 
-// Skills + plans — directory junctions per tool (root level)
+// Skills — directory junctions per tool (root level)
 for (const tool of TOOLS) {
   ensureDir(join(root, tool));
   linkDir(join(root, tool, "skills"), SKILLS);
-  linkDir(join(root, tool, "plans"), PLANS);
+  removeLink(join(root, tool, "plans"));
 }
 
-// Rules — directory junctions (same pattern as skills/plans)
+// Rules — directory junctions
 for (const tool of TOOLS) {
   ensureDir(join(root, tool));
   linkDir(join(root, tool, "rules"), RULES);
@@ -145,13 +142,13 @@ function syncLocalAgentTools(rootDir) {
         const toolDir = join(subDir, tool);
         ensureDir(toolDir);
         linkDir(join(toolDir, "skills"), join(agentsDir, "skills"));
-        linkDir(join(toolDir, "plans"), join(agentsDir, "plans"));
+        removeLink(join(toolDir, "plans"));
         linkDir(join(toolDir, "rules"), join(agentsDir, "rules"));
       }
     } else {
       // No local .agents/ — remove any stale tool dirs
       for (const tool of TOOLS) {
-        for (const sub of ["skills", "plans", "rules"]) {
+        for (const sub of ["skills", "rules"]) {
           const link = join(subDir, tool, sub);
           if (existsSync(link)) removeLink(link);
         }
