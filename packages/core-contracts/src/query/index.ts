@@ -78,6 +78,7 @@ export const queryKeys = {
   },
   admin: {
     all: ["admin"] as const,
+    dashboard: () => [...queryKeys.admin.all, "dashboard"] as const,
     users: {
       all: () => [...queryKeys.admin.all, "users"] as const,
       list: (query?: string, role?: string) =>

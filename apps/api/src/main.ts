@@ -4,7 +4,6 @@ import { AllExceptionsFilter } from './shared/errors/http-exception.filter';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
-import { Transport } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
@@ -118,13 +117,6 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
-
-  // TCP microservice listener — reserved for future microservice-based workers.
-  app.connectMicroservice({
-    transport: Transport.TCP,
-    options: { host: '127.0.0.1', port: 5001 },
-  });
-  await app.startAllMicroservices();
 
   await app.listen(config.PORT, '0.0.0.0');
 }
