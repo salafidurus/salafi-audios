@@ -12,6 +12,21 @@ cleanup.
 
 ## PR preparation
 
+Run the applicable post-work checks before publishing. The repository baseline
+is:
+
+```bash
+bun run build
+bun run lint
+bun run typecheck
+bun run test
+bun run test:e2e
+bun run doctor
+```
+
+Skip a check only when the plan records why it cannot apply. Diagnose failures
+against the pre-work baseline before pushing.
+
 Verify the implementation and review evidence, then prepare the PR with this
 minimal body:
 
@@ -32,7 +47,8 @@ match the intended worktree. If risks or follow-up work are identified, ask
 whether they should be drilled further into a new specification or ticket
 before finalizing the PR.
 
-Push and open or update the PR according to the repository worktree rules.
+Push the verified branch and open or update the PR. The branch must match the
+approved worktree and naming classification from `implement`.
 
 ## Merge-gated cleanup
 

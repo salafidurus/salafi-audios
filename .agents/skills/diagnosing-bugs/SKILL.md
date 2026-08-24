@@ -10,11 +10,13 @@ otherwise unexplained. Diagnosis establishes the cause and evidence. It does
 not authorize a code change; after diagnosis, apply the fix only when the user
 has requested implementation or the active ticket explicitly includes it.
 
-Before investigating, read the root and nearest workspace `AGENT.md`,
-`.agents/rules/worktree-rules.md`, and `CONTEXT.md` or relevant ADRs when they
-exist. Classify the work as an issue ticket, a specification investigation, or
-an untracked diagnosis. A specification selects tickets; diagnosis itself does
-not turn an umbrella specification into an implementation task.
+Before investigating, read the root and nearest workspace `AGENT.md`, and
+`CONTEXT.md` or relevant ADRs when they exist. Classify the work as an issue
+ticket, a specification investigation, or an untracked diagnosis. A
+specification selects tickets; diagnosis itself does not turn an umbrella
+specification into an implementation task. If an authorized fix requires code
+changes, hand it to the `pre-implement` and `implement` lifecycle so checkout,
+setup, and delivery follow one source of truth.
 
 ## 1. Build the feedback loop first
 

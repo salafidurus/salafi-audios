@@ -36,11 +36,10 @@ These rules are NON-NEGOTIABLE. Violations will be rejected.
 
 These `.agents/rules/` files contain always-on behavioral rules that complement these guardrails:
 
-| Rule file            | What it covers                                                  |
-| -------------------- | --------------------------------------------------------------- |
-| `worktree-rules.md`  | Git worktree creation, env copy, pre-work verification, cleanup |
-| `rtk-rules.md`       | CLI token optimization via RTK                                  |
-| `codegraph-rules.md` | Structural code search via CodeGraph                            |
+| Rule file            | What it covers                       |
+| -------------------- | ------------------------------------ |
+| `rtk-rules.md`       | CLI token optimization via RTK       |
+| `codegraph-rules.md` | Structural code search via CodeGraph |
 
 ## Git Discipline
 
@@ -130,8 +129,11 @@ Strict TDD is required. See `.agents/skills/tdd/SKILL.md` for the full workflow.
 
 ## Agent Worktree Enforcement
 
-- All AI agents must work inside a git worktree. See `.agents/rules/worktree-rules.md`.
-- Agents must either create a new worktree in the `.worktrees` folder, or ask the user if they should use one of the available worktrees or create a new one.
+The implementation lifecycle owns checkout policy: `pre-implement` classifies
+the required mode, `implement` selects and prepares the checkout, and
+`post-implement` performs merge-gated cleanup. Follow those skills for worktree
+creation, environment copying, dependency installation, verification, and
+resource deletion.
 
 ## Quick Commands
 

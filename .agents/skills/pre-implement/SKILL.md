@@ -22,7 +22,7 @@ Read and cross-reference:
 1. The ticket, comments, labels, dependencies, and acceptance criteria.
 2. The parent specification, when one exists.
 3. Root and nearest workspace `AGENT.md` files.
-4. Relevant `CONTEXT.md`, architecture documents, ADRs, and existing plans.
+4. Relevant `CONTEXT.md`, architecture documents, and ADRs.
 5. The current implementation, tests, public seams, package boundaries, and
    affected scripts.
 6. Platform-specific constraints, including whether the change touches
@@ -41,6 +41,9 @@ Produce a clear implementation plan in the conversation with:
 - Exact files/modules likely to change and why.
 - Test seams and a red → green vertical-slice sequence.
 - Native/worktree classification and platform validation.
+- Proposed worktree name and branch name when isolation is required.
+- Required environment-file copy, dependency-install, and pre-work verification
+  steps for the selected checkout.
 - Ordered implementation stages and completion criteria.
 - Risks, migrations, follow-up work, and unresolved decisions.
 
@@ -50,5 +53,6 @@ comment only when the user explicitly requests publication there.
 ## Completion
 
 Stop when every acceptance criterion maps to an implementation or test step,
-the worktree mode is classified, and no material scope decision remains hidden.
+the checkout mode, worktree/branch, setup, and validation steps are classified,
+and no material scope decision remains hidden.
 Wait for the user's approval before implementation begins.
