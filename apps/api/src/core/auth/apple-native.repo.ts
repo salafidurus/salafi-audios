@@ -20,7 +20,7 @@ export class AppleNativeRepository {
 
   async createAccount(data: { userId: string; providerId: string; accountId: string }) {
     return this.prisma.account.create({
-      data,
+      data: { ...data, issuer: 'https://appleid.apple.com' },
     });
   }
 

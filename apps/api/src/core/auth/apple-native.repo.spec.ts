@@ -72,7 +72,12 @@ describe('AppleNativeRepository', () => {
         accountId: 'abc',
       });
       expect(prisma.account.create).toHaveBeenCalledWith({
-        data: { userId: 'u1', providerId: 'apple', accountId: 'abc' },
+        data: {
+          userId: 'u1',
+          providerId: 'apple',
+          accountId: 'abc',
+          issuer: 'https://appleid.apple.com',
+        },
       });
       expect(result.id).toBe('acct1');
     });
