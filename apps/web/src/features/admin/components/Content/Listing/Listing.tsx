@@ -13,7 +13,7 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import styles from "../Content.module.css";
 
 interface ListingProps {
-  listing: AdminListingListItemDto & { coverUrl?: string | null; thumbnailUrl?: string | null };
+  listing: AdminListingListItemDto;
   onEdit: (id: string) => void;
   onUpload?: (id: string) => void;
   onTranslate?: (id: string) => void;
@@ -27,7 +27,7 @@ export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps
   // server-side (a scholar-scoped editor only ever fetches their own
   // scholars' listings), so any row rendered here is already in scope.
 
-  const coverImage = listing.coverUrl || listing.thumbnailUrl;
+  const coverImage = listing.coverImageUrl;
 
   return (
     <List.Item interactive>

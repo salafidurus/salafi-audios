@@ -1,6 +1,6 @@
 "use client";
 
-import { queryKeys, type AdminListingListItemDto } from "@sd/core-contracts";
+import { queryKeys } from "@sd/core-contracts";
 import { useAbility } from "@sd/domain-account";
 import { useInfiniteAdminListings } from "@sd/domain-content";
 import { useQueryClient } from "@tanstack/react-query";
@@ -36,14 +36,6 @@ export type ListingsContentProps = {
 
 type ListingSortKey = "title" | "scholarName" | "status";
 type SortDirection = "asc" | "desc";
-
-function getArtwork(listing: AdminListingListItemDto) {
-  // SAFETY: the admin listing card already reads these optional artwork fields from the API response.
-  return listing as AdminListingListItemDto & {
-    coverUrl?: string | null;
-    thumbnailUrl?: string | null;
-  };
-}
 
 function SortIcon({ active, direction }: { active: boolean; direction: SortDirection }) {
   if (!active) return <ArrowUpDown aria-hidden="true" size={14} />;
@@ -141,9 +133,7 @@ export function ListingsContent({
               <TableCell className={styles.tablePrimaryCell}>
                 <div className={styles.tableListingCell}>
                   <AppAvatar
-                    listingArtwork={
-                      getArtwork(listing).coverUrl || getArtwork(listing).thumbnailUrl
-                    }
+                    listingArtwork={listing.coverImageUrl}
                     name={listing.title}
                     size={24}
                     className={styles.tableAvatar}

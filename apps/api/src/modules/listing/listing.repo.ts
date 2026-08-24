@@ -71,9 +71,9 @@ export class ListingRepository {
         id: true,
         slug: true,
         title: true,
+        coverImageUrl: true,
         description: true,
         format: true,
-        coverImageUrl: true,
         language: true,
         durationSeconds: true,
         publishedLectureCount: true,
@@ -885,6 +885,7 @@ export class ListingRepository {
       select: {
         id: true,
         title: true,
+        coverImageUrl: true,
         language: true,
         status: true,
         format: true,
@@ -934,6 +935,7 @@ export class ListingRepository {
       return {
         id: r.id,
         title,
+        coverImageUrl: this.toPublicAssetUrl(r.coverImageUrl),
         scholarName,
         scholarSlug: r.scholar.slug,
         format: r.format,

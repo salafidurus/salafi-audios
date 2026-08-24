@@ -152,6 +152,7 @@ export type AdminListingActionDto = z.infer<typeof AdminListingActionDtoSchema>;
 export const AdminListingListItemDtoSchema = z.object({
   id: z.string(),
   title: z.string(),
+  coverImageUrl: z.string().optional(),
   scholarName: z.string(),
   scholarSlug: z.string(),
   format: ListingFormatSchema,
