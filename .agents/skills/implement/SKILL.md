@@ -1,42 +1,44 @@
 ---
 name: implement
-description: "Implement a piece of work based on a spec or set of tickets."
+description: "Implement one approved ticket plan."
 disable-model-invocation: true
 ---
 
-Implement the work described by the user in the spec or tickets.
+Implement one approved ticket plan. Specification-level work is orchestrated
+by `implement-spec`, which selects tickets and invokes this lifecycle for each
+ticket.
 
 Before editing, read the repository instructions in `AGENT.md`, the nearest
-app/package `AGENT.md`, `.agents/rules/tdd-rules.md`, and
-`.agents/rules/worktree-rules.md`. Treat those files as mandatory workflow
-rules, not optional guidance.
+app/package `AGENT.md`, the `tdd` skill, and
+`.agents/rules/worktree-rules.md`. Treat those sources as mandatory workflow
+rules.
 
-Before editing, determine whether the requested scope includes any files under
+## Checkout selection
+
+Determine whether the approved scope includes committed files under
 `apps/native`:
 
-- If it does, work in the current checkout. Do not create or use a git
-  worktree, because native changes may require rebuilding native code against
-  the current development environment.
-- Otherwise, create and use an isolated worktree under `.worktrees`, branched
-  from `origin/main`, following `.agents/rules/worktree-rules.md`.
+- Native scope uses the current checkout because native changes may require the
+  current development environment.
+- Non-native scope uses an isolated worktree under `.worktrees`, branched from
+  `origin/main`, following `worktree-rules.md`.
+- Mixed scope follows the native/current-checkout path.
 
-Use the test-first sequence in `.agents/rules/tdd-rules.md`: write a failing
-behavior test, confirm the failure, implement the smallest change, verify the
-focused test, and run the applicable full suite before committing.
+## Execution
 
-Run typechecking regularly, single test files regularly, and the full test suite once at the end.
+Use the `tdd` skill's exact five-step red → green loop for every vertical slice:
+write red, confirm red, implement minimally, confirm green, and run the
+applicable full suite. Run typechecking and single-test commands regularly.
+Apply the nearest workspace rules and keep shared package boundaries intact.
 
-Once done, use /code-review to review the work.
+Commit test and implementation together using Conventional Commits. Once
+implementation is complete, hand the branch to `code-review`.
 
-Commit your work to the current branch.
+Do not prepare the PR or clean up the branch here. Those are the
+`post-implement` responsibilities.
 
-Before creating the PR, include a GitHub closing reference such as
-`Closes #123` in the PR body and verify that the PR points at the intended
-issue. After the PR is merged, verify the issue is closed; if GitHub did not
-close it automatically, remove `ready-for-agent` with `gh issue edit
-<number> --remove-label ready-for-agent`, close it with `gh issue close`, and
-comment with the merged PR number.
+## Completion
 
-After merge, follow `.agents/rules/worktree-rules.md` to fast-forward local
-`main`, remove the completed worktree, delete its local branch, and verify the
-remaining worktrees and `main` status.
+The approved ticket plan is implemented, focused and applicable full checks
+are recorded, and the branch contains the committed implementation ready for
+review.

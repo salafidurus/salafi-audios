@@ -18,19 +18,19 @@ These rules are NON-NEGOTIABLE. Violations will be rejected.
 
 ## Documentation Quick Reference
 
-| If working on...                                  | Read this file first   |
-| ------------------------------------------------- | ---------------------- |
-| Getting started / overall system                  | `docs/README.md`                                      |
-| Product vision, philosophy, and guardrails        | `docs/product/requirements.md`                        |
-| Monorepo layout, dependencies, package boundaries | `docs/architecture.md`                                |
+| If working on...                                  | Read this file first                                        |
+| ------------------------------------------------- | ----------------------------------------------------------- |
+| Getting started / overall system                  | `docs/README.md`                                            |
+| Product vision, philosophy, and guardrails        | `docs/product/requirements.md`                              |
+| Monorepo layout, dependencies, package boundaries | `docs/architecture.md`                                      |
 | Backend architecture, API design, and auth        | `docs/backend/api.md` and `docs/security/authentication.md` |
-| Database schemas, Prisma, and media management    | `docs/data/database.md`                               |
-| Mobile app structure and offline synchronization  | `docs/clients/mobile.md`                              |
-| Web app structure and SEO strategy                | `docs/clients/web.md`                                 |
-| Admin roles and scoped grants                     | `docs/administration/access-management.md`            |
-| Environments, configuration, and CI/CD            | `docs/policies/deployment.md`                         |
-| Operational procedures                            | `docs/runbooks/README.md`                             |
-| Current roadmap and phase progress                | `docs/AGENT.md`                                       |
+| Database schemas, Prisma, and media management    | `docs/data/database.md`                                     |
+| Mobile app structure and offline synchronization  | `docs/clients/mobile.md`                                    |
+| Web app structure and SEO strategy                | `docs/clients/web.md`                                       |
+| Admin roles and scoped grants                     | `docs/administration/access-management.md`                  |
+| Environments, configuration, and CI/CD            | `docs/policies/deployment.md`                               |
+| Operational procedures                            | `docs/runbooks/README.md`                                   |
+| Current roadmap and phase progress                | `docs/AGENT.md`                                             |
 
 ## Referenced Rules
 
@@ -39,7 +39,6 @@ These `.agents/rules/` files contain always-on behavioral rules that complement 
 | Rule file            | What it covers                                                  |
 | -------------------- | --------------------------------------------------------------- |
 | `worktree-rules.md`  | Git worktree creation, env copy, pre-work verification, cleanup |
-| `tdd-rules.md`       | Strict TDD workflow: red → green → commit                       |
 | `rtk-rules.md`       | CLI token optimization via RTK                                  |
 | `codegraph-rules.md` | Structural code search via CodeGraph                            |
 
@@ -127,7 +126,7 @@ Use tokens by **semantic role** from `packages/design-tokens`. Full reference in
 
 ## TDD
 
-Strict TDD is required. See `.agents/rules/tdd-rules.md` for the full workflow.
+Strict TDD is required. See `.agents/skills/tdd/SKILL.md` for the full workflow.
 
 ## Agent Worktree Enforcement
 
