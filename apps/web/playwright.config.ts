@@ -1,19 +1,36 @@
 import { defineConfig, devices } from "@playwright/test";
 
+export function shouldReuseExistingServer(env: Record<string, string | undefined>): boolean {
+  return env.PW_REUSE_EXISTING_SERVER === "1";
+}
+
+export function getDefaultWorkerCount(env: Record<string, string | undefined>): number {
+  const requested = Number(env.PW_WORKERS);
+  return Number.isInteger(requested) && requested > 0 ? requested : 1;
+}
+
+export function getPlaywrightPort(env: Record<string, string | undefined>): number {
+  const requested = Number(env.PW_PORT);
+  return Number.isInteger(requested) && requested > 0 && requested <= 65535 ? requested : 3008;
+}
+
+const playwrightPort = getPlaywrightPort(process.env);
+const playwrightBaseUrl = `http://localhost:${playwrightPort}`;
+
 export default defineConfig({
   testDir: "./e2e",
   testMatch: "**/*.e2e.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 2,
-  workers: process.env.CI ? 1 : undefined,
+  workers: getDefaultWorkerCount(process.env),
   reporter: "list",
   timeout: 90_000,
   expect: {
     timeout: 15_000,
   },
   use: {
-    baseURL: "http://localhost:3008",
+    baseURL: playwrightBaseUrl,
     trace: "on-first-retry",
     actionTimeout: 20_000,
     navigationTimeout: 45_000,
@@ -23,10 +40,10 @@ export default defineConfig({
   webServer: {
     command:
       process.env.PW_SKIP_WEB_BUILD === "1"
-        ? "bun --bun next start --port 3008"
-        : "bun run build && bun --bun next start --port 3008",
-    url: "http://localhost:3008",
-    reuseExistingServer: !process.env.CI,
+        ? `bun --bun next start --port ${playwrightPort}`
+        : `bun run build && bun --bun next start --port ${playwrightPort}`,
+    url: playwrightBaseUrl,
+    reuseExistingServer: shouldReuseExistingServer(process.env),
     timeout: 120_000,
   },
 

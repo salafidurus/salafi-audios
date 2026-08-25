@@ -4,35 +4,17 @@ import { useEffect } from "react";
 
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
-import {
-  ACCENT_THEME_CHANGE_EVENT,
-  getDefaultAccentTheme,
-  isAccentThemeId,
-} from "./theme/accent-theme";
+import { THEME_KEY, resolveTheme, type ThemePreference } from "./theme-bootstrap";
 
-export type ThemePreference = "system" | "light" | "dark";
-
-export const THEME_KEY = "theme-preference:v1";
+export { THEME_KEY } from "./theme-bootstrap";
+export type { ThemePreference } from "./theme-bootstrap";
 export const THEME_CHANGE_EVENT = "theme-change";
 
 function applyTheme(preference: ThemePreference, mediaQuery: MediaQueryList) {
-  const resolved = preference === "system" ? (mediaQuery.matches ? "dark" : "light") : preference;
+  const resolved = resolveTheme(preference, mediaQuery.matches);
   const root = document.documentElement;
   root.setAttribute("data-theme", resolved);
   root.classList.toggle("dark", resolved === "dark");
-}
-
-function applyAccentTheme() {
-  document.documentElement.setAttribute("data-accent-theme", getDefaultAccentTheme());
-}
-
-function syncAccentTheme() {
-  if (!hasWindow()) return;
-  const stored = window.localStorage.getItem("accent-theme:v1");
-  if (!isAccentThemeId(stored)) {
-    const newDefault = getDefaultAccentTheme();
-    document.documentElement.setAttribute("data-accent-theme", newDefault);
-  }
 }
 
 function getStoredThemePreference(): ThemePreference {
@@ -54,29 +36,24 @@ export function ThemeSync() {
 
     const syncTheme = () => {
       applyTheme(getStoredThemePreference(), mediaQuery);
-      syncAccentTheme();
     };
 
     // Apply on mount from localStorage
     syncTheme();
-    applyAccentTheme();
 
     // Re-sync when OS preference changes (only affects "system" mode)
     const handleMediaChange = () => {
       syncTheme();
-      syncAccentTheme();
     };
 
     mediaQuery.addEventListener("change", handleMediaChange);
 
     // Re-sync when the settings screen dispatches a theme-change event
     window.addEventListener(THEME_CHANGE_EVENT, syncTheme);
-    window.addEventListener(ACCENT_THEME_CHANGE_EVENT, applyAccentTheme);
 
     return () => {
       mediaQuery.removeEventListener("change", handleMediaChange);
       window.removeEventListener(THEME_CHANGE_EVENT, syncTheme);
-      window.removeEventListener(ACCENT_THEME_CHANGE_EVENT, applyAccentTheme);
     };
   }, []);
 

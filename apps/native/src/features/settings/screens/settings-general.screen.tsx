@@ -1,9 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState, useCallback, useEffect } from "react";
 import { ScrollView, View, Pressable } from "react-native";
-import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import {
+  applyThemePreference,
+  getStoredThemePreference,
+  setStoredThemePreference,
+  type ThemePreference,
+} from "@/core/styles/theme/theme-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { Toggle } from "@/shared/components/Toggle/Toggle";
 
@@ -11,20 +17,6 @@ import { ContentLanguageToggle } from "../components/content-language-toggle/con
 import { LanguageSwitch } from "../components/language-switch/language-switch";
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
-
-type ThemePreference = "system" | "parchment" | "manuscript" | "midnight" | "ember";
-
-function parseThemePreference(themeName: string | undefined): ThemePreference {
-  switch (themeName) {
-    case "parchment":
-    case "manuscript":
-    case "midnight":
-    case "ember":
-      return themeName;
-    default:
-      return "system";
-  }
-}
 
 interface NotificationState {
   master: boolean;
@@ -42,15 +34,13 @@ export function SettingsGeneralScreen() {
   });
 
   useEffect(() => {
-    const activeTheme = parseThemePreference(UnistylesRuntime.themeName);
-    if (activeTheme) {
-      setThemePreference(activeTheme);
-    }
+    void getStoredThemePreference().then(setThemePreference);
   }, []);
 
   const handleThemeChange = useCallback((val: ThemePreference) => {
     setThemePreference(val);
-    UnistylesRuntime.setTheme(val);
+    applyThemePreference(val);
+    void setStoredThemePreference(val);
   }, []);
 
   const handleNotifChange = useCallback(
@@ -79,36 +69,20 @@ export function SettingsGeneralScreen() {
       text: "#111111",
     },
     {
-      value: "parchment",
-      label: t("settings.general.themeOptions.parchment", "Parchment"),
-      description: t("settings.general.themeOptions.parchmentDesc", "Ivory & gold"),
-      canvas: "#F7F2E7",
-      accent: "#B8872E",
-      text: "#241C10",
+      value: "light",
+      label: t("settings.general.themeOptions.light", "Light"),
+      description: t("settings.general.themeOptions.lightDesc", "Use light colors"),
+      canvas: "#F2F2F3",
+      accent: "#14B8A6",
+      text: "#18181B",
     },
     {
-      value: "manuscript",
-      label: t("settings.general.themeOptions.manuscript", "Manuscript"),
-      description: t("settings.general.themeOptions.manuscriptDesc", "Sepia & dark gold"),
-      canvas: "#1C160E",
-      accent: "#B58742",
-      text: "#E5D9C5",
-    },
-    {
-      value: "midnight",
-      label: t("settings.general.themeOptions.midnight", "Midnight"),
-      description: t("settings.general.themeOptions.midnightDesc", "Deep black & gold"),
-      canvas: "#080808",
-      accent: "#E0AE43",
-      text: "#F5F5F5",
-    },
-    {
-      value: "ember",
-      label: t("settings.general.themeOptions.ember", "Ember"),
-      description: t("settings.general.themeOptions.emberDesc", "Charcoal & gold"),
-      canvas: "#141210",
-      accent: "#D99B26",
-      text: "#E6D9C5",
+      value: "dark",
+      label: t("settings.general.themeOptions.dark", "Dark"),
+      description: t("settings.general.themeOptions.darkDesc", "Use dark colors"),
+      canvas: "#0D0D0D",
+      accent: "#14B8A6",
+      text: "#FAFAFA",
     },
   ];
 
