@@ -1,27 +1,14 @@
 import { z } from "zod";
 
-import { ScholarChipDtoSchema, ContentSuggestionDtoSchema } from "./home.types";
-import { ListingFormatSchema } from "./listing.types";
-import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
-import { ScholarTitleSchema } from "./scholar.types";
+import {
+  ContentSuggestionDtoSchema,
+  HomePromotionListingDtoSchema,
+  ScholarChipDtoSchema,
+  type HomePromotionListingDto,
+} from "./home.types";
 
-export const FeedContentItemDtoSchema = z.object({
-  kind: ListingFormatSchema,
-  id: z.string(),
-  title: z.string(),
-  slug: z.string(),
-  scholarName: z.string(),
-  scholarSlug: z.string(),
-  scholarTitle: ScholarTitleSchema.optional(),
-  scholarImageUrl: z.string().optional(),
-  thumbnailUrl: z.string().nullable(),
-  durationSeconds: z.number().nullable(),
-  publishedLectureCount: z.number().optional(),
-  publishedAt: z.string(),
-  originalLanguage: LocaleSchema.optional(),
-  original: ContentOriginalFieldsSchema.optional(),
-});
-export type FeedContentItemDto = z.infer<typeof FeedContentItemDtoSchema>;
+export const FeedContentItemDtoSchema = HomePromotionListingDtoSchema;
+export type FeedContentItemDto = HomePromotionListingDto;
 
 export const FeedScholarRowDtoSchema = z.object({
   kind: z.literal("scholar_row"),
