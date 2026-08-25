@@ -34,6 +34,7 @@ export type TopicDetailDto = z.infer<typeof TopicDetailDtoSchema>;
 export const TopicLectureViewDtoSchema = z.object({
   id: z.string(),
   scholarId: z.string(),
+  scholarSlug: z.string().optional(),
   seriesId: z.string().optional(),
   slug: z.string(),
   title: z.string(),

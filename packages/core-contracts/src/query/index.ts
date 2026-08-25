@@ -34,15 +34,20 @@ export const queryKeys = {
       all: () => [...queryKeys.scholars.all, "list"] as const,
       infinite: () => [...queryKeys.scholars.all, "list", "infinite"] as const,
     },
-    detail: (slug: string) => [...queryKeys.scholars.all, "detail", slug] as const,
-    content: (slug: string) => [...queryKeys.scholars.all, "content", slug] as const,
-    topics: (slug: string) => [...queryKeys.scholars.all, "topics", slug] as const,
+    detail: (scholarSlug: string) => [...queryKeys.scholars.all, "detail", scholarSlug] as const,
+    content: (scholarSlug: string) => [...queryKeys.scholars.all, "content", scholarSlug] as const,
+    topics: (scholarSlug: string) => [...queryKeys.scholars.all, "topics", scholarSlug] as const,
   },
   listings: {
     all: ["listings"] as const,
-    detail: (slug: string) => [...queryKeys.listings.all, "detail", slug] as const,
-    contents: (slug: string) => [...queryKeys.listings.all, "contents", slug] as const,
-    lastPlayed: (slug: string) => [...queryKeys.listings.all, "last-played", slug] as const,
+    detail: (listingSlug: string) => [...queryKeys.listings.all, "detail", listingSlug] as const,
+    contents: (listingSlug: string) =>
+      [...queryKeys.listings.all, "contents", listingSlug] as const,
+    related: (listingSlug: string) => [...queryKeys.listings.all, "related", listingSlug] as const,
+    lastPlayed: (listingSlug: string) =>
+      [...queryKeys.listings.all, "last-played", listingSlug] as const,
+    progressSummary: (listingSlug: string) =>
+      [...queryKeys.listings.all, "progress-summary", listingSlug] as const,
     recent: (topicSlug?: string, cursor?: string) =>
       [...queryKeys.listings.all, "recent", topicSlug ?? "", cursor] as const,
   },

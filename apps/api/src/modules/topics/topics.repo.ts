@@ -88,6 +88,7 @@ export class TopicsRepository {
       select: {
         id: true,
         scholarId: true,
+        scholar: { select: { slug: true } },
         parentId: true,
         slug: true,
         title: true,
@@ -114,6 +115,7 @@ export class TopicsRepository {
       return {
         id: r.id,
         scholarId: r.scholarId,
+        scholarSlug: r.scholar.slug,
         seriesId: r.parentId ?? undefined,
         slug: r.slug,
         title: resolved.fields.title,

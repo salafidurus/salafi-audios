@@ -482,6 +482,7 @@ export class LibraryRepository {
       lectureId: record.listing.id,
       lectureTitle: listingTitle,
       lectureSlug: record.listing.slug,
+      listingSlug: record.listing.slug,
       format: record.listing.format,
       orderIndex: record.listing.orderIndex ?? undefined,
       publishedLectureCount: record.listing.publishedLectureCount ?? undefined,

@@ -286,6 +286,7 @@ export type ListingContentsDto = z.infer<typeof ListingContentsDtoSchema>;
 
 export const LastPlayedLessonDtoSchema = z.object({
   listingId: z.string(),
+  listingSlug: z.string().optional(),
   positionSeconds: z.number(),
   isCompleted: z.boolean(),
   updatedAt: z.string(),
@@ -300,6 +301,7 @@ export type LastPlayedLessonDto = z.infer<typeof LastPlayedLessonDtoSchema>;
  */
 export const ListingProgressSummaryDtoSchema = z.object({
   listingId: z.string(),
+  listingSlug: z.string().optional(),
   format: ListingFormatSchema,
   totalCount: z.number(),
   completedCount: z.number(),

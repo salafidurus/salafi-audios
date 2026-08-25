@@ -126,6 +126,20 @@ describe('ListingRepository — public slug resolution seam', () => {
       expect(where).toEqual({ slug: 'archived-series', deletedAt: null, status: 'published' });
     });
 
+    it('returns the resolved public slug in progress-summary responses', async () => {
+      prisma.listing.findFirst.mockResolvedValue({
+        id: 'series-internal-id',
+        slug: 'known-series',
+        format: 'series',
+      });
+      prisma.$queryRaw.mockResolvedValue([{ total: 2, completed: 1 }]);
+
+      await expect(repo.getProgressSummary('known-series', 'user-1')).resolves.toMatchObject({
+        listingId: 'series-internal-id',
+        listingSlug: 'known-series',
+      });
+    });
+
     it('does not resolve related items off an unpublished target listing', async () => {
       prisma.listing.findFirst.mockResolvedValue(null);
 

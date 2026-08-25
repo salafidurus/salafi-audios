@@ -494,12 +494,13 @@ export class ListingRepository {
     const progress = await this.prisma.$queryRaw<
       {
         listingId: string;
+        listingSlug: string;
         positionSeconds: number;
         isCompleted: boolean;
         updatedAt: Date;
       }[]
     >`
-      SELECT ulp."listingId", ulp."positionSeconds", ulp."isCompleted", ulp."updatedAt"
+      SELECT ulp."listingId", l."slug" AS "listingSlug", ulp."positionSeconds", ulp."isCompleted", ulp."updatedAt"
       FROM "UserListingProgress" ulp
       JOIN "Listing" l ON ulp."listingId" = l.id
       LEFT JOIN "Listing" m ON l."parentId" = m.id
@@ -513,12 +514,14 @@ export class ListingRepository {
     const p = progress[0];
     if (!p) return null;
 
-    return {
+    const result: LastPlayedLessonDto = {
       listingId: p.listingId,
       positionSeconds: p.positionSeconds,
       isCompleted: p.isCompleted,
       updatedAt: p.updatedAt.toISOString(),
     };
+    if (p.listingSlug) result.listingSlug = p.listingSlug;
+    return result;
   }
 
   /**
@@ -533,11 +536,11 @@ export class ListingRepository {
   ): Promise<ListingProgressSummaryDto | null> {
     const listing = await this.prisma.listing.findFirst({
       where: publishedListingSlugWhere(slug),
-      select: { id: true, format: true },
+      select: { id: true, slug: true, format: true },
     });
     if (!listing) return null;
 
-    return this.computeProgressSummary(listing.id, listing.format, userId);
+    return this.computeProgressSummary(listing.id, listing.slug, listing.format, userId);
   }
 
   /**
@@ -552,15 +555,16 @@ export class ListingRepository {
   ): Promise<ListingProgressSummaryDto | null> {
     const listing = await this.prisma.listing.findFirst({
       where: { id, deletedAt: null },
-      select: { id: true, format: true },
+      select: { id: true, slug: true, format: true },
     });
     if (!listing) return null;
 
-    return this.computeProgressSummary(listing.id, listing.format, userId);
+    return this.computeProgressSummary(listing.id, listing.slug, listing.format, userId);
   }
 
   private async computeProgressSummary(
     actualId: string,
+    listingSlug: string,
     format: ListingProgressSummaryDto['format'],
     userId: string,
   ): Promise<ListingProgressSummaryDto> {
@@ -569,7 +573,13 @@ export class ListingRepository {
         where: { userId_listingId: { userId, listingId: actualId } },
         select: { isCompleted: true },
       });
-      return this.toProgressSummary(actualId, format, 1, progress?.isCompleted ? 1 : 0);
+      return this.toProgressSummary(
+        actualId,
+        listingSlug,
+        format,
+        1,
+        progress?.isCompleted ? 1 : 0,
+      );
     }
 
     const [row] =
@@ -594,17 +604,25 @@ export class ListingRepository {
               AND m."status" = 'published'
           `;
 
-    return this.toProgressSummary(actualId, format, row?.total ?? 0, row?.completed ?? 0);
+    return this.toProgressSummary(
+      actualId,
+      listingSlug,
+      format,
+      row?.total ?? 0,
+      row?.completed ?? 0,
+    );
   }
 
   private toProgressSummary(
     listingId: string,
+    listingSlug: string,
     format: ListingProgressSummaryDto['format'],
     totalCount: number,
     completedCount: number,
   ): ListingProgressSummaryDto {
     return {
       listingId,
+      listingSlug,
       format,
       totalCount,
       completedCount,

@@ -92,6 +92,7 @@ export class AudioRepository {
       include: {
         listing: {
           select: {
+            slug: true,
             durationSeconds: true,
           },
         },
@@ -100,6 +101,7 @@ export class AudioRepository {
 
     return progressRecords.map((record) => ({
       listingId: record.listingId,
+      listingSlug: record.listing.slug,
       positionSeconds: record.positionSeconds,
       durationSeconds: record.listing.durationSeconds || 0,
       completedAt: record.isCompleted ? record.updatedAt.toISOString() : undefined,
@@ -161,22 +163,55 @@ export class AudioRepository {
 
     // Duration comes from each Listing's own canonical record, never trusted
     // from the client, to keep the completion derivation below consistent.
+    const slugItems = items.filter((item) => item.listingSlug);
+    const legacyItems = items.filter((item) => !item.listingSlug);
+    const where =
+      slugItems.length > 0 && legacyItems.length > 0
+        ? {
+            OR: [
+              { slug: { in: slugItems.map((item) => item.listingSlug!) } },
+              {
+                id: {
+                  in: legacyItems.flatMap((item) => (item.listingId ? [item.listingId] : [])),
+                },
+              },
+            ],
+          }
+        : slugItems.length > 0
+          ? { slug: { in: slugItems.map((item) => item.listingSlug!) } }
+          : {
+              id: { in: items.flatMap((item) => (item.listingId ? [item.listingId] : [])) },
+            };
     const listings = await this.prisma.listing.findMany({
-      where: { id: { in: items.map((item) => item.listingId) } },
-      select: { id: true, durationSeconds: true },
+      where,
+      select: { id: true, slug: true, durationSeconds: true },
     });
+    const listingByIdentity = new Map(
+      listings.flatMap((listing) => [
+        [listing.id, listing] as const,
+        [listing.slug, listing] as const,
+      ]),
+    );
     const durationById = new Map(listings.map((listing) => [listing.id, listing.durationSeconds]));
 
     await this.persistProgressBatch(
-      items.map((item) => ({
-        userId,
-        listingId: item.listingId,
-        positionSeconds: item.positionSeconds,
-        isCompleted:
-          Boolean(item.completedAt) ||
-          isPositionCompleted(item.positionSeconds, durationById.get(item.listingId)),
-        updatedAt: new Date(item.updatedAt),
-      })),
+      items.flatMap((item) => {
+        const identity = item.listingSlug ?? item.listingId;
+        if (!identity) return [];
+        const listing = listingByIdentity.get(identity);
+        if (!listing) return [];
+        return [
+          {
+            userId,
+            listingId: listing.id,
+            positionSeconds: item.positionSeconds,
+            isCompleted:
+              Boolean(item.completedAt) ||
+              isPositionCompleted(item.positionSeconds, durationById.get(listing.id)),
+            updatedAt: new Date(item.updatedAt),
+          },
+        ];
+      }),
       durationById,
     );
   }
