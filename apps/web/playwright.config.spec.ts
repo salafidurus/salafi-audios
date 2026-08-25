@@ -1,6 +1,10 @@
 import { describe, expect, it } from "bun:test";
 
-import { getDefaultWorkerCount, shouldReuseExistingServer } from "./playwright.config";
+import {
+  getDefaultWorkerCount,
+  getPlaywrightPort,
+  shouldReuseExistingServer,
+} from "./playwright.config";
 
 describe("Playwright web server lifecycle", () => {
   it("starts an isolated server by default", () => {
@@ -15,5 +19,11 @@ describe("Playwright web server lifecycle", () => {
   it("uses one worker by default and allows explicit parallelism", () => {
     expect(getDefaultWorkerCount({})).toBe(1);
     expect(getDefaultWorkerCount({ PW_WORKERS: "4" })).toBe(4);
+  });
+
+  it("uses the default port and accepts a valid explicit port", () => {
+    expect(getPlaywrightPort({})).toBe(3008);
+    expect(getPlaywrightPort({ PW_PORT: "3009" })).toBe(3009);
+    expect(getPlaywrightPort({ PW_PORT: "invalid" })).toBe(3008);
   });
 });
