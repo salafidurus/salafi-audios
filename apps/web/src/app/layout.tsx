@@ -5,6 +5,7 @@ import Script from "next/script";
 
 import "./globals.css";
 import { Providers } from "../core/providers";
+import { getThemeBootstrapScript } from "../core/styles/theme-bootstrap";
 import { ThemeSync } from "../core/styles/ThemeSync";
 import { themeCss } from "./theme-css";
 
@@ -188,6 +189,9 @@ export default function RootLayout({
             Do NOT change to afterInteractive — it would cause RTL layout flash. */}
         <Script id="locale-init" strategy="beforeInteractive">
           {`!function(){var c=document.cookie.match(/(?:^|; )locale=([^;]*)/),l=c?c[1]:"en";document.documentElement.lang=l,document.documentElement.dir=l==="ar"?"rtl":"ltr"}()`}
+        </Script>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {getThemeBootstrapScript()}
         </Script>
         <style>{themeCss}</style>
         <ThemeSync />
