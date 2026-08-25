@@ -21,14 +21,18 @@ export const test = base.extend({
     const originalGoto = page.goto.bind(page);
     // SAFETY: this wrapper preserves Playwright's `page.goto` call shape and return value,
     // only injecting a default `waitUntil` that callers may still override via `options`.
-    page.goto = ((
+    // SAFETY: the wrapper preserves Playwright's page.goto call signature and response value.
+    page.goto = (async (
       url: Parameters<typeof page.goto>[0],
       options?: Parameters<typeof page.goto>[1],
-    ) =>
-      originalGoto(url, {
+    ) => {
+      const response = await originalGoto(url, {
         waitUntil: "domcontentloaded",
         ...options,
-      })) as typeof page.goto;
+      });
+      await page.waitForFunction(() => document.readyState === "complete");
+      return response;
+    }) as typeof page.goto;
     // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(page);
   },
