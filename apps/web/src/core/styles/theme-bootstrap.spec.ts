@@ -1,12 +1,18 @@
 import { beforeEach, describe, expect, it } from "bun:test";
 
-import { THEME_KEY, getThemeBootstrapScript } from "./theme-bootstrap";
+import { THEME_KEY, escapeUnsafeForInlineScript, getThemeBootstrapScript } from "./theme-bootstrap";
 
 describe("theme bootstrap", () => {
   beforeEach(() => {
     window.localStorage.clear();
     document.documentElement.removeAttribute("data-theme");
     document.documentElement.classList.remove("dark");
+  });
+
+  it("escapes values before embedding them in an inline script", () => {
+    expect(escapeUnsafeForInlineScript("</script>\\line\n")).toBe(
+      "\\u003C\\u002Fscript\\u003E\\\\line\\n",
+    );
   });
 
   it("applies a stored dark preference before the app renders", () => {
