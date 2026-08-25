@@ -8,15 +8,16 @@ export const endpoints = {
   },
   scholars: {
     list: "/scholars",
-    detail: (slug: string) => `/scholars/${slug}`,
-    content: (slug: string) => `/scholars/${slug}/content`,
-    topics: (slug: string) => `/scholars/${slug}/topics`,
+    detail: (scholarSlug: string) => `/scholars/${scholarSlug}`,
+    content: (scholarSlug: string) => `/scholars/${scholarSlug}/content`,
+    topics: (scholarSlug: string) => `/scholars/${scholarSlug}/topics`,
   },
   listings: {
-    detail: (slug: string) => `/listings/${slug}`,
-    contents: (slug: string) => `/listings/${slug}/contents`,
-    lastPlayed: (slug: string) => `/listings/${slug}/last-played`,
-    progressSummary: (slug: string) => `/listings/${slug}/progress-summary`,
+    detail: (listingSlug: string) => `/listings/${listingSlug}`,
+    contents: (listingSlug: string) => `/listings/${listingSlug}/contents`,
+    related: (listingSlug: string) => `/listings/${listingSlug}/related`,
+    lastPlayed: (listingSlug: string) => `/listings/${listingSlug}/last-played`,
+    progressSummary: (listingSlug: string) => `/listings/${listingSlug}/progress-summary`,
     recent: "/listings/recent",
     promotions: "/listings/promotions",
   },
@@ -27,7 +28,7 @@ export const endpoints = {
     completed: "/me/library/completed",
     progress: "/me/library/progress",
     recentProgress: "/me/library/recent-progress",
-    saveListing: (slug: string) => `/me/library/save/${slug}`,
+    saveListing: (listingSlug: string) => `/me/library/save/${listingSlug}`,
   },
   account: {
     profile: "/account/profile",
@@ -37,10 +38,10 @@ export const endpoints = {
     progress: {
       get: "/audio/progress",
       sync: "/audio/progress/sync",
-      update: (slug: string) => `/audio/progress/${slug}`,
+      update: (listingSlug: string) => `/audio/progress/${listingSlug}`,
     },
     listings: {
-      stream: (slug: string) => `/audio/listings/${slug}/stream`,
+      stream: (listingSlug: string) => `/audio/listings/${listingSlug}/stream`,
     },
   },
   admin: {

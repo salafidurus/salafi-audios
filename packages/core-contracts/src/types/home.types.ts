@@ -38,6 +38,7 @@ export const RecentProgressDtoSchema = z.object({
   lectureId: z.string(),
   lectureTitle: z.string(),
   lectureSlug: z.string(),
+  listingSlug: z.string().optional(),
   format: ListingFormatSchema,
   orderIndex: z.number().optional(),
   publishedLectureCount: z.number().optional(),

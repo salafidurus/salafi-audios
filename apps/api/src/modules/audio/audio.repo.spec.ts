@@ -48,6 +48,7 @@ describe('AudioRepository', () => {
       },
       userListingProgress: {
         findUnique: vi.fn<any>(),
+        findMany: vi.fn<any>(),
         upsert: vi.fn<any>().mockResolvedValue(undefined),
       },
       $executeRaw: vi.fn<any>(),
@@ -202,6 +203,31 @@ describe('AudioRepository', () => {
     });
   });
 
+  describe('getUserProgress', () => {
+    it('returns public listing slugs alongside the compatibility IDs', async () => {
+      prisma.userListingProgress.findMany.mockResolvedValue([
+        {
+          listingId: 'listing1',
+          positionSeconds: 10,
+          isCompleted: false,
+          updatedAt: new Date('2026-08-26T00:00:00.000Z'),
+          listing: { slug: 'tafsir-al-fatiha', durationSeconds: 100 },
+        },
+      ]);
+
+      await expect(repo.getUserProgress('user1')).resolves.toEqual([
+        {
+          listingId: 'listing1',
+          listingSlug: 'tafsir-al-fatiha',
+          positionSeconds: 10,
+          durationSeconds: 100,
+          completedAt: undefined,
+          updatedAt: '2026-08-26T00:00:00.000Z',
+        },
+      ]);
+    });
+  });
+
   describe('bulkSync', () => {
     it("fetches canonical durations for all items' listings in one batched query", async () => {
       prisma.listing.findMany.mockResolvedValue([
@@ -226,8 +252,31 @@ describe('AudioRepository', () => {
 
       expect(prisma.listing.findMany).toHaveBeenCalledWith({
         where: { id: { in: ['l1', 'l2'] } },
-        select: { id: true, durationSeconds: true },
+        select: { id: true, slug: true, durationSeconds: true },
       });
+    });
+
+    it('resolves slug-based sync items to canonical internal listings', async () => {
+      prisma.listing.findMany.mockResolvedValue([
+        { id: 'l1', slug: 'tafsir-al-fatiha', durationSeconds: 100 },
+      ]);
+
+      await repo.bulkSync('user1', [
+        {
+          listingSlug: 'tafsir-al-fatiha',
+          positionSeconds: 10,
+          durationSeconds: 999,
+          updatedAt: new Date().toISOString(),
+        },
+      ]);
+
+      expect(prisma.listing.findMany).toHaveBeenCalledWith({
+        where: { slug: { in: ['tafsir-al-fatiha'] } },
+        select: { id: true, slug: true, durationSeconds: true },
+      });
+      const [, ...values] = prisma.$executeRaw.mock.calls[0];
+      expect(values).toContain('l1');
+      expect(values).not.toContain('legacy-id');
     });
 
     it('derives isCompleted from the canonical duration, not the client-supplied one, when completedAt is absent', async () => {
@@ -274,6 +323,18 @@ describe('AudioRepository', () => {
       // must resolve as not found, never by internal-ID compatibility.
       expect(prisma.listing.findFirst).toHaveBeenCalledWith({
         where: { slug: 'tafsir-al-fatiha', deletedAt: null, status: 'published' },
+        select: { id: true, durationSeconds: true },
+      });
+    });
+
+    it('treats an ID-shaped progress route value as an opaque slug', async () => {
+      const uuidShaped = 'a0000000-0000-0000-0000-000000000000';
+      prisma.listing.findFirst.mockResolvedValue(null);
+
+      await expect(repo.upsertProgress('user1', uuidShaped, 10)).resolves.toBe(false);
+
+      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
+        where: { slug: uuidShaped },
         select: { id: true, durationSeconds: true },
       });
     });
