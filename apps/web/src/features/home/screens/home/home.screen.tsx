@@ -5,6 +5,7 @@ import type { FeedContentItemDto, FeedItemDto } from "@sd/core-contracts";
 import { useExploreRecentScreen } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
 
+import { useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
@@ -29,7 +30,10 @@ function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
 }
 
 export function HomeScreen({ onContinueListening }: HomeScreenProps) {
-  const { recentProgress, isLoading: isProgressLoading } = useContinueListening();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { recentProgress } = useContinueListening({
+    enabled: !isAuthLoading && isAuthenticated,
+  });
   const { data: promoData, isLoading: isPromosLoading } = useHomePromotions();
   const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen({
     limit: MAX_RECENT_ITEMS,
@@ -45,13 +49,13 @@ export function HomeScreen({ onContinueListening }: HomeScreenProps) {
     }
   }
 
-  const featuredContent = promoData?.hero ?? items[0] ?? null;
+  const featuredContent = promoData?.hero?.listing ?? items[0] ?? null;
   const recentItems = featuredContent
     ? items.filter((item) => item.id !== featuredContent.id)
     : items;
   const curatedItems = promoData?.editorsPicks?.map((pick) => pick.listing) ?? [];
   const hasHistory = Boolean(recentProgress);
-  const isHeroLoading = isProgressLoading || isExploreLoading || isPromosLoading;
+  const isHeroLoading = isExploreLoading || isPromosLoading;
 
   return (
     <ScreenView
@@ -80,14 +84,13 @@ export function HomeScreen({ onContinueListening }: HomeScreenProps) {
           </div>
         </header>
 
-        {(recentProgress || isProgressLoading) && (
+        {recentProgress && (
           <section
             className={styles.continuitySection}
             data-testid="home-continue-listening-section"
           >
             <ContinueListeningCard
               recentProgress={recentProgress}
-              isLoading={isProgressLoading}
               onContinueListening={onContinueListening}
             />
           </section>
