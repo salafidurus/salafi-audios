@@ -10,6 +10,7 @@ import type {
   LastPlayedLessonDto,
   ListingProgressSummaryDto,
   FeedPageDto,
+  HomePromotionsDto,
 } from '@sd/core-contracts';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CacheTTL } from '@nestjs/cache-manager';
@@ -43,7 +44,7 @@ export class ListingController {
   @CacheTTL(24 * 60 * 60 * 1000)
   @ApiOperation({ summary: 'Get home promotions (featured hero and editors picks)' })
   @ApiOkResponse({ description: 'Promotional metadata for home screen' })
-  async getPromotions(): Promise<any> {
+  async getPromotions(): Promise<HomePromotionsDto> {
     return this.service.getPromotions();
   }
 

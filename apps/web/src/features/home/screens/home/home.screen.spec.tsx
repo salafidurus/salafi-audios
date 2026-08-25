@@ -7,6 +7,8 @@ import React from "react";
 import { useHomePromotions } from "../../hooks/use-home-promotions";
 import { HomeScreen } from "./home.screen";
 
+const mockUseAuth = vi.fn();
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -26,6 +28,10 @@ vi.mock("@sd/domain-content", () => ({
   useExploreRecentScreen: vi.fn(),
 }));
 
+vi.mock("@/core/auth", () => ({
+  useAuth: mockUseAuth,
+}));
+
 vi.mock("../../hooks/use-home-promotions", () => ({
   useHomePromotions: vi.fn(),
 }));
@@ -35,6 +41,7 @@ describe("HomeScreen", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
     (useContinueListening as unknown as Mock<any>).mockReturnValue({
       recentProgress: null,
       isLoading: false,
@@ -56,6 +63,28 @@ describe("HomeScreen", () => {
     expect(heroTitle).toBeTruthy();
 
     expect(screen.queryByText("What do you want to listen to?")).toBeNull();
+  });
+
+  it("does not request personal Progress before auth resolves or for anonymous users", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: true });
+
+    render(<HomeScreen />);
+
+    expect(useContinueListening).toHaveBeenCalledWith({ enabled: false });
+    expect(screen.queryByTestId("home-continue-listening-section")).toBeNull();
+
+    mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
+    render(<HomeScreen />);
+
+    expect(useContinueListening).toHaveBeenLastCalledWith({ enabled: false });
+  });
+
+  it("enables personal Progress only for an authenticated user", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+
+    render(<HomeScreen />);
+
+    expect(useContinueListening).toHaveBeenCalledWith({ enabled: true });
   });
 
   it("renders continue listening section when recentProgress is provided", () => {

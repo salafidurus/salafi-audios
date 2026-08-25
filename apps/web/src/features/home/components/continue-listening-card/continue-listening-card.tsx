@@ -19,43 +19,14 @@ import styles from "./continue-listening-card.module.css";
 
 export type ContinueListeningCardProps = {
   recentProgress?: RecentProgressDto | null;
-  isLoading?: boolean;
   onContinueListening?: (lectureId: string) => void;
 };
 
 export function ContinueListeningCard({
   recentProgress,
-  isLoading = false,
   onContinueListening,
 }: ContinueListeningCardProps) {
-  const { t } = useTranslation();
   const { isMobile } = useResponsive();
-
-  if (isLoading && !recentProgress) {
-    return (
-      <section
-        className={styles.continueSection}
-        aria-label={t("audio.resumePlayback", "Resume playback")}
-        data-testid="continue-listening-section"
-      >
-        <div className={styles.sectionHeader}>
-          <AppText variant="titleMd">
-            <span data-testid="continue-listening-title">
-              {t("search.continueListening", "Continue Listening")}
-            </span>
-          </AppText>
-        </div>
-        <div className={styles.loadingCard} data-testid="continue-listening-skeleton">
-          {!isMobile && <div className={`${styles.skeleton} ${styles.skeletonArtwork}`} />}
-          <div className={styles.skeletonContent}>
-            <div className={`${styles.skeleton} ${styles.skeletonTitle}`} />
-            <div className={`${styles.skeleton} ${styles.skeletonMeta}`} />
-            <div className={`${styles.skeleton} ${styles.skeletonProgress}`} />
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   if (!recentProgress) return null;
 

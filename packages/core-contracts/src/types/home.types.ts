@@ -6,6 +6,7 @@ import {
   LocaleSchema,
   ScholarOriginalFieldsSchema,
 } from "./localization.types";
+import { ScholarTitleSchema } from "./scholar.types";
 
 export const ScholarChipDtoSchema = z.object({
   id: z.string(),
@@ -33,6 +34,45 @@ export const ContentSuggestionDtoSchema = z.object({
   original: ContentOriginalFieldsSchema.optional(),
 });
 export type ContentSuggestionDto = z.infer<typeof ContentSuggestionDtoSchema>;
+
+export const HomePromotionListingDtoSchema = z.object({
+  kind: ListingFormatSchema,
+  id: z.string(),
+  title: z.string(),
+  slug: z.string(),
+  scholarName: z.string(),
+  scholarSlug: z.string(),
+  scholarTitle: ScholarTitleSchema.optional(),
+  scholarImageUrl: z.string().optional(),
+  thumbnailUrl: z.string().nullable(),
+  durationSeconds: z.number().nullable(),
+  publishedLectureCount: z.number().optional(),
+  publishedAt: z.string(),
+  originalLanguage: LocaleSchema.optional(),
+  original: ContentOriginalFieldsSchema.optional(),
+});
+export type HomePromotionListingDto = z.infer<typeof HomePromotionListingDtoSchema>;
+
+export const HomePromotionHeroDtoSchema = z.object({
+  id: z.string(),
+  listingId: z.string(),
+  headline: z.string(),
+  listing: HomePromotionListingDtoSchema,
+});
+export type HomePromotionHeroDto = z.infer<typeof HomePromotionHeroDtoSchema>;
+
+export const HomePromotionPickDtoSchema = z.object({
+  id: z.string(),
+  listingId: z.string(),
+  listing: HomePromotionListingDtoSchema,
+});
+export type HomePromotionPickDto = z.infer<typeof HomePromotionPickDtoSchema>;
+
+export const HomePromotionsDtoSchema = z.object({
+  hero: HomePromotionHeroDtoSchema.nullable(),
+  editorsPicks: z.array(HomePromotionPickDtoSchema),
+});
+export type HomePromotionsDto = z.infer<typeof HomePromotionsDtoSchema>;
 
 export const RecentProgressDtoSchema = z.object({
   lectureId: z.string(),
