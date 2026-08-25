@@ -90,6 +90,8 @@ Before finishing publication, perform a dependency audit:
 
 Do NOT close or modify any parent issue.
 
+After the approved ticket set and dependency graph are published, recommend proceeding to `pre-implement` for the first unblocked ticket. The lifecycle then continues through `implement` and `post-implement`.
+
 <local-ticket-template>
 
 # <NN>: <Ticket title>

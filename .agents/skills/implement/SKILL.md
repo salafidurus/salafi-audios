@@ -69,7 +69,7 @@ applicable full suite. Run typechecking and single-test commands regularly.
 Apply the nearest workspace rules and keep shared package boundaries intact.
 
 Commit test and implementation together using Conventional Commits. Once
-implementation is complete, hand the branch to `code-review`.
+implementation is complete, hand the branch to `post-implement`.
 
 Do not prepare the PR or clean up the branch here. Those are the
 `post-implement` responsibilities.

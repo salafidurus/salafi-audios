@@ -6,9 +6,8 @@ disable-model-invocation: true
 
 # Post-Implementation
 
-Complete the delivery lifecycle for one implemented ticket after implementation
-and review. This skill has two explicit phases: PR preparation and merge-gated
-cleanup.
+Complete the delivery lifecycle for one implemented ticket after implementation.
+This skill has two explicit phases: PR preparation and merge-gated cleanup.
 
 ## PR preparation
 
@@ -27,8 +26,7 @@ bun run doctor
 Skip a check only when the plan records why it cannot apply. Diagnose failures
 against the pre-work baseline before pushing.
 
-Verify the implementation and review evidence, then prepare the PR with this
-minimal body:
+Verify the implementation evidence, then prepare the PR with this minimal body:
 
 ```markdown
 ## Summary
