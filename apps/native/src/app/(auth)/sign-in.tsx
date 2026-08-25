@@ -1,5 +1,5 @@
 import { routes } from "@sd/core-contracts";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, type Href } from "expo-router";
 import { useEffect } from "react";
 
 import { useAuth } from "@/core/auth";
@@ -27,7 +27,8 @@ export default function SignInRoute() {
   useEffect(() => {
     if (isAuthenticated) {
       if (from) {
-        router.replace(from);
+        // SAFETY: `from` is produced by this app's same-origin route query.
+        router.replace(from as Href);
       } else if (router.canGoBack()) {
         router.back();
       } else {

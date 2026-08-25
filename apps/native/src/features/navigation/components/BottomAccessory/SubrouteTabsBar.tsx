@@ -1,5 +1,5 @@
 import { getSubnavLabel } from "@sd/core-i18n";
-import { usePathname, useRouter } from "expo-router";
+import { usePathname, useRouter, type Href } from "expo-router";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { EaseView } from "react-native-ease";
@@ -36,7 +36,8 @@ export function SubrouteTabsBar() {
     return (
       <Pressable
         key={tab.id}
-        onPress={() => router.replace(href)}
+        // SAFETY: `href` is built from the statically registered section tabs.
+        onPress={() => router.replace(href as Href)}
         accessibilityRole="button"
         accessibilityState={{ selected: isActive }}
         style={styles.tabPressable}
