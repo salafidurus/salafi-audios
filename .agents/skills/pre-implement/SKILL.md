@@ -55,4 +55,4 @@ comment only when the user explicitly requests publication there.
 Stop when every acceptance criterion maps to an implementation or test step,
 the checkout mode, worktree/branch, setup, and validation steps are classified,
 and no material scope decision remains hidden.
-Wait for the user's approval before implementation begins.
+Wait for the user's approval before implementation begins. Once the plan is approved, hand off to `implement`.

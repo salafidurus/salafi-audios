@@ -19,6 +19,8 @@ Check with the user that these seams match their expectations.
 
 3. Write the spec using the template below, then publish it to the project issue tracker. Apply both `ready-for-agent` and the `spec` artifact label - no need for additional triage. If the tracker does not have `spec` yet, create it before publishing.
 
+After the approved specification is published, recommend proceeding to `to-tickets`.
+
 <spec-template>
 
 ## Problem Statement
