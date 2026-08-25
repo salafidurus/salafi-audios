@@ -29,6 +29,7 @@ import type {
   ArrangeCommitDto,
   ArrangeCommitResultDto,
   ArrangeLessonOp,
+  HomePromotionsDto,
 } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
@@ -1891,7 +1892,7 @@ export class ListingRepository {
     return this.mapListingTranslation(record);
   }
 
-  async findPromotions() {
+  async findPromotions(): Promise<HomePromotionsDto> {
     const locale = getRequestLocale();
 
     // 1. Get featured hero recommendation and curated editors' picks concurrently

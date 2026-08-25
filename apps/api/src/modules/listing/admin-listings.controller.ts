@@ -21,6 +21,7 @@ import type {
   ArrangeCommitResultDto,
   BulkActionResultDto,
   ListingRefDto,
+  HomePromotionsDto,
 } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
@@ -55,7 +56,7 @@ export class AdminListingsController {
   @CheckPolicy('write', 'Listing')
   @ApiOperation({ summary: 'Get current home promotions (admin)' })
   @ApiOkResponse({ description: 'Current promotions metadata' })
-  async getPromotions(): Promise<any> {
+  async getPromotions(): Promise<HomePromotionsDto> {
     return this.service.getPromotions();
   }
 

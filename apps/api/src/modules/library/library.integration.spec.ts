@@ -22,6 +22,7 @@ const mockPrisma = {
 };
 
 const mockLibraryService = {
+  getRecentProgress: vi.fn<any>().mockResolvedValue(null),
   getInProgress: vi.fn<any>().mockResolvedValue({ items: [], hasMore: false }),
   getCompleted: vi.fn<any>().mockResolvedValue({ items: [], hasMore: false }),
   getSaved: vi.fn<any>().mockResolvedValue({ items: [], hasMore: false }),
@@ -56,6 +57,11 @@ describe('LibraryController — auth boundaries', () => {
 
   it('GET /me/library/progress returns 401 without a session', async () => {
     const response = await request(app.getHttpServer()).get('/me/library/progress');
+    expect(response.status).toBe(401);
+  });
+
+  it('GET /me/library/recent-progress returns 401 without a session', async () => {
+    const response = await request(app.getHttpServer()).get('/me/library/recent-progress');
     expect(response.status).toBe(401);
   });
 
@@ -100,5 +106,16 @@ describe('LibraryController — auth boundaries', () => {
     const response = await request(app.getHttpServer()).get('/me/library/progress');
     expect(response.status).toBe(200);
     expect(response.body).toBeDefined();
+  });
+
+  it('GET /me/library/recent-progress returns the personal projection with a valid session', async () => {
+    mockAuth.api.getSession.mockResolvedValue({
+      user: { id: 'u1', role: 'user', email: 'a@b.com' },
+      session: {},
+    });
+
+    const response = await request(app.getHttpServer()).get('/me/library/recent-progress');
+    expect(response.status).toBe(200);
+    expect(mockLibraryService.getRecentProgress).toHaveBeenCalledWith('u1');
   });
 });

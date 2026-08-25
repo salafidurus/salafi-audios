@@ -23,6 +23,7 @@ import type {
   AdminArrangeDataDto,
   ArrangeCommitDto,
   ArrangeCommitResultDto,
+  HomePromotionsDto,
   Locale,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
@@ -55,7 +56,7 @@ export class ListingService {
     return this.recentRepo.getRecentListings(cursor, limit, topicSlug);
   }
 
-  async getPromotions(): Promise<any> {
+  async getPromotions(): Promise<HomePromotionsDto> {
     return this.repo.findPromotions();
   }
 
