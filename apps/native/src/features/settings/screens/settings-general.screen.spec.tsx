@@ -42,23 +42,24 @@ describe("SettingsGeneralScreen", () => {
     jest.clearAllMocks();
   });
 
-  it("renders theme cards options instead of segmented control", async () => {
+  it("renders exactly the system, light, and dark theme options", async () => {
     await render(<SettingsGeneralScreen />);
 
-    // Check that we render the horizontal cards options
     expect(screen.getByText("System")).toBeTruthy();
-    expect(screen.getByText("Parchment")).toBeTruthy();
-    expect(screen.getByText("Manuscript")).toBeTruthy();
-    expect(screen.getByText("Midnight")).toBeTruthy();
-    expect(screen.getByText("Ember")).toBeTruthy();
+    expect(screen.getByText("Light")).toBeTruthy();
+    expect(screen.getByText("Dark")).toBeTruthy();
+    expect(screen.queryByText("Parchment")).toBeNull();
+    expect(screen.queryByText("Manuscript")).toBeNull();
+    expect(screen.queryByText("Midnight")).toBeNull();
+    expect(screen.queryByText("Ember")).toBeNull();
   });
 
   it("calls UnistylesRuntime.setTheme when a theme card is clicked", async () => {
     await render(<SettingsGeneralScreen />);
 
-    const parchmentCard = screen.getByText("Parchment");
-    fireEvent.press(parchmentCard);
+    const darkCard = screen.getByText("Dark");
+    fireEvent.press(darkCard);
 
-    expect(UnistylesRuntime.setTheme).toHaveBeenCalledWith("parchment");
+    expect(UnistylesRuntime.setTheme).toHaveBeenCalledWith("dark");
   });
 });

@@ -28,6 +28,11 @@ import { i18n, initI18n } from "./i18n/i18n";
 import { initIntegrations } from "./integrations";
 import { onNetworkReconnect } from "./network/network-status";
 import { queryClient } from "./query-client";
+import {
+  applyThemePreference,
+  getStoredThemePreference,
+  subscribeToSystemTheme,
+} from "./styles/theme/theme-preference";
 import { syncTypographyToLocale } from "./styles/theme/typography-sync";
 
 LogBox.ignoreLogs(["API client initialization failed", "Open debugger to view warnings"]);
@@ -92,6 +97,7 @@ type Props = {
 
 export function Providers({ children, apiBaseUrl }: Props) {
   const [i18nReady, setI18nReady] = useState(false);
+  const [themeReady, setThemeReady] = useState(false);
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
 
@@ -101,6 +107,27 @@ export function Providers({ children, apiBaseUrl }: Props) {
       initApiClient({ baseUrl: apiBaseUrl });
     }
   });
+
+  useEffect(() => {
+    let active = true;
+    let preference: "system" | "light" | "dark" = "system";
+
+    void getStoredThemePreference().then((storedPreference) => {
+      if (!active) return;
+      preference = storedPreference;
+      applyThemePreference(preference);
+      setThemeReady(true);
+    });
+
+    const unsubscribeAppearance = subscribeToSystemTheme(() => {
+      if (preference === "system") applyThemePreference(preference);
+    });
+
+    return () => {
+      active = false;
+      unsubscribeAppearance();
+    };
+  }, []);
 
   useEffect(() => {
     // RN fetch has no cookie jar, so forward the @better-auth/expo session
@@ -170,7 +197,7 @@ export function Providers({ children, apiBaseUrl }: Props) {
       });
   }, []);
 
-  if (!i18nReady) {
+  if (!i18nReady || !themeReady) {
     return null;
   }
 

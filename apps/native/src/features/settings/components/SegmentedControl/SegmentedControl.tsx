@@ -52,9 +52,7 @@ export function SegmentedControl<T extends string>({
         }}
         tintColor={theme.colors.action.primary}
         appearance={
-          rt.themeName === "midnight" ||
-          rt.themeName === "ember" ||
-          (rt.themeName === "system" && rt.colorScheme === "dark")
+          rt.themeName === "dark" || (rt.themeName === "system" && rt.colorScheme === "dark")
             ? "dark"
             : "light"
         }

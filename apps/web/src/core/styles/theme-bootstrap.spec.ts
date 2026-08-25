@@ -28,7 +28,7 @@ describe("theme bootstrap", () => {
   });
 
   it("falls back to system for invalid stored values", () => {
-    window.localStorage.setItem(THEME_KEY, "parchment");
+    window.localStorage.setItem(THEME_KEY, "neon");
     window.matchMedia = (() => ({ matches: false })) as unknown as typeof window.matchMedia;
 
     window.eval(getThemeBootstrapScript());

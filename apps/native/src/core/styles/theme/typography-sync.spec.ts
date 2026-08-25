@@ -15,7 +15,7 @@ describe("syncTypographyToLocale", () => {
 
   it("calls updateTheme for all registered themes", () => {
     syncTypographyToLocale("en");
-    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledTimes(5);
+    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledTimes(3);
   });
 
   it("passes correct locale to theme updater for English", () => {
