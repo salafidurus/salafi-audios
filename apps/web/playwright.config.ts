@@ -16,6 +16,7 @@ export function getPlaywrightPort(env: Record<string, string | undefined>): numb
 
 const playwrightPort = getPlaywrightPort(process.env);
 const playwrightBaseUrl = `http://localhost:${playwrightPort}`;
+const fallbackTestMode = process.env.PW_FALLBACK_FAULTS === "1";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -40,8 +41,8 @@ export default defineConfig({
   webServer: {
     command:
       process.env.PW_SKIP_WEB_BUILD === "1"
-        ? `bun --bun next start --port ${playwrightPort}`
-        : `bun run build && bun --bun next start --port ${playwrightPort}`,
+        ? `FALLBACK_TEST_MODE=${fallbackTestMode ? "1" : "0"} bun --bun next start --port ${playwrightPort}`
+        : `bun run build && FALLBACK_TEST_MODE=${fallbackTestMode ? "1" : "0"} bun --bun next start --port ${playwrightPort}`,
     url: playwrightBaseUrl,
     reuseExistingServer: shouldReuseExistingServer(process.env),
     timeout: 120_000,

@@ -45,6 +45,11 @@ sections allowed by their capabilities and scope.
 - **Admin workspace**: the distinct contextual presentation for administrative
   routes. Its visible destinations are filtered by backend-derived capability,
   while backend authorization remains authoritative.
+- **Normal not-found state**: the localized, theme-aware branded 404 rendered
+  inside the public navigation shell.
+- **Shell-unavailable fallback**: the provider-independent emergency 404 used
+  when the public navigation shell cannot render. It uses only static recovery
+  content, a plain home link, and browser reload behavior.
 
 Explore is a discovery-first feed rather than a query/results screen. It is one
 continuous mixed stream of listing cards and discovery modules, with Topic
