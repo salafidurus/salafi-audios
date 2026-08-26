@@ -44,9 +44,7 @@ function isTestFrameworkObject(
     }
     const source = definition.parent.source.value;
     const name = importedName(definition.node);
-    return (
-      (source === "vitest" && name === "vi") || (source === "@jest/globals" && name === "jest")
-    );
+    return source === "@jest/globals" && name === "jest";
   });
 }
 
@@ -67,13 +65,13 @@ function moduleMockCall(sourceCode: SourceCode, callee: ESTree.Expression): bool
   return method !== null && moduleMockMethods.has(method);
 }
 
-/** Ban test framework module mocking in favor of real dependency seams. */
+/** Ban Jest module mocking in favor of real dependency seams. */
 export const noModuleMockingRule = defineRule({
   meta: {
     type: "problem",
     docs: {
       description:
-        "Disallow Vitest and Jest module mocking; tests must replace dependencies through real interfaces.",
+        "Disallow Jest module mocking; tests must replace dependencies through real interfaces.",
     },
     messages: {
       moduleMock:

@@ -14,7 +14,7 @@ import { describe, it, expect } from "bun:test";
 
 describe("UserRole enum", () => {
   it("is exported from the package index", async () => {
-    // Dynamic import so Vitest can catch the missing export at runtime.
+    // Dynamic import verifies the package export at runtime.
     const mod = await import("./index");
     expect(mod).toHaveProperty("UserRole");
   });

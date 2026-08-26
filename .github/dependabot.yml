@@ -209,21 +209,6 @@ updates:
           - minor
           - patch
 
-      # Vitest and its ecosystem.
-      vitest:
-        applies-to: version-updates
-        patterns:
-          - "vitest"
-          - "vitest-*"
-          - "@vitest/*"
-          - "@vitejs/*"
-          - "vite-tsconfig-paths"
-          - "unplugin-swc"
-        update-types:
-          - major
-          - minor
-          - patch
-
   # ──────────────────────────────────────────────
   # GitHub Actions ecosystem
   # ──────────────────────────────────────────────

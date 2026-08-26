@@ -12,7 +12,7 @@ const protectedPathRules = [
     "framework or package entry point",
   ],
   [
-    /(^|\/)(?:vitest|jest|babel|metro|next|expo|oxlint|eslint|tsup)\.config\.[cm]?[jt]s$/,
+    /(^|\/)(?:jest|babel|metro|next|expo|oxlint|eslint|tsup)\.config\.[cm]?[jt]s$/,
     "tooling configuration",
   ],
 ];

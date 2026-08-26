@@ -39,7 +39,6 @@ describe("filterByGroups", () => {
   const groups: PkupdateConfig["groups"] = {
     nestjs: { patterns: ["@nestjs/*"] },
     prisma: { patterns: ["prisma", "@prisma/*"] },
-    vitest: { patterns: ["vitest", "@vitest/*"] },
   };
 
   it("matches @nestjs/core to nestjs group", () => {
