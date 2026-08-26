@@ -35,6 +35,13 @@ sections allowed by their capabilities and scope.
   frames public content. It is presentation, not an authorization boundary.
 - **Compact navigation**: the icon-first header and Sheet composition used when
   the desktop zones no longer fit without overlap.
+- **Public shell**: the reusable public navigation, fallback/content area, and
+  footer composition. It is the visible shell for normal public routes and
+  normal fallback states; consent-only side effects are composed outside it.
+- **Normal not-found state**: the localized branded 404 rendered inside the
+  public shell when a route is missing.
+- **Shell-unavailable fallback**: the deliberately minimal recovery boundary
+  used when the public shell itself cannot safely render.
 - **Admin workspace**: the distinct contextual presentation for administrative
   routes. Its visible destinations are filtered by backend-derived capability,
   while backend authorization remains authoritative.
