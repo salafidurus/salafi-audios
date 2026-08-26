@@ -80,3 +80,18 @@ separate from private personal state.
 **Continue Listening** is a Home-only projection of authenticated unfinished Progress.
 It is not a Catalog entity, is absent while personal Progress is loading or empty, and
 disappears when `completedAt` is accepted.
+
+## Dead-code governance vocabulary
+
+**Reachable code** is executable code connected through accepted static or
+dynamic edges to a declared runtime, build, route, job, CLI, package, or test
+root.
+
+**Orphan code** is executable code with no confirmed path from an accepted root.
+
+**Dead test** is a test that does not observe behavior, protect a supported
+contract, or provide meaningful regression evidence.
+
+**Confirmed dead** is an orphan or dead test whose removal has been checked
+against runtime roots, dynamic mechanisms, external-consumer policy, and
+verification results.

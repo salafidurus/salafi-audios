@@ -39,6 +39,24 @@ The initial calibrated run found:
 
 The test counts are heuristic inventory signals. They do not determine whether a test is obsolete, redundant, or safe to remove. The classifier intentionally lacks semantic equivalence and runtime coverage claims; those decisions require the evidence described in #640.
 
+The stable finding-key snapshot used for comparison is checked in at
+[`dead-code-audit-baseline.json`](./dead-code-audit-baseline.json). Refresh it
+only when the audit rules or accepted roots change, and record the source commit
+and count changes in this runbook.
+
 ## Review protocol
 
 For each proposed removal, record the candidate path or symbol, category, confidence, evidence, all discovered consumers and roots, and the validation command. Preserve public package exports, documented commands, operational scripts, framework entry points, and dynamic/runtime adapters unless their ownership explicitly changes. Use a focused test or build check before and after each approved removal.
+
+## Two-phase governance
+
+The audit phase is non-mutating and runs before PR preparation. It compares the
+checked-in baseline with findings on the implementation diff and affected graph.
+Only a newly introduced `confirmed-dead` finding blocks delivery; baseline,
+`likely-dead`, and `unknown/dynamic` findings remain review evidence.
+
+The removal phase requires an approved cleanup ticket and an explicit finding
+allowlist. It removes only confirmed findings in that allowlist and records
+before-and-after output. Public APIs, package exports, documented commands,
+operational scripts, framework roots, generated output, migrations, and
+documentation remain protected unless separately approved.
