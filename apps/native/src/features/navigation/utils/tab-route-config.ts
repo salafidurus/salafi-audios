@@ -1,42 +1,10 @@
-import type { ComponentType } from "react";
-
 import { routes } from "@sd/core-contracts";
-import { BookOpen, Cloud, Search, Settings } from "lucide-react-native";
 
 import { nativeRoutes } from "@/core/navigation/routes";
 
 import { DEFAULT_TABS, SECTION_TABS, type Section } from "../types";
 
 export type RootTab = Section | "search";
-
-export type RootTabConfig = {
-  id: RootTab;
-  routeName: "explore" | "(search)" | "my-library" | "settings";
-  /** English fallback label. */
-  label: string;
-  /** i18n key (under the `tabs` namespace) resolved at render time. */
-  labelKey: string;
-  Icon: ComponentType<{ color?: string; size?: number; strokeWidth?: number }>;
-};
-
-export const ROOT_TABS: RootTabConfig[] = [
-  { id: "explore", routeName: "explore", label: "Explore", labelKey: "tabs.explore", Icon: Cloud },
-  { id: "search", routeName: "(search)", label: "Search", labelKey: "tabs.search", Icon: Search },
-  {
-    id: "myLibrary",
-    routeName: "my-library",
-    label: "My Library",
-    labelKey: "tabs.myLibrary",
-    Icon: BookOpen,
-  },
-  {
-    id: "settings",
-    routeName: "settings",
-    label: "Settings",
-    labelKey: "tabs.settings",
-    Icon: Settings,
-  },
-];
 
 export function isSection(value: RootTab): value is Section {
   return value !== "search";
