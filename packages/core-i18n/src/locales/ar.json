@@ -72,6 +72,7 @@
       "signOutTitle": "تسجيل الخروج؟",
       "signOutConfirm": "تسجيل الخروج",
       "signOutPrompt": "هل أنت متأكد من رغبتك في تسجيل الخروج؟",
+      "signOutError": "فشل تسجيل الخروج. يُرجى المحاولة مرة أخرى.",
       "deleteAccountConfirm": "حذف الحساب",
       "deleteAccountPrompt": "هذا الإجراء دائم ولا يمكن التراجع عنه. سيتم حذف جميع بياناتك.",
       "deleteConfirmWord": "حذف",

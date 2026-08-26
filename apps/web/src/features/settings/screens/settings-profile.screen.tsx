@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 
 import { useAuth } from "@/core/auth";
 import { authClient } from "@/core/auth/auth-client";
+import { useSignOut } from "@/core/auth/use-sign-out";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AuthModal } from "@/features/auth";
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
@@ -20,7 +21,6 @@ import {
   ConfirmationTextDialog,
 } from "@/shared/components/ui/confirmation-dialog";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
-import { hasWindow } from "@/shared/lib/runtime-guards";
 
 import styles from "./settings-profile.screen.module.css";
 
@@ -38,6 +38,7 @@ function ProfileContent() {
     isSuccess: isUpdateSuccess,
     isError: isUpdateError,
   } = useUpdateProfile();
+  const { signOut, error: signOutError } = useSignOut();
   const router = useRouter();
   const [displayName, setDisplayName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -50,20 +51,6 @@ function ProfileContent() {
       setDisplayName(profile.displayName ?? "");
     }
   }, [profile]);
-
-  const handleSignOut = async () => {
-    try {
-      await authClient.signOut();
-    } catch (err) {
-      console.error("Sign out error", err);
-    } finally {
-      if (hasWindow() && window.location && !process.env.VITEST) {
-        window.location.href = "/";
-      } else {
-        router.push("/");
-      }
-    }
-  };
 
   const handleDeleteAccount = () => {
     deleteAccount(undefined, {
@@ -213,7 +200,7 @@ function ProfileContent() {
       <ConfirmationDialog
         open={showSignOutModal}
         onOpenChange={setShowSignOutModal}
-        onConfirm={handleSignOut}
+        onConfirm={signOut}
         title={t("account.profile.signOutTitle", "Sign Out?")}
         confirmLabel={t("account.profile.signOutConfirm", "Sign Out")}
         variant="destructive"
@@ -222,6 +209,7 @@ function ProfileContent() {
         modalTestId="confirm-modal"
       >
         <p>{t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}</p>
+        {signOutError && <p role="alert">{signOutError}</p>}
       </ConfirmationDialog>
 
       <ConfirmationTextDialog

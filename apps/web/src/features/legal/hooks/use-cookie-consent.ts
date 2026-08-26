@@ -7,8 +7,8 @@ import { hasWindow } from "@/shared/lib/runtime-guards";
 const COOKIE_CONSENT_KEY = "cookie-consent:v1";
 const COOKIE_CONSENT_CHANGE_EVENT = "cookie-consent-change";
 
-function getCookieConsentFromStorage(): boolean {
-  if (!hasWindow()) return false;
+function getCookieConsentFromStorage(): boolean | null {
+  if (!hasWindow()) return null;
   const stored = window.localStorage.getItem(COOKIE_CONSENT_KEY);
   return stored === "true";
 }
@@ -32,14 +32,15 @@ function subscribeToCookieConsent(onChange: () => void): () => void {
 }
 
 export function useCookieConsent() {
-  const hasAccepted = useSyncExternalStore(
+  const consent = useSyncExternalStore(
     subscribeToCookieConsent,
     getCookieConsentFromStorage,
-    () => false,
+    () => null,
   );
 
   return {
-    hasAccepted,
+    hasAccepted: consent === true,
+    isResolved: consent !== null,
     accept,
   };
 }
