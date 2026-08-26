@@ -33,6 +33,7 @@ export default defineConfig({
     "import/no-cycle": "error",
     "no-unused-vars": "error",
     "unicorn/no-empty-file": "error",
+    "eslint/complexity": ["error", { max: 50, variant: "modified" }],
   },
   overrides: [
     {
@@ -58,6 +59,25 @@ export default defineConfig({
         "anti-slop/no-unsafe-dictionary-type": "off",
         "anti-slop/no-widen-then-assert": "off",
         "anti-slop/require-safety-comment-for-type-assertion": "off",
+        "eslint/complexity": "off",
+      },
+    },
+    {
+      files: [
+        "**/*.spec-e2e.{js,jsx,ts,tsx}",
+        "**/e2e/**/*.{js,jsx,ts,tsx}",
+        "**/*.config.{js,jsx,ts,tsx,mjs,cjs}",
+        "**/next.config.*",
+        "**/vite.config.*",
+        "**/vitest.config.*",
+        "**/jest.config.*",
+        "**/metro.config.*",
+        "**/babel.config.*",
+        "**/postcss.config.*",
+        "**/app.config.*",
+      ],
+      rules: {
+        "eslint/complexity": "off",
       },
     },
     {

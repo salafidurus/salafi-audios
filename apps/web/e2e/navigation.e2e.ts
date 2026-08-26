@@ -40,7 +40,7 @@ test.describe("Navigation — public workspace & routing", () => {
     }) => {
       await page.goto("/");
       const libraryLink = page.getByRole("navigation", { name: "Main" }).getByRole("link", {
-        name: "Library",
+        name: "My Library",
       });
       await expect(libraryLink).toBeVisible();
       await libraryLink.click();

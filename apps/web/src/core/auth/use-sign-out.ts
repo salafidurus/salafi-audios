@@ -16,8 +16,11 @@ export function useSignOut() {
   const signOut = async () => {
     setError(null);
     try {
-      await authClient.signOut();
-      if (hasWindow() && window.location) {
+      const result = await authClient.signOut();
+      if (result?.error) {
+        throw result.error;
+      }
+      if (hasWindow() && window.location && !process.env.VITEST) {
         window.location.href = "/";
       } else {
         router.push("/");

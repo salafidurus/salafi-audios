@@ -28,7 +28,7 @@
     "lint": {
       "dependsOn": ["^lint"],
       // Include ESLint configs (web/native still use ESLint) and oxlint config
-      "inputs": ["$TURBO_DEFAULT$", "eslint.config.*"],
+      "inputs": ["$TURBO_DEFAULT$", "oxlint.config.*", ".oxlintrc*"],
       "outputs": []
     },
     "typecheck": {

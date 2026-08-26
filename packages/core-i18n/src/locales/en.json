@@ -195,6 +195,11 @@
       "followedScholarsDesc": "Notify when a followed scholar posts",
       "newLectures": "New Lectures",
       "newLecturesDesc": "Notify when new lectures are published"
+    },
+    "tabs": {
+      "label": "Settings sections",
+      "general": "General",
+      "profile": "Profile"
     }
   },
   "support": {
