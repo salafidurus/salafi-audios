@@ -16,7 +16,9 @@ export function getPlaywrightPort(env: Record<string, string | undefined>): numb
 
 const playwrightPort = getPlaywrightPort(process.env);
 const playwrightBaseUrl = `http://localhost:${playwrightPort}`;
-const fallbackTestMode = process.env.PW_FALLBACK_FAULTS === "1";
+// The dedicated fault route is enabled for E2E runs by default. Set this to
+// "0" when a run must exercise the route's production-safe notFound guard.
+const fallbackTestMode = process.env.PW_FALLBACK_FAULTS !== "0";
 
 export default defineConfig({
   testDir: "./e2e",
