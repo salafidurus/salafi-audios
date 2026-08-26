@@ -68,7 +68,11 @@ function getPublicNavItems(t: (key: string, fallback: string) => string): AdminN
       href: routes.scholars.index,
       Icon: GraduationCap,
     },
-    { label: t("navigation.library", "Library"), href: routes.library.index, Icon: Bookmark },
+    {
+      label: t("navigation.myLibrary", "My Library"),
+      href: routes.myLibrary.index,
+      Icon: Bookmark,
+    },
   ];
 }
 

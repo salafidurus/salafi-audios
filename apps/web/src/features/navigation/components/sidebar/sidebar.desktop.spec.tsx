@@ -52,7 +52,7 @@ describe("Sidebar component", () => {
     process.env.NEXT_PUBLIC_WEB_URL = "http://localhost:3001";
   });
 
-  it("renders basic navigation links (Search, Explore, Scholars, Library, Settings)", () => {
+  it("renders basic navigation links (Search, Explore, Scholars, My Library, Settings)", () => {
     (useAuth as Mock<any>).mockReturnValue({
       isAuthenticated: false,
       isLoading: false,
@@ -65,7 +65,7 @@ describe("Sidebar component", () => {
     expect(screen.getByText("Search")).toBeInTheDocument();
     expect(screen.getByText("Explore")).toBeInTheDocument();
     expect(screen.getByText("Scholars")).toBeInTheDocument();
-    expect(screen.getByText("Library")).toBeInTheDocument();
+    expect(screen.getByText("My Library")).toBeInTheDocument();
     expect(screen.getByText("Settings")).toBeInTheDocument();
   });
 

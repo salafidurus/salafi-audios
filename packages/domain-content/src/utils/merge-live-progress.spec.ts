@@ -1,11 +1,11 @@
-import type { LibraryItemDto } from "@sd/core-contracts";
+import type { MyLibraryItemDto } from "@sd/core-contracts";
 import type { ListingProgress, Track } from "@sd/domain-audio";
 
 import { describe, it, expect } from "bun:test";
 
 import { mergeLiveProgress } from "./merge-live-progress";
 
-const baseItem: LibraryItemDto = {
+const baseItem: MyLibraryItemDto = {
   id: "l1",
   listingId: "l1",
   listingTitle: "Lecture One",

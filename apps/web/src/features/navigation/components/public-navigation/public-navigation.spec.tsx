@@ -248,7 +248,7 @@ describe("PublicNavigation", () => {
   });
 
   it("returns to the last safe public path from the admin workspace", () => {
-    window.sessionStorage.setItem(ADMIN_RETURN_PATH_KEY, "/library/saved");
+    window.sessionStorage.setItem(ADMIN_RETURN_PATH_KEY, "/my-library?tab=saved");
     mockUsePathname.mockReturnValue("/admin");
     (useAuth as Mock<any>).mockReturnValue({
       isAuthenticated: true,
@@ -263,7 +263,7 @@ describe("PublicNavigation", () => {
 
     expect(screen.getByRole("link", { name: "Back to App" })).toHaveAttribute(
       "href",
-      "/library/saved",
+      "/my-library?tab=saved",
     );
     window.sessionStorage.removeItem(ADMIN_RETURN_PATH_KEY);
   });

@@ -22,7 +22,7 @@ The mobile app (`apps/native`) is the listening-first client. It prioritizes con
 
 ## 3. Current Implementation State
 
-Mobile has search, auth, catalog browsing, audio playback with progress tracking, saved/library, offline audio downloads, local-first sync, and admin surfaces implemented. See §6 for the sync architecture and §7 for playback/downloads specifics.
+Mobile has search, auth, catalog browsing, audio playback with progress tracking, My Library, offline audio downloads, local-first sync, and admin surfaces implemented. See §6 for the sync architecture and §7 for playback/downloads specifics.
 
 The navigation surface has been reworked into a tabs-owned structure:
 
@@ -53,14 +53,14 @@ network-first and in-memory.
 Mobile data falls into three categories:
 
 1. **Offline-readable**: downloaded audio (`apps/native/src/features/downloads/`).
-2. **Offline-writable**: personal intent — progress and saved/library — recorded locally first and queued for sync via `@sd/core-sync`.
+2. **Offline-writable**: personal intent — progress and My Library saved state — recorded locally first and queued for sync via `@sd/core-sync`.
 3. **Offline-only**: temporary UI state and device-local preferences.
 
-Catalog/search/browse data is network-first and in-memory only (`QueryClientProvider`, no persister) — it is not available offline. Only progress, saved/library, and downloaded audio survive an app restart without connectivity.
+Catalog/search/browse data is network-first and in-memory only (`QueryClientProvider`, no persister) — it is not available offline. Only progress, My Library saved state, and downloaded audio survive an app restart without connectivity.
 
 ## 6. Sync Architecture
 
-`@sd/core-sync` is the shared local-first primitive, used by `@sd/domain-audio` (progress) and `@sd/domain-content` (saved/library) — the same logic on both web and native, differing only in which `StorageAdapter` each app injects (`apps/web/src/core/sync/local-storage-adapter.ts` wraps `localStorage`; `apps/native/src/core/sync/sqlite-kv-adapter.ts` wraps a dedicated `expo-sqlite` `kv_store` table in `sd-sync.db`).
+`@sd/core-sync` is the shared local-first primitive, used by `@sd/domain-audio` (progress) and `@sd/domain-content` (My Library saved state) — the same logic on both web and native, differing only in which `StorageAdapter` each app injects (`apps/web/src/core/sync/local-storage-adapter.ts` wraps `localStorage`; `apps/native/src/core/sync/sqlite-kv-adapter.ts` wraps a dedicated `expo-sqlite` `kv_store` table in `sd-sync.db`).
 
 - **Local writes are immediate and optimistic.** A save/unsave or a progress tick updates the local entity store before any network call. Progress and playback identity are keyed by `listingSlug`; internal database IDs are not client-facing identities.
 - **Debounced background sync.** Changes are batched and pushed after a short debounce rather than on every write.
@@ -71,8 +71,8 @@ network/API failures. The server-side Redis buffer only reduces PostgreSQL
 write frequency after a request has reached the API.
 
 - **Outbox is namespaced per user** (`progress:${userId}`, `saved:${userId}`) so switching accounts on the same device never leaks or retries another user's queued writes.
-- **Conflict resolution is last-write-wins by `updatedAt`**, mirroring the server's own `bulkSync` SQL (`INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...`). Progress additionally merges `isCompleted` monotonically (a completion can't be un-completed by an older write); saved/library uses plain LWW on a `deletedAt` tombstone, since a later unsave must be able to override an earlier save and vice versa.
-- **Delta hydration** pulls only what changed since the last sync via `?since=` on both the progress and saved/library endpoints.
+- **Conflict resolution is last-write-wins by `updatedAt`**, mirroring the server's own `bulkSync` SQL (`INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...`). Progress additionally merges `isCompleted` monotonically (a completion can't be un-completed by an older write); My Library saved state uses plain LWW on a `deletedAt` tombstone, since a later unsave must be able to override an earlier save and vice versa.
+- **Delta hydration** pulls only what changed since the last sync via `?since=` on both the progress and My Library saved-state endpoints.
 - **Drain triggers (native only):** `AppState` foreground and `expo-network` reconnect (`apps/native/src/core/network/network-status.ts`), wired in `apps/native/src/core/providers.tsx`. Web has no network-status listener — nothing on web currently needs one, since the debounced flush already covers the tab-stays-open case.
 
 This is the implemented architecture, not a target — backend rules still resolve conflicts deterministically and clients still record intent rather than authority, matching §4.
@@ -86,7 +86,7 @@ This is the implemented architecture, not a target — backend rules still resol
 
 ## 8. Mobile-Specific Constraints
 
-- Persistence is narrow and repository-owned (progress, saved/library, downloads) — not a blanket cache. Catalog/browse data is network-first and in-memory only.
+- Persistence is narrow and repository-owned (progress, My Library saved state, downloads) — not a blanket cache. Catalog/browse data is network-first and in-memory only.
 - It must not duplicate backend policy.
 - It must not invent alternative sync semantics outside the documented outbox model (§6).
 - Native admin screens are convenience clients for backend-protected
@@ -104,7 +104,7 @@ The tab bar is a product-specific navigation surface layered over a standard Exp
 - Subsection routes live inside each tab stack.
 - Current route state is authoritative for the active location.
 - Default subsection routes are canonical tab paths like `/(tabs)/(explore)`,
-  `/(tabs)/library`, and `/(tabs)/settings`.
+  `/(tabs)/my-library`, and `/(tabs)/settings`.
 
 ### Ownership
 

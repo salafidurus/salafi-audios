@@ -84,7 +84,7 @@ describe("proxy", () => {
       "/account/profile",
       "/explore",
       "/live",
-      "/library",
+      "/my-library",
       "/search",
       "/settings",
       "/",

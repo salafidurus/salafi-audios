@@ -112,10 +112,10 @@ function getNavItems(t: (key: string, fallback: string) => string): NavItem[] {
       activeMatch: routes.scholars.index,
     },
     {
-      label: t("navigation.library", "Library"),
+      label: t("navigation.myLibrary", "My Library"),
       Icon: Bookmark,
-      href: routes.library.index,
-      activeMatch: routes.library.index,
+      href: routes.myLibrary.index,
+      activeMatch: routes.myLibrary.index,
     },
     {
       label: t("navigation.settings", "Settings"),

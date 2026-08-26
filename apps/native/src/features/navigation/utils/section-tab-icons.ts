@@ -24,9 +24,9 @@ export type SectionTabIconKey =
   | "explore-recent"
   | "explore-scholar"
   | "explore-curation"
-  | "library-started"
-  | "library-saved"
-  | "library-completed"
+  | "my-library-started"
+  | "my-library-saved"
+  | "my-library-completed"
   | "settings-general"
   | "settings-profile"
   | "settings-legal";
@@ -35,9 +35,9 @@ const SECTION_TAB_ICONS = {
   "explore-recent": Clock,
   "explore-scholar": GraduationCap,
   "explore-curation": Sparkles,
-  "library-started": Play,
-  "library-saved": Bookmark,
-  "library-completed": CheckCircle,
+  "my-library-started": Play,
+  "my-library-saved": Bookmark,
+  "my-library-completed": CheckCircle,
   "settings-general": SlidersHorizontal,
   "settings-profile": User,
   "settings-legal": Scale,
