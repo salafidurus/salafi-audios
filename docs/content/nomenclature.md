@@ -65,6 +65,18 @@ respectively.
 To optimize querying, Listing records store a denormalized `title` and `description`
 containing the primary source text (e.g., Arabic), whereas `ListingTranslation`
 contains secondary localized translations (e.g., English). Slugs are globally unique
-(`slug String @unique`) to allow clean URL lookups at `/listings/:slug` for both web
-and mobile applications. Parent listings use `onDelete: Restrict` on child relations
-to prevent accidental orphans.
+(`slug String @unique`) and are the public identity used for clean URL lookups at
+`/listings/:slug` by both web and mobile applications. Client-facing contracts use
+`listingSlug`, `topicSlug`, and `scholarSlug`; after resolving those values, the API
+may use internal database IDs for relational queries. An ID-shaped public value never
+falls back to an internal-ID lookup. Parent listings use `onDelete: Restrict` on child
+relations to prevent accidental orphans.
+
+## Home and personal listening vocabulary
+
+**Public Home** is the anonymous Catalog surface for promotions and discovery. It is
+separate from private personal state.
+
+**Continue Listening** is a Home-only projection of authenticated unfinished Progress.
+It is not a Catalog entity, is absent while personal Progress is loading or empty, and
+disappears when `completedAt` is accepted.

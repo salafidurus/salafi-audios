@@ -62,7 +62,7 @@ Catalog/search/browse data is network-first and in-memory only (`QueryClientProv
 
 `@sd/core-sync` is the shared local-first primitive, used by `@sd/domain-audio` (progress) and `@sd/domain-content` (saved/library) — the same logic on both web and native, differing only in which `StorageAdapter` each app injects (`apps/web/src/core/sync/local-storage-adapter.ts` wraps `localStorage`; `apps/native/src/core/sync/sqlite-kv-adapter.ts` wraps a dedicated `expo-sqlite` `kv_store` table in `sd-sync.db`).
 
-- **Local writes are immediate and optimistic.** A save/unsave or a progress tick updates the local entity store (Zustand, keyed by id) before any network call.
+- **Local writes are immediate and optimistic.** A save/unsave or a progress tick updates the local entity store before any network call. Progress and playback identity are keyed by `listingSlug`; internal database IDs are not client-facing identities.
 - **Debounced background sync.** Changes are batched and pushed after a short debounce rather than on every write.
 - **Persisted outbox.** Pending pushes are queued in a `createOutboxStore` instance backed by the platform's `StorageAdapter`, so a failed push (offline, crash, force-quit) survives and is retried on the next flush — not lost like an in-memory retry queue would be.
 

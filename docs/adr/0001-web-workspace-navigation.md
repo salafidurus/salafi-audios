@@ -12,8 +12,8 @@ with administrative access need an unmistakable way to enter administration and
 return to the public application. Administrative access is capability- and
 scope-aware; it is not synonymous with the `superadmin` Role.
 
-The web client already has a shadcn foundation, RTL support, light/dark and
-accent themes, and stable public and `/admin/*` routes. Reorganizing those
+The web client already has a shadcn foundation, RTL support, light/dark themes,
+and stable public and `/admin/*` routes. Reorganizing those
 routes would add SEO, deep-link, and E2E risk without improving the underlying
 navigation problem.
 
