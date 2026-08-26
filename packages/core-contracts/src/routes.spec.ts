@@ -15,7 +15,6 @@ const leafRoutes = [
   routes.explore.curation,
   routes.myLibrary.index,
   routes.settings.index,
-  routes.settings.profile,
   routes.settings.legal,
   routes.scholars.index,
   routes.admin.index,
@@ -113,12 +112,10 @@ describe("resolveRouteAccess", () => {
   });
 
   it("normalizes a trailing slash", () => {
-    expect(resolveRouteAccess("/settings/profile/")).toBe("auth-optional");
     expect(resolveRouteAccess("/settings/")).toBe("auth-optional");
   });
 
   it("matches nested sub-paths via prefix", () => {
-    expect(resolveRouteAccess("/settings/profile/edit")).toBe("auth-optional");
     expect(resolveRouteAccess("/my-library/saved")).toBe("auth-optional");
     expect(resolveRouteAccess("/admin/users")).toBe("auth-required");
   });
@@ -146,7 +143,7 @@ describe("resolveRouteAccess", () => {
     expect(resolveRouteAccess("/admin/scholars")).toBe("auth-required");
   });
 
-  it("/settings/profile is auth-optional — shows AuthRequiredState, does not redirect", () => {
-    expect(resolveRouteAccess("/settings/profile")).toBe("auth-optional");
+  it("does not register the removed Settings Profile route", () => {
+    expect(routeDefinitions.some(({ path }) => path === "/settings/profile")).toBe(false);
   });
 });

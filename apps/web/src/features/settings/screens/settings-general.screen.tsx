@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { routes } from "@sd/core-contracts";
+import { useSearchParams } from "next/navigation";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { z } from "zod";
 
 import type { ThemePreference } from "@/core/styles/ThemeSync";
@@ -59,9 +61,19 @@ function loadThemePreference(): ThemePreference {
 
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<"general" | "profile">("general");
+  const searchParams = useSearchParams();
+  const queryTab = searchParams.get("tab") === "profile" ? "profile" : "general";
+  const [activeTab, setActiveTab] = useState<"general" | "profile">(queryTab);
+  const lastQueryTab = useRef(queryTab);
   const [themePreference, setThemePreference] = useState<ThemePreference>(loadThemePreference);
   const [notif, setNotif] = useState<NotificationState>(loadNotifState);
+
+  useEffect(() => {
+    if (queryTab !== lastQueryTab.current) {
+      lastQueryTab.current = queryTab;
+      setActiveTab(queryTab);
+    }
+  }, [queryTab]);
 
   const themeOptions: { value: ThemePreference; label: string }[] = [
     { value: "system", label: t("settings.general.themeOptions.system", "System") },
@@ -100,7 +112,19 @@ export function SettingsGeneralScreen() {
           value={activeTab}
           onValueChange={(value) => {
             // SAFETY: only the two values declared by this TabsList can be emitted by Radix Tabs.
-            setActiveTab(value as "general" | "profile");
+            const nextTab = value as "general" | "profile";
+            setActiveTab(nextTab);
+            const url = new URL(window.location.href);
+            if (nextTab === "profile") {
+              url.searchParams.set("tab", "profile");
+            } else {
+              url.searchParams.delete("tab");
+            }
+            window.history.replaceState(
+              window.history.state,
+              "",
+              `${routes.settings.index}${url.search}`,
+            );
           }}
           className={styles.tabs}
         >
