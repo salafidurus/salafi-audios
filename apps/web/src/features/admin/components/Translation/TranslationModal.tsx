@@ -9,7 +9,16 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { useTranslationForm } from "@/features/admin/hooks/Translation/useTranslationForm";
 import { getSecondaryLocales, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { computeLocalesToSave } from "@/features/admin/utils/translation-save";
-import { Modal } from "@/shared/components/ui/modal";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 
 import {
   translationEntities,
@@ -99,6 +108,7 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
 
   const secondaryLocales = getSecondaryLocales(state.mainLocale);
   const activeTab = activeTabOverride || secondaryLocales[0] || "review";
+  const errorTabSet = new Set(errorTabs);
 
   const handleClose = () => {
     setErrorTabs([]);
@@ -186,89 +196,126 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
     : t("admin.translations.title", "Translations");
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      title={modalTitle}
-      size="xl"
-      width="wide"
-      height="long"
-      multiTab
-      requireReview
-      errorTabs={errorTabs}
-      activeTab={activeTab}
-      onActiveTabChange={setActiveTabOverride}
-      saveFormId="translation-form"
-      saving={state.saving}
-      reviewTabId="review"
-    >
-      <form id="translation-form" onSubmit={handleSave} className={styles.form}>
-        <Modal.Tabs errorTabs={errorTabs}>
-          {secondaryLocales.map((locale) => (
-            <Modal.TabItem key={locale} id={locale}>
-              {getLocaleLabel(locale)}
-            </Modal.TabItem>
-          ))}
-          {showChildrenTab && (
-            <Modal.TabItem id="children">
-              {t("admin.translations.childrenTab", "Sub-listings")}
-            </Modal.TabItem>
-          )}
-          <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
-        </Modal.Tabs>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && !state.saving && handleClose()}>
+      <DialogContent className="max-h-[calc(100vh-2rem)] overflow-hidden sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>{modalTitle}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("admin.modal.formDescription", "Complete each tab before saving.")}
+          </DialogDescription>
+        </DialogHeader>
 
-        {state.status === "loading" && (
-          <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
-        )}
-
-        {state.status === "error" && !state.entityId && (
-          <div className={styles.error}>
-            {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
-          </div>
-        )}
-
-        {state.status === "ready" && (
-          <>
-            {state.error && <div className={styles.error}>{state.error}</div>}
-
-            {secondaryLocales.map((locale) => {
-              if (activeTab !== locale) return null;
-              return (
-                <TranslationLocaleFields
+        <form
+          id="translation-form"
+          onSubmit={handleSave}
+          className={`${styles.form} min-h-0 flex-1`}
+        >
+          <Tabs value={activeTab} onValueChange={setActiveTabOverride} className="min-h-0">
+            <TabsList
+              className="no-scrollbar w-full justify-start overflow-x-auto overflow-y-hidden"
+              aria-label={t("admin.modal.tabsLabel", "Form sections")}
+            >
+              {secondaryLocales.map((locale) => (
+                <TabsTrigger
                   key={locale}
+                  value={locale}
+                  aria-invalid={errorTabSet.has(locale) || undefined}
+                  onClick={() => setActiveTabOverride(locale)}
+                >
+                  {getLocaleLabel(locale)}
+                </TabsTrigger>
+              ))}
+              {showChildrenTab && (
+                <TabsTrigger value="children" onClick={() => setActiveTabOverride("children")}>
+                  {t("admin.translations.childrenTab", "Sub-listings")}
+                </TabsTrigger>
+              )}
+              <TabsTrigger value="review" onClick={() => setActiveTabOverride("review")}>
+                {t("admin.modal.reviewTab", "Review")}
+              </TabsTrigger>
+            </TabsList>
+            {state.status === "loading" && (
+              <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
+            )}
+
+            {state.status === "error" && !state.entityId && (
+              <div className={styles.error}>
+                {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
+              </div>
+            )}
+
+            {state.error && state.status === "ready" && (
+              <div className={styles.error}>{state.error}</div>
+            )}
+
+            {secondaryLocales.map((locale) => (
+              <TabsContent key={locale} value={locale}>
+                {state.status === "ready" && (
+                  <TranslationLocaleFields
+                    config={config}
+                    state={state}
+                    dispatch={dispatch}
+                    locale={locale}
+                    idPrefix={`translation-${target.entity}`}
+                    onPublishToggle={handlePublishToggle}
+                  />
+                )}
+              </TabsContent>
+            ))}
+
+            {showChildrenTab && (
+              <TabsContent value="children">
+                {state.status === "ready" && (
+                  <TranslationChildrenTab
+                    config={config}
+                    status={childrenStatus}
+                    error={childrenError}
+                    items={children}
+                    selectedChildId={selectedChildId}
+                    onSelectChild={setSelectedChildId}
+                    onBack={() => setSelectedChildId(null)}
+                    onChildSaved={() => setSelectedChildId(null)}
+                  />
+                )}
+              </TabsContent>
+            )}
+
+            <TabsContent value="review">
+              {state.status === "ready" && (
+                <TranslationReviewTab
                   config={config}
                   state={state}
-                  dispatch={dispatch}
-                  locale={locale}
-                  idPrefix={`translation-${target.entity}`}
-                  onPublishToggle={handlePublishToggle}
+                  secondaryLocales={secondaryLocales}
                 />
-              );
-            })}
+              )}
+            </TabsContent>
+          </Tabs>
 
-            {showChildrenTab && activeTab === "children" && (
-              <TranslationChildrenTab
-                config={config}
-                status={childrenStatus}
-                error={childrenError}
-                items={children}
-                selectedChildId={selectedChildId}
-                onSelectChild={setSelectedChildId}
-                onBack={() => setSelectedChildId(null)}
-                onChildSaved={() => setSelectedChildId(null)}
-              />
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={handleClose} disabled={state.saving}>
+              {t("common.cancel", "Cancel")}
+            </Button>
+            {activeTab === "review" ? (
+              <Button
+                type="submit"
+                form="translation-form"
+                variant="primary"
+                loading={state.saving}
+              >
+                {state.saving ? t("admin.access.saving", "Saving…") : t("common.save", "Save")}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => setActiveTabOverride("review")}
+              >
+                {t("admin.modal.reviewTab", "Review")}
+              </Button>
             )}
-
-            {activeTab === "review" && (
-              <TranslationReviewTab
-                config={config}
-                state={state}
-                secondaryLocales={secondaryLocales}
-              />
-            )}
-          </>
-        )}
-      </form>
-    </Modal>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
