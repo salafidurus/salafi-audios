@@ -6,8 +6,6 @@ import { TestAuthFactory, accessGrant } from './helpers/test-auth.factory';
 import { AccessCapability, AccessTarget } from '@sd/core-db';
 import { TEST_SCHOLAR_ID, seedTestData, cleanupE2ETestData } from './helpers/seed-test-data';
 
-process.env.DISABLE_THROTTLER = 'true';
-
 const SERIES_ID = 'b0000000-0000-0000-0000-000000000201';
 const SERIES_SLUG = 'e2e-arrange-series';
 const COLLECTION_ID = 'b0000000-0000-0000-0000-000000000202';

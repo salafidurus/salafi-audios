@@ -11,8 +11,6 @@ import { defineAbilityFor } from '../src/core/auth/ability/ability.factory';
 import type { AppAbility } from '../src/core/auth/ability/ability.types';
 import { TEST_SCHOLAR_SLUG, seedTestData, cleanupE2ETestData } from './helpers/seed-test-data';
 
-process.env.DISABLE_THROTTLER = 'true';
-
 function unpackClientAbility(rules: UserProfileDto['rules']): AppAbility {
   const ability = createMongoAbility(unpackRules(rules));
   // SAFETY: `/account/profile` returns packed CASL rules produced by the same
