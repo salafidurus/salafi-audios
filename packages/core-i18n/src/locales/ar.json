@@ -195,6 +195,11 @@
       "followedScholarsDesc": "إشعار عند نشر شيخ تتابعه",
       "newLectures": "المحاضرات الجديدة",
       "newLecturesDesc": "إشعار عند نشر محاضرات جديدة"
+    },
+    "tabs": {
+      "label": "أقسام الإعدادات",
+      "general": "عام",
+      "profile": "الملف الشخصي"
     }
   },
   "support": {
