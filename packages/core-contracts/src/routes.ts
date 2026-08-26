@@ -19,10 +19,8 @@ export const routes = {
     curation: "/explore/curation",
   },
 
-  library: {
-    index: "/library",
-    saved: "/library/saved",
-    completed: "/library/completed",
+  myLibrary: {
+    index: "/my-library",
   },
 
   settings: {
@@ -89,7 +87,7 @@ export const routeDefinitions: RouteDefinition[] = [
   { path: routes.settings.profile, access: "auth-optional" },
   { path: routes.settings.legal, access: "public" },
   { path: routes.settings.index, access: "auth-optional" },
-  { path: routes.library.index, access: "auth-optional" },
+  { path: routes.myLibrary.index, access: "auth-optional" },
   { path: routes.search, access: "public" },
   { path: routes.scholars.index, access: "public" },
   { path: routes.support, access: "public" },

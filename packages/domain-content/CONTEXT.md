@@ -1,7 +1,7 @@
 # Content Catalog
 
 The Content Catalog context defines the public teaching content people browse,
-the scholars who provide it, and the personal Library relationship to that
+the scholars who provide it, and the personal My Library relationship to that
 content.
 
 ## Content hierarchy
@@ -40,11 +40,11 @@ A public subject classification used to organize and discover Listings.
 The public surface where Listings are discovered and browsed. Explore is a
 user-facing name for this surface.
 
-_Avoid_: Library when referring to public catalog browsing.
+_Avoid_: My Library when referring to public catalog browsing.
 
-**Library**:
+**My Library**:
 A user's personal set of saved, in-progress, or completed relationships to
-content. Library membership does not change the public Listing.
+content. My Library membership does not change the public Listing.
 
 **Continue Listening**:
 A Home-only projection of an authenticated user's unfinished Progress. It is a

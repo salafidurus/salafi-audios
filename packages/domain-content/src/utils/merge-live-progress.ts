@@ -1,4 +1,4 @@
-import type { LibraryItemDto } from "@sd/core-contracts";
+import type { MyLibraryItemDto } from "@sd/core-contracts";
 import type { ListingProgress, Track } from "@sd/domain-audio";
 
 /**
@@ -12,15 +12,15 @@ import type { ListingProgress, Track } from "@sd/domain-audio";
  * the list (just started, not yet synced), it's added at the top. A lesson
  * nested in a Series/Collection is intentionally left out of this synthetic
  * step — the API rolls those up to the top-level listing (see
- * LibraryRepository.findInProgress), and this function has no way to know
+ * MyLibraryRepository.findInProgress), and this function has no way to know
  * that top-level listing's own title/slug from Track metadata alone. That
  * case self-heals within the next sync + invalidation instead.
  */
 export function mergeLiveProgress(
-  items: LibraryItemDto[],
+  items: MyLibraryItemDto[],
   progressMap: Record<string, ListingProgress>,
   currentTrack?: Track | null,
-): LibraryItemDto[] {
+): MyLibraryItemDto[] {
   const merged = items.map((item) => {
     const live = progressMap[item.listingSlug];
     if (!live) return item;

@@ -42,16 +42,16 @@ function buildEngine(outbox: Outbox<SavedEntry>): SyncEngine<SavedEntry> {
     // collapses an accidental double-tap rather than batching a stream of writes.
     debounceMs: 3_000,
     pushOne: async (entry) => {
-      // Resolves by slug, not the uuid id (LibraryRepository.resolveListingId) —
+      // Resolves by slug, not the uuid id (MyLibraryRepository.resolveListingId) —
       // fall back to id only if no slug was ever recorded for this entry.
       await httpClient({
-        url: endpoints.library.saveListing(entry.slug ?? entry.id),
+        url: endpoints.myLibrary.saveListing(entry.slug ?? entry.id),
         method: entry.deletedAt ? "DELETE" : "POST",
       });
     },
     pushBulk: async (entries) => {
       await httpClient({
-        url: endpoints.library.savedSync,
+        url: endpoints.myLibrary.savedSync,
         method: "POST",
         body: {
           items: entries.map((entry) => ({
@@ -64,7 +64,7 @@ function buildEngine(outbox: Outbox<SavedEntry>): SyncEngine<SavedEntry> {
     },
     pullSince: async (since) => {
       const entries = await httpClient<SavedDeltaItemDto[]>({
-        url: endpoints.library.savedDelta,
+        url: endpoints.myLibrary.savedDelta,
         method: "GET",
         params: since ? { since } : undefined,
       });

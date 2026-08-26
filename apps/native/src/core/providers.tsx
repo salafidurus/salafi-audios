@@ -157,7 +157,7 @@ export function Providers({ children, apiBaseUrl }: Props) {
     if (!isAuthenticated || !user?.id) return;
     return initProgressPersistence(user.id, {
       onFlushed: () => {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.library.all });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.myLibrary.all });
       },
     });
   }, [isAuthenticated, user?.id]);

@@ -35,14 +35,16 @@ test.describe("Navigation — public workspace & routing", () => {
       await expect(page).toHaveURL(/\/scholars/);
     });
 
-    test("clicking Library public navigation link navigates to /library", async ({ page }) => {
+    test("clicking My Library public navigation link navigates to /my-library", async ({
+      page,
+    }) => {
       await page.goto("/");
       const libraryLink = page.getByRole("navigation", { name: "Main" }).getByRole("link", {
         name: "Library",
       });
       await expect(libraryLink).toBeVisible();
       await libraryLink.click();
-      await expect(page).toHaveURL(/\/library/);
+      await expect(page).toHaveURL(/\/my-library/);
     });
 
     test("page title updates on navigation", async ({ page }) => {

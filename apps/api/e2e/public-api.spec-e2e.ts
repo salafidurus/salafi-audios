@@ -224,7 +224,7 @@ describe('Public API (e2e)', () => {
       await request(server).get(`/listings/${TEST_LISTING_ID}/contents`).expect(404);
       await request(server).get(`/audio/listings/${TEST_LISTING_ID}/stream`).expect(404);
       await request(server)
-        .post(`/me/library/save/${TEST_LISTING_ID}`)
+        .post(`/me/my-library/save/${TEST_LISTING_ID}`)
         .set(auth.headers)
         .expect(404);
       await request(server)

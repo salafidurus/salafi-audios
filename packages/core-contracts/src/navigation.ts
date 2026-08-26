@@ -6,7 +6,7 @@
  */
 import { routes } from "./routes";
 
-export type Section = "explore" | "library" | "settings" | "adminContents";
+export type Section = "explore" | "myLibrary" | "settings" | "adminContents";
 
 export type TabConfig = { id: string; label: string; labelKey: string; icon: string };
 
@@ -26,18 +26,23 @@ export const SECTION_TABS = {
       icon: "sparkles",
     },
   ],
-  library: [
+  myLibrary: [
     {
       id: "started",
       label: "Started",
-      labelKey: "navigation.subnav.library.started",
+      labelKey: "navigation.subnav.myLibrary.started",
       icon: "play",
     },
-    { id: "saved", label: "Saved", labelKey: "navigation.subnav.library.saved", icon: "bookmark" },
+    {
+      id: "saved",
+      label: "Saved",
+      labelKey: "navigation.subnav.myLibrary.saved",
+      icon: "bookmark",
+    },
     {
       id: "completed",
       label: "Completed",
-      labelKey: "navigation.subnav.library.completed",
+      labelKey: "navigation.subnav.myLibrary.completed",
       icon: "check-circle",
     },
   ],
@@ -73,21 +78,21 @@ export const SECTION_TABS = {
 
 export const DEFAULT_TABS = {
   explore: "recent",
-  library: "started",
+  myLibrary: "started",
   settings: "general",
   adminContents: "topics",
 } satisfies Record<Section, string>;
 
 export const SECTION_LABELS = {
   explore: "Explore",
-  library: "Library",
+  myLibrary: "My Library",
   settings: "Settings",
   adminContents: "Content",
 } satisfies Record<Section, string>;
 
 export const SECTION_ROUTES = {
   explore: routes.explore.index,
-  library: routes.library.index,
+  myLibrary: routes.myLibrary.index,
   settings: routes.settings.index,
   adminContents: routes.admin.contents,
 } satisfies Record<Section, string>;

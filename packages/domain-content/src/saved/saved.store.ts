@@ -4,7 +4,7 @@ import { createEntityStore, type SyncableEntity } from "@sd/core-sync";
  * `id` is the stable listingId (uuid) — this is what the rest of the app
  * keys "is this saved" lookups on. `slug` is carried alongside for the
  * sync layer's push, since the single-item save/unsave endpoint resolves by
- * slug, not uuid (see `LibraryRepository.resolveListingId`). Absent
+ * slug, not uuid (see `MyLibraryRepository.resolveListingId`). Absent
  * `savedAt` means the entry is tombstoned (unsaved).
  */
 export type SavedEntry = SyncableEntity & {

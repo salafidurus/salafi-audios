@@ -13,11 +13,11 @@ export type UseContinueListeningOptions = {
 
 export function useContinueListening(options?: UseContinueListeningOptions) {
   const query = useApiQuery<RecentProgressDto | null>(
-    queryKeys.library.recentProgress(),
+    queryKeys.myLibrary.recentProgress(),
     async () => {
       try {
         return await httpClient<RecentProgressDto | null>({
-          url: endpoints.library.recentProgress,
+          url: endpoints.myLibrary.recentProgress,
           method: "GET",
         });
       } catch (error) {

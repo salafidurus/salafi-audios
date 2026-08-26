@@ -11,7 +11,7 @@ import { initProgressPersistence } from "./progress-persistence";
 // effects (e.g. a fallback QueryClient instantiation) that don't play well
 // with this file's minimal jest environment — same convention already used
 // by other native specs that touch @sd/domain-content (e.g.
-// library-saved.screen.spec.tsx). Saved-sync's real behavior is covered by
+// my-library-saved.screen.spec.tsx). Saved-sync's real behavior is covered by
 // @sd/domain-content's own saved.sync.spec.ts.
 jest.mock("@sd/domain-content", () => ({
   initSavedSync: jest.fn(async () => {}),
@@ -124,7 +124,7 @@ describe("initProgressPersistence", () => {
     cleanup();
   });
 
-  it("hydrates saved/library state from the server once on init", () => {
+  it("hydrates saved/my-library state from the server once on init", () => {
     const cleanup = initProgressPersistence(USER_ID);
 
     expect(hydrateSavedFromServer).toHaveBeenCalledTimes(1);

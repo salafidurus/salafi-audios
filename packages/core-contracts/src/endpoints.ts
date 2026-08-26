@@ -21,14 +21,14 @@ export const endpoints = {
     recent: "/listings/recent",
     promotions: "/listings/promotions",
   },
-  library: {
-    saved: "/me/library/saved",
-    savedDelta: "/me/library/saved/delta",
-    savedSync: "/me/library/saved/sync",
-    completed: "/me/library/completed",
-    progress: "/me/library/progress",
-    recentProgress: "/me/library/recent-progress",
-    saveListing: (listingSlug: string) => `/me/library/save/${listingSlug}`,
+  myLibrary: {
+    saved: "/me/my-library/saved",
+    savedDelta: "/me/my-library/saved/delta",
+    savedSync: "/me/my-library/saved/sync",
+    completed: "/me/my-library/completed",
+    progress: "/me/my-library/progress",
+    recentProgress: "/me/my-library/recent-progress",
+    saveListing: (listingSlug: string) => `/me/my-library/save/${listingSlug}`,
   },
   account: {
     profile: "/account/profile",

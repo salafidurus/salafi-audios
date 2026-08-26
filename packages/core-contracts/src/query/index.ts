@@ -61,21 +61,21 @@ export const queryKeys = {
     infinite: (params: SearchCatalogParams) =>
       [...queryKeys.search.all, "infinite", params] as const,
   },
-  library: {
-    all: ["library"] as const,
+  myLibrary: {
+    all: ["my-library"] as const,
     saved: {
-      all: () => [...queryKeys.library.all, "saved"] as const,
-      infinite: () => [...queryKeys.library.all, "saved", "infinite"] as const,
+      all: () => [...queryKeys.myLibrary.all, "saved"] as const,
+      infinite: () => [...queryKeys.myLibrary.all, "saved", "infinite"] as const,
     },
     completed: {
-      all: () => [...queryKeys.library.all, "completed"] as const,
-      infinite: () => [...queryKeys.library.all, "completed", "infinite"] as const,
+      all: () => [...queryKeys.myLibrary.all, "completed"] as const,
+      infinite: () => [...queryKeys.myLibrary.all, "completed", "infinite"] as const,
     },
     progress: {
-      all: () => [...queryKeys.library.all, "progress"] as const,
-      infinite: () => [...queryKeys.library.all, "progress", "infinite"] as const,
+      all: () => [...queryKeys.myLibrary.all, "progress"] as const,
+      infinite: () => [...queryKeys.myLibrary.all, "progress", "infinite"] as const,
     },
-    recentProgress: () => [...queryKeys.library.all, "recentProgress"] as const,
+    recentProgress: () => [...queryKeys.myLibrary.all, "recentProgress"] as const,
   },
   account: {
     all: ["account"] as const,
