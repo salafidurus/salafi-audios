@@ -6,9 +6,14 @@ import { PublicNavigation } from "../public-navigation/public-navigation";
 type PublicShellProps = {
   children: React.ReactNode;
   beforeFooter?: React.ReactNode;
+  simulateFailure?: boolean;
 };
 
-export function PublicShell({ children, beforeFooter }: PublicShellProps) {
+export function PublicShell({ children, beforeFooter, simulateFailure = false }: PublicShellProps) {
+  if (simulateFailure) {
+    throw new Error("Intentional public shell failure");
+  }
+
   return (
     <div className="appFrame">
       <div className="appConsentShell">
