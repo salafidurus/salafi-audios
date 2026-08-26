@@ -21,7 +21,7 @@ test.describe("My Library", () => {
         "aria-selected",
         "true",
       );
-      await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+      await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
     }
   });
 
@@ -30,7 +30,7 @@ test.describe("My Library", () => {
 
     await page.getByRole("tab", { name: "Saved" }).click();
     await expect(page).toHaveURL("/my-library?tab=saved");
-    await expect(page.getByRole("heading", { name: "Saved" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Saved", exact: true })).toBeVisible();
 
     await page.goBack();
     await expect(page).toHaveURL(/\/my-library$/);
@@ -48,7 +48,7 @@ test.describe("My Library", () => {
     await page.goto("/my-library?tab=saved");
 
     await expect(
-      page.getByRole("heading", { name: "Sign in to view your saved lessons" }),
+      page.getByRole("heading", { name: "Sign in to view saved lectures" }),
     ).toBeVisible();
     await expect(page).toHaveURL("/my-library?tab=saved");
   });
