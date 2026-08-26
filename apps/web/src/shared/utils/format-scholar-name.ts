@@ -1,5 +1,1 @@
-export {
-  formatScholarName,
-  useFormatScholarName,
-  type ScholarWithNameAndTitle,
-} from "@sd/domain-content";
+export { useFormatScholarName, type ScholarWithNameAndTitle } from "@sd/domain-content";

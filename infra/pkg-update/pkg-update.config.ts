@@ -11,9 +11,6 @@ export const config: PkupdateConfig = {
   groups: {
     nestjs: { patterns: ["@nestjs/*"] },
     prisma: { patterns: ["prisma", "@prisma/*"] },
-    vitest: {
-      patterns: ["vitest", "@vitest/*", "@vitejs/*", "vite-tsconfig-paths", "unplugin-swc"],
-    },
     fastify: { patterns: ["@fastify/*"] },
     "better-auth": { patterns: ["better-auth", "@better-auth/*"] },
     turbo: { patterns: ["turbo"] },

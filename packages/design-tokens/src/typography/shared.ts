@@ -100,13 +100,6 @@ export const typographyBase = {
   },
 } satisfies Record<TypographyVariant, TypographyToken>;
 
-export const weightToKey = {
-  400: "regular",
-  500: "medium",
-  600: "semibold",
-  700: "bold",
-} satisfies Record<number, FontWeightKey>;
-
 export const getWeightKey = (weight: number): FontWeightKey => {
   switch (weight) {
     case 400:

@@ -57,9 +57,7 @@
         "**/*.spec.*",
         "**/*.test.*",
         "jest.config.*",
-        "**/jest.config.*",
-        "vitest.config.*",
-        "**/vitest.config.*"
+        "**/jest.config.*"
       ],
       "outputs": []
     },

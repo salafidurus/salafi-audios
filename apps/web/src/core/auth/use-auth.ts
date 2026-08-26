@@ -8,11 +8,3 @@ export function useAuth() {
     user: session?.user,
   };
 }
-
-export function useRequireAuth() {
-  const { data: session, isPending } = authClient.useSession();
-  return {
-    isAuthenticated: !!session,
-    isLoading: isPending,
-  };
-}

@@ -1,7 +1,4 @@
-import type { ComponentType } from "react";
-
 import { routes } from "@sd/core-contracts";
-import { BookOpen, Cloud, Search, Settings } from "lucide-react-native";
 
 import { nativeRoutes } from "@/core/navigation/routes";
 
@@ -9,57 +6,8 @@ import { DEFAULT_TABS, SECTION_TABS, type Section } from "../types";
 
 export type RootTab = Section | "search";
 
-export type RootTabConfig = {
-  id: RootTab;
-  routeName: "explore" | "(search)" | "my-library" | "settings";
-  /** English fallback label. */
-  label: string;
-  /** i18n key (under the `tabs` namespace) resolved at render time. */
-  labelKey: string;
-  Icon: ComponentType<{ color?: string; size?: number; strokeWidth?: number }>;
-};
-
-export const ROOT_TABS: RootTabConfig[] = [
-  { id: "explore", routeName: "explore", label: "Explore", labelKey: "tabs.explore", Icon: Cloud },
-  { id: "search", routeName: "(search)", label: "Search", labelKey: "tabs.search", Icon: Search },
-  {
-    id: "myLibrary",
-    routeName: "my-library",
-    label: "My Library",
-    labelKey: "tabs.myLibrary",
-    Icon: BookOpen,
-  },
-  {
-    id: "settings",
-    routeName: "settings",
-    label: "Settings",
-    labelKey: "tabs.settings",
-    Icon: Settings,
-  },
-];
-
-const GROUP_NAME_TO_TAB = {
-  explore: "explore",
-  "(search)": "search",
-  "my-library": "myLibrary",
-  settings: "settings",
-} satisfies Record<RootTabConfig["routeName"], RootTab>;
-
 export function isSection(value: RootTab): value is Section {
   return value !== "search";
-}
-
-function isRootTabRouteName(routeName: string): routeName is keyof typeof GROUP_NAME_TO_TAB {
-  return routeName in GROUP_NAME_TO_TAB;
-}
-
-export function getRootTabByRouteName(routeName: string): RootTabConfig | undefined {
-  if (!isRootTabRouteName(routeName)) {
-    return undefined;
-  }
-
-  const tabId = GROUP_NAME_TO_TAB[routeName];
-  return ROOT_TABS.find((tab) => tab.id === tabId);
 }
 
 export function getRootTabFromPathname(pathname: string): RootTab {

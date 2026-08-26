@@ -88,3 +88,18 @@ in-scope production function. The repository measures it with Oxlint's
 `eslint/complexity` rule using the `modified` variant. It is a control-flow
 maintainability measure, not a synonym for file size, naming quality, or
 general readability.
+
+## Dead-code governance vocabulary
+
+**Reachable code** is executable code connected through accepted static or
+dynamic edges to a declared runtime, build, route, job, CLI, package, or test
+root.
+
+**Orphan code** is executable code with no confirmed path from an accepted root.
+
+**Dead test** is a test that does not observe behavior, protect a supported
+contract, or provide meaningful regression evidence.
+
+**Confirmed dead** is an orphan or dead test whose removal has been checked
+against runtime roots, dynamic mechanisms, external-consumer policy, and
+verification results.

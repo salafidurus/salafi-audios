@@ -19,7 +19,6 @@ export {
   LectureSaveButton,
   type LectureSaveButtonProps,
 } from "./components/listing/lecture-save-button/LectureSaveButton";
-export { LectureMeta, type LectureMetaProps } from "./components/listing/lecture-meta/lecture-meta";
 export { TopicChips, type TopicChipsProps } from "./components/listing/topic-chips/topic-chips";
 export {
   SeriesContextBar,

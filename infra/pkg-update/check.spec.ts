@@ -1,4 +1,4 @@
-import { describe, it, expect, mock } from "bun:test";
+import { describe, it, expect } from "bun:test";
 import { mkdtempSync, writeFileSync, mkdirSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
@@ -6,28 +6,33 @@ import { join } from "path";
 import {
   filterByGroups,
   dedupeCandidates,
-  checkAll,
-  checkCatalog,
-  checkBun,
-  checkExpo,
+  checkAll as checkAllWithRealFetcher,
+  checkCatalog as checkCatalogWithRealFetcher,
+  checkBun as checkBunWithRealFetcher,
+  checkExpo as checkExpoWithRealFetcher,
 } from "./check";
 import { config, type PkupdateConfig } from "./pkg-update.config";
 
-mock.module("./utils/npm", () => ({
-  fetchLatestVersion: mock((name: string) => {
-    const versions: Record<string, string> = {
-      zod: "4.4.3",
-      bun: "1.4.0",
-      expo: "57.0.6",
-      "@nestjs/core": "11.2.0",
-      prisma: "7.4.1",
-      typescript: "5.6.3",
-      "@babel/runtime": "7.25.0",
-      "@babel/core": "8.0.1",
-    };
-    return Promise.resolve(versions[name] ?? null);
-  }),
-}));
+const fetchLatestVersionMock = async (name: string): Promise<string | null> => {
+  const versions: Record<string, string> = {
+    zod: "4.4.3",
+    bun: "1.4.0",
+    expo: "57.0.6",
+    "@nestjs/core": "11.2.0",
+    prisma: "7.4.1",
+    typescript: "5.6.3",
+    "@babel/runtime": "7.25.0",
+    "@babel/core": "8.0.1",
+  };
+  return versions[name] ?? null;
+};
+
+const checkCatalog = (rootDir: string, cfg: PkupdateConfig) =>
+  checkCatalogWithRealFetcher(rootDir, cfg, fetchLatestVersionMock);
+const checkBun = (rootDir: string) => checkBunWithRealFetcher(rootDir, fetchLatestVersionMock);
+const checkExpo = (rootDir: string) => checkExpoWithRealFetcher(rootDir, fetchLatestVersionMock);
+const checkAll = (rootDir: string, cfg: PkupdateConfig) =>
+  checkAllWithRealFetcher(rootDir, cfg, fetchLatestVersionMock);
 
 function createTempPkg(content: Record<string, unknown>): string {
   const dir = mkdtempSync(join(tmpdir(), "pkg-update-test-"));
@@ -39,7 +44,6 @@ describe("filterByGroups", () => {
   const groups: PkupdateConfig["groups"] = {
     nestjs: { patterns: ["@nestjs/*"] },
     prisma: { patterns: ["prisma", "@prisma/*"] },
-    vitest: { patterns: ["vitest", "@vitest/*"] },
   };
 
   it("matches @nestjs/core to nestjs group", () => {

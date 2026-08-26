@@ -26,8 +26,6 @@ export type WebRuntimeEnv = {
 };
 
 export const isDev = process.env.NODE_ENV === "development";
-export const isProduction = process.env.NODE_ENV === "production";
-export const isPreview = !isDev && !isProduction;
 
 export function getWebRuntimeEnv(): WebRuntimeEnv {
   if (process.env.NODE_ENV === "test") {

@@ -3,11 +3,6 @@
  * Encodes/decodes cursors as base64 to make them opaque to clients
  */
 
-export interface PaginationParams {
-  cursor?: string;
-  pageSize?: number;
-}
-
 export interface PaginatedResult<T> {
   items: T[];
   nextCursor?: string;

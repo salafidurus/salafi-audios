@@ -21,7 +21,7 @@ describe('Public API (e2e)', () => {
   let authFactory: TestAuthFactory;
 
   beforeAll(async () => {
-    ({ app } = await createE2eApp());
+    ({ app } = await createE2eApp({ disableThrottler: true }));
     prisma = app.get(PrismaService);
     authFactory = new TestAuthFactory(prisma);
     await seedTestData(prisma);
