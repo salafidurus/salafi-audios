@@ -32,6 +32,12 @@ describe("dead-code-audit CLI", () => {
     const report = JSON.parse(result.stdout);
     expect(report.tool).toBe("knip");
     expect(report.mode).toBe("report-only");
+    expect(report.summary).toMatchObject({
+      blockingCount: 0,
+      currentFindingCount: 2,
+      introducedCount: 0,
+      testFilesReviewed: 0,
+    });
     expect(report.testFindings).toEqual([]);
     expect(report.findings).toEqual(
       expect.arrayContaining([

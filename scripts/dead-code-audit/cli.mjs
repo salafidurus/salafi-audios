@@ -220,6 +220,12 @@ function makeReport({
     introduced,
     mode: mode === "audit" ? "report-only" : mode,
     root: auditRoot,
+    summary: {
+      blockingCount: blocking.length,
+      currentFindingCount: findings.length,
+      introducedCount: introduced.length,
+      testFilesReviewed: testFindings.length,
+    },
     testFindings,
     blocking,
     tool: "knip",
@@ -256,24 +262,39 @@ function printReport(report, format) {
     return;
   }
   process.stdout.write(`# Dead-code audit\n\nMode: ${report.mode}\n\n`);
+  process.stdout.write("## Delivery status\n\n");
   process.stdout.write(
-    `Baseline findings: ${report.baseline.findingCount}; introduced findings: ${report.introduced.length}\n\n`,
+    `- Baseline findings: ${report.baseline.findingCount}\n` +
+      `- Introduced findings: ${report.introduced.length}\n` +
+      `- Blocking findings: ${report.blocking.length}\n\n`,
   );
-  const categories = Map.groupBy(
-    [...report.findings, ...report.testFindings],
-    ({ category }) => category,
+
+  process.stdout.write(
+    "Only newly introduced `confirmed-dead` findings block delivery. The sections below are review evidence and test statistics; they are not deletion counts.\n\n",
   );
-  process.stdout.write("## Findings by classification\n\n");
-  for (const [category, items] of categories)
+
+  const codeCategories = Map.groupBy(report.findings, ({ category }) => category);
+  process.stdout.write("## Code review inventory (non-blocking)\n\n");
+  if (codeCategories.size === 0) process.stdout.write("- None\n");
+  for (const [category, items] of codeCategories)
     process.stdout.write(`- ${category}: ${items.length}\n`);
   process.stdout.write("\n");
-  if (report.blocking.length > 0) process.stdout.write("## Blocking findings\n\n");
-  for (const finding of report.blocking)
-    process.stdout.write(
-      `- ${finding.category}: \`${finding.file}\` (${finding.key}) — ${finding.recommendation ?? "review"}\n`,
-    );
-  process.stdout.write("## Test inventory\n\n");
+
+  if (report.blocking.length > 0) {
+    process.stdout.write("## Blocking findings\n\n");
+    for (const finding of report.blocking)
+      process.stdout.write(
+        `- ${finding.category}: \`${finding.file}\` (${finding.key}) — ${finding.recommendation ?? "review"}\n`,
+      );
+    process.stdout.write("\n");
+  }
+
+  process.stdout.write("## Test inventory statistics (non-blocking)\n\n");
   process.stdout.write(`Test files reviewed: ${report.testFindings.length}\n\n`);
+  if (report.testFindings.length === 0) {
+    process.stdout.write("- None\n");
+    return;
+  }
   for (const category of new Set(report.testFindings.map(({ category }) => category))) {
     process.stdout.write(
       `- ${category}: ${report.testFindings.filter((finding) => finding.category === category).length}\n`,

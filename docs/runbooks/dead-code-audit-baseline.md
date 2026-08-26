@@ -39,6 +39,13 @@ The initial calibrated run found:
 
 The test counts are heuristic inventory signals. They do not determine whether a test is obsolete, redundant, or safe to remove. The classifier intentionally lacks semantic equivalence and runtime coverage claims; those decisions require the evidence described in #640.
 
+The command's Markdown output separates delivery status from review inventory and
+test statistics. `Baseline findings`, `introduced findings`, and `blocking
+findings` describe delivery gates. Code classifications and test classifications
+are non-blocking evidence counts; they are not a backlog whose totals should be
+reduced to zero. Only an explicitly confirmed and approved cleanup candidate is
+eligible for removal.
+
 The stable finding-key snapshot is generated temporarily from the selected base
 commit when `--base` is supplied. No generated JSON snapshot or allowlist is
 checked into the repository. Record material rule or accepted-root changes in
