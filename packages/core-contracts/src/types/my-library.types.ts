@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { LocaleSchema } from "./localization.types";
 
-export const LibraryItemDtoSchema = z.object({
+export const MyLibraryItemDtoSchema = z.object({
   id: z.string(),
   listingId: z.string(),
   listingTitle: z.string(),
@@ -22,14 +22,14 @@ export const LibraryItemDtoSchema = z.object({
   /** Original-language listing title, set only when `listingTitle` is translated. */
   originalListingTitle: z.string().optional(),
 });
-export type LibraryItemDto = z.infer<typeof LibraryItemDtoSchema>;
+export type MyLibraryItemDto = z.infer<typeof MyLibraryItemDtoSchema>;
 
-export const LibraryPageDtoSchema = z.object({
-  items: z.array(LibraryItemDtoSchema),
+export const MyLibraryPageDtoSchema = z.object({
+  items: z.array(MyLibraryItemDtoSchema),
   nextCursor: z.string().optional(),
   hasMore: z.boolean(),
 });
-export type LibraryPageDto = z.infer<typeof LibraryPageDtoSchema>;
+export type MyLibraryPageDto = z.infer<typeof MyLibraryPageDtoSchema>;
 
 export const SavedSyncItemDtoSchema = z.object({
   listingId: z.string(),
@@ -43,7 +43,7 @@ export const SavedSyncDtoSchema = z.object({
 });
 export type SavedSyncDto = z.infer<typeof SavedSyncDtoSchema>;
 
-/** One row of `GET /me/library/saved/delta` — includes tombstones (`deletedAt` set) so a
+/** One row of `GET /me/my-library/saved/delta` — includes tombstones (`deletedAt` set) so a
  * client can reconcile removals, not just additions, since the given cursor. */
 export const SavedDeltaItemDtoSchema = z.object({
   listingId: z.string(),
