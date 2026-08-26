@@ -44,7 +44,7 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { t } = useTranslation();
 
   const { isPlaying, currentTrack } = useAudio();
-  const isCurrentTrack = lecture ? currentTrack?.id === lecture.id : false;
+  const isCurrentTrack = lecture ? currentTrack?.slug === lecture.slug : false;
 
   const isSaved = useIsSaved(lecture?.id ?? "");
 
@@ -215,10 +215,10 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
           </View>
         </View>
 
-        <DownloadProgress lectureId={lecture.id} />
+        <DownloadProgress listingSlug={lecture.slug} />
 
         {lecture.primaryAudioAsset?.url ? (
-          <DownloadButton lectureId={lecture.id} audioUrl={lecture.primaryAudioAsset.url} />
+          <DownloadButton listingSlug={lecture.slug} audioUrl={lecture.primaryAudioAsset.url} />
         ) : null}
 
         <TopicChips topics={lecture.topics} />
@@ -230,7 +230,7 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
         ) : null}
 
         {lecture.seriesContext ? (
-          <SeriesContextBar seriesContext={lecture.seriesContext} lectureId={lecture.id} />
+          <SeriesContextBar seriesContext={lecture.seriesContext} listingSlug={lecture.slug} />
         ) : null}
       </ScrollView>
     </ScreenView>

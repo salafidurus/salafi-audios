@@ -19,7 +19,7 @@ const baseItem: LibraryItemDto = {
 
 function liveProgress(overrides: Partial<ListingProgress> = {}): ListingProgress {
   return {
-    listingId: "l1",
+    listingSlug: "l1",
     positionSeconds: 500,
     durationSeconds: 1000,
     updatedAt: "2026-01-01T00:00:05.000Z",
@@ -41,14 +41,19 @@ const standaloneTrack: Track = {
 
 describe("mergeLiveProgress", () => {
   it("overrides progressSeconds with the live store value for a listed item", () => {
-    const result = mergeLiveProgress([baseItem], { l1: liveProgress() });
+    const result = mergeLiveProgress([baseItem], {
+      "lecture-one": liveProgress({ listingSlug: "lecture-one" }),
+    });
 
     expect(result[0]?.progressSeconds).toBe(500);
   });
 
   it("marks a listed item completed once the live store says so", () => {
     const result = mergeLiveProgress([baseItem], {
-      l1: liveProgress({ completedAt: "2026-01-01T00:01:00.000Z" }),
+      "lecture-one": liveProgress({
+        listingSlug: "lecture-one",
+        completedAt: "2026-01-01T00:01:00.000Z",
+      }),
     });
 
     expect(result[0]?.completedAt).toBe("2026-01-01T00:01:00.000Z");
@@ -63,21 +68,22 @@ describe("mergeLiveProgress", () => {
   it("adds a synthetic row for a just-started standalone lecture not yet in the list", () => {
     const result = mergeLiveProgress(
       [baseItem],
-      { l2: liveProgress({ listingId: "l2" }) },
+      { "lecture-two": liveProgress({ listingSlug: "lecture-two" }) },
       standaloneTrack,
     );
 
     expect(result).toHaveLength(2);
-    expect(result[0]).toMatchObject({ listingId: "l2", listingTitle: "Lecture Two" });
+    expect(result[0]).toMatchObject({ listingSlug: "lecture-two", listingTitle: "Lecture Two" });
   });
 
   it("does not duplicate a standalone lecture already present in the server list", () => {
     const result = mergeLiveProgress(
       [baseItem],
-      { l1: liveProgress() },
+      { "lecture-one": liveProgress({ listingSlug: "lecture-one" }) },
       {
         ...standaloneTrack,
         id: "l1",
+        slug: "lecture-one",
       },
     );
 
@@ -88,7 +94,7 @@ describe("mergeLiveProgress", () => {
     const nestedTrack: Track = { ...standaloneTrack, id: "lesson-1", seriesId: "series-1" };
     const result = mergeLiveProgress(
       [baseItem],
-      { "lesson-1": liveProgress({ listingId: "lesson-1" }) },
+      { "lesson-1": liveProgress({ listingSlug: "lesson-1" }) },
       nestedTrack,
     );
 
@@ -98,7 +104,12 @@ describe("mergeLiveProgress", () => {
   it("does not synthesize a row once the currently-playing track is completed", () => {
     const result = mergeLiveProgress(
       [baseItem],
-      { l2: liveProgress({ listingId: "l2", completedAt: "2026-01-01T00:01:00.000Z" }) },
+      {
+        "lecture-two": liveProgress({
+          listingSlug: "lecture-two",
+          completedAt: "2026-01-01T00:01:00.000Z",
+        }),
+      },
       standaloneTrack,
     );
 

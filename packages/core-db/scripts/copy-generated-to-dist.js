@@ -51,8 +51,11 @@ async function main() {
     await fs.mkdir(generatedRoot, { recursive: true });
     await fs.cp(src, dest, { recursive: true });
   } finally {
-    await lock.close();
+    // Remove the lock while this process still owns its open handle. Closing
+    // first creates a window where another process can acquire the same path
+    // before this cleanup removes the new owner's lock.
     await fs.rm(lockPath, { force: true });
+    await lock.close();
   }
 }
 

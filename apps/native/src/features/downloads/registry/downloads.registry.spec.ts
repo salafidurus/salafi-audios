@@ -9,7 +9,7 @@ jest.mock("expo-sqlite", () => {
       runAsync: jest.fn(async (sql: string, ...args: unknown[]) => {
         if (sql.trim().startsWith("INSERT")) {
           const [
-            listingId,
+            listingSlug,
             url,
             localUri,
             status,
@@ -19,8 +19,8 @@ jest.mock("expo-sqlite", () => {
             createdAt,
             updatedAt,
           ] = args;
-          rows.set(listingId as string, {
-            listingId,
+          rows.set(listingSlug as string, {
+            listingSlug,
             url,
             localUri,
             status,
@@ -35,7 +35,7 @@ jest.mock("expo-sqlite", () => {
         }
       }),
       getFirstAsync: jest.fn(
-        async (_sql: string, listingId: string) => rows.get(listingId) ?? null,
+        async (_sql: string, listingSlug: string) => rows.get(listingSlug) ?? null,
       ),
       getAllAsync: jest.fn(async () => Array.from(rows.values())),
     })),
@@ -53,7 +53,7 @@ describe("downloads.registry", () => {
 
   it("round-trips a full row through upsert/get", async () => {
     await upsertDownload({
-      listingId: "l1",
+      listingSlug: "l1",
       url: "https://s/l1.mp3",
       status: "downloading",
       bytesTotal: 1000,
@@ -62,7 +62,7 @@ describe("downloads.registry", () => {
 
     const row = await getDownload("l1");
     expect(row).toMatchObject({
-      listingId: "l1",
+      listingSlug: "l1",
       url: "https://s/l1.mp3",
       status: "downloading",
       bytesTotal: 1000,
@@ -71,13 +71,13 @@ describe("downloads.registry", () => {
   });
 
   it("merges a partial upsert onto the existing row instead of clobbering it", async () => {
-    await upsertDownload({ listingId: "l1", url: "https://s/l1.mp3", status: "downloading" });
+    await upsertDownload({ listingSlug: "l1", url: "https://s/l1.mp3", status: "downloading" });
 
-    await upsertDownload({ listingId: "l1", bytesDownloaded: 500, bytesTotal: 1000 });
+    await upsertDownload({ listingSlug: "l1", bytesDownloaded: 500, bytesTotal: 1000 });
 
     const row = await getDownload("l1");
     expect(row).toMatchObject({
-      listingId: "l1",
+      listingSlug: "l1",
       url: "https://s/l1.mp3", // preserved from the first upsert
       status: "downloading", // preserved
       bytesDownloaded: 500,
@@ -86,16 +86,16 @@ describe("downloads.registry", () => {
   });
 
   it("getAllDownloads returns every registered row", async () => {
-    await upsertDownload({ listingId: "l1", url: "https://s/l1.mp3", status: "complete" });
-    await upsertDownload({ listingId: "l2", url: "https://s/l2.mp3", status: "downloading" });
+    await upsertDownload({ listingSlug: "l1", url: "https://s/l1.mp3", status: "complete" });
+    await upsertDownload({ listingSlug: "l2", url: "https://s/l2.mp3", status: "downloading" });
 
     const rows = await getAllDownloads();
 
-    expect(rows.map((r) => r.listingId).sort()).toEqual(["l1", "l2"]);
+    expect(rows.map((r) => r.listingSlug).sort()).toEqual(["l1", "l2"]);
   });
 
   it("removeDownload deletes the row", async () => {
-    await upsertDownload({ listingId: "l1", url: "https://s/l1.mp3", status: "complete" });
+    await upsertDownload({ listingSlug: "l1", url: "https://s/l1.mp3", status: "complete" });
 
     await removeDownload("l1");
 

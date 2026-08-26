@@ -329,7 +329,10 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
                 )}
 
                 {listing.seriesContext && (
-                  <SeriesContextBar seriesContext={listing.seriesContext} lectureId={listing.id} />
+                  <SeriesContextBar
+                    seriesContext={listing.seriesContext}
+                    listingSlug={listing.slug}
+                  />
                 )}
               </div>
             </StickyHeaderLayout.Content>

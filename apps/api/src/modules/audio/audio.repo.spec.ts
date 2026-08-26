@@ -204,7 +204,7 @@ describe('AudioRepository', () => {
   });
 
   describe('getUserProgress', () => {
-    it('returns public listing slugs alongside the compatibility IDs', async () => {
+    it('returns public listing slugs without internal listing IDs', async () => {
       prisma.userListingProgress.findMany.mockResolvedValue([
         {
           listingId: 'listing1',
@@ -217,7 +217,6 @@ describe('AudioRepository', () => {
 
       await expect(repo.getUserProgress('user1')).resolves.toEqual([
         {
-          listingId: 'listing1',
           listingSlug: 'tafsir-al-fatiha',
           positionSeconds: 10,
           durationSeconds: 100,
@@ -231,19 +230,19 @@ describe('AudioRepository', () => {
   describe('bulkSync', () => {
     it("fetches canonical durations for all items' listings in one batched query", async () => {
       prisma.listing.findMany.mockResolvedValue([
-        { id: 'l1', durationSeconds: 100 },
-        { id: 'l2', durationSeconds: 200 },
+        { id: 'l1', slug: 'l1-slug', durationSeconds: 100 },
+        { id: 'l2', slug: 'l2-slug', durationSeconds: 200 },
       ]);
 
       await repo.bulkSync('user1', [
         {
-          listingId: 'l1',
+          listingSlug: 'l1-slug',
           positionSeconds: 10,
           durationSeconds: 999,
           updatedAt: new Date().toISOString(),
         },
         {
-          listingId: 'l2',
+          listingSlug: 'l2-slug',
           positionSeconds: 20,
           durationSeconds: 999,
           updatedAt: new Date().toISOString(),
@@ -251,7 +250,7 @@ describe('AudioRepository', () => {
       ]);
 
       expect(prisma.listing.findMany).toHaveBeenCalledWith({
-        where: { id: { in: ['l1', 'l2'] } },
+        where: { slug: { in: ['l1-slug', 'l2-slug'] } },
         select: { id: true, slug: true, durationSeconds: true },
       });
     });
@@ -280,11 +279,13 @@ describe('AudioRepository', () => {
     });
 
     it('derives isCompleted from the canonical duration, not the client-supplied one, when completedAt is absent', async () => {
-      prisma.listing.findMany.mockResolvedValue([{ id: 'l1', durationSeconds: 100 }]);
+      prisma.listing.findMany.mockResolvedValue([
+        { id: 'l1', slug: 'l1-slug', durationSeconds: 100 },
+      ]);
 
       await repo.bulkSync('user1', [
         {
-          listingId: 'l1',
+          listingSlug: 'l1-slug',
           positionSeconds: 95, // 95% of the canonical 100s duration
           durationSeconds: 5, // client-reported duration is wildly different — must be ignored
           updatedAt: new Date().toISOString(),
@@ -296,11 +297,13 @@ describe('AudioRepository', () => {
     });
 
     it('includes a monotonic OR-guard around the isCompleted CASE so a stale sync cannot un-complete a lesson', async () => {
-      prisma.listing.findMany.mockResolvedValue([{ id: 'l1', durationSeconds: 100 }]);
+      prisma.listing.findMany.mockResolvedValue([
+        { id: 'l1', slug: 'l1-slug', durationSeconds: 100 },
+      ]);
 
       await repo.bulkSync('user1', [
         {
-          listingId: 'l1',
+          listingSlug: 'l1-slug',
           positionSeconds: 1,
           durationSeconds: 100,
           updatedAt: new Date().toISOString(),

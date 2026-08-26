@@ -4,11 +4,11 @@ import { StyleSheet } from "react-native-unistyles";
 import { useDownload } from "@/features/downloads/hooks/use-download";
 
 type DownloadProgressProps = {
-  lectureId: string;
+  listingSlug: string;
 };
 
-export function DownloadProgress({ lectureId }: DownloadProgressProps) {
-  const { isDownloading, progress } = useDownload(lectureId);
+export function DownloadProgress({ listingSlug }: DownloadProgressProps) {
+  const { isDownloading, progress } = useDownload(listingSlug);
 
   if (!isDownloading) return null;
 

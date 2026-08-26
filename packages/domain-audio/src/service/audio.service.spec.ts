@@ -37,6 +37,7 @@ describe("DurusAudioService", () => {
 
   const mockTrack: Track = {
     id: "l1",
+    slug: "l1-slug",
     title: "Lecture 1",
     artist: "Scholar 1",
     url: "https://stream.mp3",
@@ -45,6 +46,7 @@ describe("DurusAudioService", () => {
 
   const mockTrack2: Track = {
     id: "l2",
+    slug: "l2-slug",
     title: "Lecture 2",
     artist: "Scholar 1",
     url: "https://stream2.mp3",
@@ -53,6 +55,7 @@ describe("DurusAudioService", () => {
 
   const mockTrack3: Track = {
     id: "l3",
+    slug: "l3-slug",
     title: "Lecture 3",
     artist: "Scholar 1",
     url: "https://stream3.mp3",
@@ -152,11 +155,10 @@ describe("DurusAudioService", () => {
     engineEvents.onPositionChange!(90);
 
     expect(usePlaybackStore.getState().positionSeconds).toBe(90);
-    expect(useProgressStore.getState().progressMap[mockTrack.id]).toBeDefined();
-    expect(useProgressStore.getState().progressMap[mockTrack.id]!.positionSeconds).toBe(90);
+    expect(useProgressStore.getState().progressMap[mockTrack.slug]).toBeDefined();
+    expect(useProgressStore.getState().progressMap[mockTrack.slug]!.positionSeconds).toBe(90);
     expect(syncProgressToBackend).toHaveBeenCalledWith({
-      listingId: mockTrack.id,
-      localListingId: mockTrack.id,
+      listingSlug: mockTrack.slug,
       positionSeconds: 90,
       durationSeconds: 1800,
     });
@@ -170,17 +172,17 @@ describe("DurusAudioService", () => {
     engineEvents.onPositionChange!(90);
 
     expect(syncProgressToBackend).toHaveBeenCalledWith(
-      expect.objectContaining({ listingId: "tafsir-al-fatiha", localListingId: slugTrack.id }),
+      expect.objectContaining({ listingSlug: "tafsir-al-fatiha" }),
     );
     // The live progress store still keys by the stable uuid id, unaffected.
-    expect(useProgressStore.getState().progressMap[slugTrack.id]).toBeDefined();
+    expect(useProgressStore.getState().progressMap[slugTrack.slug]).toBeDefined();
   });
 
   it("should mark listing completed on track end and stop if no next track", async () => {
     await service.playListing(mockTrack);
     await engineEvents.onTrackEnd!();
 
-    expect(useProgressStore.getState().progressMap[mockTrack.id]?.completedAt).toBeDefined();
+    expect(useProgressStore.getState().progressMap[mockTrack.slug]?.completedAt).toBeDefined();
     expect(usePlaybackStore.getState().currentTrack).toBeNull();
     expect(usePlaybackStore.getState().status).toBe("idle");
   });
@@ -190,7 +192,7 @@ describe("DurusAudioService", () => {
     await engineEvents.onTrackEnd!();
 
     expect(syncProgressToBackend).toHaveBeenCalledWith(
-      expect.objectContaining({ listingId: mockTrack.id }),
+      expect.objectContaining({ listingSlug: mockTrack.slug }),
     );
     expect(flushPendingProgress).toHaveBeenCalled();
   });
@@ -201,7 +203,7 @@ describe("DurusAudioService", () => {
     await engineEvents.onTrackEnd!();
 
     expect(syncProgressToBackend).toHaveBeenCalledWith(
-      expect.objectContaining({ listingId: "tafsir-al-fatiha", localListingId: slugTrack.id }),
+      expect.objectContaining({ listingSlug: "tafsir-al-fatiha" }),
     );
   });
 
@@ -219,7 +221,7 @@ describe("DurusAudioService", () => {
     await service.playListing(stubTrack);
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/audio/listings/l1/stream",
+      url: "/audio/listings/l1-slug/stream",
       method: "GET",
     });
     expect(mockEngine.load).toHaveBeenCalledWith({ ...stubTrack, url: "https://fresh-signed.mp3" });
@@ -285,7 +287,7 @@ describe("DurusAudioService", () => {
       await localService.playListing(stubTrack);
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/audio/listings/l1/stream",
+        url: "/audio/listings/l1-slug/stream",
         method: "GET",
       });
       expect(mockEngine.load).toHaveBeenCalledWith({
@@ -371,7 +373,7 @@ describe("DurusAudioService", () => {
   });
 
   it("should seek to a previously saved, non-completed position when playing a listing", async () => {
-    useProgressStore.getState().actions.setProgress(mockTrack.id, 120, 1800);
+    useProgressStore.getState().actions.setProgress(mockTrack.slug, 120, 1800);
 
     await service.playListing(mockTrack);
 
@@ -379,8 +381,8 @@ describe("DurusAudioService", () => {
   });
 
   it("should not resume when the saved progress is already completed", async () => {
-    useProgressStore.getState().actions.setProgress(mockTrack.id, 120, 1800);
-    useProgressStore.getState().actions.markCompleted(mockTrack.id);
+    useProgressStore.getState().actions.setProgress(mockTrack.slug, 120, 1800);
+    useProgressStore.getState().actions.markCompleted(mockTrack.slug);
 
     await service.playListing(mockTrack);
 
@@ -388,7 +390,7 @@ describe("DurusAudioService", () => {
   });
 
   it("should skip resume when fromStart is requested", async () => {
-    useProgressStore.getState().actions.setProgress(mockTrack.id, 120, 1800);
+    useProgressStore.getState().actions.setProgress(mockTrack.slug, 120, 1800);
 
     await service.playListing(mockTrack, undefined, { fromStart: true });
 
@@ -405,7 +407,7 @@ describe("DurusAudioService", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/audio/listings/l2/stream",
+      url: "/audio/listings/l2-slug/stream",
       method: "GET",
     });
 
@@ -416,7 +418,7 @@ describe("DurusAudioService", () => {
     expect(httpClient).not.toHaveBeenCalled();
     expect(mockEngine.load).toHaveBeenLastCalledWith({
       ...stubTrack2,
-      url: "https://resolved/audio/listings/l2/stream",
+      url: "https://resolved/audio/listings/l2-slug/stream",
     });
   });
 });

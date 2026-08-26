@@ -36,7 +36,7 @@ export function HeroSection({
   const heroItem =
     hasHistory && recentProgress
       ? {
-          id: recentProgress.lectureId,
+          id: recentProgress.listingSlug,
           slug: recentProgress.lectureSlug,
           title: recentProgress.lectureTitle,
           scholarName: recentProgress.scholarName,

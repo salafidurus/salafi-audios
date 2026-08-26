@@ -2,7 +2,7 @@ import { resolveLastWriteWins } from "@sd/core-sync";
 import { create } from "zustand";
 
 export type ListingProgress = {
-  listingId: string;
+  listingSlug: string;
   positionSeconds: number;
   durationSeconds: number;
   completedAt?: string;
@@ -12,7 +12,6 @@ export type ListingProgress = {
 /** Progress reconciliation entity used by the shared sync engine. */
 export type ProgressSyncEntity = ListingProgress & {
   id: string;
-  serverListingId?: string;
 };
 
 /**
@@ -34,11 +33,11 @@ type ProgressState = {
   progressMap: Record<string, ListingProgress>;
   lastSyncedAt: string | null;
   actions: {
-    setProgress: (listingId: string, positionSeconds: number, durationSeconds: number) => void;
-    markCompleted: (listingId: string) => void;
+    setProgress: (listingSlug: string, positionSeconds: number, durationSeconds: number) => void;
+    markCompleted: (listingSlug: string) => void;
     upsertProgress: (entry: ListingProgress) => void;
     loadProgress: (entries: ListingProgress[]) => void;
-    getProgress: (listingId: string) => ListingProgress | undefined;
+    getProgress: (listingSlug: string) => ListingProgress | undefined;
     setLastSyncedAt: (timestamp: string) => void;
   };
 };
@@ -48,28 +47,28 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
   lastSyncedAt: null,
 
   actions: {
-    setProgress: (listingId, positionSeconds, durationSeconds) =>
+    setProgress: (listingSlug, positionSeconds, durationSeconds) =>
       set((state) => ({
         progressMap: {
           ...state.progressMap,
-          [listingId]: {
-            listingId,
+          [listingSlug]: {
+            listingSlug,
             positionSeconds,
             durationSeconds,
-            completedAt: state.progressMap[listingId]?.completedAt,
+            completedAt: state.progressMap[listingSlug]?.completedAt,
             updatedAt: new Date().toISOString(),
           },
         },
       })),
 
-    markCompleted: (listingId) =>
+    markCompleted: (listingSlug) =>
       set((state) => {
-        const existing = state.progressMap[listingId];
+        const existing = state.progressMap[listingSlug];
         if (!existing) return state;
         return {
           progressMap: {
             ...state.progressMap,
-            [listingId]: {
+            [listingSlug]: {
               ...existing,
               completedAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
@@ -80,7 +79,7 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
 
     upsertProgress: (entry) =>
       set((state) => ({
-        progressMap: { ...state.progressMap, [entry.listingId]: entry },
+        progressMap: { ...state.progressMap, [entry.listingSlug]: entry },
       })),
 
     // Last-write-wins by `updatedAt`, mirroring the server's own conflict-resolution
@@ -90,12 +89,12 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       set((state) => {
         const newMap = { ...state.progressMap };
         for (const entry of entries) {
-          newMap[entry.listingId] = mergeProgress(newMap[entry.listingId], entry);
+          newMap[entry.listingSlug] = mergeProgress(newMap[entry.listingSlug], entry);
         }
         return { progressMap: newMap };
       }),
 
-    getProgress: (listingId) => get().progressMap[listingId],
+    getProgress: (listingSlug) => get().progressMap[listingSlug],
 
     setLastSyncedAt: (timestamp) => set({ lastSyncedAt: timestamp }),
   },

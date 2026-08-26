@@ -55,8 +55,8 @@ describe("useLibraryProgressScreen", () => {
       isFetching: false,
       error: null,
     });
-    mockProgressMap.l1 = {
-      listingId: "l1",
+    mockProgressMap[serverItem.listingSlug] = {
+      listingSlug: serverItem.listingSlug,
       positionSeconds: 700,
       durationSeconds: 1000,
       updatedAt: "2026-01-01T00:00:05.000Z",

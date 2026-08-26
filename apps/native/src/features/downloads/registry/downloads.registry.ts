@@ -6,7 +6,7 @@ const TABLE_NAME = "downloads";
 export type DownloadStatus = "pending" | "downloading" | "paused" | "complete" | "error";
 
 export type DownloadRow = {
-  listingId: string;
+  listingSlug: string;
   url: string;
   localUri: string | null;
   status: DownloadStatus;
@@ -26,7 +26,7 @@ function getDb(): Promise<SQLite.SQLiteDatabase> {
       const db = await SQLite.openDatabaseAsync(DB_NAME);
       await db.execAsync(
         `CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
-          listingId TEXT PRIMARY KEY,
+          listingSlug TEXT PRIMARY KEY,
           url TEXT NOT NULL,
           localUri TEXT,
           status TEXT NOT NULL,
@@ -37,6 +37,15 @@ function getDb(): Promise<SQLite.SQLiteDatabase> {
           updatedAt INTEGER NOT NULL
         )`,
       );
+      // Existing installs may still have the pre-slug primary-key column.
+      // Renaming it preserves downloaded rows while allowing all new queries
+      // and writes to use the public listing identity.
+      try {
+        await db.execAsync(`ALTER TABLE ${TABLE_NAME} RENAME COLUMN listingId TO listingSlug`);
+      } catch {
+        // New databases already have listingSlug; SQLite reports an expected
+        // error when there is no legacy column to rename.
+      }
       return db;
     })();
   }
@@ -47,12 +56,14 @@ function getDb(): Promise<SQLite.SQLiteDatabase> {
  * than `@sd/core-sync`'s KV `StorageAdapter` (that abstraction is for the
  * outbox and progress/saved caches, not a row-per-download registry). */
 export async function upsertDownload(
-  row: Partial<Omit<DownloadRow, "listingId" | "createdAt" | "updatedAt">> & { listingId: string },
+  row: Partial<Omit<DownloadRow, "listingSlug" | "createdAt" | "updatedAt">> & {
+    listingSlug: string;
+  },
 ): Promise<void> {
-  const [db, existing] = await Promise.all([getDb(), getDownload(row.listingId)]);
+  const [db, existing] = await Promise.all([getDb(), getDownload(row.listingSlug)]);
 
   const merged: DownloadRow = {
-    listingId: row.listingId,
+    listingSlug: row.listingSlug,
     url: row.url ?? existing?.url ?? "",
     localUri: row.localUri !== undefined ? row.localUri : (existing?.localUri ?? null),
     status: row.status ?? existing?.status ?? "pending",
@@ -65,9 +76,9 @@ export async function upsertDownload(
 
   await db.runAsync(
     `INSERT OR REPLACE INTO ${TABLE_NAME}
-      (listingId, url, localUri, status, bytesTotal, bytesDownloaded, pauseState, createdAt, updatedAt)
+      (listingSlug, url, localUri, status, bytesTotal, bytesDownloaded, pauseState, createdAt, updatedAt)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    merged.listingId,
+    merged.listingSlug,
     merged.url,
     merged.localUri,
     merged.status,
@@ -79,11 +90,11 @@ export async function upsertDownload(
   );
 }
 
-export async function getDownload(listingId: string): Promise<DownloadRow | null> {
+export async function getDownload(listingSlug: string): Promise<DownloadRow | null> {
   const db = await getDb();
   const row = await db.getFirstAsync<DownloadRow>(
-    `SELECT * FROM ${TABLE_NAME} WHERE listingId = ?`,
-    listingId,
+    `SELECT * FROM ${TABLE_NAME} WHERE listingSlug = ?`,
+    listingSlug,
   );
   return row ?? null;
 }
@@ -93,7 +104,7 @@ export async function getAllDownloads(): Promise<DownloadRow[]> {
   return db.getAllAsync<DownloadRow>(`SELECT * FROM ${TABLE_NAME}`);
 }
 
-export async function removeDownload(listingId: string): Promise<void> {
+export async function removeDownload(listingSlug: string): Promise<void> {
   const db = await getDb();
-  await db.runAsync(`DELETE FROM ${TABLE_NAME} WHERE listingId = ?`, listingId);
+  await db.runAsync(`DELETE FROM ${TABLE_NAME} WHERE listingSlug = ?`, listingSlug);
 }

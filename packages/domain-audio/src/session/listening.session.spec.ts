@@ -13,6 +13,7 @@ vi.mock("../progress/progress.sync", () => ({
 
 const track: Track = {
   id: "track-1",
+  slug: "track-one",
   title: "Track 1",
   artist: "Scholar",
   url: "https://example.test/track.mp3",
@@ -46,10 +47,10 @@ describe("ListeningSession", () => {
 
     await session.playListing(track);
     await session.stop();
-    expect(useProgressStore.getState().progressMap[track.id]?.completedAt).toBeUndefined();
+    expect(useProgressStore.getState().progressMap[track.slug]?.completedAt).toBeUndefined();
 
     await session.playListing(track);
     await events().onTrackEnd?.();
-    expect(useProgressStore.getState().progressMap[track.id]?.completedAt).toBeDefined();
+    expect(useProgressStore.getState().progressMap[track.slug]?.completedAt).toBeDefined();
   });
 });

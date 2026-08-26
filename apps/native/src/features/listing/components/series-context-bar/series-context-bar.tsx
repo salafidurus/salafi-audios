@@ -10,15 +10,15 @@ import { AppText } from "@/shared/components/AppText/AppText";
 export type SeriesContextBarProps = {
   seriesContext: SeriesContextDto;
   /** The lesson this bar is shown for — Previous/Next only act when it's the one currently playing. */
-  lectureId: string;
+  listingSlug: string;
 };
 
-export function SeriesContextBar({ seriesContext, lectureId }: SeriesContextBarProps) {
+export function SeriesContextBar({ seriesContext, listingSlug }: SeriesContextBarProps) {
   const { queue, currentIndex, currentTrack, hasNext, hasPrevious } = useQueue();
 
   // Prev/Next only make sense relative to the queue that's actually playing this lesson —
   // otherwise they'd show sibling info from an unrelated queue.
-  const isActiveQueue = currentTrack?.id === lectureId;
+  const isActiveQueue = currentTrack?.slug === listingSlug;
   const prevTrack = isActiveQueue && hasPrevious ? (queue[currentIndex - 1] ?? null) : null;
   const nextTrack = isActiveQueue && hasNext ? (queue[currentIndex + 1] ?? null) : null;
 

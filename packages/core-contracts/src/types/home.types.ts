@@ -75,10 +75,9 @@ export const HomePromotionsDtoSchema = z.object({
 export type HomePromotionsDto = z.infer<typeof HomePromotionsDtoSchema>;
 
 export const RecentProgressDtoSchema = z.object({
-  lectureId: z.string(),
   lectureTitle: z.string(),
   lectureSlug: z.string(),
-  listingSlug: z.string().optional(),
+  listingSlug: z.string(),
   format: ListingFormatSchema,
   orderIndex: z.number().optional(),
   publishedLectureCount: z.number().optional(),

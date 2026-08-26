@@ -1,7 +1,7 @@
 import { useProgressStore } from "../progress/progress.store";
 
-export function useListingProgress(listingId: string) {
-  const progress = useProgressStore((state) => state.progressMap[listingId]);
+export function useListingProgress(listingSlug: string) {
+  const progress = useProgressStore((state) => state.progressMap[listingSlug]);
 
   const isCompleted = !!progress?.completedAt;
   const resumePositionSeconds = progress?.positionSeconds ?? 0;

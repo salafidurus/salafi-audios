@@ -95,7 +95,7 @@ describe("QuickButtonSection", () => {
   it("resumes at the last-played lesson, resolving that track's URL eagerly instead of the first track's", () => {
     (useLastPlayedLesson as Mock<any>).mockReturnValue({
       data: {
-        listingId: "l2",
+        listingSlug: "l2",
         positionSeconds: 30,
         isCompleted: false,
         updatedAt: "2026-01-01T00:00:00.000Z",
@@ -140,6 +140,7 @@ describe("QuickButtonSection", () => {
   it("toggles pause/resume instead of rebuilding the queue when this listing is already playing", () => {
     usePlaybackStore.getState().actions.setCurrentTrack({
       id: "l1",
+      slug: "l1",
       title: "Lesson 1",
       artist: "Ibn Baz",
       url: "https://s/l1.mp3",

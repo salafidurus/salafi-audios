@@ -13,13 +13,13 @@ describe('AudioService', () => {
 
   const mockProgress: AudioProgressDto[] = [
     {
-      listingId: 'l1',
+      listingSlug: 'l1',
       positionSeconds: 900,
       durationSeconds: 1800,
       updatedAt: new Date('2024-01-01T00:00:00.000Z').toISOString(),
     },
     {
-      listingId: 'l2',
+      listingSlug: 'l2',
       positionSeconds: 1800,
       durationSeconds: 1800,
       completedAt: new Date('2024-01-01T00:00:00.000Z').toISOString(),
@@ -105,7 +105,7 @@ describe('AudioService', () => {
     it('should sync multiple progress items for user', async () => {
       const items: ProgressSyncItemDto[] = [
         {
-          listingId: 'l1',
+          listingSlug: 'l1',
           positionSeconds: 300,
           durationSeconds: 1800,
           updatedAt: new Date().toISOString(),

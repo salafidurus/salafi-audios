@@ -8,8 +8,7 @@ export const StreamResponseDtoSchema = z.object({
 export type StreamResponseDto = z.infer<typeof StreamResponseDtoSchema>;
 
 export const AudioProgressDtoSchema = z.object({
-  listingId: z.string(),
-  listingSlug: z.string().optional(),
+  listingSlug: z.string(),
   positionSeconds: z.number(),
   durationSeconds: z.number(),
   completedAt: z.string().optional(),
@@ -17,19 +16,13 @@ export const AudioProgressDtoSchema = z.object({
 });
 export type AudioProgressDto = z.infer<typeof AudioProgressDtoSchema>;
 
-export const ProgressSyncItemDtoSchema = z
-  .object({
-    listingId: z.string().min(1).optional(),
-    listingSlug: z.string().min(1).optional(),
-    positionSeconds: z.number(),
-    durationSeconds: z.number(),
-    completedAt: z.string().optional(),
-    updatedAt: z.string(),
-  })
-  .refine((item) => item.listingId || item.listingSlug, {
-    message: "Either listingSlug or legacy listingId is required",
-    path: ["listingSlug"],
-  });
+export const ProgressSyncItemDtoSchema = z.object({
+  listingSlug: z.string().min(1),
+  positionSeconds: z.number(),
+  durationSeconds: z.number(),
+  completedAt: z.string().optional(),
+  updatedAt: z.string(),
+});
 export type ProgressSyncItemDto = z.infer<typeof ProgressSyncItemDtoSchema>;
 
 export const ProgressSyncDtoSchema = z.object({

@@ -4,13 +4,13 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useDownload } from "@/features/downloads/hooks/use-download";
 
 type DownloadButtonProps = {
-  lectureId: string;
+  listingSlug: string;
   audioUrl: string;
 };
 
-export function DownloadButton({ lectureId, audioUrl }: DownloadButtonProps) {
+export function DownloadButton({ listingSlug, audioUrl }: DownloadButtonProps) {
   const { status, isDownloaded, isDownloading, startDownload, removeDownload } = useDownload(
-    lectureId,
+    listingSlug,
     audioUrl,
   );
   const { theme } = useUnistyles();

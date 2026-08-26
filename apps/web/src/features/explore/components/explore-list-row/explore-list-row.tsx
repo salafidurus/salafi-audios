@@ -12,9 +12,9 @@ import React from "react";
 import { useToast } from "@/core/toast";
 import { audioService, usePlayListing } from "@/features/audio";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { Button } from "@/shared/components/ui/button";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { Button } from "@/shared/components/ui/button";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { useResponsive } from "@/shared/hooks/use-responsive";
@@ -35,10 +35,10 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
 
   const { isPlaying, currentTrack } = useAudio();
   // A series/collection row is "current" whenever any of its own lessons is
-  // playing, not just when currentTrack.id equals this container's own id
+  // playing, not just when the current track's slug equals this row's slug
   // (which only happens for a single).
   const isCurrentTrack =
-    currentTrack?.id === item.id ||
+    currentTrack?.slug === item.slug ||
     currentTrack?.seriesId === item.id ||
     currentTrack?.collectionId === item.id;
 
@@ -57,7 +57,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
 
   const isSaved = useIsSaved(item.id);
 
-  const progress = useProgressStore((s) => s.progressMap[item.id]);
+  const progress = useProgressStore((s) => s.progressMap[item.slug]);
   const isInProgress = progress && progress.positionSeconds > 0 && !progress.completedAt;
 
   const progressPercent =

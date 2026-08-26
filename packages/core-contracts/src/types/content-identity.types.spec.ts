@@ -10,16 +10,17 @@ import {
 } from "./index";
 
 describe("public content identity contracts", () => {
-  it("accepts listing slugs on progress payloads while retaining the migration field", () => {
-    expect(
-      AudioProgressDtoSchema.parse({
-        listingId: "internal-listing-id",
-        listingSlug: "tafsir-al-fatiha",
-        positionSeconds: 30,
-        durationSeconds: 120,
-        updatedAt: "2026-08-26T00:00:00.000Z",
-      }).listingSlug,
-    ).toBe("tafsir-al-fatiha");
+  it("requires public slugs on progress payloads and removes internal listing identity", () => {
+    const progress = AudioProgressDtoSchema.parse({
+      listingId: "internal-listing-id",
+      listingSlug: "tafsir-al-fatiha",
+      positionSeconds: 30,
+      durationSeconds: 120,
+      updatedAt: "2026-08-26T00:00:00.000Z",
+    });
+
+    expect(progress.listingSlug).toBe("tafsir-al-fatiha");
+    expect(progress).not.toHaveProperty("listingId");
 
     expect(
       ProgressSyncItemDtoSchema.parse({
@@ -32,6 +33,7 @@ describe("public content identity contracts", () => {
 
     expect(() =>
       ProgressSyncItemDtoSchema.parse({
+        listingId: "internal-listing-id",
         positionSeconds: 30,
         durationSeconds: 120,
         updatedAt: "2026-08-26T00:00:00.000Z",

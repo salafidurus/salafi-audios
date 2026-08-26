@@ -51,9 +51,9 @@ export function ContentListItem({
 }: ContentListItemProps) {
   const formattedScholarName = useFormattedScholarName(scholarName, scholarSlug);
   const { isPlaying, currentTrack } = useAudio();
-  const progress = useProgressStore((s) => s.progressMap[item.id]);
+  const progress = useProgressStore((s) => s.progressMap[item.slug]);
 
-  const isCurrentTrack = currentTrack?.id === item.id;
+  const isCurrentTrack = currentTrack?.slug === item.slug;
   const isCurrentlyPlaying = isCurrentTrack && isPlaying;
 
   const durationStr = formatDuration(

@@ -20,7 +20,7 @@ import { FEATURED_SENIOR_SCHOLAR_SLUG, MOBILE_APP_AVAILABILITY } from "./home.co
 import styles from "./home.screen.module.css";
 
 export type HomeScreenProps = {
-  onContinueListening?: (lectureId: string) => void;
+  onContinueListening?: (listingSlug: string) => void;
 };
 
 const MAX_RECENT_ITEMS = 10;
