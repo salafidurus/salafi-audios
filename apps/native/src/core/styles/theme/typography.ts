@@ -89,6 +89,5 @@ export const createTypography = (
 };
 
 export const typographyNative = createTypography("en");
-export const typographyArabic = createTypography("ar");
 
 export type TypographyNative = typeof typographyNative;

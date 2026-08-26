@@ -21,9 +21,6 @@ if (!connectionString) {
   throw new Error("DATABASE_URL or DIRECT_DB_URL must be set.");
 }
 
-// Media CDN base URL (defaults to placeholder for dev)
-export const MEDIA_CDN_BASE_URL = process.env.MEDIA_CDN_BASE_URL ?? "https://placeholder.dev/audio";
-
 // Create and export Prisma client
 const adapter = new PrismaPg({ connectionString });
 export const prisma = new PrismaClient({ adapter });

@@ -35,8 +35,6 @@ const cookieAdapter: LanguageStorageAdapter = {
 const store = createContentPreferenceStore(cookieAdapter);
 store.hydrate();
 
-export const contentPreferenceStore = store;
-
 /** Reactive access to the "show content in original language" preference. */
 export function useShowOriginalContent(): boolean {
   return useSyncExternalStore(store.subscribe, store.getShowOriginal, () => false);
