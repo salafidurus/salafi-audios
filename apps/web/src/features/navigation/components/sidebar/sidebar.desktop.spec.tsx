@@ -147,4 +147,29 @@ describe("Sidebar component", () => {
     // Check that authClient.signOut was called
     expect(authClient.signOut).toHaveBeenCalled();
   });
+
+  it("keeps the confirmation dialog open when sign out fails", async () => {
+    (useAuth as Mock<any>).mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { name: "Test User", email: "test@example.com" },
+    });
+    (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
+    (authClient.signOut as Mock<any>).mockRejectedValueOnce(new Error("network failure"));
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    render(<Sidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Sign Out" }));
+
+    const dialog = await waitFor(() => screen.getByRole("dialog"));
+    await act(async () => {
+      fireEvent.click(within(dialog).getByRole("button", { name: "Sign Out" }));
+    });
+
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+      "Sign out failed. Please try again.",
+    );
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    consoleError.mockRestore();
+  });
 });
