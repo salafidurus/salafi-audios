@@ -156,7 +156,7 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
           </DialogDescription>
         </DialogHeader>
 
-        <form id="lecture-form" onSubmit={handleSave} className={styles.form}>
+        <form id="lecture-form" onSubmit={handleSave} className={`${styles.form} min-h-0 flex-1`}>
           <Tabs
             value={activeTab}
             onValueChange={(id) => {
@@ -165,7 +165,7 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
             className="min-h-0"
           >
             <TabsList
-              className="w-full justify-start overflow-x-auto"
+              className="no-scrollbar w-full justify-start overflow-x-auto overflow-y-hidden"
               aria-label={t("admin.modal.tabsLabel", "Form sections")}
             >
               <TabsTrigger

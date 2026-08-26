@@ -146,7 +146,11 @@ export function ListingUploadArrangeModal({
           </DialogDescription>
         </DialogHeader>
 
-        <form id="listing-upload-arrange-form" onSubmit={handleSubmit} className={styles.form}>
+        <form
+          id="listing-upload-arrange-form"
+          onSubmit={handleSubmit}
+          className={`${styles.form} min-h-0 flex-1`}
+        >
           <Tabs
             value={activeTab}
             onValueChange={(id) => {
@@ -155,7 +159,7 @@ export function ListingUploadArrangeModal({
             className="min-h-0"
           >
             <TabsList
-              className="w-full justify-start overflow-x-auto"
+              className="no-scrollbar w-full justify-start overflow-x-auto overflow-y-hidden"
               aria-label={t("admin.modal.tabsLabel", "Form sections")}
             >
               <TabsTrigger value="upload">
