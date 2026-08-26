@@ -13,7 +13,7 @@ not an authority in its own right.
 The web client has two presentation workspaces over the same authenticated
 identity:
 
-- **Public workspace**: discovery, listening continuity, Library, account, and
+- **Public workspace**: discovery, listening continuity, My Library, account, and
   support surfaces.
 - **Admin workspace**: editorial, catalog, user-access, and operational
   surfaces available to Users with backend-recognized administrative access.
@@ -26,7 +26,7 @@ sections allowed by their capabilities and scope.
 ### Public navigation glossary
 
 - **Public primary navigation**: the persistent content destinations Home,
-  Explore, Scholars, and Library. It excludes Settings and administrative
+  Explore, Scholars, and My Library. It excludes Settings and administrative
   actions.
 - **Utility actions**: account, theme, language, search, and capability-aware
   Admin actions that support the public workspace without becoming catalog
@@ -92,7 +92,7 @@ Current route groups include consent-gated public/account routes under
 
 ## 4. Authenticated and Editorial Responsibilities
 
-- Account, settings, support, and library flows for signed-in users.
+- Account, settings, support, and My Library flows for signed-in users.
 - Editorial/admin flows for content, scholars, users, and stats, gated by
   backend-enforced roles.
 - Bulk workflows may exist on web for usability, but all policy remains server-side.

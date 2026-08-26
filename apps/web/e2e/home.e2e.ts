@@ -24,8 +24,9 @@ test("home page loads the study landing", async ({ page }) => {
 
   await expect(page).toHaveTitle(/./);
 
-  // Check the hero title using its data-testid is present and not empty
-  const heading = page.getByTestId("home-hero-title");
+  // The featured hero is API-backed and may be absent when the catalog is empty.
+  // The study header is the stable contract for the landing page.
+  const heading = page.getByTestId("home-study-header");
   await heading.waitFor({ state: "visible", timeout: 30_000 });
   await expect(heading).not.toHaveText("");
 

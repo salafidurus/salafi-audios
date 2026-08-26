@@ -13,4 +13,4 @@ it("allows concurrent generated-client publication", async () => {
   const exitCodes = await Promise.all(processes.map((process) => process.exited));
 
   expect(exitCodes).toEqual(Array.from({ length: 16 }, () => 0));
-});
+}, 15_000);

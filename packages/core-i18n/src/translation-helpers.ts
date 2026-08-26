@@ -13,10 +13,10 @@ export const SUBNAV_KEYS = {
     scholar: "navigation.subnav.explore.scholar",
     curation: "navigation.subnav.explore.curation",
   },
-  library: {
-    started: "navigation.subnav.library.started",
-    saved: "navigation.subnav.library.saved",
-    completed: "navigation.subnav.library.completed",
+  myLibrary: {
+    started: "navigation.subnav.myLibrary.started",
+    saved: "navigation.subnav.myLibrary.saved",
+    completed: "navigation.subnav.myLibrary.completed",
   },
   settings: {
     general: "navigation.subnav.settings.general",
@@ -34,7 +34,7 @@ export const SUBNAV_FALLBACKS = {
     scholar: "Scholars",
     curation: "Curation",
   },
-  library: {
+  myLibrary: {
     started: "Started",
     saved: "Saved",
     completed: "Completed",

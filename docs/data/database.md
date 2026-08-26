@@ -81,7 +81,7 @@ Client persistence improves continuity but never becomes authoritative.
 ## 9. Soft-Delete Tombstones for Delta Sync
 
 - `FavoriteListing` (saved/library) carries an app-settable `updatedAt` and a `deletedAt` tombstone, the same shape as `UserListingProgress`. Unsaving sets `deletedAt`/`updatedAt` instead of deleting the row; re-saving clears `deletedAt` and bumps `updatedAt`. This lets offline clients delta-sync via `?since=` and reconcile removals — a hard delete would be invisible to a client that was offline when it happened.
-- Conflict resolution on both tables is last-write-wins by `updatedAt`, applied via a raw `INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...` upsert (see `AudioRepository.bulkSync` / `LibraryRepository.bulkSync`). Progress additionally merges `isCompleted` monotonically; saved/library uses plain LWW since a later unsave must be able to override an earlier save and vice versa. See [mobile.md](../clients/mobile.md#6-sync-architecture) for the client-side half of this.
+- Conflict resolution on both tables is last-write-wins by `updatedAt`, applied via a raw `INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...` upsert (see `AudioRepository.bulkSync` / `MyLibraryRepository.bulkSync`). Progress additionally merges `isCompleted` monotonically; My Library saved state uses plain LWW since a later unsave must be able to override an earlier save and vice versa. See [mobile.md](../clients/mobile.md#6-sync-architecture) for the client-side half of this.
 - Every read path over these tables filters `deletedAt: null`.
 
 ## 10. Privacy and Hard Deletions

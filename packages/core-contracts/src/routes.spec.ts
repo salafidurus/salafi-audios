@@ -13,9 +13,7 @@ const leafRoutes = [
   routes.explore.recent,
   routes.explore.scholar,
   routes.explore.curation,
-  routes.library.index,
-  routes.library.saved,
-  routes.library.completed,
+  routes.myLibrary.index,
   routes.settings.index,
   routes.settings.profile,
   routes.settings.legal,
@@ -61,6 +59,17 @@ describe("routes – structural integrity", () => {
     const duplicates = values.filter((v, i) => values.indexOf(v) !== i);
     expect(duplicates).toEqual([]);
     expect(unique.size).toBe(values.length);
+  });
+});
+
+describe("my library route contract", () => {
+  it("uses the canonical route and removes legacy library paths", () => {
+    expect(routes.myLibrary.index).toBe("/my-library");
+    expect(routes.myLibrary.saved).toBeUndefined();
+    expect(routes.myLibrary.completed).toBeUndefined();
+    expect(leafRoutes).not.toContain("/library");
+    expect(leafRoutes).not.toContain("/library/saved");
+    expect(leafRoutes).not.toContain("/library/completed");
   });
 });
 
@@ -110,13 +119,13 @@ describe("resolveRouteAccess", () => {
 
   it("matches nested sub-paths via prefix", () => {
     expect(resolveRouteAccess("/settings/profile/edit")).toBe("auth-optional");
-    expect(resolveRouteAccess("/library/saved")).toBe("auth-optional");
+    expect(resolveRouteAccess("/my-library/saved")).toBe("auth-optional");
     expect(resolveRouteAccess("/admin/users")).toBe("auth-required");
   });
 
   it("preserves local-first semantics as auth-optional", () => {
     expect(resolveRouteAccess("/settings")).toBe("auth-optional");
-    expect(resolveRouteAccess("/library")).toBe("auth-optional");
+    expect(resolveRouteAccess("/my-library")).toBe("auth-optional");
   });
 
   it("honors the per-path public override under an auth-optional section", () => {

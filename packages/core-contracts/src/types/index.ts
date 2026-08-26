@@ -206,17 +206,17 @@ export {
   FeedPageDtoSchema,
 } from "../types/feed.types";
 export {
-  type LibraryItemDto,
-  LibraryItemDtoSchema,
-  type LibraryPageDto,
-  LibraryPageDtoSchema,
+  type MyLibraryItemDto,
+  MyLibraryItemDtoSchema,
+  type MyLibraryPageDto,
+  MyLibraryPageDtoSchema,
   type SavedSyncItemDto,
   SavedSyncItemDtoSchema,
   type SavedSyncDto,
   SavedSyncDtoSchema,
   type SavedDeltaItemDto,
   SavedDeltaItemDtoSchema,
-} from "../types/library.types";
+} from "../types/my-library.types";
 export {
   type UserProfileDto,
   UserProfileDtoSchema,

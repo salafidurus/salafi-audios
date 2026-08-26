@@ -84,14 +84,14 @@
   "tabs": {
     "search": "بحث",
     "feed": "الرئيسية",
-    "library": "المكتبة",
+    "myLibrary": "مكتبتي",
     "account": "الحساب"
   },
   "navigation": {
     "explore": "استكشاف",
     "home": "الرئيسية",
     "scholars": "العلماء",
-    "library": "المكتبة",
+    "myLibrary": "مكتبتي",
     "account": "الحساب",
     "siteTitle": "دروس سلفية",
     "primarySidebar": "الشريط الجانبي الرئيسي",
@@ -135,7 +135,7 @@
         "scholar": "العلماء",
         "curation": "المنتقى"
       },
-      "library": {
+      "myLibrary": {
         "started": "قيد التشغيل",
         "saved": "المحفوظة",
         "completed": "المكتملة"
@@ -280,7 +280,7 @@
     "filterRemoveAria": "إزالة تصفية {{label}}",
     "enterQuery": "أدخل كلمة بحث للبدء"
   },
-  "library": {
+  "myLibrary": {
     "title": "مكتبتي",
     "inProgress": "قيد الاستماع",
     "saved": "المحفوظة",

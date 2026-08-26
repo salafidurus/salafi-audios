@@ -20,11 +20,11 @@ describe("getRootTabFromPathname", () => {
   it("returns explore for /explore/recent", () => {
     expect(getRootTabFromPathname("/explore/recent")).toBe("explore");
   });
-  it("returns library for /library", () => {
-    expect(getRootTabFromPathname("/library")).toBe("library");
+  it("returns library for /my-library", () => {
+    expect(getRootTabFromPathname("/my-library")).toBe("myLibrary");
   });
-  it("returns library for /library/saved", () => {
-    expect(getRootTabFromPathname("/library/saved")).toBe("library");
+  it("returns library for /my-library/saved", () => {
+    expect(getRootTabFromPathname("/my-library/saved")).toBe("myLibrary");
   });
   it("returns settings for /settings", () => {
     expect(getRootTabFromPathname("/settings")).toBe("settings");
@@ -45,10 +45,10 @@ describe("getActiveSubsection", () => {
     expect(getActiveSubsection("/unknown", "explore")).toBe("recent");
   });
   it("returns matched library subsection", () => {
-    expect(getActiveSubsection("/library/saved", "library")).toBe("saved");
+    expect(getActiveSubsection("/my-library/saved", "myLibrary")).toBe("saved");
   });
   it("returns default library tab for bare path", () => {
-    expect(getActiveSubsection("/library", "library")).toBe("started");
+    expect(getActiveSubsection("/my-library", "myLibrary")).toBe("started");
   });
   it("strips trailing slash", () => {
     expect(getActiveSubsection("/recent/", "explore")).toBe("recent");
