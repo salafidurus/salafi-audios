@@ -5,6 +5,7 @@ import {
   blocksPreparation,
   changedFilesFromDiff,
   findingKey,
+  removableUnit,
   scopeIntroducedFindings,
 } from "./policy.mjs";
 
@@ -70,5 +71,29 @@ describe("dead-code audit policy", () => {
     expect(changedFilesFromDiff("M\tsrc/changed.ts\nA\tsrc/new.ts\n")).toEqual(
       new Set(["src/changed.ts", "src/new.ts"]),
     );
+  });
+
+  test("rejects symbol findings as whole-file removal units", () => {
+    expect(() => removableUnit({ ...finding(), name: "unusedExport" })).toThrow(
+      /symbol-level removal/,
+    );
+    expect(removableUnit({ ...finding(), type: "file", name: "src/orphan.ts" })).toEqual({
+      kind: "file",
+      file: "src/orphan.ts",
+    });
+  });
+
+  test("protects framework, public, historical, and generated paths", () => {
+    expect(removableUnit({ ...finding(), type: "file", file: "apps/web/src/app/page.tsx" })).toBe(
+      null,
+    );
+    expect(
+      removableUnit({
+        ...finding(),
+        type: "file",
+        file: "packages/core-db/prisma/migrations/x.ts",
+      }),
+    ).toBe(null);
+    expect(removableUnit({ ...finding(), type: "file", file: "dist/orphan.js" })).toBe(null);
   });
 });

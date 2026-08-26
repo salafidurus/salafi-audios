@@ -28,15 +28,14 @@ implementation diff:
 
 ```bash
 bun run dead-code-audit -- --mode audit \
-  --baseline docs/runbooks/dead-code-audit-baseline.json \
   --base origin/main --check-introduced --format json
 ```
 
 Keep the audit report with the implementation evidence. Pre-existing baseline
 findings are report-only. PR preparation is blocked only when the audit exits
-with a newly introduced `confirmed-dead` code or test finding. `likely-dead`
-and `unknown/dynamic` findings are reported for human review and never trigger
-automatic deletion or blocking.
+with a newly introduced `confirmed-dead` code or test finding. `probable-dead`,
+`needs-review`, `protected`, `historical`, and `unknown/dynamic` findings are
+reported for human review and never trigger automatic deletion.
 
 Skip a check only when the plan records why it cannot apply. Diagnose failures
 against the pre-work baseline before pushing.

@@ -24,10 +24,11 @@ Dead-code governance has two phases:
    allowlist. It removes only confirmed findings in that scope and records
    before-and-after evidence.
 
-`likely-dead` and `unknown/dynamic` findings are never automatically deleted or
-used to block delivery. Public APIs, package exports, documented commands,
-operational scripts, framework roots, generated output, migrations, and
-documentation remain protected unless separately approved.
+`probable-dead`, `needs-review`, `unknown/dynamic`, `protected`, and `historical`
+findings are never automatically deleted or used to block delivery. Public
+APIs, package exports, documented commands, operational scripts, framework
+roots, generated output, migrations, and documentation remain protected unless
+separately approved.
 
 ## Consequences
 

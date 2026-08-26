@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
-import { readFile, readdir, unlink } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm, symlink, unlink } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { relative, resolve } from "node:path";
 
+import { collectEvidence, evidenceForFinding } from "./evidence.mjs";
 import {
   assertRemovalScope,
   blocksPreparation,
   changedFilesFromDiff,
   findingKey,
+  removableUnit,
   scopeIntroducedFindings,
   withFindingKey,
 } from "./policy.mjs";
@@ -89,20 +92,22 @@ async function collectTestFiles(directory) {
 
 async function collectFindings(auditRoot) {
   const knipReport = runKnip(auditRoot);
+  const evidence = await collectEvidence(auditRoot);
   const findings = (knipReport.issues ?? []).flatMap((entry) => {
     const file = relative(auditRoot, resolve(auditRoot, entry.file));
     return Object.entries(entry).flatMap(([type, items]) => {
       if (type === "file" || !Array.isArray(items)) return [];
-      return items.map((item) =>
-        withFindingKey({
+      return items.map((item) => {
+        const finding = withFindingKey({
           category: deadCodeTypes.has(type) ? "likely-dead" : "unknown/dynamic",
           confidence: type === "files" ? "medium" : "low",
           evidence: `Knip reported a ${type} issue from the configured workspace graph.`,
           file,
           name: item.name ?? item.symbol ?? item,
           type: typeNames[type] ?? type,
-        }),
-      );
+        });
+        return evidenceForFinding(finding, evidence);
+      });
     });
   });
 
@@ -135,6 +140,27 @@ async function readJson(path, fallback) {
   } catch (error) {
     if (error.code === "ENOENT") return fallback;
     throw error;
+  }
+}
+
+async function findingsAtBase(auditRoot, base) {
+  const temporaryRoot = await mkdtemp(resolve(tmpdir(), "dead-code-audit-base-"));
+  const archive = resolve(temporaryRoot, "base.tar");
+  try {
+    const archiveResult = spawnSync("git", ["-C", auditRoot, "archive", "-o", archive, base], {
+      encoding: "utf8",
+    });
+    if (archiveResult.status !== 0)
+      throw new Error(archiveResult.stderr || `Unable to archive ${base}`);
+    const extractResult = spawnSync("tar", ["-xf", archive, "-C", temporaryRoot], {
+      encoding: "utf8",
+    });
+    if (extractResult.status !== 0)
+      throw new Error(extractResult.stderr || `Unable to extract ${base}`);
+    await symlink(resolve(auditRoot, "node_modules"), resolve(temporaryRoot, "node_modules"));
+    return await collectFindings(temporaryRoot);
+  } finally {
+    await rm(temporaryRoot, { recursive: true, force: true });
   }
 }
 
@@ -217,7 +243,9 @@ function findAllowlistedFindings(report, allowlist) {
 }
 
 async function removeFindings(auditRoot, candidates) {
-  const files = [...new Set(candidates.map(({ file }) => file))].sort();
+  const files = [
+    ...new Set(candidates.map((finding) => removableUnit(finding)?.file).filter(Boolean)),
+  ].sort();
   for (const file of files) await unlink(resolve(auditRoot, file));
   return { removedFiles: files };
 }
@@ -231,9 +259,19 @@ function printReport(report, format) {
   process.stdout.write(
     `Baseline findings: ${report.baseline.findingCount}; introduced findings: ${report.introduced.length}\n\n`,
   );
+  const categories = Map.groupBy(
+    [...report.findings, ...report.testFindings],
+    ({ category }) => category,
+  );
+  process.stdout.write("## Findings by classification\n\n");
+  for (const [category, items] of categories)
+    process.stdout.write(`- ${category}: ${items.length}\n`);
+  process.stdout.write("\n");
   if (report.blocking.length > 0) process.stdout.write("## Blocking findings\n\n");
   for (const finding of report.blocking)
-    process.stdout.write(`- ${finding.category}: \`${finding.file}\` (${finding.key})\n`);
+    process.stdout.write(
+      `- ${finding.category}: \`${finding.file}\` (${finding.key}) — ${finding.recommendation ?? "review"}\n`,
+    );
   process.stdout.write("## Test inventory\n\n");
   process.stdout.write(`Test files reviewed: ${report.testFindings.length}\n\n`);
   for (const category of new Set(report.testFindings.map(({ category }) => category))) {
@@ -248,7 +286,11 @@ export async function runAudit(options = {}) {
   const mode = options.mode ?? "audit";
   if (!["audit", "remove"].includes(mode)) throw new Error(usage());
   const { findings, testFindings } = await collectFindings(auditRoot);
-  const baseline = await readJson(options.baseline, {});
+  const baseline = options.baseline
+    ? await readJson(options.baseline, {})
+    : options.base
+      ? await findingsAtBase(auditRoot, options.base)
+      : {};
   const changedFiles = loadChangedFiles(auditRoot, options.base);
   const allFindings = [...findings, ...testFindings];
   const introduced = options.base

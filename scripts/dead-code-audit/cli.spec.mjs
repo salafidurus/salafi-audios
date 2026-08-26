@@ -36,7 +36,7 @@ describe("dead-code-audit CLI", () => {
     expect(report.findings).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          category: "likely-dead",
+          category: "confirmed-dead",
           file: "src/orphan.js",
           type: "file",
         }),

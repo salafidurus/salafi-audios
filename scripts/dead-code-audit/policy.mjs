@@ -2,6 +2,21 @@ import { createHash } from "node:crypto";
 
 const blockingCategories = new Set(["confirmed-dead"]);
 
+const protectedPathRules = [
+  [/^(?:.+\/)?(?:dist|build|coverage|generated)\//, "generated or build output"],
+  [/(^|\/)\.next\//, "Next.js build output"],
+  [/(^|\/)prisma\/migrations\//, "database migration history"],
+  [/(^|\/)src\/app\//, "filesystem route or application entry point"],
+  [
+    /(^|\/)(?:main|index|layout|middleware|proxy)\.[cm]?[jt]sx?$/,
+    "framework or package entry point",
+  ],
+  [
+    /(^|\/)(?:vitest|jest|babel|metro|next|expo|oxlint|eslint|tsup)\.config\.[cm]?[jt]s$/,
+    "tooling configuration",
+  ],
+];
+
 export function findingKey(finding) {
   const identity = [
     finding.kind ?? "code",
@@ -40,6 +55,21 @@ export function scopeIntroducedFindings(findings, { changedFiles, baselineKeys =
 
 export function blocksPreparation(findings) {
   return findings.filter((finding) => blockingCategories.has(finding.category));
+}
+
+export function protectedPathReason(file) {
+  return protectedPathRules.find(([pattern]) => pattern.test(file))?.[1] ?? null;
+}
+
+export function removableUnit(finding) {
+  const protectedReason = protectedPathReason(finding.file);
+  if (protectedReason) return null;
+  if (finding.kind !== "test" && finding.type !== "file") {
+    throw new Error(
+      "Removal mode does not support symbol-level removal until a source edit is explicitly provided.",
+    );
+  }
+  return { kind: "file", file: finding.file };
 }
 
 export function assertRemovalScope({ ticket, allowlist, findings }) {
