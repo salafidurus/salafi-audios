@@ -17,7 +17,7 @@ import {
 } from "@/features/admin/components/Translation";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/ui/button";
-import { Modal } from "@/shared/components/ui/modal";
+import { ConfirmationDialog } from "@/shared/components/ui/confirmation-dialog";
 import {
   Table,
   TableBody,
@@ -223,9 +223,10 @@ export function TopicsContent({
 
   return (
     <>
-      <Modal.ConfirmDialog
-        isOpen={deleteModalOpen}
-        onClose={() => {
+      <ConfirmationDialog
+        open={deleteModalOpen}
+        onOpenChange={(open) => {
+          if (open) return;
           setDeleteModalOpen(false);
           deletingTopicSlugRef.current = null;
           setDeletingTopicName("");
@@ -234,7 +235,8 @@ export function TopicsContent({
         onConfirm={handleConfirmDelete}
         title={t("admin.contents.deleteTitle", "Delete Topic?")}
         confirmLabel={t("admin.contents.deleteConfirm", "Delete Topic")}
-        confirmVariant="danger"
+        variant="destructive"
+        error={deleteError}
       >
         <p>
           {t("admin.contents.deletePrompt", {
@@ -250,7 +252,7 @@ export function TopicsContent({
             {deleteError}
           </p>
         )}
-      </Modal.ConfirmDialog>
+      </ConfirmationDialog>
 
       {filteredTopics.length > 0 ? (
         <>

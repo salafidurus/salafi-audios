@@ -12,10 +12,13 @@ import { AuthModal } from "@/features/auth";
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
 import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
 import { EmptyState } from "@/shared/components/EmptyState";
-import { Modal } from "@/shared/components/ui/modal";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Button } from "@/shared/components/ui/button";
+import {
+  ConfirmationDialog,
+  ConfirmationTextDialog,
+} from "@/shared/components/ui/confirmation-dialog";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
@@ -207,23 +210,23 @@ function ProfileContent() {
         </Button>
       </div>
 
-      <Modal.ConfirmDialog
-        isOpen={showSignOutModal}
-        onClose={() => setShowSignOutModal(false)}
+      <ConfirmationDialog
+        open={showSignOutModal}
+        onOpenChange={setShowSignOutModal}
         onConfirm={handleSignOut}
         title={t("account.profile.signOutTitle", "Sign Out?")}
         confirmLabel={t("account.profile.signOutConfirm", "Sign Out")}
-        confirmVariant="danger"
+        variant="destructive"
         testId="confirm-modal-confirm"
         cancelTestId="confirm-modal-cancel"
         modalTestId="confirm-modal"
       >
         <p>{t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}</p>
-      </Modal.ConfirmDialog>
+      </ConfirmationDialog>
 
-      <Modal.ConfirmText
-        isOpen={showDeleteAccountModal}
-        onClose={() => setShowDeleteAccountModal(false)}
+      <ConfirmationTextDialog
+        open={showDeleteAccountModal}
+        onOpenChange={setShowDeleteAccountModal}
         onConfirm={handleDeleteAccount}
         title={t("account.profile.deleteAccount", "Delete Account")}
         message={t(
@@ -231,7 +234,7 @@ function ProfileContent() {
           "This action is permanent and cannot be undone. All your data will be deleted.",
         )}
         confirmLabel={t("account.profile.deleteAccountConfirm", "Delete Account")}
-        confirmVariant="danger"
+        variant="destructive"
         confirmWord={t("account.profile.deleteConfirmWord", "DELETE")}
         testId="confirm-modal-confirm"
         modalTestId="delete-account-modal"

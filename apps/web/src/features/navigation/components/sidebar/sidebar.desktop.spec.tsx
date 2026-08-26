@@ -1,6 +1,6 @@
 import { createMongoAbility } from "@casl/ability";
 import { useAbility } from "@sd/domain-account";
-import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, act, waitFor, within } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
@@ -136,16 +136,8 @@ describe("Sidebar component", () => {
       fireEvent.click(signOutBtn);
     });
 
-    // Wait for the modal to appear and get all Sign Out buttons
-    await waitFor(
-      () => {
-        expect(screen.queryAllByRole("button", { name: /sign out/i }).length).toBeGreaterThan(1);
-      },
-      { timeout: 2000 },
-    );
-
-    const signOutButtons = screen.getAllByRole("button", { name: /sign out/i });
-    const modalSignOutBtn = signOutButtons[signOutButtons.length - 1]!; // Get the modal's Sign Out button
+    const dialog = await waitFor(() => screen.getByRole("dialog"));
+    const modalSignOutBtn = within(dialog).getByRole("button", { name: "Sign Out" });
 
     // Click the modal's Sign Out button
     await act(async () => {
