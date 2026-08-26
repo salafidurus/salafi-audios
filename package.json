@@ -36,6 +36,7 @@
   "scripts": {
     "agents:update": "bun scripts/sync-agents.mjs",
     "catalog": "bun ./infra/catalog/cli.ts",
+    "dead-code-audit": "bun scripts/dead-code-audit/cli.mjs",
     "dev": "turbo watch dev --filter=api --filter=web --filter=native",
     "dev:api": "turbo watch dev --filter=api",
     "dev:web": "turbo run dev --filter=web",
@@ -57,6 +58,7 @@
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
     "test:prepush": "turbo run test:prepush",
+    "test:dead-code-audit": "bun test scripts/dead-code-audit/*.spec.mjs",
     "verify:build-configs": "bun ./scripts/verify-build-configs.mjs",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
@@ -86,6 +88,7 @@
     "@types/react": "catalog:",
     "bun-types": "catalog:",
     "husky": "9.1.7",
+    "knip": "^6.32.2",
     "lint-staged": "17.0.8",
     "markdownlint-cli2": "0.23.0",
     "oxfmt": "^0.59.0",
