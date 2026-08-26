@@ -47,7 +47,7 @@ three Listing formats are exactly **Collection**, **Series**, and **Single**
 - **Dev-facing:** the type `Listing` / `ListingFormat`; surfaces such as search,
   feed, and `getContent` return Listings.
 - **User-facing:** the place where Listings are browsed is the **Catalog**
-  (a.k.a. "Explore"). Note: "Library" is a _different_ surface — the user's saved
+  (a.k.a. "Explore"). Note: "My Library" is a _different_ surface — the user's saved
   / in-progress / completed items — and must not be reused for the Catalog.
 
 ## How the model maps to storage

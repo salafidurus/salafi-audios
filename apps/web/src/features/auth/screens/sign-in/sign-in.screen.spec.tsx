@@ -32,13 +32,13 @@ vi.mock("next/link", () => ({
 
 describe("SignInResponsiveScreen", () => {
   it("preserves the requested destination in the social callback URL", () => {
-    render(<SignInResponsiveScreen redirectTo="/library?tab=completed" />);
+    render(<SignInResponsiveScreen redirectTo="/my-library?tab=completed" />);
 
     fireEvent.click(screen.getByRole("button", { name: "Continue with google" }));
 
     expect(authClient.signIn.social).toHaveBeenCalledWith({
       provider: "google",
-      callbackURL: "http://localhost:3001/auth/callback?redirect=%2Flibrary%3Ftab%3Dcompleted",
+      callbackURL: "http://localhost:3001/auth/callback?redirect=%2Fmy-library%3Ftab%3Dcompleted",
     });
   });
 });

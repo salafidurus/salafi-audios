@@ -11,7 +11,7 @@ const SUPPORT_SECTIONS = [
       },
       {
         q: "How do I save lectures?",
-        a: "Tap the bookmark icon on any lecture to add it to your Library.",
+        a: "Tap the bookmark icon on any lecture to add it to your MyLibrary.",
       },
       {
         q: "Can I listen offline?",

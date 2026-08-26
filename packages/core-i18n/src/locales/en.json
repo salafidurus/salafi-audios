@@ -84,14 +84,14 @@
   "tabs": {
     "search": "Search",
     "feed": "Feed",
-    "library": "Library",
+    "myLibrary": "My Library",
     "account": "Account"
   },
   "navigation": {
     "explore": "Explore",
     "home": "Home",
     "scholars": "Scholars",
-    "library": "Library",
+    "myLibrary": "My Library",
     "account": "Account",
     "siteTitle": "Salafi Durus",
     "primarySidebar": "Primary sidebar",
@@ -135,7 +135,7 @@
         "scholar": "Scholars",
         "curation": "Curation"
       },
-      "library": {
+      "myLibrary": {
         "started": "Started",
         "saved": "Saved",
         "completed": "Completed"
@@ -280,7 +280,7 @@
     "filterRemoveAria": "Remove {{label}} filter",
     "enterQuery": "Enter a search query to begin"
   },
-  "library": {
+  "myLibrary": {
     "title": "My Library",
     "inProgress": "In Progress",
     "saved": "Saved",

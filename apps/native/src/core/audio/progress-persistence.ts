@@ -53,7 +53,7 @@ async function writeCachedProgress(userId: string, entries: ListingProgress[]): 
 
 /**
  * Wires local, per-user local-first sync for the current app session — both
- * progress and saved/library state: hydrates progress from the local cache
+ * progress and saved/my-library state: hydrates progress from the local cache
  * immediately (before the network round-trip resolves), then both from the
  * server; persists progress store changes back to the cache (throttled); and
  * flushes any pending debounced sync (both progress and saved) when the app
