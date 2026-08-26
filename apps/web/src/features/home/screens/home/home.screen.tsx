@@ -2,6 +2,7 @@
 
 import type { FeedContentItemDto, FeedItemDto } from "@sd/core-contracts";
 
+import { useProgressStore } from "@sd/domain-audio";
 import { useExploreRecentScreen } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
 
@@ -34,6 +35,9 @@ export function HomeScreen({ onContinueListening }: HomeScreenProps) {
   const { recentProgress } = useContinueListening({
     enabled: !isAuthLoading && isAuthenticated,
   });
+  const localProgress = useProgressStore((state) =>
+    recentProgress ? state.progressMap[recentProgress.listingSlug] : undefined,
+  );
   const { data: promoData, isLoading: isPromosLoading } = useHomePromotions();
   const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen({
     limit: MAX_RECENT_ITEMS,
@@ -54,7 +58,15 @@ export function HomeScreen({ onContinueListening }: HomeScreenProps) {
     ? items.filter((item) => item.id !== featuredContent.id)
     : items;
   const curatedItems = promoData?.editorsPicks?.map((pick) => pick.listing) ?? [];
-  const hasHistory = Boolean(recentProgress);
+  const liveRecentProgress =
+    recentProgress && !localProgress?.completedAt
+      ? {
+          ...recentProgress,
+          positionSeconds: localProgress?.positionSeconds ?? recentProgress.positionSeconds,
+          durationSeconds: localProgress?.durationSeconds ?? recentProgress.durationSeconds,
+        }
+      : null;
+  const hasHistory = Boolean(liveRecentProgress);
   const isHeroLoading = isExploreLoading || isPromosLoading;
 
   return (
@@ -84,13 +96,13 @@ export function HomeScreen({ onContinueListening }: HomeScreenProps) {
           </div>
         </header>
 
-        {recentProgress && (
+        {liveRecentProgress && (
           <section
             className={styles.continuitySection}
             data-testid="home-continue-listening-section"
           >
             <ContinueListeningCard
-              recentProgress={recentProgress}
+              recentProgress={liveRecentProgress}
               onContinueListening={onContinueListening}
             />
           </section>

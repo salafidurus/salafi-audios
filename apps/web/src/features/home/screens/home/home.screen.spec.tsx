@@ -1,6 +1,7 @@
+import { useProgressStore } from "@sd/domain-audio";
 import { useExploreRecentScreen } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
 
@@ -16,6 +17,42 @@ vi.mock("next/navigation", () => ({
     back: vi.fn(),
   }),
 }));
+
+vi.mock("@sd/domain-audio", () => {
+  const { create } = require("zustand");
+  return {
+    useProgressStore: create((set: (state: unknown) => void) => ({
+      progressMap: {},
+      lastSyncedAt: null,
+      actions: {
+        setProgress: (listingSlug: string, positionSeconds: number, durationSeconds: number) =>
+          set((state: any) => ({
+            ...state,
+            progressMap: {
+              ...state.progressMap,
+              [listingSlug]: {
+                listingSlug,
+                positionSeconds,
+                durationSeconds,
+                updatedAt: new Date().toISOString(),
+              },
+            },
+          })),
+        markCompleted: (listingSlug: string) =>
+          set((state: any) => ({
+            ...state,
+            progressMap: {
+              ...state.progressMap,
+              [listingSlug]: {
+                ...state.progressMap[listingSlug],
+                completedAt: new Date().toISOString(),
+              },
+            },
+          })),
+      },
+    })),
+  };
+});
 
 vi.mock("@sd/domain-search", () => ({
   useContinueListening: vi.fn(),
@@ -41,6 +78,7 @@ describe("HomeScreen", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    useProgressStore.setState({ progressMap: {}, lastSyncedAt: null });
     mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
     (useContinueListening as unknown as Mock<any>).mockReturnValue({
       recentProgress: null,
@@ -92,6 +130,7 @@ describe("HomeScreen", () => {
       recentProgress: {
         lectureTitle: "Tauheed Explained",
         lectureSlug: "tauheed-explained",
+        listingSlug: "tauheed-explained",
         format: "single",
         orderIndex: 2,
         seriesContext: {
@@ -134,6 +173,60 @@ describe("HomeScreen", () => {
     );
 
     expect(mockOnContinueListening).toHaveBeenCalledWith("tauheed-explained");
+  });
+
+  it("updates the displayed position and percentage from local playback progress", () => {
+    (useContinueListening as unknown as Mock<any>).mockReturnValue({
+      recentProgress: {
+        lectureTitle: "Tauheed Explained",
+        lectureSlug: "tauheed-explained",
+        listingSlug: "tauheed-explained",
+        format: "single",
+        scholarName: "Shaikh Salih al-Fawzan",
+        scholarSlug: "salih-al-fawzan",
+        durationSeconds: 1800,
+        positionSeconds: 600,
+      },
+      isLoading: false,
+    });
+
+    render(<HomeScreen />);
+    expect(screen.getByTestId("continue-listening-progress-text").textContent).toBe("10:00");
+    expect(screen.getByText("33% complete")).toBeTruthy();
+
+    act(() => {
+      useProgressStore.getState().actions.setProgress("tauheed-explained", 900, 1800);
+    });
+
+    expect(screen.getByTestId("continue-listening-progress-text").textContent).toBe("15:00");
+    expect(screen.getByText("50% complete")).toBeTruthy();
+  });
+
+  it("removes Continue Listening when local completion is accepted", () => {
+    (useContinueListening as unknown as Mock<any>).mockReturnValue({
+      recentProgress: {
+        lectureTitle: "Tauheed Explained",
+        lectureSlug: "tauheed-explained",
+        listingSlug: "tauheed-explained",
+        format: "single",
+        scholarName: "Shaikh Salih al-Fawzan",
+        scholarSlug: "salih-al-fawzan",
+        durationSeconds: 1800,
+        positionSeconds: 600,
+      },
+      isLoading: false,
+    });
+
+    render(<HomeScreen />);
+    expect(screen.getByTestId("continue-listening-section")).toBeTruthy();
+
+    act(() => {
+      useProgressStore.getState().actions.setProgress("tauheed-explained", 900, 1800);
+      useProgressStore.getState().actions.markCompleted("tauheed-explained");
+    });
+
+    expect(screen.queryByTestId("continue-listening-section")).toBeNull();
+    expect(screen.queryByTestId("home-continue-listening-section")).toBeNull();
   });
 
   it("places listening continuity before discovery sections", () => {
@@ -326,6 +419,7 @@ describe("HomeScreen", () => {
     render(<HomeScreen />);
 
     expect(screen.getByTestId("home-hero-skeleton")).toBeTruthy();
+    expect(screen.queryByTestId("home-continue-listening-section")).toBeNull();
   });
 
   it("renders mobile app download section", () => {
