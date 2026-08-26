@@ -34,6 +34,10 @@ vi.mock("next/navigation", () => ({
   useRouter: vi.fn(),
 }));
 
+vi.mock("next/image", () => ({
+  default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => <img {...props} />,
+}));
+
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     t: (key: string, fallback?: string) => fallback || key,
