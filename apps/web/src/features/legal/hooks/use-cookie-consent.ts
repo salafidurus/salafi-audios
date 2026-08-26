@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
 const COOKIE_CONSENT_KEY = "cookie-consent:v1";
 const COOKIE_CONSENT_CHANGE_EVENT = "cookie-consent-change";
 
-function getCookieConsentFromStorage(): boolean {
-  if (!hasWindow()) return false;
+function getCookieConsentFromStorage(): boolean | null {
+  if (!hasWindow()) return null;
   const stored = window.localStorage.getItem(COOKIE_CONSENT_KEY);
   return stored === "true";
 }
@@ -32,18 +32,15 @@ function subscribeToCookieConsent(onChange: () => void): () => void {
 }
 
 export function useCookieConsent() {
-  const [isResolved, setIsResolved] = useState(false);
-  const hasAccepted = useSyncExternalStore(
+  const consent = useSyncExternalStore(
     subscribeToCookieConsent,
     getCookieConsentFromStorage,
-    () => false,
+    () => null,
   );
 
-  useEffect(() => setIsResolved(true), []);
-
   return {
-    hasAccepted,
-    isResolved,
+    hasAccepted: consent === true,
+    isResolved: consent !== null,
     accept,
   };
 }
