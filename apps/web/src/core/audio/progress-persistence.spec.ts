@@ -15,7 +15,7 @@ vi.mock("@sd/core-contracts", () => ({
         update: (listingSlug: string) => `/audio/progress/${listingSlug}`,
       },
     },
-    library: {
+    myLibrary: {
       saved: "/me/my-library/saved",
       savedDelta: "/me/my-library/saved/delta",
       savedSync: "/me/my-library/saved/sync",
