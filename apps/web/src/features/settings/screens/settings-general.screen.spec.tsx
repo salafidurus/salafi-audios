@@ -17,6 +17,37 @@ vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
   ),
 }));
 
+const mockSearchParams = vi.fn(() => new URLSearchParams());
+
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => mockSearchParams(),
+}));
+
+vi.mock("./settings-profile.screen", () => ({
+  SettingsProfileScreen: () => <div data-testid="profile-panel">Profile panel</div>,
+}));
+
+const TabsChangeContext = React.createContext<(value: string) => void>(() => {});
+
+vi.mock("@/shared/components/ui/tabs", () => ({
+  Tabs: ({
+    onValueChange,
+    children,
+  }: {
+    onValueChange: (value: string) => void;
+    children: React.ReactNode;
+  }) => <TabsChangeContext.Provider value={onValueChange}>{children}</TabsChangeContext.Provider>,
+  TabsList: ({ children }: { children: React.ReactNode }) => <div role="tablist">{children}</div>,
+  TabsTrigger: ({ value, children }: { value: string; children: React.ReactNode }) => {
+    const onValueChange = React.useContext(TabsChangeContext);
+    return (
+      <button role="tab" type="button" onClick={() => onValueChange(value)}>
+        {children}
+      </button>
+    );
+  },
+}));
+
 vi.mock("@/features/settings/components/SettingsSection/SettingsSection", () => ({
   SettingsSection: ({ title, children }: { title: string; children: React.ReactNode }) => (
     <section>
@@ -79,6 +110,7 @@ describe("SettingsGeneralScreen", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSearchParams.mockReturnValue(new URLSearchParams());
     localStorageMock.clear();
     Object.defineProperty(window, "localStorage", {
       value: localStorageMock,
@@ -154,5 +186,29 @@ describe("SettingsGeneralScreen", () => {
   it("keeps the mode control available", () => {
     render(<SettingsGeneralScreen />);
     expect(screen.getByRole("button", { name: "Dark" })).toBeInTheDocument();
+  });
+
+  it("renders Profile when the URL selects the profile tab", () => {
+    mockSearchParams.mockReturnValue(new URLSearchParams("tab=profile"));
+    render(<SettingsGeneralScreen />);
+
+    expect(screen.getByTestId("profile-panel")).toBeInTheDocument();
+    expect(screen.queryByText("Language")).not.toBeInTheDocument();
+  });
+
+  it.each(["", "invalid", "general"])('renders General for tab value "%s"', (tab) => {
+    mockSearchParams.mockReturnValue(new URLSearchParams(tab ? `tab=${tab}` : ""));
+    render(<SettingsGeneralScreen />);
+
+    expect(screen.getByText("Language")).toBeInTheDocument();
+  });
+
+  it("updates the URL when the Profile tab is selected", () => {
+    render(<SettingsGeneralScreen />);
+
+    const replaceStateSpy = vi.spyOn(window.history, "replaceState");
+    fireEvent.click(screen.getByRole("tab", { name: "Profile" }));
+
+    expect(replaceStateSpy).toHaveBeenCalledWith(window.history.state, "", "/settings?tab=profile");
   });
 });
