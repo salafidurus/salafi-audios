@@ -20,6 +20,7 @@ export default function Error({ error, reset }: ErrorProps) {
         <h1 className={styles.title}>Page not found</h1>
         <p className={styles.description}>The page could not be loaded right now.</p>
         <div className={styles.actions}>
+          {/* react-doctor-disable-next-line react-doctor/nextjs-no-a-element -- native recovery link must survive router/provider failures */}
           <a href="/" className={styles.link}>
             Back to home
           </a>
