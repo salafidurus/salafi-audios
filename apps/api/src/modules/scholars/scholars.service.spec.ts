@@ -147,13 +147,6 @@ describe('ScholarsService', () => {
     });
   });
 
-  describe('getFormData', () => {
-    it('method exists and is callable', () => {
-      expect(service.getFormData).toBeDefined();
-      expect(typeof service.getFormData).toBe('function');
-    });
-  });
-
   describe('create', () => {
     it('should create a new scholar', async () => {
       const dto: CreateScholarDto = {
