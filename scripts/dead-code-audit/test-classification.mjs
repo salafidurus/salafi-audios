@@ -3,6 +3,10 @@ const skippedPattern = /\b(?:it|test|describe)\.skip\b|\b(?:xit|xdescribe)\b/;
 const placeholderPattern = /expect\(\s*(?:true|false|null|undefined|["'`]\s*["'`])\s*\)/;
 const criticalPattern = /\b(?:auth|permission|access|security|contract|regression|boundary|e2e)\b/i;
 
+function withoutStringLiterals(source) {
+  return source.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)/g, " ");
+}
+
 export function isTestFile(file) {
   return testFilePattern.test(file);
 }
@@ -15,7 +19,9 @@ export function normalizeTestSource(source) {
 }
 
 export function classifyTestFile({ file, source }) {
-  if (skippedPattern.test(source)) {
+  const executableSource = withoutStringLiterals(source);
+
+  if (skippedPattern.test(executableSource)) {
     return {
       category: "permanently-skipped",
       confidence: "low",
@@ -25,7 +31,7 @@ export function classifyTestFile({ file, source }) {
     };
   }
 
-  if (placeholderPattern.test(source)) {
+  if (placeholderPattern.test(executableSource)) {
     return {
       category: "placeholder",
       confidence: "medium",
@@ -36,7 +42,7 @@ export function classifyTestFile({ file, source }) {
   }
 
   if (
-    /\b(?:obsolete|deprecated|legacy)\b/i.test(source) ||
+    /\b(?:obsolete|deprecated|legacy)\b/i.test(executableSource) ||
     /(?:obsolete|deprecated|legacy)/i.test(file)
   ) {
     return {

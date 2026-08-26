@@ -60,7 +60,7 @@ describe("aggregate access schema", () => {
     expect(user).toMatch(/accessVersion\s+Int\s+@default\(0\)/);
   });
 
-  it("contains no legacy permission-based access structures", async () => {
+  it("uses only aggregate access structures", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
     const schema = fs.readFileSync(path.resolve(__dirname, "../prisma/schema.prisma"), "utf-8");
@@ -73,7 +73,7 @@ describe("aggregate access schema", () => {
     expect(schema).not.toMatch(/\bpermissions\b|\bscholarRoles\b|\btranslatorRoles\b/);
   });
 
-  it("does not export the legacy Permission enum", async () => {
+  it("does not export the removed Permission enum", async () => {
     const mod = await import("./index");
     expect(mod).not.toHaveProperty("Permission");
   });

@@ -26,6 +26,12 @@ describe("test classification", () => {
     ).toMatchObject({
       category: "permanently-skipped",
     });
+    expect(
+      classifyTestFile({
+        file: "classifier.spec.mjs",
+        source: 'test("fixture", () => "test.skip(\'pending\', () => {})");',
+      }),
+    ).not.toMatchObject({ category: "permanently-skipped" });
   });
 
   test("normalizes source for exact duplicate review", () => {

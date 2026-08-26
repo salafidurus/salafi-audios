@@ -62,7 +62,7 @@ describe("routes – structural integrity", () => {
 });
 
 describe("my library route contract", () => {
-  it("uses the canonical route and removes legacy library paths", () => {
+  it("uses only the canonical My Library route", () => {
     expect(routes.myLibrary.index).toBe("/my-library");
     expect(routes.myLibrary.saved).toBeUndefined();
     expect(routes.myLibrary.completed).toBeUndefined();
