@@ -92,40 +92,77 @@ Do NOT close or modify any parent issue.
 
 After the approved ticket set and dependency graph are published, recommend proceeding to `pre-implement` for the first unblocked ticket. The lifecycle then continues through `implement` and `post-implement`.
 
-<local-ticket-template>
+<ticket-template>
 
 # <NN>: <Ticket title>
 
-**What to build:** the end-to-end behaviour this ticket makes work, from the user's perspective, not a layer-by-layer implementation list.
+**What to build:** the end-to-end behaviour this ticket makes work, from the
+user's perspective. Describe the outcome, not a layer-by-layer implementation
+list.
 
-**Blocked by:** the numbers/titles of the tickets that gate this one, or "None (can start immediately)".
+**Key contracts:** the durable interfaces, domain rules, or decisions that an
+agent must preserve while implementing the ticket. Name behavior and public
+interfaces; omit paths and details that are likely to move.
 
-**Status:** ready-for-agent
-
-- [ ] Acceptance criterion 1
-- [ ] Acceptance criterion 2
-
-</local-ticket-template>
-
-<issue-template>
-
-## Parent
-
-A reference to the parent issue on the tracker (if the source was an existing issue, otherwise omit this section).
-
-## What to build
-
-The end-to-end behaviour this ticket makes work, from the user's perspective, not layer-by-layer implementation.
-
-## Acceptance criteria
+**Acceptance criteria:** each criterion must be independently testable and
+describe observable behavior. Include unhappy paths, authorization boundaries,
+and migration compatibility when they apply.
 
 - [ ] Criterion 1
 - [ ] Criterion 2
 
-## Blocked by
+**Out of scope:** the adjacent behavior that this ticket explicitly does not
+change. This section is mandatory, even when it contains only one boundary.
 
-- A reference to each blocking ticket, or "None (can start immediately)".
+- Adjacent behavior not included in this ticket
 
-</issue-template>
+**Blocked by:** only tickets that genuinely prevent this ticket from starting.
+Use "None (can start immediately)" when no such ticket exists.
 
-In either form, avoid specific file paths or code snippets: they go stale fast. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it and note briefly that it came from a prototype. Trim to the decision-rich parts, not a working demo, just the important bits.
+</ticket-template>
+
+### Platform deltas
+
+Use the same ticket content on every platform, then apply only these publishing
+differences:
+
+- **GitHub:** when the ticket belongs to a specification, the first line must
+  be `Part of #<spec-number>`. Use a concise Conventional Commit-style title,
+  and apply the `ticket` and `ready-for-agent` labels unless the workflow says
+  otherwise. Represent blockers in both the body and GitHub's native dependency
+  graph when available.
+- **Local files:** number files from `01` in dependency order under the
+  feature's issue directory. Keep the ticket title, contracts, acceptance
+  criteria, out-of-scope boundary, and blocker wording from the canonical
+  template; do not add tracker-only metadata.
+
+Do not add specific file paths or implementation snippets: they go stale fast.
+Include a compact decision shape only when it communicates a contract more
+precisely than prose, such as a state machine, reducer, schema, or type shape.
+Trim it to the decision-rich parts rather than pasting a working demo.
+
+### Worked example
+
+```markdown
+# 01: Resume unfinished listening from Home
+
+**What to build:** An authenticated listener can open Home and resume the most
+recent unfinished track, while an anonymous visitor sees the public Home
+content without a personal progress request.
+
+**Key contracts:** Public Home data remains available without a session.
+Continue Listening is a personal projection and is absent while progress is
+loading, when no unfinished progress exists, and after completion.
+
+**Acceptance criteria:**
+
+- [ ] Anonymous Home loads public content without requesting personal progress
+- [ ] Authenticated Home shows unfinished progress in recency order
+- [ ] Completed progress is not shown in Continue Listening
+
+**Out of scope:**
+
+- Changing playback controls or the public Catalog ordering
+
+**Blocked by:** None (can start immediately)
+```
