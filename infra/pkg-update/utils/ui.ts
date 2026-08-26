@@ -1,4 +1,4 @@
-import { confirm, multiselect, note, outro } from "@clack/prompts";
+import { confirm, multiselect, note } from "@clack/prompts";
 import color from "picocolors";
 
 import { categorizeBump } from "./semver";
@@ -27,6 +27,7 @@ export async function selectUpdates(candidates: UpdateCandidate[]): Promise<Upda
     return [];
   }
 
+  // SAFETY: @clack/prompts returns the selected values or a cancellation symbol.
   const selected = (await multiselect({
     message: "Select updates to apply:",
     options: candidates.map((c) => ({
@@ -45,5 +46,3 @@ export async function confirmCommit(): Promise<boolean> {
   });
   return result === true;
 }
-
-export { outro };
