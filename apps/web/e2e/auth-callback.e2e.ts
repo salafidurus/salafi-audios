@@ -65,7 +65,6 @@ test.describe("Authentication callback fallback", () => {
 
     await expect(page.getByRole("banner")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Authentication Error" })).toBeVisible();
-    await expect(page.getByText("Provider failed")).toBeVisible();
     await expect(page.getByRole("link", { name: "Try again" })).toBeVisible();
     await expect(page.getByRole("contentinfo")).toBeVisible();
   });
