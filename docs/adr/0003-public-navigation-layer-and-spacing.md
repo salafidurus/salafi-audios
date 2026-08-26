@@ -14,7 +14,7 @@ the impression of multiple navigation layers.
 The web app needs a public discovery shell for Home, Explore, Scholars, and
 Library. Settings and administrative actions have different intent and must
 not compete with public content navigation. The shell must also support RTL,
-light/dark and accent themes, capability-aware Admin access, keyboard use, and
+light/dark themes, capability-aware Admin access, keyboard use, and
 small screens without changing routes or authority boundaries.
 
 ## Decision

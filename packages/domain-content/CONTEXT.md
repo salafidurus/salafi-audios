@@ -46,6 +46,12 @@ _Avoid_: Library when referring to public catalog browsing.
 A user's personal set of saved, in-progress, or completed relationships to
 content. Library membership does not change the public Listing.
 
+**Continue Listening**:
+A Home-only projection of an authenticated user's unfinished Progress. It is a
+presentation of personal state, not a Catalog entity or an independent public
+surface. It is absent while personal Progress is loading, when no unfinished
+Progress exists, and after the backend accepts `completedAt`.
+
 **Published**:
 A Listing state in which the content is eligible for public discovery. It is
 distinct from whether a user has saved, downloaded, or completed the content.
@@ -61,9 +67,16 @@ The stable identity of a Listing across presentation languages and client
 surfaces. A translation is not a new Listing.
 
 **Public slug**:
-The only external identifier used to resolve a Listing. This applies to public
-and protected route contracts, including editorial routes. An internal ID may
-be used after backend resolution, but an external ID-shaped value never falls
-back to internal-ID lookup.
+The external identity used to resolve public Catalog entities. Client-facing
+contracts use `listingSlug` for Listings, `topicSlug` for Topics, and
+`scholarSlug` for Scholars. This applies to public and protected route
+contracts, including editorial routes. An internal ID may be used after
+backend resolution, but an external ID-shaped value never falls back to
+internal-ID lookup.
+
+**Public Home**:
+The anonymous Catalog surface containing public promotions and discovery. It
+is separate from private personal Progress and must not require a session to
+load its public data.
 
 Translation vocabulary is defined by the [Localization context](../core-i18n/CONTEXT.md).
