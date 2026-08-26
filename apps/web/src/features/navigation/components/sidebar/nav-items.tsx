@@ -18,16 +18,16 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { useAuth, authClient } from "@/core/auth";
+import { useAuth } from "@/core/auth";
+import { useSignOut } from "@/core/auth/use-sign-out";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { LanguageSwitch } from "@/features/settings";
 import { Button } from "@/shared/components/ui/button";
 import { ConfirmationDialog } from "@/shared/components/ui/confirmation-dialog";
 import { useResponsive } from "@/shared/hooks/use-responsive";
-import { hasWindow } from "@/shared/lib/runtime-guards";
 
 import { SectionLabel } from "./section-label";
 import styles from "./sidebar.module.css";
@@ -132,7 +132,6 @@ interface NavItemsProps {
 
 export function NavItems({ onItemClick }: NavItemsProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const { t } = useTranslation();
   const { isAuthenticated, user, isLoading } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
@@ -140,6 +139,7 @@ export function NavItems({ onItemClick }: NavItemsProps) {
   const showLanguageSwitch = isMobile || isTablet;
 
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
+  const { signOut, error: signOutError } = useSignOut();
 
   const hasAdminAccess = isAuthenticated && hasAnyAdminAccess(ability);
   const visibleAdminNavItems = getAdminNavItems(t).filter(
@@ -261,22 +261,11 @@ export function NavItems({ onItemClick }: NavItemsProps) {
       <ConfirmationDialog
         open={isSignOutDialogOpen}
         onOpenChange={setIsSignOutDialogOpen}
-        onConfirm={async () => {
-          try {
-            await authClient.signOut();
-          } catch (err) {
-            console.error("Sign out error", err);
-          } finally {
-            if (hasWindow() && window.location && !process.env.VITEST) {
-              window.location.href = "/";
-            } else {
-              router.push("/");
-            }
-          }
-        }}
+        onConfirm={signOut}
         title={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
         confirmLabel={t("account.signOut", "Sign Out")}
         variant="destructive"
+        error={signOutError}
       />
     </>
   );

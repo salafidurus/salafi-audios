@@ -1,6 +1,25 @@
 import { test, expect } from "./test-base";
 
 test("home page loads the study landing", async ({ page }) => {
+  await page.route("http://localhost:4000/listings/recent**", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ items: [], exhausted: true }),
+    });
+  });
+  await page.route("http://localhost:4000/listings/promotions", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ hero: null, editorsPicks: [] }),
+    });
+  });
+  await page.route("http://localhost:4000/scholars", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ scholars: [] }),
+    });
+  });
+
   await page.goto("/");
 
   await expect(page).toHaveTitle(/./);

@@ -27,6 +27,12 @@ Use two explicitly separate fallback tiers:
   boundary. It must not depend on public navigation, the footer, auth, API data,
   runtime translation hooks, client routing, or application providers.
 
+The app-level error boundary implements the shell-unavailable fallback with
+static browser primitives. Its home action is a same-origin anchor and its
+reload action calls the browser's native reload API. A controlled shell-failure
+test seam verifies that this boundary does not recurse through the failing
+public shell.
+
 The normal consent layout may add its own mini-player and consent/analytics
 behavior around the reusable public shell. Those additions are not part of the
 normal fallback shell.
