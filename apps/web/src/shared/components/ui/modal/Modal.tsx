@@ -1,18 +1,8 @@
 "use client";
 
-import {
-  Children,
-  createContext,
-  isValidElement,
-  useCallback,
-  useContext,
-  useState,
-  type ReactElement,
-  type ReactNode,
-} from "react";
+import { useState, type ReactNode } from "react";
 import { z } from "zod";
 
-import { useTranslation } from "@/core/i18n/use-translation";
 import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
@@ -22,7 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { cn } from "@/shared/utils";
 
 export type ModalWidthVariant = "wide" | "standard" | "narrow" | "auto";
@@ -41,19 +30,6 @@ export interface ModalProps {
   footerAlignment?: "left" | "right" | "center" | "space-between";
   footerBorder?: boolean;
   loading?: boolean;
-  multiTab?: boolean;
-  requireReview?: boolean;
-  activeTab?: string;
-  onActiveTabChange?: (id: string) => void;
-  defaultActiveTab?: string;
-  reviewTabId?: string;
-  errorTabs?: string[];
-  saveFormId?: string;
-  saving?: boolean;
-  saveLabel?: ReactNode;
-  savingLabel?: ReactNode;
-  reviewLabel?: ReactNode;
-  cancelLabel?: ReactNode;
   contentClassName?: string;
 }
 
@@ -63,20 +39,10 @@ const widthClasses = {
   narrow: "sm:max-w-md",
   auto: "sm:max-w-lg",
 } satisfies Record<ModalWidthVariant, string>;
-type ModalTabProps = { id: string; children?: ReactNode; disabled?: boolean; hasError?: boolean };
-type ModalContentProps = { id: string; children?: ReactNode };
-const modalIdSchema = z.object({ id: z.string() });
 const modalWidthSchema = z.enum(["wide", "standard", "narrow", "auto"]);
-function isModalTab(child: ReactNode): child is ReactElement<ModalTabProps> {
-  return isValidElement<ModalTabProps>(child) && modalIdSchema.safeParse(child.props).success;
-}
-function isModalContentItem(child: ReactNode): child is ReactElement<ModalContentProps> {
-  return isValidElement<ModalContentProps>(child) && modalIdSchema.safeParse(child.props).success;
-}
 function isModalWidth(value: string): value is ModalWidthVariant {
   return modalWidthSchema.safeParse(value).success;
 }
-const modalTabChangeContext = createContext<((value: string) => void) | null>(null);
 
 function ModalBody({ children, className }: { children: ReactNode; className?: string }) {
   return (
@@ -114,48 +80,6 @@ function ModalFooter({
   );
 }
 
-function ModalTabItem(_props: ModalTabProps) {
-  return null;
-}
-function ModalTabs({ children, errorTabs = [] }: { children?: ReactNode; errorTabs?: string[] }) {
-  const tabs = Children.toArray(children).filter(isModalTab);
-  const errorTabSet = new Set(errorTabs);
-  const onTabChange = useContext(modalTabChangeContext);
-  return (
-    <TabsList className="w-full justify-start overflow-x-auto">
-      {tabs.map((tab) => {
-        const props = tab.props;
-        return (
-          <TabsTrigger
-            key={props.id}
-            value={props.id}
-            disabled={props.disabled}
-            onClick={() => onTabChange?.(props.id)}
-            aria-invalid={props.hasError || errorTabSet.has(props.id) || undefined}
-          >
-            {props.children}
-          </TabsTrigger>
-        );
-      })}
-    </TabsList>
-  );
-}
-function ModalContentItem(_props: ModalContentProps) {
-  return null;
-}
-function ModalContent({ children }: { children?: ReactNode }) {
-  const items = Children.toArray(children).filter(isModalContentItem);
-  return (
-    <>
-      {items.map((item) => (
-        <TabsContent key={item.props.id} value={item.props.id}>
-          {item.props.children}
-        </TabsContent>
-      ))}
-    </>
-  );
-}
-
 function ModalRoot({
   isOpen,
   onClose,
@@ -169,39 +93,8 @@ function ModalRoot({
   footerAlignment = "right",
   footerBorder = true,
   loading,
-  multiTab = false,
-  requireReview = false,
-  activeTab: controlledActiveTab,
-  onActiveTabChange,
-  defaultActiveTab = "en",
-  reviewTabId = "review",
-  saveFormId,
-  saving = false,
-  saveLabel,
-  savingLabel,
-  reviewLabel,
-  cancelLabel,
   contentClassName,
 }: ModalProps) {
-  const { t } = useTranslation();
-  const [uncontrolledActiveTab, setUncontrolledActiveTab] = useState(defaultActiveTab);
-  const activeTab = controlledActiveTab ?? uncontrolledActiveTab;
-  const setActiveTab = useCallback(
-    (value: string) => {
-      onActiveTabChange?.(value);
-      if (!onActiveTabChange) setUncontrolledActiveTab(value);
-    },
-    [onActiveTabChange],
-  );
-  const content = multiTab ? (
-    <modalTabChangeContext.Provider value={setActiveTab}>
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        {children}
-      </Tabs>
-    </modalTabChangeContext.Provider>
-  ) : (
-    children
-  );
   const parsedWidth = z.union([modalWidthSchema, z.string()]).safeParse(width);
   const maxWidth =
     parsedWidth.success && isModalWidth(parsedWidth.data)
@@ -212,30 +105,12 @@ function ModalRoot({
       <DialogContent className={cn(maxWidth, contentClassName)} data-size={size}>
         {title && <ModalHeader>{title}</ModalHeader>}
         <DialogDescription className="sr-only">Dialog content</DialogDescription>
-        {content}
-        {!hideFooter &&
-          (requireReview ? (
-            <ModalFooter alignment={footerAlignment} border={footerBorder}>
-              <Button variant="outline" size="sm" onClick={onClose} disabled={loading || saving}>
-                {cancelLabel ?? t("common.cancel", "Cancel")}
-              </Button>
-              {activeTab === reviewTabId ? (
-                <Button type="submit" form={saveFormId} variant="primary" loading={saving}>
-                  {saving
-                    ? (savingLabel ?? t("admin.access.saving", "Saving…"))
-                    : (saveLabel ?? t("common.save", "Save"))}
-                </Button>
-              ) : (
-                <Button type="button" variant="primary" onClick={() => setActiveTab(reviewTabId)}>
-                  {reviewLabel ?? t("admin.modal.reviewTab", "Review")}
-                </Button>
-              )}
-            </ModalFooter>
-          ) : footer ? (
-            <ModalFooter alignment={footerAlignment} border={footerBorder}>
-              {footer}
-            </ModalFooter>
-          ) : null)}
+        {children}
+        {!hideFooter && footer ? (
+          <ModalFooter alignment={footerAlignment} border={footerBorder}>
+            {footer}
+          </ModalFooter>
+        ) : null}
       </DialogContent>
     </Dialog>
   );
@@ -402,10 +277,6 @@ export namespace Modal {
   export const Footer = ModalFooter;
   export const ConfirmDialog = ModalConfirmDialog;
   export const ConfirmText = ModalConfirmText;
-  export const Tabs = ModalTabs;
-  export const TabItem = ModalTabItem;
-  export const Content = ModalContent;
-  export const ContentItem = ModalContentItem;
 }
 
 export { ModalBody, ModalFooter, ModalHeader, ModalConfirmDialog, ModalConfirmText };

@@ -35,11 +35,6 @@ const ExploreFiltersStorageSchema = z.object({
   language: z.string().default(""),
   sort: z.enum(EXPLORE_SORT_OPTIONS).default("recent"),
 });
-const ExploreSortSchema = z.enum(EXPLORE_SORT_OPTIONS);
-
-export const isExploreSort = (value: string): value is ExploreSort =>
-  ExploreSortSchema.safeParse(value).success;
-
 export function readExploreFilters(storage: Storage, key: string): ExploreFilters {
   try {
     const parsed: unknown = JSON.parse(storage.getItem(key) ?? "null");

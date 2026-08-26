@@ -1,5 +1,4 @@
 import type {
-  AdminUserListDto,
   AdminTopicDetailDto,
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
@@ -72,27 +71,6 @@ export function fetchScholarFormData(id: string) {
 
 // --- Topics ---
 
-export type AdminTopicInput = {
-  slug: string;
-  name: { en: string; ar?: string };
-};
-
-export function createTopic(data: AdminTopicInput) {
-  return httpClient<unknown>({
-    url: endpoints.admin.topics.create,
-    method: "POST",
-    body: data,
-  });
-}
-
-export function updateTopic(slug: string, data: AdminTopicInput) {
-  return httpClient<unknown>({
-    url: endpoints.admin.topics.update(slug),
-    method: "PATCH",
-    body: data,
-  });
-}
-
 export function deleteTopic(slug: string) {
   return httpClient<unknown>({
     url: endpoints.admin.topics.delete(slug),
@@ -126,19 +104,3 @@ export function updateTopicWithTranslations(slug: string, data: UpdateTopicWithT
 }
 
 // --- Users ---
-
-export function fetchAdminUsers(params?: { q?: string; role?: string }) {
-  const url = endpoints.admin.users.list;
-  const query = new URLSearchParams();
-  if (params?.q) {
-    query.append("q", params.q);
-  }
-  if (params?.role) {
-    query.append("role", params.role);
-  }
-  const queryString = query.toString();
-  return httpClient<AdminUserListDto>({
-    url: queryString ? `${url}?${queryString}` : url,
-    method: "GET",
-  });
-}

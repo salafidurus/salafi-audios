@@ -70,14 +70,6 @@ export function isDev(): boolean {
   return getRuntimeEnv()?.appEnv === "development";
 }
 
-export function isPreview(): boolean {
-  return getRuntimeEnv()?.appEnv === "preview";
-}
-
-export function isProduction(): boolean {
-  return getRuntimeEnv()?.appEnv === "production";
-}
-
 // The Android emulator's "localhost" refers to the emulator itself, not the
 // host machine. 10.0.2.2 is QEMU's alias back to the host's loopback address.
 function rewriteLoopbackForAndroidEmulator(url: string): string {

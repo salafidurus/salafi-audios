@@ -15,11 +15,11 @@ vi.mock("@sd/core-contracts", () => ({
         update: (listingSlug: string) => `/audio/progress/${listingSlug}`,
       },
     },
-    library: {
-      saved: "/me/library/saved",
-      savedDelta: "/me/library/saved/delta",
-      savedSync: "/me/library/saved/sync",
-      saveListing: (listingId: string) => `/me/library/save/${listingId}`,
+    myLibrary: {
+      saved: "/me/my-library/saved",
+      savedDelta: "/me/my-library/saved/delta",
+      savedSync: "/me/my-library/saved/sync",
+      saveListing: (listingId: string) => `/me/my-library/save/${listingId}`,
     },
   },
 }));
@@ -27,7 +27,7 @@ vi.mock("@sd/core-contracts", () => ({
 const USER_ID = "user-1";
 
 function defaultHttpClientMock(opts: { url: string }) {
-  if (opts.url === "/me/library/saved/delta") return Promise.resolve([]);
+  if (opts.url === "/me/my-library/saved/delta") return Promise.resolve([]);
   return Promise.resolve([]);
 }
 
@@ -92,7 +92,7 @@ describe("initProgressPersistence", () => {
     const cleanup = initProgressPersistence(USER_ID);
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/me/library/saved/delta",
+      url: "/me/my-library/saved/delta",
       method: "GET",
       params: undefined,
     });

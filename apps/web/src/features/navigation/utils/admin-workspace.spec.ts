@@ -19,10 +19,10 @@ describe("admin workspace return path", () => {
       setItem: (key: string, value: string) => storage.set(key, value),
     };
 
-    rememberAdminReturnPath("/library/saved", adapter);
-    expect(getAdminReturnPath(adapter)).toBe("/library/saved");
+    rememberAdminReturnPath("/my-library?tab=saved", adapter);
+    expect(getAdminReturnPath(adapter)).toBe("/my-library?tab=saved");
 
     rememberAdminReturnPath("/admin/users", adapter);
-    expect(getAdminReturnPath(adapter)).toBe("/library/saved");
+    expect(getAdminReturnPath(adapter)).toBe("/my-library?tab=saved");
   });
 });

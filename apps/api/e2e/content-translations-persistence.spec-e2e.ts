@@ -13,8 +13,6 @@ import {
   cleanupE2ETestData,
 } from './helpers/seed-test-data';
 
-process.env.DISABLE_THROTTLER = 'true';
-
 /**
  * Translations are written exclusively through the standalone per-locale
  * endpoints (POST /listings/:slug/translations, POST /scholars/:slug/translations,

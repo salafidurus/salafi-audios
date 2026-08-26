@@ -2,7 +2,6 @@ import type {
   PresignedUrlRequestDto,
   PresignedUrlResponseDto,
   CreateListingDto,
-  AdminListingListDto,
   AdminListingDetailDto,
   BulkActionDto,
   BulkActionResultDto,
@@ -66,22 +65,6 @@ export async function createListing(data: CreateListingDto): Promise<AdminListin
     url: endpoints.admin.listings.create,
     method: "POST",
     body: data,
-  });
-}
-
-export async function fetchAdminListings(params?: {
-  scholarId?: string;
-  status?: string;
-  page?: number;
-}): Promise<AdminListingListDto> {
-  return httpClient<AdminListingListDto>({
-    url: endpoints.admin.listings.list,
-    method: "GET",
-    params: {
-      scholarId: params?.scholarId,
-      status: params?.status,
-      page: params?.page,
-    },
   });
 }
 

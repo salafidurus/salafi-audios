@@ -275,7 +275,7 @@ describe('AudioRepository', () => {
       });
       const [, ...values] = prisma.$executeRaw.mock.calls[0];
       expect(values).toContain('l1');
-      expect(values).not.toContain('legacy-id');
+      expect(values).not.toContain('unresolved-listing-id');
     });
 
     it('derives isCompleted from the canonical duration, not the client-supplied one, when completedAt is absent', async () => {

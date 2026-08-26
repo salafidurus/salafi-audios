@@ -52,17 +52,12 @@ describe('Infrastructure & Basic API Features (e2e)', () => {
     expect(res.body).toHaveProperty('message');
   });
 
-  // NOTE: This test fails in bun:test due to faster event loop timing
-  // The throttler uses millisecond-precision timing and Bun's Promise.all
-  // processes requests faster than the throttler can count them.
-  // This would need a timing-aware fix or separate throttler testing strategy.
-  it.skip('Throttler - rapid requests return 429', async () => {
+  it('Throttler - sequential requests return 429 after the limit', async () => {
     const auth = await authFactory.createUser();
-    const requests = Array.from({ length: 5 }).map(() =>
-      request(app.getHttpServer()).get('/account/profile').set(auth.headers),
-    );
-
-    const responses = await Promise.all(requests);
+    const responses = [];
+    for (let index = 0; index < 3; index += 1) {
+      responses.push(await request(app.getHttpServer()).get('/account/profile').set(auth.headers));
+    }
     const has429 = responses.some((res) => res.status === 429);
     expect(has429).toBe(true);
   });

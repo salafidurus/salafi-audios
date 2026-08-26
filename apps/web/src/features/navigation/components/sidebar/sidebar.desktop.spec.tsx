@@ -34,6 +34,10 @@ vi.mock("next/navigation", () => ({
   useRouter: vi.fn(),
 }));
 
+vi.mock("next/image", () => ({
+  default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => <img {...props} />,
+}));
+
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     t: (key: string, fallback?: string) => fallback || key,
@@ -52,7 +56,7 @@ describe("Sidebar component", () => {
     process.env.NEXT_PUBLIC_WEB_URL = "http://localhost:3001";
   });
 
-  it("renders basic navigation links (Search, Explore, Scholars, Library, Settings)", () => {
+  it("renders basic navigation links (Search, Explore, Scholars, My Library, Settings)", () => {
     (useAuth as Mock<any>).mockReturnValue({
       isAuthenticated: false,
       isLoading: false,
@@ -65,7 +69,7 @@ describe("Sidebar component", () => {
     expect(screen.getByText("Search")).toBeInTheDocument();
     expect(screen.getByText("Explore")).toBeInTheDocument();
     expect(screen.getByText("Scholars")).toBeInTheDocument();
-    expect(screen.getByText("Library")).toBeInTheDocument();
+    expect(screen.getByText("My Library")).toBeInTheDocument();
     expect(screen.getByText("Settings")).toBeInTheDocument();
   });
 
@@ -146,5 +150,30 @@ describe("Sidebar component", () => {
 
     // Check that authClient.signOut was called
     expect(authClient.signOut).toHaveBeenCalled();
+  });
+
+  it("keeps the confirmation dialog open when sign out fails", async () => {
+    (useAuth as Mock<any>).mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { name: "Test User", email: "test@example.com" },
+    });
+    (useAbility as Mock<any>).mockReturnValue({ ability: createMongoAbility([]) });
+    (authClient.signOut as Mock<any>).mockRejectedValueOnce(new Error("network failure"));
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    render(<Sidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Sign Out" }));
+
+    const dialog = await waitFor(() => screen.getByRole("dialog"));
+    await act(async () => {
+      fireEvent.click(within(dialog).getByRole("button", { name: "Sign Out" }));
+    });
+
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+      "Sign out failed. Please try again.",
+    );
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    consoleError.mockRestore();
   });
 });

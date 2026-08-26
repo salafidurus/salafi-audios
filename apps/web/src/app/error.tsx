@@ -1,12 +1,5 @@
 "use client";
 
-import { routes } from "@sd/core-contracts";
-import Link from "next/link";
-import { useEffect } from "react";
-
-import { useTranslation } from "@/core/i18n/use-translation";
-import { Button } from "@/shared/components/ui/button";
-
 import styles from "./error.module.css";
 
 type ErrorProps = {
@@ -15,31 +8,25 @@ type ErrorProps = {
 };
 
 export default function Error({ error, reset }: ErrorProps) {
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    // noop: we could wire reporting later
-    error satisfies Error;
-  }, [error]);
+  // Keep the last-resort boundary independent from the application runtime.
+  void error;
+  void reset;
 
   return (
     <main className={styles.page}>
       <div className={styles.card}>
-        <p className={styles.kicker}>500</p>
-        <h1 className={styles.title}>{t("serverError.title", "Something went wrong")}</h1>
-        <p className={styles.description}>
-          {t(
-            "serverError.description",
-            "The page could not be loaded right now. Please try again.",
-          )}
-        </p>
+        <p className={styles.brand}>Salafi Durus</p>
+        <p className={styles.kicker}>404</p>
+        <h1 className={styles.title}>Page not found</h1>
+        <p className={styles.description}>The page could not be loaded right now.</p>
         <div className={styles.actions}>
-          <Button variant="primary" onClick={reset}>
-            {t("serverError.retry", "Try again")}
-          </Button>
-          <Link href={routes.home} className={styles.link}>
-            {t("notFound.backHome", "Back to home")}
-          </Link>
+          {/* react-doctor-disable-next-line react-doctor/nextjs-no-a-element -- native recovery link must survive router/provider failures */}
+          <a href="/" className={styles.link}>
+            Back to home
+          </a>
+          <button type="button" className={styles.reload} onClick={() => window.location.reload()}>
+            Reload page
+          </button>
         </div>
       </div>
     </main>

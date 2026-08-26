@@ -57,7 +57,6 @@ export function hasAnyAdminAccess(ability: AppAbility): boolean {
 export function useAbility(options?: UseAbilityOptions): UseAbilityResult {
   const { isAuthenticated, enabled } = options ?? {};
   const queryEnabled = enabled ?? (isAuthenticated !== undefined ? isAuthenticated : true);
-
   const { data: profile, isLoading } = useAccountProfile({ enabled: queryEnabled });
 
   return {

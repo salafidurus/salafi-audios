@@ -188,6 +188,25 @@ textarea:focus {
   scrollbar-width: none;
 }
 
+.styled-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-primary) transparent;
+}
+
+.styled-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.styled-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.styled-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--border-primary);
+}
+
 .listRow {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-subtle);

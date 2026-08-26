@@ -3,7 +3,6 @@ import type {
   PresignedUrlResponseDto,
   CreateListingDto,
   UpdateListingDetailsDto,
-  AdminListingMediaDetailDto,
   UpdateListingMediaDto,
   AdminListingListDto,
   AdminListingDetailDto,
@@ -150,27 +149,6 @@ export function updateListingMedia(id: string, data: UpdateListingMediaDto) {
   });
 }
 
-export function fetchListingMediaData(id: string) {
-  return httpClient<AdminListingMediaDetailDto>({
-    url: endpoints.admin.listings.mediaData(id),
-    method: "GET",
-  });
-}
-
-export function publishLecture(id: string) {
-  return httpClient<AdminListingDetailDto>({
-    url: endpoints.admin.listings.publish(id),
-    method: "POST",
-  });
-}
-
-export function archiveLecture(id: string) {
-  return httpClient<AdminListingDetailDto>({
-    url: endpoints.admin.listings.archive(id),
-    method: "POST",
-  });
-}
-
 export function fetchAdminLectures(params?: {
   cursor?: string;
   search?: string;
@@ -197,13 +175,6 @@ export function fetchAdminLectures(params?: {
 
   return httpClient<AdminListingListDto>({
     url,
-    method: "GET",
-  });
-}
-
-export function fetchAdminLectureDetail(id: string) {
-  return httpClient<AdminListingDetailDto>({
-    url: endpoints.admin.listings.detail(id),
     method: "GET",
   });
 }

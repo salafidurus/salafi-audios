@@ -35,14 +35,16 @@ test.describe("Navigation — public workspace & routing", () => {
       await expect(page).toHaveURL(/\/scholars/);
     });
 
-    test("clicking Library public navigation link navigates to /library", async ({ page }) => {
+    test("clicking My Library public navigation link navigates to /my-library", async ({
+      page,
+    }) => {
       await page.goto("/");
       const libraryLink = page.getByRole("navigation", { name: "Main" }).getByRole("link", {
-        name: "Library",
+        name: "My Library",
       });
       await expect(libraryLink).toBeVisible();
       await libraryLink.click();
-      await expect(page).toHaveURL(/\/library/);
+      await expect(page).toHaveURL(/\/my-library/);
     });
 
     test("page title updates on navigation", async ({ page }) => {
@@ -60,6 +62,39 @@ test.describe("Navigation — public workspace & routing", () => {
       await expect(tabs).toBeVisible();
       await expect(tabs.getByRole("tab", { name: "General" })).toBeVisible();
       await expect(tabs.getByRole("tab", { name: "Profile" })).toBeVisible();
+    });
+
+    test("settings profile tab is query-backed and survives direct loading", async ({ page }) => {
+      await page.goto("/settings?tab=profile");
+      await expect(page).toHaveURL(/\/settings\?tab=profile/);
+      await expect(page.getByRole("tab", { name: "Profile" })).toHaveAttribute(
+        "data-state",
+        "active",
+      );
+
+      await page.getByRole("tab", { name: "General" }).click();
+      await expect(page).toHaveURL(/\/settings$/);
+      await expect(page.getByRole("tab", { name: "General" })).toHaveAttribute(
+        "data-state",
+        "active",
+      );
+    });
+
+    test("invalid settings tabs safely fall back to General", async ({ page }) => {
+      await page.goto("/settings?tab=unknown");
+
+      await expect(page.getByRole("tab", { name: "General" })).toHaveAttribute(
+        "data-state",
+        "active",
+      );
+    });
+
+    test("removed settings profile route is not aliased", async ({ page }) => {
+      const response = await page.goto("/settings/profile");
+
+      expect(response?.status()).toBe(404);
+      await expect(page.getByText("Page not found")).toBeVisible();
+      await expect(page).toHaveURL(/\/settings\/profile$/);
     });
   });
 

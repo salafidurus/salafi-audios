@@ -21,7 +21,7 @@ import { SitemapModule } from './core/sitemap/sitemap.module';
 import { SearchModule } from './modules/search/search.module';
 import { TopicsModule } from './modules/topics/topics.module';
 import { ScholarsModule } from './modules/scholars/scholars.module';
-import { LibraryModule } from './modules/library/library.module';
+import { MyLibraryModule } from './modules/my-library/my-library.module';
 import { AudioModule } from './modules/audio/audio.module';
 import { MediaModule } from './modules/media/media.module';
 import { ListingModule } from './modules/listing/listing.module';
@@ -54,7 +54,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     SearchModule,
     TopicsModule,
     ScholarsModule,
-    LibraryModule,
+    MyLibraryModule,
     AudioModule,
     MediaModule,
     ListingModule,

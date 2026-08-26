@@ -108,5 +108,3 @@ export const createShadowsNative = (mode: "light" | "dark"): ShadowsNativeTheme 
     elevated: isLight ? shadowsNative.elevated.light : shadowsNative.elevated.dark,
   };
 };
-
-export type ShadowsNative = typeof shadowsNative;

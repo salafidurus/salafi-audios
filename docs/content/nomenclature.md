@@ -47,7 +47,7 @@ three Listing formats are exactly **Collection**, **Series**, and **Single**
 - **Dev-facing:** the type `Listing` / `ListingFormat`; surfaces such as search,
   feed, and `getContent` return Listings.
 - **User-facing:** the place where Listings are browsed is the **Catalog**
-  (a.k.a. "Explore"). Note: "Library" is a _different_ surface — the user's saved
+  (a.k.a. "Explore"). Note: "My Library" is a _different_ surface — the user's saved
   / in-progress / completed items — and must not be reused for the Catalog.
 
 ## How the model maps to storage
@@ -80,3 +80,26 @@ separate from private personal state.
 **Continue Listening** is a Home-only projection of authenticated unfinished Progress.
 It is not a Catalog entity, is absent while personal Progress is loading or empty, and
 disappears when `completedAt` is accepted.
+
+## Engineering vocabulary
+
+**Complexity budget** is the maximum cyclomatic complexity permitted for an
+in-scope production function. The repository measures it with Oxlint's
+`eslint/complexity` rule using the `modified` variant. It is a control-flow
+maintainability measure, not a synonym for file size, naming quality, or
+general readability.
+
+## Dead-code governance vocabulary
+
+**Reachable code** is executable code connected through accepted static or
+dynamic edges to a declared runtime, build, route, job, CLI, package, or test
+root.
+
+**Orphan code** is executable code with no confirmed path from an accepted root.
+
+**Dead test** is a test that does not observe behavior, protect a supported
+contract, or provide meaningful regression evidence.
+
+**Confirmed dead** is an orphan or dead test whose removal has been checked
+against runtime roots, dynamic mechanisms, external-consumer policy, and
+verification results.

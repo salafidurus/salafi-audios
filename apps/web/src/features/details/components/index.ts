@@ -7,7 +7,6 @@ export {
   LectureSaveButton,
   type LectureSaveButtonProps,
 } from "./listing/lecture-save-button/LectureSaveButton";
-export { LectureMeta, type LectureMetaProps } from "./listing/lecture-meta/lecture-meta";
 export { TopicChips, type TopicChipsProps } from "./listing/topic-chips/topic-chips";
 export {
   SeriesContextBar,

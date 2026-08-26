@@ -5,6 +5,7 @@ import React from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./accordion";
 import { Avatar, AvatarFallback } from "./avatar";
 import { Card, CardContent, CardTitle } from "./card";
+import { Dialog, DialogContent } from "./dialog";
 import {
   SidebarContent,
   SidebarMenu,
@@ -37,6 +38,32 @@ describe("generated navigation and content primitives", () => {
     const second = screen.getByRole("tab", { name: "Two" });
     expect(first).toHaveAttribute("aria-selected", "true");
     expect(second).toHaveAttribute("aria-selected", "false");
+  });
+
+  it("keeps tab navigation horizontal and gives the active panel a scroll boundary", () => {
+    render(
+      <Dialog open>
+        <DialogContent>
+          <Tabs defaultValue="one" className="min-h-0 flex-1">
+            <TabsList className="no-scrollbar w-full justify-start overflow-x-auto overflow-y-hidden">
+              <TabsTrigger value="one">A very long tab label</TabsTrigger>
+              <TabsTrigger value="two">Another long tab label</TabsTrigger>
+            </TabsList>
+            <TabsContent value="one">First content</TabsContent>
+            <TabsContent value="two">Second content</TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>,
+    );
+
+    const dialog = screen.getByRole("dialog");
+    const tabs = screen.getByRole("tablist");
+    const activePanel = screen.getByRole("tabpanel");
+
+    expect(dialog).toHaveClass("flex", "min-h-0");
+    expect(tabs).toHaveClass("no-scrollbar", "overflow-x-auto", "overflow-y-hidden");
+    expect(activePanel).toHaveClass("min-h-0", "overflow-y-auto", "styled-scrollbar");
+    expect(screen.getByRole("tab", { name: "A very long tab label" })).toHaveClass("flex-1");
   });
 
   it("exposes toggle and switch state through accessible state attributes", () => {

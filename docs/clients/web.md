@@ -13,7 +13,7 @@ not an authority in its own right.
 The web client has two presentation workspaces over the same authenticated
 identity:
 
-- **Public workspace**: discovery, listening continuity, Library, account, and
+- **Public workspace**: discovery, listening continuity, My Library, account, and
   support surfaces.
 - **Admin workspace**: editorial, catalog, user-access, and operational
   surfaces available to Users with backend-recognized administrative access.
@@ -26,7 +26,7 @@ sections allowed by their capabilities and scope.
 ### Public navigation glossary
 
 - **Public primary navigation**: the persistent content destinations Home,
-  Explore, Scholars, and Library. It excludes Settings and administrative
+  Explore, Scholars, and My Library. It excludes Settings and administrative
   actions.
 - **Utility actions**: account, theme, language, search, and capability-aware
   Admin actions that support the public workspace without becoming catalog
@@ -45,6 +45,11 @@ sections allowed by their capabilities and scope.
 - **Admin workspace**: the distinct contextual presentation for administrative
   routes. Its visible destinations are filtered by backend-derived capability,
   while backend authorization remains authoritative.
+- **Normal not-found state**: the localized, theme-aware branded 404 rendered
+  inside the public navigation shell.
+- **Shell-unavailable fallback**: the provider-independent emergency 404 used
+  when the public navigation shell cannot render. It uses only static recovery
+  content, a plain home link, and browser reload behavior.
 
 Explore is a discovery-first feed rather than a query/results screen. It is one
 continuous mixed stream of listing cards and discovery modules, with Topic
@@ -87,7 +92,7 @@ Current route groups include consent-gated public/account routes under
 
 ## 4. Authenticated and Editorial Responsibilities
 
-- Account, settings, support, and library flows for signed-in users.
+- Account, settings, support, and My Library flows for signed-in users.
 - Editorial/admin flows for content, scholars, users, and stats, gated by
   backend-enforced roles.
 - Bulk workflows may exist on web for usability, but all policy remains server-side.

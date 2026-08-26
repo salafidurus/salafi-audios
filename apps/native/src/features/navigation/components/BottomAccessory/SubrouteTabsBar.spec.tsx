@@ -34,10 +34,10 @@ describe("SubrouteTabsBar", () => {
   it.each([
     ["explore", "/recent", ["Recent", "Scholars", "Curation"], ["/", "/scholar", "/curation"]],
     [
-      "library",
-      "/library/started",
+      "myLibrary",
+      "/my-library/started",
       ["Started", "Saved", "Completed"],
-      ["/library", "/library/saved", "/library/completed"],
+      ["/my-library", "/my-library/saved", "/my-library/completed"],
     ],
     ["settings", "/settings", ["General", "Profile"], ["/settings", "/settings/profile"]],
   ])("routes every %s tab correctly", async (_section, pathname, labels, routes) => {

@@ -1,63 +1,13 @@
-import type { ComponentType } from "react";
-
 import { routes } from "@sd/core-contracts";
-import { BookOpen, Cloud, Search, Settings } from "lucide-react-native";
+
+import { nativeRoutes } from "@/core/navigation/routes";
 
 import { DEFAULT_TABS, SECTION_TABS, type Section } from "../types";
 
 export type RootTab = Section | "search";
 
-export type RootTabConfig = {
-  id: RootTab;
-  routeName: "explore" | "(search)" | "library" | "settings";
-  /** English fallback label. */
-  label: string;
-  /** i18n key (under the `tabs` namespace) resolved at render time. */
-  labelKey: string;
-  Icon: ComponentType<{ color?: string; size?: number; strokeWidth?: number }>;
-};
-
-export const ROOT_TABS: RootTabConfig[] = [
-  { id: "explore", routeName: "explore", label: "Explore", labelKey: "tabs.explore", Icon: Cloud },
-  { id: "search", routeName: "(search)", label: "Search", labelKey: "tabs.search", Icon: Search },
-  {
-    id: "library",
-    routeName: "library",
-    label: "Library",
-    labelKey: "tabs.library",
-    Icon: BookOpen,
-  },
-  {
-    id: "settings",
-    routeName: "settings",
-    label: "Settings",
-    labelKey: "tabs.settings",
-    Icon: Settings,
-  },
-];
-
-const GROUP_NAME_TO_TAB = {
-  explore: "explore",
-  "(search)": "search",
-  library: "library",
-  settings: "settings",
-} satisfies Record<RootTabConfig["routeName"], RootTab>;
-
 export function isSection(value: RootTab): value is Section {
   return value !== "search";
-}
-
-function isRootTabRouteName(routeName: string): routeName is keyof typeof GROUP_NAME_TO_TAB {
-  return routeName in GROUP_NAME_TO_TAB;
-}
-
-export function getRootTabByRouteName(routeName: string): RootTabConfig | undefined {
-  if (!isRootTabRouteName(routeName)) {
-    return undefined;
-  }
-
-  const tabId = GROUP_NAME_TO_TAB[routeName];
-  return ROOT_TABS.find((tab) => tab.id === tabId);
 }
 
 export function getRootTabFromPathname(pathname: string): RootTab {
@@ -74,8 +24,8 @@ export function getRootTabFromPathname(pathname: string): RootTab {
     return "explore";
   }
 
-  if (pathname.startsWith(routes.library.index)) {
-    return "library";
+  if (pathname.startsWith(nativeRoutes.myLibrary.index)) {
+    return "myLibrary";
   }
 
   if (pathname.startsWith(routes.settings.index)) {
@@ -92,7 +42,7 @@ export function isTabRoute(pathname: string): boolean {
     pathname === "/scholar" ||
     pathname === "/curation" ||
     pathname.startsWith("/search") ||
-    pathname.startsWith("/library") ||
+    pathname.startsWith("/my-library") ||
     pathname.startsWith("/settings")
   ) {
     return true;
@@ -128,6 +78,13 @@ export function buildSectionPath(section: Section, tabId?: string): string {
       return "/";
     }
     return `/${activeTab}`;
+  }
+
+  if (section === "myLibrary") {
+    if (activeTab === DEFAULT_TABS[section]) {
+      return nativeRoutes.myLibrary.index;
+    }
+    return `/my-library/${activeTab}`;
   }
 
   if (activeTab === DEFAULT_TABS[section]) {

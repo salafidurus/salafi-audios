@@ -7,6 +7,14 @@ import { config, type PkupdateConfig } from "./pkg-update.config";
 import { fetchLatestVersion } from "./utils/npm";
 import { categorizeBump, isNewer } from "./utils/semver";
 
+type LatestVersionFetcher = (packageName: string) => Promise<string | null>;
+
+type PackageJson = {
+  workspaces?: { catalog?: Record<string, string> };
+  packageManager?: string;
+  dependencies?: Record<string, string>;
+};
+
 export function filterByGroups(depName: string, groups: PkupdateConfig["groups"]): string | null {
   for (const [groupName, group] of Object.entries(groups)) {
     for (const pattern of group.patterns) {
@@ -29,8 +37,9 @@ export function dedupeCandidates(candidates: UpdateCandidate[]): UpdateCandidate
   return Array.from(map.values());
 }
 
-function readJson(path: string): Record<string, unknown> {
-  return JSON.parse(readFileSync(path, "utf-8")) as Record<string, unknown>;
+function readJson(path: string): PackageJson {
+  // SAFETY: callers only read the optional package.json fields represented by this local shape.
+  return JSON.parse(readFileSync(path, "utf-8")) as PackageJson;
 }
 
 function matchesSkip(name: string, skip: string[], cfg: PkupdateConfig): boolean {
@@ -60,14 +69,14 @@ function matchesNever(name: string, never: string[]): boolean {
 export async function checkCatalog(
   rootDir: string,
   cfg: PkupdateConfig,
+  fetcher: LatestVersionFetcher = fetchLatestVersion,
 ): Promise<UpdateCandidate[]> {
   const rootPkg = readJson(resolve(rootDir, "package.json")); // nosemgrep
-  const workspaces = rootPkg.workspaces as Record<string, unknown> | undefined;
-  const catalog = (workspaces?.catalog ?? {}) as Record<string, string>;
+  const catalog = rootPkg.workspaces?.catalog ?? {};
 
   const entries = Object.entries(catalog).filter(([pkg]) => !matchesSkip(pkg, cfg.skip, cfg));
 
-  const versions = await Promise.all(entries.map(([pkg]) => fetchLatestVersion(pkg)));
+  const versions = await Promise.all(entries.map(([pkg]) => fetcher(pkg)));
 
   const updateTypeSets = new Map<string, ReadonlySet<string> | undefined>();
   for (const [name, g] of Object.entries(cfg.groups)) {
@@ -101,16 +110,20 @@ export async function checkCatalog(
   return results;
 }
 
-export async function checkBun(rootDir: string): Promise<UpdateCandidate | null> {
+export async function checkBun(
+  rootDir: string,
+  fetcher: LatestVersionFetcher = fetchLatestVersion,
+): Promise<UpdateCandidate | null> {
   const rootPkg = readJson(resolve(rootDir, "package.json")); // nosemgrep
-  const packageManager = rootPkg.packageManager as string | undefined;
+  const packageManager = rootPkg.packageManager;
   if (!packageManager) return null;
 
   const match = packageManager.match(/^bun@(\d+\.\d+\.\d+)/);
   if (!match) return null;
 
+  // SAFETY: the capture group is present because the regular expression matched.
   const current = match[1]!;
-  const latest = await fetchLatestVersion("bun");
+  const latest = await fetcher("bun");
   if (!latest || latest === current) return null;
 
   return {
@@ -121,16 +134,19 @@ export async function checkBun(rootDir: string): Promise<UpdateCandidate | null>
   };
 }
 
-export async function checkExpo(rootDir: string): Promise<UpdateCandidate | null> {
+export async function checkExpo(
+  rootDir: string,
+  fetcher: LatestVersionFetcher = fetchLatestVersion,
+): Promise<UpdateCandidate | null> {
   const nativePkgPath = resolve(rootDir, "apps", "native", "package.json"); // nosemgrep
   if (!existsSync(nativePkgPath)) return null;
 
   const nativePkg = readJson(nativePkgPath);
-  const deps = (nativePkg.dependencies ?? {}) as Record<string, string>;
+  const deps = nativePkg.dependencies ?? {};
   const current = deps.expo;
   if (!current) return null;
 
-  const latest = await fetchLatestVersion("expo");
+  const latest = await fetcher("expo");
   if (!latest) return null;
 
   const raw = current.replace(/^[\^~]/, "");
@@ -148,18 +164,19 @@ export async function checkExpo(rootDir: string): Promise<UpdateCandidate | null
 export async function checkAll(
   rootDir: string,
   cfg: PkupdateConfig = config,
+  fetcher: LatestVersionFetcher = fetchLatestVersion,
 ): Promise<UpdateCandidate[]> {
   const results: UpdateCandidate[] = [];
 
-  results.push(...(await checkCatalog(rootDir, cfg)));
+  results.push(...(await checkCatalog(rootDir, cfg, fetcher)));
 
   if (cfg.bun.enabled) {
-    const bun = await checkBun(rootDir);
+    const bun = await checkBun(rootDir, fetcher);
     if (bun) results.push(bun);
   }
 
   if (cfg.expo.enabled) {
-    const expo = await checkExpo(rootDir);
+    const expo = await checkExpo(rootDir, fetcher);
     if (expo) results.push(expo);
   }
 

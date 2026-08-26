@@ -32,12 +32,14 @@ export default function TabsLayout() {
           <NativeTabs.Trigger.Label>{t("navigation.explore", "Explore")}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
-        <NativeTabs.Trigger name="library">
+        <NativeTabs.Trigger name="my-library">
           <NativeTabs.Trigger.Icon
             sf={{ default: "books.vertical", selected: "books.vertical.fill" }}
             md={{ default: "library_books", selected: "library_books" }}
           />
-          <NativeTabs.Trigger.Label>{t("navigation.library", "Library")}</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>
+            {t("navigation.myLibrary", "My Library")}
+          </NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
         <NativeTabs.Trigger name="settings">

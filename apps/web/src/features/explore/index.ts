@@ -15,7 +15,6 @@ export {
 } from "./components/scholar-grid-skeleton/scholar-grid-skeleton";
 
 // Screens
-export { FeedScreen, type FeedScreenProps } from "./screens/feed.screen";
 export { FeedRecentScreen, type FeedRecentScreenProps } from "./screens/explore-recent.screen";
 export {
   ExploreScholarScreen,

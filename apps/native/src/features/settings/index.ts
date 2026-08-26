@@ -12,8 +12,4 @@ export { LanguageSwitch } from "./components/language-switch/language-switch";
 export { ContentLanguageToggle } from "./components/content-language-toggle/content-language-toggle";
 
 // i18n utilities
-export {
-  contentPreferenceStore,
-  useShowOriginalContent,
-  setShowOriginalContent,
-} from "./content-preference";
+export { useShowOriginalContent, setShowOriginalContent } from "./content-preference";

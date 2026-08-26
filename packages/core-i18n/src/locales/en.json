@@ -72,6 +72,7 @@
       "signOutTitle": "Sign Out?",
       "signOutConfirm": "Sign Out",
       "signOutPrompt": "Are you sure you want to sign out?",
+      "signOutError": "Sign out failed. Please try again.",
       "deleteAccountConfirm": "Delete Account",
       "deleteAccountPrompt": "This action is permanent and cannot be undone. All your data will be deleted.",
       "deleteConfirmWord": "DELETE",
@@ -84,14 +85,14 @@
   "tabs": {
     "search": "Search",
     "feed": "Feed",
-    "library": "Library",
+    "myLibrary": "My Library",
     "account": "Account"
   },
   "navigation": {
     "explore": "Explore",
     "home": "Home",
     "scholars": "Scholars",
-    "library": "Library",
+    "myLibrary": "My Library",
     "account": "Account",
     "siteTitle": "Salafi Durus",
     "primarySidebar": "Primary sidebar",
@@ -135,7 +136,7 @@
         "scholar": "Scholars",
         "curation": "Curation"
       },
-      "library": {
+      "myLibrary": {
         "started": "Started",
         "saved": "Saved",
         "completed": "Completed"
@@ -194,6 +195,11 @@
       "followedScholarsDesc": "Notify when a followed scholar posts",
       "newLectures": "New Lectures",
       "newLecturesDesc": "Notify when new lectures are published"
+    },
+    "tabs": {
+      "label": "Settings sections",
+      "general": "General",
+      "profile": "Profile"
     }
   },
   "support": {
@@ -280,7 +286,7 @@
     "filterRemoveAria": "Remove {{label}} filter",
     "enterQuery": "Enter a search query to begin"
   },
-  "library": {
+  "myLibrary": {
     "title": "My Library",
     "inProgress": "In Progress",
     "saved": "Saved",

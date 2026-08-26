@@ -72,6 +72,7 @@
       "signOutTitle": "تسجيل الخروج؟",
       "signOutConfirm": "تسجيل الخروج",
       "signOutPrompt": "هل أنت متأكد من رغبتك في تسجيل الخروج؟",
+      "signOutError": "فشل تسجيل الخروج. يُرجى المحاولة مرة أخرى.",
       "deleteAccountConfirm": "حذف الحساب",
       "deleteAccountPrompt": "هذا الإجراء دائم ولا يمكن التراجع عنه. سيتم حذف جميع بياناتك.",
       "deleteConfirmWord": "حذف",
@@ -84,14 +85,14 @@
   "tabs": {
     "search": "بحث",
     "feed": "الرئيسية",
-    "library": "المكتبة",
+    "myLibrary": "مكتبتي",
     "account": "الحساب"
   },
   "navigation": {
     "explore": "استكشاف",
     "home": "الرئيسية",
     "scholars": "العلماء",
-    "library": "المكتبة",
+    "myLibrary": "مكتبتي",
     "account": "الحساب",
     "siteTitle": "دروس سلفية",
     "primarySidebar": "الشريط الجانبي الرئيسي",
@@ -135,7 +136,7 @@
         "scholar": "العلماء",
         "curation": "المنتقى"
       },
-      "library": {
+      "myLibrary": {
         "started": "قيد التشغيل",
         "saved": "المحفوظة",
         "completed": "المكتملة"
@@ -194,6 +195,11 @@
       "followedScholarsDesc": "إشعار عند نشر شيخ تتابعه",
       "newLectures": "المحاضرات الجديدة",
       "newLecturesDesc": "إشعار عند نشر محاضرات جديدة"
+    },
+    "tabs": {
+      "label": "أقسام الإعدادات",
+      "general": "عام",
+      "profile": "الملف الشخصي"
     }
   },
   "support": {
@@ -280,7 +286,7 @@
     "filterRemoveAria": "إزالة تصفية {{label}}",
     "enterQuery": "أدخل كلمة بحث للبدء"
   },
-  "library": {
+  "myLibrary": {
     "title": "مكتبتي",
     "inProgress": "قيد الاستماع",
     "saved": "المحفوظة",

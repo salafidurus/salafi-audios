@@ -1,5 +1,5 @@
 import { useAccountProfile } from "@sd/domain-account";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
 
@@ -192,6 +192,24 @@ describe("SettingsProfileScreen", () => {
     fireEvent.click(screen.getByTestId("sign-out-trigger"));
     fireEvent.click(screen.getByTestId("confirm-modal-confirm"));
     expect(mockSignOut).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the confirmation open and shows a retryable error when sign-out fails", async () => {
+    const mockSignOut = vi.fn().mockRejectedValue(new Error("network failure"));
+    (authClient.signOut as Mock<any>).mockImplementation(mockSignOut);
+
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+    mockProfile.mockReturnValue({ data: PROFILE, isFetching: false } as ReturnType<
+      typeof useAccountProfile
+    >);
+    render(<SettingsProfileScreen />);
+    fireEvent.click(screen.getByTestId("sign-out-trigger"));
+    fireEvent.click(screen.getByTestId("confirm-modal-confirm"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("confirm-modal")).toBeInTheDocument();
+      expect(screen.getByRole("alert")).toHaveTextContent("Sign out failed. Please try again.");
+    });
   });
 
   it("closes modal without signing out when cancel is clicked", () => {

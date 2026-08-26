@@ -607,8 +607,8 @@ describe("runCatalogFix (reality -> config)", () => {
           name: "@sd/native",
           dependencies: { react: "18.0.0" },
         },
-        "packages/legacy/package.json": {
-          name: "@sd/legacy",
+        "packages/fixture/package.json": {
+          name: "@sd/fixture",
           dependencies: { react: "18.0.0" },
         },
       },
@@ -619,7 +619,7 @@ describe("runCatalogFix (reality -> config)", () => {
     const { updatedFiles } = runCatalogFix(TEMP_DIR);
     expect(updatedFiles).toContain("@sd/web");
     expect(updatedFiles).toContain("@sd/native");
-    expect(updatedFiles).toContain("@sd/legacy");
+    expect(updatedFiles).toContain("@sd/fixture");
 
     const configContent = JSON.parse(
       fs.readFileSync(path.join(TEMP_DIR, "catalog.config.json"), "utf-8"),

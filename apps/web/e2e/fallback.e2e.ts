@@ -43,3 +43,20 @@ test.describe("Public not-found fallback", () => {
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   });
 });
+
+test.describe("Shell-unavailable fallback", () => {
+  test("recovers from an intentional public-shell failure", async ({ page }) => {
+    const response = await page.goto("/shell-failure");
+
+    expect(response?.status()).toBe(500);
+    await expect(page.getByRole("main")).toBeVisible();
+    await expect(page.getByText("Salafi Durus")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+    await expect(page.getByRole("banner")).toHaveCount(0);
+    await expect(page.getByRole("contentinfo")).toHaveCount(0);
+
+    const homeLink = page.getByRole("link", { name: "Back to home" });
+    await expect(homeLink).toHaveAttribute("href", "/");
+    await expect(page.getByRole("button", { name: "Reload page" })).toBeVisible();
+  });
+});

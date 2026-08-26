@@ -10,10 +10,10 @@ import { useCookieConsent } from "../hooks/use-cookie-consent";
 import styles from "./cookie-consent-gate.module.css";
 
 export function CookieConsentGate() {
-  const { hasAccepted, accept } = useCookieConsent();
+  const { hasAccepted, isResolved, accept } = useCookieConsent();
   const { t } = useTranslation();
 
-  if (hasAccepted) {
+  if (!isResolved || hasAccepted) {
     return null;
   }
 

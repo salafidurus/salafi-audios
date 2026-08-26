@@ -6,15 +6,7 @@ export const authClient = createAuthClient({
   plugins: [adminClient()],
   fetchOptions: {
     credentials: "include",
-    onSuccess: (ctx) => {
-      if (String(ctx.request.url).endsWith("/sign-out")) {
-        // Full navigation to "/" reloads the JS bundle, so the in-memory
-        // (no longer persisted) query client is recreated fresh anyway.
-        window.location.href = "/";
-      }
-    },
   },
 });
 
-export type Session = typeof authClient.$Infer.Session;
 export type User = typeof authClient.$Infer.Session.user;

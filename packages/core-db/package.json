@@ -32,7 +32,7 @@
     "pretypecheck": "bun run prisma:generate",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prisma:studio": "prisma studio",
-    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma --config=./prisma.config.ts && bun ./scripts/copy-generated-to-dist.js",
+    "prisma:generate": "bun ./scripts/generate-prisma.js",
     "prisma:format": "prisma format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "prisma:seed": "bun run scripts/seed.ts",

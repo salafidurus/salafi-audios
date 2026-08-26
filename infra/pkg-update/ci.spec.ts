@@ -47,7 +47,7 @@ describe("getGroupOrder", () => {
 describe("groupCandidates", () => {
   it("groups by candidate group field", () => {
     const a = makeCandidate({ group: "turbo", packageName: "turbo" });
-    const b = makeCandidate({ group: "vitest", packageName: "vitest" });
+    const b = makeCandidate({ group: "typescript", packageName: "typescript" });
     const c = makeCandidate({ group: undefined, packageName: "something" });
 
     const batches = groupCandidates([a, b, c]);
@@ -55,7 +55,7 @@ describe("groupCandidates", () => {
 
     const names = batches.map((b) => b.groupName);
     expect(names).toContain("turbo");
-    expect(names).toContain("vitest");
+    expect(names).toContain("typescript");
     expect(names).toContain("ungrouped");
   });
 
@@ -65,7 +65,7 @@ describe("groupCandidates", () => {
 
   it("follows group order (alphabetical between bun/expo and ungrouped)", () => {
     const a = makeCandidate({ group: "ungrouped" });
-    const b = makeCandidate({ group: "vitest" });
+    const b = makeCandidate({ group: "typescript" });
     const c = makeCandidate({ group: "turbo" });
     const d = makeCandidate({ group: "bun" });
 
@@ -74,18 +74,18 @@ describe("groupCandidates", () => {
 
     const bunIdx = names.indexOf("bun");
     const turboIdx = names.indexOf("turbo");
-    const vitestIdx = names.indexOf("vitest");
+    const typescriptIdx = names.indexOf("typescript");
     const ungroupedIdx = names.indexOf("ungrouped");
     expect(bunIdx).toBe(0);
-    expect(turboIdx).toBeLessThan(vitestIdx);
+    expect(turboIdx).toBeLessThan(typescriptIdx);
     expect(turboIdx).toBeLessThan(ungroupedIdx);
-    expect(vitestIdx).toBeLessThan(ungroupedIdx);
+    expect(typescriptIdx).toBeLessThan(ungroupedIdx);
   });
 
   it("includes dynamic groups (e.g. never packages) after known groups", () => {
     const a = makeCandidate({ group: "ungrouped" });
     const b = makeCandidate({ group: "dynamic-pkg" });
-    const c = makeCandidate({ group: "vitest" });
+    const c = makeCandidate({ group: "typescript" });
 
     const batches = groupCandidates([a, b, c]);
     const names = batches.map((b) => b.groupName);
@@ -93,19 +93,19 @@ describe("groupCandidates", () => {
     expect(names).toContain("dynamic-pkg");
     const dynIdx = names.indexOf("dynamic-pkg");
     const ungroupedIdx = names.indexOf("ungrouped");
-    const vitestIdx = names.indexOf("vitest");
-    expect(vitestIdx).toBeLessThan(dynIdx);
+    const typescriptIdx = names.indexOf("typescript");
+    expect(typescriptIdx).toBeLessThan(dynIdx);
     expect(ungroupedIdx).toBeLessThan(dynIdx);
   });
 
   it("sorts configured groups alphabetically, including typescript", () => {
-    const a = makeCandidate({ group: "typescript" });
-    const b = makeCandidate({ group: "vitest" });
+    const a = makeCandidate({ group: "testing" });
+    const b = makeCandidate({ group: "typescript" });
 
     const batches = groupCandidates([a, b]);
     const names = batches.map((x) => x.groupName);
 
-    expect(names.indexOf("typescript")).toBeLessThan(names.indexOf("vitest"));
+    expect(names.indexOf("testing")).toBeLessThan(names.indexOf("typescript"));
   });
 });
 
@@ -148,13 +148,13 @@ describe("sanitizeBranchName", () => {
 
   it("leaves plain names unchanged", () => {
     expect(sanitizeBranchName("typescript")).toBe("typescript");
-    expect(sanitizeBranchName("vitest")).toBe("vitest");
+    expect(sanitizeBranchName("typescript")).toBe("typescript");
   });
 });
 
 describe("branchName", () => {
   it("formats branch name with deps/ prefix", () => {
-    expect(branchName("vitest")).toBe("deps/vitest");
+    expect(branchName("typescript")).toBe("deps/typescript");
     expect(branchName("bun")).toBe("deps/bun");
     expect(branchName("ungrouped")).toBe("deps/ungrouped");
   });
@@ -166,9 +166,9 @@ describe("branchName", () => {
 
 describe("worktreeDir", () => {
   it("generates worktree path under .worktrees", () => {
-    const result = worktreeDir("/repo", "vitest");
+    const result = worktreeDir("/repo", "typescript");
     expect(result).toContain(".worktrees");
-    expect(result).toContain("deps-vitest");
+    expect(result).toContain("deps-typescript");
   });
 
   it("sanitizes special characters in group name", () => {

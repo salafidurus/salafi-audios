@@ -3,8 +3,6 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { PrismaService } from '../src/core/db/prisma.service';
 
-process.env.DISABLE_THROTTLER = 'true';
-
 /**
  * Public search must match and rank against translations, not just
  * base-language columns — a query typed in a locale that only exists in a

@@ -50,10 +50,6 @@ export const resolveUnscoped: PolicyResourceResolver = (ctx) => {
 };
 
 /** Scholar routes use the public slug as the resource identity. */
-export const resolveScholarParam =
-  (paramName = 'slug'): PolicyResourceResolver =>
-  (ctx) => ({ slug: ctx.params[paramName] });
-
 /** Legacy admin routes still expose an internal id until their route contract migrates. */
 export const resolveScholarIdParam =
   (paramName = 'id'): PolicyResourceResolver =>
@@ -66,16 +62,6 @@ export const resolveScholarIdParam =
   };
 
 /** Listing routes: fetch the listing's owning public scholar slug. */
-export const resolveListingScholar =
-  (paramName = 'slug'): PolicyResourceResolver =>
-  async (ctx, prisma) => {
-    const listing = await prisma.listing.findUnique({
-      where: { slug: ctx.params[paramName] },
-      select: { scholar: { select: { slug: true } } },
-    });
-    return { scholarSlug: listing?.scholar?.slug };
-  };
-
 /** Legacy admin routes still expose an internal id until their route contract migrates. */
 export const resolveListingScholarId =
   (paramName = 'id'): PolicyResourceResolver =>

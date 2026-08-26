@@ -57,7 +57,10 @@ function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPr
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn("flex-1 text-sm outline-none", className)}
+      className={cn(
+        "styled-scrollbar min-h-0 flex-1 overflow-y-auto text-sm outline-none",
+        className,
+      )}
       {...props}
     />
   );

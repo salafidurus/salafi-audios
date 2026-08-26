@@ -31,13 +31,13 @@ When creating tasks/scripts/pipelines, you MUST:
 ```json
 // DO THIS: Scripts in each package
 // apps/web/package.json
-{ "scripts": { "build": "next build", "lint": "eslint .", "test": "vitest" } }
+{ "scripts": { "build": "next build", "lint": "eslint .", "test": "bun test" } }
 
 // apps/api/package.json
-{ "scripts": { "build": "tsc", "lint": "eslint .", "test": "vitest" } }
+{ "scripts": { "build": "tsc", "lint": "eslint .", "test": "bun test" } }
 
 // packages/ui/package.json
-{ "scripts": { "build": "tsc", "lint": "eslint .", "test": "vitest" } }
+{ "scripts": { "build": "tsc", "lint": "eslint .", "test": "bun test" } }
 ```
 
 ```json
@@ -69,7 +69,7 @@ When creating tasks/scripts/pipelines, you MUST:
   "scripts": {
     "build": "cd apps/web && next build && cd ../api && tsc",
     "lint": "eslint apps/ packages/",
-    "test": "vitest"
+    "test": "bun test"
   }
 }
 ```
@@ -504,7 +504,7 @@ Don't use relative paths like `../` to reference files outside the package. Use 
 
 **Before flagging missing `outputs`, check what the task actually produces:**
 
-1. Read the package's script (e.g., `"build": "tsc"`, `"test": "vitest"`)
+1. Read the package's script (e.g., `"build": "tsc"`, `"test": "bun test"`)
 2. Determine if it writes files to disk or only outputs to stdout
 3. Only flag if the task produces files that should be cached
 
