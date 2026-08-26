@@ -3,12 +3,12 @@
 import { useListingProgress } from "@sd/domain-audio";
 
 type ProgressIndicatorProps = {
-  listingId: string;
+  listingSlug: string;
   size?: number;
 };
 
-export function ProgressIndicator({ listingId, size = 32 }: ProgressIndicatorProps) {
-  const { progressPercent, isCompleted } = useListingProgress(listingId);
+export function ProgressIndicator({ listingSlug, size = 32 }: ProgressIndicatorProps) {
+  const { progressPercent, isCompleted } = useListingProgress(listingSlug);
 
   if (progressPercent === 0 && !isCompleted) {
     return null;

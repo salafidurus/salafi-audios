@@ -69,12 +69,12 @@ jest.mock("@/features/downloads/registry/downloads.registry", () => {
   return {
     __rows: rows,
     upsertDownload: jest.fn(async (row: any) => {
-      const existing = rows.get(row.listingId) ?? {};
-      rows.set(row.listingId, { ...existing, ...row });
+      const existing = rows.get(row.listingSlug) ?? {};
+      rows.set(row.listingSlug, { ...existing, ...row });
     }),
-    getDownload: jest.fn(async (listingId: string) => rows.get(listingId) ?? null),
+    getDownload: jest.fn(async (listingSlug: string) => rows.get(listingSlug) ?? null),
     getAllDownloads: jest.fn(async () => Array.from(rows.values())),
-    removeDownload: jest.fn(async (listingId: string) => void rows.delete(listingId)),
+    removeDownload: jest.fn(async (listingSlug: string) => void rows.delete(listingSlug)),
   };
 });
 
@@ -99,7 +99,7 @@ describe("download.engine", () => {
     await downloadLecture("l1", "https://s/l1.mp3");
 
     expect(upsertSpy.mock.calls[0]?.[0]).toMatchObject({
-      listingId: "l1",
+      listingSlug: "l1",
       url: "https://s/l1.mp3",
       status: "downloading",
     });
@@ -155,7 +155,7 @@ describe("download.engine", () => {
     expect(downloadsOutbox.useOutboxStore.getState().entries).toEqual([
       expect.objectContaining({
         type: "start-download",
-        payload: { lectureId: "l1", audioUrl: "https://s/l1.mp3" },
+        payload: { listingSlug: "l1", audioUrl: "https://s/l1.mp3" },
       }),
     ]);
   });
@@ -173,7 +173,7 @@ describe("download.engine", () => {
       mockDownloadAsync.mockResolvedValue({ uri: "file:///lectures/l1.mp3" });
 
       await handleDownloadOutboxEntry("start-download", {
-        lectureId: "l1",
+        listingSlug: "l1",
         audioUrl: "https://s/l1.mp3",
       });
 
@@ -183,7 +183,7 @@ describe("download.engine", () => {
     it("ignores an unknown entry type", async () => {
       await expect(
         handleDownloadOutboxEntry("unknown-type", {
-          lectureId: "l1",
+          listingSlug: "l1",
           audioUrl: "https://s/l1.mp3",
         }),
       ).resolves.toBeUndefined();
@@ -200,7 +200,7 @@ describe("download.engine", () => {
       const { upsertDownload } = jest.requireMock(
         "@/features/downloads/registry/downloads.registry",
       );
-      await upsertDownload({ listingId: "l1", status: "downloading", localUri: null });
+      await upsertDownload({ listingSlug: "l1", status: "downloading", localUri: null });
 
       expect(await getLocalAudioUri("l1")).toBeUndefined();
     });
@@ -210,7 +210,7 @@ describe("download.engine", () => {
         "@/features/downloads/registry/downloads.registry",
       );
       await upsertDownload({
-        listingId: "l1",
+        listingSlug: "l1",
         status: "complete",
         localUri: "file:///lectures/l1.mp3",
       });

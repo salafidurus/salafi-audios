@@ -1,6 +1,6 @@
 export type Track = {
   id: string;
-  slug?: string;
+  slug: string;
   title: string;
   artist: string; // scholar name
   scholarSlug?: string; // used to resolve the scholar's honorific title for display

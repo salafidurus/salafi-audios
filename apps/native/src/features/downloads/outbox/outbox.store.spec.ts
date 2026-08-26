@@ -30,7 +30,7 @@ describe("downloadsOutbox", () => {
 
   it("enqueue adds an entry and persists it via the SQLite kv adapter", async () => {
     downloadsOutbox.useOutboxStore.getState().actions.enqueue("start-download", {
-      lectureId: "l1",
+      listingSlug: "l1",
       audioUrl: "https://s/l1.mp3",
     });
 

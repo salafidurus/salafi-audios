@@ -8,10 +8,10 @@ export function localProgressItems(progressMap: Record<string, ListingProgress>)
     .filter((p) => !p.completedAt && p.positionSeconds > 0)
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .map((p) => ({
-      id: p.listingId,
-      listingId: p.listingId,
-      listingTitle: p.listingId,
-      listingSlug: p.listingId,
+      id: p.listingSlug,
+      listingId: p.listingSlug,
+      listingTitle: p.listingSlug,
+      listingSlug: p.listingSlug,
       scholarId: "",
       scholarSlug: "",
       scholarName: "",
@@ -43,10 +43,10 @@ export function localCompletedItems(
     .filter((p): p is ListingProgress & { completedAt: string } => !!p.completedAt)
     .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
     .map((p) => ({
-      id: p.listingId,
-      listingId: p.listingId,
-      listingTitle: p.listingId,
-      listingSlug: p.listingId,
+      id: p.listingSlug,
+      listingId: p.listingSlug,
+      listingTitle: p.listingSlug,
+      listingSlug: p.listingSlug,
       scholarId: "",
       scholarSlug: "",
       scholarName: "",

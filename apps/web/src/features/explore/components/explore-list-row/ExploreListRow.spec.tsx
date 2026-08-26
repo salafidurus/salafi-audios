@@ -116,7 +116,7 @@ describe("FeedListRow", () => {
   it("calls audioService.pause on active playing track play button click", () => {
     (useAudio as Mock<any>).mockReturnValue({
       isPlaying: true,
-      currentTrack: { id: "lec-1" },
+      currentTrack: { id: "lec-1", slug: "importance-of-sunnah" },
     });
     render(<FeedListRow item={baseItem} />);
     const pauseBtn = screen.getByRole("button", { name: "Pause lecture" });
@@ -127,7 +127,7 @@ describe("FeedListRow", () => {
   it("calls audioService.resume on active paused track play button click", () => {
     (useAudio as Mock<any>).mockReturnValue({
       isPlaying: false,
-      currentTrack: { id: "lec-1" },
+      currentTrack: { id: "lec-1", slug: "importance-of-sunnah" },
     });
     render(<FeedListRow item={baseItem} />);
     const playBtn = screen.getByRole("button", { name: "Play lecture" });
@@ -184,7 +184,7 @@ describe("FeedListRow", () => {
   });
 
   it("renders progress bar at calculated width when progress is in range", () => {
-    useProgressStore.getState().actions.setProgress("lec-1", 450, 1800); // 25%
+    useProgressStore.getState().actions.setProgress("importance-of-sunnah", 450, 1800); // 25%
     render(<FeedListRow item={baseItem} />);
     const progressBar = screen.getByTestId("progress-bar");
     expect(progressBar).toBeInTheDocument();

@@ -90,7 +90,6 @@ describe("HomeScreen", () => {
   it("renders continue listening section when recentProgress is provided", () => {
     (useContinueListening as unknown as Mock<any>).mockReturnValue({
       recentProgress: {
-        lectureId: "lecture-123",
         lectureTitle: "Tauheed Explained",
         lectureSlug: "tauheed-explained",
         format: "single",
@@ -140,7 +139,6 @@ describe("HomeScreen", () => {
   it("places listening continuity before discovery sections", () => {
     (useContinueListening as unknown as Mock<any>).mockReturnValue({
       recentProgress: {
-        lectureId: "lecture-123",
         lectureTitle: "Tauheed Explained",
         lectureSlug: "tauheed-explained",
         scholarName: "Shaikh Salih al-Fawzan",
@@ -176,7 +174,6 @@ describe("HomeScreen", () => {
   it("renders module and collection context for a collection lesson", () => {
     (useContinueListening as unknown as Mock<any>).mockReturnValue({
       recentProgress: {
-        lectureId: "lesson-123",
         lectureTitle: "The Meaning of Worship",
         lectureSlug: "the-meaning-of-worship",
         format: "single",
@@ -211,7 +208,6 @@ describe("HomeScreen", () => {
   it("does not add context metadata to a standalone single", () => {
     (useContinueListening as unknown as Mock<any>).mockReturnValue({
       recentProgress: {
-        lectureId: "single-123",
         lectureTitle: "A Standalone Lesson",
         lectureSlug: "a-standalone-lesson",
         format: "single",

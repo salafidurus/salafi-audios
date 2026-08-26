@@ -2,8 +2,8 @@ import type { SeriesContextDto } from "@sd/core-contracts";
 import type { Track } from "@sd/domain-audio";
 
 import { useQueue } from "@sd/domain-audio";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from "bun:test";
 import React from "react";
 
 import { audioService } from "@/features/audio";
@@ -29,6 +29,7 @@ const seriesContext: SeriesContextDto = {
 
 const trackA: Track = {
   id: "lec-a",
+  slug: "lec-a-slug",
   title: "Lesson A",
   artist: "Scholar",
   url: "",
@@ -36,6 +37,7 @@ const trackA: Track = {
 };
 const trackB: Track = {
   id: "lec-b",
+  slug: "lec-b-slug",
   title: "Lesson B",
   artist: "Scholar",
   url: "",
@@ -43,6 +45,7 @@ const trackB: Track = {
 };
 const trackC: Track = {
   id: "lec-c",
+  slug: "lec-c-slug",
   title: "Lesson C",
   artist: "Scholar",
   url: "",
@@ -51,6 +54,10 @@ const trackC: Track = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+});
+
+afterEach(() => {
+  cleanup();
 });
 
 describe("SeriesContextBar", () => {
@@ -63,7 +70,7 @@ describe("SeriesContextBar", () => {
       hasPrevious: false,
     });
 
-    render(<SeriesContextBar seriesContext={seriesContext} lectureId="lec-b" />);
+    render(<SeriesContextBar seriesContext={seriesContext} listingSlug="lec-b-slug" />);
 
     expect(screen.getByText("Islamic Jurisprudence")).toBeInTheDocument();
   });
@@ -77,7 +84,7 @@ describe("SeriesContextBar", () => {
       hasPrevious: true,
     });
 
-    render(<SeriesContextBar seriesContext={seriesContext} lectureId="lec-b" />);
+    render(<SeriesContextBar seriesContext={seriesContext} listingSlug="lec-b-slug" />);
 
     expect(screen.queryByText("Lesson A")).not.toBeInTheDocument();
     expect(screen.queryByText("Lesson C")).not.toBeInTheDocument();
@@ -92,7 +99,7 @@ describe("SeriesContextBar", () => {
       hasPrevious: true,
     });
 
-    render(<SeriesContextBar seriesContext={seriesContext} lectureId="lec-b" />);
+    render(<SeriesContextBar seriesContext={seriesContext} listingSlug="lec-b-slug" />);
 
     expect(screen.getByText("Lesson A")).toBeInTheDocument();
     expect(screen.getByText("Lesson C")).toBeInTheDocument();
@@ -107,7 +114,7 @@ describe("SeriesContextBar", () => {
       hasPrevious: true,
     });
 
-    render(<SeriesContextBar seriesContext={seriesContext} lectureId="lec-b" />);
+    render(<SeriesContextBar seriesContext={seriesContext} listingSlug="lec-b-slug" />);
     fireEvent.click(screen.getByText("Lesson A"));
 
     expect(audioService.skipToPrevious).toHaveBeenCalled();
@@ -122,7 +129,7 @@ describe("SeriesContextBar", () => {
       hasPrevious: true,
     });
 
-    render(<SeriesContextBar seriesContext={seriesContext} lectureId="lec-b" />);
+    render(<SeriesContextBar seriesContext={seriesContext} listingSlug="lec-b-slug" />);
     fireEvent.click(screen.getByText("Lesson C"));
 
     expect(audioService.skipToNext).toHaveBeenCalled();
@@ -137,7 +144,7 @@ describe("SeriesContextBar", () => {
       hasPrevious: false,
     });
 
-    render(<SeriesContextBar seriesContext={seriesContext} lectureId="lec-a" />);
+    render(<SeriesContextBar seriesContext={seriesContext} listingSlug="lec-a-slug" />);
 
     expect(screen.queryByText(/Previous/)).not.toBeInTheDocument();
     expect(screen.getByText("Lesson B")).toBeInTheDocument();

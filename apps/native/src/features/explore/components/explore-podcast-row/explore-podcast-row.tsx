@@ -33,11 +33,11 @@ export function ExplorePodcastRow({
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const scholarName = item.scholarName;
   const displayScholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
-  const { progressPercent } = useListingProgress(item.id);
+  const { progressPercent } = useListingProgress(item.slug);
 
   const { isPlaying, currentTrack } = useAudio();
   const isCurrentTrack =
-    currentTrack?.id === item.id ||
+    currentTrack?.slug === item.slug ||
     currentTrack?.seriesId === item.id ||
     currentTrack?.collectionId === item.id;
 

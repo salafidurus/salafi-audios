@@ -3,7 +3,7 @@ import { createOutboxStore, type Outbox } from "@sd/core-sync";
 import { createSqliteKvAdapter } from "@/core/sync/sqlite-kv-adapter";
 
 export type DownloadOutboxPayload = {
-  lectureId: string;
+  listingSlug: string;
   audioUrl: string;
 };
 

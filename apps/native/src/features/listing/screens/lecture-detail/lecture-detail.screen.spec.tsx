@@ -391,10 +391,10 @@ describe("LectureDetailScreen", () => {
     await render(<LectureDetailScreen slug="lecture-1" />);
 
     expect(mockDownloadButton).toHaveBeenCalledWith(
-      expect.objectContaining({ lectureId: "lecture-1", audioUrl: "https://s/lecture-1.mp3" }),
+      expect.objectContaining({ listingSlug: "lecture-1", audioUrl: "https://s/lecture-1.mp3" }),
     );
     expect(mockDownloadProgress).toHaveBeenCalledWith(
-      expect.objectContaining({ lectureId: "lecture-1" }),
+      expect.objectContaining({ listingSlug: "lecture-1" }),
     );
   });
 

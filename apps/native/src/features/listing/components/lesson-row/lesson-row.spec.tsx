@@ -110,10 +110,10 @@ describe("LessonRow", () => {
     await render(<LessonRow item={item} queue={[track]} />);
 
     expect(mockDownloadButton).toHaveBeenCalledWith(
-      expect.objectContaining({ lectureId: "lesson-1", audioUrl: "https://s/lesson-1.mp3" }),
+      expect.objectContaining({ listingSlug: "lesson-1", audioUrl: "https://s/lesson-1.mp3" }),
     );
     expect(mockDownloadProgress).toHaveBeenCalledWith(
-      expect.objectContaining({ lectureId: "lesson-1" }),
+      expect.objectContaining({ listingSlug: "lesson-1" }),
     );
   });
 });

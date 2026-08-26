@@ -31,9 +31,9 @@ export type LessonRowProps = {
 export function LessonRow({ item, queue, highlighted = false, onLayout }: LessonRowProps) {
   const { theme } = useUnistyles();
   const { isPlaying, currentTrack } = useAudio();
-  const { progressPercent, isCompleted } = useListingProgress(item.id);
+  const { progressPercent, isCompleted } = useListingProgress(item.slug);
 
-  const isCurrentTrack = currentTrack?.id === item.id;
+  const isCurrentTrack = currentTrack?.slug === item.slug;
   const isCurrentlyPlaying = isCurrentTrack && isPlaying;
   const durationStr = formatDuration(
     item.durationSeconds || item.primaryAudioAsset?.durationSeconds,
@@ -49,7 +49,7 @@ export function LessonRow({ item, queue, highlighted = false, onLayout }: Lesson
       return;
     }
 
-    const track = queue.find((t) => t.id === item.id);
+    const track = queue.find((t) => t.slug === item.slug);
     if (track) {
       await audioService.playListing(track, queue);
     }
@@ -80,10 +80,10 @@ export function LessonRow({ item, queue, highlighted = false, onLayout }: Lesson
                 <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
               </View>
             ) : null}
-            <DownloadProgress lectureId={item.id} />
+            <DownloadProgress listingSlug={item.slug} />
           </View>
           {item.primaryAudioAsset?.url ? (
-            <DownloadButton lectureId={item.id} audioUrl={item.primaryAudioAsset.url} />
+            <DownloadButton listingSlug={item.slug} audioUrl={item.primaryAudioAsset.url} />
           ) : null}
           <View style={styles.playButton}>
             {isCurrentlyPlaying ? (

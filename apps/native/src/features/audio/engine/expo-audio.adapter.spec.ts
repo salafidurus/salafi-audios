@@ -6,6 +6,7 @@ import { ExpoAudioAdapter } from "./expo-audio.adapter";
 
 const mockTrack: Track = {
   id: "l1",
+  slug: "l1-slug",
   title: "Lecture 1",
   artist: "Scholar 1",
   artworkUrl: "https://cdn.test/art.jpg",

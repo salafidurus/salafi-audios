@@ -27,7 +27,7 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
   const { data: lastPlayed } = useLastPlayedLesson(listing.slug, isAuthenticated);
 
   // Check progress: for single, check store directly; for series/collection, check lastPlayed or store
-  const singleProgress = useProgressStore((s) => s.progressMap[listing.id]);
+  const singleProgress = useProgressStore((s) => s.progressMap[listing.slug]);
 
   const isSingle = listing.format === "single";
 
@@ -36,17 +36,17 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
     : !!lastPlayed && lastPlayed.positionSeconds > 0 && !lastPlayed.isCompleted;
 
   // Check if currently playing:
-  // single -> currentTrack.id === listing.id
+  // single -> currentTrack.slug === listing.slug
   // series -> currentTrack.seriesId === listing.id
   // collection -> currentTrack.collectionId === listing.id
   const isCurrentlyPlaying = isSingle
-    ? currentTrack?.id === listing.id && isPlaying
+    ? currentTrack?.slug === listing.slug && isPlaying
     : listing.format === "series"
       ? currentTrack?.seriesId === listing.id && isPlaying
       : currentTrack?.collectionId === listing.id && isPlaying;
 
   const isCurrentActive = isSingle
-    ? currentTrack?.id === listing.id
+    ? currentTrack?.slug === listing.slug
     : listing.format === "series"
       ? currentTrack?.seriesId === listing.id
       : currentTrack?.collectionId === listing.id;
@@ -59,6 +59,7 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
         return [
           {
             id: listing.id,
+            slug: listing.slug,
             title: listing.title,
             artist: formatScholarName(listing.scholar),
             url: listing.primaryAudioAsset.url,
@@ -115,7 +116,7 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
 
     // Find the track to resume, and build the queue starting eager URL
     // resolution there instead of always at the first track.
-    const resumeId = isSingle ? listing.id : lastPlayed?.listingId;
+    const resumeId = isSingle ? listing.slug : lastPlayed?.listingSlug;
     const allTracks = getAllTracks(resumeId);
     if (allTracks.length === 0) return;
 

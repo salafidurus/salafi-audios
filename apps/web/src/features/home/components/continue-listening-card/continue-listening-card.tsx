@@ -19,7 +19,7 @@ import styles from "./continue-listening-card.module.css";
 
 export type ContinueListeningCardProps = {
   recentProgress?: RecentProgressDto | null;
-  onContinueListening?: (lectureId: string) => void;
+  onContinueListening?: (listingSlug: string) => void;
 };
 
 export function ContinueListeningCard({
@@ -41,7 +41,7 @@ export function ContinueListeningCard({
 
 type RichResumeCardProps = {
   recentProgress: RecentProgressDto;
-  onContinueListening?: (lectureId: string) => void;
+  onContinueListening?: (listingSlug: string) => void;
   isMobile: boolean;
 };
 
@@ -53,7 +53,7 @@ function RichResumeCard({ recentProgress, onContinueListening, isMobile }: RichR
   );
   const progress = getProgress(recentProgress.positionSeconds, recentProgress.durationSeconds);
   const { play, isLoading: isResumeLoading } = usePlayListing({
-    id: recentProgress.lectureId,
+    id: recentProgress.listingSlug,
     slug: recentProgress.lectureSlug,
     title: recentProgress.lectureTitle,
     format: recentProgress.format,

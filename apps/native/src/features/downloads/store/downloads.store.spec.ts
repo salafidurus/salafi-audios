@@ -5,7 +5,7 @@ jest.mock("../registry/downloads.registry", () => {
   return {
     __rows: rows,
     upsertDownload: jest.fn(async (row: any) => {
-      const existing = rows.get(row.listingId) ?? {
+      const existing = rows.get(row.listingSlug) ?? {
         status: "pending",
         bytesTotal: 0,
         bytesDownloaded: 0,
@@ -14,11 +14,11 @@ jest.mock("../registry/downloads.registry", () => {
         createdAt: 0,
         updatedAt: 0,
       };
-      rows.set(row.listingId, { ...existing, ...row });
+      rows.set(row.listingSlug, { ...existing, ...row });
     }),
-    getDownload: jest.fn(async (listingId: string) => rows.get(listingId) ?? null),
+    getDownload: jest.fn(async (listingSlug: string) => rows.get(listingSlug) ?? null),
     getAllDownloads: jest.fn(async () => Array.from(rows.values())),
-    removeDownload: jest.fn(async (listingId: string) => void rows.delete(listingId)),
+    removeDownload: jest.fn(async (listingSlug: string) => void rows.delete(listingSlug)),
   };
 });
 
@@ -36,7 +36,7 @@ describe("useDownloadsStore", () => {
 
   it("hydrate loads every row from the registry into state", async () => {
     const { upsertDownload } = jest.requireMock("../registry/downloads.registry");
-    await upsertDownload({ listingId: "l1", url: "https://s/l1.mp3", status: "complete" });
+    await upsertDownload({ listingSlug: "l1", url: "https://s/l1.mp3", status: "complete" });
 
     await useDownloadsStore.getState().actions.hydrate();
 
@@ -45,7 +45,7 @@ describe("useDownloadsStore", () => {
 
   it("upsert writes through to the registry and updates local state reactively", async () => {
     await useDownloadsStore.getState().actions.upsert({
-      listingId: "l1",
+      listingSlug: "l1",
       url: "https://s/l1.mp3",
       status: "downloading",
       bytesDownloaded: 50,
@@ -60,7 +60,7 @@ describe("useDownloadsStore", () => {
   it("remove writes through to the registry and clears local state", async () => {
     await useDownloadsStore
       .getState()
-      .actions.upsert({ listingId: "l1", url: "u", status: "complete" });
+      .actions.upsert({ listingSlug: "l1", url: "u", status: "complete" });
 
     await useDownloadsStore.getState().actions.remove("l1");
 

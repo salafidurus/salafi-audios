@@ -479,7 +479,6 @@ export class LibraryRepository {
         : null;
 
     return {
-      lectureId: record.listing.id,
       lectureTitle: listingTitle,
       lectureSlug: record.listing.slug,
       listingSlug: record.listing.slug,

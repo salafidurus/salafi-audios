@@ -100,7 +100,6 @@ export class AudioRepository {
     });
 
     return progressRecords.map((record) => ({
-      listingId: record.listingId,
       listingSlug: record.listing.slug,
       positionSeconds: record.positionSeconds,
       durationSeconds: record.listing.durationSeconds || 0,
@@ -163,25 +162,7 @@ export class AudioRepository {
 
     // Duration comes from each Listing's own canonical record, never trusted
     // from the client, to keep the completion derivation below consistent.
-    const slugItems = items.filter((item) => item.listingSlug);
-    const legacyItems = items.filter((item) => !item.listingSlug);
-    const where =
-      slugItems.length > 0 && legacyItems.length > 0
-        ? {
-            OR: [
-              { slug: { in: slugItems.map((item) => item.listingSlug!) } },
-              {
-                id: {
-                  in: legacyItems.flatMap((item) => (item.listingId ? [item.listingId] : [])),
-                },
-              },
-            ],
-          }
-        : slugItems.length > 0
-          ? { slug: { in: slugItems.map((item) => item.listingSlug!) } }
-          : {
-              id: { in: items.flatMap((item) => (item.listingId ? [item.listingId] : [])) },
-            };
+    const where = { slug: { in: items.map((item) => item.listingSlug) } };
     const listings = await this.prisma.listing.findMany({
       where,
       select: { id: true, slug: true, durationSeconds: true },
@@ -196,9 +177,7 @@ export class AudioRepository {
 
     await this.persistProgressBatch(
       items.flatMap((item) => {
-        const identity = item.listingSlug ?? item.listingId;
-        if (!identity) return [];
-        const listing = listingByIdentity.get(identity);
+        const listing = listingByIdentity.get(item.listingSlug);
         if (!listing) return [];
         return [
           {

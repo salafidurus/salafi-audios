@@ -22,7 +22,7 @@ export function mergeLiveProgress(
   currentTrack?: Track | null,
 ): LibraryItemDto[] {
   const merged = items.map((item) => {
-    const live = progressMap[item.listingId];
+    const live = progressMap[item.listingSlug];
     if (!live) return item;
 
     return {
@@ -34,9 +34,9 @@ export function mergeLiveProgress(
   });
 
   const isStandaloneTrack = currentTrack && !currentTrack.seriesId && !currentTrack.collectionId;
-  const liveCurrent = currentTrack ? progressMap[currentTrack.id] : undefined;
+  const liveCurrent = currentTrack ? progressMap[currentTrack.slug] : undefined;
   const alreadyListed = currentTrack
-    ? merged.some((item) => item.listingId === currentTrack.id)
+    ? merged.some((item) => item.listingSlug === currentTrack.slug)
     : true;
 
   if (
@@ -47,8 +47,8 @@ export function mergeLiveProgress(
     !alreadyListed
   ) {
     merged.unshift({
-      id: currentTrack.id,
-      listingId: currentTrack.id,
+      id: currentTrack.slug,
+      listingId: currentTrack.slug,
       listingTitle: currentTrack.title,
       listingSlug: currentTrack.slug ?? currentTrack.id,
       scholarId: "",

@@ -5,12 +5,12 @@ import { describe, it, expect } from "bun:test";
 import { localProgressItems, localSavedItems, localCompletedItems } from "./library.local";
 
 const makeProgress = (
-  listingId: string,
+  listingSlug: string,
   positionSeconds: number,
   durationSeconds: number,
   extra?: Partial<ListingProgress>,
 ): ListingProgress => ({
-  listingId,
+  listingSlug,
   positionSeconds,
   durationSeconds,
   updatedAt: "2024-01-01T00:00:00Z",
@@ -26,7 +26,7 @@ describe("localProgressItems", () => {
     const entry = makeProgress("lec1", 100, 600);
     const result = localProgressItems({ lec1: entry });
     expect(result).toHaveLength(1);
-    expect(result[0]!.listingId).toBe("lec1");
+    expect(result[0]!.listingSlug).toBe("lec1");
     expect(result[0]!.progressSeconds).toBe(100);
     expect(result[0]!.durationSeconds).toBe(600);
   });
@@ -49,8 +49,8 @@ describe("localProgressItems", () => {
       lec2: makeProgress("lec2", 20, 600, { updatedAt: "2024-02-01T00:00:00Z" }),
     };
     const result = localProgressItems(map);
-    expect(result[0]!.listingId).toBe("lec2");
-    expect(result[1]!.listingId).toBe("lec1");
+    expect(result[0]!.listingSlug).toBe("lec2");
+    expect(result[1]!.listingSlug).toBe("lec1");
   });
 
   it("maps to LibraryItemDto shape", () => {
@@ -78,7 +78,7 @@ describe("localSavedItems", () => {
       { id: "lec1", updatedAt: "2024-01-01T00:00:00Z", savedAt: "2024-01-01T00:00:00Z" },
     ]);
     expect(result).toHaveLength(1);
-    expect(result[0]!.listingId).toBe("lec1");
+    expect(result[0]!.listingSlug).toBe("lec1");
     expect(result[0]!.savedAt).toBe("2024-01-01T00:00:00Z");
   });
 
@@ -88,8 +88,8 @@ describe("localSavedItems", () => {
       { id: "lec2", updatedAt: "2024-02-01T00:00:00Z", savedAt: "2024-02-01T00:00:00Z" },
     ];
     const result = localSavedItems(entries);
-    expect(result[0]!.listingId).toBe("lec2");
-    expect(result[1]!.listingId).toBe("lec1");
+    expect(result[0]!.listingSlug).toBe("lec2");
+    expect(result[1]!.listingSlug).toBe("lec1");
   });
 
   it("maps to LibraryItemDto shape", () => {

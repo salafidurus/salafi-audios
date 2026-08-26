@@ -118,7 +118,7 @@ export class ListeningSession {
   }
 
   private async applyResumePosition(track: Track): Promise<void> {
-    const saved = useProgressStore.getState().actions.getProgress(track.id);
+    const saved = useProgressStore.getState().actions.getProgress(track.slug);
     if (saved && !saved.completedAt && saved.positionSeconds > 0) {
       await this.engine.seek(saved.positionSeconds);
     }
@@ -151,7 +151,7 @@ export class ListeningSession {
     if (track.url) return track;
 
     const { url } = await httpClient<StreamUrlResponse>({
-      url: endpoints.audio.listings.stream(track.slug ?? track.id),
+      url: endpoints.audio.listings.stream(track.slug),
       method: "GET",
     });
 
@@ -162,11 +162,10 @@ export class ListeningSession {
     const currentTrack = usePlaybackStore.getState().currentTrack;
     if (currentTrack) {
       const duration = usePlaybackStore.getState().durationSeconds;
-      useProgressStore.getState().actions.setProgress(currentTrack.id, duration, duration);
-      useProgressStore.getState().actions.markCompleted(currentTrack.id);
+      useProgressStore.getState().actions.setProgress(currentTrack.slug, duration, duration);
+      useProgressStore.getState().actions.markCompleted(currentTrack.slug);
       syncProgressToBackend({
-        listingId: currentTrack.slug ?? currentTrack.id,
-        localListingId: currentTrack.id,
+        listingSlug: currentTrack.slug,
         positionSeconds: duration,
         durationSeconds: duration,
       });
@@ -182,10 +181,9 @@ export class ListeningSession {
     if (!currentTrack) return;
 
     const duration = usePlaybackStore.getState().durationSeconds;
-    useProgressStore.getState().actions.setProgress(currentTrack.id, positionSeconds, duration);
+    useProgressStore.getState().actions.setProgress(currentTrack.slug, positionSeconds, duration);
     syncProgressToBackend({
-      listingId: currentTrack.slug ?? currentTrack.id,
-      localListingId: currentTrack.id,
+      listingSlug: currentTrack.slug,
       positionSeconds,
       durationSeconds: duration,
     });

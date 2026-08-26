@@ -26,7 +26,7 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
   }
 
   const asset = lecture.primaryAudioAsset;
-  const isCurrentLecture = currentTrack?.id === lecture.id;
+  const isCurrentLecture = currentTrack?.slug === lecture.slug;
 
   const handlePlay = async () => {
     if (isCurrentLecture) {

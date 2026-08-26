@@ -135,7 +135,7 @@ describe('Core User Flows (e2e)', () => {
         .expect(200);
 
       expect(res.body).toBeInstanceOf(Array);
-      const matched = res.body.find((p: any) => p.listingId === TEST_LISTING_ID);
+      const matched = res.body.find((p: any) => p.listingSlug === TEST_LISTING_SLUG);
       expect(matched).toBeDefined();
       expect(matched.positionSeconds).toBe(50);
 
@@ -146,7 +146,7 @@ describe('Core User Flows (e2e)', () => {
         .set(auth.headers)
         .expect(200);
       expect(resFuture.body).toBeInstanceOf(Array);
-      expect(resFuture.body.find((p: any) => p.listingId === TEST_LISTING_ID)).toBeUndefined();
+      expect(resFuture.body.find((p: any) => p.listingSlug === TEST_LISTING_SLUG)).toBeUndefined();
     });
 
     it('PUT /audio/progress/:listingId with isCompleted: true -> marks done', async () => {

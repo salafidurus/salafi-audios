@@ -65,7 +65,7 @@ function FeedGridItemCard({
   const { isPlaying, currentTrack } = useAudio();
 
   const isCurrentTrack =
-    currentTrack?.id === item.id ||
+    currentTrack?.slug === item.slug ||
     currentTrack?.seriesId === item.id ||
     currentTrack?.collectionId === item.id;
 
@@ -83,7 +83,7 @@ function FeedGridItemCard({
     { onError: (message) => addToast(message, "error") },
   );
 
-  const progress = useProgressStore((s) => s.progressMap[item.id]);
+  const progress = useProgressStore((s) => s.progressMap[item.slug]);
   const progressPercent =
     progress && progress.durationSeconds
       ? Math.min(Math.max((progress.positionSeconds / progress.durationSeconds) * 100, 0), 100)

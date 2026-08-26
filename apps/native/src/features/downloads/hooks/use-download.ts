@@ -6,8 +6,8 @@ import { useDownloadsStore } from "@/features/downloads/store/downloads.store";
 /** UI-only status — "idle" means no registry row exists yet for this listing. */
 export type UiDownloadStatus = "idle" | "pending" | "downloading" | "paused" | "complete" | "error";
 
-export function useDownload(lectureId: string, audioUrl?: string) {
-  const row = useDownloadsStore((s) => s.downloads[lectureId]);
+export function useDownload(listingSlug: string, audioUrl?: string) {
+  const row = useDownloadsStore((s) => s.downloads[listingSlug]);
 
   const status: UiDownloadStatus = row?.status ?? "idle";
   const progress = row && row.bytesTotal > 0 ? (row.bytesDownloaded / row.bytesTotal) * 100 : 0;
@@ -17,12 +17,12 @@ export function useDownload(lectureId: string, audioUrl?: string) {
 
   const startDownload = useCallback(() => {
     if (!audioUrl) return;
-    void downloadLecture(lectureId, audioUrl);
-  }, [lectureId, audioUrl]);
+    void downloadLecture(listingSlug, audioUrl);
+  }, [listingSlug, audioUrl]);
 
   const removeDownload = useCallback(() => {
-    void removeLecture(lectureId);
-  }, [lectureId]);
+    void removeLecture(listingSlug);
+  }, [listingSlug]);
 
   return useMemo(
     () => ({

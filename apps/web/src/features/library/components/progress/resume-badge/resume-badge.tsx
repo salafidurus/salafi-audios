@@ -5,11 +5,11 @@ import { useListingProgress } from "@sd/domain-audio";
 import styles from "./resume-badge.module.css";
 
 type ResumeBadgeProps = {
-  listingId: string;
+  listingSlug: string;
 };
 
-export function ResumeBadge({ listingId }: ResumeBadgeProps) {
-  const { resumePositionSeconds, isCompleted, progressPercent } = useListingProgress(listingId);
+export function ResumeBadge({ listingSlug }: ResumeBadgeProps) {
+  const { resumePositionSeconds, isCompleted, progressPercent } = useListingProgress(listingSlug);
 
   if (isCompleted) {
     return <span className={styles.completedBadge}>✓ Completed</span>;

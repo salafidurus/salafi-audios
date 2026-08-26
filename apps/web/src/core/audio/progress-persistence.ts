@@ -1,5 +1,6 @@
 "use client";
 
+import { ListingProgressDtoSchema } from "@sd/core-contracts";
 import {
   drainPendingProgress,
   flushPendingProgress,
@@ -34,7 +35,12 @@ function readCachedProgress(userId: string): ListingProgress[] {
     const raw = window.localStorage.getItem(storageKey(userId));
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed)
+      ? parsed.flatMap((entry) => {
+          const result = ListingProgressDtoSchema.safeParse(entry);
+          return result.success ? [result.data] : [];
+        })
+      : [];
   } catch {
     return [];
   }

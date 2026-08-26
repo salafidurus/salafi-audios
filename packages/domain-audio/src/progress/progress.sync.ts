@@ -30,20 +30,16 @@ function createInMemoryStorageAdapter(): StorageAdapter {
   };
 }
 
-function toProgressEntity(
-  entry: ListingProgress,
-  serverListingId = entry.listingId,
-): ProgressSyncEntity {
+function toProgressEntity(entry: ListingProgress): ProgressSyncEntity {
   const entity: ProgressSyncEntity = {
     ...entry,
-    id: entry.listingId,
+    id: entry.listingSlug,
   };
-  if (serverListingId !== entry.listingId) entity.serverListingId = serverListingId;
   return entity;
 }
 
 function fromProgressEntity(entity: ProgressSyncEntity): ListingProgress {
-  const { id: _id, serverListingId: _serverListingId, ...entry } = entity;
+  const { id: _id, ...entry } = entity;
   return entry;
 }
 
@@ -84,7 +80,7 @@ function buildEngine(nextOutbox: Outbox<ProgressSyncEntity>): SyncEngine<Progres
       if (entry.completedAt) body.isCompleted = true;
 
       await httpClient({
-        url: endpoints.audio.progress.update(entry.serverListingId ?? entry.listingId),
+        url: endpoints.audio.progress.update(entry.listingSlug),
         method: "PUT",
         body,
       });
@@ -122,22 +118,19 @@ export async function initProgressSync(adapter: StorageAdapter, userId: string):
 
 /** Enqueues a progress update for shared debounced synchronization. */
 export function syncProgressToBackend(update: {
-  listingId: string;
-  localListingId?: string;
+  listingSlug: string;
   positionSeconds: number;
   durationSeconds: number;
 }): void {
-  const localListingId = update.localListingId ?? update.listingId;
-  const current = useProgressStore.getState().actions.getProgress(localListingId);
+  const current = useProgressStore.getState().actions.getProgress(update.listingSlug);
   const entry: ProgressSyncEntity = {
-    id: localListingId,
-    listingId: localListingId,
+    id: update.listingSlug,
+    listingSlug: update.listingSlug,
     positionSeconds: update.positionSeconds,
     durationSeconds: update.durationSeconds,
     completedAt: current?.completedAt,
     updatedAt: current?.updatedAt ?? new Date().toISOString(),
   };
-  if (update.listingId !== localListingId) entry.serverListingId = update.listingId;
   engine.scheduleSync(entry);
 }
 

@@ -12,7 +12,7 @@ vi.mock("@sd/core-contracts", () => ({
       progress: {
         get: "/audio/progress",
         sync: "/audio/progress/sync",
-        update: (listingId: string) => `/audio/progress/${listingId}`,
+        update: (listingSlug: string) => `/audio/progress/${listingSlug}`,
       },
     },
     library: {
@@ -44,7 +44,7 @@ describe("initProgressPersistence", () => {
       `sd:progress-cache:v1:${USER_ID}`,
       JSON.stringify([
         {
-          listingId: "l1",
+          listingSlug: "l1",
           positionSeconds: 42,
           durationSeconds: 100,
           updatedAt: "2026-01-01T00:00:00.000Z",
@@ -63,7 +63,7 @@ describe("initProgressPersistence", () => {
       `sd:progress-cache:v1:other-user`,
       JSON.stringify([
         {
-          listingId: "l1",
+          listingSlug: "l1",
           positionSeconds: 42,
           durationSeconds: 100,
           updatedAt: "2026-01-01T00:00:00.000Z",
@@ -106,7 +106,7 @@ describe("initProgressPersistence", () => {
         {
           id: "outbox-1",
           type: "progress-update",
-          payload: { listingId: "l9", positionSeconds: 30, durationSeconds: 200 },
+          payload: { listingSlug: "l9", positionSeconds: 30, durationSeconds: 200 },
           createdAt: Date.now(),
           retries: 0,
         },
@@ -131,7 +131,7 @@ describe("initProgressPersistence", () => {
         {
           id: "outbox-1",
           type: "progress-update",
-          payload: { listingId: "l9", positionSeconds: 30, durationSeconds: 200 },
+          payload: { listingSlug: "l9", positionSeconds: 30, durationSeconds: 200 },
           createdAt: Date.now(),
           retries: 0,
         },
@@ -158,14 +158,14 @@ describe("initProgressPersistence", () => {
     const raw = window.localStorage.getItem(`sd:progress-cache:v1:${USER_ID}`);
     expect(raw).not.toBeNull();
     const parsed = JSON.parse(raw!);
-    expect(parsed.find((e: any) => e.listingId === "l2")?.positionSeconds).toBe(5);
+    expect(parsed.find((e: any) => e.listingSlug === "l2")?.positionSeconds).toBe(5);
 
     cleanup();
   });
 
   it("flushes a pending debounced update immediately when the tab becomes hidden", async () => {
     const cleanup = initProgressPersistence(USER_ID);
-    syncProgressToBackend({ listingId: "l3", positionSeconds: 1, durationSeconds: 100 });
+    syncProgressToBackend({ listingSlug: "l3", positionSeconds: 1, durationSeconds: 100 });
     (httpClient as any).mockClear();
 
     Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
@@ -182,7 +182,7 @@ describe("initProgressPersistence", () => {
 
   it("flushes a pending debounced update immediately on beforeunload", async () => {
     const cleanup = initProgressPersistence(USER_ID);
-    syncProgressToBackend({ listingId: "l4", positionSeconds: 2, durationSeconds: 100 });
+    syncProgressToBackend({ listingSlug: "l4", positionSeconds: 2, durationSeconds: 100 });
     (httpClient as any).mockClear();
 
     window.dispatchEvent(new Event("beforeunload"));
@@ -210,7 +210,7 @@ describe("initProgressPersistence", () => {
     const onFlushed = vi.fn();
     const cleanup = initProgressPersistence(USER_ID, { onFlushed });
 
-    syncProgressToBackend({ listingId: "l5", positionSeconds: 3, durationSeconds: 100 });
+    syncProgressToBackend({ listingSlug: "l5", positionSeconds: 3, durationSeconds: 100 });
     Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
     document.dispatchEvent(new Event("visibilitychange"));
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -224,7 +224,7 @@ describe("initProgressPersistence", () => {
     const cleanup = initProgressPersistence(USER_ID, { onFlushed });
     cleanup();
 
-    syncProgressToBackend({ listingId: "l6", positionSeconds: 3, durationSeconds: 100 });
+    syncProgressToBackend({ listingSlug: "l6", positionSeconds: 3, durationSeconds: 100 });
     await flushPendingProgress();
 
     expect(onFlushed).not.toHaveBeenCalled();
