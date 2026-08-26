@@ -20,10 +20,11 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { authClient, useAuth } from "@/core/auth";
+import { useAuth } from "@/core/auth";
+import { useSignOut } from "@/core/auth/use-sign-out";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AuthModal } from "@/features/auth";
 import { LanguageSwitch } from "@/features/settings";
@@ -190,11 +191,11 @@ function NavigationLinks({
 function AccountMenu({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation();
   const { isAuthenticated, isLoading, user } = useAuth();
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
+  const { signOut: performSignOut, error: signOutError } = useSignOut();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -267,11 +268,7 @@ function AccountMenu({ compact = false }: { compact?: boolean }) {
 
   const signOut = async () => {
     closeMenu();
-    try {
-      await authClient.signOut();
-    } finally {
-      router.push(routes.home);
-    }
+    await performSignOut();
   };
 
   return (
@@ -329,6 +326,7 @@ function AccountMenu({ compact = false }: { compact?: boolean }) {
         title={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
         confirmLabel={t("account.signOut", "Sign Out")}
         variant="destructive"
+        error={signOutError}
       />
     </div>
   );

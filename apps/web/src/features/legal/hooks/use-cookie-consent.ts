@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
@@ -32,14 +32,18 @@ function subscribeToCookieConsent(onChange: () => void): () => void {
 }
 
 export function useCookieConsent() {
+  const [isResolved, setIsResolved] = useState(false);
   const hasAccepted = useSyncExternalStore(
     subscribeToCookieConsent,
     getCookieConsentFromStorage,
     () => false,
   );
 
+  useEffect(() => setIsResolved(true), []);
+
   return {
     hasAccepted,
+    isResolved,
     accept,
   };
 }
