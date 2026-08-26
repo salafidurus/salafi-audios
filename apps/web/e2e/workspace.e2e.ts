@@ -68,6 +68,18 @@ async function mockRole(page: Page, role: WorkspaceRole) {
       }),
     });
   });
+
+  await page.route("**/admin/users**", async (route) => {
+    if (route.request().resourceType() === "document") {
+      await route.continue();
+      return;
+    }
+
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ users: [], nextCursor: null, hasMore: false }),
+    });
+  });
 }
 
 test.describe("complete public and admin workspace journeys", () => {
