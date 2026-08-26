@@ -24,8 +24,9 @@ proxy for naming, file size, switch readability, or architectural layering.
 
 ## Ratchet
 
-The initial maximum is **100**. The budget may only decrease after a complete
-scan reports zero violations at the current maximum:
+The initial maximum was **100**. The active maximum is **50** after the first
+ratchet completed with zero violations. The budget may only decrease after a
+complete scan reports zero violations at the current maximum:
 
 ```text
 100 → 50 → 25 → 15 → 10 → 7 → 5
@@ -35,6 +36,13 @@ Each reduction is a separate implementation ticket or clearly bounded refactor
 batch. Every ticket records the measured violation count and affected
 functions before and after the change. The preferred final maximum is 5; 7 or
 10 may be retained when reaching 5 consistently produces less clear code.
+
+### Ratchet 100 → 50
+
+The completed scan covered 1,125 production source files under `apps/*/src`
+and `packages/*/src`. It reported **zero violations** and **no affected
+functions** at maximum 50. The highest measured function complexity was 47 in
+`apps/api/src/modules/listing/listing.repo.ts`.
 
 ## Exceptions
 
