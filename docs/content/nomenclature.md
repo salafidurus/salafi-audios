@@ -80,3 +80,11 @@ separate from private personal state.
 **Continue Listening** is a Home-only projection of authenticated unfinished Progress.
 It is not a Catalog entity, is absent while personal Progress is loading or empty, and
 disappears when `completedAt` is accepted.
+
+## Engineering vocabulary
+
+**Complexity budget** is the maximum cyclomatic complexity permitted for an
+in-scope production function. The repository measures it with Oxlint's
+`eslint/complexity` rule using the `modified` variant. It is a control-flow
+maintainability measure, not a synonym for file size, naming quality, or
+general readability.
