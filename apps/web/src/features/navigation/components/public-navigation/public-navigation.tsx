@@ -29,7 +29,7 @@ import { AuthModal } from "@/features/auth";
 import { LanguageSwitch } from "@/features/settings";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
-import { Modal } from "@/shared/components/ui/modal";
+import { ConfirmationDialog } from "@/shared/components/ui/confirmation-dialog";
 import {
   Sheet,
   SheetClose,
@@ -318,13 +318,13 @@ function AccountMenu({ compact = false }: { compact?: boolean }) {
           </button>
         </div>
       )}
-      <Modal.ConfirmDialog
-        isOpen={isSignOutDialogOpen}
-        onClose={() => setIsSignOutDialogOpen(false)}
+      <ConfirmationDialog
+        open={isSignOutDialogOpen}
+        onOpenChange={setIsSignOutDialogOpen}
         onConfirm={signOut}
         title={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
         confirmLabel={t("account.signOut", "Sign Out")}
-        confirmVariant="danger"
+        variant="destructive"
       />
     </div>
   );

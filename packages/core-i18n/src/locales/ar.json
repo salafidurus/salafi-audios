@@ -10,6 +10,8 @@
     "and": "و",
     "comingSoon": "قريبًا",
     "cancel": "إلغاء",
+    "typeToConfirm": "اكتب {{word}} للتأكيد",
+    "confirmationPlaceholder": "اكتب \"{{word}}\" للتأكيد",
     "save": "حفظ",
     "add": "إضافة",
     "english": "الإنجليزية",

@@ -10,6 +10,8 @@
     "and": "and",
     "comingSoon": "Coming soon",
     "cancel": "Cancel",
+    "typeToConfirm": "Type {{word}} to confirm",
+    "confirmationPlaceholder": "Type \"{{word}}\" to confirm",
     "save": "Save",
     "add": "Add",
     "english": "English",

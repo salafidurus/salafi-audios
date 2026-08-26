@@ -25,7 +25,7 @@ import { useAuth, authClient } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { LanguageSwitch } from "@/features/settings";
 import { Button } from "@/shared/components/ui/button";
-import { Modal } from "@/shared/components/ui/modal";
+import { ConfirmationDialog } from "@/shared/components/ui/confirmation-dialog";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
@@ -258,9 +258,9 @@ export function NavItems({ onItemClick }: NavItemsProps) {
         ) : null}
       </div>
 
-      <Modal.ConfirmDialog
-        isOpen={isSignOutDialogOpen}
-        onClose={() => setIsSignOutDialogOpen(false)}
+      <ConfirmationDialog
+        open={isSignOutDialogOpen}
+        onOpenChange={setIsSignOutDialogOpen}
         onConfirm={async () => {
           try {
             await authClient.signOut();
@@ -276,7 +276,7 @@ export function NavItems({ onItemClick }: NavItemsProps) {
         }}
         title={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
         confirmLabel={t("account.signOut", "Sign Out")}
-        confirmVariant="danger"
+        variant="destructive"
       />
     </>
   );

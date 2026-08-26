@@ -24,6 +24,10 @@ type ConfirmationDialogProps = {
   variant?: "default" | "destructive";
   error?: ReactNode;
   children?: ReactNode;
+  confirmDisabled?: boolean;
+  testId?: string;
+  cancelTestId?: string;
+  modalTestId?: string;
 };
 
 export function ConfirmationDialog({
@@ -37,6 +41,10 @@ export function ConfirmationDialog({
   variant = "default",
   error,
   children,
+  confirmDisabled = false,
+  testId,
+  cancelTestId,
+  modalTestId,
 }: ConfirmationDialogProps) {
   const { t } = useTranslation();
   const [isConfirming, setIsConfirming] = useState(false);
@@ -62,7 +70,7 @@ export function ConfirmationDialog({
         if (!nextOpen && !isLoading) onOpenChange(false);
       }}
     >
-      <DialogContent showCloseButton={!isLoading}>
+      <DialogContent showCloseButton={!isLoading} data-testid={modalTestId}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
@@ -79,6 +87,7 @@ export function ConfirmationDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
+            data-testid={cancelTestId}
           >
             {cancelLabel ?? t("common.cancel", "Cancel")}
           </Button>
@@ -87,12 +96,53 @@ export function ConfirmationDialog({
             variant={variant === "destructive" ? "danger" : "primary"}
             onClick={confirm}
             loading={isLoading}
-            disabled={isLoading || !onConfirm}
+            disabled={isLoading || confirmDisabled}
+            data-testid={testId}
           >
             {confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+type ConfirmationTextDialogProps = Omit<ConfirmationDialogProps, "description" | "children"> & {
+  message: ReactNode;
+  confirmWord: string;
+};
+
+export function ConfirmationTextDialog({
+  message,
+  confirmWord,
+  onConfirm,
+  ...props
+}: ConfirmationTextDialogProps) {
+  const { t } = useTranslation();
+  const [value, setValue] = useState("");
+  const isValid = value === confirmWord;
+
+  return (
+    <ConfirmationDialog
+      {...props}
+      onConfirm={async () => {
+        if (isValid) await onConfirm?.();
+      }}
+      confirmDisabled={!isValid}
+    >
+      <p>{message}</p>
+      <label className="mt-4 block text-sm" htmlFor="confirmation-text-input">
+        {t("common.typeToConfirm", "Type {{word}} to confirm", { word: confirmWord })}
+      </label>
+      <input
+        id="confirmation-text-input"
+        className="mt-2 min-h-12 w-full rounded-lg border bg-background px-3"
+        placeholder={t("common.confirmationPlaceholder", 'Type "{{word}}" to confirm', {
+          word: confirmWord,
+        })}
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+      />
+    </ConfirmationDialog>
   );
 }
