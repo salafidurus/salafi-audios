@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { Suspense } from "react";
+
 import { SettingsGeneralScreen } from "@/features/settings/screens/settings-general.screen";
 
 export const metadata: Metadata = {
@@ -8,5 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function AccountPage() {
-  return <SettingsGeneralScreen />;
+  return (
+    <Suspense fallback={null}>
+      <SettingsGeneralScreen />
+    </Suspense>
+  );
 }
