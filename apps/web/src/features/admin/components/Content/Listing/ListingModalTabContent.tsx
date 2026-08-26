@@ -6,8 +6,6 @@ import React from "react";
 
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
 
-import { Modal } from "@/shared/components/ui/modal";
-
 import styles from "./listing-modal.module.css";
 import { ListingGeneralSection } from "./ListingGeneralSection";
 import { ListingReviewSection } from "./ListingReviewSection";
@@ -47,9 +45,9 @@ export function ListingModalTabContent({
 }: ListingModalTabContentProps) {
   const { formError } = state;
 
-  return (
-    <Modal.Content>
-      <Modal.ContentItem id="general">
+  if (activeTab === "general") {
+    return (
+      <>
         {(errorTabSet.has("general") || activeTab === "general") && formError && (
           <div className={styles.errorBanner}>{formError}</div>
         )}
@@ -63,9 +61,13 @@ export function ListingModalTabContent({
           onImageStaged={onImageStaged}
           stagedImagePreview={stagedImagePreview}
         />
-      </Modal.ContentItem>
+      </>
+    );
+  }
 
-      <Modal.ContentItem id="main">
+  if (activeTab === "main") {
+    return (
+      <>
         {(errorTabSet.has("main") || activeTab === "main") && formError && (
           <div className={styles.errorBanner}>{formError}</div>
         )}
@@ -77,18 +79,18 @@ export function ListingModalTabContent({
             ((v) => dispatch({ type: "UPDATE_FIELD", field: "title", value: v }))
           }
         />
-      </Modal.ContentItem>
+      </>
+    );
+  }
 
-      {showSublistingsTab && state.id && (
-        <Modal.ContentItem id="sublistings">
-          <ListingSublistingsTab rootListingId={state.id} />
-        </Modal.ContentItem>
-      )}
+  if (activeTab === "sublistings" && showSublistingsTab && state.id) {
+    return <ListingSublistingsTab rootListingId={state.id} />;
+  }
 
-      <Modal.ContentItem id="review">
-        {formError && <div className={styles.errorBanner}>{formError}</div>}
-        <ListingReviewSection state={state} mainLocale={mainLocale} topics={topics} />
-      </Modal.ContentItem>
-    </Modal.Content>
+  return (
+    <>
+      {formError && <div className={styles.errorBanner}>{formError}</div>}
+      <ListingReviewSection state={state} mainLocale={mainLocale} topics={topics} />
+    </>
   );
 }

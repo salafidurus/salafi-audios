@@ -10,7 +10,16 @@ import {
   localSlugConflicts,
   useUploadArrangeState,
 } from "@/features/admin/hooks/Content/useUploadArrangeState";
-import { Modal } from "@/shared/components/ui/modal";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 
 import styles from "./listing-modal.module.css";
@@ -124,61 +133,79 @@ export function ListingUploadArrangeModal({
       : [];
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={
-        state.existing && isDesktop
-          ? `${t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange")} (${state.existing.title})`
-          : t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange")
-      }
-      size="xl"
-      width="wide"
-      height="long"
-      multiTab
-      requireReview
-      activeTab={activeTab}
-      onActiveTabChange={(id) => {
-        if (isUploadArrangeTabId(id)) {
-          setActiveTab(id);
-        }
-      }}
-      defaultActiveTab="upload"
-      saveFormId="listing-upload-arrange-form"
-      saving={busy}
-      saveLabel={t("admin.contents.listing.uploadAction", "Upload")}
-      savingLabel={savingLabel}
-      reviewTabId="review"
-      errorTabs={errorTabs}
-    >
-      <form id="listing-upload-arrange-form" onSubmit={handleSubmit} className={styles.form}>
-        <Modal.Tabs>
-          <Modal.TabItem id="upload">
-            {t("admin.contents.listing.uploadTab", "Upload Audio")}
-          </Modal.TabItem>
-          <Modal.TabItem id="arrange">
-            {t("admin.contents.listing.arrangeTab", "Arrange")}
-          </Modal.TabItem>
-          <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
-        </Modal.Tabs>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && !busy && onClose()}>
+      <DialogContent className="max-h-[calc(100vh-2rem)] overflow-hidden sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>
+            {state.existing && isDesktop
+              ? `${t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange")} (${state.existing.title})`
+              : t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange")}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("admin.modal.formDescription", "Complete each tab before saving.")}
+          </DialogDescription>
+        </DialogHeader>
 
-        <Modal.Content>
-          <Modal.ContentItem id="upload">
-            {state.error && <div className={styles.errorBanner}>{state.error}</div>}
-            <UploadArrangeUploadTab state={state} dispatch={dispatch} />
-          </Modal.ContentItem>
+        <form id="listing-upload-arrange-form" onSubmit={handleSubmit} className={styles.form}>
+          <Tabs
+            value={activeTab}
+            onValueChange={(id) => {
+              if (isUploadArrangeTabId(id)) setActiveTab(id);
+            }}
+            className="min-h-0"
+          >
+            <TabsList
+              className="w-full justify-start overflow-x-auto"
+              aria-label={t("admin.modal.tabsLabel", "Form sections")}
+            >
+              <TabsTrigger value="upload">
+                {t("admin.contents.listing.uploadTab", "Upload Audio")}
+              </TabsTrigger>
+              <TabsTrigger
+                value="arrange"
+                aria-invalid={errorTabs.includes("arrange") || undefined}
+              >
+                {t("admin.contents.listing.arrangeTab", "Arrange")}
+              </TabsTrigger>
+              <TabsTrigger value="review">{t("admin.modal.reviewTab", "Review")}</TabsTrigger>
+            </TabsList>
+            <TabsContent value="upload">
+              {state.error && <div className={styles.errorBanner}>{state.error}</div>}
+              <UploadArrangeUploadTab state={state} dispatch={dispatch} />
+            </TabsContent>
 
-          <Modal.ContentItem id="arrange">
-            {state.error && <div className={styles.errorBanner}>{state.error}</div>}
-            <UploadArrangeArrangeTab state={state} dispatch={dispatch} />
-          </Modal.ContentItem>
+            <TabsContent value="arrange">
+              {state.error && <div className={styles.errorBanner}>{state.error}</div>}
+              <UploadArrangeArrangeTab state={state} dispatch={dispatch} />
+            </TabsContent>
 
-          <Modal.ContentItem id="review">
-            {state.error && <div className={styles.errorBanner}>{state.error}</div>}
-            <UploadArrangeReviewTab state={state} dispatch={dispatch} />
-          </Modal.ContentItem>
-        </Modal.Content>
-      </form>
-    </Modal>
+            <TabsContent value="review">
+              {state.error && <div className={styles.errorBanner}>{state.error}</div>}
+              <UploadArrangeReviewTab state={state} dispatch={dispatch} />
+            </TabsContent>
+          </Tabs>
+
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={onClose} disabled={busy}>
+              {t("common.cancel", "Cancel")}
+            </Button>
+            {activeTab === "review" ? (
+              <Button
+                type="submit"
+                form="listing-upload-arrange-form"
+                variant="primary"
+                loading={busy}
+              >
+                {busy ? savingLabel : t("admin.contents.listing.uploadAction", "Upload")}
+              </Button>
+            ) : (
+              <Button type="button" variant="primary" onClick={() => setActiveTab("review")}>
+                {t("admin.modal.reviewTab", "Review")}
+              </Button>
+            )}
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

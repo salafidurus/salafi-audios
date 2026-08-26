@@ -10,8 +10,18 @@ import { fetchScholarFormData } from "@/features/admin/api/admin.api";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { slugify } from "@/features/admin/utils/slugify";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
 import { InputField } from "@/shared/components/ui/input-field";
 import { Modal } from "@/shared/components/ui/modal";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 
 import { useSaveScholar } from "../../hooks/Scholar/useSaveScholar";
 import { useScholarForm } from "../../hooks/Scholar/useScholarForm";
@@ -135,108 +145,131 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
   const errorTabSet = new Set(errorTabs);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      title={
-        state.isEditing
-          ? t("admin.scholars.editScholar", "Edit Scholar")
-          : t("admin.scholars.addScholar", "Add Scholar")
-      }
-      size="xl"
-      width="wide"
-      height="long"
-      multiTab
-      requireReview
-      errorTabs={errorTabs}
-      activeTab={activeTab}
-      onActiveTabChange={(id) => {
-        if (isScholarModalTab(id)) {
-          setActiveTab(id);
-        }
-      }}
-      defaultActiveTab="general"
-      saveFormId="scholar-form"
-      saving={state.saving}
-      reviewTabId="review"
-      saveLabel={
-        state.isEditing
-          ? t("admin.scholars.saveChanges", "Save Changes")
-          : t("admin.scholars.addScholar", "Add Scholar")
-      }
-    >
-      <form id="scholar-form" onSubmit={handleSubmit} className={styles.form}>
-        <Modal.Tabs errorTabs={errorTabs}>
-          <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
-          <Modal.TabItem id="main">
-            {
-              // SAFETY: scholar main language is constrained to the same locale domain used by locale labels.
-              getLocaleLabel(state.mainLanguage as Locale)
-            }
-          </Modal.TabItem>
-          <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
-        </Modal.Tabs>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && !state.saving && handleClose()}>
+      <DialogContent className="max-h-[calc(100vh-2rem)] overflow-hidden sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>
+            {state.isEditing
+              ? t("admin.scholars.editScholar", "Edit Scholar")
+              : t("admin.scholars.addScholar", "Add Scholar")}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("admin.modal.formDescription", "Complete each tab before saving.")}
+          </DialogDescription>
+        </DialogHeader>
 
-        <Modal.Content>
-          <Modal.ContentItem id="general">
-            {(errorTabSet.has("general") || activeTab === "general") && state.error && (
-              <div className={styles.error}>{state.error}</div>
+        <form id="scholar-form" onSubmit={handleSubmit} className={styles.form}>
+          <Tabs
+            value={activeTab}
+            onValueChange={(id) => {
+              if (isScholarModalTab(id)) setActiveTab(id);
+            }}
+            className="min-h-0"
+          >
+            <TabsList
+              className="w-full justify-start overflow-x-auto"
+              aria-label={t("admin.modal.tabsLabel", "Form sections")}
+            >
+              <TabsTrigger
+                value="general"
+                aria-invalid={errorTabs.includes("general") || undefined}
+                onClick={() => setActiveTab("general")}
+              >
+                {t("admin.modal.generalTab", "General")}
+              </TabsTrigger>
+              <TabsTrigger
+                value="main"
+                aria-invalid={errorTabs.includes("main") || undefined}
+                onClick={() => setActiveTab("main")}
+              >
+                {
+                  // SAFETY: scholar main language is constrained to the same locale domain used by locale labels.
+                  getLocaleLabel(state.mainLanguage as Locale)
+                }
+              </TabsTrigger>
+              <TabsTrigger value="review" onClick={() => setActiveTab("review")}>
+                {t("admin.modal.reviewTab", "Review")}
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="general">
+              {(errorTabSet.has("general") || activeTab === "general") && state.error && (
+                <div className={styles.error}>{state.error}</div>
+              )}
+              <GeneralDataSection
+                formData={state}
+                dispatch={dispatch}
+                onImageStaged={handleImageStaged}
+                isEditing={state.isEditing}
+              />
+              <LocationSection formData={state} dispatch={dispatch} />
+              <SocialSection formData={state} dispatch={dispatch} />
+              <SettingsSection formData={state} dispatch={dispatch} />
+            </TabsContent>
+
+            <TabsContent value="main">
+              {(errorTabSet.has("main") || activeTab === "main") && state.error && (
+                <div className={styles.error}>{state.error}</div>
+              )}
+              <FormSection title={t("admin.modal.mainLanguageContent", "Main Language Content")}>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="scholar-name">
+                    {t("admin.scholars.nameLabel", "Name")}
+                    {!state.isEditing ? " *" : ""}
+                  </label>
+                  <InputField
+                    id="scholar-name"
+                    type="text"
+                    value={state.name}
+                    onChange={handleNameChange}
+                    placeholder={t("admin.scholars.namePlaceholder", "Scholar name")}
+                  />
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="scholar-bio">
+                    {t("admin.scholars.bioLabel", "Bio")}
+                  </label>
+                  <InputField
+                    id="scholar-bio"
+                    type="textarea"
+                    value={state.bio}
+                    onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "bio", value })}
+                    placeholder={t("admin.scholars.bioPlaceholder", "Scholar biography")}
+                  />
+                </div>
+              </FormSection>
+            </TabsContent>
+
+            <TabsContent value="review">
+              {state.error && <div className={styles.error}>{state.error}</div>}
+              <ReviewSection
+                formData={state}
+                changedFields={changedFields}
+                stagedImagePreview={state.stagedImagePreview}
+              />
+            </TabsContent>
+          </Tabs>
+
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={handleClose} disabled={state.saving}>
+              {t("common.cancel", "Cancel")}
+            </Button>
+            {activeTab === "review" ? (
+              <Button type="submit" form="scholar-form" variant="primary" loading={state.saving}>
+                {state.saving
+                  ? t("admin.access.saving", "Saving…")
+                  : state.isEditing
+                    ? t("admin.scholars.saveChanges", "Save Changes")
+                    : t("admin.scholars.addScholar", "Add Scholar")}
+              </Button>
+            ) : (
+              <Button type="button" variant="primary" onClick={() => setActiveTab("review")}>
+                {t("admin.modal.reviewTab", "Review")}
+              </Button>
             )}
-            <GeneralDataSection
-              formData={state}
-              dispatch={dispatch}
-              onImageStaged={handleImageStaged}
-              isEditing={state.isEditing}
-            />
-            <LocationSection formData={state} dispatch={dispatch} />
-            <SocialSection formData={state} dispatch={dispatch} />
-            <SettingsSection formData={state} dispatch={dispatch} />
-          </Modal.ContentItem>
-
-          <Modal.ContentItem id="main">
-            {(errorTabSet.has("main") || activeTab === "main") && state.error && (
-              <div className={styles.error}>{state.error}</div>
-            )}
-            <FormSection title={t("admin.modal.mainLanguageContent", "Main Language Content")}>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="scholar-name">
-                  {t("admin.scholars.nameLabel", "Name")}
-                  {!state.isEditing ? " *" : ""}
-                </label>
-                <InputField
-                  id="scholar-name"
-                  type="text"
-                  value={state.name}
-                  onChange={handleNameChange}
-                  placeholder={t("admin.scholars.namePlaceholder", "Scholar name")}
-                />
-              </div>
-
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="scholar-bio">
-                  {t("admin.scholars.bioLabel", "Bio")}
-                </label>
-                <InputField
-                  id="scholar-bio"
-                  type="textarea"
-                  value={state.bio}
-                  onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "bio", value })}
-                  placeholder={t("admin.scholars.bioPlaceholder", "Scholar biography")}
-                />
-              </div>
-            </FormSection>
-          </Modal.ContentItem>
-
-          <Modal.ContentItem id="review">
-            {state.error && <div className={styles.error}>{state.error}</div>}
-            <ReviewSection
-              formData={state}
-              changedFields={changedFields}
-              stagedImagePreview={state.stagedImagePreview}
-            />
-          </Modal.ContentItem>
-        </Modal.Content>
-      </form>
-    </Modal>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
