@@ -25,14 +25,28 @@ function recentListingPresentation(
   record: RecentListingRecord,
   toPublicUrl: (value: string) => string | undefined,
 ) {
-  const isSingle = record.format === 'single';
   return {
-    durationSeconds: isSingle
-      ? (record.durationSeconds ?? 0)
-      : (record.publishedDurationSeconds ?? 0),
-    thumbnailUrl: isSingle ? null : toPublicUrl(record.coverImageUrl ?? ''),
-    publishedLectureCount: isSingle ? 1 : (record.publishedLectureCount ?? 1),
+    durationSeconds: listingDuration(record),
+    thumbnailUrl: listingThumbnail(record, toPublicUrl),
+    publishedLectureCount: listingLectureCount(record),
   };
+}
+
+function listingDuration(record: RecentListingRecord): number {
+  return record.format === 'single'
+    ? (record.durationSeconds ?? 0)
+    : (record.publishedDurationSeconds ?? 0);
+}
+
+function listingThumbnail(
+  record: RecentListingRecord,
+  toPublicUrl: (value: string) => string | undefined,
+): string | null | undefined {
+  return record.format === 'single' ? null : toPublicUrl(record.coverImageUrl ?? '');
+}
+
+function listingLectureCount(record: RecentListingRecord): number {
+  return record.format === 'single' ? 1 : (record.publishedLectureCount ?? 1);
 }
 
 function applyRecentFilters(
