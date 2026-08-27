@@ -41,6 +41,10 @@ interface TabState {
 
 const EMPTY_DATA: TabData = { modules: [], topLevelLessons: [], allChildIds: [] };
 
+function hasChildren(data: TabData) {
+  return data.modules.length > 0 || data.topLevelLessons.length > 0;
+}
+
 /**
  * The listing modal's "Sub-listings" tab: lists modules + lessons with an
  * accordion for modules, bulk Publish All / Draft All buttons, and a
@@ -122,7 +126,7 @@ export function ListingSublistingsTab({ rootListingId }: ListingSublistingsTabPr
   }
 
   const { data } = state;
-  const hasChildren = data.modules.length > 0 || data.topLevelLessons.length > 0;
+  const containsChildren = hasChildren(data);
 
   return (
     <div className={styles.childrenTab}>
@@ -134,12 +138,12 @@ export function ListingSublistingsTab({ rootListingId }: ListingSublistingsTabPr
           {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
         </div>
       )}
-      {state.status === "ready" && !hasChildren && (
+      {state.status === "ready" && !containsChildren && (
         <div className={styles.emptyState}>
           {t("admin.translations.childrenEmpty", "No sub-listings yet")}
         </div>
       )}
-      {state.status === "ready" && hasChildren && (
+      {state.status === "ready" && containsChildren && (
         <>
           {/* Bulk actions */}
           <div className={styles.bulkActions}>
