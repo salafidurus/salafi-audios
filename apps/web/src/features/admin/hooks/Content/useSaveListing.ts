@@ -32,11 +32,13 @@ async function uploadStagedCoverImage(
 
 function getRequiredFieldErrorTabs(state: FormState): string[] {
   const tabs: string[] = [];
-  const hasGeneralFields =
-    state.scholarId && state.language && state.selectedTopics && state.selectedTopics.length > 0;
+  const hasGeneralFields = [state.scholarId, state.language, state.selectedTopics?.length].every(
+    Boolean,
+  );
+  const hasMainFields = [state.title, state.slug].every((value) => Boolean(value?.trim()));
 
   if (!hasGeneralFields) tabs.push("general");
-  if (!(state.title ?? "").trim() || !state.slug?.trim()) tabs.push("main");
+  if (!hasMainFields) tabs.push("main");
   if (!state.isEditing && state.scholarId && !state.slugSuffix?.trim()) tabs.push("general");
   return tabs;
 }
