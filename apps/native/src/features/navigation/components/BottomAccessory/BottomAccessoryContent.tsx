@@ -34,6 +34,15 @@ export function BottomAccessoryContent() {
     return null;
   }
 
+  return renderAccessory(hasMiniPlayer, hasSubroute, expandedView, setExpandedView);
+}
+
+function renderAccessory(
+  hasMiniPlayer: boolean,
+  hasSubroute: boolean,
+  expandedView: "miniPlayer" | "subroute",
+  setExpandedView: React.Dispatch<React.SetStateAction<"miniPlayer" | "subroute">>,
+) {
   if (hasSubroute && !hasMiniPlayer) {
     return (
       <View style={styles.container} testID="subroute-only-container">
@@ -41,7 +50,6 @@ export function BottomAccessoryContent() {
       </View>
     );
   }
-
   if (hasMiniPlayer && !hasSubroute) {
     return (
       <View style={styles.container} testID="miniplayer-only-container">
@@ -50,7 +58,6 @@ export function BottomAccessoryContent() {
     );
   }
 
-  // Dual mode (both available)
   return (
     <View style={styles.container} testID="dual-mode-container">
       {expandedView === "miniPlayer" ? (
