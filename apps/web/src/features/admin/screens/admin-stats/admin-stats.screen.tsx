@@ -35,13 +35,63 @@ function flattenPages<T>(data: { pages?: Array<{ items: T[] }> } | undefined): T
   return data?.pages?.flatMap((page) => page.items) ?? [];
 }
 
+function hasAccess(isLoading: boolean, check: () => boolean): boolean {
+  return !isLoading && check();
+}
+
+type StatsCardsProps = {
+  canReadScholars: boolean;
+  canReadListings: boolean;
+  canManageUsers: boolean;
+  scholarsCount: number;
+  listingsCount: number;
+  usersCount: number;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function StatsCards({
+  canReadScholars,
+  canReadListings,
+  canManageUsers,
+  scholarsCount,
+  listingsCount,
+  usersCount,
+  t,
+}: StatsCardsProps) {
+  return (
+    <div className={styles.cards} aria-label={t("admin.stats.summary", "Available data summary")}>
+      {canReadScholars && (
+        <AdminStatsCard
+          icon={<GraduationCap />}
+          label={t("admin.stats.scholars", "Scholars")}
+          value={scholarsCount}
+        />
+      )}
+      {canReadListings && (
+        <AdminStatsCard
+          icon={<BookOpen />}
+          label={t("admin.stats.listings", "Listings")}
+          value={listingsCount}
+        />
+      )}
+      {canManageUsers && (
+        <AdminStatsCard
+          icon={<Users />}
+          label={t("admin.stats.users", "Users")}
+          value={usersCount}
+        />
+      )}
+    </div>
+  );
+}
+
 export function AdminStatsScreen() {
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useAuth();
   const { ability, isLoading: isAccessLoading } = useAbility({ isAuthenticated });
-  const canReadListings = !isAccessLoading && ability.can("read", "Listing");
-  const canReadScholars = !isAccessLoading && ability.can("read", "Scholar");
-  const canManageUsers = !isAccessLoading && ability.can("manage", "UserAccess");
+  const canReadListings = hasAccess(isAccessLoading, () => ability.can("read", "Listing"));
+  const canReadScholars = hasAccess(isAccessLoading, () => ability.can("read", "Scholar"));
+  const canManageUsers = hasAccess(isAccessLoading, () => ability.can("manage", "UserAccess"));
 
   const listingsQuery = useInfiniteAdminListings({ enabled: canReadListings });
   const scholarsQuery = useInfiniteAdminScholars({ enabled: canReadScholars });
@@ -150,32 +200,15 @@ export function AdminStatsScreen() {
         />
       ) : (
         <div className={styles.content}>
-          <div
-            className={styles.cards}
-            aria-label={t("admin.stats.summary", "Available data summary")}
-          >
-            {canReadScholars && (
-              <AdminStatsCard
-                icon={<GraduationCap />}
-                label={t("admin.stats.scholars", "Scholars")}
-                value={scholars.length}
-              />
-            )}
-            {canReadListings && (
-              <AdminStatsCard
-                icon={<BookOpen />}
-                label={t("admin.stats.listings", "Listings")}
-                value={listings.length}
-              />
-            )}
-            {canManageUsers && (
-              <AdminStatsCard
-                icon={<Users />}
-                label={t("admin.stats.users", "Users")}
-                value={users.length}
-              />
-            )}
-          </div>
+          <StatsCards
+            canReadScholars={canReadScholars}
+            canReadListings={canReadListings}
+            canManageUsers={canManageUsers}
+            scholarsCount={scholars.length}
+            listingsCount={listings.length}
+            usersCount={users.length}
+            t={t}
+          />
 
           {canReadListings && (
             <section className={styles.section} aria-labelledby="admin-stats-content-heading">
