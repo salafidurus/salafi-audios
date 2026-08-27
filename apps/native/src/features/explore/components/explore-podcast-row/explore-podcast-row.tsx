@@ -29,6 +29,97 @@ export type ExplorePodcastRowProps = {
   hideBorder?: boolean;
 };
 
+async function playExploreItem(
+  item: FeedContentItemDto,
+  title: string,
+  scholarName: string,
+  isCurrentTrack: boolean,
+  isPlaying: boolean,
+) {
+  if (isCurrentTrack) {
+    if (isPlaying) await audioService.pause();
+    else await audioService.resume();
+    return;
+  }
+
+  if (item.kind !== "single") {
+    try {
+      const contents = await httpClient<ListingContentsDto>({
+        url: endpoints.listings.contents(item.slug),
+        method: "GET",
+      });
+      const queue = buildTrackQueue(
+        {
+          id: item.id,
+          title,
+          format: item.kind,
+          scholarName,
+          scholarSlug: item.scholarSlug,
+          artworkUrl: item.thumbnailUrl ?? undefined,
+        },
+        contents,
+      );
+      const firstTrack = queue[0];
+      if (firstTrack) {
+        await audioService.playListing(firstTrack, queue);
+        return;
+      }
+    } catch {
+      // Fall through to the single-track fallback below.
+    }
+  }
+
+  const track: Track = {
+    id: item.id,
+    slug: item.slug,
+    title,
+    artist: scholarName,
+    scholarSlug: item.scholarSlug,
+    url: "",
+    durationSeconds: item.durationSeconds ?? 0,
+    artworkUrl: item.thumbnailUrl ?? undefined,
+    seriesId: null,
+    seriesTitle: null,
+  };
+
+  await audioService.playListing(track, [track]);
+}
+
+function showExploreDetails(
+  slug: string,
+  onPress?: () => void,
+  onNavigateToListing?: (slug: string) => void,
+) {
+  if (onPress) onPress();
+  else if (onNavigateToListing) onNavigateToListing(slug);
+}
+
+function toggleExploreSave(item: FeedContentItemDto, isSaved: boolean) {
+  if (isSaved) markUnsaved(item.id, item.slug);
+  else markSaved(item.id, item.slug);
+}
+
+function handleExploreAction(
+  id: string,
+  item: FeedContentItemDto,
+  isSaved: boolean,
+  onPress?: () => void,
+  onNavigateToListing?: (slug: string) => void,
+) {
+  if (id === "details") showExploreDetails(item.slug, onPress, onNavigateToListing);
+  if (id === "save") toggleExploreSave(item, isSaved);
+}
+
+function renderProgressBar(progressPercent: number) {
+  if (progressPercent <= 0 || progressPercent >= 100) return null;
+
+  return (
+    <View style={styles.progressTrack} testID="progress-bar-track">
+      <View style={[styles.progressBar, { width: `${Math.round(progressPercent)}%` }]} />
+    </View>
+  );
+}
+
 export function ExplorePodcastRow({
   item,
   onPress,
@@ -48,77 +139,7 @@ export function ExplorePodcastRow({
 
   const isSaved = useIsSaved(item.id);
 
-  const handlePlay = async () => {
-    if (isCurrentTrack) {
-      if (isPlaying) {
-        await audioService.pause();
-      } else {
-        await audioService.resume();
-      }
-      return;
-    }
-
-    // A Series/Collection row has no audio asset of its own — fetch its
-    // contents on tap and play the full ordered queue starting at the first
-    // lesson, instead of mis-tracking progress against the row's own id.
-    if (item.kind !== "single") {
-      try {
-        const contents = await httpClient<ListingContentsDto>({
-          url: endpoints.listings.contents(item.slug),
-          method: "GET",
-        });
-        const queue = buildTrackQueue(
-          {
-            id: item.id,
-            title,
-            format: item.kind,
-            scholarName,
-            scholarSlug: item.scholarSlug,
-            artworkUrl: item.thumbnailUrl ?? undefined,
-          },
-          contents,
-        );
-        const firstTrack = queue[0];
-        if (firstTrack) {
-          await audioService.playListing(firstTrack, queue);
-          return;
-        }
-      } catch {
-        // Fall through to the single-track fallback below.
-      }
-    }
-
-    const track: Track = {
-      id: item.id,
-      slug: item.slug,
-      title,
-      artist: scholarName,
-      scholarSlug: item.scholarSlug,
-      url: "",
-      durationSeconds: item.durationSeconds ?? 0,
-      artworkUrl: item.thumbnailUrl ?? undefined,
-      seriesId: null,
-      seriesTitle: null,
-    };
-
-    await audioService.playListing(track, [track]);
-  };
-
-  const handleDetails = () => {
-    if (onPress) {
-      onPress();
-    } else if (onNavigateToListing) {
-      onNavigateToListing(item.slug);
-    }
-  };
-
-  const handleSave = () => {
-    if (isSaved) {
-      markUnsaved(item.id, item.slug);
-    } else {
-      markSaved(item.id, item.slug);
-    }
-  };
+  const handlePlay = () => playExploreItem(item, title, scholarName, isCurrentTrack, isPlaying);
 
   const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";
   const publishedDateText = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : "";
@@ -128,10 +149,8 @@ export function ExplorePodcastRow({
     { id: "save", title: "Save", state: isSaved ? "on" : "off" },
   ];
 
-  const handleAction = (id: string) => {
-    if (id === "details") handleDetails();
-    if (id === "save") handleSave();
-  };
+  const handleAction = (id: string) =>
+    handleExploreAction(id, item, isSaved, onPress, onNavigateToListing);
 
   return (
     <List.Item onPress={handlePlay} hideBorder={hideBorder} testID="podcast-row-item">
@@ -147,11 +166,7 @@ export function ExplorePodcastRow({
               {publishedDateText}
             </AppText>
           </View>
-          {progressPercent > 0 && progressPercent < 100 ? (
-            <View style={styles.progressTrack} testID="progress-bar-track">
-              <View style={[styles.progressBar, { width: `${Math.round(progressPercent)}%` }]} />
-            </View>
-          ) : null}
+          {renderProgressBar(progressPercent)}
         </View>
       </View>
 
