@@ -27,6 +27,37 @@ export type ListingDetailScreenProps = {
   slug: string;
 };
 
+function getContentHeading(format: string | undefined, t: ReturnType<typeof useTranslation>["t"]) {
+  if (format === "single") return t("listing.listenNow", "Listen now");
+  if (format === "series") return t("listing.lessons", "Lessons");
+  return null;
+}
+
+function getContentCountLabel(
+  format: string | undefined,
+  moduleCount: number,
+  itemCount: number,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  const isCollection = format === "collection";
+  const count = isCollection ? moduleCount : itemCount;
+  const singular = count === 1;
+  return t(
+    isCollection
+      ? singular
+        ? "listing.module"
+        : "listing.modules"
+      : singular
+        ? "listing.item"
+        : "listing.items",
+    isCollection ? (singular ? "module" : "modules") : singular ? "item" : "items",
+  );
+}
+
+function isMultiItemListing(format: string | undefined) {
+  return format === "series" || format === "collection";
+}
+
 type ListingContents = NonNullable<ReturnType<typeof useListingContents>["data"]>;
 type Translation = ReturnType<typeof useTranslation>;
 type FormatScholarName = ReturnType<typeof useFormatScholarName>;
@@ -236,7 +267,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [highlightItemId, contents]);
 
-  const isMultiItem = listing?.format === "series" || listing?.format === "collection";
+  const isMultiItem = isMultiItemListing(listing?.format);
   const query = searchQuery.trim().toLowerCase();
 
   // Filter items for search
@@ -250,22 +281,13 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
 
   const contentCount =
     contents?.format === "collection" ? filteredModules.length : filteredSingleOrSeriesItems.length;
-  const contentHeading =
-    listing?.format === "single"
-      ? t("listing.listenNow", "Listen now")
-      : listing?.format === "series"
-        ? t("listing.lessons", "Lessons")
-        : null;
-  const contentCountLabel =
-    contents?.format === "collection"
-      ? t(
-          filteredModules.length === 1 ? "listing.module" : "listing.modules",
-          filteredModules.length === 1 ? "module" : "modules",
-        )
-      : t(
-          filteredSingleOrSeriesItems.length === 1 ? "listing.item" : "listing.items",
-          filteredSingleOrSeriesItems.length === 1 ? "item" : "items",
-        );
+  const contentHeading = getContentHeading(listing?.format, t);
+  const contentCountLabel = getContentCountLabel(
+    contents?.format,
+    filteredModules.length,
+    filteredSingleOrSeriesItems.length,
+    t,
+  );
 
   if (isListingError && !listing) {
     return (
