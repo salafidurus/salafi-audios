@@ -40,6 +40,18 @@ function renderButtonContent(
   );
 }
 
+function resolveButtonComponent(asChild: boolean) {
+  return asChild ? Slot.Root : "button";
+}
+
+function resolveButtonSize(size: ButtonVariantProps["size"] | "md") {
+  return size === "md" ? "default" : size;
+}
+
+function resolveButtonDisabled(loading: boolean, disabled: boolean | undefined) {
+  return loading || disabled;
+}
+
 function Button({
   className,
   variant = "default",
@@ -62,9 +74,9 @@ function Button({
     iconPosition?: "left" | "right";
     fullWidth?: boolean;
   }) {
-  const Comp = asChild ? Slot.Root : "button";
+  const Comp = resolveButtonComponent(asChild);
   const normalizedVariant = normalizeButtonVariant(variant);
-  const normalizedSize: ButtonVariantProps["size"] = size === "md" ? "default" : size;
+  const normalizedSize: ButtonVariantProps["size"] = resolveButtonSize(size);
   const content = label ?? props.children;
 
   return (
@@ -78,7 +90,7 @@ function Button({
       )}
       {...props}
       aria-busy={loading || undefined}
-      disabled={loading || props.disabled}
+      disabled={resolveButtonDisabled(loading, props.disabled)}
     >
       {renderButtonContent(asChild, loading, props.children, icon, iconPosition, content)}
     </Comp>
