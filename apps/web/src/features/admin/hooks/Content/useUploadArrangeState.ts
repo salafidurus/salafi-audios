@@ -295,6 +295,28 @@ function buildStagedItems(state: UploadArrangeState, inputs: StagedItemInput[]):
   });
 }
 
+type EditModuleAction = Extract<UploadArrangeAction, { type: "EDIT_MODULE" }>;
+
+function editModule(mod: NewModule, action: EditModuleAction, rootSlug: string): NewModule {
+  if (action.field === "slug") {
+    return { ...mod, slug: String(action.value ?? ""), slugEdited: true };
+  }
+  if (action.field === "title") {
+    const title = String(action.value ?? "");
+    if (mod.slugEdited) return { ...mod, title };
+    return { ...mod, title, slug: deriveChildSlug(rootSlug, title) };
+  }
+  return {
+    ...mod,
+    [action.field]:
+      action.field === "orderIndex"
+        ? action.value === null
+          ? null
+          : Number(action.value)
+        : action.value,
+  };
+}
+
 function reducer(state: UploadArrangeState, action: UploadArrangeAction): UploadArrangeState {
   switch (action.type) {
     case "INIT_EXISTING":
@@ -462,26 +484,9 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
     }
 
     case "EDIT_MODULE": {
-      const newModules = state.newModules.map((mod) => {
-        if (mod.tempId !== action.tempId) return mod;
-        if (action.field === "slug") {
-          return { ...mod, slug: String(action.value ?? ""), slugEdited: true };
-        }
-        if (action.field === "title") {
-          const title = String(action.value ?? "");
-          if (mod.slugEdited) return { ...mod, title };
-          return { ...mod, title, slug: deriveChildSlug(state.existing?.slug ?? "", title) };
-        }
-        return {
-          ...mod,
-          [action.field]:
-            action.field === "orderIndex"
-              ? action.value === null
-                ? null
-                : Number(action.value)
-              : action.value,
-        };
-      });
+      const newModules = state.newModules.map((mod) =>
+        mod.tempId === action.tempId ? editModule(mod, action, state.existing?.slug ?? "") : mod,
+      );
 
       const editedModule = newModules.find((m) => m.tempId === action.tempId);
       const moduleKey = `new:${action.tempId}`;
