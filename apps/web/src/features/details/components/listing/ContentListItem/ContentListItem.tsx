@@ -2,7 +2,7 @@
 
 import type { ListingContentItemDto } from "@sd/core-contracts";
 
-import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
+import { useAudio, useProgressStore, type ListingProgress, type Track } from "@sd/domain-audio";
 import { Play, Pause, Check } from "lucide-react";
 import React from "react";
 
@@ -65,6 +65,19 @@ function PlayIcon({ playing }: { playing: boolean }) {
   );
 }
 
+function getProgressState(progress: ListingProgress | undefined) {
+  const completed = !!progress?.completedAt;
+  const progressPercent =
+    progress && progress.durationSeconds > 0
+      ? Math.min(100, (progress.positionSeconds / progress.durationSeconds) * 100)
+      : 0;
+  return { completed, progressPercent };
+}
+
+function nullableValue(value: string | undefined) {
+  return value ?? null;
+}
+
 export type ContentListItemProps = {
   item: ListingContentItemDto;
   scholarName?: string;
@@ -116,11 +129,11 @@ function createContentTrack(
     artist,
     url: item.primaryAudioAsset?.url ?? "",
     durationSeconds: item.durationSeconds || item.primaryAudioAsset?.durationSeconds || 0,
-    seriesId: context.seriesId ?? null,
-    seriesTitle: context.seriesTitle ?? null,
-    moduleId: context.moduleId ?? null,
-    moduleTitle: context.moduleTitle ?? null,
-    collectionId: context.collectionId ?? null,
+    seriesId: nullableValue(context.seriesId),
+    seriesTitle: nullableValue(context.seriesTitle),
+    moduleId: nullableValue(context.moduleId),
+    moduleTitle: nullableValue(context.moduleTitle),
+    collectionId: nullableValue(context.collectionId),
   };
 }
 
@@ -146,11 +159,7 @@ export function ContentListItem({
   const durationStr = formatDuration(
     item.durationSeconds || item.primaryAudioAsset?.durationSeconds,
   );
-  const isCompleted = !!progress?.completedAt;
-  const progressPercent =
-    progress && progress.durationSeconds > 0
-      ? Math.min(100, (progress.positionSeconds / progress.durationSeconds) * 100)
-      : 0;
+  const { completed: isCompleted, progressPercent } = getProgressState(progress);
 
   const handlePlayClick = (e?: React.MouseEvent) =>
     playContentItem(e, isCurrentTrack, isPlaying, item, formattedScholarName, {
