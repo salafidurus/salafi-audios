@@ -13,6 +13,37 @@ import { resolveContentTranslation } from '../../shared/i18n/resolve-content-tra
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { ConfigService } from '../../core/config/config.service';
 
+type RecentListingRecord = {
+  format: ListingFormat;
+  durationSeconds: number | null;
+  publishedDurationSeconds: number | null;
+  coverImageUrl: string | null;
+  publishedLectureCount: number | null;
+};
+
+function recentListingPresentation(
+  record: RecentListingRecord,
+  toPublicUrl: (value: string) => string | undefined,
+) {
+  const isSingle = record.format === 'single';
+  return {
+    durationSeconds: isSingle
+      ? (record.durationSeconds ?? 0)
+      : (record.publishedDurationSeconds ?? 0),
+    thumbnailUrl: isSingle ? null : toPublicUrl(record.coverImageUrl ?? ''),
+    publishedLectureCount: isSingle ? 1 : (record.publishedLectureCount ?? 1),
+  };
+}
+
+function applyRecentFilters(
+  where: Prisma.ListingWhereInput,
+  topicSlug?: string,
+  cursorDate?: Date,
+) {
+  if (topicSlug) where.topics = { some: { topic: { slug: topicSlug } } };
+  if (cursorDate) where.createdAt = { lt: cursorDate };
+}
+
 @Injectable()
 export class RecentListingsRepo {
   constructor(
@@ -33,12 +64,7 @@ export class RecentListingsRepo {
       parentId: null,
       scholar: { isActive: true },
     };
-    if (topicSlug) {
-      where.topics = { some: { topic: { slug: topicSlug } } };
-    }
-    if (cursorDate) {
-      where.createdAt = { lt: cursorDate };
-    }
+    applyRecentFilters(where, topicSlug, cursorDate);
 
     const moduleCount = pageNumber % 2 === 0 ? 2 : 0;
     const contentLimit = Math.max(1, limit - moduleCount);
@@ -87,10 +113,7 @@ export class RecentListingsRepo {
         publishedTranslation: r.scholar!.translations[0] ?? null,
       }).fields.name;
 
-      const durationSeconds =
-        r.format === 'single' ? (r.durationSeconds ?? 0) : (r.publishedDurationSeconds ?? 0);
-      const thumbnailUrl = r.format === 'single' ? null : this.toOptionalPublicUrl(r.coverImageUrl);
-      const publishedLectureCount = r.format === 'single' ? 1 : (r.publishedLectureCount ?? 1);
+      const presentation = recentListingPresentation(r, (value) => this.toOptionalPublicUrl(value));
       const kind: ListingFormat = r.format;
 
       return {
@@ -102,9 +125,9 @@ export class RecentListingsRepo {
         scholarSlug: r.scholar!.slug,
         scholarTitle: r.scholar!.title ?? undefined,
         scholarImageUrl: r.scholar!.imageUrl ?? undefined,
-        thumbnailUrl: thumbnailUrl ?? null,
-        durationSeconds: durationSeconds ?? 0,
-        publishedLectureCount,
+        thumbnailUrl: presentation.thumbnailUrl ?? null,
+        durationSeconds: presentation.durationSeconds,
+        publishedLectureCount: presentation.publishedLectureCount,
         publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
         originalLanguage: resolved.originalLanguage,
         original: resolved.original ? { title: resolved.original.title } : undefined,
