@@ -1504,6 +1504,35 @@ export class ListingRepository {
     }
   }
 
+  private buildArrangePrefixChecks(
+    rootSlug: string,
+    moduleOps: NonNullable<ArrangeCommitDto['modules']>,
+    rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
+    existingModuleSlugById: Map<string, string>,
+  ): { slug: string; expectedPrefix: string }[] {
+    const checks: { slug: string; expectedPrefix: string }[] = [];
+    for (const moduleOp of moduleOps) {
+      const parentSlug =
+        moduleOp.op === 'create'
+          ? moduleOp.slug
+          : (existingModuleSlugById.get(moduleOp.id) ?? rootSlug);
+      if (moduleOp.op === 'create') {
+        checks.push({ slug: moduleOp.slug, expectedPrefix: rootSlug });
+      }
+      for (const lessonOp of moduleOp.lessons) {
+        if (lessonOp.op === 'create') {
+          checks.push({ slug: lessonOp.slug, expectedPrefix: parentSlug });
+        }
+      }
+    }
+    for (const lessonOp of rootLessonOps) {
+      if (lessonOp.op === 'create') {
+        checks.push({ slug: lessonOp.slug, expectedPrefix: rootSlug });
+      }
+    }
+    return checks;
+  }
+
   private async validateArrangeSlugs(
     tx: Prisma.TransactionClient,
     rootSlug: string,
@@ -1511,24 +1540,12 @@ export class ListingRepository {
     rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
     existingModuleSlugById: Map<string, string>,
   ): Promise<void> {
-    const prefixChecks: { slug: string; expectedPrefix: string }[] = [];
-    for (const moduleOp of moduleOps) {
-      const parentSlug =
-        moduleOp.op === 'create'
-          ? moduleOp.slug
-          : (existingModuleSlugById.get(moduleOp.id) ?? rootSlug);
-      if (moduleOp.op === 'create')
-        prefixChecks.push({ slug: moduleOp.slug, expectedPrefix: rootSlug });
-      for (const lessonOp of moduleOp.lessons) {
-        if (lessonOp.op === 'create') {
-          prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: parentSlug });
-        }
-      }
-    }
-    for (const lessonOp of rootLessonOps) {
-      if (lessonOp.op === 'create')
-        prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: rootSlug });
-    }
+    const prefixChecks = this.buildArrangePrefixChecks(
+      rootSlug,
+      moduleOps,
+      rootLessonOps,
+      existingModuleSlugById,
+    );
 
     const createSlugs = prefixChecks.map((check) => check.slug);
     const duplicates = createSlugs.filter((slug, index) => createSlugs.indexOf(slug) !== index);
