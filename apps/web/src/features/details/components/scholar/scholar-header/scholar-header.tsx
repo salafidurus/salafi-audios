@@ -22,6 +22,20 @@ export type ScholarHeaderProps = {
   layout?: "inline" | "sidebar";
 };
 
+function languageLabel(
+  language: ScholarDetailDto["mainLanguage"],
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  switch (language) {
+    case "ar":
+      return t("common.arabic", "Arabic");
+    case "en":
+      return t("common.english", "English");
+    default:
+      return language || "";
+  }
+}
+
 export function ScholarHeader({ scholar, onFollow, layout = "inline" }: ScholarHeaderProps) {
   const { t } = useTranslation();
   const formatScholarName = useFormatScholarName();
@@ -32,11 +46,7 @@ export function ScholarHeader({ scholar, onFollow, layout = "inline" }: ScholarH
     : undefined;
 
   const statsParts = [
-    scholar.mainLanguage === "ar"
-      ? t("common.arabic", "Arabic")
-      : scholar.mainLanguage === "en"
-        ? t("common.english", "English")
-        : scholar.mainLanguage || "",
+    languageLabel(scholar.mainLanguage, t),
     t("scholarContent.statLecturesFormat", "{{count}} Lectures", { count: scholar.lectureCount }),
   ].filter(Boolean);
 
