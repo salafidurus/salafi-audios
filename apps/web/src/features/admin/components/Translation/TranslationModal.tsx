@@ -6,7 +6,11 @@ import { sanitizeError } from "@sd/utils-error";
 import { useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useTranslationForm } from "@/features/admin/hooks/Translation/useTranslationForm";
+import {
+  useTranslationForm,
+  type TranslationFormAction,
+  type TranslationFormState,
+} from "@/features/admin/hooks/Translation/useTranslationForm";
 import { getSecondaryLocales, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { computeLocalesToSave } from "@/features/admin/utils/translation-save";
 import { Button } from "@/shared/components/ui/button";
@@ -23,6 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui
 import {
   translationEntities,
   type ClientTranslationTarget,
+  type TranslationEntityConfig,
   type TranslationChildSummary,
 } from "./translation-entities";
 import styles from "./translation-modal.module.css";
@@ -101,6 +106,125 @@ function getTranslationModalTitle(
   return sourceTitle ? `${title} — ${sourceTitle}` : title;
 }
 
+function shouldShowChildrenTab(
+  config: TranslationEntityConfig | null,
+  rootFormat: string | undefined,
+  entityId: string | null,
+): boolean {
+  return Boolean(config?.supportsChildren && rootFormat && rootFormat !== "single" && entityId);
+}
+
+type TranslationModalTabsProps = {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  config: TranslationEntityConfig;
+  targetEntity: ClientTranslationTarget["entity"];
+  state: TranslationFormState;
+  dispatch: React.Dispatch<TranslationFormAction>;
+  secondaryLocales: Locale[];
+  showChildrenTab: boolean;
+  errorTabs: string[];
+  childrenStatus: "idle" | "loading" | "ready" | "error";
+  childrenError: string | null;
+  childItems: TranslationChildSummary[] | null;
+  selectedChildId: string | null;
+  onSelectChild: (id: string | null) => void;
+  onPublishToggle: (locale: Locale) => Promise<void>;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function TranslationModalTabs({
+  activeTab,
+  onTabChange,
+  config,
+  targetEntity,
+  state,
+  dispatch,
+  secondaryLocales,
+  showChildrenTab,
+  errorTabs,
+  childrenStatus,
+  childrenError,
+  childItems,
+  selectedChildId,
+  onSelectChild,
+  onPublishToggle,
+  t,
+}: TranslationModalTabsProps) {
+  const tabs = showChildrenTab
+    ? [...secondaryLocales, "children", "review"]
+    : [...secondaryLocales, "review"];
+  const errorTabSet = new Set(errorTabs);
+
+  return (
+    <Tabs value={activeTab} onValueChange={onTabChange} className="min-h-0">
+      <TabsList
+        className="no-scrollbar w-full justify-start overflow-x-auto overflow-y-hidden"
+        aria-label={t("admin.modal.tabsLabel", "Form sections")}
+      >
+        {tabs.map((tab) => (
+          <TabsTrigger
+            key={tab}
+            value={tab}
+            aria-invalid={errorTabSet.has(tab) || undefined}
+            onClick={() => onTabChange(tab)}
+          >
+            {tab === "children"
+              ? t("admin.translations.childrenTab", "Sub-listings")
+              : tab === "review"
+                ? t("admin.modal.reviewTab", "Review")
+                : getLocaleLabel(secondaryLocales.find((locale) => locale === tab) ?? "ar")}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      <TranslationStatusNotices
+        status={state.status}
+        entityId={state.entityId}
+        error={state.error}
+        t={t}
+      />
+
+      {secondaryLocales.map((locale) => (
+        <TabsContent key={locale} value={locale}>
+          {state.status === "ready" && (
+            <TranslationLocaleFields
+              config={config}
+              state={state}
+              dispatch={dispatch}
+              locale={locale}
+              idPrefix={`translation-${targetEntity}`}
+              onPublishToggle={onPublishToggle}
+            />
+          )}
+        </TabsContent>
+      ))}
+
+      {showChildrenTab && (
+        <TabsContent value="children">
+          {state.status === "ready" && (
+            <TranslationChildrenTab
+              config={config}
+              status={childrenStatus}
+              error={childrenError}
+              items={childItems}
+              selectedChildId={selectedChildId}
+              onSelectChild={onSelectChild}
+              onBack={() => onSelectChild(null)}
+              onChildSaved={() => onSelectChild(null)}
+            />
+          )}
+        </TabsContent>
+      )}
+
+      <TabsContent value="review">
+        {state.status === "ready" && (
+          <TranslationReviewTab config={config} state={state} secondaryLocales={secondaryLocales} />
+        )}
+      </TabsContent>
+    </Tabs>
+  );
+}
+
 export function TranslationModal({ isOpen, onClose, target }: TranslationModalProps) {
   const { t } = useTranslation();
   // Empty until the user picks a tab — falls back to the first secondary locale
@@ -146,8 +270,7 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target, dispatch]);
 
-  const showChildrenTab =
-    !!config?.supportsChildren && !!rootFormat && rootFormat !== "single" && !!state.entityId;
+  const showChildrenTab = shouldShowChildrenTab(config, rootFormat, state.entityId);
 
   useEffect(() => {
     const loadChildren = config?.loadChildren;
@@ -173,8 +296,6 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
 
   const secondaryLocales = getSecondaryLocales(state.mainLocale);
   const activeTab = activeTabOverride || secondaryLocales[0] || "review";
-  const errorTabSet = new Set(errorTabs);
-
   const handleClose = () => {
     setErrorTabs([]);
     setActiveTabOverride("");
@@ -273,79 +394,24 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
           onSubmit={handleSave}
           className={`${styles.form} min-h-0 flex-1`}
         >
-          <Tabs value={activeTab} onValueChange={setActiveTabOverride} className="min-h-0">
-            <TabsList
-              className="no-scrollbar w-full justify-start overflow-x-auto overflow-y-hidden"
-              aria-label={t("admin.modal.tabsLabel", "Form sections")}
-            >
-              {secondaryLocales.map((locale) => (
-                <TabsTrigger
-                  key={locale}
-                  value={locale}
-                  aria-invalid={errorTabSet.has(locale) || undefined}
-                  onClick={() => setActiveTabOverride(locale)}
-                >
-                  {getLocaleLabel(locale)}
-                </TabsTrigger>
-              ))}
-              {showChildrenTab && (
-                <TabsTrigger value="children" onClick={() => setActiveTabOverride("children")}>
-                  {t("admin.translations.childrenTab", "Sub-listings")}
-                </TabsTrigger>
-              )}
-              <TabsTrigger value="review" onClick={() => setActiveTabOverride("review")}>
-                {t("admin.modal.reviewTab", "Review")}
-              </TabsTrigger>
-            </TabsList>
-            <TranslationStatusNotices
-              status={state.status}
-              entityId={state.entityId}
-              error={state.error}
-              t={t}
-            />
-
-            {secondaryLocales.map((locale) => (
-              <TabsContent key={locale} value={locale}>
-                {state.status === "ready" && (
-                  <TranslationLocaleFields
-                    config={config}
-                    state={state}
-                    dispatch={dispatch}
-                    locale={locale}
-                    idPrefix={`translation-${target.entity}`}
-                    onPublishToggle={handlePublishToggle}
-                  />
-                )}
-              </TabsContent>
-            ))}
-
-            {showChildrenTab && (
-              <TabsContent value="children">
-                {state.status === "ready" && (
-                  <TranslationChildrenTab
-                    config={config}
-                    status={childrenStatus}
-                    error={childrenError}
-                    items={children}
-                    selectedChildId={selectedChildId}
-                    onSelectChild={setSelectedChildId}
-                    onBack={() => setSelectedChildId(null)}
-                    onChildSaved={() => setSelectedChildId(null)}
-                  />
-                )}
-              </TabsContent>
-            )}
-
-            <TabsContent value="review">
-              {state.status === "ready" && (
-                <TranslationReviewTab
-                  config={config}
-                  state={state}
-                  secondaryLocales={secondaryLocales}
-                />
-              )}
-            </TabsContent>
-          </Tabs>
+          <TranslationModalTabs
+            activeTab={activeTab}
+            onTabChange={setActiveTabOverride}
+            config={config}
+            targetEntity={target.entity}
+            state={state}
+            dispatch={dispatch}
+            secondaryLocales={secondaryLocales}
+            showChildrenTab={showChildrenTab}
+            errorTabs={errorTabs}
+            childrenStatus={childrenStatus}
+            childrenError={childrenError}
+            childItems={children}
+            selectedChildId={selectedChildId}
+            onSelectChild={setSelectedChildId}
+            onPublishToggle={handlePublishToggle}
+            t={t}
+          />
 
           <TranslationModalFooter
             activeTab={activeTab}
