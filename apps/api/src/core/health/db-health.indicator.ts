@@ -9,6 +9,10 @@ const neonEndpointSchema = z.object({
   endpoint: z.object({ current_state: z.string().min(1) }).optional(),
 });
 
+function isNeonConfigured(config: ConfigService): boolean {
+  return Boolean(config.NEON_API_KEY && config.NEON_PROJECT_ID && config.NEON_ENDPOINT_ID);
+}
+
 @Injectable()
 export class DbHealthIndicator extends HealthIndicator {
   constructor(private readonly config: ConfigService) {
@@ -16,15 +20,11 @@ export class DbHealthIndicator extends HealthIndicator {
   }
 
   async pingCheck(key: string, options?: { timeout?: number }): Promise<HealthIndicatorResult> {
-    const apiKey = this.config.NEON_API_KEY;
-    const projectId = this.config.NEON_PROJECT_ID;
-    const endpointId = this.config.NEON_ENDPOINT_ID;
-
     // Local/dev deployments run without Neon control-plane credentials; the
     // env schema still requires them outside development, so a skip here
     // never masks a misconfigured deployment. Real connectivity is
     // exercised by every Prisma-backed request.
-    if (!apiKey || !projectId || !endpointId) {
+    if (!isNeonConfigured(this.config)) {
       return this.getStatus(key, true, { currentState: 'unknown', neonConfigured: false });
     }
 
@@ -33,16 +33,7 @@ export class DbHealthIndicator extends HealthIndicator {
     const timer = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const response = await fetch(
-        `${NEON_API_BASE_URL}/projects/${this.config.NEON_PROJECT_ID}/endpoints/${this.config.NEON_ENDPOINT_ID}`,
-        {
-          headers: {
-            accept: 'application/json',
-            authorization: `Bearer ${this.config.NEON_API_KEY}`,
-          },
-          signal: controller.signal,
-        },
-      );
+      const response = await fetchNeonEndpoint(this.config, controller.signal);
 
       if (!response.ok) throw new Error(`Neon API returned HTTP ${response.status}`);
 
@@ -64,4 +55,17 @@ export class DbHealthIndicator extends HealthIndicator {
       clearTimeout(timer);
     }
   }
+}
+
+function fetchNeonEndpoint(config: ConfigService, signal: AbortSignal): Promise<Response> {
+  return fetch(
+    `${NEON_API_BASE_URL}/projects/${config.NEON_PROJECT_ID}/endpoints/${config.NEON_ENDPOINT_ID}`,
+    {
+      headers: {
+        accept: 'application/json',
+        authorization: `Bearer ${config.NEON_API_KEY}`,
+      },
+      signal,
+    },
+  );
 }

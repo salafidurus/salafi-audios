@@ -10,6 +10,34 @@ import { ConfigService } from '../config/config.service';
 
 const jsonValueSchema = z.unknown();
 
+type RedisSetOptions = {
+  mode?: 'EX' | 'PX';
+  duration?: number;
+  condition?: 'NX' | 'XX';
+};
+
+function setWithExpiration(client: Redis, key: string, value: string, options: RedisSetOptions) {
+  if (!options.mode || options.duration === undefined) return undefined;
+  if (options.mode === 'EX') {
+    return options.condition === 'NX'
+      ? client.set(key, value, 'EX', options.duration, 'NX')
+      : options.condition === 'XX'
+        ? client.set(key, value, 'EX', options.duration, 'XX')
+        : client.set(key, value, 'EX', options.duration);
+  }
+  return options.condition === 'NX'
+    ? client.set(key, value, 'PX', options.duration, 'NX')
+    : options.condition === 'XX'
+      ? client.set(key, value, 'PX', options.duration, 'XX')
+      : client.set(key, value, 'PX', options.duration);
+}
+
+function setWithCondition(client: Redis, key: string, value: string, condition?: 'NX' | 'XX') {
+  if (condition === 'NX') return client.set(key, value, 'NX');
+  if (condition === 'XX') return client.set(key, value, 'XX');
+  return client.set(key, value);
+}
+
 @Injectable()
 export class RedisService implements OnModuleDestroy {
   private readonly client: Redis | undefined;
@@ -64,29 +92,10 @@ export class RedisService implements OnModuleDestroy {
     condition?: 'NX' | 'XX',
   ): Promise<string | null> {
     const client = this.requireClient();
-    if (mode === 'EX' && duration !== undefined && condition) {
-      return condition === 'NX'
-        ? client.set(key, value, 'EX', duration, 'NX')
-        : client.set(key, value, 'EX', duration, 'XX');
-    }
-    if (mode === 'PX' && duration !== undefined && condition) {
-      return condition === 'NX'
-        ? client.set(key, value, 'PX', duration, 'NX')
-        : client.set(key, value, 'PX', duration, 'XX');
-    }
-    if (mode === 'EX' && duration !== undefined) {
-      return client.set(key, value, 'EX', duration);
-    }
-    if (mode === 'PX' && duration !== undefined) {
-      return client.set(key, value, 'PX', duration);
-    }
-    if (condition === 'NX') {
-      return client.set(key, value, 'NX');
-    }
-    if (condition === 'XX') {
-      return client.set(key, value, 'XX');
-    }
-    return client.set(key, value);
+    return (
+      setWithExpiration(client, key, value, { mode, duration, condition }) ??
+      setWithCondition(client, key, value, condition)
+    );
   }
 
   async del(...keys: string[]): Promise<number> {
