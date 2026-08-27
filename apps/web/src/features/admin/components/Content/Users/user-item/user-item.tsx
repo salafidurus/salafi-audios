@@ -22,6 +22,45 @@ export type UserItemProps = {
   layout?: "list" | "table";
 };
 
+function renderActionButtons(
+  user: AdminUserListItemDto,
+  displayName: string,
+  isCompact: boolean,
+  canManageAccess: boolean,
+  onManageAccess: (() => void) | undefined,
+  copyEmail: () => void,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  return (
+    <>
+      {canManageAccess && (
+        <Button
+          variant={isCompact ? "outline" : "ghost"}
+          size={isCompact ? "sm" : "icon"}
+          fullWidth={isCompact}
+          onClick={onManageAccess}
+          icon={<ShieldCog aria-hidden="true" />}
+          aria-label={t("admin.access.manageAccessBtn", "Manage Access")}
+        >
+          {isCompact && t("admin.access.manageAccessBtnShort", "Access")}
+        </Button>
+      )}
+      <Button
+        variant="ghost"
+        size={isCompact ? "sm" : "icon"}
+        onClick={copyEmail}
+        icon={<Copy aria-hidden="true" />}
+        aria-label={t("admin.users.copyEmailFor", {
+          defaultValue: `Copy email for ${displayName}`,
+          name: displayName,
+        })}
+      >
+        {isCompact && t("admin.users.copyEmail", "Copy email")}
+      </Button>
+    </>
+  );
+}
+
 export function UserItem({ user, onManageAccess, layout = "list" }: UserItemProps): ReactNode {
   const { isMobile } = useResponsive();
   const isCompact = isMobile;
@@ -57,33 +96,14 @@ export function UserItem({ user, onManageAccess, layout = "list" }: UserItemProp
     ) : (
       <span className={styles.noAccess}>{t("admin.users.noAccessGrants", "No access grants")}</span>
     );
-  const actionButtons = (
-    <>
-      {ability.can("manage", "UserAccess") && (
-        <Button
-          variant={isCompact ? "outline" : "ghost"}
-          size={isCompact ? "sm" : "icon"}
-          fullWidth={isCompact}
-          onClick={onManageAccess}
-          icon={<ShieldCog aria-hidden="true" />}
-          aria-label={t("admin.access.manageAccessBtn", "Manage Access")}
-        >
-          {isCompact && t("admin.access.manageAccessBtnShort", "Access")}
-        </Button>
-      )}
-      <Button
-        variant="ghost"
-        size={isCompact ? "sm" : "icon"}
-        onClick={copyEmail}
-        icon={<Copy aria-hidden="true" />}
-        aria-label={t("admin.users.copyEmailFor", {
-          defaultValue: `Copy email for ${displayName}`,
-          name: displayName,
-        })}
-      >
-        {isCompact && t("admin.users.copyEmail", "Copy email")}
-      </Button>
-    </>
+  const actionButtons = renderActionButtons(
+    user,
+    displayName,
+    isCompact,
+    ability.can("manage", "UserAccess"),
+    onManageAccess,
+    copyEmail,
+    t,
   );
 
   if (layout === "table") {
