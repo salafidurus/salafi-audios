@@ -1445,6 +1445,38 @@ export class ListingRepository {
     };
   }
 
+  private validateArrangeRoot(root: { format: ListingFormat }, dto: ArrangeCommitDto): void {
+    if (root.format === 'single') {
+      throw new BadRequestException('Single listings update audio via the media endpoint');
+    }
+    if (root.format === 'series' && !dto.lessons) {
+      throw new BadRequestException('Series commits require lessons');
+    }
+    if (root.format === 'collection' && !dto.modules) {
+      throw new BadRequestException('Collection commits require modules');
+    }
+  }
+
+  private async getArrangeModuleSlugs(
+    tx: Prisma.TransactionClient,
+    rootId: string,
+    moduleOps: NonNullable<ArrangeCommitDto['modules']>,
+  ): Promise<Map<string, string>> {
+    const moduleUpdateIds = moduleOps.flatMap((moduleOp) =>
+      moduleOp.op === 'update' ? [moduleOp.id] : [],
+    );
+    if (moduleUpdateIds.length === 0) return new Map();
+
+    const found = await tx.listing.findMany({
+      where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
+      select: { id: true, slug: true },
+    });
+    if (found.length !== moduleUpdateIds.length) {
+      throw new BadRequestException('Module update target is not under this listing');
+    }
+    return new Map(found.map((module) => [module.id, module.slug]));
+  }
+
   private async validateArrangeCommit(
     tx: Prisma.TransactionClient,
     rootId: string,
@@ -1455,34 +1487,12 @@ export class ListingRepository {
       select: { id: true, slug: true, scholarId: true, format: true },
     });
     if (!root) throw new NotFoundException('Listing not found');
-    if (root.format === 'single') {
-      throw new BadRequestException('Single listings update audio via the media endpoint');
-    }
-    if (root.format === 'series' && !dto.lessons) {
-      throw new BadRequestException('Series commits require lessons');
-    }
-    if (root.format === 'collection' && !dto.modules) {
-      throw new BadRequestException('Collection commits require modules');
-    }
+    this.validateArrangeRoot(root, dto);
 
     const moduleOps = dto.modules ?? [];
     const rootLessonOps = dto.lessons ?? [];
     this.validateNewModuleLessons(moduleOps);
-    const moduleUpdateIds: string[] = [];
-    for (const moduleOp of moduleOps) {
-      if (moduleOp.op === 'update') moduleUpdateIds.push(moduleOp.id);
-    }
-    const existingModuleSlugById = new Map<string, string>();
-    if (moduleUpdateIds.length) {
-      const found = await tx.listing.findMany({
-        where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
-        select: { id: true, slug: true },
-      });
-      if (found.length !== moduleUpdateIds.length) {
-        throw new BadRequestException('Module update target is not under this listing');
-      }
-      for (const module of found) existingModuleSlugById.set(module.id, module.slug);
-    }
+    const existingModuleSlugById = await this.getArrangeModuleSlugs(tx, rootId, moduleOps);
 
     await this.validateArrangeSlugs(
       tx,
