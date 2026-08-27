@@ -12,21 +12,15 @@ export type EmptyStateProps = {
 };
 
 export function EmptyState({ message, variant = "empty" }: EmptyStateProps) {
-  const Icon =
-    variant === "error"
-      ? CircleAlert
-      : variant === "denied"
-        ? CircleSlash
-        : variant === "loading"
-          ? LoaderCircle
-          : BookOpen;
+  const Icon = getStateIcon(variant);
+  const isAlert = isAlertVariant(variant);
 
   return (
     <Card
       data-variant={variant}
       className={styles.emptyState}
-      role={variant === "error" || variant === "denied" ? "alert" : "status"}
-      aria-live={variant === "error" || variant === "denied" ? "assertive" : "polite"}
+      role={isAlert ? "alert" : "status"}
+      aria-live={isAlert ? "assertive" : "polite"}
     >
       <CardContent className={styles.content}>
         <Icon className={styles.icon} aria-hidden="true" />
@@ -34,4 +28,21 @@ export function EmptyState({ message, variant = "empty" }: EmptyStateProps) {
       </CardContent>
     </Card>
   );
+}
+
+function getStateIcon(variant: EmptyStateVariant) {
+  switch (variant) {
+    case "error":
+      return CircleAlert;
+    case "denied":
+      return CircleSlash;
+    case "loading":
+      return LoaderCircle;
+    default:
+      return BookOpen;
+  }
+}
+
+function isAlertVariant(variant: EmptyStateVariant): boolean {
+  return variant === "error" || variant === "denied";
 }
