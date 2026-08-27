@@ -43,6 +43,69 @@ function isScholarModalTab(id: string): id is "general" | "main" | "review" {
   return id === "general" || id === "main" || id === "review";
 }
 
+function ScholarLoadingModal({
+  isOpen,
+  onClose,
+  fetchError,
+  t,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  fetchError: string | null;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t("admin.scholars.editScholar", "Edit Scholar")}
+      size="xl"
+    >
+      <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
+      {fetchError && <div className={styles.error}>{fetchError}</div>}
+    </Modal>
+  );
+}
+
+type ScholarModalFooterProps = {
+  activeTab: string;
+  saving: boolean;
+  isEditing: boolean;
+  onClose: () => void;
+  onReview: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function ScholarModalFooter({
+  activeTab,
+  saving,
+  isEditing,
+  onClose,
+  onReview,
+  t,
+}: ScholarModalFooterProps) {
+  return (
+    <DialogFooter>
+      <Button variant="outline" size="sm" onClick={onClose} disabled={saving}>
+        {t("common.cancel", "Cancel")}
+      </Button>
+      {activeTab === "review" ? (
+        <Button type="submit" form="scholar-form" variant="primary" loading={saving}>
+          {saving
+            ? t("admin.access.saving", "Saving…")
+            : isEditing
+              ? t("admin.scholars.saveChanges", "Save Changes")
+              : t("admin.scholars.addScholar", "Add Scholar")}
+        </Button>
+      ) : (
+        <Button type="button" variant="primary" onClick={onReview}>
+          {t("admin.modal.reviewTab", "Review")}
+        </Button>
+      )}
+    </DialogFooter>
+  );
+}
+
 export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarModalProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<string>("general");
@@ -130,15 +193,7 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
 
   if (!state.isEditing && loading) {
     return (
-      <Modal
-        isOpen={isOpen}
-        onClose={handleClose}
-        title={t("admin.scholars.editScholar", "Edit Scholar")}
-        size="xl"
-      >
-        {loading && <div className={styles.loading}>{t("common.loading", "Loading...")}</div>}
-        {fetchError && <div className={styles.error}>{fetchError}</div>}
-      </Modal>
+      <ScholarLoadingModal isOpen={isOpen} onClose={handleClose} fetchError={fetchError} t={t} />
     );
   }
 
@@ -250,24 +305,14 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
             </TabsContent>
           </Tabs>
 
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={handleClose} disabled={state.saving}>
-              {t("common.cancel", "Cancel")}
-            </Button>
-            {activeTab === "review" ? (
-              <Button type="submit" form="scholar-form" variant="primary" loading={state.saving}>
-                {state.saving
-                  ? t("admin.access.saving", "Saving…")
-                  : state.isEditing
-                    ? t("admin.scholars.saveChanges", "Save Changes")
-                    : t("admin.scholars.addScholar", "Add Scholar")}
-              </Button>
-            ) : (
-              <Button type="button" variant="primary" onClick={() => setActiveTab("review")}>
-                {t("admin.modal.reviewTab", "Review")}
-              </Button>
-            )}
-          </DialogFooter>
+          <ScholarModalFooter
+            activeTab={activeTab}
+            saving={state.saving}
+            isEditing={state.isEditing}
+            onClose={handleClose}
+            onReview={() => setActiveTab("review")}
+            t={t}
+          />
         </form>
       </DialogContent>
     </Dialog>
