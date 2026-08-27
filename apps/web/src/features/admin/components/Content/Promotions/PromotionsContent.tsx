@@ -18,6 +18,30 @@ import { EditorsPicksSection } from "./EditorsPicksSection";
 import styles from "./promotions-content.module.css";
 import { PromotionsHeroSection, type PromotionListingOption } from "./PromotionsHeroSection";
 
+function buildPromotionPayload(
+  heroListingId: string,
+  heroHeadline: string,
+  editorsPicks: PromotionListingOption[],
+) {
+  return {
+    heroListingId: heroListingId || null,
+    heroHeadline: heroHeadline || null,
+    editorsPickListingIds: editorsPicks.map((pick) => pick.id),
+  };
+}
+
+function hasSearchTerm(value: string) {
+  return value.length > 0;
+}
+
+function findActiveHero(
+  options: PromotionListingOption[],
+  selectedId: string,
+  fallback: PromotionListingOption | undefined,
+) {
+  return options.find((option) => option.id === selectedId) ?? fallback;
+}
+
 export function PromotionsContent() {
   const { t } = useTranslation();
   const { ability } = useAbility();
@@ -46,12 +70,12 @@ export function PromotionsContent() {
   const { data: heroListingsData } = useQuery({
     queryKey: ["admin", "listings", "search-hero", heroSearch],
     queryFn: () => fetchAdminLectures({ search: heroSearch }),
-    enabled: heroSearch.length > 0,
+    enabled: hasSearchTerm(heroSearch),
   });
   const { data: picksListingsData } = useQuery({
     queryKey: ["admin", "listings", "search-picks", picksSearch],
     queryFn: () => fetchAdminLectures({ search: picksSearch }),
-    enabled: picksSearch.length > 0,
+    enabled: hasSearchTerm(picksSearch),
   });
   const heroSearchOptions = heroListingsData?.items ?? [];
   const picksSearchOptions = picksListingsData?.items ?? [];
@@ -84,15 +108,14 @@ export function PromotionsContent() {
   const handleSave = () => {
     setSaveFeedback(null);
     setSaveError(null);
-    mutation.mutate({
-      heroListingId: heroListingId || null,
-      heroHeadline: heroHeadline || null,
-      editorsPickListingIds: editorsPicks.map((pick) => pick.id),
-    });
+    mutation.mutate(buildPromotionPayload(heroListingId, heroHeadline, editorsPicks));
   };
 
-  const activeHeroListing =
-    heroSearchOptions.find((option) => option.id === heroListingId) || promotions?.hero?.listing;
+  const activeHeroListing = findActiveHero(
+    heroSearchOptions,
+    heroListingId,
+    promotions?.hero?.listing,
+  );
 
   if (!canManagePromotions) return <AdminAccessState status="denied" />;
   if (isLoading) return <div className={styles.loading}>{t("common.loading", "Loading...")}</div>;
