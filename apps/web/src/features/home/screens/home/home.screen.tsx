@@ -54,30 +54,53 @@ function getLiveRecentProgress(
   };
 }
 
-export function HomeScreen({ onContinueListening }: HomeScreenProps) {
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
-  const { recentProgress } = useContinueListening({
-    enabled: !isAuthLoading && isAuthenticated,
-  });
-  const localProgress = useProgressStore((state) =>
-    recentProgress ? state.progressMap[recentProgress.listingSlug] : undefined,
-  );
-  const { data: promoData, isLoading: isPromosLoading } = useHomePromotions();
-  const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen({
-    limit: MAX_RECENT_ITEMS,
-  });
-  const { t } = useTranslation();
-
+function getHomeContentData(
+  promoData:
+    | {
+        hero?: { listing: FeedContentItemDto } | null;
+        editorsPicks?: { listing: FeedContentItemDto }[];
+      }
+    | undefined,
+  exploreData: { pages?: { items: FeedItemDto[] }[] } | undefined,
+  recentProgress: Parameters<typeof getLiveRecentProgress>[0],
+  localProgress: Parameters<typeof getLiveRecentProgress>[1],
+) {
   const items = getContentItems(exploreData);
-
   const featuredContent = promoData?.hero?.listing ?? items[0] ?? null;
   const recentItems = featuredContent
     ? items.filter((item) => item.id !== featuredContent.id)
     : items;
-  const curatedItems = promoData?.editorsPicks?.map((pick) => pick.listing) ?? [];
-  const liveRecentProgress = getLiveRecentProgress(recentProgress, localProgress);
+  return {
+    featuredContent,
+    recentItems,
+    curatedItems: promoData?.editorsPicks?.map((pick) => pick.listing) ?? [],
+    liveRecentProgress: getLiveRecentProgress(recentProgress, localProgress),
+  };
+}
+
+type HomeContentProps = {
+  featuredContent: FeedContentItemDto | null;
+  recentItems: FeedContentItemDto[];
+  curatedItems: FeedContentItemDto[];
+  liveRecentProgress: ReturnType<typeof getLiveRecentProgress>;
+  isHeroLoading: boolean;
+  isExploreLoading: boolean;
+  isPromosLoading: boolean;
+  onContinueListening?: (listingSlug: string) => void;
+};
+
+function HomeContent({
+  featuredContent,
+  recentItems,
+  curatedItems,
+  liveRecentProgress,
+  isHeroLoading,
+  isExploreLoading,
+  isPromosLoading,
+  onContinueListening,
+}: HomeContentProps) {
+  const { t } = useTranslation();
   const hasHistory = Boolean(liveRecentProgress);
-  const isHeroLoading = isExploreLoading || isPromosLoading;
 
   return (
     <ScreenView
@@ -147,5 +170,39 @@ export function HomeScreen({ onContinueListening }: HomeScreenProps) {
         </section>
       </div>
     </ScreenView>
+  );
+}
+
+export function HomeScreen({ onContinueListening }: HomeScreenProps) {
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { recentProgress } = useContinueListening({
+    enabled: !isAuthLoading && isAuthenticated,
+  });
+  const localProgress = useProgressStore((state) =>
+    recentProgress ? state.progressMap[recentProgress.listingSlug] : undefined,
+  );
+  const { data: promoData, isLoading: isPromosLoading } = useHomePromotions();
+  const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen({
+    limit: MAX_RECENT_ITEMS,
+  });
+  const { featuredContent, recentItems, curatedItems, liveRecentProgress } = getHomeContentData(
+    promoData,
+    exploreData,
+    recentProgress,
+    localProgress,
+  );
+  const isHeroLoading = isExploreLoading || isPromosLoading;
+
+  return (
+    <HomeContent
+      featuredContent={featuredContent}
+      recentItems={recentItems}
+      curatedItems={curatedItems}
+      liveRecentProgress={liveRecentProgress}
+      isHeroLoading={isHeroLoading}
+      isExploreLoading={isExploreLoading}
+      isPromosLoading={isPromosLoading}
+      onContinueListening={onContinueListening}
+    />
   );
 }
