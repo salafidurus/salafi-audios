@@ -48,6 +48,29 @@ type AdminNavItem = {
   requiredSubject?: AppSubjectType;
 };
 
+type NavLinkProps = {
+  item: NavItem | AdminNavItem;
+  isActive: boolean;
+  onClick: () => void;
+};
+
+function NavLink({ item, isActive, onClick }: NavLinkProps) {
+  return (
+    <Link
+      href={item.href}
+      className={clsx(styles.link, isActive && styles.active)}
+      aria-label={item.label}
+      data-testid={`nav-link-${item.label.toLowerCase()}`}
+      onClick={onClick}
+    >
+      <span className={styles.icon} aria-hidden="true">
+        <item.Icon size={18} />
+      </span>
+      <span className={styles.label}>{item.label}</span>
+    </Link>
+  );
+}
+
 function getAdminNavItems(t: (key: string, fallback: string) => string): AdminNavItem[] {
   return [
     {
@@ -130,6 +153,75 @@ interface NavItemsProps {
   onItemClick?: () => void;
 }
 
+type AuthFooterProps = {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  user: NonNullable<ReturnType<typeof useAuth>["user"]> | undefined;
+  onItemClick: () => void;
+  t: (key: string, fallback: string) => string;
+};
+
+function AuthFooter({ isAuthenticated, isLoading, user, onItemClick, t }: AuthFooterProps) {
+  const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
+  const { signOut, error: signOutError } = useSignOut();
+  const userInitial = (user?.name || user?.email || "?").charAt(0).toUpperCase();
+
+  return (
+    <>
+      {!isLoading && isAuthenticated && user ? (
+        <div className={styles.profileRow}>
+          <div className={styles.profileInfo}>
+            <div className={styles.avatar}>{userInitial}</div>
+            <div className={styles.profileDetails}>
+              <span className={styles.profileName}>
+                {user.name || user.email || t("account.defaultUser", "User")}
+              </span>
+              <span className={styles.profileEmail}>{user.email}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            className={styles.signOutButton}
+            onClick={() => {
+              onItemClick();
+              setIsSignOutDialogOpen(true);
+            }}
+            aria-label={t("authStrip.signOut", "Sign Out")}
+          >
+            <LogOut size={16} />
+          </button>
+        </div>
+      ) : !isLoading && !isAuthenticated ? (
+        <div className={styles.keepPlaceCard}>
+          <p className={styles.keepPlaceTitle}>
+            {t("navigation.keepYourPlace", "Keep your place")}
+          </p>
+          <p className={styles.keepPlaceDesc}>
+            {t(
+              "navigation.keepYourPlaceDesc",
+              "Sign in to sync progress and saved durus across your devices.",
+            )}
+          </p>
+          <Link href={routes.signIn} onClick={onItemClick} className={styles.signInButton}>
+            <Button variant="primary" size="sm" fullWidth tabIndex={-1}>
+              {t("authStrip.signIn", "Sign In")}
+            </Button>
+          </Link>
+        </div>
+      ) : null}
+      <ConfirmationDialog
+        open={isSignOutDialogOpen}
+        onOpenChange={setIsSignOutDialogOpen}
+        onConfirm={signOut}
+        title={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
+        confirmLabel={t("account.signOut", "Sign Out")}
+        variant="destructive"
+        error={signOutError}
+      />
+    </>
+  );
+}
+
 export function NavItems({ onItemClick }: NavItemsProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
@@ -137,9 +229,6 @@ export function NavItems({ onItemClick }: NavItemsProps) {
   const { ability } = useAbility({ isAuthenticated });
   const { isMobile, isTablet } = useResponsive();
   const showLanguageSwitch = isMobile || isTablet;
-
-  const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
-  const { signOut, error: signOutError } = useSignOut();
 
   const hasAdminAccess = isAuthenticated && hasAnyAdminAccess(ability);
   const visibleAdminNavItems = getAdminNavItems(t).filter(
@@ -149,8 +238,6 @@ export function NavItems({ onItemClick }: NavItemsProps) {
       ability.can(item.requiredAction, item.requiredSubject),
   );
   const navItems = getNavItems(t);
-
-  const userInitial = (user?.name || user?.email || "?").charAt(0).toUpperCase();
 
   const handleNavClick = () => {
     onItemClick?.();
@@ -163,19 +250,7 @@ export function NavItems({ onItemClick }: NavItemsProps) {
           const isActive =
             pathname === item.activeMatch || pathname.startsWith(`${item.activeMatch}/`);
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={clsx(styles.link, isActive && styles.active)}
-              aria-label={item.label}
-              data-testid={`nav-link-${item.label.toLowerCase()}`}
-              onClick={handleNavClick}
-            >
-              <span className={styles.icon} aria-hidden="true">
-                <item.Icon size={18} />
-              </span>
-              <span className={styles.label}>{item.label}</span>
-            </Link>
+            <NavLink key={item.href} item={item} isActive={isActive} onClick={handleNavClick} />
           );
         })}
 
@@ -189,18 +264,7 @@ export function NavItems({ onItemClick }: NavItemsProps) {
                   ? pathname === routes.admin.index
                   : pathname.startsWith(item.href);
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={clsx(styles.link, isActive && styles.active)}
-                  aria-label={item.label}
-                  onClick={handleNavClick}
-                >
-                  <span className={styles.icon} aria-hidden="true">
-                    <item.Icon size={18} />
-                  </span>
-                  <span className={styles.label}>{item.label}</span>
-                </Link>
+                <NavLink key={item.href} item={item} isActive={isActive} onClick={handleNavClick} />
               );
             })}
           </>
@@ -215,58 +279,14 @@ export function NavItems({ onItemClick }: NavItemsProps) {
             <LanguageSwitch direction="up" />
           </div>
         )}
-        {!isLoading && isAuthenticated && user ? (
-          <div className={styles.profileRow}>
-            <div className={styles.profileInfo}>
-              <div className={styles.avatar}>{userInitial}</div>
-              <div className={styles.profileDetails}>
-                <span className={styles.profileName}>
-                  {user.name || user.email || t("account.defaultUser", "User")}
-                </span>
-                <span className={styles.profileEmail}>{user.email}</span>
-              </div>
-            </div>
-            <button
-              type="button"
-              className={styles.signOutButton}
-              onClick={() => {
-                handleNavClick();
-                setIsSignOutDialogOpen(true);
-              }}
-              aria-label={t("authStrip.signOut", "Sign Out")}
-            >
-              <LogOut size={16} />
-            </button>
-          </div>
-        ) : !isLoading && !isAuthenticated ? (
-          <div className={styles.keepPlaceCard}>
-            <p className={styles.keepPlaceTitle}>
-              {t("navigation.keepYourPlace", "Keep your place")}
-            </p>
-            <p className={styles.keepPlaceDesc}>
-              {t(
-                "navigation.keepYourPlaceDesc",
-                "Sign in to sync progress and saved durus across your devices.",
-              )}
-            </p>
-            <Link href={routes.signIn} onClick={handleNavClick} className={styles.signInButton}>
-              <Button variant="primary" size="sm" fullWidth tabIndex={-1}>
-                {t("authStrip.signIn", "Sign In")}
-              </Button>
-            </Link>
-          </div>
-        ) : null}
+        <AuthFooter
+          isAuthenticated={isAuthenticated}
+          isLoading={isLoading}
+          user={user}
+          onItemClick={handleNavClick}
+          t={t}
+        />
       </div>
-
-      <ConfirmationDialog
-        open={isSignOutDialogOpen}
-        onOpenChange={setIsSignOutDialogOpen}
-        onConfirm={signOut}
-        title={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
-        confirmLabel={t("account.signOut", "Sign Out")}
-        variant="destructive"
-        error={signOutError}
-      />
     </>
   );
 }
