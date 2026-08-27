@@ -43,6 +43,41 @@ export interface AdaptiveDataViewProps<TData extends object> {
   errorMessage?: string;
 }
 
+function renderSortIcon(
+  columnKey: string,
+  sort?: { key: string; direction: AdaptiveDataViewSortDirection },
+) {
+  if (sort?.key !== columnKey) return <ArrowUpDown data-icon="inline-end" aria-hidden="true" />;
+  return sort.direction === "ascending" ? (
+    <ArrowUp data-icon="inline-end" aria-hidden="true" />
+  ) : (
+    <ArrowDown data-icon="inline-end" aria-hidden="true" />
+  );
+}
+
+function renderHeaderCell<TData extends object>(
+  column: AdaptiveDataViewColumn<TData>,
+  sort: AdaptiveDataViewProps<TData>["sort"],
+  onSort: AdaptiveDataViewProps<TData>["onSort"],
+) {
+  if (!column.sortable || !onSort) return column.header;
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className={styles.sortButton}
+      onClick={() => onSort(column.key)}
+      aria-label={`Sort by ${column.header}`}
+      aria-sort={sort?.key === column.key ? sort.direction : "none"}
+    >
+      {column.header}
+      {renderSortIcon(column.key, sort)}
+    </Button>
+  );
+}
+
 export function AdaptiveDataView<TData extends object>({
   ariaLabel,
   columns,
@@ -97,30 +132,7 @@ export function AdaptiveDataView<TData extends object>({
                 data-priority={column.priority ?? "primary"}
                 aria-sort={sort?.key === column.key ? sort.direction : undefined}
               >
-                {column.sortable && onSort ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className={styles.sortButton}
-                    onClick={() => onSort(column.key)}
-                    aria-label={`Sort by ${column.header}`}
-                    aria-sort={sort?.key === column.key ? sort.direction : "none"}
-                  >
-                    {column.header}
-                    {sort?.key === column.key ? (
-                      sort.direction === "ascending" ? (
-                        <ArrowUp data-icon="inline-end" aria-hidden="true" />
-                      ) : (
-                        <ArrowDown data-icon="inline-end" aria-hidden="true" />
-                      )
-                    ) : (
-                      <ArrowUpDown data-icon="inline-end" aria-hidden="true" />
-                    )}
-                  </Button>
-                ) : (
-                  column.header
-                )}
+                {renderHeaderCell(column, sort, onSort)}
               </TableHead>
             ))}
           </TableRow>
