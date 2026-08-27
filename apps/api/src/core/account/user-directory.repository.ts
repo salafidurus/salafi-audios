@@ -31,9 +31,7 @@ export class UserDirectoryRepository {
       },
       orderBy: { createdAt: 'desc' },
     } satisfies Prisma.UserFindManyArgs;
-    const queryArgs = cursor
-      ? { ...baseQueryArgs, cursor: { id: cursor }, skip: 1 }
-      : baseQueryArgs;
+    const queryArgs = withUserCursor(baseQueryArgs, cursor);
 
     const users = await this.prisma.user.findMany(queryArgs);
 
@@ -45,6 +43,13 @@ export class UserDirectoryRepository {
       hasMore,
     };
   }
+}
+
+function withUserCursor<T extends Prisma.UserFindManyArgs>(
+  args: T,
+  cursor?: string,
+): T | (T & { cursor: { id: string }; skip: number }) {
+  return cursor ? { ...args, cursor: { id: cursor }, skip: 1 } : args;
 }
 
 function isUserRole(value: string): value is UserRole {

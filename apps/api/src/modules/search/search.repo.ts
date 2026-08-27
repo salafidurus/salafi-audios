@@ -204,13 +204,7 @@ export class SearchRepository {
         original: resolved.original ? { title: resolved.original.title } : undefined,
       });
 
-      if (format === 'collection') {
-        collections.push(normalized);
-      } else if (format === 'series') {
-        series.push(normalized);
-      } else if (format === 'single') {
-        singles.push(normalized);
-      }
+      pushSearchItem({ collections, series, singles }, format, normalized);
     }
 
     return { collections, series, singles };
@@ -499,4 +493,13 @@ export class SearchRepository {
     if (!value) return undefined;
     return this.toPublicUrl(value);
   }
+}
+
+function pushSearchItem(
+  buckets: Record<string, SearchCatalogItemDto[]>,
+  format: string,
+  item: SearchCatalogItemDto,
+): void {
+  const bucket = buckets[`${format}s`];
+  bucket?.push(item);
 }
