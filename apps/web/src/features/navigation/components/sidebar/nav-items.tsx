@@ -161,6 +161,59 @@ type AuthFooterProps = {
   t: (key: string, fallback: string) => string;
 };
 
+function AuthenticatedCard({
+  user,
+  userInitial,
+  onSignOut,
+  t,
+}: {
+  user: NonNullable<AuthFooterProps["user"]>;
+  userInitial: string;
+  onSignOut: () => void;
+  t: AuthFooterProps["t"];
+}) {
+  return (
+    <div className={styles.profileRow}>
+      <div className={styles.profileInfo}>
+        <div className={styles.avatar}>{userInitial}</div>
+        <div className={styles.profileDetails}>
+          <span className={styles.profileName}>
+            {user.name || user.email || t("account.defaultUser", "User")}
+          </span>
+          <span className={styles.profileEmail}>{user.email}</span>
+        </div>
+      </div>
+      <button
+        type="button"
+        className={styles.signOutButton}
+        onClick={onSignOut}
+        aria-label={t("authStrip.signOut", "Sign Out")}
+      >
+        <LogOut size={16} />
+      </button>
+    </div>
+  );
+}
+
+function AnonymousCard({ onItemClick, t }: Pick<AuthFooterProps, "onItemClick" | "t">) {
+  return (
+    <div className={styles.keepPlaceCard}>
+      <p className={styles.keepPlaceTitle}>{t("navigation.keepYourPlace", "Keep your place")}</p>
+      <p className={styles.keepPlaceDesc}>
+        {t(
+          "navigation.keepYourPlaceDesc",
+          "Sign in to sync progress and saved durus across your devices.",
+        )}
+      </p>
+      <Link href={routes.signIn} onClick={onItemClick} className={styles.signInButton}>
+        <Button variant="primary" size="sm" fullWidth tabIndex={-1}>
+          {t("authStrip.signIn", "Sign In")}
+        </Button>
+      </Link>
+    </div>
+  );
+}
+
 function AuthFooter({ isAuthenticated, isLoading, user, onItemClick, t }: AuthFooterProps) {
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
   const { signOut, error: signOutError } = useSignOut();
@@ -169,45 +222,17 @@ function AuthFooter({ isAuthenticated, isLoading, user, onItemClick, t }: AuthFo
   return (
     <>
       {!isLoading && isAuthenticated && user ? (
-        <div className={styles.profileRow}>
-          <div className={styles.profileInfo}>
-            <div className={styles.avatar}>{userInitial}</div>
-            <div className={styles.profileDetails}>
-              <span className={styles.profileName}>
-                {user.name || user.email || t("account.defaultUser", "User")}
-              </span>
-              <span className={styles.profileEmail}>{user.email}</span>
-            </div>
-          </div>
-          <button
-            type="button"
-            className={styles.signOutButton}
-            onClick={() => {
-              onItemClick();
-              setIsSignOutDialogOpen(true);
-            }}
-            aria-label={t("authStrip.signOut", "Sign Out")}
-          >
-            <LogOut size={16} />
-          </button>
-        </div>
+        <AuthenticatedCard
+          user={user}
+          userInitial={userInitial}
+          onSignOut={() => {
+            onItemClick();
+            setIsSignOutDialogOpen(true);
+          }}
+          t={t}
+        />
       ) : !isLoading && !isAuthenticated ? (
-        <div className={styles.keepPlaceCard}>
-          <p className={styles.keepPlaceTitle}>
-            {t("navigation.keepYourPlace", "Keep your place")}
-          </p>
-          <p className={styles.keepPlaceDesc}>
-            {t(
-              "navigation.keepYourPlaceDesc",
-              "Sign in to sync progress and saved durus across your devices.",
-            )}
-          </p>
-          <Link href={routes.signIn} onClick={onItemClick} className={styles.signInButton}>
-            <Button variant="primary" size="sm" fullWidth tabIndex={-1}>
-              {t("authStrip.signIn", "Sign In")}
-            </Button>
-          </Link>
-        </div>
+        <AnonymousCard onItemClick={onItemClick} t={t} />
       ) : null}
       <ConfirmationDialog
         open={isSignOutDialogOpen}
