@@ -660,49 +660,52 @@ export class ListingRepository {
     format: ListingProgressSummaryDto['format'],
     userId: string,
   ): Promise<ListingProgressSummaryDto> {
-    if (format === 'single') {
-      const progress = await this.prisma.userListingProgress.findUnique({
-        where: { userId_listingId: { userId, listingId: actualId } },
-        select: { isCompleted: true },
-      });
-      return this.toProgressSummary(
-        actualId,
-        listingSlug,
-        format,
-        1,
-        progress?.isCompleted ? 1 : 0,
-      );
-    }
+    const counts =
+      format === 'single'
+        ? await this.getSingleProgressCounts(actualId, userId)
+        : await this.getNestedProgressCounts(actualId, userId, format);
 
+    return this.toProgressSummary(actualId, listingSlug, format, counts.total, counts.completed);
+  }
+
+  private async getSingleProgressCounts(
+    listingId: string,
+    userId: string,
+  ): Promise<{ total: number; completed: number }> {
+    const progress = await this.prisma.userListingProgress.findUnique({
+      where: { userId_listingId: { userId, listingId } },
+      select: { isCompleted: true },
+    });
+    return { total: 1, completed: progress?.isCompleted ? 1 : 0 };
+  }
+
+  private async getNestedProgressCounts(
+    listingId: string,
+    userId: string,
+    format: ListingProgressSummaryDto['format'],
+  ): Promise<{ total: number; completed: number }> {
     const [row] =
       format === 'series'
         ? await this.prisma.$queryRaw<{ total: number; completed: number }[]>`
-            SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
-            FROM "Listing" l
-            LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
-            WHERE l."parentId" = ${actualId}::uuid
-              AND l."deletedAt" IS NULL
-              AND l."status" = 'published'
-          `
+          SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
+          FROM "Listing" l
+          LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
+          WHERE l."parentId" = ${listingId}::uuid
+            AND l."deletedAt" IS NULL
+            AND l."status" = 'published'
+        `
         : await this.prisma.$queryRaw<{ total: number; completed: number }[]>`
-            SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
-            FROM "Listing" l
-            JOIN "Listing" m ON l."parentId" = m.id
-            LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
-            WHERE m."parentId" = ${actualId}::uuid
-              AND l."deletedAt" IS NULL
-              AND l."status" = 'published'
-              AND m."deletedAt" IS NULL
-              AND m."status" = 'published'
-          `;
-
-    return this.toProgressSummary(
-      actualId,
-      listingSlug,
-      format,
-      row?.total ?? 0,
-      row?.completed ?? 0,
-    );
+          SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
+          FROM "Listing" l
+          JOIN "Listing" m ON l."parentId" = m.id
+          LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
+          WHERE m."parentId" = ${listingId}::uuid
+            AND l."deletedAt" IS NULL
+            AND l."status" = 'published'
+            AND m."deletedAt" IS NULL
+            AND m."status" = 'published'
+        `;
+    return { total: row?.total ?? 0, completed: row?.completed ?? 0 };
   }
 
   private toProgressSummary(
