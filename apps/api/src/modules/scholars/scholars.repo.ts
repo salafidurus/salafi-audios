@@ -46,6 +46,63 @@ function buildScholarUpdateData(dto: UpdateScholarDto): Prisma.ScholarUpdateInpu
   return data;
 }
 
+type ScholarFormRecord = {
+  id: string;
+  name: string;
+  slug: string;
+  bio: string | null;
+  imageUrl: string | null;
+  country: string | null;
+  mainLanguage: string | null;
+  isActive: boolean;
+  title: string | null;
+  orderIndex: number;
+  socialTwitter: string | null;
+  socialTelegram: string | null;
+  socialYoutube: string | null;
+  socialWebsite: string | null;
+  createdAt: Date;
+  updatedAt: Date | null;
+  translations: Array<{
+    locale: string;
+    status: string;
+    name: string;
+    bio: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }>;
+};
+
+function mapScholarFormData(scholar: ScholarFormRecord) {
+  return {
+    scholar: {
+      id: scholar.id,
+      name: scholar.name,
+      slug: scholar.slug,
+      bio: toOptional(scholar.bio),
+      imageUrl: toOptional(scholar.imageUrl),
+      country: toOptional(scholar.country),
+      mainLanguage: toOptional(scholar.mainLanguage),
+      isActive: scholar.isActive,
+      title: toOptional(scholar.title),
+      orderIndex: scholar.orderIndex,
+      socialTwitter: toOptional(scholar.socialTwitter),
+      socialTelegram: toOptional(scholar.socialTelegram),
+      socialYoutube: toOptional(scholar.socialYoutube),
+      socialWebsite: toOptional(scholar.socialWebsite),
+      createdAt: scholar.createdAt.toISOString(),
+      updatedAt: scholar.updatedAt?.toISOString(),
+    },
+    translations: scholar.translations.map((translation) => ({
+      locale: translation.locale,
+      status: translation.status,
+      fields: { name: translation.name, bio: translation.bio },
+      createdAt: translation.createdAt.toISOString(),
+      updatedAt: translation.updatedAt.toISOString(),
+    })),
+  };
+}
+
 @Injectable()
 export class ScholarsRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -438,37 +495,7 @@ export class ScholarsRepository {
     });
 
     if (!scholar) return null;
-
-    return {
-      scholar: {
-        id: scholar.id,
-        name: scholar.name,
-        slug: scholar.slug,
-        bio: scholar.bio ?? undefined,
-        imageUrl: scholar.imageUrl ?? undefined,
-        country: scholar.country ?? undefined,
-        mainLanguage: scholar.mainLanguage ?? undefined,
-        isActive: scholar.isActive,
-        title: scholar.title ?? undefined,
-        orderIndex: scholar.orderIndex,
-        socialTwitter: scholar.socialTwitter ?? undefined,
-        socialTelegram: scholar.socialTelegram ?? undefined,
-        socialYoutube: scholar.socialYoutube ?? undefined,
-        socialWebsite: scholar.socialWebsite ?? undefined,
-        createdAt: scholar.createdAt.toISOString(),
-        updatedAt: scholar.updatedAt?.toISOString(),
-      },
-      translations: scholar.translations.map((t) => ({
-        locale: t.locale,
-        status: t.status,
-        fields: {
-          name: t.name,
-          bio: t.bio ?? null,
-        },
-        createdAt: t.createdAt.toISOString(),
-        updatedAt: t.updatedAt.toISOString(),
-      })),
-    };
+    return mapScholarFormData(scholar);
   }
 
   async findById(id: string) {
