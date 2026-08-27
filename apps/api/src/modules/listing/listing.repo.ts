@@ -1559,36 +1559,56 @@ export class ListingRepository {
     }
   }
 
+  private collectArrangeLessonUpdateTargets(
+    moduleOps: ArrangeCommitDto['modules'],
+    rootLessonOps: ArrangeCommitDto['lessons'],
+    rootId: string,
+  ): Array<{ id: string; parentId: string }> {
+    const targets: Array<{ id: string; parentId: string }> = [];
+    for (const lessonOp of rootLessonOps ?? []) {
+      if (lessonOp.op === 'update') targets.push({ id: lessonOp.id, parentId: rootId });
+    }
+    for (const moduleOp of moduleOps ?? []) {
+      if (moduleOp.op !== 'update') continue;
+      for (const lessonOp of moduleOp.lessons) {
+        if (lessonOp.op === 'update') {
+          targets.push({ id: lessonOp.id, parentId: moduleOp.id });
+        }
+      }
+    }
+    return targets;
+  }
+
+  private assertArrangeLessonTargets(
+    targets: Array<{ id: string; parentId: string }>,
+    found: Array<{ id: string; parentId: string | null }>,
+  ): void {
+    const parentById = new Map(found.map((listing) => [listing.id, listing.parentId]));
+    for (const target of targets) {
+      if (parentById.get(target.id) !== target.parentId) {
+        throw new BadRequestException('Lesson update target is not under this listing');
+      }
+    }
+  }
+
   private async validateArrangeLessonTargets(
     tx: Prisma.TransactionClient,
     rootId: string,
     moduleOps: ArrangeCommitDto['modules'],
     rootLessonOps: ArrangeCommitDto['lessons'],
   ): Promise<void> {
-    const lessonUpdateTargets: Array<{ id: string; parentId: string }> = [];
-    for (const lessonOp of rootLessonOps ?? []) {
-      if (lessonOp.op === 'update') lessonUpdateTargets.push({ id: lessonOp.id, parentId: rootId });
-    }
-    for (const moduleOp of moduleOps ?? []) {
-      if (moduleOp.op !== 'update') continue;
-      for (const lessonOp of moduleOp.lessons) {
-        if (lessonOp.op === 'update') {
-          lessonUpdateTargets.push({ id: lessonOp.id, parentId: moduleOp.id });
-        }
-      }
-    }
+    const lessonUpdateTargets = this.collectArrangeLessonUpdateTargets(
+      moduleOps,
+      rootLessonOps,
+      rootId,
+    );
     if (!lessonUpdateTargets.length) return;
 
     const found = await tx.listing.findMany({
       where: { id: { in: lessonUpdateTargets.map((target) => target.id) }, deletedAt: null },
       select: { id: true, parentId: true },
     });
-    const parentById = new Map(found.map((listing) => [listing.id, listing.parentId]));
-    for (const target of lessonUpdateTargets) {
-      if (parentById.get(target.id) !== target.parentId) {
-        throw new BadRequestException('Lesson update target is not under this listing');
-      }
-    }
+    this.assertArrangeLessonTargets(lessonUpdateTargets, found);
   }
 
   async arrangeCommit(
