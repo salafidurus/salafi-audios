@@ -28,6 +28,67 @@ interface ListingModalTabContentProps {
   showSublistingsTab?: boolean;
 }
 
+function GeneralTabContent({
+  state,
+  dispatch,
+  error,
+  scholars,
+  topics,
+  handleTopicToggle,
+  isEditing,
+  onImageStaged,
+  stagedImagePreview,
+}: Pick<
+  ListingModalTabContentProps,
+  | "state"
+  | "dispatch"
+  | "scholars"
+  | "topics"
+  | "handleTopicToggle"
+  | "isEditing"
+  | "onImageStaged"
+  | "stagedImagePreview"
+> & { error: string | null }) {
+  return (
+    <>
+      <FormErrorBanner error={error} />
+      <ListingGeneralSection
+        state={state}
+        dispatch={dispatch}
+        scholars={scholars}
+        topics={topics}
+        handleTopicToggle={handleTopicToggle}
+        isEditing={isEditing}
+        onImageStaged={onImageStaged}
+        stagedImagePreview={stagedImagePreview}
+      />
+    </>
+  );
+}
+
+function MainTabContent({
+  state,
+  dispatch,
+  error,
+  errorTabSet,
+  handleTitleChange,
+}: Pick<ListingModalTabContentProps, "state" | "dispatch" | "errorTabSet" | "handleTitleChange"> & {
+  error: string | null;
+}) {
+  return (
+    <>
+      {errorTabSet.has("main") && <FormErrorBanner error={error} />}
+      <ListingTranslatableFields
+        state={state}
+        dispatch={dispatch}
+        handleTitleChange={
+          handleTitleChange || ((v) => dispatch({ type: "UPDATE_FIELD", field: "title", value: v }))
+        }
+      />
+    </>
+  );
+}
+
 export function ListingModalTabContent({
   state,
   dispatch,
@@ -47,37 +108,29 @@ export function ListingModalTabContent({
 
   if (activeTab === "general") {
     return (
-      <>
-        {(errorTabSet.has(activeTab) || activeTab === "general") && (
-          <FormErrorBanner error={formError} />
-        )}
-        <ListingGeneralSection
-          state={state}
-          dispatch={dispatch}
-          scholars={scholars}
-          topics={topics}
-          handleTopicToggle={handleTopicToggle}
-          isEditing={isEditing}
-          onImageStaged={onImageStaged}
-          stagedImagePreview={stagedImagePreview}
-        />
-      </>
+      <GeneralTabContent
+        state={state}
+        dispatch={dispatch}
+        error={formError}
+        scholars={scholars}
+        topics={topics}
+        handleTopicToggle={handleTopicToggle}
+        isEditing={isEditing}
+        onImageStaged={onImageStaged}
+        stagedImagePreview={stagedImagePreview}
+      />
     );
   }
 
   if (activeTab === "main") {
     return (
-      <>
-        {errorTabSet.has(activeTab) && <FormErrorBanner error={formError} />}
-        <ListingTranslatableFields
-          state={state}
-          dispatch={dispatch}
-          handleTitleChange={
-            handleTitleChange ||
-            ((v) => dispatch({ type: "UPDATE_FIELD", field: "title", value: v }))
-          }
-        />
-      </>
+      <MainTabContent
+        state={state}
+        dispatch={dispatch}
+        error={formError}
+        errorTabSet={errorTabSet}
+        handleTitleChange={handleTitleChange}
+      />
     );
   }
 
