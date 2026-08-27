@@ -50,6 +50,13 @@ type AdminListingFilterParams = {
   accessibleScholarIds?: string[];
 };
 
+type CounterChild = {
+  format: string;
+  durationSeconds: number | null;
+  publishedLectureCount: number | null;
+  publishedDurationSeconds: number | null;
+};
+
 function buildAdminListingWhere(params: AdminListingFilterParams): Prisma.ListingWhereInput {
   const scholarId = params.accessibleScholarIds
     ? params.scholarId && !params.accessibleScholarIds.includes(params.scholarId)
@@ -76,6 +83,25 @@ function buildAdminListingWhere(params: AdminListingFilterParams): Prisma.Listin
     ];
   }
   return where;
+}
+
+function sumListingCounters(children: CounterChild[]): {
+  totalCount: number;
+  totalDuration: number;
+} {
+  return children.reduce(
+    (totals, child) =>
+      child.format === 'single'
+        ? {
+            totalCount: totals.totalCount + 1,
+            totalDuration: totals.totalDuration + (child.durationSeconds ?? 0),
+          }
+        : {
+            totalCount: totals.totalCount + (child.publishedLectureCount ?? 0),
+            totalDuration: totals.totalDuration + (child.publishedDurationSeconds ?? 0),
+          },
+    { totalCount: 0, totalDuration: 0 },
+  );
 }
 
 function hasTranslatableListingChange(dto: UpdateListingDetailsDto): boolean {
@@ -886,32 +912,8 @@ export class ListingRepository {
     tx: Prisma.TransactionClient,
     options?: { recurse?: boolean },
   ): Promise<void> {
-    const children = await tx.listing.findMany({
-      where: {
-        parentId: listingId,
-        status: Status.published,
-        deletedAt: null,
-      },
-      select: {
-        format: true,
-        durationSeconds: true,
-        publishedLectureCount: true,
-        publishedDurationSeconds: true,
-      },
-    });
-
-    let totalCount = 0;
-    let totalDuration = 0;
-
-    for (const child of children) {
-      if (child.format === 'single') {
-        totalCount += 1;
-        totalDuration += child.durationSeconds ?? 0;
-      } else {
-        totalCount += child.publishedLectureCount ?? 0;
-        totalDuration += child.publishedDurationSeconds ?? 0;
-      }
-    }
+    const children = await this.findPublishedChildren(tx, listingId);
+    const { totalCount, totalDuration } = sumListingCounters(children);
 
     await tx.listing.update({
       where: { id: listingId },
@@ -931,6 +933,21 @@ export class ListingRepository {
     if (listing?.parentId) {
       await this.syncListingCounters(listing.parentId, tx);
     }
+  }
+
+  private async findPublishedChildren(
+    tx: Prisma.TransactionClient,
+    listingId: string,
+  ): Promise<CounterChild[]> {
+    return tx.listing.findMany({
+      where: { parentId: listingId, status: Status.published, deletedAt: null },
+      select: {
+        format: true,
+        durationSeconds: true,
+        publishedLectureCount: true,
+        publishedDurationSeconds: true,
+      },
+    });
   }
 
   // ─── Admin Listing Methods ────────────────────────────────────────────────
