@@ -73,6 +73,21 @@ type ScholarFormRecord = {
   }>;
 };
 
+function getListingStats(listing: {
+  format: string;
+  publishedLectureCount: number | null;
+  publishedDurationSeconds: number | null;
+  durationSeconds: number | null;
+}) {
+  const isSingle = listing.format === 'single';
+  return {
+    lectureCount: isSingle ? 1 : (listing.publishedLectureCount ?? 0),
+    durationSeconds: isSingle
+      ? (listing.durationSeconds ?? undefined)
+      : (listing.publishedDurationSeconds ?? undefined),
+  };
+}
+
 function mapScholarFormData(scholar: ScholarFormRecord) {
   return {
     scholar: {
@@ -325,12 +340,7 @@ export class ScholarsRepository {
         publishedTranslation: r.translations[0] ?? null,
       });
 
-      const lectureCount = r.format === 'single' ? 1 : (r.publishedLectureCount ?? 0);
-
-      const durationSeconds =
-        r.format === 'single'
-          ? (r.durationSeconds ?? undefined)
-          : (r.publishedDurationSeconds ?? undefined);
+      const { lectureCount, durationSeconds } = getListingStats(r);
 
       const recencyAt = (r.publishedAt ?? r.createdAt).toISOString();
 
@@ -415,9 +425,10 @@ export class ScholarsRepository {
       return topicMap.get(topicId)!;
     };
 
-    for (const row of listingTopics) {
-      const r = row.listing;
-      const topicName = row.topic.translations[0]?.name ?? row.topic.name;
+    const mapTopicListing = (
+      r: (typeof listingTopics)[number]['listing'],
+      scholarImageUrl: string | null,
+    ): ScholarContentItemDto => {
       const resolved = resolveContentTranslation({
         base: { title: r.title },
         originalLanguage: r.language,
@@ -425,17 +436,11 @@ export class ScholarsRepository {
         publishedTranslation: r.translations[0] ?? null,
       });
 
-      const lectureCount = r.format === 'single' ? 1 : (r.publishedLectureCount ?? 0);
-
-      const durationSeconds =
-        r.format === 'single'
-          ? (r.durationSeconds ?? undefined)
-          : (r.publishedDurationSeconds ?? undefined);
+      const { lectureCount, durationSeconds } = getListingStats(r);
 
       const recencyAt = (r.publishedAt ?? r.createdAt).toISOString();
 
-      const bucket = ensureTopic(row.topic.id, topicName);
-      bucket.items.push({
+      return {
         id: r.id,
         slug: r.slug,
         title: resolved.fields.title,
@@ -443,13 +448,21 @@ export class ScholarsRepository {
         type: r.format as 'collection' | 'series' | 'single',
         recencyAt,
         coverImageUrl: r.coverImageUrl ?? undefined,
-        scholarImageUrl: scholar.imageUrl ?? undefined,
+        scholarImageUrl: scholarImageUrl ?? undefined,
         lectureCount,
         durationSeconds,
         originalLanguage: resolved.originalLanguage,
         original: resolved.original ? { title: resolved.original.title } : undefined,
-      });
-    }
+      };
+    };
+
+    const addTopicListing = (row: (typeof listingTopics)[number]) => {
+      const topicName = row.topic.translations[0]?.name ?? row.topic.name;
+      const bucket = ensureTopic(row.topic.id, topicName);
+      bucket.items.push(mapTopicListing(row.listing, scholar.imageUrl));
+    };
+
+    listingTopics.forEach(addTopicListing);
 
     const topics = Array.from(topicMap.entries()).map(([topicId, { topicName, items }]) => {
       items.sort((a, b) => b.recencyAt.localeCompare(a.recencyAt));
@@ -567,11 +580,11 @@ export class ScholarsRepository {
           (t) => t.locale === locale && t.status === 'published',
         );
         const resolved = resolveContentTranslation({
-          base: { name: r.name, bio: r.bio ?? undefined },
+          base: { name: r.name, bio: toOptional(r.bio) },
           originalLanguage: r.mainLanguage,
           targetLocale: locale,
           publishedTranslation: published
-            ? { name: published.name, bio: published.bio ?? undefined }
+            ? { name: published.name, bio: toOptional(published.bio) }
             : null,
         }).fields;
 
@@ -581,15 +594,15 @@ export class ScholarsRepository {
           name: resolved.name,
           bio: resolved.bio,
           country: normalizeCountryCode(r.country),
-          mainLanguage: r.mainLanguage ?? undefined,
-          imageUrl: r.imageUrl ?? undefined,
+          mainLanguage: toOptional(r.mainLanguage),
+          imageUrl: toOptional(r.imageUrl),
           isActive: r.isActive,
-          title: r.title ?? undefined,
+          title: toOptional(r.title),
           orderIndex: r.orderIndex,
-          socialTwitter: r.socialTwitter ?? undefined,
-          socialTelegram: r.socialTelegram ?? undefined,
-          socialYoutube: r.socialYoutube ?? undefined,
-          socialWebsite: r.socialWebsite ?? undefined,
+          socialTwitter: toOptional(r.socialTwitter),
+          socialTelegram: toOptional(r.socialTelegram),
+          socialYoutube: toOptional(r.socialYoutube),
+          socialWebsite: toOptional(r.socialWebsite),
           createdAt: r.createdAt.toISOString(),
           updatedAt: r.updatedAt?.toISOString(),
           translations: r.translations.map((t) => ({
