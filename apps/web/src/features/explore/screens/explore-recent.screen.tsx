@@ -1,6 +1,6 @@
 "use client";
 
-import { routes, type FeedContentItemDto } from "@sd/core-contracts";
+import { routes, type FeedContentItemDto, type FeedItemDto } from "@sd/core-contracts";
 import { getErrorStateText, getLocalizedName } from "@sd/core-i18n";
 import {
   getProgressPercent,
@@ -125,6 +125,128 @@ function FeedGridItemCard({
   );
 }
 
+function buildFeedBlocks(
+  items: FeedItemDto[],
+  onNavigateToListing: (slug: string) => void,
+  onNavigateToScholar: (slug: string) => void,
+): ReactNode[] {
+  const blocks: ReactNode[] = [];
+  let cards: { key: string; node: ReactNode }[] = [];
+  const flushGrid = () => {
+    if (cards.length === 0) return;
+    const firstKey = cards[0]?.key ?? "grid";
+    blocks.push(
+      <div key={`grid-${firstKey}`} className={styles.grid}>
+        {cards.map((card) => card.node)}
+      </div>,
+    );
+    cards = [];
+  };
+
+  items.forEach((item) => {
+    if (item.kind === "scholar_row") {
+      flushGrid();
+      const rowKey = item.scholars[0]?.slug ?? "scholars";
+      blocks.push(
+        <section className={styles.section} key={`scholar-row-${rowKey}`}>
+          <FeedScholarRow scholars={item.scholars} onScholarPress={onNavigateToScholar} />
+        </section>,
+      );
+    } else if (item.kind === "topic_row") {
+      flushGrid();
+      blocks.push(
+        <section className={styles.section} key={`topic-row-${item.topicName}`}>
+          <FeedTopicRow
+            topicName={item.topicName}
+            items={item.items}
+            onItemPress={onNavigateToListing}
+          />
+        </section>,
+      );
+    } else {
+      // SAFETY: the non-row branch excludes scholar_row and topic_row, leaving only listing content items.
+      const feedContentItem = item as FeedContentItemDto;
+      cards.push({
+        key: feedContentItem.id,
+        node: (
+          <FeedGridItemCard
+            key={feedContentItem.id}
+            item={{
+              id: feedContentItem.id,
+              slug: feedContentItem.slug,
+              title: feedContentItem.title,
+              kind: feedContentItem.kind,
+              scholarName: feedContentItem.scholarName,
+              scholarSlug: feedContentItem.scholarSlug,
+              thumbnailUrl: feedContentItem.thumbnailUrl,
+              durationSeconds: feedContentItem.durationSeconds,
+              publishedLectureCount: feedContentItem.publishedLectureCount,
+            }}
+            onNavigate={onNavigateToListing}
+          />
+        ),
+      });
+    }
+  });
+
+  flushGrid();
+  return blocks;
+}
+
+function FeedBody({
+  isHydrated,
+  isRecentError,
+  isRecentFetching,
+  items,
+  onRetry,
+  onNavigateToListing,
+  onNavigateToScholar,
+  loadMoreRef,
+  t,
+}: {
+  isHydrated: boolean;
+  isRecentError: boolean;
+  isRecentFetching: boolean;
+  items: FeedItemDto[];
+  onRetry: () => void;
+  onNavigateToListing: (slug: string) => void;
+  onNavigateToScholar: (slug: string) => void;
+  loadMoreRef: React.RefObject<HTMLDivElement | null>;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  if (!isHydrated) return <FeedSkeleton />;
+  if (isRecentError && items.length === 0) {
+    return (
+      <div className={styles.state} role="alert">
+        <span>{getErrorStateText("feed", t)}</span>
+        <Button type="button" variant="outline" size="sm" onClick={onRetry}>
+          {t("feed.retry", "Try Again")}
+        </Button>
+      </div>
+    );
+  }
+  if (isRecentFetching && items.length === 0) return <FeedSkeleton />;
+  if (items.length === 0) {
+    return (
+      <Empty>
+        <EmptyHeader>
+          <EmptyTitle>{t("explore.noContentTitle", "No content yet")}</EmptyTitle>
+          <EmptyDescription>
+            {t("explore.noContent", "No content yet. Check back soon.")}
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    );
+  }
+
+  return (
+    <>
+      {buildFeedBlocks(items, onNavigateToListing, onNavigateToScholar)}
+      <div ref={loadMoreRef} style={{ height: "20px" }} />
+    </>
+  );
+}
+
 // This screen predates the Explore redesign and already owns the feed, catalog,
 // playback, and navigation composition. Keep the warning visible for a future
 // screen decomposition, but do not block this vertical filter slice on that
@@ -219,104 +341,20 @@ export function FeedRecentScreen({
     return () => observer.disconnect();
   }, [hasRecentNextPage, isRecentFetching, fetchRecentNextPage]);
 
-  let body: ReactNode;
   const feedTitle = t("explore.title", "Explore");
-
-  if (!isHydrated) {
-    body = <FeedSkeleton />;
-  } else if (isRecentError && visibleRecentItems.length === 0) {
-    body = (
-      <div className={styles.state} role="alert">
-        <span>{getErrorStateText("feed", t)}</span>
-        <Button type="button" variant="outline" size="sm" onClick={() => refetchRecent()}>
-          {t("feed.retry", "Try Again")}
-        </Button>
-      </div>
-    );
-  } else if (isRecentFetching && visibleRecentItems.length === 0) {
-    body = <FeedSkeleton />;
-  } else if (visibleRecentItems.length === 0) {
-    body = (
-      <Empty>
-        <EmptyHeader>
-          <EmptyTitle>{t("explore.noContentTitle", "No content yet")}</EmptyTitle>
-          <EmptyDescription>
-            {t("explore.noContent", "No content yet. Check back soon.")}
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
-  } else {
-    // Render Recent items using Grid Cards!
-    let cards: { key: string; node: ReactNode }[] = [];
-    const blocks: ReactNode[] = [];
-
-    const flushGrid = () => {
-      if (cards.length === 0) return;
-      const firstKey = cards[0]?.key ?? "grid";
-      blocks.push(
-        <div key={`grid-${firstKey}`} className={styles.grid}>
-          {cards.map((card) => card.node)}
-        </div>,
-      );
-      cards = [];
-    };
-
-    visibleRecentItems.forEach((item) => {
-      if (item.kind === "scholar_row") {
-        flushGrid();
-        const rowKey = item.scholars[0]?.slug ?? "scholars";
-        blocks.push(
-          <section className={styles.section} key={`scholar-row-${rowKey}`}>
-            <FeedScholarRow scholars={item.scholars} onScholarPress={handleNavigateToScholar} />
-          </section>,
-        );
-      } else if (item.kind === "topic_row") {
-        flushGrid();
-        blocks.push(
-          <section className={styles.section} key={`topic-row-${item.topicName}`}>
-            <FeedTopicRow
-              topicName={item.topicName}
-              items={item.items}
-              onItemPress={handleNavigateToListing}
-            />
-          </section>,
-        );
-      } else {
-        // SAFETY: the non-row branch excludes `scholar_row` and `topic_row`, leaving only listing content items.
-        const feedContentItem = item as FeedContentItemDto;
-        cards.push({
-          key: feedContentItem.id,
-          node: (
-            <FeedGridItemCard
-              key={feedContentItem.id}
-              item={{
-                id: feedContentItem.id,
-                slug: feedContentItem.slug,
-                title: feedContentItem.title,
-                kind: feedContentItem.kind,
-                scholarName: feedContentItem.scholarName,
-                scholarSlug: feedContentItem.scholarSlug,
-                thumbnailUrl: feedContentItem.thumbnailUrl,
-                durationSeconds: feedContentItem.durationSeconds,
-                publishedLectureCount: feedContentItem.publishedLectureCount,
-              }}
-              onNavigate={handleNavigateToListing}
-            />
-          ),
-        });
-      }
-    });
-
-    flushGrid();
-
-    body = (
-      <>
-        {blocks}
-        <div ref={loadMoreRef} style={{ height: "20px" }} />
-      </>
-    );
-  }
+  const body = (
+    <FeedBody
+      isHydrated={isHydrated}
+      isRecentError={isRecentError}
+      isRecentFetching={isRecentFetching}
+      items={visibleRecentItems}
+      onRetry={() => void refetchRecent()}
+      onNavigateToListing={handleNavigateToListing}
+      onNavigateToScholar={handleNavigateToScholar}
+      loadMoreRef={loadMoreRef}
+      t={t}
+    />
+  );
 
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
