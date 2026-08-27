@@ -35,16 +35,55 @@ type ReviewChanges = {
 function getReviewChanges(state: FormState): ReviewChanges {
   const { title, description, status, orderIndex, selectedTopics, language, coverImageUrl } = state;
   const initial = state.initialSnapshot;
+  return initial
+    ? getEditReviewChanges(
+        initial,
+        title,
+        description,
+        status,
+        orderIndex,
+        selectedTopics,
+        language,
+        coverImageUrl,
+      )
+    : getCreateReviewChanges(title, language, coverImageUrl, selectedTopics);
+}
+
+function getCreateReviewChanges(
+  title: string,
+  language: Locale,
+  coverImageUrl: string | null,
+  selectedTopics: string[],
+): ReviewChanges {
   return {
-    titleChanged: initial ? title !== initial.title : Boolean(title),
-    descriptionChanged: initial ? description !== initial.description : false,
-    statusChanged: initial ? status !== initial.status : false,
-    orderIndexChanged: initial ? orderIndex !== initial.orderIndex : false,
-    languageChanged: initial ? language !== initial.language : Boolean(language),
-    coverImageChanged: initial ? coverImageUrl !== initial.coverImageUrl : Boolean(coverImageUrl),
-    topicsChanged: initial
-      ? !sameTopics(selectedTopics, initial.selectedTopics)
-      : selectedTopics.length > 0,
+    titleChanged: Boolean(title),
+    descriptionChanged: false,
+    statusChanged: false,
+    orderIndexChanged: false,
+    languageChanged: Boolean(language),
+    coverImageChanged: Boolean(coverImageUrl),
+    topicsChanged: selectedTopics.length > 0,
+  };
+}
+
+function getEditReviewChanges(
+  initial: NonNullable<FormState["initialSnapshot"]>,
+  title: string,
+  description: string,
+  status: string,
+  orderIndex: number | null,
+  selectedTopics: string[],
+  language: Locale,
+  coverImageUrl: string | null,
+): ReviewChanges {
+  return {
+    titleChanged: title !== initial.title,
+    descriptionChanged: description !== initial.description,
+    statusChanged: status !== initial.status,
+    orderIndexChanged: orderIndex !== initial.orderIndex,
+    languageChanged: language !== initial.language,
+    coverImageChanged: coverImageUrl !== initial.coverImageUrl,
+    topicsChanged: !sameTopics(selectedTopics, initial.selectedTopics),
   };
 }
 
