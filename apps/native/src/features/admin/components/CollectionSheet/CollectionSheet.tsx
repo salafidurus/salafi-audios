@@ -41,62 +41,57 @@ function getErrorMessage(cause: unknown): string {
   return cause instanceof Error ? cause.message : "Unable to save collection";
 }
 
-export function CollectionSheet({
-  isOpen,
-  scholarId,
-  scholarSlug,
+async function saveCollection(
+  state: FormState,
+  collection: AdminListingDetailDto | undefined,
+  scholarId: string,
+  dispatch: (patch: Partial<FormState>) => void,
+  onSaved: () => void,
+  t: ReturnType<typeof useTranslation>["t"],
+): Promise<void> {
+  if (!state.title.trim()) {
+    dispatch({ error: t("admin.collectionEdit.titleRequired", "Title is required") });
+    return;
+  }
+  dispatch({ isSaving: true, error: null });
+  try {
+    if (collection) {
+      await updateCollection(collection.id, {
+        title: state.title,
+        description: state.description || undefined,
+        language: parseLocaleInput(state.language),
+      });
+    } else {
+      await createCollection({ scholarId, title: state.title, format: "collection" });
+    }
+    onSaved();
+  } catch (cause) {
+    dispatch({ error: getErrorMessage(cause) });
+  } finally {
+    dispatch({ isSaving: false });
+  }
+}
+
+function CollectionSheetForm({
+  state,
   collection,
+  canSave,
+  theme,
+  t,
+  onSave,
   onClose,
-  onSaved,
-}: CollectionSheetProps) {
-  const { theme } = useUnistyles();
-  const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
-  const { ability } = useAbility({ isAuthenticated });
-  const [state, dispatch] = useReducer(reduce, {
-    title: collection?.title ?? "",
-    description: collection?.description ?? "",
-    language: collection?.language ?? "",
-    isSaving: false,
-    error: null,
-  });
-
-  if (!isOpen) return null;
-
+  dispatch,
+}: {
+  state: FormState;
+  collection: AdminListingDetailDto | undefined;
+  canSave: boolean;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+  t: ReturnType<typeof useTranslation>["t"];
+  onSave: () => Promise<void>;
+  onClose: () => void;
+  dispatch: (patch: Partial<FormState>) => void;
+}) {
   const { title, description, language, isSaving, error } = state;
-  const canSave = ability.can(
-    collection ? "update" : "create",
-    subject("Listing", { scholarSlug }),
-  );
-
-  const handleSave = async () => {
-    if (!title.trim()) {
-      dispatch({ error: t("admin.collectionEdit.titleRequired", "Title is required") });
-      return;
-    }
-    dispatch({ isSaving: true, error: null });
-    try {
-      if (collection) {
-        await updateCollection(collection.id, {
-          title,
-          description: description || undefined,
-          language: parseLocaleInput(language),
-        });
-      } else {
-        await createCollection({
-          scholarId,
-          title,
-          format: "collection",
-        });
-      }
-      onSaved();
-    } catch (cause) {
-      dispatch({ error: getErrorMessage(cause) });
-    } finally {
-      dispatch({ isSaving: false });
-    }
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
@@ -132,7 +127,7 @@ export function CollectionSheet({
         {error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>
       <View style={styles.buttonRow}>
-        <Pressable onPress={handleSave} disabled={isSaving || !canSave} style={styles.saveBtn}>
+        <Pressable onPress={onSave} disabled={isSaving || !canSave} style={styles.saveBtn}>
           {isSaving ? (
             <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (
@@ -144,6 +139,49 @@ export function CollectionSheet({
         </Pressable>
       </View>
     </View>
+  );
+}
+
+export function CollectionSheet({
+  isOpen,
+  scholarId,
+  scholarSlug,
+  collection,
+  onClose,
+  onSaved,
+}: CollectionSheetProps) {
+  const { theme } = useUnistyles();
+  const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const { ability } = useAbility({ isAuthenticated });
+  const [state, dispatch] = useReducer(reduce, {
+    title: collection?.title ?? "",
+    description: collection?.description ?? "",
+    language: collection?.language ?? "",
+    isSaving: false,
+    error: null,
+  });
+
+  if (!isOpen) return null;
+
+  const canSave = ability.can(
+    collection ? "update" : "create",
+    subject("Listing", { scholarSlug }),
+  );
+
+  const handleSave = () => saveCollection(state, collection, scholarId, dispatch, onSaved, t);
+
+  return (
+    <CollectionSheetForm
+      state={state}
+      collection={collection}
+      canSave={canSave}
+      theme={theme}
+      t={t}
+      onSave={handleSave}
+      onClose={onClose}
+      dispatch={dispatch}
+    />
   );
 }
 
