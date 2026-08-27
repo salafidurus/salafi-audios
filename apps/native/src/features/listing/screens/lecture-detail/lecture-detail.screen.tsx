@@ -88,37 +88,36 @@ async function playLecture(
   await audioService.playListing(track, [track]);
 }
 
-type LoadedLectureModel = {
+type LoadedLectureView = {
   lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]>;
   title: string;
   description?: string;
   anchor?: string;
   ownContents: NonNullable<ReturnType<typeof useListingContents>["data"]> | undefined;
   loadingMessage: string;
-};
-
-type LoadedLecturePlayback = {
   isSaved: boolean;
   isCurrentTrack: boolean;
   isPlaying: boolean;
   theme: ReturnType<typeof useUnistyles>["theme"];
-};
-
-type LoadedLectureActions = {
   onPlay: () => Promise<void>;
   onSave: () => void;
 };
 
-type LoadedLectureProps = {
-  model: LoadedLectureModel;
-  playback: LoadedLecturePlayback;
-  actions: LoadedLectureActions;
-};
-
-function LoadedLectureBody({ model, playback, actions }: LoadedLectureProps) {
-  const { lecture, title, description, anchor, ownContents, loadingMessage } = model;
-  const { isSaved, isCurrentTrack, isPlaying, theme } = playback;
-  const { onPlay, onSave } = actions;
+function LoadedLectureBody({ view }: { view: LoadedLectureView }) {
+  const {
+    lecture,
+    title,
+    description,
+    anchor,
+    ownContents,
+    loadingMessage,
+    isSaved,
+    isCurrentTrack,
+    isPlaying,
+    theme,
+    onPlay,
+    onSave,
+  } = view;
   const isContainer = lecture.format === "series" || lecture.format === "collection";
   if (isContainer) {
     const listingRef: ComponentProps<typeof ListingContentView>["listingRef"] = {
@@ -273,18 +272,22 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
     }
   };
 
-  const model: LoadedLectureModel = {
+  const view: LoadedLectureView = {
     lecture,
     title,
     description,
     anchor,
     ownContents,
     loadingMessage: t("lecture.loading", "Loading lessons…"),
+    isSaved,
+    isCurrentTrack,
+    isPlaying,
+    theme,
+    onPlay: handlePlay,
+    onSave: handleSave,
   };
-  const playback: LoadedLecturePlayback = { isSaved, isCurrentTrack, isPlaying, theme };
-  const actions: LoadedLectureActions = { onPlay: handlePlay, onSave: handleSave };
 
-  return <LoadedLectureBody model={model} playback={playback} actions={actions} />;
+  return <LoadedLectureBody view={view} />;
 }
 
 const styles = StyleSheet.create((theme) => ({

@@ -95,6 +95,18 @@ describe("httpClient – configured", () => {
     expect(calledUrl.searchParams.get("search")).toBe("test");
   });
 
+  it("preserves query params already present in the request URL", async () => {
+    await httpClient({
+      url: "/items?sort=recent",
+      method: "GET",
+      params: { page: 2 },
+    });
+
+    const calledUrl = new URL(lastFetchUrl());
+    expect(calledUrl.searchParams.get("sort")).toBe("recent");
+    expect(calledUrl.searchParams.get("page")).toBe("2");
+  });
+
   it("appends array query params", async () => {
     await httpClient({
       url: "/items",

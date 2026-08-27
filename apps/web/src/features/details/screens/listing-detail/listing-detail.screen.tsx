@@ -137,54 +137,19 @@ function ListingContentSection({ model, t }: ListingContentSectionProps) {
   );
 }
 
-type LoadedListingModel = {
+type LoadedListingView = {
   listing: NonNullable<ReturnType<typeof useListingDetail>["data"]>;
   contents: ListingContents | undefined;
   isFetchingContents: boolean;
   isMultiItem: boolean;
-  contentCount: number;
-  contentCountLabel: string;
-  contentHeading: string | null;
-  filteredSingleOrSeriesItems: React.ComponentProps<typeof ContentList>["items"];
-  filteredModules: React.ComponentProps<typeof CollectionContentLayout>["modules"];
-  formatScholarName: FormatScholarName;
-  highlightItemId: string | undefined;
-};
-
-type LoadedListingProps = {
-  model: LoadedListingModel;
+  content: ListingContentModel | undefined;
   search: { value: string; onChange: (value: string) => void };
   router: ReturnType<typeof useRouter>;
   t: Translation["t"];
 };
 
-function LoadedListing({ model, search, router, t }: LoadedListingProps) {
-  const {
-    listing,
-    contents,
-    isFetchingContents,
-    isMultiItem,
-    contentCount,
-    contentCountLabel,
-    contentHeading,
-    filteredSingleOrSeriesItems,
-    filteredModules,
-    formatScholarName,
-    highlightItemId,
-  } = model;
-  const contentModel: ListingContentModel | undefined = contents
-    ? {
-        contents,
-        listing,
-        contentCount,
-        contentCountLabel,
-        contentHeading,
-        filteredSingleOrSeriesItems,
-        filteredModules,
-        formatScholarName,
-        highlightItemId,
-      }
-    : undefined;
+function LoadedListing({ view }: { view: LoadedListingView }) {
+  const { listing, contents, isFetchingContents, isMultiItem, content, search, router, t } = view;
   return (
     <ScreenView>
       <div className={styles.pageLayout}>
@@ -226,7 +191,7 @@ function LoadedListing({ model, search, router, t }: LoadedListingProps) {
                     <span className="sr-only">{t("lecture.loading", "Loading lessons…")}</span>
                   </div>
                 ) : null}
-                {contentModel ? <ListingContentSection model={contentModel} t={t} /> : null}
+                {content ? <ListingContentSection model={content} t={t} /> : null}
                 {listing.seriesContext ? (
                   <SeriesContextBar
                     seriesContext={listing.seriesContext}
@@ -384,20 +349,29 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
     );
   }
 
-  const loadedModel: LoadedListingModel = {
+  const content: ListingContentModel | undefined = contents
+    ? {
+        contents,
+        listing,
+        contentCount,
+        contentCountLabel,
+        contentHeading,
+        filteredSingleOrSeriesItems,
+        filteredModules,
+        formatScholarName,
+        highlightItemId,
+      }
+    : undefined;
+  const view: LoadedListingView = {
     listing,
     contents,
     isFetchingContents,
     isMultiItem,
-    contentCount,
-    contentCountLabel,
-    contentHeading,
-    filteredSingleOrSeriesItems,
-    filteredModules,
-    formatScholarName,
-    highlightItemId,
+    content,
+    search: { value: searchQuery, onChange: setSearchQuery },
+    router,
+    t,
   };
-  const search = { value: searchQuery, onChange: setSearchQuery };
 
-  return <LoadedListing model={loadedModel} search={search} router={router} t={t} />;
+  return <LoadedListing view={view} />;
 }
