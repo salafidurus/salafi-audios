@@ -27,7 +27,7 @@ export default defineConfig({
     "import/no-cycle": "error",
     "no-unused-vars": "error",
     "unicorn/no-empty-file": "error",
-    "eslint/complexity": ["error", { max: 50, variant: "modified" }],
+    "eslint/complexity": ["error", { max: 25, variant: "modified" }],
   },
   overrides: [
     {

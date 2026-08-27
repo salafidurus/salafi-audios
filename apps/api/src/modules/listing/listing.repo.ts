@@ -1455,131 +1455,159 @@ export class ListingRepository {
     };
   }
 
+  private async validateArrangeCommit(
+    tx: Prisma.TransactionClient,
+    rootId: string,
+    dto: ArrangeCommitDto,
+  ) {
+    const root = await tx.listing.findFirst({
+      where: { id: rootId, deletedAt: null },
+      select: { id: true, slug: true, scholarId: true, format: true },
+    });
+    if (!root) throw new NotFoundException('Listing not found');
+    if (root.format === 'single') {
+      throw new BadRequestException('Single listings update audio via the media endpoint');
+    }
+    if (root.format === 'series' && !dto.lessons) {
+      throw new BadRequestException('Series commits require lessons');
+    }
+    if (root.format === 'collection' && !dto.modules) {
+      throw new BadRequestException('Collection commits require modules');
+    }
+
+    const moduleOps = dto.modules ?? [];
+    const rootLessonOps = dto.lessons ?? [];
+    this.validateNewModuleLessons(moduleOps);
+    const moduleUpdateIds: string[] = [];
+    for (const moduleOp of moduleOps) {
+      if (moduleOp.op === 'update') moduleUpdateIds.push(moduleOp.id);
+    }
+    const existingModuleSlugById = new Map<string, string>();
+    if (moduleUpdateIds.length) {
+      const found = await tx.listing.findMany({
+        where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
+        select: { id: true, slug: true },
+      });
+      if (found.length !== moduleUpdateIds.length) {
+        throw new BadRequestException('Module update target is not under this listing');
+      }
+      for (const module of found) existingModuleSlugById.set(module.id, module.slug);
+    }
+
+    await this.validateArrangeSlugs(
+      tx,
+      root.slug,
+      moduleOps,
+      rootLessonOps,
+      existingModuleSlugById,
+    );
+
+    await this.validateArrangeLessonTargets(tx, rootId, moduleOps, rootLessonOps);
+    return { root, moduleOps, rootLessonOps };
+  }
+
+  private validateNewModuleLessons(moduleOps: NonNullable<ArrangeCommitDto['modules']>): void {
+    for (const moduleOp of moduleOps) {
+      if (moduleOp.op === 'create' && moduleOp.lessons.some((lesson) => lesson.op === 'update')) {
+        throw new BadRequestException('New modules can only contain new lessons');
+      }
+    }
+  }
+
+  private async validateArrangeSlugs(
+    tx: Prisma.TransactionClient,
+    rootSlug: string,
+    moduleOps: NonNullable<ArrangeCommitDto['modules']>,
+    rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
+    existingModuleSlugById: Map<string, string>,
+  ): Promise<void> {
+    const prefixChecks: { slug: string; expectedPrefix: string }[] = [];
+    for (const moduleOp of moduleOps) {
+      const parentSlug =
+        moduleOp.op === 'create'
+          ? moduleOp.slug
+          : (existingModuleSlugById.get(moduleOp.id) ?? rootSlug);
+      if (moduleOp.op === 'create')
+        prefixChecks.push({ slug: moduleOp.slug, expectedPrefix: rootSlug });
+      for (const lessonOp of moduleOp.lessons) {
+        if (lessonOp.op === 'create') {
+          prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: parentSlug });
+        }
+      }
+    }
+    for (const lessonOp of rootLessonOps) {
+      if (lessonOp.op === 'create')
+        prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: rootSlug });
+    }
+
+    const createSlugs = prefixChecks.map((check) => check.slug);
+    const duplicates = createSlugs.filter((slug, index) => createSlugs.indexOf(slug) !== index);
+    if (duplicates.length) {
+      throw new BadRequestException(`Duplicate slugs in payload: ${duplicates.join(', ')}`);
+    }
+    const badPrefix = prefixChecks.filter(
+      (check) => !check.slug.startsWith(`${check.expectedPrefix}-`),
+    );
+    if (badPrefix.length) {
+      throw new BadRequestException(
+        `Slugs must be prefixed by their parent's slug: ${badPrefix
+          .map((check) => `${check.slug} (expected prefix: ${check.expectedPrefix}-)`)
+          .join(', ')}`,
+      );
+    }
+    if (!createSlugs.length) return;
+
+    const clashes = await tx.listing.findMany({
+      where: { slug: { in: createSlugs } },
+      select: { slug: true },
+    });
+    if (clashes.length) {
+      throw new ConflictException({
+        message: 'Slugs already in use',
+        conflictingSlugs: clashes.map((clash) => clash.slug),
+      });
+    }
+  }
+
+  private async validateArrangeLessonTargets(
+    tx: Prisma.TransactionClient,
+    rootId: string,
+    moduleOps: ArrangeCommitDto['modules'],
+    rootLessonOps: ArrangeCommitDto['lessons'],
+  ): Promise<void> {
+    const lessonUpdateTargets: Array<{ id: string; parentId: string }> = [];
+    for (const lessonOp of rootLessonOps ?? []) {
+      if (lessonOp.op === 'update') lessonUpdateTargets.push({ id: lessonOp.id, parentId: rootId });
+    }
+    for (const moduleOp of moduleOps ?? []) {
+      if (moduleOp.op !== 'update') continue;
+      for (const lessonOp of moduleOp.lessons) {
+        if (lessonOp.op === 'update') {
+          lessonUpdateTargets.push({ id: lessonOp.id, parentId: moduleOp.id });
+        }
+      }
+    }
+    if (!lessonUpdateTargets.length) return;
+
+    const found = await tx.listing.findMany({
+      where: { id: { in: lessonUpdateTargets.map((target) => target.id) }, deletedAt: null },
+      select: { id: true, parentId: true },
+    });
+    const parentById = new Map(found.map((listing) => [listing.id, listing.parentId]));
+    for (const target of lessonUpdateTargets) {
+      if (parentById.get(target.id) !== target.parentId) {
+        throw new BadRequestException('Lesson update target is not under this listing');
+      }
+    }
+  }
+
   async arrangeCommit(
     rootId: string,
     dto: ArrangeCommitDto,
     userId?: string,
   ): Promise<{ result: ArrangeCommitResultDto; affectedIds: string[] }> {
     return this.prisma.$transaction(async (tx) => {
-      const root = await tx.listing.findFirst({
-        where: { id: rootId, deletedAt: null },
-        select: { id: true, slug: true, scholarId: true, format: true },
-      });
-      if (!root) throw new NotFoundException('Listing not found');
-      if (root.format === 'single') {
-        throw new BadRequestException('Single listings update audio via the media endpoint');
-      }
-      if (root.format === 'series' && !dto.lessons) {
-        throw new BadRequestException('Series commits require lessons');
-      }
-      if (root.format === 'collection' && !dto.modules) {
-        throw new BadRequestException('Collection commits require modules');
-      }
-
-      const moduleOps = dto.modules ?? [];
-      const rootLessonOps = dto.lessons ?? [];
-
-      for (const moduleOp of moduleOps) {
-        if (moduleOp.op === 'create' && moduleOp.lessons.some((l) => l.op === 'update')) {
-          throw new BadRequestException('New modules can only contain new lessons');
-        }
-      }
-
-      const moduleUpdateIds: string[] = [];
-      for (const moduleOp of moduleOps) {
-        if (moduleOp.op === 'update') moduleUpdateIds.push(moduleOp.id);
-      }
-      const existingModuleSlugById = new Map<string, string>();
-      if (moduleUpdateIds.length) {
-        const found = await tx.listing.findMany({
-          where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
-          select: { id: true, slug: true },
-        });
-        if (found.length !== moduleUpdateIds.length) {
-          throw new BadRequestException('Module update target is not under this listing');
-        }
-        for (const m of found) existingModuleSlugById.set(m.id, m.slug);
-      }
-
-      // Each create-slug is checked against its own immediate parent's slug, not just
-      // the root's — a lesson nested under a module must be prefixed by that module's
-      // slug (which is itself prefixed by the root's), not merely share the root prefix.
-      const prefixChecks: { slug: string; expectedPrefix: string }[] = [];
-      for (const moduleOp of moduleOps) {
-        if (moduleOp.op === 'create') {
-          prefixChecks.push({ slug: moduleOp.slug, expectedPrefix: root.slug });
-          for (const lessonOp of moduleOp.lessons) {
-            if (lessonOp.op === 'create') {
-              prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: moduleOp.slug });
-            }
-          }
-        } else {
-          const parentSlug = existingModuleSlugById.get(moduleOp.id) ?? root.slug;
-          for (const lessonOp of moduleOp.lessons) {
-            if (lessonOp.op === 'create') {
-              prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: parentSlug });
-            }
-          }
-        }
-      }
-      for (const lessonOp of rootLessonOps) {
-        if (lessonOp.op === 'create') {
-          prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: root.slug });
-        }
-      }
-
-      const createSlugs = prefixChecks.map((c) => c.slug);
-      const duplicates = createSlugs.filter((slug, i) => createSlugs.indexOf(slug) !== i);
-      if (duplicates.length) {
-        throw new BadRequestException(`Duplicate slugs in payload: ${duplicates.join(', ')}`);
-      }
-      const badPrefix = prefixChecks.filter((c) => !c.slug.startsWith(`${c.expectedPrefix}-`));
-      if (badPrefix.length) {
-        throw new BadRequestException(
-          `Slugs must be prefixed by their parent's slug: ${badPrefix
-            .map((c) => `${c.slug} (expected prefix: ${c.expectedPrefix}-)`)
-            .join(', ')}`,
-        );
-      }
-      if (createSlugs.length) {
-        const clashes = await tx.listing.findMany({
-          where: { slug: { in: createSlugs } },
-          select: { slug: true },
-        });
-        if (clashes.length) {
-          throw new ConflictException({
-            message: 'Slugs already in use',
-            conflictingSlugs: clashes.map((c) => c.slug),
-          });
-        }
-      }
-
-      const lessonUpdateTargets: Array<{ id: string; parentId: string }> = [];
-      for (const lessonOp of rootLessonOps) {
-        if (lessonOp.op === 'update')
-          lessonUpdateTargets.push({ id: lessonOp.id, parentId: rootId });
-      }
-      for (const moduleOp of moduleOps) {
-        if (moduleOp.op !== 'update') continue;
-        for (const lessonOp of moduleOp.lessons) {
-          if (lessonOp.op === 'update') {
-            lessonUpdateTargets.push({ id: lessonOp.id, parentId: moduleOp.id });
-          }
-        }
-      }
-      if (lessonUpdateTargets.length) {
-        const found = await tx.listing.findMany({
-          where: { id: { in: lessonUpdateTargets.map((t) => t.id) }, deletedAt: null },
-          select: { id: true, parentId: true },
-        });
-        const parentById = new Map(found.map((f) => [f.id, f.parentId]));
-        for (const target of lessonUpdateTargets) {
-          if (parentById.get(target.id) !== target.parentId) {
-            throw new BadRequestException('Lesson update target is not under this listing');
-          }
-        }
-      }
-
+      const { root, moduleOps, rootLessonOps } = await this.validateArrangeCommit(tx, rootId, dto);
       const result: ArrangeCommitResultDto = {
         createdModules: 0,
         createdLessons: 0,

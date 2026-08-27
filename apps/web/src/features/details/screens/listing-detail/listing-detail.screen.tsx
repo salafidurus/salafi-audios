@@ -31,8 +31,9 @@ type ListingContents = NonNullable<ReturnType<typeof useListingContents>["data"]
 type Translation = ReturnType<typeof useTranslation>;
 type FormatScholarName = ReturnType<typeof useFormatScholarName>;
 
-type ListingContentSectionProps = {
+type ListingContentModel = {
   contents: ListingContents;
+  listing: NonNullable<ReturnType<typeof useListingDetail>["data"]>;
   contentCount: number;
   contentCountLabel: string;
   contentHeading: string | null;
@@ -40,22 +41,44 @@ type ListingContentSectionProps = {
   filteredModules: React.ComponentProps<typeof CollectionContentLayout>["modules"];
   formatScholarName: FormatScholarName;
   highlightItemId: string | undefined;
-  listing: NonNullable<ReturnType<typeof useListingDetail>["data"]>;
+};
+
+type ListingContentSectionProps = {
+  model: ListingContentModel;
   t: Translation["t"];
 };
 
-function ListingContentSection({
-  contents,
-  contentCount,
-  contentCountLabel,
-  contentHeading,
-  filteredSingleOrSeriesItems,
-  filteredModules,
-  formatScholarName,
-  highlightItemId,
-  listing,
-  t,
-}: ListingContentSectionProps) {
+function filterContentItems(contents: ListingContents | undefined, query: string) {
+  if (!contents || (contents.format !== "single" && contents.format !== "series")) return [];
+  if (!query) return contents.items;
+  return contents.items.filter((item) => item.title.toLowerCase().includes(query));
+}
+
+function filterContentModules(contents: ListingContents | undefined, query: string) {
+  if (!contents || contents.format !== "collection") return [];
+  if (!query) return contents.modules;
+
+  return contents.modules.flatMap((module) => {
+    const lessons = module.lessons.filter(
+      (lesson) =>
+        lesson.title.toLowerCase().includes(query) || module.title.toLowerCase().includes(query),
+    );
+    return lessons.length > 0 ? [{ ...module, lessons }] : [];
+  });
+}
+
+function ListingContentSection({ model, t }: ListingContentSectionProps) {
+  const {
+    contents,
+    contentCount,
+    contentCountLabel,
+    contentHeading,
+    filteredSingleOrSeriesItems,
+    filteredModules,
+    formatScholarName,
+    highlightItemId,
+    listing,
+  } = model;
   return (
     <section
       aria-label={contentHeading ? undefined : t("listing.collectionContent", "Collection content")}
@@ -114,6 +137,111 @@ function ListingContentSection({
   );
 }
 
+type LoadedListingModel = {
+  listing: NonNullable<ReturnType<typeof useListingDetail>["data"]>;
+  contents: ListingContents | undefined;
+  isFetchingContents: boolean;
+  isMultiItem: boolean;
+  contentCount: number;
+  contentCountLabel: string;
+  contentHeading: string | null;
+  filteredSingleOrSeriesItems: React.ComponentProps<typeof ContentList>["items"];
+  filteredModules: React.ComponentProps<typeof CollectionContentLayout>["modules"];
+  formatScholarName: FormatScholarName;
+  highlightItemId: string | undefined;
+};
+
+type LoadedListingProps = {
+  model: LoadedListingModel;
+  search: { value: string; onChange: (value: string) => void };
+  router: ReturnType<typeof useRouter>;
+  t: Translation["t"];
+};
+
+function LoadedListing({ model, search, router, t }: LoadedListingProps) {
+  const {
+    listing,
+    contents,
+    isFetchingContents,
+    isMultiItem,
+    contentCount,
+    contentCountLabel,
+    contentHeading,
+    filteredSingleOrSeriesItems,
+    filteredModules,
+    formatScholarName,
+    highlightItemId,
+  } = model;
+  const contentModel: ListingContentModel | undefined = contents
+    ? {
+        contents,
+        listing,
+        contentCount,
+        contentCountLabel,
+        contentHeading,
+        filteredSingleOrSeriesItems,
+        filteredModules,
+        formatScholarName,
+        highlightItemId,
+      }
+    : undefined;
+  return (
+    <ScreenView>
+      <div className={styles.pageLayout}>
+        <aside className={styles.detailsRail} aria-label={t("listing.details", "Listing details")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className={styles.backButton}
+            onClick={() => router.back()}
+            aria-label={t("navigation.back", "Back")}
+          >
+            <ChevronLeft data-icon="inline-start" />
+            {t("navigation.back", "Back")}
+          </Button>
+          <MetaDataSection
+            listing={listing}
+            layout="sidebar"
+            moduleCount={contents?.format === "collection" ? contents.modules.length : undefined}
+          />
+          <QuickButtonSection listing={listing} contents={contents} />
+          {isMultiItem ? (
+            <div className={styles.searchWrapper}>
+              <Search.Bar
+                value={search.value}
+                onChange={search.onChange}
+                placeholder={t("listing.searchPlaceholder", "Search lessons…")}
+              />
+            </div>
+          ) : null}
+        </aside>
+        <main className={styles.contentColumn}>
+          <StickyHeaderLayout>
+            <StickyHeaderLayout.Content>
+              <div className={styles.contentWrapper}>
+                {isFetchingContents && !contents ? (
+                  <div className={styles.contentLoading} role="status">
+                    <Skeleton className={styles.loadingRow} />
+                    <span className="sr-only">{t("lecture.loading", "Loading lessons…")}</span>
+                  </div>
+                ) : null}
+                {contentModel ? <ListingContentSection model={contentModel} t={t} /> : null}
+                {listing.seriesContext ? (
+                  <SeriesContextBar
+                    seriesContext={listing.seriesContext}
+                    listingSlug={listing.slug}
+                  />
+                ) : null}
+              </div>
+            </StickyHeaderLayout.Content>
+          </StickyHeaderLayout>
+        </main>
+      </div>
+    </ScreenView>
+  );
+}
+
 export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -148,25 +276,11 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
 
   // Filter items for search
   const filteredSingleOrSeriesItems = useMemo(() => {
-    if (!contents || (contents.format !== "single" && contents.format !== "series")) return [];
-    if (!query) return contents.items;
-    return contents.items.filter((item) => item.title.toLowerCase().includes(query));
+    return filterContentItems(contents, query);
   }, [contents, query]);
 
   const filteredModules = useMemo(() => {
-    if (!contents || contents.format !== "collection") return [];
-    if (!query) return contents.modules;
-
-    const result: typeof contents.modules = [];
-    for (const m of contents.modules) {
-      const matchingLessons = m.lessons.filter(
-        (l) => l.title.toLowerCase().includes(query) || m.title.toLowerCase().includes(query),
-      );
-      if (matchingLessons.length > 0) {
-        result.push({ ...m, lessons: matchingLessons });
-      }
-    }
-    return result;
+    return filterContentModules(contents, query);
   }, [contents, query]);
 
   const contentCount =
@@ -270,75 +384,20 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
     );
   }
 
-  return (
-    <ScreenView>
-      <div className={styles.pageLayout}>
-        <aside className={styles.detailsRail} aria-label={t("listing.details", "Listing details")}>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className={styles.backButton}
-            onClick={() => router.back()}
-            aria-label={t("navigation.back", "Back")}
-          >
-            <ChevronLeft data-icon="inline-start" />
-            {t("navigation.back", "Back")}
-          </Button>
-          <MetaDataSection
-            listing={listing}
-            layout="sidebar"
-            moduleCount={contents?.format === "collection" ? contents.modules.length : undefined}
-          />
-          <QuickButtonSection listing={listing} contents={contents} />
-          {isMultiItem && (
-            <div className={styles.searchWrapper}>
-              <Search.Bar
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder={t("listing.searchPlaceholder", "Search lessons…")}
-              />
-            </div>
-          )}
-        </aside>
+  const loadedModel: LoadedListingModel = {
+    listing,
+    contents,
+    isFetchingContents,
+    isMultiItem,
+    contentCount,
+    contentCountLabel,
+    contentHeading,
+    filteredSingleOrSeriesItems,
+    filteredModules,
+    formatScholarName,
+    highlightItemId,
+  };
+  const search = { value: searchQuery, onChange: setSearchQuery };
 
-        <main className={styles.contentColumn}>
-          <StickyHeaderLayout>
-            <StickyHeaderLayout.Content>
-              <div className={styles.contentWrapper}>
-                {isFetchingContents && !contents && (
-                  <div className={styles.contentLoading} role="status">
-                    <Skeleton className={styles.loadingRow} />
-                    <span className="sr-only">{t("lecture.loading", "Loading lessons…")}</span>
-                  </div>
-                )}
-
-                {contents && (
-                  <ListingContentSection
-                    contents={contents}
-                    contentCount={contentCount}
-                    contentCountLabel={contentCountLabel}
-                    contentHeading={contentHeading}
-                    filteredSingleOrSeriesItems={filteredSingleOrSeriesItems}
-                    filteredModules={filteredModules}
-                    formatScholarName={formatScholarName}
-                    highlightItemId={highlightItemId}
-                    listing={listing}
-                    t={t}
-                  />
-                )}
-
-                {listing.seriesContext && (
-                  <SeriesContextBar
-                    seriesContext={listing.seriesContext}
-                    listingSlug={listing.slug}
-                  />
-                )}
-              </div>
-            </StickyHeaderLayout.Content>
-          </StickyHeaderLayout>
-        </main>
-      </div>
-    </ScreenView>
-  );
+  return <LoadedListing model={loadedModel} search={search} router={router} t={t} />;
 }
