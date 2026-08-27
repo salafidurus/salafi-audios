@@ -24,6 +24,94 @@ export type ScholarDetailScreenProps = {
   slug: string;
 };
 
+type ScholarStateProps = {
+  isError: boolean;
+  isFetching: boolean;
+  hasScholar: boolean;
+  onRetry: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function getScholarState(isError: boolean, isFetching: boolean, hasScholar: boolean) {
+  if (isError && !hasScholar) return "error" as const;
+  if (isFetching && !hasScholar) return "loading" as const;
+  if (!hasScholar) return "not-found" as const;
+  return "ready" as const;
+}
+
+function ScholarState({ isError, isFetching, hasScholar, onRetry, t }: ScholarStateProps) {
+  if (isError && !hasScholar) {
+    return (
+      <ScreenView center>
+        <Empty className={styles.state}>
+          <EmptyHeader>
+            <EmptyTitle>{t("scholarContent.error", "Failed to load scholar details")}</EmptyTitle>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button type="button" variant="outline" onClick={onRetry}>
+              {t("common.retry", "Try again")}
+            </Button>
+          </EmptyContent>
+        </Empty>
+      </ScreenView>
+    );
+  }
+  if (isFetching && !hasScholar) {
+    return <ScholarLoadingState t={t} />;
+  }
+  if (!hasScholar) {
+    return (
+      <ScreenView center>
+        <Empty className={styles.state}>
+          <EmptyHeader>
+            <EmptyTitle>{t("scholarContent.notFound", "Scholar not found")}</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
+      </ScreenView>
+    );
+  }
+  return null;
+}
+
+function ScholarLoadingState({ t }: { t: ScholarStateProps["t"] }) {
+  return (
+    <ScreenView>
+      <StickyHeaderLayout>
+        <StickyHeaderLayout.Header>
+          <div>
+            <div className={styles.backBar}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className={styles.backButton}
+                onClick={handleBack}
+              >
+                <ChevronLeft data-icon="inline-start" />
+                {t("scholars.backToScholars", "Back to Scholars")}
+              </Button>
+            </div>
+            <div className={styles.loadingScholar}>
+              <Skeleton className={styles.loadingAvatar} />
+              <div className={styles.loadingScholarText}>
+                <Skeleton className={styles.loadingName} />
+                <Skeleton className={styles.loadingStats} />
+              </div>
+            </div>
+          </div>
+        </StickyHeaderLayout.Header>
+        <StickyHeaderLayout.Content>
+          <div className={styles.contentList} aria-label={t("common.loading", "Loading…")}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={`scholar-detail-skeleton-${i}`} className={styles.loadingRow} />
+            ))}
+          </div>
+        </StickyHeaderLayout.Content>
+      </StickyHeaderLayout>
+    </ScreenView>
+  );
+}
+
 function formatDuration(durationSeconds?: number): string {
   if (!durationSeconds || durationSeconds <= 0) {
     return "";
@@ -78,75 +166,19 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
     console.log(`Follow scholar: ${slug}`);
   };
 
-  if (isScholarError && !scholar) {
+  const scholarState = getScholarState(isScholarError, isFetchingScholar, Boolean(scholar));
+  if (scholarState !== "ready") {
     return (
-      <ScreenView center>
-        <Empty className={styles.state}>
-          <EmptyHeader>
-            <EmptyTitle>{t("scholarContent.error", "Failed to load scholar details")}</EmptyTitle>
-          </EmptyHeader>
-          <EmptyContent>
-            <Button type="button" variant="outline" onClick={() => refetchScholar()}>
-              {t("common.retry", "Try again")}
-            </Button>
-          </EmptyContent>
-        </Empty>
-      </ScreenView>
+      <ScholarState
+        isError={isScholarError}
+        isFetching={isFetchingScholar}
+        hasScholar={Boolean(scholar)}
+        onRetry={() => void refetchScholar()}
+        t={t}
+      />
     );
   }
-
-  if (isFetchingScholar && !scholar) {
-    return (
-      <ScreenView>
-        <StickyHeaderLayout>
-          <StickyHeaderLayout.Header>
-            <div>
-              <div className={styles.backBar}>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className={styles.backButton}
-                  onClick={handleBack}
-                >
-                  <ChevronLeft data-icon="inline-start" />
-                  {t("scholars.backToScholars", "Back to Scholars")}
-                </Button>
-              </div>
-
-              <div className={styles.loadingScholar}>
-                <Skeleton className={styles.loadingAvatar} />
-                <div className={styles.loadingScholarText}>
-                  <Skeleton className={styles.loadingName} />
-                  <Skeleton className={styles.loadingStats} />
-                </div>
-              </div>
-            </div>
-          </StickyHeaderLayout.Header>
-
-          <StickyHeaderLayout.Content>
-            <div className={styles.contentList} aria-label={t("common.loading", "Loading…")}>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={`scholar-detail-skeleton-${i}`} className={styles.loadingRow} />
-              ))}
-            </div>
-          </StickyHeaderLayout.Content>
-        </StickyHeaderLayout>
-      </ScreenView>
-    );
-  }
-
-  if (!scholar) {
-    return (
-      <ScreenView center>
-        <Empty className={styles.state}>
-          <EmptyHeader>
-            <EmptyTitle>{t("scholarContent.notFound", "Scholar not found")}</EmptyTitle>
-          </EmptyHeader>
-        </Empty>
-      </ScreenView>
-    );
-  }
+  if (!scholar) return null;
 
   let rawItems = contentData?.items ?? [];
   if (selectedTopicId && topicsData?.topics) {
