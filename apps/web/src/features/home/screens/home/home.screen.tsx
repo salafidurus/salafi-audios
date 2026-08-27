@@ -30,6 +30,30 @@ function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
   return item.kind !== "scholar_row" && item.kind !== "topic_row";
 }
 
+function getContentItems(exploreData: { pages?: { items: FeedItemDto[] }[] } | undefined) {
+  const items: FeedContentItemDto[] = [];
+  for (const page of exploreData?.pages ?? []) {
+    for (const item of page.items) {
+      if (isContentItem(item)) items.push(item);
+    }
+  }
+  return items;
+}
+
+function getLiveRecentProgress(
+  recentProgress: ReturnType<typeof useContinueListening>["recentProgress"],
+  localProgress:
+    | { completedAt?: string | null; positionSeconds?: number; durationSeconds?: number }
+    | undefined,
+) {
+  if (!recentProgress || localProgress?.completedAt) return null;
+  return {
+    ...recentProgress,
+    positionSeconds: localProgress?.positionSeconds ?? recentProgress.positionSeconds,
+    durationSeconds: localProgress?.durationSeconds ?? recentProgress.durationSeconds,
+  };
+}
+
 export function HomeScreen({ onContinueListening }: HomeScreenProps) {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { recentProgress } = useContinueListening({
@@ -44,28 +68,14 @@ export function HomeScreen({ onContinueListening }: HomeScreenProps) {
   });
   const { t } = useTranslation();
 
-  const items: FeedContentItemDto[] = [];
-  for (const page of exploreData?.pages ?? []) {
-    for (const item of page.items) {
-      if (isContentItem(item)) {
-        items.push(item);
-      }
-    }
-  }
+  const items = getContentItems(exploreData);
 
   const featuredContent = promoData?.hero?.listing ?? items[0] ?? null;
   const recentItems = featuredContent
     ? items.filter((item) => item.id !== featuredContent.id)
     : items;
   const curatedItems = promoData?.editorsPicks?.map((pick) => pick.listing) ?? [];
-  const liveRecentProgress =
-    recentProgress && !localProgress?.completedAt
-      ? {
-          ...recentProgress,
-          positionSeconds: localProgress?.positionSeconds ?? recentProgress.positionSeconds,
-          durationSeconds: localProgress?.durationSeconds ?? recentProgress.durationSeconds,
-        }
-      : null;
+  const liveRecentProgress = getLiveRecentProgress(recentProgress, localProgress);
   const hasHistory = Boolean(liveRecentProgress);
   const isHeroLoading = isExploreLoading || isPromosLoading;
 
