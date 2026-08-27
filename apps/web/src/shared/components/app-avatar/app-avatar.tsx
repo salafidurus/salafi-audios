@@ -22,6 +22,28 @@ type AppAvatarProps = {
 
 type AvatarStage = "listing" | "scholar" | "image" | "fallback";
 
+function nextAvatarStage(
+  currentStage: AvatarStage,
+  scholarImageUrl?: string | null,
+  image?: string | null,
+) {
+  if (currentStage === "listing" && scholarImageUrl) return "scholar";
+  if (currentStage !== "image" && image) return "image";
+  return "fallback";
+}
+
+function avatarSource(
+  stage: AvatarStage,
+  listingArtwork?: string | null,
+  scholarImageUrl?: string | null,
+  image?: string | null,
+) {
+  if (stage === "listing") return listingArtwork;
+  if (stage === "scholar") return scholarImageUrl;
+  if (stage === "image") return image;
+  return null;
+}
+
 export function AppAvatar({
   image,
   listingArtwork,
@@ -46,20 +68,11 @@ export function AppAvatar({
   const handleError: ImageProps["onError"] = (event) => {
     onError?.(event);
     setStage((currentStage) => {
-      if (currentStage === "listing" && scholarImageUrl) return "scholar";
-      if (currentStage !== "image" && image) return "image";
-      return "fallback";
+      return nextAvatarStage(currentStage, scholarImageUrl, image);
     });
   };
 
-  const source =
-    stage === "listing"
-      ? listingArtwork
-      : stage === "scholar"
-        ? scholarImageUrl
-        : stage === "image"
-          ? image
-          : null;
+  const source = avatarSource(stage, listingArtwork, scholarImageUrl, image);
 
   if (source) {
     return (

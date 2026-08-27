@@ -42,6 +42,81 @@ const ItemWithIdSchema = z.object({
   id: z.union([z.string(), z.number()]),
 });
 
+function itemKey<TData>(item: TData, index: number): string {
+  const parsed = ItemWithIdSchema.safeParse(item);
+  return parsed.success ? String(parsed.data.id) : String(index);
+}
+
+function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
+  return (
+    <Alert variant="destructive" className={styles.error}>
+      <CircleAlert aria-hidden="true" />
+      <AlertDescription>{message}</AlertDescription>
+      {onRetry && (
+        <Button type="button" variant="outline" size="sm" onClick={onRetry}>
+          Try again
+        </Button>
+      )}
+    </Alert>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className={styles.skeletonContainer} role="status" aria-label="Loading content">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Skeleton key={`list-skeleton-${i}`} className={styles.skeletonRow} />
+      ))}
+    </div>
+  );
+}
+
+function EmptyState({
+  message,
+  hasMore,
+  isFetchingNextPage,
+  observerTarget,
+}: {
+  message: string;
+  hasMore: boolean;
+  isFetchingNextPage?: boolean;
+  observerTarget: React.RefObject<HTMLDivElement | null>;
+}) {
+  return (
+    <>
+      <Empty className={styles.empty}>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <BookOpen aria-hidden="true" />
+          </EmptyMedia>
+          <EmptyDescription>{message}</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+      {hasMore && (
+        <div
+          ref={observerTarget}
+          className={styles.sentinel}
+          data-testid="infinite-scroll-sentinel"
+        />
+      )}
+      {hasMore && isFetchingNextPage && <div className={styles.loadingMore}>Loading more…</div>}
+    </>
+  );
+}
+
+function ListItems<TData>({
+  data,
+  renderItem,
+}: Pick<InfiniteScrollListProps<TData>, "data" | "renderItem">) {
+  return (
+    <>
+      {data.map((item, index) => (
+        <Fragment key={itemKey(item, index)}>{renderItem(item, index)}</Fragment>
+      ))}
+    </>
+  );
+}
+
 // react-doctor-disable-next-line react-doctor/no-many-boolean-props
 export function InfiniteScrollList<TData>({
   data,
@@ -77,49 +152,21 @@ export function InfiniteScrollList<TData>({
   }, [hasMore, onLoadMore, isFetchingNextPage]);
 
   if (isError && data.length === 0) {
-    return (
-      <Alert variant="destructive" className={styles.error}>
-        <CircleAlert aria-hidden="true" />
-        <AlertDescription>{errorMessage}</AlertDescription>
-        {onRetry && (
-          <Button type="button" variant="outline" size="sm" onClick={onRetry}>
-            Try again
-          </Button>
-        )}
-      </Alert>
-    );
+    return <ErrorState message={errorMessage} onRetry={onRetry} />;
   }
 
   if (isLoading && data.length === 0) {
-    return (
-      <div className={styles.skeletonContainer} role="status" aria-label="Loading content">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={`list-skeleton-${i}`} className={styles.skeletonRow} />
-        ))}
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (data.length === 0) {
     return (
-      <>
-        <Empty className={styles.empty}>
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <BookOpen aria-hidden="true" />
-            </EmptyMedia>
-            <EmptyDescription>{emptyMessage}</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-        {hasMore && (
-          <div
-            ref={observerTarget}
-            className={styles.sentinel}
-            data-testid="infinite-scroll-sentinel"
-          />
-        )}
-        {hasMore && isFetchingNextPage && <div className={styles.loadingMore}>Loading more…</div>}
-      </>
+      <EmptyState
+        message={emptyMessage}
+        hasMore={hasMore}
+        isFetchingNextPage={isFetchingNextPage}
+        observerTarget={observerTarget}
+      />
     );
   }
 
@@ -129,16 +176,7 @@ export function InfiniteScrollList<TData>({
         <Table>
           {tableHeader && <TableHeader>{tableHeader}</TableHeader>}
           <TableBody>
-            {data.map((item, itemIndex) => (
-              <Fragment
-                key={(() => {
-                  const parsed = ItemWithIdSchema.safeParse(item);
-                  return parsed.success ? String(parsed.data.id) : String(itemIndex);
-                })()}
-              >
-                {renderItem(item, itemIndex)}
-              </Fragment>
-            ))}
+            <ListItems data={data} renderItem={renderItem} />
           </TableBody>
         </Table>
         <div
@@ -154,16 +192,7 @@ export function InfiniteScrollList<TData>({
   // Render all items in a List with intersection observer for loading more
   return (
     <List>
-      {data.map((item, itemIndex) => (
-        <Fragment
-          key={(() => {
-            const parsed = ItemWithIdSchema.safeParse(item);
-            return parsed.success ? String(parsed.data.id) : String(itemIndex);
-          })()}
-        >
-          {renderItem(item, itemIndex)}
-        </Fragment>
-      ))}
+      <ListItems data={data} renderItem={renderItem} />
 
       {/* Intersection observer target for loading more */}
       <div

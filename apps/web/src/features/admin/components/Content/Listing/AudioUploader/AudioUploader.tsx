@@ -33,6 +33,42 @@ interface AudioUploaderProps {
   }) => void;
 }
 
+type ModeToggleProps = {
+  mode: UploadMode;
+  setMode: (mode: UploadMode) => void;
+  reset: () => void;
+  t: (key: string, fallback: string) => string;
+};
+
+function UploadModeToggle({ mode, setMode, reset, t }: ModeToggleProps) {
+  const selectMode = (nextMode: UploadMode) => {
+    setMode(nextMode);
+    reset();
+  };
+
+  return (
+    <div className={styles.modeToggle}>
+      <Button
+        type="button"
+        variant={mode === "file" ? "primary" : "ghost"}
+        size="sm"
+        onClick={() => selectMode("file")}
+      >
+        {t("admin.contents.listing.uploadFileMode", "Upload file")}
+      </Button>
+      <Button
+        type="button"
+        variant={mode === "link" ? "primary" : "ghost"}
+        size="sm"
+        icon={<Link2 size={14} />}
+        onClick={() => selectMode("link")}
+      >
+        {t("admin.contents.listing.pasteLinkMode", "Paste link")}
+      </Button>
+    </div>
+  );
+}
+
 export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
   const { t } = useTranslation();
   const [dragActive, setDragActive] = useState(false);
@@ -160,33 +196,15 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
   return (
     <div className={styles.container}>
       {showModeToggle && (
-        <div className={styles.modeToggle}>
-          <Button
-            type="button"
-            variant={mode === "file" ? "primary" : "ghost"}
-            size="sm"
-            onClick={() => {
-              setMode("file");
-              setUploadState("idle");
-              setError(null);
-            }}
-          >
-            {t("admin.contents.listing.uploadFileMode", "Upload file")}
-          </Button>
-          <Button
-            type="button"
-            variant={mode === "link" ? "primary" : "ghost"}
-            size="sm"
-            icon={<Link2 size={14} />}
-            onClick={() => {
-              setMode("link");
-              setUploadState("idle");
-              setError(null);
-            }}
-          >
-            {t("admin.contents.listing.pasteLinkMode", "Paste link")}
-          </Button>
-        </div>
+        <UploadModeToggle
+          mode={mode}
+          setMode={setMode}
+          reset={() => {
+            setUploadState("idle");
+            setError(null);
+          }}
+          t={t}
+        />
       )}
 
       {mode === "link" && uploadState === "idle" ? (

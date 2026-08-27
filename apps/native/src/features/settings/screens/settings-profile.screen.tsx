@@ -26,6 +26,85 @@ function getVisibleRoles(profile: { roles?: string[] }): string[] {
   return profile.roles?.filter((role) => role !== "listener") ?? [];
 }
 
+type ProfileEditControlsProps = {
+  isEditing: boolean;
+  isDirty: boolean;
+  isPending: boolean;
+  onEdit: () => void;
+  onCancel: () => void;
+  onSave: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function ProfileEditControls({
+  isEditing,
+  isDirty,
+  isPending,
+  onEdit,
+  onCancel,
+  onSave,
+  t,
+}: ProfileEditControlsProps) {
+  if (!isEditing)
+    return (
+      <Pressable onPress={onEdit} style={styles.editButton}>
+        <AppText variant="bodySm" style={styles.editButtonText}>
+          {t("account.profile.edit", "Edit")}
+        </AppText>
+      </Pressable>
+    );
+  return (
+    <View style={styles.editActions}>
+      <Pressable
+        onPress={onCancel}
+        disabled={isPending}
+        style={[styles.editButton, styles.editButtonOutline]}
+      >
+        <AppText variant="bodySm" style={styles.editButtonOutlineText}>
+          {t("account.profile.cancel", "Cancel")}
+        </AppText>
+      </Pressable>
+      <Pressable
+        onPress={onSave}
+        disabled={!isDirty || isPending}
+        style={[styles.editButton, (!isDirty || isPending) && styles.editButtonDisabled]}
+      >
+        <AppText variant="bodySm" style={styles.editButtonText}>
+          {isPending ? t("account.profile.saving", "Saving…") : t("account.profile.save", "Save")}
+        </AppText>
+      </Pressable>
+    </View>
+  );
+}
+
+function ProfileRoles({
+  roles,
+  theme,
+  t,
+}: {
+  roles: string[];
+  theme: ReturnType<typeof useUnistyles>["theme"];
+  t: ProfileEditControlsProps["t"];
+}) {
+  if (roles.length === 0) return null;
+  return (
+    <SettingsRow label={t("account.profile.roles", "Roles")} hideBorder>
+      <View style={styles.rolesRow}>
+        {roles.map((role) => (
+          <View
+            key={role}
+            style={[styles.roleBadge, { backgroundColor: theme.colors.surface.hover }]}
+          >
+            <AppText variant="caption" style={{ color: theme.colors.content.strong }}>
+              {role}
+            </AppText>
+          </View>
+        ))}
+      </View>
+    </SettingsRow>
+  );
+}
+
 function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
@@ -112,36 +191,15 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
               editable={isEditing}
               style={[styles.input, !isEditing && styles.inputDisabled]}
             />
-            {!isEditing ? (
-              <Pressable onPress={() => setIsEditing(true)} style={styles.editButton}>
-                <AppText variant="bodySm" style={styles.editButtonText}>
-                  {t("account.profile.edit", "Edit")}
-                </AppText>
-              </Pressable>
-            ) : (
-              <View style={styles.editActions}>
-                <Pressable
-                  onPress={handleCancel}
-                  disabled={isPending}
-                  style={[styles.editButton, styles.editButtonOutline]}
-                >
-                  <AppText variant="bodySm" style={styles.editButtonOutlineText}>
-                    {t("account.profile.cancel", "Cancel")}
-                  </AppText>
-                </Pressable>
-                <Pressable
-                  onPress={handleSave}
-                  disabled={!isDirty || isPending}
-                  style={[styles.editButton, (!isDirty || isPending) && styles.editButtonDisabled]}
-                >
-                  <AppText variant="bodySm" style={styles.editButtonText}>
-                    {isPending
-                      ? t("account.profile.saving", "Saving…")
-                      : t("account.profile.save", "Save")}
-                  </AppText>
-                </Pressable>
-              </View>
-            )}
+            <ProfileEditControls
+              isEditing={isEditing}
+              isDirty={isDirty}
+              isPending={isPending}
+              onEdit={() => setIsEditing(true)}
+              onCancel={handleCancel}
+              onSave={handleSave}
+              t={t}
+            />
           </View>
         </SettingsRow>
         <SettingsRow
@@ -152,22 +210,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
             {profile.email}
           </AppText>
         </SettingsRow>
-        {nonListenerRoles.length > 0 && (
-          <SettingsRow label={t("account.profile.roles", "Roles")} hideBorder>
-            <View style={styles.rolesRow}>
-              {nonListenerRoles.map((r: string) => (
-                <View
-                  key={r}
-                  style={[styles.roleBadge, { backgroundColor: theme.colors.surface.hover }]}
-                >
-                  <AppText variant="caption" style={{ color: theme.colors.content.strong }}>
-                    {r}
-                  </AppText>
-                </View>
-              ))}
-            </View>
-          </SettingsRow>
-        )}
+        <ProfileRoles roles={nonListenerRoles} theme={theme} t={t} />
       </SettingsSection>
 
       {(isSuccess || isError) && (

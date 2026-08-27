@@ -6,9 +6,9 @@ import { useAbility } from "@sd/domain-account";
 import { X, Send, Film, ExternalLink, Pencil, Languages } from "lucide-react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Button } from "@/shared/components/ui/button";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { Button } from "@/shared/components/ui/button";
 import { UserAvatar } from "@/shared/components/user-avatar";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
@@ -21,18 +21,100 @@ export interface ScholarItemProps {
   onTranslate?: () => void;
 }
 
+type ScholarSocialsProps = Pick<
+  AdminScholarListItemDto,
+  "socialTwitter" | "socialTelegram" | "socialYoutube" | "socialWebsite"
+>;
+
+function ScholarSocials({
+  socialTwitter,
+  socialTelegram,
+  socialYoutube,
+  socialWebsite,
+}: ScholarSocialsProps) {
+  const links = [
+    { href: socialTwitter, label: "Twitter", icon: <X size={14} /> },
+    { href: socialTelegram, label: "Telegram", icon: <Send size={14} /> },
+    { href: socialYoutube, label: "YouTube", icon: <Film size={14} /> },
+    { href: socialWebsite, label: "Website", icon: <ExternalLink size={14} /> },
+  ];
+  const visibleLinks = links.filter((link) => link.href);
+  if (visibleLinks.length === 0) return null;
+  return (
+    <div className={styles.socialRow}>
+      {visibleLinks.map((link) => (
+        <a
+          key={link.label}
+          href={link.href ?? undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.socialLink}
+          title={link.label}
+          aria-label={link.label}
+        >
+          {link.icon}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+type ScholarItemActionsProps = {
+  isMobile: boolean;
+  canEdit: boolean;
+  canTranslate: boolean;
+  scholarName: string;
+  onEdit: () => void;
+  onTranslate?: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function ScholarItemActions({
+  isMobile,
+  canEdit,
+  canTranslate,
+  scholarName,
+  onEdit,
+  onTranslate,
+  t,
+}: ScholarItemActionsProps) {
+  const buttonProps = {
+    variant: isMobile ? ("outline" as const) : ("ghost" as const),
+    size: isMobile ? ("sm" as const) : ("icon" as const),
+    fullWidth: isMobile,
+  };
+  return (
+    <List.Item.Actions>
+      {canEdit && (
+        <Button
+          {...buttonProps}
+          onClick={onEdit}
+          icon={<Pencil size={16} />}
+          aria-label={`Edit ${scholarName}`}
+        >
+          {isMobile && t("common.edit", "Edit")}
+        </Button>
+      )}
+      {canTranslate && (
+        <Button
+          {...buttonProps}
+          onClick={onTranslate}
+          icon={<Languages size={16} />}
+          aria-label={`Translate ${scholarName}`}
+        >
+          {isMobile && t("admin.translations.button", "Translations")}
+        </Button>
+      )}
+    </List.Item.Actions>
+  );
+}
+
 export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
   const { ability } = useAbility();
   const formatScholarName = useFormatScholarName();
   const countryName = scholar.country ? (COUNTRY_NAMES[scholar.country] ?? scholar.country) : null;
-
-  const hasSocials =
-    scholar.socialTwitter ||
-    scholar.socialTelegram ||
-    scholar.socialYoutube ||
-    scholar.socialWebsite;
 
   return (
     <List.Item interactive className={styles.listItem}>
@@ -69,86 +151,18 @@ export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) 
             </div>
           )}
           {scholar.bio && <p className={styles.bio}>{scholar.bio}</p>}
-          {hasSocials && (
-            <div className={styles.socialRow}>
-              {scholar.socialTwitter && (
-                <a
-                  href={scholar.socialTwitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.socialLink}
-                  title="Twitter"
-                  aria-label="Twitter"
-                >
-                  <X size={14} />
-                </a>
-              )}
-              {scholar.socialTelegram && (
-                <a
-                  href={scholar.socialTelegram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.socialLink}
-                  title="Telegram"
-                  aria-label="Telegram"
-                >
-                  <Send size={14} />
-                </a>
-              )}
-              {scholar.socialYoutube && (
-                <a
-                  href={scholar.socialYoutube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.socialLink}
-                  title="YouTube"
-                  aria-label="YouTube"
-                >
-                  <Film size={14} />
-                </a>
-              )}
-              {scholar.socialWebsite && (
-                <a
-                  href={scholar.socialWebsite}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.socialLink}
-                  title="Website"
-                  aria-label="Website"
-                >
-                  <ExternalLink size={14} />
-                </a>
-              )}
-            </div>
-          )}
+          <ScholarSocials {...scholar} />
         </div>
       </div>
-      <List.Item.Actions>
-        {ability.can("update", subject("Scholar", { slug: scholar.slug })) && (
-          <Button
-            variant={isMobile ? "outline" : "ghost"}
-            size={isMobile ? "sm" : "icon"}
-            fullWidth={isMobile}
-            onClick={onEdit}
-            icon={<Pencil size={16} />}
-            aria-label={`Edit ${scholar.name}`}
-          >
-            {isMobile && t("common.edit", "Edit")}
-          </Button>
-        )}
-        {ability.can("read", subject("Translation", { scholarSlug: scholar.slug })) && (
-          <Button
-            variant={isMobile ? "outline" : "ghost"}
-            size={isMobile ? "sm" : "icon"}
-            fullWidth={isMobile}
-            onClick={onTranslate}
-            icon={<Languages size={16} />}
-            aria-label={`Translate ${scholar.name}`}
-          >
-            {isMobile && t("admin.translations.button", "Translations")}
-          </Button>
-        )}
-      </List.Item.Actions>
+      <ScholarItemActions
+        isMobile={isMobile}
+        canEdit={ability.can("update", subject("Scholar", { slug: scholar.slug }))}
+        canTranslate={ability.can("read", subject("Translation", { scholarSlug: scholar.slug }))}
+        scholarName={scholar.name}
+        onEdit={onEdit}
+        onTranslate={onTranslate}
+        t={t}
+      />
     </List.Item>
   );
 }

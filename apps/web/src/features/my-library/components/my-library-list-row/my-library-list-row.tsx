@@ -24,6 +24,40 @@ export type MyLibraryListRowProps = {
   variant: "progress" | "saved" | "completed";
 };
 
+function statusLabelFor(
+  variant: MyLibraryListRowProps["variant"],
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  if (variant === "progress") return t("myLibrary.status.progress", "In progress");
+  if (variant === "saved") return t("myLibrary.status.saved", "Saved");
+  return t("myLibrary.status.completed", "Completed");
+}
+
+function badgeVariantFor(variant: MyLibraryListRowProps["variant"]) {
+  if (variant === "progress") return "default" as const;
+  if (variant === "completed") return "secondary" as const;
+  return "outline" as const;
+}
+
+function rightLabelFor(
+  variant: MyLibraryListRowProps["variant"],
+  progress: number | null,
+  item: MyLibraryItemDto,
+  savedAt: string,
+  completedAt: string,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  if (variant === "progress" && progress !== null)
+    return t("myLibrary.percentListened", "{{percent}}% listened", { percent: progress });
+  if (variant === "saved" && item.savedAt)
+    return t("myLibrary.savedOn", "Saved {{date}}", { date: savedAt });
+  if (variant === "completed" && item.completedAt)
+    return t("myLibrary.completedOn", "Completed {{date}}", { date: completedAt });
+  if (item.durationSeconds)
+    return t("lecture.minutes", "{{count}} min", { count: Math.round(item.durationSeconds / 60) });
+  return "";
+}
+
 export function MyLibraryListRow({ item, variant }: MyLibraryListRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
@@ -34,12 +68,7 @@ export function MyLibraryListRow({ item, variant }: MyLibraryListRowProps) {
   const initial = scholarName ? scholarName.trim().charAt(0).toUpperCase() : "?";
 
   const progress = getMyLibraryItemPercent(item);
-  const statusLabel =
-    variant === "progress"
-      ? t("myLibrary.status.progress", "In progress")
-      : variant === "saved"
-        ? t("myLibrary.status.saved", "Saved")
-        : t("myLibrary.status.completed", "Completed");
+  const statusLabel = statusLabelFor(variant, t);
   const seriesProgress =
     item.totalLeafCount && item.totalLeafCount > 0
       ? t("myLibrary.seriesProgress", "{{completed}} of {{total}} lessons", {
@@ -59,22 +88,14 @@ export function MyLibraryListRow({ item, variant }: MyLibraryListRowProps) {
     day: "numeric",
   });
 
-  let rightLabelText = "";
-  if (variant === "progress" && progress !== null) {
-    rightLabelText = t("myLibrary.percentListened", "{{percent}}% listened", { percent: progress });
-  } else if (variant === "saved" && item.savedAt) {
-    rightLabelText = t("myLibrary.savedOn", "Saved {{date}}", {
-      date: savedAtFormatted,
-    });
-  } else if (variant === "completed" && item.completedAt) {
-    rightLabelText = t("myLibrary.completedOn", "Completed {{date}}", {
-      date: completedAtFormatted,
-    });
-  } else if (item.durationSeconds) {
-    rightLabelText = t("lecture.minutes", "{{count}} min", {
-      count: Math.round(item.durationSeconds / 60),
-    });
-  }
+  const rightLabelText = rightLabelFor(
+    variant,
+    progress,
+    item,
+    savedAtFormatted,
+    completedAtFormatted,
+    t,
+  );
 
   return (
     <Card size="sm" className={styles.card}>
@@ -97,17 +118,7 @@ export function MyLibraryListRow({ item, variant }: MyLibraryListRowProps) {
                 {scholarName}
                 {item.seriesTitle && ` · ${item.seriesTitle}`}
               </span>
-              <Badge
-                variant={
-                  variant === "progress"
-                    ? "default"
-                    : variant === "completed"
-                      ? "secondary"
-                      : "outline"
-                }
-              >
-                {statusLabel}
-              </Badge>
+              <Badge variant={badgeVariantFor(variant)}>{statusLabel}</Badge>
             </div>
             {seriesProgress && <div className={styles.seriesProgress}>{seriesProgress}</div>}
             {variant === "progress" && progress !== null && (

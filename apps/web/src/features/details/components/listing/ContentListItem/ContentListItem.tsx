@@ -23,6 +23,48 @@ function formatDuration(seconds?: number): string {
   return `${m}m`;
 }
 
+function StatusCircle({ completed }: { completed: boolean }) {
+  return (
+    <div className={`${styles.statusCircle} ${completed ? styles.completedCircle : ""}`}>
+      {completed && <Check size={12} strokeWidth={3} />}
+    </div>
+  );
+}
+
+function ProgressIndicator({
+  durationStr,
+  progressPercent,
+  completed,
+}: {
+  durationStr: string;
+  progressPercent: number;
+  completed: boolean;
+}) {
+  return (
+    <>
+      {durationStr && <p className={styles.itemDuration}>{durationStr}</p>}
+      {progressPercent > 0 && !completed && (
+        <div className={styles.progressBarContainer}>
+          <div className={styles.progressBarFill} style={{ width: `${progressPercent}%` }} />
+        </div>
+      )}
+    </>
+  );
+}
+
+function PlayIcon({ playing }: { playing: boolean }) {
+  return playing ? (
+    <Pause size={13} fill="var(--action-primary)" color="var(--action-primary)" />
+  ) : (
+    <Play
+      size={13}
+      fill="var(--action-primary)"
+      color="var(--action-primary)"
+      style={{ marginLeft: 1 }}
+    />
+  );
+}
+
 export type ContentListItemProps = {
   item: ListingContentItemDto;
   scholarName?: string;
@@ -36,6 +78,51 @@ export type ContentListItemProps = {
   /** When this matches `item.id`, the row gets an anchor id and a brief highlight animation. */
   highlightItemId?: string;
 };
+
+async function playContentItem(
+  e: React.MouseEvent | undefined,
+  isCurrentTrack: boolean,
+  isPlaying: boolean,
+  item: ListingContentItemDto,
+  formattedScholarName: string,
+  context: Pick<
+    ContentListItemProps,
+    "seriesId" | "seriesTitle" | "moduleId" | "moduleTitle" | "collectionId" | "allTracksInContext"
+  >,
+) {
+  e?.stopPropagation();
+  if (isCurrentTrack) {
+    if (isPlaying) await audioService.pause();
+    else await audioService.resume();
+    return;
+  }
+  const track = createContentTrack(item, formattedScholarName, context);
+  const queueContext = context.allTracksInContext?.length ? context.allTracksInContext : [track];
+  await audioService.playListing(track, queueContext);
+}
+
+function createContentTrack(
+  item: ListingContentItemDto,
+  artist: string,
+  context: Pick<
+    ContentListItemProps,
+    "seriesId" | "seriesTitle" | "moduleId" | "moduleTitle" | "collectionId"
+  >,
+): Track {
+  return {
+    id: item.id,
+    slug: item.slug,
+    title: item.title,
+    artist,
+    url: item.primaryAudioAsset?.url ?? "",
+    durationSeconds: item.durationSeconds || item.primaryAudioAsset?.durationSeconds || 0,
+    seriesId: context.seriesId ?? null,
+    seriesTitle: context.seriesTitle ?? null,
+    moduleId: context.moduleId ?? null,
+    moduleTitle: context.moduleTitle ?? null,
+    collectionId: context.collectionId ?? null,
+  };
+}
 
 export function ContentListItem({
   item,
@@ -65,36 +152,15 @@ export function ContentListItem({
       ? Math.min(100, (progress.positionSeconds / progress.durationSeconds) * 100)
       : 0;
 
-  const handlePlayClick = async (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-
-    if (isCurrentTrack) {
-      if (isPlaying) {
-        await audioService.pause();
-      } else {
-        await audioService.resume();
-      }
-      return;
-    }
-
-    const track: Track = {
-      id: item.id,
-      slug: item.slug,
-      title: item.title,
-      artist: formattedScholarName,
-      url: item.primaryAudioAsset?.url ?? "",
-      durationSeconds: item.durationSeconds || item.primaryAudioAsset?.durationSeconds || 0,
-      seriesId: seriesId ?? null,
-      seriesTitle: seriesTitle ?? null,
-      moduleId: moduleId ?? null,
-      moduleTitle: moduleTitle ?? null,
-      collectionId: collectionId ?? null,
-    };
-
-    const queueContext =
-      allTracksInContext && allTracksInContext.length > 0 ? allTracksInContext : [track];
-    await audioService.playListing(track, queueContext);
-  };
+  const handlePlayClick = (e?: React.MouseEvent) =>
+    playContentItem(e, isCurrentTrack, isPlaying, item, formattedScholarName, {
+      seriesId,
+      seriesTitle,
+      moduleId,
+      moduleTitle,
+      collectionId,
+      allTracksInContext,
+    });
 
   const isHighlighted = highlightItemId === item.id;
 
@@ -108,18 +174,15 @@ export function ContentListItem({
     >
       <div className={styles.leftGroup}>
         {/* Status circle: checkmark if completed, otherwise empty circle */}
-        <div className={`${styles.statusCircle} ${isCompleted ? styles.completedCircle : ""}`}>
-          {isCompleted && <Check size={12} strokeWidth={3} />}
-        </div>
+        <StatusCircle completed={isCompleted} />
 
         <div className={styles.titleGroup}>
           <p className={styles.itemTitle}>{item.title}</p>
-          {durationStr && <p className={styles.itemDuration}>{durationStr}</p>}
-          {progressPercent > 0 && !isCompleted && (
-            <div className={styles.progressBarContainer}>
-              <div className={styles.progressBarFill} style={{ width: `${progressPercent}%` }} />
-            </div>
-          )}
+          <ProgressIndicator
+            durationStr={durationStr}
+            progressPercent={progressPercent}
+            completed={isCompleted}
+          />
         </div>
       </div>
 
@@ -129,16 +192,7 @@ export function ContentListItem({
         aria-label={isCurrentlyPlaying ? `Pause ${item.title}` : `Play ${item.title}`}
         className={styles.playCircleBtn}
       >
-        {isCurrentlyPlaying ? (
-          <Pause size={13} fill="var(--action-primary)" color="var(--action-primary)" />
-        ) : (
-          <Play
-            size={13}
-            fill="var(--action-primary)"
-            color="var(--action-primary)"
-            style={{ marginLeft: 1 }}
-          />
-        )}
+        <PlayIcon playing={isCurrentlyPlaying} />
       </button>
     </List.Item>
   );

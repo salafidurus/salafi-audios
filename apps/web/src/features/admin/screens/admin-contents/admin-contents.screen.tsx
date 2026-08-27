@@ -27,6 +27,46 @@ import styles from "./admin-contents.screen.module.css";
 const EMPTY_TOPICS_ARRAY: TopicDetailDto[] = [];
 type ContentTab = "listings" | "topics" | "promotions";
 
+type Translate = (key: string, fallback: string) => string;
+
+function getContentTitle(isMobile: boolean, activeTab: ContentTab, t: Translate): string {
+  if (isMobile) return t("admin.contents.titleMobile", "Content");
+  if (activeTab === "topics") return t("admin.contents.topicManagement", "Topic Management");
+  if (activeTab === "listings") return t("admin.contents.listingManagement", "Listing Management");
+  return t("admin.contents.promotionsManagement", "Promotions Management");
+}
+
+type ContentActionsProps = {
+  isMobile: boolean;
+  activeTab: ContentTab;
+  canCreate: boolean;
+  onClick: () => void;
+  t: Translate;
+};
+
+function ContentActions({ isMobile, activeTab, canCreate, onClick, t }: ContentActionsProps) {
+  if (!canCreate || activeTab === "promotions") return null;
+  const isTopic = activeTab === "topics";
+  return (
+    <Button
+      variant="primary"
+      size={isMobile ? "sm" : "md"}
+      icon={<Plus size={isMobile ? 16 : 18} />}
+      onClick={onClick}
+    >
+      {isTopic
+        ? t(
+            isMobile ? "admin.contents.addTopicMobile" : "admin.contents.addTopic",
+            isMobile ? "Topic" : "Add Topic",
+          )
+        : t(
+            isMobile ? "admin.contents.addListingMobile" : "admin.contents.addListing",
+            isMobile ? "Listing" : "Add Listing",
+          )}
+    </Button>
+  );
+}
+
 export function AdminContentsScreen() {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
@@ -81,43 +121,19 @@ export function AdminContentsScreen() {
           <StickyHeaderLayout>
             <StickyHeaderLayout.Header>
               <PageHeader
-                title={
-                  isMobile
-                    ? t("admin.contents.titleMobile", "Content")
-                    : activeTab === "topics"
-                      ? t("admin.contents.topicManagement", "Topic Management")
-                      : activeTab === "listings"
-                        ? t("admin.contents.listingManagement", "Listing Management")
-                        : t("admin.contents.promotionsManagement", "Promotions Management")
-                }
+                title={getContentTitle(isMobile, activeTab, t)}
                 actions={
-                  activeTab === "topics"
-                    ? ability.can("create", "Topic") && (
-                        <Button
-                          variant="primary"
-                          size={!isMobile ? "md" : "sm"}
-                          icon={<Plus size={!isMobile ? 18 : 16} />}
-                          onClick={handleOpenAddTopic}
-                        >
-                          {!isMobile
-                            ? t("admin.contents.addTopic", "Add Topic")
-                            : t("admin.contents.addTopicMobile", "Topic")}
-                        </Button>
-                      )
-                    : activeTab === "listings"
-                      ? ability.can("create", "Listing") && (
-                          <Button
-                            variant="primary"
-                            size={!isMobile ? "md" : "sm"}
-                            icon={<Plus size={!isMobile ? 18 : 16} />}
-                            onClick={handleOpenAddListing}
-                          >
-                            {!isMobile
-                              ? t("admin.contents.addListing", "Add Listing")
-                              : t("admin.contents.addListingMobile", "Listing")}
-                          </Button>
-                        )
-                      : null
+                  <ContentActions
+                    isMobile={isMobile}
+                    activeTab={activeTab}
+                    canCreate={
+                      activeTab === "topics"
+                        ? ability.can("create", "Topic")
+                        : ability.can("create", "Listing")
+                    }
+                    onClick={activeTab === "topics" ? handleOpenAddTopic : handleOpenAddListing}
+                    t={t}
+                  />
                 }
               />
 

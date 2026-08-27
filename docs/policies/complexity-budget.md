@@ -24,7 +24,7 @@ proxy for naming, file size, switch readability, or architectural layering.
 
 ## Ratchet
 
-The initial maximum was **100**. The active maximum is **50** after the first
+The initial maximum was **100**. The active maximum is **15** after the third
 ratchet completed with zero violations. The budget may only decrease after a
 complete scan reports zero violations at the current maximum:
 
@@ -52,6 +52,15 @@ violations: `httpClient` (32), `LectureDetailScreen` (33),
 `ListingDetailScreen` (31), `ReviewSection` (35), `FeedListRow` (34),
 `arrangeCommit` (47), and `MetaDataSection` (30). After behavior-preserving
 refactoring, the scan reports **zero violations** at maximum 25.
+
+### Ratchet 25 → 15
+
+The completed scan covered production source under `apps/*/src` and
+`packages/*/src`. The initial scan reported **47 violations** at maximum 15:
+11 in API, seven in native, and 29 in web. After behavior-preserving
+refactoring of projection, authorization, form, modal, and screen-rendering
+boundaries, the scan reports **zero violations** at maximum 15. Focused API,
+web, and native behavioral tests remained green for the affected paths.
 
 ## Exceptions
 

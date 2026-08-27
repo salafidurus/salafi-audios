@@ -36,6 +36,71 @@ export interface TranslationModalProps {
   target: ClientTranslationTarget | null;
 }
 
+function TranslationStatusNotices({
+  status,
+  entityId,
+  error,
+  t,
+}: {
+  status: string;
+  entityId?: string | null;
+  error: string | null;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <>
+      {status === "loading" && (
+        <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
+      )}
+      {status === "error" && !entityId && (
+        <div className={styles.error}>
+          {error ?? t("admin.contents.failedToLoad", "Failed to load")}
+        </div>
+      )}
+      {error && status === "ready" && <div className={styles.error}>{error}</div>}
+    </>
+  );
+}
+
+function TranslationModalFooter({
+  activeTab,
+  saving,
+  onClose,
+  onReview,
+  t,
+}: {
+  activeTab: string;
+  saving: boolean;
+  onClose: () => void;
+  onReview: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <DialogFooter>
+      <Button variant="outline" size="sm" onClick={onClose} disabled={saving}>
+        {t("common.cancel", "Cancel")}
+      </Button>
+      {activeTab === "review" ? (
+        <Button type="submit" form="translation-form" variant="primary" loading={saving}>
+          {saving ? t("admin.access.saving", "Saving…") : t("common.save", "Save")}
+        </Button>
+      ) : (
+        <Button type="button" variant="primary" onClick={onReview}>
+          {t("admin.modal.reviewTab", "Review")}
+        </Button>
+      )}
+    </DialogFooter>
+  );
+}
+
+function getTranslationModalTitle(
+  sourceTitle: string | null | undefined,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  const title = t("admin.translations.title", "Translations");
+  return sourceTitle ? `${title} — ${sourceTitle}` : title;
+}
+
 export function TranslationModal({ isOpen, onClose, target }: TranslationModalProps) {
   const { t } = useTranslation();
   // Empty until the user picks a tab — falls back to the first secondary locale
@@ -191,9 +256,7 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
 
   const titleField = config.fields[0];
   const sourceTitle = titleField ? state.source[titleField.key] : undefined;
-  const modalTitle = sourceTitle
-    ? `${t("admin.translations.title", "Translations")} — ${sourceTitle}`
-    : t("admin.translations.title", "Translations");
+  const modalTitle = getTranslationModalTitle(sourceTitle, t);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && !state.saving && handleClose()}>
@@ -234,19 +297,12 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
                 {t("admin.modal.reviewTab", "Review")}
               </TabsTrigger>
             </TabsList>
-            {state.status === "loading" && (
-              <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
-            )}
-
-            {state.status === "error" && !state.entityId && (
-              <div className={styles.error}>
-                {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
-              </div>
-            )}
-
-            {state.error && state.status === "ready" && (
-              <div className={styles.error}>{state.error}</div>
-            )}
+            <TranslationStatusNotices
+              status={state.status}
+              entityId={state.entityId}
+              error={state.error}
+              t={t}
+            />
 
             {secondaryLocales.map((locale) => (
               <TabsContent key={locale} value={locale}>
@@ -291,29 +347,13 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
             </TabsContent>
           </Tabs>
 
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={handleClose} disabled={state.saving}>
-              {t("common.cancel", "Cancel")}
-            </Button>
-            {activeTab === "review" ? (
-              <Button
-                type="submit"
-                form="translation-form"
-                variant="primary"
-                loading={state.saving}
-              >
-                {state.saving ? t("admin.access.saving", "Saving…") : t("common.save", "Save")}
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="primary"
-                onClick={() => setActiveTabOverride("review")}
-              >
-                {t("admin.modal.reviewTab", "Review")}
-              </Button>
-            )}
-          </DialogFooter>
+          <TranslationModalFooter
+            activeTab={activeTab}
+            saving={state.saving}
+            onClose={handleClose}
+            onReview={() => setActiveTabOverride("review")}
+            t={t}
+          />
         </form>
       </DialogContent>
     </Dialog>

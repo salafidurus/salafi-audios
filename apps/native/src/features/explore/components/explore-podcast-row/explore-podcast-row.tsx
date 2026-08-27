@@ -4,7 +4,13 @@ import type { Track } from "@sd/domain-audio";
 
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
-import { useAudio, useListingProgress, buildTrackQueue } from "@sd/domain-audio";
+import {
+  isTrackActiveForListing,
+  isListingFormat,
+  useAudio,
+  useListingProgress,
+  buildTrackQueue,
+} from "@sd/domain-audio";
 import { useFormattedScholarName, useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -37,9 +43,8 @@ export function ExplorePodcastRow({
 
   const { isPlaying, currentTrack } = useAudio();
   const isCurrentTrack =
-    currentTrack?.slug === item.slug ||
-    currentTrack?.seriesId === item.id ||
-    currentTrack?.collectionId === item.id;
+    isListingFormat(item.kind) &&
+    isTrackActiveForListing({ id: item.id, slug: item.slug, format: item.kind }, currentTrack);
 
   const isSaved = useIsSaved(item.id);
 

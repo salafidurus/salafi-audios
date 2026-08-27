@@ -2,7 +2,13 @@
 
 import type { ListingDetailDto, ListingContentsDto } from "@sd/core-contracts";
 
-import { useAudio, useProgressStore, buildTrackQueue, type Track } from "@sd/domain-audio";
+import {
+  isTrackActiveForListing,
+  useAudio,
+  useProgressStore,
+  buildTrackQueue,
+  type Track,
+} from "@sd/domain-audio";
 import { useLastPlayedLesson } from "@sd/domain-content";
 import { Play, Pause, RotateCcw } from "lucide-react";
 import React from "react";
@@ -20,58 +26,23 @@ export type QuickButtonSectionProps = {
   contents?: ListingContentsDto;
 };
 
-export function QuickButtonSection({ listing, contents }: QuickButtonSectionProps) {
-  const formatScholarName = useFormatScholarName();
-  const { isAuthenticated } = useAuth();
-  const { isPlaying, currentTrack } = useAudio();
-  const { data: lastPlayed } = useLastPlayedLesson(listing.slug, isAuthenticated);
+function hasListingProgress(
+  isSingle: boolean,
+  singleProgress: ReturnType<typeof useProgressStore.getState>["progressMap"][string] | undefined,
+  lastPlayed: { positionSeconds: number; isCompleted: boolean } | null | undefined,
+) {
+  if (isSingle)
+    return !!singleProgress && singleProgress.positionSeconds > 0 && !singleProgress.completedAt;
+  return !!lastPlayed && lastPlayed.positionSeconds > 0 && !lastPlayed.isCompleted;
+}
 
-  // Check progress: for single, check store directly; for series/collection, check lastPlayed or store
-  const singleProgress = useProgressStore((s) => s.progressMap[listing.slug]);
-
-  const isSingle = listing.format === "single";
-
-  const hasProgress = isSingle
-    ? !!singleProgress && singleProgress.positionSeconds > 0 && !singleProgress.completedAt
-    : !!lastPlayed && lastPlayed.positionSeconds > 0 && !lastPlayed.isCompleted;
-
-  // Check if currently playing:
-  // single -> currentTrack.slug === listing.slug
-  // series -> currentTrack.seriesId === listing.id
-  // collection -> currentTrack.collectionId === listing.id
-  const isCurrentlyPlaying = isSingle
-    ? currentTrack?.slug === listing.slug && isPlaying
-    : listing.format === "series"
-      ? currentTrack?.seriesId === listing.id && isPlaying
-      : currentTrack?.collectionId === listing.id && isPlaying;
-
-  const isCurrentActive = isSingle
-    ? currentTrack?.slug === listing.slug
-    : listing.format === "series"
-      ? currentTrack?.seriesId === listing.id
-      : currentTrack?.collectionId === listing.id;
-
-  // Builds the full ordered queue from contents, optionally starting eager
-  // URL resolution at a specific track (e.g. resuming mid-series/collection).
-  const getAllTracks = (startAtId?: string): Track[] => {
-    if (!contents) {
-      if (listing.primaryAudioAsset) {
-        return [
-          {
-            id: listing.id,
-            slug: listing.slug,
-            title: listing.title,
-            artist: formatScholarName(listing.scholar),
-            url: listing.primaryAudioAsset.url,
-            durationSeconds:
-              listing.durationSeconds || listing.primaryAudioAsset.durationSeconds || 0,
-            artworkUrl: listing.scholar.imageUrl,
-          },
-        ];
-      }
-      return [];
-    }
-
+function buildListingTracks(
+  listing: ListingDetailDto,
+  contents: ListingContentsDto | undefined,
+  formatScholarName: (scholar: ListingDetailDto["scholar"]) => string,
+  startAtId?: string,
+): Track[] {
+  if (contents) {
     return buildTrackQueue(
       {
         id: listing.id,
@@ -84,7 +55,45 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
       contents,
       { startAtId },
     );
-  };
+  }
+  if (!listing.primaryAudioAsset) return [];
+  return [
+    {
+      id: listing.id,
+      slug: listing.slug,
+      title: listing.title,
+      artist: formatScholarName(listing.scholar),
+      url: listing.primaryAudioAsset.url,
+      durationSeconds: listing.durationSeconds || listing.primaryAudioAsset.durationSeconds || 0,
+      artworkUrl: listing.scholar.imageUrl,
+    },
+  ];
+}
+
+export function QuickButtonSection({ listing, contents }: QuickButtonSectionProps) {
+  const formatScholarName = useFormatScholarName();
+  const { isAuthenticated } = useAuth();
+  const { isPlaying, currentTrack } = useAudio();
+  const { data: lastPlayed } = useLastPlayedLesson(listing.slug, isAuthenticated);
+
+  // Check progress: for single, check store directly; for series/collection, check lastPlayed or store
+  const singleProgress = useProgressStore((s) => s.progressMap[listing.slug]);
+
+  const isSingle = listing.format === "single";
+
+  const hasProgress = hasListingProgress(isSingle, singleProgress, lastPlayed);
+
+  // Check if currently playing:
+  // single -> currentTrack.slug === listing.slug
+  // series -> currentTrack.seriesId === listing.id
+  // collection -> currentTrack.collectionId === listing.id
+  const isCurrentActive = isTrackActiveForListing(listing, currentTrack);
+  const isCurrentlyPlaying = isCurrentActive && isPlaying;
+
+  // Builds the full ordered queue from contents, optionally starting eager
+  // URL resolution at a specific track (e.g. resuming mid-series/collection).
+  const getAllTracks = (startAtId?: string) =>
+    buildListingTracks(listing, contents, formatScholarName, startAtId);
 
   const handlePlayPauseToggle = async () => {
     if (isCurrentActive) {

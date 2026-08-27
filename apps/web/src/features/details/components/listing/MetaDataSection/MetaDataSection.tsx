@@ -57,41 +57,78 @@ type MetadataRowsProps = {
 };
 
 function MetadataRows({ metadata, t }: MetadataRowsProps) {
-  const { listing, duration, language, hasLessonCount, moduleCount } = metadata;
-  const hasModuleCount = moduleCount !== undefined;
-  const hasMeta = Boolean(duration || language || hasLessonCount || hasModuleCount);
-
   return (
     <div className={styles.metaRow}>
-      {listing.topics.length > 0 && <TopicChips topics={listing.topics} />}
-      {listing.topics.length > 0 && hasMeta && <span className={styles.dot}>•</span>}
-      {duration && (
-        <AppText variant="bodySm" color="muted">
-          {duration}
-        </AppText>
-      )}
-      {duration && (language || hasLessonCount || hasModuleCount) && (
-        <span className={styles.dot}>•</span>
-      )}
-      {language && (
-        <AppText variant="bodySm" color="muted">
-          {language}
-        </AppText>
-      )}
-      {language && (hasLessonCount || hasModuleCount) && <span className={styles.dot}>•</span>}
-      {hasLessonCount && (
-        <Badge variant="outline">
-          {listing.publishedLectureCount} {t("listing.lessons", "lessons")}
-        </Badge>
-      )}
-      {hasLessonCount && hasModuleCount && <span className={styles.dot}>•</span>}
-      {hasModuleCount && (
-        <Badge variant="secondary">
-          {moduleCount} {t("listing.modules", "modules")}
-        </Badge>
-      )}
+      <TopicMetadata metadata={metadata} />
+      <DurationMetadata metadata={metadata} />
+      <LanguageMetadata metadata={metadata} />
+      <LessonMetadata metadata={metadata} t={t} />
+      <ModuleMetadata metadata={metadata} t={t} />
     </div>
   );
+}
+
+function Dot() {
+  return <span className={styles.dot}>•</span>;
+}
+
+function TopicMetadata({ metadata }: { metadata: MetadataViewModel }) {
+  if (metadata.listing.topics.length === 0) return null;
+  const hasMeta = Boolean(
+    metadata.duration ||
+    metadata.language ||
+    metadata.hasLessonCount ||
+    metadata.moduleCount !== undefined,
+  );
+  return (
+    <>
+      <TopicChips topics={metadata.listing.topics} />
+      {hasMeta && <Dot />}
+    </>
+  );
+}
+
+function DurationMetadata({ metadata }: { metadata: MetadataViewModel }) {
+  return metadata.duration ? (
+    <>
+      <AppText variant="bodySm" color="muted">
+        {metadata.duration}
+      </AppText>
+      {(metadata.language || metadata.hasLessonCount || metadata.moduleCount !== undefined) && (
+        <Dot />
+      )}
+    </>
+  ) : null;
+}
+
+function LanguageMetadata({ metadata }: { metadata: MetadataViewModel }) {
+  return metadata.language ? (
+    <>
+      <AppText variant="bodySm" color="muted">
+        {metadata.language}
+      </AppText>
+      {(metadata.hasLessonCount || metadata.moduleCount !== undefined) && <Dot />}
+    </>
+  ) : null;
+}
+
+function LessonMetadata({ metadata, t }: MetadataRowsProps) {
+  return metadata.hasLessonCount ? (
+    <>
+      <Badge variant="outline">
+        {metadata.listing.publishedLectureCount} {t("listing.lessons", "lessons")}
+      </Badge>
+      {metadata.moduleCount !== undefined && <Dot />}
+    </>
+  ) : null;
+}
+
+function ModuleMetadata({ metadata, t }: MetadataRowsProps) {
+  return metadata.moduleCount !== undefined ? (
+    <Badge variant="secondary">
+      {metadata.moduleCount} {t("listing.modules", "modules")}
+    </Badge>
+  ) : null;
 }
 
 export function MetaDataSection({ listing, layout = "inline", moduleCount }: MetaDataSectionProps) {

@@ -14,6 +14,7 @@ import { Search } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { useDebouncedSearch } from "@/shared/hooks";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
+import { formatDuration } from "@/shared/utils/format";
 
 import styles from "./search-processing.screen.module.css";
 
@@ -21,21 +22,6 @@ export type SearchProcessingScreenProps = {
   searchKey?: string;
   topicSlug?: string;
 };
-
-function formatDuration(durationSeconds?: number): string {
-  if (!durationSeconds || durationSeconds <= 0) {
-    return "";
-  }
-  const hours = Math.floor(durationSeconds / 3600);
-  const minutes = Math.round((durationSeconds % 3600) / 60);
-  if (hours > 0) {
-    return `${hours}h ${String(minutes).padStart(2, "0")}m`;
-  }
-  if (minutes <= 0) {
-    return "";
-  }
-  return `${minutes}m`;
-}
 
 export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessingScreenProps) {
   const showOriginal = useShowOriginalContent();

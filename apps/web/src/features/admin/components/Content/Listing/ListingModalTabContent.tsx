@@ -6,7 +6,7 @@ import React from "react";
 
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
 
-import styles from "./listing-modal.module.css";
+import { FormErrorBanner } from "./FormErrorBanner";
 import { ListingGeneralSection } from "./ListingGeneralSection";
 import { ListingReviewSection } from "./ListingReviewSection";
 import { ListingSublistingsTab } from "./ListingSublistingsTab";
@@ -48,8 +48,8 @@ export function ListingModalTabContent({
   if (activeTab === "general") {
     return (
       <>
-        {(errorTabSet.has("general") || activeTab === "general") && formError && (
-          <div className={styles.errorBanner}>{formError}</div>
+        {(errorTabSet.has(activeTab) || activeTab === "general") && (
+          <FormErrorBanner error={formError} />
         )}
         <ListingGeneralSection
           state={state}
@@ -68,9 +68,7 @@ export function ListingModalTabContent({
   if (activeTab === "main") {
     return (
       <>
-        {(errorTabSet.has("main") || activeTab === "main") && formError && (
-          <div className={styles.errorBanner}>{formError}</div>
-        )}
+        {errorTabSet.has(activeTab) && <FormErrorBanner error={formError} />}
         <ListingTranslatableFields
           state={state}
           dispatch={dispatch}
@@ -89,7 +87,7 @@ export function ListingModalTabContent({
 
   return (
     <>
-      {formError && <div className={styles.errorBanner}>{formError}</div>}
+      <FormErrorBanner error={formError} />
       <ListingReviewSection state={state} mainLocale={mainLocale} topics={topics} />
     </>
   );

@@ -3,7 +3,13 @@
 import type { FeedContentItemDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
-import { useAudio, useProgressStore } from "@sd/domain-audio";
+import {
+  getProgressPercent,
+  isListingFormat,
+  isTrackActiveForListing,
+  useAudio,
+  useProgressStore,
+} from "@sd/domain-audio";
 import { useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
 import { Play, Pause, Bookmark } from "lucide-react";
 import Image from "next/image";
@@ -56,28 +62,73 @@ type FeedListRowContentProps = {
   actions: FeedRowActions;
 };
 
+function FeedRowArtwork({
+  item,
+  scholarName,
+  initial,
+}: Pick<FeedRowModel, "item" | "scholarName" | "initial">) {
+  return (
+    <div className={styles.avatarSection}>
+      {item.thumbnailUrl ? (
+        <Image
+          src={item.thumbnailUrl}
+          alt={scholarName}
+          fill
+          sizes="(max-width: 640px) 20vw, 14vw"
+          className={styles.avatarImage}
+        />
+      ) : (
+        <div className={styles.avatarFallback} aria-hidden="true">
+          {initial}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FeedRowActions({ model, state, actions }: FeedListRowContentProps) {
+  const { isMobile } = model;
+  const { isCurrentTrack, isPlaying, isSaved } = state;
+  return (
+    <List.Item.Actions>
+      <Button
+        variant="primary"
+        size={!isMobile ? "icon" : "sm"}
+        fullWidth={isMobile}
+        aria-label={isCurrentTrack && isPlaying ? "Pause lecture" : "Play lecture"}
+        icon={
+          isCurrentTrack && isPlaying ? (
+            <Pause size={16} fill="currentColor" />
+          ) : (
+            <Play size={16} fill="currentColor" />
+          )
+        }
+        onClick={actions.onPlay}
+      >
+        {isMobile && (isCurrentTrack && isPlaying ? "Pause" : "Play")}
+      </Button>
+      <Button
+        variant={!isMobile ? "ghost" : "outline"}
+        size={!isMobile ? "sm" : "icon"}
+        fullWidth={isMobile}
+        aria-label={isSaved ? "Remove from saved" : "Save lecture"}
+        icon={<Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />}
+        onClick={actions.onSave}
+      >
+        {isMobile && (isSaved ? "Saved" : "Save")}
+      </Button>
+    </List.Item.Actions>
+  );
+}
+
 function FeedListRowContent({ model, state, actions }: FeedListRowContentProps) {
-  const { item, title, scholarName, initial, durationText, publishedDateText, isMobile } = model;
-  const { isCurrentTrack, isPlaying, isSaved, isInProgress, progressPercent } = state;
-  const { onPlay, onSave, onPress } = actions;
+  const { item, title, scholarName, initial, durationText, publishedDateText } = model;
+  const { isInProgress, progressPercent } = state;
+  const { onPress } = actions;
   return (
     <List.Item interactive className={styles.row} onClick={onPress}>
       <div className={styles.container}>
-        <div className={styles.avatarSection}>
-          {item.thumbnailUrl ? (
-            <Image
-              src={item.thumbnailUrl}
-              alt={scholarName}
-              fill
-              sizes="(max-width: 640px) 20vw, 14vw"
-              className={styles.avatarImage}
-            />
-          ) : (
-            <div className={styles.avatarFallback} aria-hidden="true">
-              {initial}
-            </div>
-          )}
-        </div>
+        <FeedRowArtwork item={item} scholarName={scholarName} initial={initial} />
         <div className={styles.centerSection}>
           <MarqueeText
             text={title}
@@ -94,34 +145,7 @@ function FeedListRowContent({ model, state, actions }: FeedListRowContentProps) 
           </div>
         </div>
       </div>
-      <List.Item.Actions>
-        <Button
-          variant="primary"
-          size={!isMobile ? "icon" : "sm"}
-          fullWidth={isMobile}
-          aria-label={isCurrentTrack && isPlaying ? "Pause lecture" : "Play lecture"}
-          icon={
-            isCurrentTrack && isPlaying ? (
-              <Pause size={16} fill="currentColor" />
-            ) : (
-              <Play size={16} fill="currentColor" />
-            )
-          }
-          onClick={onPlay}
-        >
-          {isMobile && (isCurrentTrack && isPlaying ? "Pause" : "Play")}
-        </Button>
-        <Button
-          variant={!isMobile ? "ghost" : "outline"}
-          size={!isMobile ? "sm" : "icon"}
-          fullWidth={isMobile}
-          aria-label={isSaved ? "Remove from saved" : "Save lecture"}
-          icon={<Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />}
-          onClick={onSave}
-        >
-          {isMobile && (isSaved ? "Saved" : "Save")}
-        </Button>
-      </List.Item.Actions>
+      <FeedRowActions model={model} state={state} actions={actions} />
       {isInProgress && (
         <div
           className={styles.progressBarContainer}
@@ -151,9 +175,8 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   // playing, not just when the current track's slug equals this row's slug
   // (which only happens for a single).
   const isCurrentTrack =
-    currentTrack?.slug === item.slug ||
-    currentTrack?.seriesId === item.id ||
-    currentTrack?.collectionId === item.id;
+    isListingFormat(item.kind) &&
+    isTrackActiveForListing({ id: item.id, slug: item.slug, format: item.kind }, currentTrack);
 
   const { play } = usePlayListing(
     {
@@ -173,10 +196,9 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const progress = useProgressStore((s) => s.progressMap[item.slug]);
   const isInProgress = progress && progress.positionSeconds > 0 && !progress.completedAt;
 
-  const progressPercent =
-    progress && progress.durationSeconds
-      ? Math.min(Math.max((progress.positionSeconds / progress.durationSeconds) * 100, 0), 100)
-      : 0;
+  const progressPercent = progress
+    ? getProgressPercent(progress.positionSeconds, progress.durationSeconds)
+    : 0;
 
   const handlePlay = async (e: React.MouseEvent) => {
     e.stopPropagation();

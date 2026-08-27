@@ -2,7 +2,13 @@
 
 import { routes, type FeedContentItemDto } from "@sd/core-contracts";
 import { getErrorStateText, getLocalizedName } from "@sd/core-i18n";
-import { useAudio, useProgressStore } from "@sd/domain-audio";
+import {
+  getProgressPercent,
+  isListingFormat,
+  isTrackActiveForListing,
+  useAudio,
+  useProgressStore,
+} from "@sd/domain-audio";
 import { useExploreRecentScreen } from "@sd/domain-content";
 import { useTopicsList } from "@sd/domain-search";
 import { useRouter } from "next/navigation";
@@ -65,9 +71,8 @@ function FeedGridItemCard({
   const { isPlaying, currentTrack } = useAudio();
 
   const isCurrentTrack =
-    currentTrack?.slug === item.slug ||
-    currentTrack?.seriesId === item.id ||
-    currentTrack?.collectionId === item.id;
+    isListingFormat(item.kind) &&
+    isTrackActiveForListing({ id: item.id, slug: item.slug, format: item.kind }, currentTrack);
 
   const { play } = usePlayListing(
     {
@@ -84,10 +89,9 @@ function FeedGridItemCard({
   );
 
   const progress = useProgressStore((s) => s.progressMap[item.slug]);
-  const progressPercent =
-    progress && progress.durationSeconds
-      ? Math.min(Math.max((progress.positionSeconds / progress.durationSeconds) * 100, 0), 100)
-      : 0;
+  const progressPercent = progress
+    ? getProgressPercent(progress.positionSeconds, progress.durationSeconds)
+    : 0;
 
   const handlePlay = async (e: React.MouseEvent) => {
     e.stopPropagation();

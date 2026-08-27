@@ -3,9 +3,18 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const { withGeneratedClientLock } = require("./generated-client-lock.js");
+const {
+  getGeneratedClientLockPath,
+  withGeneratedClientLock,
+} = require("./generated-client-lock.js");
 
 const temporaryDirectories: string[] = [];
+
+it("keeps the generation lock outside dist so build cleanup cannot remove it", () => {
+  const packageRoot = "/tmp/core-db-package";
+
+  expect(getGeneratedClientLockPath(packageRoot)).toBe(join(packageRoot, ".generated-prisma.lock"));
+});
 
 afterEach(async () => {
   await Promise.all(
