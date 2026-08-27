@@ -165,15 +165,28 @@ function nextOrderIndex(state: UploadArrangeState, moduleKey: ModuleKey): number
 }
 
 /** The slug an item/module must be prefixed by, given its immediate parent container. */
-export function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
-  if (moduleKey === ROOT_MODULE_KEY) return state.existing?.slug ?? "";
-  if (moduleKey.startsWith("new:")) {
-    const tempId = moduleKey.slice("new:".length);
-    return state.newModules.find((m) => m.tempId === tempId)?.slug ?? state.existing?.slug ?? "";
-  }
+function existingRootSlug(state: UploadArrangeState): string {
+  return state.existing?.slug ?? "";
+}
+
+function newModuleParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+  const tempId = moduleKey.slice("new:".length);
   return (
-    state.existing?.modules.find((m) => m.id === moduleKey)?.slug ?? state.existing?.slug ?? ""
+    state.newModules.find((module) => module.tempId === tempId)?.slug ?? existingRootSlug(state)
   );
+}
+
+function existingModuleParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+  return (
+    state.existing?.modules.find((module) => module.id === moduleKey)?.slug ??
+    existingRootSlug(state)
+  );
+}
+
+export function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+  if (moduleKey === ROOT_MODULE_KEY) return existingRootSlug(state);
+  if (moduleKey.startsWith("new:")) return newModuleParentSlug(state, moduleKey);
+  return existingModuleParentSlug(state, moduleKey);
 }
 
 function updateItem(
