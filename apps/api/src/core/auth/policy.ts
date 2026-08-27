@@ -23,6 +23,31 @@ function hasDefinedValue(value: string | undefined): value is string {
   return value !== undefined && value.length > 0;
 }
 
+function copyPolicyResource(resource: PolicyResource): PolicyResource {
+  const normalized: PolicyResource = {};
+  if (resource.slug !== undefined) normalized.slug = resource.slug;
+  if (resource.scholarSlug !== undefined) normalized.scholarSlug = resource.scholarSlug;
+  if (resource.locale !== undefined) normalized.locale = resource.locale;
+  return normalized;
+}
+
+function requiredScopeFor(
+  subjectType: AppSubjectType,
+  resource: PolicyResource,
+): string | undefined {
+  if (subjectType === 'Scholar') return resource.slug;
+  if (subjectType === 'Listing' || subjectType === 'Media') return resource.scholarSlug;
+  return undefined;
+}
+
+function hasRequiredResolvedScope(subjectType: AppSubjectType, resource: PolicyResource): boolean {
+  if (subjectType === 'Translation') return hasDefinedValue(resource.locale);
+  if (subjectType === 'Scholar' || subjectType === 'Listing' || subjectType === 'Media') {
+    return hasDefinedValue(requiredScopeFor(subjectType, resource));
+  }
+  return true;
+}
+
 /**
  * Normalizes resource scope into the condition shape emitted by the policy.
  * An adapter that resolved a missing resource is distinguishable from a route
@@ -37,28 +62,8 @@ export function normalizePolicyResource(
     return resourceResolved ? undefined : {};
   }
 
-  const normalized: PolicyResource = {};
-  if (resource.slug !== undefined) normalized.slug = resource.slug;
-  if (resource.scholarSlug !== undefined) normalized.scholarSlug = resource.scholarSlug;
-  if (resource.locale !== undefined) normalized.locale = resource.locale;
-
-  const requiredScope =
-    subjectType === 'Scholar'
-      ? normalized.slug
-      : subjectType === 'Listing' || subjectType === 'Media'
-        ? normalized.scholarSlug
-        : undefined;
-
-  if (
-    resourceResolved &&
-    (subjectType === 'Scholar' || subjectType === 'Listing' || subjectType === 'Media')
-  ) {
-    return hasDefinedValue(requiredScope) ? normalized : undefined;
-  }
-
-  if (resourceResolved && subjectType === 'Translation' && !hasDefinedValue(normalized.locale)) {
-    return undefined;
-  }
+  const normalized = copyPolicyResource(resource);
+  if (resourceResolved && !hasRequiredResolvedScope(subjectType, normalized)) return undefined;
 
   if (Object.values(normalized).some((value) => value === undefined || value === ''))
     return undefined;
