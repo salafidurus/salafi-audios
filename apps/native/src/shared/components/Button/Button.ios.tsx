@@ -51,6 +51,23 @@ type SwiftFontWeight =
 
 const FULL_WIDTH: DimensionValue = "100%";
 
+function buildModifiers(
+  t: ReturnType<typeof getButtonTokens>,
+  isDisabled: boolean,
+): ModifierConfig[] {
+  const modifiers: ModifierConfig[] = [
+    buttonStyle("plain"),
+    padding({ horizontal: t.paddingHorizontal }),
+    frame({ height: t.height, alignment: "center" }),
+    background(t.backgroundColor),
+  ];
+  if (t.borderWidth && t.borderColor)
+    modifiers.push(border({ color: t.borderColor, width: t.borderWidth }));
+  modifiers.push(cornerRadius(t.borderRadius));
+  if (isDisabled) modifiers.push(opacity(0.5), disabledModifier(true));
+  return modifiers;
+}
+
 export function Button({
   variant = "surface",
   size = "md",
@@ -70,19 +87,7 @@ export function Button({
 
   // "plain" has no built-in chrome — "filled"/"bordered" would paint their own
   // background/padding on top of (not instead of) the modifiers below.
-  const modifiers: ModifierConfig[] = [
-    buttonStyle("plain"),
-    padding({ horizontal: t.paddingHorizontal }),
-    frame({ height: t.height, alignment: "center" }),
-    background(t.backgroundColor),
-  ];
-  if (t.borderWidth && t.borderColor) {
-    modifiers.push(border({ color: t.borderColor, width: t.borderWidth }));
-  }
-  modifiers.push(cornerRadius(t.borderRadius));
-  if (isDisabled) {
-    modifiers.push(opacity(0.5), disabledModifier(true));
-  }
+  const modifiers = buildModifiers(t, isDisabled);
 
   const textModifiers: ModifierConfig[] = [
     font({ size: t.labelStyle.fontSize, weight: mapFontWeight(t.labelStyle.fontWeight) }),

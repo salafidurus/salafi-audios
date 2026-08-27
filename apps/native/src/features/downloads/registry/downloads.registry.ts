@@ -18,6 +18,39 @@ export type DownloadRow = {
   updatedAt: number;
 };
 
+type DownloadUpdate = Partial<Omit<DownloadRow, "listingSlug" | "createdAt" | "updatedAt">> & {
+  listingSlug: string;
+};
+
+function keepDefined<T>(value: T | undefined, previous: T): T {
+  return value === undefined ? previous : value;
+}
+
+function mergeDownloadRow(row: DownloadUpdate, existing: DownloadRow | null): DownloadRow {
+  const previous = existing ?? {
+    listingSlug: row.listingSlug,
+    url: "",
+    localUri: null,
+    status: "pending" as const,
+    bytesTotal: 0,
+    bytesDownloaded: 0,
+    pauseState: null,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  return {
+    listingSlug: row.listingSlug,
+    url: row.url ?? previous.url,
+    localUri: keepDefined(row.localUri, previous.localUri),
+    status: row.status ?? previous.status,
+    bytesTotal: row.bytesTotal ?? previous.bytesTotal,
+    bytesDownloaded: row.bytesDownloaded ?? previous.bytesDownloaded,
+    pauseState: keepDefined(row.pauseState, previous.pauseState),
+    createdAt: previous.createdAt,
+    updatedAt: Date.now(),
+  };
+}
+
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
 function getDb(): Promise<SQLite.SQLiteDatabase> {
@@ -55,24 +88,9 @@ function getDb(): Promise<SQLite.SQLiteDatabase> {
 /** Genuinely relational/queryable data, so this goes through raw SQLite rather
  * than `@sd/core-sync`'s KV `StorageAdapter` (that abstraction is for the
  * outbox and progress/saved caches, not a row-per-download registry). */
-export async function upsertDownload(
-  row: Partial<Omit<DownloadRow, "listingSlug" | "createdAt" | "updatedAt">> & {
-    listingSlug: string;
-  },
-): Promise<void> {
+export async function upsertDownload(row: DownloadUpdate): Promise<void> {
   const [db, existing] = await Promise.all([getDb(), getDownload(row.listingSlug)]);
-
-  const merged: DownloadRow = {
-    listingSlug: row.listingSlug,
-    url: row.url ?? existing?.url ?? "",
-    localUri: row.localUri !== undefined ? row.localUri : (existing?.localUri ?? null),
-    status: row.status ?? existing?.status ?? "pending",
-    bytesTotal: row.bytesTotal ?? existing?.bytesTotal ?? 0,
-    bytesDownloaded: row.bytesDownloaded ?? existing?.bytesDownloaded ?? 0,
-    pauseState: row.pauseState !== undefined ? row.pauseState : (existing?.pauseState ?? null),
-    createdAt: existing?.createdAt ?? Date.now(),
-    updatedAt: Date.now(),
-  };
+  const merged = mergeDownloadRow(row, existing);
 
   await db.runAsync(
     `INSERT OR REPLACE INTO ${TABLE_NAME}

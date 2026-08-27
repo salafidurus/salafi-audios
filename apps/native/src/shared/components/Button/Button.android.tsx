@@ -66,6 +66,13 @@ const VARIANT_COMPONENT = {
   danger: FilledButton,
 } satisfies Record<ButtonVariant, typeof FilledButton | typeof OutlinedButton | typeof TextButton>;
 
+function buildModifiers(t: ReturnType<typeof getButtonTokens>, testID?: string): ModifierConfig[] {
+  const modifiers: ModifierConfig[] = [height(t.height)];
+  if (t.borderWidth && t.borderColor) modifiers.push(border(t.borderWidth, t.borderColor));
+  if (testID) modifiers.push(testIDModifier(testID));
+  return modifiers;
+}
+
 export function Button({
   variant = "surface",
   size = "md",
@@ -84,13 +91,7 @@ export function Button({
   const t = getButtonTokens(variant, size, theme);
   const ButtonComponent = VARIANT_COMPONENT[variant];
 
-  const modifiers: ModifierConfig[] = [height(t.height)];
-  if (t.borderWidth && t.borderColor) {
-    modifiers.push(border(t.borderWidth, t.borderColor));
-  }
-  if (testID) {
-    modifiers.push(testIDModifier(testID));
-  }
+  const modifiers = buildModifiers(t, testID);
 
   const colors: ComposeButtonProps["colors"] = {
     containerColor: t.backgroundColor,
