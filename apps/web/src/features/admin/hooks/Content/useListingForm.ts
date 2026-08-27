@@ -87,30 +87,34 @@ function getInitialFormState(): FormState {
   };
 }
 
+function withDefault<T>(value: T | null | undefined, fallback: T): T {
+  return value == null ? fallback : value;
+}
+
 function buildEditFormState(data: ListingFormDataDto): FormState {
   const { listing } = data;
 
-  const title = listing.title || "";
-  const description = listing.description || "";
+  const title = withDefault(listing.title, "");
+  const description = withDefault(listing.description, "");
   // SAFETY: admin listing form data returns status values from the same listing contract
   // the editor writes back to, so this is already a valid `LectureStatus`.
-  const status = (listing.status as LectureStatus) || "draft";
-  const orderIndex = listing.orderIndex || 0;
-  const selectedTopics = listing.topics || [];
+  const status = withDefault(listing.status as LectureStatus | null, "draft");
+  const orderIndex = withDefault(listing.orderIndex, 0);
+  const selectedTopics = withDefault(listing.topics, []);
   // SAFETY: the form-data payload carries only supported locale values for listing language.
-  const language = (listing.language as Locale) || "ar";
-  const coverImageUrl = listing.coverImageUrl || "";
+  const language = withDefault(listing.language as Locale | null, "ar");
+  const coverImageUrl = withDefault(listing.coverImageUrl, "");
 
   return {
     id: listing.id,
     scholarName: listing.scholarName,
     title,
-    slug: listing.slug || "",
+    slug: withDefault(listing.slug, ""),
     slugSuffix: "",
     description,
-    scholarId: listing.scholarId || "",
+    scholarId: withDefault(listing.scholarId, ""),
     // SAFETY: listing format comes from the same admin DTO/domain union consumed by the editor.
-    format: (listing.format as "single" | "series" | "collection") || "single",
+    format: withDefault(listing.format as "single" | "series" | "collection" | null, "single"),
     status,
     orderIndex,
     selectedTopics,
