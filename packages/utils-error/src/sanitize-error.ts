@@ -42,6 +42,8 @@ function parseStructuredMessage(message: string): string | undefined {
       // Ignore JSON parse errors and proceed to pattern matching
     }
   }
+
+  return undefined;
 }
 
 function matchKnownError(message: string): string | undefined {
@@ -69,6 +71,8 @@ function matchKnownError(message: string): string | undefined {
       return userMessage;
     }
   }
+
+  return undefined;
 }
 
 function getSafeShortMessage(message: string): string | undefined {
@@ -78,4 +82,6 @@ function getSafeShortMessage(message: string): string | undefined {
       return message;
     }
   }
+
+  return undefined;
 }

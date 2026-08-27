@@ -51,4 +51,15 @@ describe("sanitizeError validation parser", () => {
       "Service temporarily unavailable. Please try again later.",
     );
   });
+
+  it("uses the original message for a short non-technical error", () => {
+    expect(sanitizeError("Please try again")).toBe("Please try again");
+  });
+
+  it("uses the generic message for empty or technical errors", () => {
+    expect(sanitizeError("")).toBe("Something went wrong. Please try again.");
+    expect(sanitizeError("Error: database unavailable")).toBe(
+      "Something went wrong. Please try again.",
+    );
+  });
 });
