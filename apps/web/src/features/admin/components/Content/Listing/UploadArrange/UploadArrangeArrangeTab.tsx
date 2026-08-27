@@ -618,6 +618,91 @@ function CollectionView({
   );
 }
 
+function SingleFormatView({ state }: { state: UploadArrangeState }) {
+  const { t } = useTranslation();
+  const existing = state.existing;
+  if (!existing) return null;
+
+  return (
+    <div className={styles.arrangeStack}>
+      {existing.audioUrl && (
+        <div className={styles.existingLesson}>
+          {t("admin.contents.listing.currentAudio", "Current audio:")} {existing.audioUrl}
+        </div>
+      )}
+      {state.items.map((item) => (
+        <div key={item.id} className={styles.stagedItem}>
+          <div className={styles.stagedItemHeader}>
+            <span className={styles.stagedItemTitle}>{item.filename}</span>
+            <span className={styles.fileMeta}>
+              {t("admin.contents.listing.replacesPrimaryAudio", "Replaces the primary audio")}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SeriesFormatView({
+  state,
+  dispatch,
+  conflictSlugs,
+}: {
+  state: UploadArrangeState;
+  dispatch: React.Dispatch<UploadArrangeAction>;
+  conflictSlugs: Set<string>;
+}) {
+  const { t } = useTranslation();
+  const existing = state.existing;
+  if (!existing) return null;
+  const hasNewLessons = state.items.some((i) => i.assignment.kind === "new-lesson");
+
+  return (
+    <div className={styles.arrangeStack}>
+      {hasNewLessons && (
+        <div className={styles.bulkActions}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "published" })}
+          >
+            {t("admin.contents.listing.publishAll", "Publish All")}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "draft" })}
+          >
+            {t("admin.contents.listing.draftAll", "Draft All")}
+          </Button>
+        </div>
+      )}
+      {existing.lessons.length > 0 && (
+        <div className={styles.moduleSection}>
+          <span className={styles.moduleSlug}>
+            {t("admin.contents.listing.existingLessons", "Existing lessons")}
+          </span>
+          {existing.lessons.map((lesson) => (
+            <div key={lesson.id} className={styles.existingLesson}>
+              <span className={styles.orderBadge}>{lesson.orderIndex ?? "—"}</span>
+              {lesson.title}
+            </div>
+          ))}
+        </div>
+      )}
+      <StagedList
+        moduleKey={ROOT_MODULE_KEY}
+        state={state}
+        dispatch={dispatch}
+        lessonsInScope={existing.lessons}
+        conflictSlugs={conflictSlugs}
+        moduleOptions={null}
+      />
+    </div>
+  );
+}
+
 export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrangeTabProps) {
   const { t } = useTranslation();
   const [newModuleTitle, setNewModuleTitle] = useState("");
@@ -658,72 +743,11 @@ export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrang
   const conflictSlugs = new Set([...localSlugConflicts(state), ...state.conflictSlugs]);
 
   if (existing.format === "single") {
-    return (
-      <div className={styles.arrangeStack}>
-        {existing.audioUrl && (
-          <div className={styles.existingLesson}>
-            {t("admin.contents.listing.currentAudio", "Current audio:")} {existing.audioUrl}
-          </div>
-        )}
-        {state.items.map((item) => (
-          <div key={item.id} className={styles.stagedItem}>
-            <div className={styles.stagedItemHeader}>
-              <span className={styles.stagedItemTitle}>{item.filename}</span>
-              <span className={styles.fileMeta}>
-                {t("admin.contents.listing.replacesPrimaryAudio", "Replaces the primary audio")}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
+    return <SingleFormatView state={state} />;
   }
 
   if (existing.format === "series") {
-    const hasNewLessons = state.items.some((i) => i.assignment.kind === "new-lesson");
-    return (
-      <div className={styles.arrangeStack}>
-        {hasNewLessons && (
-          <div className={styles.bulkActions}>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "published" })}
-            >
-              {t("admin.contents.listing.publishAll", "Publish All")}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "draft" })}
-            >
-              {t("admin.contents.listing.draftAll", "Draft All")}
-            </Button>
-          </div>
-        )}
-        {existing.lessons.length > 0 && (
-          <div className={styles.moduleSection}>
-            <span className={styles.moduleSlug}>
-              {t("admin.contents.listing.existingLessons", "Existing lessons")}
-            </span>
-            {existing.lessons.map((lesson) => (
-              <div key={lesson.id} className={styles.existingLesson}>
-                <span className={styles.orderBadge}>{lesson.orderIndex ?? "—"}</span>
-                {lesson.title}
-              </div>
-            ))}
-          </div>
-        )}
-        <StagedList
-          moduleKey={ROOT_MODULE_KEY}
-          state={state}
-          dispatch={dispatch}
-          lessonsInScope={existing.lessons}
-          conflictSlugs={conflictSlugs}
-          moduleOptions={null}
-        />
-      </div>
-    );
+    return <SeriesFormatView state={state} dispatch={dispatch} conflictSlugs={conflictSlugs} />;
   }
 
   return (
