@@ -36,6 +36,68 @@ function languageLabel(
   }
 }
 
+function renderAvatar(scholar: ScholarHeaderProps["scholar"], initial: string) {
+  if (scholar.imageUrl) {
+    return (
+      <Image
+        src={scholar.imageUrl}
+        alt={scholar.name}
+        width={92}
+        height={92}
+        unoptimized
+        className={styles.avatar}
+      />
+    );
+  }
+  return (
+    <div className={styles.avatarFallback} role="img" aria-label={scholar.name}>
+      {initial}
+    </div>
+  );
+}
+
+function renderBio(
+  bio: string | null | undefined,
+  expanded: boolean,
+  setExpanded: (update: (value: boolean) => boolean) => void,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  if (!bio) return null;
+  return (
+    <span className={cn(styles.bioDisclosure, expanded && styles.bioDisclosureExpanded)}>
+      <span className={cn(styles.bio, expanded && styles.bioExpanded)}>{bio}</span>
+      <button
+        type="button"
+        className={styles.bioToggle}
+        aria-expanded={expanded}
+        onClick={() => setExpanded((value) => !value)}
+      >
+        {expanded
+          ? t("scholarContent.readLess", "Read less")
+          : t("scholarContent.readMore", "Read more")}
+      </button>
+    </span>
+  );
+}
+
+function renderFollowButton(
+  onFollow: ScholarHeaderProps["onFollow"],
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  if (!onFollow) return null;
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className={styles.followButton}
+      onClick={onFollow}
+    >
+      {t("scholarContent.follow", "Follow")}
+    </Button>
+  );
+}
+
 export function ScholarHeader({ scholar, onFollow, layout = "inline" }: ScholarHeaderProps) {
   const { t } = useTranslation();
   const formatScholarName = useFormatScholarName();
@@ -52,55 +114,16 @@ export function ScholarHeader({ scholar, onFollow, layout = "inline" }: ScholarH
 
   return (
     <div className={cn(styles.root, layout === "sidebar" && styles.sidebar)}>
-      <div className={styles.avatarSection}>
-        {scholar.imageUrl ? (
-          <Image
-            src={scholar.imageUrl}
-            alt={scholar.name}
-            width={92}
-            height={92}
-            unoptimized
-            className={styles.avatar}
-          />
-        ) : (
-          <div className={styles.avatarFallback} role="img" aria-label={scholar.name}>
-            {initial}
-          </div>
-        )}
-      </div>
+      <div className={styles.avatarSection}>{renderAvatar(scholar, initial)}</div>
 
       <div className={styles.infoColumn}>
         {scholarTitle && <span className={styles.scholarTitle}>{scholarTitle}</span>}
         <h1 className={styles.name}>{formatScholarName(scholar.name)}</h1>
         <p className={styles.stats}>{statsParts.join(" \u00B7 ")}</p>
-        {scholar.bio && (
-          <span className={cn(styles.bioDisclosure, bioExpanded && styles.bioDisclosureExpanded)}>
-            <span className={cn(styles.bio, bioExpanded && styles.bioExpanded)}>{scholar.bio}</span>
-            <button
-              type="button"
-              className={styles.bioToggle}
-              aria-expanded={bioExpanded}
-              onClick={() => setBioExpanded((expanded) => !expanded)}
-            >
-              {bioExpanded
-                ? t("scholarContent.readLess", "Read less")
-                : t("scholarContent.readMore", "Read more")}
-            </button>
-          </span>
-        )}
+        {renderBio(scholar.bio, bioExpanded, setBioExpanded, t)}
       </div>
 
-      {onFollow && (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className={styles.followButton}
-          onClick={onFollow}
-        >
-          {t("scholarContent.follow", "Follow")}
-        </Button>
-      )}
+      {renderFollowButton(onFollow, t)}
     </div>
   );
 }
