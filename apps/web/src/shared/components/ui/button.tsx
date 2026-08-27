@@ -5,6 +5,41 @@ import { cn } from "@/shared/utils/index";
 
 import { buttonVariants, type ButtonVariantProps } from "./button-variants";
 
+function normalizeButtonVariant(
+  variant: ButtonVariantProps["variant"] | "primary" | "surface" | "danger",
+) {
+  if (variant === "primary") return "default";
+  if (variant === "surface") return "secondary";
+  if (variant === "danger") return "destructive";
+  return variant;
+}
+
+function renderButtonContent(
+  asChild: boolean,
+  loading: boolean,
+  children: React.ReactNode,
+  icon: React.ReactNode,
+  iconPosition: "left" | "right",
+  content: React.ReactNode,
+) {
+  if (asChild) return children;
+  if (loading) {
+    return (
+      <span
+        aria-hidden="true"
+        className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+      />
+    );
+  }
+  return (
+    <>
+      {icon && iconPosition === "left" && icon}
+      {content}
+      {icon && iconPosition === "right" && icon}
+    </>
+  );
+}
+
 function Button({
   className,
   variant = "default",
@@ -28,14 +63,7 @@ function Button({
     fullWidth?: boolean;
   }) {
   const Comp = asChild ? Slot.Root : "button";
-  const normalizedVariant: ButtonVariantProps["variant"] =
-    variant === "primary"
-      ? "default"
-      : variant === "surface"
-        ? "secondary"
-        : variant === "danger"
-          ? "destructive"
-          : variant;
+  const normalizedVariant = normalizeButtonVariant(variant);
   const normalizedSize: ButtonVariantProps["size"] = size === "md" ? "default" : size;
   const content = label ?? props.children;
 
@@ -52,20 +80,7 @@ function Button({
       aria-busy={loading || undefined}
       disabled={loading || props.disabled}
     >
-      {asChild ? (
-        props.children
-      ) : loading ? (
-        <span
-          aria-hidden="true"
-          className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-        />
-      ) : (
-        <>
-          {icon && iconPosition === "left" && icon}
-          {content}
-          {icon && iconPosition === "right" && icon}
-        </>
-      )}
+      {renderButtonContent(asChild, loading, props.children, icon, iconPosition, content)}
     </Comp>
   );
 }

@@ -1,7 +1,12 @@
 "use client";
 
-import type { ScholarContentItemDto } from "@sd/core-contracts";
-
+import {
+  ScholarContentUnifiedDtoSchema,
+  ScholarTopicsDtoSchema,
+  type ScholarContentItemDto,
+  type ScholarContentUnifiedDto,
+  type ScholarTopicsDto,
+} from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useScholarTopics, useScholarContent } from "@sd/domain-content";
 import { Play, ChevronLeft, ChevronRight } from "lucide-react";
@@ -21,8 +26,33 @@ export type ScholarContentListProps = {
   scholarImageUrl?: string;
 };
 
+type ScholarTopicsData = ScholarTopicsDto | undefined;
+type ScholarContentData = ScholarContentUnifiedDto | undefined;
+
 function contentHref(item: ScholarContentItemDto): string {
   return `/listings/${item.slug}`;
+}
+
+function shouldShowLoading(
+  isTopicsFetching: boolean,
+  topicsData: ScholarTopicsData,
+  isFlatFetching: boolean,
+  flatContent: ScholarContentData,
+) {
+  return (isTopicsFetching && !topicsData) || (isFlatFetching && !flatContent && !topicsData);
+}
+
+function selectScholarItems(
+  selectedTopicId: string | null,
+  topicsData: ScholarTopicsData,
+  flatContent: ScholarContentData,
+) {
+  const parsedTopics = ScholarTopicsDtoSchema.safeParse(topicsData);
+  const parsedContent = ScholarContentUnifiedDtoSchema.safeParse(flatContent);
+  if (selectedTopicId && parsedTopics.success) {
+    return parsedTopics.data.topics.find((topic) => topic.topicId === selectedTopicId)?.items ?? [];
+  }
+  return parsedContent.success ? parsedContent.data.items : [];
 }
 
 export function ContentRow({
@@ -114,7 +144,7 @@ export function ScholarContentList({
 
   const query = searchQuery.trim().toLowerCase();
 
-  if ((isTopicsFetching && !topicsData) || (isFlatFetching && !flatContent && !topicsData)) {
+  if (shouldShowLoading(isTopicsFetching, topicsData, isFlatFetching, flatContent)) {
     return <p className={styles.empty}>{t("common.loading", "Loading…")}</p>;
   }
 
@@ -128,14 +158,7 @@ export function ScholarContentList({
   // Determine items to display:
   // If a single topic filter chip is selected, retrieve items for that topic.
   // Otherwise, fallback to flat top-level content list.
-  let rawItems: ScholarContentItemDto[] = [];
-  if (selectedTopicId && topicsData?.topics) {
-    const topic = topicsData.topics.find((t) => t.topicId === selectedTopicId);
-    rawItems = topic?.items ?? [];
-  } else {
-    rawItems = flatContent?.items ?? [];
-  }
-
+  const rawItems = selectScholarItems(selectedTopicId, topicsData, flatContent);
   const filteredItems = rawItems.filter(matchesQuery);
 
   if (filteredItems.length === 0) {
