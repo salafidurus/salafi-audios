@@ -117,6 +117,48 @@ function ListItems<TData>({
   );
 }
 
+function LoadedState<TData>({
+  data,
+  renderItem,
+  layout,
+  tableHeader,
+  observerTarget,
+  isFetchingNextPage,
+}: Pick<InfiniteScrollListProps<TData>, "data" | "renderItem" | "layout" | "tableHeader"> & {
+  observerTarget: React.RefObject<HTMLDivElement | null>;
+  isFetchingNextPage?: boolean;
+}) {
+  const loadingMore = isFetchingNextPage ? (
+    <div className={styles.loadingMore}>Loading more…</div>
+  ) : null;
+  const sentinel = (
+    <div ref={observerTarget} className={styles.sentinel} data-testid="infinite-scroll-sentinel" />
+  );
+
+  if (layout === "table") {
+    return (
+      <>
+        <Table>
+          {tableHeader && <TableHeader>{tableHeader}</TableHeader>}
+          <TableBody>
+            <ListItems data={data} renderItem={renderItem} />
+          </TableBody>
+        </Table>
+        {sentinel}
+        {loadingMore}
+      </>
+    );
+  }
+
+  return (
+    <List>
+      <ListItems data={data} renderItem={renderItem} />
+      {sentinel}
+      {loadingMore}
+    </List>
+  );
+}
+
 // react-doctor-disable-next-line react-doctor/no-many-boolean-props
 export function InfiniteScrollList<TData>({
   data,
@@ -170,37 +212,14 @@ export function InfiniteScrollList<TData>({
     );
   }
 
-  if (layout === "table") {
-    return (
-      <>
-        <Table>
-          {tableHeader && <TableHeader>{tableHeader}</TableHeader>}
-          <TableBody>
-            <ListItems data={data} renderItem={renderItem} />
-          </TableBody>
-        </Table>
-        <div
-          ref={observerTarget}
-          className={styles.sentinel}
-          data-testid="infinite-scroll-sentinel"
-        />
-        {isFetchingNextPage && <div className={styles.loadingMore}>Loading more…</div>}
-      </>
-    );
-  }
-
-  // Render all items in a List with intersection observer for loading more
   return (
-    <List>
-      <ListItems data={data} renderItem={renderItem} />
-
-      {/* Intersection observer target for loading more */}
-      <div
-        ref={observerTarget}
-        className={styles.sentinel}
-        data-testid="infinite-scroll-sentinel"
-      />
-      {isFetchingNextPage && <div className={styles.loadingMore}>Loading more…</div>}
-    </List>
+    <LoadedState
+      data={data}
+      renderItem={renderItem}
+      layout={layout}
+      tableHeader={tableHeader}
+      observerTarget={observerTarget}
+      isFetchingNextPage={isFetchingNextPage}
+    />
   );
 }
