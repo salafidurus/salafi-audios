@@ -13,12 +13,7 @@ export function useInfiniteAdminUsers(options?: UseInfiniteAdminUsersOptions) {
   return useInfiniteQuery({
     queryKey: queryKeys.admin.users.infinite(options?.search, options?.role),
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
-      const params = new URLSearchParams();
-      if (options?.search) params.append("q", options.search);
-      if (options?.role) params.append("role", options.role);
-      if (pageParam) params.append("cursor", pageParam);
-
-      const url = `${endpoints.admin.users.list}${params.size > 0 ? `?${params}` : ""}`;
+      const url = buildAdminUsersUrl(options, pageParam);
       const response = await httpClient<AdminUserListDto>({ url, method: "GET" });
 
       return {
@@ -31,4 +26,19 @@ export function useInfiniteAdminUsers(options?: UseInfiniteAdminUsersOptions) {
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: options?.enabled !== false,
   });
+}
+
+function buildAdminUsersUrl(
+  options: UseInfiniteAdminUsersOptions | undefined,
+  pageParam: string | undefined,
+): string {
+  const params = new URLSearchParams();
+  appendParam(params, "q", options?.search);
+  appendParam(params, "role", options?.role);
+  appendParam(params, "cursor", pageParam);
+  return `${endpoints.admin.users.list}${params.size > 0 ? `?${params}` : ""}`;
+}
+
+function appendParam(params: URLSearchParams, key: string, value: string | undefined): void {
+  if (value) params.append(key, value);
 }
