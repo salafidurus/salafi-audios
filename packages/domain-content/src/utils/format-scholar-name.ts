@@ -90,8 +90,7 @@ export function useFormattedScholarName(
 ): string {
   const { t } = useTranslation();
   const contextClient = React.useContext(QueryClientContext);
-  const hasQueryClient = Boolean(contextClient);
-  const shouldFetch = hasQueryClient && Boolean(scholarName) && Boolean(scholarSlug);
+  const shouldFetch = Boolean(contextClient && scholarName && scholarSlug);
 
   const scholarsQuery = useScholarsList(
     { enabled: shouldFetch },
@@ -99,15 +98,16 @@ export function useFormattedScholarName(
   );
   const data = shouldFetch ? scholarsQuery.data : undefined;
 
+  return resolveFormattedScholarName(scholarName, scholarSlug, data?.scholars, t);
+}
+
+function resolveFormattedScholarName(
+  scholarName: string | null | undefined,
+  scholarSlug: string | null | undefined,
+  scholars: Array<{ slug: string; title?: ScholarTitle | string | null }> | undefined,
+  t: TranslateFn,
+): string {
   if (!scholarName) return "";
-
-  const foundScholar = scholarSlug
-    ? data?.scholars?.find((s) => s.slug === scholarSlug)
-    : undefined;
-
-  if (foundScholar?.title) {
-    return formatScholarName(scholarName, foundScholar.title, t);
-  }
-
-  return scholarName;
+  const title = scholars?.find((scholar) => scholar.slug === scholarSlug)?.title;
+  return title ? formatScholarName(scholarName, title, t) : scholarName;
 }

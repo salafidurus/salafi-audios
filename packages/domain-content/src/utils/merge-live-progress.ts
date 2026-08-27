@@ -21,43 +21,53 @@ export function mergeLiveProgress(
   progressMap: Record<string, ListingProgress>,
   currentTrack?: Track | null,
 ): MyLibraryItemDto[] {
-  const merged = items.map((item) => {
-    const live = progressMap[item.listingSlug];
-    if (!live) return item;
+  const merged = items.map((item) => mergeItemProgress(item, progressMap[item.listingSlug]));
 
-    return {
-      ...item,
-      progressSeconds: live.positionSeconds,
-      durationSeconds: item.durationSeconds ?? live.durationSeconds,
-      completedAt: live.completedAt ?? item.completedAt,
-    };
-  });
-
-  const isStandaloneTrack = currentTrack && !currentTrack.seriesId && !currentTrack.collectionId;
+  const isStandaloneTrack = Boolean(
+    currentTrack && !currentTrack.seriesId && !currentTrack.collectionId,
+  );
   const liveCurrent = currentTrack ? progressMap[currentTrack.slug] : undefined;
   const alreadyListed = currentTrack
     ? merged.some((item) => item.listingSlug === currentTrack.slug)
     : true;
 
-  if (
-    currentTrack &&
-    isStandaloneTrack &&
-    liveCurrent &&
-    !liveCurrent.completedAt &&
-    !alreadyListed
-  ) {
-    merged.unshift({
-      id: currentTrack.slug,
-      listingId: currentTrack.slug,
-      listingTitle: currentTrack.title,
-      listingSlug: currentTrack.slug ?? currentTrack.id,
-      scholarId: "",
-      scholarSlug: currentTrack.scholarSlug ?? "",
-      scholarName: currentTrack.artist,
-      durationSeconds: liveCurrent.durationSeconds || currentTrack.durationSeconds,
-      progressSeconds: liveCurrent.positionSeconds,
-    });
+  if (shouldAddCurrentTrack(currentTrack, isStandaloneTrack, liveCurrent, alreadyListed)) {
+    if (!currentTrack || !liveCurrent) return merged;
+    merged.unshift(createCurrentTrackItem(currentTrack, liveCurrent));
   }
 
   return merged;
+}
+
+function mergeItemProgress(item: MyLibraryItemDto, live?: ListingProgress): MyLibraryItemDto {
+  if (!live) return item;
+  return {
+    ...item,
+    progressSeconds: live.positionSeconds,
+    durationSeconds: item.durationSeconds ?? live.durationSeconds,
+    completedAt: live.completedAt ?? item.completedAt,
+  };
+}
+
+function shouldAddCurrentTrack(
+  track: Track | null | undefined,
+  isStandalone: boolean,
+  live: ListingProgress | undefined,
+  alreadyListed: boolean,
+): boolean {
+  return Boolean(track && isStandalone && live && !live.completedAt && !alreadyListed);
+}
+
+function createCurrentTrackItem(track: Track, live: ListingProgress): MyLibraryItemDto {
+  return {
+    id: track.slug,
+    listingId: track.slug,
+    listingTitle: track.title,
+    listingSlug: track.slug ?? track.id,
+    scholarId: "",
+    scholarSlug: track.scholarSlug ?? "",
+    scholarName: track.artist,
+    durationSeconds: live.durationSeconds || track.durationSeconds,
+    progressSeconds: live.positionSeconds,
+  };
 }

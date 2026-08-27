@@ -81,6 +81,52 @@ async function parseResponse<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
+async function readAuth(config: HttpClientConfig) {
+  return {
+    token: config.getAccessToken?.() ?? undefined,
+    cookie: (await config.getCookie?.()) ?? undefined,
+    locale: config.getLocale?.() ?? undefined,
+  };
+}
+
+function createRequestController(signal?: AbortSignal) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
+  signal?.addEventListener("abort", () => controller.abort(), { once: true });
+  return { controller, timeout };
+}
+
+async function fetchResponse(
+  endpoint: URL,
+  options: {
+    method: string;
+    headers: Record<string, string>;
+    body?: string;
+    signal: AbortSignal;
+  },
+): Promise<Response> {
+  try {
+    return await fetch(endpoint.toString(), {
+      method: options.method,
+      credentials: "include",
+      headers: options.headers,
+      body: options.body,
+      signal: options.signal,
+    });
+  } catch {
+    throw new Error("Network request failed. Check API availability and base URL configuration.");
+  }
+}
+
+async function throwForResponseError(
+  response: Response,
+  onError?: (status: number) => void,
+): Promise<never> {
+  onError?.(response.status);
+  const text = await response.text().catch(() => "");
+  throw new HttpError(response.status, response.statusText, text);
+}
+
 export function configureApiClient(next: HttpClientConfig) {
   config = next;
 }
@@ -104,9 +150,7 @@ export async function httpClient<T>(options: {
     );
   }
 
-  const token = config.getAccessToken?.() ?? undefined;
-  const cookie = (await config.getCookie?.()) ?? undefined;
-  const locale = config.getLocale?.() ?? undefined;
+  const auth = await readAuth(config);
 
   const endpoint = new URL(`${config.baseUrl}${options.url}`);
 
@@ -114,37 +158,16 @@ export async function httpClient<T>(options: {
 
   const payload = options.body ?? options.data;
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
-
-  // If the caller passed their own signal, abort our controller when theirs does
-  if (options.signal) {
-    options.signal.addEventListener("abort", () => controller.abort(), { once: true });
-  }
-
-  let res: Response;
-
-  try {
-    res = await fetch(endpoint.toString(), {
-      method: options.method,
-      // Send cookies automatically (web via browser, native via @better-auth/expo).
-      // Cookies are sent via either credentials:"include" (web) or Cookie header
-      // (native). For native, getCookie() will override via headers below.
-      credentials: "include",
-      headers: buildHeaders(options, { token, cookie, locale }),
-      body: payload ? JSON.stringify(payload) : undefined,
-      signal: controller.signal,
-    });
-  } catch {
-    throw new Error("Network request failed. Check API availability and base URL configuration.");
-  } finally {
-    clearTimeout(timeout);
-  }
+  const { controller, timeout } = createRequestController(options.signal);
+  const res = await fetchResponse(endpoint, {
+    method: options.method,
+    headers: buildHeaders(options, await auth),
+    body: payload ? JSON.stringify(payload) : undefined,
+    signal: controller.signal,
+  }).finally(() => clearTimeout(timeout));
 
   if (!res.ok) {
-    config.onError?.(res.status);
-    const text = await res.text().catch(() => "");
-    throw new HttpError(res.status, res.statusText, text);
+    return throwForResponseError(res, config.onError);
   }
 
   // allow empty responses
