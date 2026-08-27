@@ -24,6 +24,71 @@ import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 import styles from "./settings-profile.screen.module.css";
 
+type ProfileEditActionsProps = {
+  isEditing: boolean;
+  isDirty: boolean;
+  isUpdating: boolean;
+  onEdit: () => void;
+  onCancel: () => void;
+  onSave: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function ProfileEditActions({
+  isEditing,
+  isDirty,
+  isUpdating,
+  onEdit,
+  onCancel,
+  onSave,
+  t,
+}: ProfileEditActionsProps) {
+  if (!isEditing) return <Button onClick={onEdit}>{t("account.profile.edit", "Edit")}</Button>;
+  return (
+    <>
+      <Button variant="outline" onClick={onCancel} disabled={isUpdating}>
+        {t("account.profile.cancel", "Cancel")}
+      </Button>
+      <Button disabled={!isDirty || isUpdating} onClick={onSave}>
+        {isUpdating ? t("account.profile.saving", "Saving…") : t("account.profile.save", "Save")}
+      </Button>
+    </>
+  );
+}
+
+function ProfileAccountStatus({
+  profile,
+  roles,
+  t,
+}: {
+  profile: { email: string; emailVerified: boolean };
+  roles: string[];
+  t: ProfileEditActionsProps["t"];
+}) {
+  return (
+    <SettingsSection title={t("account.title", "Account")}>
+      <SettingsRow label={t("account.profile.emailVerified", "Email Verified")}>
+        <span className={profile.emailVerified ? styles.verifiedBadge : styles.unverifiedBadge}>
+          {profile.emailVerified
+            ? t("account.profile.verified", "Verified")
+            : t("account.profile.unverified", "Unverified")}
+        </span>
+      </SettingsRow>
+      {roles.length > 0 && (
+        <SettingsRow label={t("account.profile.roles", "Roles")}>
+          <div className={styles.rolesRow}>
+            {roles.map((role) => (
+              <span key={role} className={styles.roleBadge}>
+                {role}
+              </span>
+            ))}
+          </div>
+        </SettingsRow>
+      )}
+    </SettingsSection>
+  );
+}
+
 function ProfileContent() {
   const { t } = useTranslation();
   const {
@@ -127,20 +192,15 @@ function ProfileContent() {
               aria-label={t("account.profile.displayNameAria", "Display name")}
               disabled={!isEditing}
             />
-            {!isEditing ? (
-              <Button onClick={handleEdit}>{t("account.profile.edit", "Edit")}</Button>
-            ) : (
-              <>
-                <Button variant="outline" onClick={handleCancel} disabled={isUpdatingProfile}>
-                  {t("account.profile.cancel", "Cancel")}
-                </Button>
-                <Button disabled={!isDirty || isUpdatingProfile} onClick={handleSave}>
-                  {isUpdatingProfile
-                    ? t("account.profile.saving", "Saving…")
-                    : t("account.profile.save", "Save")}
-                </Button>
-              </>
-            )}
+            <ProfileEditActions
+              isEditing={isEditing}
+              isDirty={isDirty}
+              isUpdating={isUpdatingProfile}
+              onEdit={handleEdit}
+              onCancel={handleCancel}
+              onSave={handleSave}
+              t={t}
+            />
           </div>
         </SettingsRow>
         <SettingsRow label={t("account.profile.email", "Email")}>
@@ -156,26 +216,7 @@ function ProfileContent() {
         </p>
       )}
 
-      <SettingsSection title={t("account.title", "Account")}>
-        <SettingsRow label={t("account.profile.emailVerified", "Email Verified")}>
-          <span className={profile.emailVerified ? styles.verifiedBadge : styles.unverifiedBadge}>
-            {profile.emailVerified
-              ? t("account.profile.verified", "Verified")
-              : t("account.profile.unverified", "Unverified")}
-          </span>
-        </SettingsRow>
-        {nonListenerRoles.length > 0 && (
-          <SettingsRow label={t("account.profile.roles", "Roles")}>
-            <div className={styles.rolesRow}>
-              {nonListenerRoles.map((r) => (
-                <span key={r} className={styles.roleBadge}>
-                  {r}
-                </span>
-              ))}
-            </div>
-          </SettingsRow>
-        )}
-      </SettingsSection>
+      <ProfileAccountStatus profile={profile} roles={nonListenerRoles} t={t} />
 
       <div className={styles.actionRow}>
         <Button
