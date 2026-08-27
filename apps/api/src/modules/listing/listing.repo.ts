@@ -30,6 +30,7 @@ import type {
   ArrangeCommitResultDto,
   ArrangeLessonOp,
   HomePromotionsDto,
+  ListingFormat,
 } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
@@ -75,6 +76,20 @@ function buildAdminListingWhere(params: AdminListingFilterParams): Prisma.Listin
     ];
   }
   return where;
+}
+
+function hasTranslatableListingChange(dto: UpdateListingDetailsDto): boolean {
+  return [dto.title, dto.description, dto.language].some((value) => value !== undefined);
+}
+
+function setPublishedAtWhenPublishing(
+  updateData: Prisma.ListingUpdateInput,
+  nextStatus: Status | undefined,
+  currentStatus: Status,
+): void {
+  if (nextStatus === Status.published && currentStatus !== Status.published) {
+    updateData.publishedAt = new Date();
+  }
 }
 
 async function createListingTopics(
@@ -1195,6 +1210,19 @@ export class ListingRepository {
     });
   }
 
+  private async syncUpdatedListingParents(
+    tx: Prisma.TransactionClient,
+    originalParentId: string | null,
+    nextParentId: string | null | undefined,
+  ): Promise<void> {
+    if (originalParentId) {
+      await this.syncListingCounters(originalParentId, tx);
+    }
+    if (nextParentId !== undefined && nextParentId !== originalParentId && nextParentId) {
+      await this.syncListingCounters(nextParentId, tx);
+    }
+  }
+
   async updateListingDetails(
     id: string,
     dto: UpdateListingDetailsDto,
@@ -1215,8 +1243,7 @@ export class ListingRepository {
 
         if (!original) throw new Error('Not found');
 
-        const hasTranslatableChange =
-          dto.title !== undefined || dto.description !== undefined || dto.language !== undefined;
+        const hasTranslatableChange = hasTranslatableListingChange(dto);
 
         // Exclude topics from the main update data
         const { topics, ...dtoWithoutTopics } = dto;
@@ -1227,9 +1254,7 @@ export class ListingRepository {
           updatedBy,
         };
 
-        if (dto.status === Status.published && original.status !== Status.published) {
-          updateData.publishedAt = new Date();
-        }
+        setPublishedAtWhenPublishing(updateData, dto.status, original.status);
 
         await tx.listing.update({
           where: { id },
@@ -1251,17 +1276,7 @@ export class ListingRepository {
 
         await replaceListingTopics(tx, id, topics);
 
-        // Sync old parent if it exists
-        if (original.parentId) {
-          await this.syncListingCounters(original.parentId, tx);
-        }
-
-        // Sync new parent if parentId is updated and different
-        if (dto.parentId !== undefined && dto.parentId !== original.parentId) {
-          if (dto.parentId) {
-            await this.syncListingCounters(dto.parentId, tx);
-          }
-        }
+        await this.syncUpdatedListingParents(tx, original.parentId, dto.parentId);
       });
       return true;
     } catch {
