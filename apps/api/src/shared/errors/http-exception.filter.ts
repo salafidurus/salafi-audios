@@ -44,6 +44,13 @@ type DevDetails =
 
 type ErrorExtraSource = z.infer<typeof errorExtraSourceSchema>;
 
+type ExceptionResolution = {
+  statusCode: number;
+  message: string;
+  details?: DevDetails;
+  extras: ErrorExtras;
+};
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly config: ConfigService) {}
@@ -56,45 +63,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const requestId = req.id ?? res.getHeader('x-request-id') ?? '';
     const timestamp = new Date().toISOString();
 
-    let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal Server Error';
-    let details: DevDetails | undefined;
-    let extras: ErrorExtras = {};
-
-    if (this.isPrismaConnectionRefused(exception)) {
-      message = 'Database connection refused. Ensure PostgreSQL is running and reachable.';
-    } else if (exception instanceof ZodValidationException) {
-      statusCode = exception.getStatus();
-      message = 'Validation failed';
-      const parsedZodError = zodValidationErrorSchema.safeParse(exception.getZodError());
-      details = parsedZodError.success
-        ? parsedZodError.data.issues.map((issue) => issue.message)
-        : ['Validation failed'];
-    } else if (exception instanceof HttpException) {
-      statusCode = exception.getStatus();
-      const parsedResponse = httpExceptionBodySchema.safeParse(exception.getResponse());
-
-      if (parsedResponse.success) {
-        const body = parsedResponse.data;
-        const messageList = bodyMessageArraySchema.safeParse(body.message);
-        const messageText = bodyMessageStringSchema.safeParse(body.message);
-        if (messageList.success) {
-          message = 'Validation failed';
-          details = messageList.data;
-        } else if (messageText.success) {
-          message = exception.message || message;
-          // Preserve structured fields (e.g. conflictingSlugs) thrown alongside
-          // the message — `details` is dev-only, so they must survive here.
-          const { message: _msg, statusCode: _status, error: _error, ...rest } = body;
-          const parsedExtraSource = errorExtraSourceSchema.safeParse(rest);
-          extras = parsedExtraSource.success ? toErrorExtras(parsedExtraSource.data) : {};
-        }
-      } else {
-        message = exception.message || message;
-      }
-    } else if (exception instanceof Error) {
-      message = exception.message || message;
-    }
+    const { statusCode, message, details, extras } = this.resolveException(exception);
 
     const isProd = this.config.NODE_ENV === 'production';
     const devDetails = isProd ? undefined : this.buildDevDetails(exception, details);
@@ -108,6 +77,70 @@ export class AllExceptionsFilter implements ExceptionFilter {
       timestamp,
       path: req.url,
     });
+  }
+
+  private resolveException(
+    exception: Error | HttpException | ZodValidationException | unknown,
+  ): ExceptionResolution {
+    const fallback = {
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: 'Internal Server Error',
+      details: undefined,
+      extras: {},
+    } satisfies ExceptionResolution;
+    if (this.isPrismaConnectionRefused(exception)) {
+      return {
+        ...fallback,
+        message: 'Database connection refused. Ensure PostgreSQL is running and reachable.',
+      };
+    }
+    if (exception instanceof ZodValidationException) {
+      const parsed = zodValidationErrorSchema.safeParse(exception.getZodError());
+      return {
+        ...fallback,
+        statusCode: exception.getStatus(),
+        message: 'Validation failed',
+        details: parsed.success
+          ? parsed.data.issues.map((issue) => issue.message)
+          : ['Validation failed'],
+      };
+    }
+    if (exception instanceof HttpException) return this.resolveHttpException(exception, fallback);
+    return exception instanceof Error
+      ? { ...fallback, message: exception.message || fallback.message }
+      : fallback;
+  }
+
+  private resolveHttpException(
+    exception: HttpException,
+    fallback: ExceptionResolution,
+  ): ExceptionResolution {
+    const parsedResponse = httpExceptionBodySchema.safeParse(exception.getResponse());
+    if (!parsedResponse.success)
+      return {
+        ...fallback,
+        statusCode: exception.getStatus(),
+        message: exception.message || fallback.message,
+      };
+    const body = parsedResponse.data;
+    const messageList = bodyMessageArraySchema.safeParse(body.message);
+    if (messageList.success)
+      return {
+        ...fallback,
+        statusCode: exception.getStatus(),
+        message: 'Validation failed',
+        details: messageList.data,
+      };
+    const messageText = bodyMessageStringSchema.safeParse(body.message);
+    if (!messageText.success) return { ...fallback, statusCode: exception.getStatus() };
+    const { message: _msg, statusCode: _status, error: _error, ...rest } = body;
+    const parsedExtraSource = errorExtraSourceSchema.safeParse(rest);
+    return {
+      ...fallback,
+      statusCode: exception.getStatus(),
+      message: exception.message || fallback.message,
+      extras: parsedExtraSource.success ? toErrorExtras(parsedExtraSource.data) : {},
+    };
   }
 
   private buildDevDetails(
