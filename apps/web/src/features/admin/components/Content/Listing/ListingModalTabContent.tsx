@@ -28,6 +28,20 @@ interface ListingModalTabContentProps {
   showSublistingsTab?: boolean;
 }
 
+function TabError({
+  activeTab,
+  errorTabSet,
+  formError,
+}: {
+  activeTab: string;
+  errorTabSet: Set<string>;
+  formError?: string | null;
+}) {
+  return (errorTabSet.has(activeTab) || activeTab === "general") && formError ? (
+    <div className={styles.errorBanner}>{formError}</div>
+  ) : null;
+}
+
 export function ListingModalTabContent({
   state,
   dispatch,
@@ -48,9 +62,7 @@ export function ListingModalTabContent({
   if (activeTab === "general") {
     return (
       <>
-        {(errorTabSet.has("general") || activeTab === "general") && formError && (
-          <div className={styles.errorBanner}>{formError}</div>
-        )}
+        <TabError activeTab={activeTab} errorTabSet={errorTabSet} formError={formError} />
         <ListingGeneralSection
           state={state}
           dispatch={dispatch}
@@ -68,9 +80,7 @@ export function ListingModalTabContent({
   if (activeTab === "main") {
     return (
       <>
-        {(errorTabSet.has("main") || activeTab === "main") && formError && (
-          <div className={styles.errorBanner}>{formError}</div>
-        )}
+        <TabError activeTab={activeTab} errorTabSet={errorTabSet} formError={formError} />
         <ListingTranslatableFields
           state={state}
           dispatch={dispatch}
