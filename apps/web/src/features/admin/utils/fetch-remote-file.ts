@@ -88,33 +88,43 @@ export async function fetchFileFromUrl(
   url: string,
   onProgress?: (loaded: number, total: number | null) => void,
 ): Promise<File> {
-  let response: Response;
+  const response = await fetchFileResponse(url);
+  validateFileResponse(response);
+
+  const filename =
+    filenameFromContentDisposition(response.headers.get("content-disposition")) ??
+    filenameFromUrl(url);
+  const resolvedType = resolveContentType(response.headers.get("content-type") ?? "", filename);
+  const blob = await readFileBlob(response, onProgress);
+
+  return new File([blob], filename, { type: resolvedType });
+}
+
+async function fetchFileResponse(url: string): Promise<Response> {
   try {
-    response = await fetch(url);
+    return await fetch(url);
   } catch {
     throw friendlyCorsError();
   }
+}
 
+function validateFileResponse(response: Response): void {
   if (!response.ok) {
     throw new Error(`Failed to fetch file: HTTP ${response.status}`);
   }
-
   const contentType = response.headers.get("content-type") ?? "";
   if (contentType.startsWith("text/html")) {
     throw new Error(
       "This link points to a web page, not a direct audio file. Find the direct download link instead.",
     );
   }
+}
 
-  const filename =
-    filenameFromContentDisposition(response.headers.get("content-disposition")) ??
-    filenameFromUrl(url);
-  const resolvedType = resolveContentType(contentType, filename);
-
-  const blob =
-    onProgress && response.body
-      ? await readBodyWithProgress(response, onProgress)
-      : await response.blob();
-
-  return new File([blob], filename, { type: resolvedType });
+async function readFileBlob(
+  response: Response,
+  onProgress?: (loaded: number, total: number | null) => void,
+): Promise<Blob> {
+  return onProgress && response.body
+    ? await readBodyWithProgress(response, onProgress)
+    : await response.blob();
 }
