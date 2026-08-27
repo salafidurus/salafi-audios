@@ -1223,6 +1223,91 @@ export class ListingRepository {
     }
   }
 
+  private async syncArrangeLessonAudio(
+    tx: Prisma.TransactionClient,
+    listingId: string,
+    audio: ArrangeAudioRef,
+  ): Promise<void> {
+    const primary = await tx.audioAsset.findFirst({
+      where: { listingId, isPrimary: true },
+      select: { id: true },
+    });
+    if (primary) {
+      await tx.audioAsset.update({
+        where: { id: primary.id },
+        data: this.arrangeAudioAssetData(audio),
+      });
+      return;
+    }
+    await tx.audioAsset.create({
+      data: {
+        listingId,
+        ...this.arrangeAudioAssetData(audio),
+        isPrimary: true,
+        source: 'r2',
+      },
+    });
+  }
+
+  private async createArrangeLesson(
+    tx: Prisma.TransactionClient,
+    op: Extract<ArrangeLessonOp, { op: 'create' }>,
+    parentId: string,
+    scholarId: string,
+    userId?: string,
+  ): Promise<string> {
+    const status = op.status ?? Status.draft;
+    const lesson = await tx.listing.create({
+      data: {
+        slug: op.slug,
+        title: op.title,
+        description: op.description ?? undefined,
+        format: 'single',
+        status,
+        publishedAt: status === Status.published ? new Date() : undefined,
+        orderIndex: op.orderIndex ?? undefined,
+        durationSeconds: op.audio.durationSeconds,
+        scholarId,
+        parentId,
+        createdBy: userId,
+      },
+      select: { id: true },
+    });
+    await tx.audioAsset.create({
+      data: {
+        listingId: lesson.id,
+        ...this.arrangeAudioAssetData(op.audio),
+        isPrimary: true,
+        source: 'r2',
+      },
+    });
+    return lesson.id;
+  }
+
+  private async updateArrangeLesson(
+    tx: Prisma.TransactionClient,
+    op: Extract<ArrangeLessonOp, { op: 'update' }>,
+    userId?: string,
+  ): Promise<void> {
+    const existing = await tx.listing.findUnique({
+      where: { id: op.id },
+      select: { status: true },
+    });
+    const data: Prisma.ListingUpdateInput = { updatedAt: new Date(), updatedBy: userId };
+    if (op.title !== undefined) data.title = op.title;
+    if (op.description !== undefined) data.description = op.description;
+    if (op.status !== undefined) {
+      data.status = op.status;
+      if (op.status === Status.published && existing?.status !== Status.published) {
+        data.publishedAt = new Date();
+      }
+    }
+    if (op.orderIndex !== undefined) data.orderIndex = op.orderIndex;
+    if (op.audio) data.durationSeconds = op.audio.durationSeconds;
+    await tx.listing.update({ where: { id: op.id }, data });
+    if (op.audio) await this.syncArrangeLessonAudio(tx, op.id, op.audio);
+  }
+
   async updateListingDetails(
     id: string,
     dto: UpdateListingDetailsDto,
@@ -1669,78 +1754,13 @@ export class ListingRepository {
       const affectedIds: string[] = [rootId];
       const touchedParents = new Set<string>();
 
-      const syncLessonAudio = async (listingId: string, audio: ArrangeAudioRef): Promise<void> => {
-        const primary = await tx.audioAsset.findFirst({
-          where: { listingId, isPrimary: true },
-          select: { id: true },
-        });
-        if (primary) {
-          await tx.audioAsset.update({
-            where: { id: primary.id },
-            data: this.arrangeAudioAssetData(audio),
-          });
-          return;
-        }
-        await tx.audioAsset.create({
-          data: {
-            listingId,
-            ...this.arrangeAudioAssetData(audio),
-            isPrimary: true,
-            source: 'r2',
-          },
-        });
-      };
-
       const applyLessonOp = async (op: ArrangeLessonOp, parentId: string): Promise<void> => {
         if (op.op === 'create') {
-          const status = op.status ?? Status.draft;
-          const lesson = await tx.listing.create({
-            data: {
-              slug: op.slug,
-              title: op.title,
-              description: op.description ?? undefined,
-              format: 'single',
-              status,
-              publishedAt: status === Status.published ? new Date() : undefined,
-              orderIndex: op.orderIndex ?? undefined,
-              durationSeconds: op.audio.durationSeconds,
-              scholarId: root.scholarId,
-              parentId,
-              createdBy: userId,
-            },
-            select: { id: true },
-          });
-          await tx.audioAsset.create({
-            data: {
-              listingId: lesson.id,
-              ...this.arrangeAudioAssetData(op.audio),
-              isPrimary: true,
-              source: 'r2',
-            },
-          });
+          const lessonId = await this.createArrangeLesson(tx, op, parentId, root.scholarId, userId);
           result.createdLessons += 1;
-          affectedIds.push(lesson.id);
+          affectedIds.push(lessonId);
         } else {
-          const existing = await tx.listing.findUnique({
-            where: { id: op.id },
-            select: { status: true },
-          });
-          const data: Prisma.ListingUpdateInput = { updatedAt: new Date(), updatedBy: userId };
-          if (op.title !== undefined) data.title = op.title;
-          if (op.description !== undefined) data.description = op.description;
-          if (op.status !== undefined) {
-            data.status = op.status;
-            if (op.status === Status.published && existing?.status !== Status.published) {
-              data.publishedAt = new Date();
-            }
-          }
-          if (op.orderIndex !== undefined) data.orderIndex = op.orderIndex;
-          if (op.audio) data.durationSeconds = op.audio.durationSeconds;
-          await tx.listing.update({ where: { id: op.id }, data });
-
-          if (op.audio) {
-            await syncLessonAudio(op.id, op.audio);
-          }
+          await this.updateArrangeLesson(tx, op, userId);
           result.updatedLessons += 1;
           affectedIds.push(op.id);
         }
