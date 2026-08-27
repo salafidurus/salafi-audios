@@ -22,6 +22,61 @@ export type HeroSectionProps = {
   hasHistory?: boolean;
 };
 
+type HeroItem = {
+  id: string;
+  slug: string;
+  title: string;
+  scholarName: string;
+  scholarSlug: string;
+  scholarTitle?: string;
+  format: FeedContentItemDto["kind"] | RecentProgressDto["format"];
+  artworkUrl?: string;
+  scholarImageUrl?: string;
+};
+
+function getHeroItem(
+  hasHistory: boolean,
+  recentProgress: RecentProgressDto | null | undefined,
+  featuredContent: FeedContentItemDto | null | undefined,
+): HeroItem | null {
+  if (hasHistory && recentProgress) {
+    return {
+      id: recentProgress.listingSlug,
+      slug: recentProgress.lectureSlug,
+      title: recentProgress.lectureTitle,
+      scholarName: recentProgress.scholarName,
+      scholarSlug: recentProgress.scholarSlug,
+      format: recentProgress.format,
+      artworkUrl: recentProgress.artworkUrl,
+      scholarImageUrl: recentProgress.scholarImageUrl,
+    };
+  }
+  if (!featuredContent) return null;
+  return {
+    id: featuredContent.id,
+    slug: featuredContent.slug,
+    title: featuredContent.title,
+    scholarName: featuredContent.scholarName,
+    scholarSlug: featuredContent.scholarSlug,
+    scholarTitle: featuredContent.scholarTitle,
+    format: featuredContent.kind,
+    artworkUrl: featuredContent.thumbnailUrl ?? undefined,
+    scholarImageUrl: featuredContent.scholarImageUrl,
+  };
+}
+
+function getHeroScholarName(
+  heroItem: HeroItem,
+  formatScholarName: ReturnType<typeof useFormatScholarName>,
+  formattedScholarFallback: string,
+): string {
+  if (!heroItem.scholarTitle) return formattedScholarFallback;
+  return formatScholarName({
+    name: heroItem.scholarName,
+    title: heroItem.scholarTitle,
+  });
+}
+
 export function HeroSection({
   recentProgress,
   featuredContent,
@@ -33,32 +88,7 @@ export function HeroSection({
   const { t } = useTranslation();
   const formatScholarName = useFormatScholarName();
 
-  const heroItem =
-    hasHistory && recentProgress
-      ? {
-          id: recentProgress.listingSlug,
-          slug: recentProgress.lectureSlug,
-          title: recentProgress.lectureTitle,
-          scholarName: recentProgress.scholarName,
-          scholarSlug: recentProgress.scholarSlug,
-          scholarTitle: undefined,
-          format: recentProgress.format,
-          artworkUrl: recentProgress.artworkUrl,
-          scholarImageUrl: recentProgress.scholarImageUrl,
-        }
-      : featuredContent
-        ? {
-            id: featuredContent.id,
-            slug: featuredContent.slug,
-            title: featuredContent.title,
-            scholarName: featuredContent.scholarName,
-            scholarSlug: featuredContent.scholarSlug,
-            scholarTitle: featuredContent.scholarTitle,
-            format: featuredContent.kind,
-            artworkUrl: featuredContent.thumbnailUrl ?? undefined,
-            scholarImageUrl: featuredContent.scholarImageUrl,
-          }
-        : null;
+  const heroItem = getHeroItem(hasHistory, recentProgress, featuredContent);
 
   const formattedScholarFallback = useFormattedScholarName(
     heroItem?.scholarName,
@@ -142,9 +172,7 @@ export function HeroSection({
   }
 
   const title = heroItem.title;
-  const scholarName = heroItem.scholarTitle
-    ? formatScholarName({ name: heroItem.scholarName, title: heroItem.scholarTitle })
-    : formattedScholarFallback;
+  const scholarName = getHeroScholarName(heroItem, formatScholarName, formattedScholarFallback);
 
   return (
     <section className={styles.hero}>
