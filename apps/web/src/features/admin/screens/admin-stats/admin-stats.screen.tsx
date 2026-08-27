@@ -85,6 +85,107 @@ function StatsCards({
   );
 }
 
+type AdminStatsContentProps = {
+  access: {
+    listings: boolean;
+    scholars: boolean;
+    users: boolean;
+  };
+  counts: {
+    scholars: number;
+    listings: number;
+    users: number;
+  };
+  statusFilter: string;
+  setStatusFilter: (value: string) => void;
+  table: {
+    columns: AdaptiveDataViewColumn<AdminListingListItemDto>[];
+    sortedListings: AdminListingListItemDto[];
+    listings: AdminListingListItemDto[];
+    isError: boolean;
+    sort: { key: SortKey; direction: "ascending" | "descending" };
+    handleSort: (key: string) => void;
+  };
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function AdminStatsContent({
+  access,
+  counts,
+  statusFilter,
+  setStatusFilter,
+  table,
+  t,
+}: AdminStatsContentProps) {
+  return (
+    <div className={styles.content}>
+      <StatsCards
+        canReadScholars={access.scholars}
+        canReadListings={access.listings}
+        canManageUsers={access.users}
+        scholarsCount={counts.scholars}
+        listingsCount={counts.listings}
+        usersCount={counts.users}
+        t={t}
+      />
+
+      {access.listings && (
+        <section className={styles.section} aria-labelledby="admin-stats-content-heading">
+          <div className={styles.sectionHeader}>
+            <div>
+              <h2 id="admin-stats-content-heading" className={styles.sectionTitle}>
+                {t("admin.stats.contentHeading", "Accessible content")}
+              </h2>
+              <p className={styles.sectionDescription}>
+                {t(
+                  "admin.stats.contentDescription",
+                  "Showing content returned for your current access.",
+                )}
+              </p>
+            </div>
+            <Field className={styles.filter}>
+              <FieldLabel htmlFor="stats-status-filter">
+                {t("admin.stats.filterStatus", "Filter status")}
+              </FieldLabel>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger id="stats-status-filter">
+                  <SelectValue placeholder={t("admin.stats.allStatuses", "All statuses")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="all">
+                      {t("admin.stats.allStatuses", "All statuses")}
+                    </SelectItem>
+                    <SelectItem value="draft">{t("status.draft", "Draft")}</SelectItem>
+                    <SelectItem value="published">{t("status.published", "Published")}</SelectItem>
+                    <SelectItem value="archived">{t("status.archived", "Archived")}</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
+          <AdaptiveDataView
+            ariaLabel={t("admin.stats.contentTable", "Accessible content data")}
+            columns={table.columns}
+            data={table.sortedListings}
+            getRowKey={(item) => item.id}
+            onSort={table.handleSort}
+            sort={table.sort}
+            state={table.isError && table.listings.length === 0 ? "error" : undefined}
+            errorMessage={t("admin.stats.error", "Unable to load available statistics.")}
+            emptyMessage={t("admin.stats.empty", "No accessible content matches this filter.")}
+          />
+        </section>
+      )}
+      {table.isError && table.listings.length > 0 && (
+        <p className={styles.warning} role="status">
+          {t("admin.stats.partialError", "Some available data could not be refreshed.")}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function AdminStatsScreen() {
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useAuth();
@@ -199,73 +300,21 @@ export function AdminStatsScreen() {
           message={t("admin.stats.unavailable", "No authorized statistics are available.")}
         />
       ) : (
-        <div className={styles.content}>
-          <StatsCards
-            canReadScholars={canReadScholars}
-            canReadListings={canReadListings}
-            canManageUsers={canManageUsers}
-            scholarsCount={scholars.length}
-            listingsCount={listings.length}
-            usersCount={users.length}
-            t={t}
-          />
-
-          {canReadListings && (
-            <section className={styles.section} aria-labelledby="admin-stats-content-heading">
-              <div className={styles.sectionHeader}>
-                <div>
-                  <h2 id="admin-stats-content-heading" className={styles.sectionTitle}>
-                    {t("admin.stats.contentHeading", "Accessible content")}
-                  </h2>
-                  <p className={styles.sectionDescription}>
-                    {t(
-                      "admin.stats.contentDescription",
-                      "Showing content returned for your current access.",
-                    )}
-                  </p>
-                </div>
-                <Field className={styles.filter}>
-                  <FieldLabel htmlFor="stats-status-filter">
-                    {t("admin.stats.filterStatus", "Filter status")}
-                  </FieldLabel>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger id="stats-status-filter">
-                      <SelectValue placeholder={t("admin.stats.allStatuses", "All statuses")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="all">
-                          {t("admin.stats.allStatuses", "All statuses")}
-                        </SelectItem>
-                        <SelectItem value="draft">{t("status.draft", "Draft")}</SelectItem>
-                        <SelectItem value="published">
-                          {t("status.published", "Published")}
-                        </SelectItem>
-                        <SelectItem value="archived">{t("status.archived", "Archived")}</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </Field>
-              </div>
-              <AdaptiveDataView
-                ariaLabel={t("admin.stats.contentTable", "Accessible content data")}
-                columns={columns}
-                data={sortedListings}
-                getRowKey={(item) => item.id}
-                onSort={handleSort}
-                sort={sort}
-                state={isError && listings.length === 0 ? "error" : undefined}
-                errorMessage={t("admin.stats.error", "Unable to load available statistics.")}
-                emptyMessage={t("admin.stats.empty", "No accessible content matches this filter.")}
-              />
-            </section>
-          )}
-          {isError && listings.length > 0 && (
-            <p className={styles.warning} role="status">
-              {t("admin.stats.partialError", "Some available data could not be refreshed.")}
-            </p>
-          )}
-        </div>
+        <AdminStatsContent
+          access={{ listings: canReadListings, scholars: canReadScholars, users: canManageUsers }}
+          counts={{ scholars: scholars.length, listings: listings.length, users: users.length }}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          table={{
+            columns,
+            sortedListings,
+            listings,
+            isError,
+            sort,
+            handleSort,
+          }}
+          t={t}
+        />
       )}
     </ScreenView>
   );
