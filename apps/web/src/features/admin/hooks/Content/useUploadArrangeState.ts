@@ -317,6 +317,50 @@ function editModule(mod: NewModule, action: EditModuleAction, rootSlug: string):
   };
 }
 
+function appendStagedItems(
+  state: UploadArrangeState,
+  inputs: StagedItemInput[],
+): UploadArrangeState {
+  if (!state.existing) return state;
+  if (state.existing.format === "single" && (state.items.length > 0 || inputs.length > 1)) {
+    return { ...state, error: "This listing holds a single audio file." };
+  }
+  const newItems = buildStagedItems(state, inputs);
+  return { ...state, items: [...state.items, ...newItems], error: null };
+}
+
+function addFiles(
+  state: UploadArrangeState,
+  action: Extract<UploadArrangeAction, { type: "ADD_FILES" }>,
+): UploadArrangeState {
+  return appendStagedItems(
+    state,
+    action.files.map(({ file, durationSeconds }) => ({
+      source: { kind: "local", file },
+      filename: file.name,
+      contentType: file.type,
+      sizeBytes: file.size,
+      durationSeconds,
+    })),
+  );
+}
+
+function addUrlItems(
+  state: UploadArrangeState,
+  action: Extract<UploadArrangeAction, { type: "ADD_URL_ITEMS" }>,
+): UploadArrangeState {
+  return appendStagedItems(
+    state,
+    action.items.map((entry) => ({
+      source: { kind: "url", url: entry.url },
+      filename: entry.filename,
+      contentType: entry.contentType,
+      sizeBytes: entry.sizeBytes,
+      durationSeconds: entry.durationSeconds,
+    })),
+  );
+}
+
 function reducer(state: UploadArrangeState, action: UploadArrangeAction): UploadArrangeState {
   switch (action.type) {
     case "INIT_EXISTING":
@@ -325,52 +369,11 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
       // spread INITIAL_STATE here too.
       return { ...state, existing: action.data };
 
-    case "ADD_FILES": {
-      if (!state.existing) return state;
-      // Single-format roots hold exactly one staged file.
-      if (
-        state.existing.format === "single" &&
-        (state.items.length > 0 || action.files.length > 1)
-      ) {
-        return { ...state, error: "This listing holds a single audio file." };
-      }
+    case "ADD_FILES":
+      return addFiles(state, action);
 
-      const newItems = buildStagedItems(
-        state,
-        action.files.map(({ file, durationSeconds }) => ({
-          source: { kind: "local", file },
-          filename: file.name,
-          contentType: file.type,
-          sizeBytes: file.size,
-          durationSeconds,
-        })),
-      );
-
-      return { ...state, items: [...state.items, ...newItems], error: null };
-    }
-
-    case "ADD_URL_ITEMS": {
-      if (!state.existing) return state;
-      if (
-        state.existing.format === "single" &&
-        (state.items.length > 0 || action.items.length > 1)
-      ) {
-        return { ...state, error: "This listing holds a single audio file." };
-      }
-
-      const newItems = buildStagedItems(
-        state,
-        action.items.map((entry) => ({
-          source: { kind: "url", url: entry.url },
-          filename: entry.filename,
-          contentType: entry.contentType,
-          sizeBytes: entry.sizeBytes,
-          durationSeconds: entry.durationSeconds,
-        })),
-      );
-
-      return { ...state, items: [...state.items, ...newItems], error: null };
-    }
+    case "ADD_URL_ITEMS":
+      return addUrlItems(state, action);
 
     case "RENAME_ITEM":
       return updateItem(state, action.itemId, (item) => {
