@@ -41,6 +41,42 @@ import {
 } from './listing-editorial.transitions';
 import { toOptional } from '../../shared/utils/to-optional';
 
+type AdminListingFilterParams = {
+  cursor?: string;
+  scholarId?: string;
+  status?: string;
+  search?: string;
+  accessibleScholarIds?: string[];
+};
+
+function buildAdminListingWhere(params: AdminListingFilterParams): Prisma.ListingWhereInput {
+  const scholarId = params.accessibleScholarIds
+    ? params.scholarId && !params.accessibleScholarIds.includes(params.scholarId)
+      ? { in: [] }
+      : (params.scholarId ?? { in: params.accessibleScholarIds })
+    : params.scholarId;
+  const where: Prisma.ListingWhereInput = {
+    deletedAt: null,
+    parentId: null,
+    scholarId,
+    // SAFETY: status is validated by the admin route DTO before reaching this repository filter.
+    status: params.status as Status | undefined,
+  };
+  if (params.search) {
+    where.OR = [
+      { title: { contains: params.search, mode: 'insensitive' } },
+      { translations: { some: { title: { contains: params.search, mode: 'insensitive' } } } },
+      { scholar: { name: { contains: params.search, mode: 'insensitive' } } },
+      {
+        scholar: {
+          translations: { some: { name: { contains: params.search, mode: 'insensitive' } } },
+        },
+      },
+    ];
+  }
+  return where;
+}
+
 async function createListingTopics(
   tx: Prisma.TransactionClient,
   listingId: string,
@@ -881,61 +917,12 @@ export class ListingRepository {
 
   // ─── Admin Listing Methods ────────────────────────────────────────────────
 
-  async listAdmin(params: {
-    cursor?: string;
-    scholarId?: string;
-    status?: string;
-    search?: string;
-    accessibleScholarIds?: string[];
-  }): Promise<AdminListingListDto> {
+  async listAdmin(params: AdminListingFilterParams): Promise<AdminListingListDto> {
     const locale = getRequestLocale();
     const pageSize = 50;
     const take = pageSize + 1;
 
-    // Intersect the caller-requested scholarId filter (if any) with what
-    // their ability actually allows (if scoped) — a scoped editor filtering
-    // by a scholarId outside their access sees no rows, not another
-    // scholar's rows.
-    let scholarIdFilter: Prisma.ListingWhereInput['scholarId'];
-    if (params.accessibleScholarIds) {
-      scholarIdFilter = params.scholarId
-        ? params.accessibleScholarIds.includes(params.scholarId)
-          ? params.scholarId
-          : { in: [] }
-        : { in: params.accessibleScholarIds };
-    } else if (params.scholarId) {
-      scholarIdFilter = params.scholarId;
-    }
-
-    const where: Prisma.ListingWhereInput = {
-      deletedAt: null,
-      parentId: null,
-    };
-    if (scholarIdFilter) {
-      where.scholarId = scholarIdFilter;
-    }
-    if (params.status) {
-      // SAFETY: admin listing status filters come from validated route/query inputs and match the shared Status union.
-      where.status = params.status as Status;
-    }
-    if (params.search) {
-      where.OR = [
-        { title: { contains: params.search, mode: 'insensitive' } },
-        {
-          translations: {
-            some: { title: { contains: params.search, mode: 'insensitive' } },
-          },
-        },
-        { scholar: { name: { contains: params.search, mode: 'insensitive' } } },
-        {
-          scholar: {
-            translations: {
-              some: { name: { contains: params.search, mode: 'insensitive' } },
-            },
-          },
-        },
-      ];
-    }
+    const where = buildAdminListingWhere(params);
 
     const baseQueryArgs = {
       where,
