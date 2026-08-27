@@ -238,58 +238,33 @@ function LoadedListing({ view }: { view: LoadedListingView }) {
   );
 }
 
-export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
-  const { t } = useTranslation();
-  const router = useRouter();
-  const formatScholarName = useFormatScholarName();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [highlightItemId, setHighlightItemId] = useState<string | undefined>(undefined);
+type ListingFallbackState = "error" | "loading" | "not-found" | "nested";
 
-  const {
-    data: listing,
-    isFetching: isFetchingDetail,
-    isError: isListingError,
-    refetch: refetchListing,
-  } = useListingDetail(slug);
-  const { data: contents, isFetching: isFetchingContents } = useListingContents(
-    listing?.slug ?? "",
-  );
+function getListingFallbackState(
+  isListingError: boolean,
+  isFetchingDetail: boolean,
+  hasListing: boolean,
+  isNested: boolean,
+): ListingFallbackState | null {
+  if (isListingError && !hasListing) return "error";
+  if (isFetchingDetail && !hasListing) return "loading";
+  if (!hasListing) return "not-found";
+  if (isNested) return "nested";
+  return null;
+}
 
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash) setHighlightItemId(hash.slice(1));
-  }, []);
-
-  useEffect(() => {
-    if (!highlightItemId || !contents) return;
-    document
-      .getElementById(contentItemAnchorId(highlightItemId))
-      ?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [highlightItemId, contents]);
-
-  const isMultiItem = isMultiItemListing(listing?.format);
-  const query = searchQuery.trim().toLowerCase();
-
-  // Filter items for search
-  const filteredSingleOrSeriesItems = useMemo(() => {
-    return filterContentItems(contents, query);
-  }, [contents, query]);
-
-  const filteredModules = useMemo(() => {
-    return filterContentModules(contents, query);
-  }, [contents, query]);
-
-  const contentCount =
-    contents?.format === "collection" ? filteredModules.length : filteredSingleOrSeriesItems.length;
-  const contentHeading = getContentHeading(listing?.format, t);
-  const contentCountLabel = getContentCountLabel(
-    contents?.format,
-    filteredModules.length,
-    filteredSingleOrSeriesItems.length,
-    t,
-  );
-
-  if (isListingError && !listing) {
+function ListingDetailFallback({
+  state,
+  onRetry,
+  onBack,
+  t,
+}: {
+  state: ListingFallbackState;
+  onRetry: () => void;
+  onBack: () => void;
+  t: Translation["t"];
+}) {
+  if (state === "error") {
     return (
       <ScreenView center>
         <Empty className={styles.state}>
@@ -297,7 +272,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
             <EmptyTitle>{t("lecture.error", "Failed to load content details")}</EmptyTitle>
           </EmptyHeader>
           <EmptyContent>
-            <Button type="button" variant="outline" onClick={() => refetchListing()}>
+            <Button type="button" variant="outline" onClick={onRetry}>
               {t("common.retry", "Try again")}
             </Button>
           </EmptyContent>
@@ -306,7 +281,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
     );
   }
 
-  if (isFetchingDetail && !listing) {
+  if (state === "loading") {
     return (
       <ScreenView>
         <StickyHeaderLayout>
@@ -317,7 +292,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
                 variant="ghost"
                 size="sm"
                 className={styles.backButton}
-                onClick={() => router.back()}
+                onClick={onBack}
                 aria-label={t("navigation.back", "Back")}
               >
                 <ChevronLeft data-icon="inline-start" />
@@ -343,47 +318,133 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
     );
   }
 
-  if (!listing) {
+  const title =
+    state === "nested"
+      ? t("lecture.loading", "Loading content…")
+      : t("lecture.notFound", "Content not found");
+  return (
+    <ScreenView center>
+      <Empty className={styles.state}>
+        <EmptyHeader>
+          <EmptyTitle>{title}</EmptyTitle>
+        </EmptyHeader>
+      </Empty>
+    </ScreenView>
+  );
+}
+
+function useListingHighlight(contents: ListingContents | undefined) {
+  const [highlightItemId, setHighlightItemId] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) setHighlightItemId(hash.slice(1));
+  }, []);
+
+  useEffect(() => {
+    if (!highlightItemId || !contents) return;
+    document
+      .getElementById(contentItemAnchorId(highlightItemId))
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [highlightItemId, contents]);
+
+  return highlightItemId;
+}
+
+function useListingContentModel({
+  contents,
+  listing,
+  searchQuery,
+  formatScholarName,
+  highlightItemId,
+  t,
+}: {
+  contents: ListingContents | undefined;
+  listing: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined;
+  searchQuery: string;
+  formatScholarName: FormatScholarName;
+  highlightItemId: string | undefined;
+  t: Translation["t"];
+}) {
+  const isMultiItem = isMultiItemListing(listing?.format);
+  const query = searchQuery.trim().toLowerCase();
+  const filteredSingleOrSeriesItems = useMemo(
+    () => filterContentItems(contents, query),
+    [contents, query],
+  );
+  const filteredModules = useMemo(() => filterContentModules(contents, query), [contents, query]);
+  const contentCount =
+    contents?.format === "collection" ? filteredModules.length : filteredSingleOrSeriesItems.length;
+  const contentCountLabel = getContentCountLabel(
+    contents?.format,
+    filteredModules.length,
+    filteredSingleOrSeriesItems.length,
+    t,
+  );
+  const contentHeading = getContentHeading(listing?.format, t);
+  const content =
+    contents && listing
+      ? {
+          contents,
+          listing,
+          contentCount,
+          contentCountLabel,
+          contentHeading,
+          filteredSingleOrSeriesItems,
+          filteredModules,
+          formatScholarName,
+          highlightItemId,
+        }
+      : undefined;
+
+  return { isMultiItem, content };
+}
+
+export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const formatScholarName = useFormatScholarName();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const {
+    data: listing,
+    isFetching: isFetchingDetail,
+    isError: isListingError,
+    refetch: refetchListing,
+  } = useListingDetail(slug);
+  const { data: contents, isFetching: isFetchingContents } = useListingContents(
+    listing?.slug ?? "",
+  );
+  const highlightItemId = useListingHighlight(contents);
+
+  const { isMultiItem, content } = useListingContentModel({
+    contents,
+    listing,
+    searchQuery,
+    formatScholarName,
+    highlightItemId,
+    t,
+  });
+
+  const fallbackState = getListingFallbackState(
+    isListingError,
+    isFetchingDetail,
+    Boolean(listing),
+    Boolean(listing?.rootListing),
+  );
+  if (fallbackState) {
     return (
-      <ScreenView center>
-        <Empty className={styles.state}>
-          <EmptyHeader>
-            <EmptyTitle>{t("lecture.notFound", "Content not found")}</EmptyTitle>
-          </EmptyHeader>
-        </Empty>
-      </ScreenView>
+      <ListingDetailFallback
+        state={fallbackState}
+        onRetry={() => void refetchListing()}
+        onBack={() => router.back()}
+        t={t}
+      />
     );
   }
 
-  if (listing.rootListing) {
-    // The server-rendered page redirects a nested Lesson/Module's own slug to
-    // its top-level listing (see app/.../listings/[slug]/page.tsx) before this
-    // ever mounts. This guards against rendering the wrong content in the
-    // rare case a client-side cache serves stale data past that redirect.
-    return (
-      <ScreenView center>
-        <Empty className={styles.state}>
-          <EmptyHeader>
-            <EmptyTitle>{t("lecture.loading", "Loading content…")}</EmptyTitle>
-          </EmptyHeader>
-        </Empty>
-      </ScreenView>
-    );
-  }
+  if (!listing) return null;
 
-  const content: ListingContentModel | undefined = contents
-    ? {
-        contents,
-        listing,
-        contentCount,
-        contentCountLabel,
-        contentHeading,
-        filteredSingleOrSeriesItems,
-        filteredModules,
-        formatScholarName,
-        highlightItemId,
-      }
-    : undefined;
   const view: LoadedListingView = {
     listing,
     contents,

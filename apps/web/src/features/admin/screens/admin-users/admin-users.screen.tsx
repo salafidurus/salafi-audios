@@ -32,8 +32,60 @@ const ROLE_PRIORITY = new Map<string, number>([
   ["superadmin", 6],
 ]);
 
+type UserSortKey = "name" | "createdAt" | "roles";
+type UserSort = { key: UserSortKey; direction: "asc" | "desc" };
+
 function highestRole(roles: string[]): number {
   return Math.max(...roles.map((role) => ROLE_PRIORITY.get(role.toLowerCase()) ?? 0), 0);
+}
+
+function UsersTableHeader({
+  sort,
+  onSort,
+}: {
+  sort: UserSort;
+  onSort: (key: UserSortKey) => void;
+}) {
+  const { t } = useTranslation();
+  const sortIcon = (key: UserSortKey) => {
+    if (sort.key !== key) return <ArrowUpDown aria-hidden="true" data-icon="inline-end" />;
+    return sort.direction === "asc" ? (
+      <ArrowUp aria-hidden="true" data-icon="inline-end" />
+    ) : (
+      <ArrowDown aria-hidden="true" data-icon="inline-end" />
+    );
+  };
+
+  const sortableHeaders: Array<{ key: UserSortKey; label: string }> = [
+    { key: "name", label: t("admin.users.columns.user", "User") },
+    { key: "createdAt", label: t("admin.users.columns.joined", "Date joined") },
+    { key: "roles", label: t("admin.users.columns.roles", "Roles") },
+  ];
+
+  return (
+    <TableRow>
+      {sortableHeaders.map(({ key, label }) => (
+        <TableHead
+          key={key}
+          aria-sort={
+            sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"
+          }
+        >
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className={styles.sortButton}
+            onClick={() => onSort(key)}
+          >
+            {label}
+            {sortIcon(key)}
+          </Button>
+        </TableHead>
+      ))}
+      <TableHead>{t("admin.users.columns.actions", "Actions")}</TableHead>
+    </TableRow>
+  );
 }
 
 export function AdminUsersScreen(): ReactNode {
@@ -42,10 +94,7 @@ export function AdminUsersScreen(): ReactNode {
   const { t } = useTranslation();
   const { query: searchQuery, setQuery: setSearchQuery, debouncedQuery } = useDebouncedSearch();
   const [role, setRole] = useState("");
-  const [sort, setSort] = useState<{
-    key: "name" | "createdAt" | "roles";
-    direction: "asc" | "desc";
-  }>({
+  const [sort, setSort] = useState<UserSort>({
     key: "createdAt",
     direction: "desc",
   });
@@ -83,7 +132,7 @@ export function AdminUsersScreen(): ReactNode {
     });
   }, [data?.pages, sort]);
 
-  const toggleSort = (key: "name" | "createdAt" | "roles") => {
+  const toggleSort = (key: UserSortKey) => {
     setSort((current) => ({
       key,
       direction:
@@ -95,15 +144,6 @@ export function AdminUsersScreen(): ReactNode {
             ? "desc"
             : "asc",
     }));
-  };
-
-  const sortIcon = (key: "name" | "createdAt" | "roles") => {
-    if (sort.key !== key) return <ArrowUpDown aria-hidden="true" data-icon="inline-end" />;
-    return sort.direction === "asc" ? (
-      <ArrowUp aria-hidden="true" data-icon="inline-end" />
-    ) : (
-      <ArrowDown aria-hidden="true" data-icon="inline-end" />
-    );
   };
 
   const handleAccessChange = useCallback(() => {
@@ -158,71 +198,7 @@ export function AdminUsersScreen(): ReactNode {
               isFetchingNextPage={isFetchingNextPage}
               layout={isDesktop ? "table" : "list"}
               tableHeader={
-                isDesktop ? (
-                  <TableRow>
-                    <TableHead
-                      aria-sort={
-                        sort.key === "name"
-                          ? sort.direction === "asc"
-                            ? "ascending"
-                            : "descending"
-                          : "none"
-                      }
-                    >
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className={styles.sortButton}
-                        onClick={() => toggleSort("name")}
-                      >
-                        {t("admin.users.columns.user", "User")}
-                        {sortIcon("name")}
-                      </Button>
-                    </TableHead>
-                    <TableHead
-                      aria-sort={
-                        sort.key === "createdAt"
-                          ? sort.direction === "asc"
-                            ? "ascending"
-                            : "descending"
-                          : "none"
-                      }
-                    >
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className={styles.sortButton}
-                        onClick={() => toggleSort("createdAt")}
-                      >
-                        {t("admin.users.columns.joined", "Date joined")}
-                        {sortIcon("createdAt")}
-                      </Button>
-                    </TableHead>
-                    <TableHead
-                      aria-sort={
-                        sort.key === "roles"
-                          ? sort.direction === "asc"
-                            ? "ascending"
-                            : "descending"
-                          : "none"
-                      }
-                    >
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className={styles.sortButton}
-                        onClick={() => toggleSort("roles")}
-                      >
-                        {t("admin.users.columns.roles", "Roles")}
-                        {sortIcon("roles")}
-                      </Button>
-                    </TableHead>
-                    <TableHead>{t("admin.users.columns.actions", "Actions")}</TableHead>
-                  </TableRow>
-                ) : undefined
+                isDesktop ? <UsersTableHeader sort={sort} onSort={toggleSort} /> : undefined
               }
               renderItem={(user) => (
                 <UserItem

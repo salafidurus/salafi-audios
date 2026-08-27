@@ -56,16 +56,23 @@ it("generates and publishes the Prisma client", async () => {
     stdout: "pipe",
   });
 
-  expect(await generator.exited).toBe(0);
+  let hasExited = false;
+  try {
+    const exitCode = await generator.exited;
+    hasExited = true;
+    expect(exitCode).toBe(0);
 
-  const generatedClient = await readFile(
-    join(packageRoot, "dist", "generated", "prisma", "client.js"),
-    "utf8",
-  );
-  const generatedIndex = await readFile(
-    join(packageRoot, "dist", "generated", "prisma", "index.js"),
-    "utf8",
-  );
-  expect(generatedClient).toContain("require('.')");
-  expect(generatedIndex).toContain("getPrismaClient");
-});
+    const generatedClient = await readFile(
+      join(packageRoot, "dist", "generated", "prisma", "client.js"),
+      "utf8",
+    );
+    const generatedIndex = await readFile(
+      join(packageRoot, "dist", "generated", "prisma", "index.js"),
+      "utf8",
+    );
+    expect(generatedClient).toContain("require('.')");
+    expect(generatedIndex).toContain("getPrismaClient");
+  } finally {
+    if (!hasExited) generator.kill();
+  }
+}, 30_000);

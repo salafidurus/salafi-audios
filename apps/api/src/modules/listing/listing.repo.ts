@@ -30,6 +30,7 @@ import type {
   ArrangeCommitResultDto,
   ArrangeLessonOp,
   HomePromotionsDto,
+  ListingFormat,
 } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
@@ -40,6 +41,56 @@ import {
   type ListingEditorialTransition,
 } from './listing-editorial.transitions';
 import { toOptional } from '../../shared/utils/to-optional';
+
+type AdminListingFilterParams = {
+  cursor?: string;
+  scholarId?: string;
+  status?: string;
+  search?: string;
+  accessibleScholarIds?: string[];
+};
+
+function buildAdminListingWhere(params: AdminListingFilterParams): Prisma.ListingWhereInput {
+  const scholarId = params.accessibleScholarIds
+    ? params.scholarId && !params.accessibleScholarIds.includes(params.scholarId)
+      ? { in: [] }
+      : (params.scholarId ?? { in: params.accessibleScholarIds })
+    : params.scholarId;
+  const where: Prisma.ListingWhereInput = {
+    deletedAt: null,
+    parentId: null,
+    scholarId,
+    // SAFETY: status is validated by the admin route DTO before reaching this repository filter.
+    status: params.status as Status | undefined,
+  };
+  if (params.search) {
+    where.OR = [
+      { title: { contains: params.search, mode: 'insensitive' } },
+      { translations: { some: { title: { contains: params.search, mode: 'insensitive' } } } },
+      { scholar: { name: { contains: params.search, mode: 'insensitive' } } },
+      {
+        scholar: {
+          translations: { some: { name: { contains: params.search, mode: 'insensitive' } } },
+        },
+      },
+    ];
+  }
+  return where;
+}
+
+function hasTranslatableListingChange(dto: UpdateListingDetailsDto): boolean {
+  return [dto.title, dto.description, dto.language].some((value) => value !== undefined);
+}
+
+function setPublishedAtWhenPublishing(
+  updateData: Prisma.ListingUpdateInput,
+  nextStatus: Status | undefined,
+  currentStatus: Status,
+): void {
+  if (nextStatus === Status.published && currentStatus !== Status.published) {
+    updateData.publishedAt = new Date();
+  }
+}
 
 async function createListingTopics(
   tx: Prisma.TransactionClient,
@@ -881,61 +932,12 @@ export class ListingRepository {
 
   // ─── Admin Listing Methods ────────────────────────────────────────────────
 
-  async listAdmin(params: {
-    cursor?: string;
-    scholarId?: string;
-    status?: string;
-    search?: string;
-    accessibleScholarIds?: string[];
-  }): Promise<AdminListingListDto> {
+  async listAdmin(params: AdminListingFilterParams): Promise<AdminListingListDto> {
     const locale = getRequestLocale();
     const pageSize = 50;
     const take = pageSize + 1;
 
-    // Intersect the caller-requested scholarId filter (if any) with what
-    // their ability actually allows (if scoped) — a scoped editor filtering
-    // by a scholarId outside their access sees no rows, not another
-    // scholar's rows.
-    let scholarIdFilter: Prisma.ListingWhereInput['scholarId'];
-    if (params.accessibleScholarIds) {
-      scholarIdFilter = params.scholarId
-        ? params.accessibleScholarIds.includes(params.scholarId)
-          ? params.scholarId
-          : { in: [] }
-        : { in: params.accessibleScholarIds };
-    } else if (params.scholarId) {
-      scholarIdFilter = params.scholarId;
-    }
-
-    const where: Prisma.ListingWhereInput = {
-      deletedAt: null,
-      parentId: null,
-    };
-    if (scholarIdFilter) {
-      where.scholarId = scholarIdFilter;
-    }
-    if (params.status) {
-      // SAFETY: admin listing status filters come from validated route/query inputs and match the shared Status union.
-      where.status = params.status as Status;
-    }
-    if (params.search) {
-      where.OR = [
-        { title: { contains: params.search, mode: 'insensitive' } },
-        {
-          translations: {
-            some: { title: { contains: params.search, mode: 'insensitive' } },
-          },
-        },
-        { scholar: { name: { contains: params.search, mode: 'insensitive' } } },
-        {
-          scholar: {
-            translations: {
-              some: { name: { contains: params.search, mode: 'insensitive' } },
-            },
-          },
-        },
-      ];
-    }
+    const where = buildAdminListingWhere(params);
 
     const baseQueryArgs = {
       where,
@@ -1208,6 +1210,104 @@ export class ListingRepository {
     });
   }
 
+  private async syncUpdatedListingParents(
+    tx: Prisma.TransactionClient,
+    originalParentId: string | null,
+    nextParentId: string | null | undefined,
+  ): Promise<void> {
+    if (originalParentId) {
+      await this.syncListingCounters(originalParentId, tx);
+    }
+    if (nextParentId !== undefined && nextParentId !== originalParentId && nextParentId) {
+      await this.syncListingCounters(nextParentId, tx);
+    }
+  }
+
+  private async syncArrangeLessonAudio(
+    tx: Prisma.TransactionClient,
+    listingId: string,
+    audio: ArrangeAudioRef,
+  ): Promise<void> {
+    const primary = await tx.audioAsset.findFirst({
+      where: { listingId, isPrimary: true },
+      select: { id: true },
+    });
+    if (primary) {
+      await tx.audioAsset.update({
+        where: { id: primary.id },
+        data: this.arrangeAudioAssetData(audio),
+      });
+      return;
+    }
+    await tx.audioAsset.create({
+      data: {
+        listingId,
+        ...this.arrangeAudioAssetData(audio),
+        isPrimary: true,
+        source: 'r2',
+      },
+    });
+  }
+
+  private async createArrangeLesson(
+    tx: Prisma.TransactionClient,
+    op: Extract<ArrangeLessonOp, { op: 'create' }>,
+    parentId: string,
+    scholarId: string,
+    userId?: string,
+  ): Promise<string> {
+    const status = op.status ?? Status.draft;
+    const lesson = await tx.listing.create({
+      data: {
+        slug: op.slug,
+        title: op.title,
+        description: op.description ?? undefined,
+        format: 'single',
+        status,
+        publishedAt: status === Status.published ? new Date() : undefined,
+        orderIndex: op.orderIndex ?? undefined,
+        durationSeconds: op.audio.durationSeconds,
+        scholarId,
+        parentId,
+        createdBy: userId,
+      },
+      select: { id: true },
+    });
+    await tx.audioAsset.create({
+      data: {
+        listingId: lesson.id,
+        ...this.arrangeAudioAssetData(op.audio),
+        isPrimary: true,
+        source: 'r2',
+      },
+    });
+    return lesson.id;
+  }
+
+  private async updateArrangeLesson(
+    tx: Prisma.TransactionClient,
+    op: Extract<ArrangeLessonOp, { op: 'update' }>,
+    userId?: string,
+  ): Promise<void> {
+    const existing = await tx.listing.findUnique({
+      where: { id: op.id },
+      select: { status: true },
+    });
+    const data: Prisma.ListingUpdateInput = { updatedAt: new Date(), updatedBy: userId };
+    if (op.title !== undefined) data.title = op.title;
+    if (op.description !== undefined) data.description = op.description;
+    if (op.status !== undefined) {
+      data.status = op.status;
+      if (op.status === Status.published && existing?.status !== Status.published) {
+        data.publishedAt = new Date();
+      }
+    }
+    if (op.orderIndex !== undefined) data.orderIndex = op.orderIndex;
+    if (op.audio) data.durationSeconds = op.audio.durationSeconds;
+    await tx.listing.update({ where: { id: op.id }, data });
+    if (op.audio) await this.syncArrangeLessonAudio(tx, op.id, op.audio);
+  }
+
   async updateListingDetails(
     id: string,
     dto: UpdateListingDetailsDto,
@@ -1228,8 +1328,7 @@ export class ListingRepository {
 
         if (!original) throw new Error('Not found');
 
-        const hasTranslatableChange =
-          dto.title !== undefined || dto.description !== undefined || dto.language !== undefined;
+        const hasTranslatableChange = hasTranslatableListingChange(dto);
 
         // Exclude topics from the main update data
         const { topics, ...dtoWithoutTopics } = dto;
@@ -1240,9 +1339,7 @@ export class ListingRepository {
           updatedBy,
         };
 
-        if (dto.status === Status.published && original.status !== Status.published) {
-          updateData.publishedAt = new Date();
-        }
+        setPublishedAtWhenPublishing(updateData, dto.status, original.status);
 
         await tx.listing.update({
           where: { id },
@@ -1264,17 +1361,7 @@ export class ListingRepository {
 
         await replaceListingTopics(tx, id, topics);
 
-        // Sync old parent if it exists
-        if (original.parentId) {
-          await this.syncListingCounters(original.parentId, tx);
-        }
-
-        // Sync new parent if parentId is updated and different
-        if (dto.parentId !== undefined && dto.parentId !== original.parentId) {
-          if (dto.parentId) {
-            await this.syncListingCounters(dto.parentId, tx);
-          }
-        }
+        await this.syncUpdatedListingParents(tx, original.parentId, dto.parentId);
       });
       return true;
     } catch {
@@ -1458,6 +1545,38 @@ export class ListingRepository {
     };
   }
 
+  private validateArrangeRoot(root: { format: ListingFormat }, dto: ArrangeCommitDto): void {
+    if (root.format === 'single') {
+      throw new BadRequestException('Single listings update audio via the media endpoint');
+    }
+    if (root.format === 'series' && !dto.lessons) {
+      throw new BadRequestException('Series commits require lessons');
+    }
+    if (root.format === 'collection' && !dto.modules) {
+      throw new BadRequestException('Collection commits require modules');
+    }
+  }
+
+  private async getArrangeModuleSlugs(
+    tx: Prisma.TransactionClient,
+    rootId: string,
+    moduleOps: NonNullable<ArrangeCommitDto['modules']>,
+  ): Promise<Map<string, string>> {
+    const moduleUpdateIds = moduleOps.flatMap((moduleOp) =>
+      moduleOp.op === 'update' ? [moduleOp.id] : [],
+    );
+    if (moduleUpdateIds.length === 0) return new Map();
+
+    const found = await tx.listing.findMany({
+      where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
+      select: { id: true, slug: true },
+    });
+    if (found.length !== moduleUpdateIds.length) {
+      throw new BadRequestException('Module update target is not under this listing');
+    }
+    return new Map(found.map((module) => [module.id, module.slug]));
+  }
+
   private async validateArrangeCommit(
     tx: Prisma.TransactionClient,
     rootId: string,
@@ -1468,34 +1587,12 @@ export class ListingRepository {
       select: { id: true, slug: true, scholarId: true, format: true },
     });
     if (!root) throw new NotFoundException('Listing not found');
-    if (root.format === 'single') {
-      throw new BadRequestException('Single listings update audio via the media endpoint');
-    }
-    if (root.format === 'series' && !dto.lessons) {
-      throw new BadRequestException('Series commits require lessons');
-    }
-    if (root.format === 'collection' && !dto.modules) {
-      throw new BadRequestException('Collection commits require modules');
-    }
+    this.validateArrangeRoot(root, dto);
 
     const moduleOps = dto.modules ?? [];
     const rootLessonOps = dto.lessons ?? [];
     this.validateNewModuleLessons(moduleOps);
-    const moduleUpdateIds: string[] = [];
-    for (const moduleOp of moduleOps) {
-      if (moduleOp.op === 'update') moduleUpdateIds.push(moduleOp.id);
-    }
-    const existingModuleSlugById = new Map<string, string>();
-    if (moduleUpdateIds.length) {
-      const found = await tx.listing.findMany({
-        where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
-        select: { id: true, slug: true },
-      });
-      if (found.length !== moduleUpdateIds.length) {
-        throw new BadRequestException('Module update target is not under this listing');
-      }
-      for (const module of found) existingModuleSlugById.set(module.id, module.slug);
-    }
+    const existingModuleSlugById = await this.getArrangeModuleSlugs(tx, rootId, moduleOps);
 
     await this.validateArrangeSlugs(
       tx,
@@ -1517,6 +1614,35 @@ export class ListingRepository {
     }
   }
 
+  private buildArrangePrefixChecks(
+    rootSlug: string,
+    moduleOps: NonNullable<ArrangeCommitDto['modules']>,
+    rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
+    existingModuleSlugById: Map<string, string>,
+  ): { slug: string; expectedPrefix: string }[] {
+    const checks: { slug: string; expectedPrefix: string }[] = [];
+    for (const moduleOp of moduleOps) {
+      const parentSlug =
+        moduleOp.op === 'create'
+          ? moduleOp.slug
+          : (existingModuleSlugById.get(moduleOp.id) ?? rootSlug);
+      if (moduleOp.op === 'create') {
+        checks.push({ slug: moduleOp.slug, expectedPrefix: rootSlug });
+      }
+      for (const lessonOp of moduleOp.lessons) {
+        if (lessonOp.op === 'create') {
+          checks.push({ slug: lessonOp.slug, expectedPrefix: parentSlug });
+        }
+      }
+    }
+    for (const lessonOp of rootLessonOps) {
+      if (lessonOp.op === 'create') {
+        checks.push({ slug: lessonOp.slug, expectedPrefix: rootSlug });
+      }
+    }
+    return checks;
+  }
+
   private async validateArrangeSlugs(
     tx: Prisma.TransactionClient,
     rootSlug: string,
@@ -1524,24 +1650,12 @@ export class ListingRepository {
     rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
     existingModuleSlugById: Map<string, string>,
   ): Promise<void> {
-    const prefixChecks: { slug: string; expectedPrefix: string }[] = [];
-    for (const moduleOp of moduleOps) {
-      const parentSlug =
-        moduleOp.op === 'create'
-          ? moduleOp.slug
-          : (existingModuleSlugById.get(moduleOp.id) ?? rootSlug);
-      if (moduleOp.op === 'create')
-        prefixChecks.push({ slug: moduleOp.slug, expectedPrefix: rootSlug });
-      for (const lessonOp of moduleOp.lessons) {
-        if (lessonOp.op === 'create') {
-          prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: parentSlug });
-        }
-      }
-    }
-    for (const lessonOp of rootLessonOps) {
-      if (lessonOp.op === 'create')
-        prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: rootSlug });
-    }
+    const prefixChecks = this.buildArrangePrefixChecks(
+      rootSlug,
+      moduleOps,
+      rootLessonOps,
+      existingModuleSlugById,
+    );
 
     const createSlugs = prefixChecks.map((check) => check.slug);
     const duplicates = createSlugs.filter((slug, index) => createSlugs.indexOf(slug) !== index);
@@ -1572,36 +1686,56 @@ export class ListingRepository {
     }
   }
 
+  private collectArrangeLessonUpdateTargets(
+    moduleOps: ArrangeCommitDto['modules'],
+    rootLessonOps: ArrangeCommitDto['lessons'],
+    rootId: string,
+  ): Array<{ id: string; parentId: string }> {
+    const targets: Array<{ id: string; parentId: string }> = [];
+    for (const lessonOp of rootLessonOps ?? []) {
+      if (lessonOp.op === 'update') targets.push({ id: lessonOp.id, parentId: rootId });
+    }
+    for (const moduleOp of moduleOps ?? []) {
+      if (moduleOp.op !== 'update') continue;
+      for (const lessonOp of moduleOp.lessons) {
+        if (lessonOp.op === 'update') {
+          targets.push({ id: lessonOp.id, parentId: moduleOp.id });
+        }
+      }
+    }
+    return targets;
+  }
+
+  private assertArrangeLessonTargets(
+    targets: Array<{ id: string; parentId: string }>,
+    found: Array<{ id: string; parentId: string | null }>,
+  ): void {
+    const parentById = new Map(found.map((listing) => [listing.id, listing.parentId]));
+    for (const target of targets) {
+      if (parentById.get(target.id) !== target.parentId) {
+        throw new BadRequestException('Lesson update target is not under this listing');
+      }
+    }
+  }
+
   private async validateArrangeLessonTargets(
     tx: Prisma.TransactionClient,
     rootId: string,
     moduleOps: ArrangeCommitDto['modules'],
     rootLessonOps: ArrangeCommitDto['lessons'],
   ): Promise<void> {
-    const lessonUpdateTargets: Array<{ id: string; parentId: string }> = [];
-    for (const lessonOp of rootLessonOps ?? []) {
-      if (lessonOp.op === 'update') lessonUpdateTargets.push({ id: lessonOp.id, parentId: rootId });
-    }
-    for (const moduleOp of moduleOps ?? []) {
-      if (moduleOp.op !== 'update') continue;
-      for (const lessonOp of moduleOp.lessons) {
-        if (lessonOp.op === 'update') {
-          lessonUpdateTargets.push({ id: lessonOp.id, parentId: moduleOp.id });
-        }
-      }
-    }
+    const lessonUpdateTargets = this.collectArrangeLessonUpdateTargets(
+      moduleOps,
+      rootLessonOps,
+      rootId,
+    );
     if (!lessonUpdateTargets.length) return;
 
     const found = await tx.listing.findMany({
       where: { id: { in: lessonUpdateTargets.map((target) => target.id) }, deletedAt: null },
       select: { id: true, parentId: true },
     });
-    const parentById = new Map(found.map((listing) => [listing.id, listing.parentId]));
-    for (const target of lessonUpdateTargets) {
-      if (parentById.get(target.id) !== target.parentId) {
-        throw new BadRequestException('Lesson update target is not under this listing');
-      }
-    }
+    this.assertArrangeLessonTargets(lessonUpdateTargets, found);
   }
 
   async arrangeCommit(
@@ -1620,78 +1754,13 @@ export class ListingRepository {
       const affectedIds: string[] = [rootId];
       const touchedParents = new Set<string>();
 
-      const syncLessonAudio = async (listingId: string, audio: ArrangeAudioRef): Promise<void> => {
-        const primary = await tx.audioAsset.findFirst({
-          where: { listingId, isPrimary: true },
-          select: { id: true },
-        });
-        if (primary) {
-          await tx.audioAsset.update({
-            where: { id: primary.id },
-            data: this.arrangeAudioAssetData(audio),
-          });
-          return;
-        }
-        await tx.audioAsset.create({
-          data: {
-            listingId,
-            ...this.arrangeAudioAssetData(audio),
-            isPrimary: true,
-            source: 'r2',
-          },
-        });
-      };
-
       const applyLessonOp = async (op: ArrangeLessonOp, parentId: string): Promise<void> => {
         if (op.op === 'create') {
-          const status = op.status ?? Status.draft;
-          const lesson = await tx.listing.create({
-            data: {
-              slug: op.slug,
-              title: op.title,
-              description: op.description ?? undefined,
-              format: 'single',
-              status,
-              publishedAt: status === Status.published ? new Date() : undefined,
-              orderIndex: op.orderIndex ?? undefined,
-              durationSeconds: op.audio.durationSeconds,
-              scholarId: root.scholarId,
-              parentId,
-              createdBy: userId,
-            },
-            select: { id: true },
-          });
-          await tx.audioAsset.create({
-            data: {
-              listingId: lesson.id,
-              ...this.arrangeAudioAssetData(op.audio),
-              isPrimary: true,
-              source: 'r2',
-            },
-          });
+          const lessonId = await this.createArrangeLesson(tx, op, parentId, root.scholarId, userId);
           result.createdLessons += 1;
-          affectedIds.push(lesson.id);
+          affectedIds.push(lessonId);
         } else {
-          const existing = await tx.listing.findUnique({
-            where: { id: op.id },
-            select: { status: true },
-          });
-          const data: Prisma.ListingUpdateInput = { updatedAt: new Date(), updatedBy: userId };
-          if (op.title !== undefined) data.title = op.title;
-          if (op.description !== undefined) data.description = op.description;
-          if (op.status !== undefined) {
-            data.status = op.status;
-            if (op.status === Status.published && existing?.status !== Status.published) {
-              data.publishedAt = new Date();
-            }
-          }
-          if (op.orderIndex !== undefined) data.orderIndex = op.orderIndex;
-          if (op.audio) data.durationSeconds = op.audio.durationSeconds;
-          await tx.listing.update({ where: { id: op.id }, data });
-
-          if (op.audio) {
-            await syncLessonAudio(op.id, op.audio);
-          }
+          await this.updateArrangeLesson(tx, op, userId);
           result.updatedLessons += 1;
           affectedIds.push(op.id);
         }
@@ -2021,6 +2090,13 @@ export class ListingRepository {
       return toPublicUrl(value);
     };
 
+    const getListingMetrics = (l: any) => ({
+      durationSeconds:
+        l.format === 'single' ? (l.durationSeconds ?? 0) : (l.publishedDurationSeconds ?? 0),
+      thumbnailUrl: l.format === 'single' ? null : toOptionalPublicUrl(l.coverImageUrl),
+      publishedLectureCount: l.format === 'single' ? 1 : (l.publishedLectureCount ?? 1),
+    });
+
     const mapListing = (l: any) => {
       const resolved = resolveContentTranslation({
         base: { title: l.title },
@@ -2035,10 +2111,7 @@ export class ListingRepository {
         publishedTranslation: l.scholar!.translations[0] ?? null,
       }).fields.name;
 
-      const durationSeconds =
-        l.format === 'single' ? (l.durationSeconds ?? 0) : (l.publishedDurationSeconds ?? 0);
-      const thumbnailUrl = l.format === 'single' ? null : toOptionalPublicUrl(l.coverImageUrl);
-      const publishedLectureCount = l.format === 'single' ? 1 : (l.publishedLectureCount ?? 1);
+      const { durationSeconds, thumbnailUrl, publishedLectureCount } = getListingMetrics(l);
 
       return {
         // SAFETY: listing formats are constrained by the shared listing schema to these three values.

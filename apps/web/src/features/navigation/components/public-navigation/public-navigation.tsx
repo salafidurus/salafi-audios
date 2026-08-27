@@ -188,88 +188,93 @@ function NavigationLinks({
   );
 }
 
-function AccountMenu({ compact = false }: { compact?: boolean }) {
+type AccountMenuBaseProps = {
+  compact: boolean;
+  isOpen: boolean;
+  closeMenu: () => void;
+  toggleMenu: () => void;
+};
+
+function GuestAccountMenu({
+  compact,
+  isOpen,
+  closeMenu,
+  toggleMenu,
+  isAuthModalOpen,
+  openAuthModal,
+  closeAuthModal,
+  accountMenuRef,
+}: AccountMenuBaseProps & {
+  isAuthModalOpen: boolean;
+  openAuthModal: () => void;
+  closeAuthModal: () => void;
+  accountMenuRef: React.RefObject<HTMLDivElement | null>;
+}) {
   const { t } = useTranslation();
-  const { isAuthenticated, isLoading, user } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
-  const accountMenuRef = useRef<HTMLDivElement>(null);
-  const { signOut: performSignOut, error: signOutError } = useSignOut();
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const closeOnOutsidePointer = (event: PointerEvent) => {
-      // SAFETY: PointerEvent targets are DOM nodes when dispatched by the document.
-      if (!accountMenuRef.current?.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("pointerdown", closeOnOutsidePointer);
-    return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
-  }, [isOpen]);
-
-  const closeMenu = () => setIsOpen(false);
-
-  if (isLoading) {
-    return <span className={styles.accountLoading} aria-hidden="true" />;
-  }
-
-  if (!isAuthenticated || !user) {
-    return (
-      <div ref={accountMenuRef} className={styles.accountMenu}>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className={clsx(
-            styles.accountControl,
-            styles.accountTrigger,
-            compact && styles.compactAccount,
-          )}
-          aria-haspopup="menu"
-          aria-expanded={isOpen}
-          aria-label={`${t("navigation.account", "Account")}: ${t("account.guest", "Guest")}`}
-          onClick={() => setIsOpen((open) => !open)}
-        >
-          <UserRound aria-hidden="true" size={18} />
-          <span className={styles.accountName}>{t("account.guest", "Guest")}</span>
-          <ChevronDown aria-hidden="true" size={15} />
-        </Button>
-        {isOpen && (
-          <div
-            className={styles.accountPopover}
-            role="menu"
-            aria-label={t("navigation.account", "Account")}
-          >
-            <Link href={routes.settings.index} role="menuitem" onClick={closeMenu}>
-              {t("navigation.settings", "Settings")}
-            </Link>
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                closeMenu();
-                setIsAuthModalOpen(true);
-              }}
-            >
-              {t("authStrip.signIn", "Sign In")}
-            </button>
-          </div>
+  return (
+    <div ref={accountMenuRef} className={styles.accountMenu}>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className={clsx(
+          styles.accountControl,
+          styles.accountTrigger,
+          compact && styles.compactAccount,
         )}
-        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-      </div>
-    );
-  }
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        aria-label={`${t("navigation.account", "Account")}: ${t("account.guest", "Guest")}`}
+        onClick={toggleMenu}
+      >
+        <UserRound aria-hidden="true" size={18} />
+        <span className={styles.accountName}>{t("account.guest", "Guest")}</span>
+        <ChevronDown aria-hidden="true" size={15} />
+      </Button>
+      {isOpen && (
+        <div
+          className={styles.accountPopover}
+          role="menu"
+          aria-label={t("navigation.account", "Account")}
+        >
+          <Link href={routes.settings.index} role="menuitem" onClick={closeMenu}>
+            {t("navigation.settings", "Settings")}
+          </Link>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              closeMenu();
+              openAuthModal();
+            }}
+          >
+            {t("authStrip.signIn", "Sign In")}
+          </button>
+        </div>
+      )}
+      <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
+    </div>
+  );
+}
 
+type AuthenticatedAccountMenuProps = AccountMenuBaseProps & {
+  user: NonNullable<ReturnType<typeof useAuth>["user"]>;
+  openSignOutDialog: () => void;
+  accountMenuRef: React.RefObject<HTMLDivElement | null>;
+};
+
+function AuthenticatedAccountMenu({
+  compact,
+  isOpen,
+  closeMenu,
+  toggleMenu,
+  user,
+  openSignOutDialog,
+  accountMenuRef,
+}: AuthenticatedAccountMenuProps) {
+  const { t } = useTranslation();
   const userInitial = (user.name || user.email || "?").charAt(0).toUpperCase();
-
-  const signOut = async () => {
-    closeMenu();
-    await performSignOut();
-  };
 
   return (
     <div ref={accountMenuRef} className={styles.accountMenu}>
@@ -285,7 +290,7 @@ function AccountMenu({ compact = false }: { compact?: boolean }) {
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label={`${t("navigation.account", "Account")}: ${user.name || user.email}`}
-        onClick={() => setIsOpen((open) => !open)}
+        onClick={toggleMenu}
       >
         <Avatar size="default" aria-hidden="true">
           {user.image ? <AvatarImage src={user.image} alt="" /> : null}
@@ -312,13 +317,74 @@ function AccountMenu({ compact = false }: { compact?: boolean }) {
             role="menuitem"
             onClick={() => {
               closeMenu();
-              setIsSignOutDialogOpen(true);
+              openSignOutDialog();
             }}
           >
             {t("authStrip.signOut", "Sign Out")}
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function AccountMenu({ compact = false }: { compact?: boolean }) {
+  const { t } = useTranslation();
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+  const { signOut: performSignOut, error: signOutError } = useSignOut();
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      // SAFETY: PointerEvent targets are DOM nodes when dispatched by the document.
+      if (!accountMenuRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
+  }, [isOpen]);
+
+  const closeMenu = () => setIsOpen(false);
+  const toggleMenu = () => setIsOpen((open) => !open);
+  const signOut = async () => {
+    closeMenu();
+    await performSignOut();
+  };
+
+  if (isLoading) return <span className={styles.accountLoading} aria-hidden="true" />;
+  if (!isAuthenticated || !user) {
+    return (
+      <GuestAccountMenu
+        compact={compact}
+        isOpen={isOpen}
+        closeMenu={closeMenu}
+        toggleMenu={toggleMenu}
+        isAuthModalOpen={isAuthModalOpen}
+        openAuthModal={() => setIsAuthModalOpen(true)}
+        closeAuthModal={() => setIsAuthModalOpen(false)}
+        accountMenuRef={accountMenuRef}
+      />
+    );
+  }
+
+  return (
+    <>
+      <AuthenticatedAccountMenu
+        compact={compact}
+        isOpen={isOpen}
+        closeMenu={closeMenu}
+        toggleMenu={toggleMenu}
+        user={user}
+        openSignOutDialog={() => setIsSignOutDialogOpen(true)}
+        accountMenuRef={accountMenuRef}
+      />
       <ConfirmationDialog
         open={isSignOutDialogOpen}
         onOpenChange={setIsSignOutDialogOpen}
@@ -328,7 +394,7 @@ function AccountMenu({ compact = false }: { compact?: boolean }) {
         variant="destructive"
         error={signOutError}
       />
-    </div>
+    </>
   );
 }
 

@@ -10,15 +10,15 @@ import type { FormAction, FormState } from "@/features/admin/hooks/Content/useLi
 import { useTranslation } from "@/core/i18n/use-translation";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { deriveChildSlug } from "@/features/admin/utils/slugify";
+import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
+import { Search } from "@/shared/components/Search";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/ui/dropdown";
-import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
 import { InputField } from "@/shared/components/ui/input-field";
-import { Search } from "@/shared/components/Search";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./listing-modal.module.css";
@@ -36,6 +36,136 @@ interface ListingGeneralSectionProps {
   stagedImagePreview?: string | null;
 }
 
+type ListingFieldProps = Pick<ListingGeneralSectionProps, "state" | "dispatch"> & {
+  scholars: ScholarListItemDto[];
+  isEditing: boolean;
+};
+
+function ListingSlugField({ state, dispatch, scholars, isEditing }: ListingFieldProps) {
+  const { t } = useTranslation();
+  const { scholarId, slug, slugSuffix } = state;
+  const scholarSlug = scholars.find((scholar) => scholar.id === scholarId)?.slug ?? "";
+  const suffixIsEmpty = !isEditing && Boolean(scholarId) && !slugSuffix.trim();
+
+  return (
+    <div className={styles.formGroup}>
+      <label htmlFor="lecture-slug" className={styles.label}>
+        {t("admin.contents.listing.slugLabel", "Slug")} *
+      </label>
+      {isEditing ? (
+        <InputField id="lecture-slug" type="text" value={slug} onChange={() => {}} disabled />
+      ) : (
+        <>
+          <div className={styles.slugPrefixGroup}>
+            {scholarSlug && <span className={styles.slugPrefixBadge}>{scholarSlug}-</span>}
+            <InputField
+              id="lecture-slug"
+              type="text"
+              value={slugSuffix}
+              onChange={(value) => {
+                dispatch({ type: "UPDATE_FIELD", field: "slugSuffix", value });
+                dispatch({
+                  type: "UPDATE_FIELD",
+                  field: "slug",
+                  value: scholarSlug ? deriveChildSlug(scholarSlug, value) : value,
+                });
+              }}
+              placeholder={
+                scholarSlug
+                  ? t("admin.contents.listing.slugSuffixPlaceholder", "bayquniyyah")
+                  : t("admin.contents.listing.slugSelectScholarFirst", "Select a scholar first")
+              }
+              disabled={!scholarId}
+            />
+          </div>
+          {suffixIsEmpty && (
+            <span className={styles.fieldError}>
+              {t(
+                "admin.contents.listing.slugSuffixRequired",
+                "Enter a slug beyond the scholar prefix.",
+              )}
+            </span>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function ListingScholarField({ state, dispatch, scholars, isEditing }: ListingFieldProps) {
+  const { t } = useTranslation();
+  const formatScholarName = useFormatScholarName();
+  const { scholarId, slugSuffix } = state;
+
+  return (
+    <div className={styles.formGroup}>
+      <label htmlFor="lecture-scholar" className={styles.label}>
+        {t("admin.contents.listing.scholarLabel", "Scholar")} *
+      </label>
+      <Dropdown
+        value={scholarId}
+        onValueChange={(value) => {
+          dispatch({ type: "UPDATE_FIELD", field: "scholarId", value });
+          if (!isEditing) {
+            const newScholarSlug = scholars.find((scholar) => scholar.id === value)?.slug ?? "";
+            dispatch({
+              type: "UPDATE_FIELD",
+              field: "slug",
+              value: newScholarSlug ? deriveChildSlug(newScholarSlug, slugSuffix) : slugSuffix,
+            });
+          }
+        }}
+        disabled={isEditing}
+      >
+        <DropdownTrigger
+          id="lecture-scholar"
+          placeholder={t("admin.contents.listing.scholarPlaceholder", "Select Scholar")}
+          testId="scholar-dropdown"
+        />
+        <DropdownContent searchable>
+          {scholars.map((scholar) => (
+            <DropdownItem key={scholar.id} value={scholar.id}>
+              {formatScholarName(scholar)}
+            </DropdownItem>
+          ))}
+        </DropdownContent>
+      </Dropdown>
+    </div>
+  );
+}
+
+function ListingTopicsField({
+  topics,
+  selectedTopics,
+  handleTopicToggle,
+}: Pick<ListingGeneralSectionProps, "topics" | "handleTopicToggle"> & {
+  selectedTopics: string[];
+}) {
+  const { t, i18n } = useTranslation();
+
+  return (
+    <div className={styles.formGroup}>
+      <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")} *</span>
+      {topics.length > 0 ? (
+        <Search.Filter
+          chips={topics.map((topic) => ({
+            id: topic.id,
+            label: getLocalizedName(topic.name, i18n.language),
+          }))}
+          selected={selectedTopics}
+          onChipChange={handleTopicToggle}
+          multiple
+          includeAllOption={false}
+        />
+      ) : (
+        <span className={styles.noData}>
+          {t("admin.contents.listing.noTopicsAvailable", "No topics available")}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function ListingGeneralSection({
   state,
   dispatch,
@@ -46,23 +176,8 @@ export function ListingGeneralSection({
   onImageStaged,
   stagedImagePreview,
 }: ListingGeneralSectionProps) {
-  const { i18n, t } = useTranslation();
-  const formatScholarName = useFormatScholarName();
-  const {
-    scholarId,
-    status,
-    orderIndex,
-    selectedTopics,
-    language,
-    formError,
-    slug,
-    slugSuffix,
-    format,
-  } = state;
-
-  const selectedScholar = scholars.find((s) => s.id === scholarId);
-  const scholarSlug = selectedScholar?.slug ?? "";
-  const suffixIsEmpty = !isEditing && Boolean(scholarId) && !slugSuffix.trim();
+  const { t } = useTranslation();
+  const { status, orderIndex, selectedTopics, language, formError, format } = state;
 
   return (
     <>
@@ -84,84 +199,21 @@ export function ListingGeneralSection({
 
         <div className={styles.fieldsColumn}>
           <div className={styles.formGroup}>
-            <label htmlFor="lecture-slug" className={styles.label}>
-              {t("admin.contents.listing.slugLabel", "Slug")} *
-            </label>
-            {isEditing ? (
-              <InputField id="lecture-slug" type="text" value={slug} onChange={() => {}} disabled />
-            ) : (
-              <>
-                <div className={styles.slugPrefixGroup}>
-                  {scholarSlug && <span className={styles.slugPrefixBadge}>{scholarSlug}-</span>}
-                  <InputField
-                    id="lecture-slug"
-                    type="text"
-                    value={slugSuffix}
-                    onChange={(value) => {
-                      dispatch({ type: "UPDATE_FIELD", field: "slugSuffix", value });
-                      dispatch({
-                        type: "UPDATE_FIELD",
-                        field: "slug",
-                        value: scholarSlug ? deriveChildSlug(scholarSlug, value) : value,
-                      });
-                    }}
-                    placeholder={
-                      scholarSlug
-                        ? t("admin.contents.listing.slugSuffixPlaceholder", "bayquniyyah")
-                        : t(
-                            "admin.contents.listing.slugSelectScholarFirst",
-                            "Select a scholar first",
-                          )
-                    }
-                    disabled={!scholarId}
-                  />
-                </div>
-                {suffixIsEmpty && (
-                  <span className={styles.fieldError}>
-                    {t(
-                      "admin.contents.listing.slugSuffixRequired",
-                      "Enter a slug beyond the scholar prefix.",
-                    )}
-                  </span>
-                )}
-              </>
-            )}
+            <ListingSlugField
+              state={state}
+              dispatch={dispatch}
+              scholars={scholars}
+              isEditing={isEditing}
+            />
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="lecture-scholar" className={styles.label}>
-              {t("admin.contents.listing.scholarLabel", "Scholar")} *
-            </label>
-            <Dropdown
-              value={scholarId}
-              onValueChange={(value) => {
-                dispatch({ type: "UPDATE_FIELD", field: "scholarId", value });
-                if (!isEditing) {
-                  const newScholarSlug = scholars.find((s) => s.id === value)?.slug ?? "";
-                  dispatch({
-                    type: "UPDATE_FIELD",
-                    field: "slug",
-                    value: newScholarSlug
-                      ? deriveChildSlug(newScholarSlug, slugSuffix)
-                      : slugSuffix,
-                  });
-                }
-              }}
-              disabled={isEditing}
-            >
-              <DropdownTrigger
-                id="lecture-scholar"
-                placeholder={t("admin.contents.listing.scholarPlaceholder", "Select Scholar")}
-                testId="scholar-dropdown"
-              />
-              <DropdownContent searchable>
-                {scholars.map((s) => (
-                  <DropdownItem key={s.id} value={s.id}>
-                    {formatScholarName(s)}
-                  </DropdownItem>
-                ))}
-              </DropdownContent>
-            </Dropdown>
+            <ListingScholarField
+              state={state}
+              dispatch={dispatch}
+              scholars={scholars}
+              isEditing={isEditing}
+            />
           </div>
         </div>
       </div>
@@ -230,25 +282,11 @@ export function ListingGeneralSection({
         }
       />
 
-      <div className={styles.formGroup}>
-        <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")} *</span>
-        {topics.length > 0 ? (
-          <Search.Filter
-            chips={topics.map((t) => ({
-              id: t.id,
-              label: getLocalizedName(t.name, i18n.language),
-            }))}
-            selected={selectedTopics}
-            onChipChange={handleTopicToggle}
-            multiple
-            includeAllOption={false}
-          />
-        ) : (
-          <span className={styles.noData}>
-            {t("admin.contents.listing.noTopicsAvailable", "No topics available")}
-          </span>
-        )}
-      </div>
+      <ListingTopicsField
+        topics={topics}
+        selectedTopics={selectedTopics}
+        handleTopicToggle={handleTopicToggle}
+      />
     </>
   );
 }

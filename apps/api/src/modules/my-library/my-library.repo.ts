@@ -2,6 +2,7 @@ import { Injectable, Optional } from '@nestjs/common';
 import { Prisma } from '@sd/core-db';
 import type {
   Locale,
+  ListingFormat,
   MyLibraryItemDto,
   RecentProgressDto,
   ListingProgressSummaryDto,
@@ -25,11 +26,34 @@ type RecentParent = {
   id: string;
   title: string;
   slug: string;
-  format: string;
+  format: ListingFormat;
   language: Locale | null;
   translations: { title: string }[];
   coverImageUrl: string | null;
   parent?: RecentParent | null;
+};
+
+type RecentProgressRecord = {
+  positionSeconds: number;
+  listing: {
+    title: string;
+    slug: string;
+    format: ListingFormat;
+    orderIndex: number | null;
+    publishedLectureCount: number | null;
+    language: Locale | null;
+    durationSeconds: number | null;
+    coverImageUrl: string | null;
+    translations: { title: string }[];
+    scholar: {
+      slug: string;
+      name: string;
+      mainLanguage: Locale | null;
+      imageUrl: string | null;
+      translations: { name: string }[];
+    };
+    parent?: RecentParent | null;
+  };
 };
 
 function getRecentArtworkKey(listing: {
@@ -77,6 +101,16 @@ function getRecentRootListing(
   }
   if (!parent) return null;
   return { id: parent.id, slug: parent.slug, title: seriesContext?.seriesTitle ?? parent.title };
+}
+
+function getRecentProgressScalars(record: RecentProgressRecord) {
+  const listing = record.listing;
+  return {
+    orderIndex: listing.orderIndex ?? undefined,
+    publishedLectureCount: listing.publishedLectureCount ?? undefined,
+    durationSeconds: listing.durationSeconds ?? 0,
+    scholarImageUrl: listing.scholar.imageUrl ?? undefined,
+  };
 }
 
 function groupProgressRecords(
@@ -256,23 +290,24 @@ export class MyLibraryRepository {
     const listingById = new Map(listings.map((l) => [l.id, l]));
     const leafById = new Map(records.map((r) => [r.listingId, r]));
 
-    const items: MyLibraryItemDto[] = [];
-    for (const { topLevelId, latestUpdatedAt, summary } of page) {
+    const items = page.flatMap(({ topLevelId, latestUpdatedAt, summary }) => {
       const listing = listingById.get(topLevelId);
-      if (!listing || !summary) continue;
+      if (!listing || !summary) return [];
 
       const leafRecord = summary.totalCount <= 1 ? leafById.get(topLevelId) : undefined;
 
-      items.push({
-        id: `${userId}-${topLevelId}`,
-        listingId: topLevelId,
-        ...this.resolveListingRelation(listing, locale),
-        progressSeconds: leafRecord?.positionSeconds,
-        totalLeafCount: summary.totalCount,
-        completedLeafCount: summary.completedCount,
-        completedAt: onlyCompleted ? latestUpdatedAt.toISOString() : undefined,
-      });
-    }
+      return [
+        {
+          id: `${userId}-${topLevelId}`,
+          listingId: topLevelId,
+          ...this.resolveListingRelation(listing, locale),
+          progressSeconds: leafRecord?.positionSeconds,
+          totalLeafCount: summary.totalCount,
+          completedLeafCount: summary.completedCount,
+          completedAt: onlyCompleted ? latestUpdatedAt.toISOString() : undefined,
+        },
+      ];
+    });
 
     return { items, nextCursor };
   }
@@ -498,6 +533,10 @@ export class MyLibraryRepository {
 
     if (!record) return null;
 
+    return this.toRecentProgressDto(record, locale);
+  }
+
+  private toRecentProgressDto(record: RecentProgressRecord, locale: Locale): RecentProgressDto {
     const listingTitle = resolveContentTranslation({
       base: { title: record.listing.title },
       originalLanguage: record.listing.language,
@@ -510,27 +549,26 @@ export class MyLibraryRepository {
       targetLocale: locale,
       publishedTranslation: record.listing.scholar.translations[0] ?? null,
     }).fields.name;
-
     const artworkKey = getRecentArtworkKey(record.listing);
-
     const parent = record.listing.parent;
     const grandparent = parent?.parent;
     const seriesContext = getRecentSeriesContext(parent, locale);
     const rootListing = getRecentRootListing(parent, grandparent, seriesContext, locale);
+    const scalars = getRecentProgressScalars(record);
 
     return {
       lectureTitle: listingTitle,
       lectureSlug: record.listing.slug,
       listingSlug: record.listing.slug,
       format: record.listing.format,
-      orderIndex: record.listing.orderIndex ?? undefined,
-      publishedLectureCount: record.listing.publishedLectureCount ?? undefined,
+      orderIndex: scalars.orderIndex,
+      publishedLectureCount: scalars.publishedLectureCount,
       scholarName,
       scholarSlug: record.listing.scholar.slug,
-      durationSeconds: record.listing.durationSeconds ?? 0,
+      durationSeconds: scalars.durationSeconds,
       positionSeconds: record.positionSeconds,
       artworkUrl: artworkKey ? this.toPublicUrl(artworkKey) : undefined,
-      scholarImageUrl: record.listing.scholar.imageUrl ?? undefined,
+      scholarImageUrl: scalars.scholarImageUrl,
       seriesContext,
       rootListing,
       rootFormat: grandparent?.format ?? parent?.format,

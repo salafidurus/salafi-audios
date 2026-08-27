@@ -19,6 +19,36 @@ function formatDuration(seconds?: number): string {
   return h > 0 ? `${h}h ${m}m` : `${m} min`;
 }
 
+async function playLesson(
+  item: ListingContentItemDto,
+  queue: Track[],
+  isCurrentTrack: boolean,
+  isPlaying: boolean,
+) {
+  if (isCurrentTrack) {
+    if (isPlaying) await audioService.pause();
+    else await audioService.resume();
+    return;
+  }
+
+  const track = queue.find((candidate) => candidate.slug === item.slug);
+  if (track) await audioService.playListing(track, queue);
+}
+
+function renderProgress(progressPercent: number, isCompleted: boolean) {
+  if (progressPercent <= 0 || isCompleted) return null;
+  return (
+    <View style={styles.progressTrack}>
+      <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
+    </View>
+  );
+}
+
+function renderDownload(item: ListingContentItemDto) {
+  if (!item.primaryAudioAsset?.url) return null;
+  return <DownloadButton listingSlug={item.slug} audioUrl={item.primaryAudioAsset.url} />;
+}
+
 export type LessonRowProps = {
   item: ListingContentItemDto;
   queue: Track[];
@@ -39,21 +69,7 @@ export function LessonRow({ item, queue, highlighted = false, onLayout }: Lesson
     item.durationSeconds || item.primaryAudioAsset?.durationSeconds,
   );
 
-  const handlePress = async () => {
-    if (isCurrentTrack) {
-      if (isPlaying) {
-        await audioService.pause();
-      } else {
-        await audioService.resume();
-      }
-      return;
-    }
-
-    const track = queue.find((t) => t.slug === item.slug);
-    if (track) {
-      await audioService.playListing(track, queue);
-    }
-  };
+  const handlePress = () => playLesson(item, queue, isCurrentTrack, isPlaying);
 
   return (
     <View
@@ -75,16 +91,10 @@ export function LessonRow({ item, queue, highlighted = false, onLayout }: Lesson
                 {durationStr}
               </AppText>
             ) : null}
-            {progressPercent > 0 && !isCompleted ? (
-              <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
-              </View>
-            ) : null}
+            {renderProgress(progressPercent, isCompleted)}
             <DownloadProgress listingSlug={item.slug} />
           </View>
-          {item.primaryAudioAsset?.url ? (
-            <DownloadButton listingSlug={item.slug} audioUrl={item.primaryAudioAsset.url} />
-          ) : null}
+          {renderDownload(item)}
           <View style={styles.playButton}>
             {isCurrentlyPlaying ? (
               <Pause size={18} color={theme.colors.content.strong} />

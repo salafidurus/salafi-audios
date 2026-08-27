@@ -18,6 +18,37 @@ export type SeriesContextBarProps = {
   listingSlug: string;
 };
 
+function renderNavigationButton(
+  track: { title: string } | null,
+  direction: "previous" | "next",
+  isRtl: boolean,
+) {
+  if (!track) return <div className={styles.spacer} />;
+
+  const isPrevious = direction === "previous";
+  const className = isPrevious ? styles.navButtonLeft : styles.navButtonRight;
+  const skip = isPrevious ? () => audioService.skipToPrevious() : () => audioService.skipToNext();
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={skip}
+      className={`${styles.navButton} ${className}`}
+    >
+      <div className={styles.navLabel}>
+        {isPrevious ? (
+          <>{isRtl ? <ChevronRight size={14} /> : <ChevronLeft size={14} />} Previous</>
+        ) : (
+          <>Next {isRtl ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}</>
+        )}
+      </div>
+      <div className={styles.navTitle}>{track.title}</div>
+    </Button>
+  );
+}
+
 export function SeriesContextBar({ seriesContext, listingSlug }: SeriesContextBarProps) {
   const isRtl = useIsRtl();
   const { queue, currentIndex, currentTrack, hasNext, hasPrevious } = useQueue();
@@ -38,39 +69,8 @@ export function SeriesContextBar({ seriesContext, listingSlug }: SeriesContextBa
       </div>
 
       <div className={styles.navButtonsRow}>
-        {prevTrack ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => audioService.skipToPrevious()}
-            className={`${styles.navButton} ${styles.navButtonLeft}`}
-          >
-            <div className={styles.navLabel}>
-              {isRtl ? <ChevronRight size={14} /> : <ChevronLeft size={14} />} Previous
-            </div>
-            <div className={styles.navTitle}>{prevTrack.title}</div>
-          </Button>
-        ) : (
-          <div className={styles.spacer} />
-        )}
-
-        {nextTrack ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => audioService.skipToNext()}
-            className={`${styles.navButton} ${styles.navButtonRight}`}
-          >
-            <div className={styles.navLabel}>
-              Next {isRtl ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
-            </div>
-            <div className={styles.navTitle}>{nextTrack.title}</div>
-          </Button>
-        ) : (
-          <div className={styles.spacer} />
-        )}
+        {renderNavigationButton(prevTrack, "previous", isRtl)}
+        {renderNavigationButton(nextTrack, "next", isRtl)}
       </div>
     </div>
   );

@@ -61,6 +61,41 @@ function getPercentWidth(percent: number): DimensionValue {
   return `${Math.min(percent, 100)}%`;
 }
 
+function renderMeta(
+  item: MyLibraryItemDto,
+  variant: MyLibraryItemRowProps["variant"],
+  progress: number | null,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  const duration = item.durationSeconds
+    ? t("lecture.minutes", "{{count}} min", { count: Math.round(item.durationSeconds / 60) })
+    : "";
+  const annotations = [
+    variant === "progress" && progress !== null
+      ? t("myLibrary.percentListened", "{{percent}}% listened", { percent: progress })
+      : "",
+    variant === "saved" && item.savedAt
+      ? t("myLibrary.savedOn", "Saved {{date}}", {
+          date: new Date(item.savedAt).toLocaleDateString(),
+        })
+      : "",
+    variant === "completed" && item.completedAt
+      ? t("myLibrary.completedOn", "Completed {{date}}", {
+          date: new Date(item.completedAt).toLocaleDateString(),
+        })
+      : "",
+  ].filter(Boolean);
+  return `${duration}${annotations.map((part) => ` · ${part}`).join("")}`;
+}
+
+function renderActions(
+  actions: MenuAction[] | undefined,
+  onAction: ((id: string) => void) | undefined,
+) {
+  if (!actions?.length || !onAction) return null;
+  return <List.Item.Actions actions={actions} onAction={onAction} />;
+}
+
 export function MyLibraryItemRow({
   item,
   variant,
@@ -91,33 +126,14 @@ export function MyLibraryItemRow({
             style={styles.subtitle}
           />
           <AppText variant="xs" style={styles.meta}>
-            {item.durationSeconds
-              ? t("lecture.minutes", "{{count}} min", {
-                  count: Math.round(item.durationSeconds / 60),
-                })
-              : ""}
-            {variant === "progress" && progress !== null
-              ? ` · ${t("myLibrary.percentListened", "{{percent}}% listened", { percent: progress })}`
-              : ""}
-            {variant === "saved" && item.savedAt
-              ? ` · ${t("myLibrary.savedOn", "Saved {{date}}", {
-                  date: new Date(item.savedAt).toLocaleDateString(),
-                })}`
-              : ""}
-            {variant === "completed" && item.completedAt
-              ? ` · ${t("myLibrary.completedOn", "Completed {{date}}", {
-                  date: new Date(item.completedAt).toLocaleDateString(),
-                })}`
-              : ""}
+            {renderMeta(item, variant, progress, t)}
           </AppText>
           {variant === "progress" && progress !== null ? (
             <ProgressBarFill percent={progress} />
           ) : null}
         </View>
       </View>
-      {actions?.length && onAction ? (
-        <List.Item.Actions actions={actions} onAction={onAction} />
-      ) : null}
+      {renderActions(actions, onAction)}
     </List.Item>
   );
 }

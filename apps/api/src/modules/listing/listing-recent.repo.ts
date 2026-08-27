@@ -135,39 +135,49 @@ export class RecentListingsRepo {
     });
 
     const items: FeedPageDto['items'] = [...contentItems];
-    if (page.length > 0 && pageNumber % 2 === 0) {
-      const scholars = this.buildScholarRow(page, locale);
-      if (scholars.length > 0) items.push({ kind: 'scholar_row', scholars });
-
-      const topicItems: ContentSuggestionDto[] = contentItems.slice(0, 6).map((item) => ({
-        id: item.id,
-        title: item.title,
-        slug: item.slug,
-        kind: item.kind,
-        scholarName: item.scholarName,
-        scholarSlug: item.scholarSlug,
-        thumbnailUrl: item.thumbnailUrl,
-        durationSeconds: item.durationSeconds,
-        originalLanguage: item.originalLanguage,
-        original: item.original,
-      }));
-      if (topicItems.length > 0) {
-        const topicName = topicSlug
-          ? await this.resolveTopicName(topicSlug, locale)
-          : 'Continue exploring';
-        items.push({
-          kind: 'topic_row',
-          topicName,
-          items: topicItems,
-        });
-      }
-    }
+    await this.appendDiscoveryRows(items, page, contentItems, pageNumber, topicSlug, locale);
 
     const lastItem = page[page.length - 1];
     const nextCursor =
       hasMore && lastItem ? this.encodeCursor(lastItem.createdAt, pageNumber + 1) : undefined;
 
     return { items, nextCursor, exhausted: !nextCursor };
+  }
+
+  private async appendDiscoveryRows(
+    items: FeedPageDto['items'],
+    page: Parameters<RecentListingsRepo['buildScholarRow']>[0],
+    contentItems: FeedContentItemDto[],
+    pageNumber: number,
+    topicSlug: string | undefined,
+    locale: Locale,
+  ) {
+    if (page.length === 0 || pageNumber % 2 !== 0) return;
+    const scholars = this.buildScholarRow(page, locale);
+    if (scholars.length > 0) items.push({ kind: 'scholar_row', scholars });
+
+    const topicItems: ContentSuggestionDto[] = contentItems.slice(0, 6).map((item) => ({
+      id: item.id,
+      title: item.title,
+      slug: item.slug,
+      kind: item.kind,
+      scholarName: item.scholarName,
+      scholarSlug: item.scholarSlug,
+      thumbnailUrl: item.thumbnailUrl,
+      durationSeconds: item.durationSeconds,
+      originalLanguage: item.originalLanguage,
+      original: item.original,
+    }));
+    if (topicItems.length > 0) {
+      const topicName = topicSlug
+        ? await this.resolveTopicName(topicSlug, locale)
+        : 'Continue exploring';
+      items.push({
+        kind: 'topic_row',
+        topicName,
+        items: topicItems,
+      });
+    }
   }
 
   private buildScholarRow(

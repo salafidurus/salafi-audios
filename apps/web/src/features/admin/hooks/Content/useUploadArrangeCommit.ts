@@ -90,6 +90,51 @@ async function uploadWithConcurrency(
   return allOk;
 }
 
+async function presignPendingItems(
+  state: UploadArrangeState,
+  needsPresign: UploadItem[],
+  dispatch: React.Dispatch<UploadArrangeAction>,
+): Promise<UploadItem[]> {
+  dispatch({ type: "SET_PHASE", phase: "presigning" });
+  const request = buildPresignRequest(state);
+  const presign = await getBatchPresignedUrls({
+    ...request,
+    files: request.files.filter((file) => needsPresign.some((item) => item.id === file.clientId)),
+  });
+  dispatch({ type: "PRESIGNED", urls: presign.files });
+  const urlById = new Map(presign.files.map((file) => [file.clientId, file]));
+  return needsPresign.map((item) => {
+    const presigned = urlById.get(item.id);
+    return presigned
+      ? {
+          ...item,
+          upload: {
+            ...item.upload,
+            uploadUrl: presigned.uploadUrl,
+            objectKey: presigned.objectKey,
+          },
+        }
+      : item;
+  });
+}
+
+async function commitUploadedItems(
+  existing: NonNullable<UploadArrangeState["existing"]>,
+  stateWithKeys: UploadArrangeState,
+): Promise<void> {
+  if (existing.format === "single") {
+    const item = stateWithKeys.items[0];
+    if (!item?.upload.objectKey) throw new Error("Upload did not produce a storage key");
+    await updateListingMedia(existing.id, {
+      audioKey: item.upload.objectKey,
+      durationSeconds: Math.round(item.durationSeconds ?? 0),
+      sizeBytes: item.sizeBytes,
+    });
+    return;
+  }
+  await commitArrange(existing.id, buildCommitDto(stateWithKeys));
+}
+
 /**
  * The Upload-button flow: batch presign → parallel R2 PUTs with progress →
  * one transactional commit. Retries reuse already-uploaded objectKeys.
@@ -108,27 +153,7 @@ export function useUploadArrangeCommit(
       const needsPresign = state.items.filter((item) => item.upload.status !== "done");
       let itemsToUpload = needsPresign;
       if (needsPresign.length > 0) {
-        dispatch({ type: "SET_PHASE", phase: "presigning" });
-        const request = buildPresignRequest(state);
-        const presign = await getBatchPresignedUrls({
-          ...request,
-          files: request.files.filter((f) => needsPresign.some((item) => item.id === f.clientId)),
-        });
-        dispatch({ type: "PRESIGNED", urls: presign.files });
-        const urlById = new Map(presign.files.map((f) => [f.clientId, f]));
-        itemsToUpload = needsPresign.map((item) => {
-          const presigned = urlById.get(item.id);
-          return presigned
-            ? {
-                ...item,
-                upload: {
-                  ...item.upload,
-                  uploadUrl: presigned.uploadUrl,
-                  objectKey: presigned.objectKey,
-                },
-              }
-            : item;
-        });
+        itemsToUpload = await presignPendingItems(state, needsPresign, dispatch);
       }
 
       // 2. Upload in parallel with per-item progress.
@@ -154,17 +179,7 @@ export function useUploadArrangeCommit(
         }),
       };
 
-      if (existing.format === "single") {
-        const item = stateWithKeys.items[0];
-        if (!item?.upload.objectKey) throw new Error("Upload did not produce a storage key");
-        await updateListingMedia(existing.id, {
-          audioKey: item.upload.objectKey,
-          durationSeconds: Math.round(item.durationSeconds ?? 0),
-          sizeBytes: item.sizeBytes,
-        });
-      } else {
-        await commitArrange(existing.id, buildCommitDto(stateWithKeys));
-      }
+      await commitUploadedItems(existing, stateWithKeys);
 
       dispatch({ type: "SET_PHASE", phase: "done" });
       await onSuccess();

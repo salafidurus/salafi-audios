@@ -95,6 +95,41 @@ type DetailChangesProps = {
   >;
 };
 
+function TopicChange({
+  topicNames,
+  t,
+}: {
+  topicNames: string[];
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <p>
+      <strong>{t("admin.contents.listing.topicsLabel", "Topics")}:</strong>{" "}
+      {topicNames.length > 0
+        ? topicNames.join(", ")
+        : t("admin.contents.listing.noTopicsAvailable", "No topics available")}
+    </p>
+  );
+}
+
+function StatusChange({
+  status,
+  t,
+}: {
+  status: string;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <p>
+      <strong>{t("admin.contents.listing.statusLabel", "Status")}:</strong> {status}
+    </p>
+  );
+}
+
+function hasDetailChanges(changes: DetailChangesProps["changes"]): boolean {
+  return Object.values(changes).some(Boolean);
+}
+
 function DetailChanges({
   status,
   orderIndex,
@@ -105,24 +140,13 @@ function DetailChanges({
 }: DetailChangesProps) {
   const { statusChanged, orderIndexChanged, languageChanged, coverImageChanged, topicsChanged } =
     changes;
-  if (
-    !statusChanged &&
-    !orderIndexChanged &&
-    !languageChanged &&
-    !coverImageChanged &&
-    !topicsChanged
-  )
-    return null;
+  if (!hasDetailChanges(changes)) return null;
   return (
     <div>
       <h4 style={{ marginBottom: "0.5rem", color: "var(--content-default)" }}>
         {t("admin.modal.generalTab", "General")}
       </h4>
-      {statusChanged && (
-        <p>
-          <strong>{t("admin.contents.listing.statusLabel", "Status")}:</strong> {status}
-        </p>
-      )}
+      {statusChanged && <StatusChange status={status} t={t} />}
       {orderIndexChanged && (
         <p>
           <strong>{t("admin.contents.listing.orderIndexLabel", "Order Index")}:</strong>{" "}
@@ -141,14 +165,7 @@ function DetailChanges({
           {t("admin.contents.listing.coverImageUpdated", "Updated")}
         </p>
       )}
-      {topicsChanged && (
-        <p>
-          <strong>{t("admin.contents.listing.topicsLabel", "Topics")}:</strong>{" "}
-          {topicNames.length > 0
-            ? topicNames.join(", ")
-            : t("admin.contents.listing.noTopicsAvailable", "No topics available")}
-        </p>
-      )}
+      {topicsChanged && <TopicChange topicNames={topicNames} t={t} />}
     </div>
   );
 }

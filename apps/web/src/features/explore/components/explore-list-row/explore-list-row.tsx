@@ -62,6 +62,80 @@ type FeedListRowContentProps = {
   actions: FeedRowActions;
 };
 
+function renderPlayButton(
+  model: FeedRowModel,
+  state: FeedRowState,
+  onPlay: FeedRowActions["onPlay"],
+) {
+  const playing = state.isCurrentTrack && state.isPlaying;
+  return (
+    <Button
+      variant="primary"
+      size={!model.isMobile ? "icon" : "sm"}
+      fullWidth={model.isMobile}
+      aria-label={playing ? "Pause lecture" : "Play lecture"}
+      icon={
+        playing ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" />
+      }
+      onClick={onPlay}
+    >
+      {model.isMobile && (playing ? "Pause" : "Play")}
+    </Button>
+  );
+}
+
+function renderSaveButton(
+  model: FeedRowModel,
+  state: FeedRowState,
+  onSave: FeedRowActions["onSave"],
+) {
+  return (
+    <Button
+      variant={!model.isMobile ? "ghost" : "outline"}
+      size={!model.isMobile ? "sm" : "icon"}
+      fullWidth={model.isMobile}
+      aria-label={state.isSaved ? "Remove from saved" : "Save lecture"}
+      icon={<Bookmark size={16} fill={state.isSaved ? "currentColor" : "none"} />}
+      onClick={onSave}
+    >
+      {model.isMobile && (state.isSaved ? "Saved" : "Save")}
+    </Button>
+  );
+}
+
+function playFeedItem(
+  event: React.MouseEvent,
+  isCurrentTrack: boolean,
+  isPlaying: boolean,
+  play: () => Promise<void>,
+) {
+  event.stopPropagation();
+  if (isCurrentTrack) return isPlaying ? audioService.pause() : audioService.resume();
+  return play();
+}
+
+function saveFeedItem(event: React.MouseEvent, item: FeedContentItemDto, isSaved: boolean) {
+  event.stopPropagation();
+  return isSaved ? markUnsaved(item.id, item.slug) : markSaved(item.id, item.slug);
+}
+
+function getFeedProgressState(
+  progress:
+    | { positionSeconds: number; durationSeconds: number; completedAt?: string | null }
+    | undefined,
+) {
+  return {
+    isInProgress: progress && progress.positionSeconds > 0 && !progress.completedAt,
+    progressPercent: progress
+      ? getProgressPercent(progress.positionSeconds, progress.durationSeconds)
+      : 0,
+  };
+}
+
+function getFeedInitial(scholarName: string) {
+  return scholarName ? scholarName.trim().charAt(0).toUpperCase() : "?";
+}
+
 function FeedRowArtwork({
   item,
   scholarName,
@@ -87,36 +161,10 @@ function FeedRowArtwork({
 }
 
 function FeedRowActions({ model, state, actions }: FeedListRowContentProps) {
-  const { isMobile } = model;
-  const { isCurrentTrack, isPlaying, isSaved } = state;
   return (
     <List.Item.Actions>
-      <Button
-        variant="primary"
-        size={!isMobile ? "icon" : "sm"}
-        fullWidth={isMobile}
-        aria-label={isCurrentTrack && isPlaying ? "Pause lecture" : "Play lecture"}
-        icon={
-          isCurrentTrack && isPlaying ? (
-            <Pause size={16} fill="currentColor" />
-          ) : (
-            <Play size={16} fill="currentColor" />
-          )
-        }
-        onClick={actions.onPlay}
-      >
-        {isMobile && (isCurrentTrack && isPlaying ? "Pause" : "Play")}
-      </Button>
-      <Button
-        variant={!isMobile ? "ghost" : "outline"}
-        size={!isMobile ? "sm" : "icon"}
-        fullWidth={isMobile}
-        aria-label={isSaved ? "Remove from saved" : "Save lecture"}
-        icon={<Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />}
-        onClick={actions.onSave}
-      >
-        {isMobile && (isSaved ? "Saved" : "Save")}
-      </Button>
+      {renderPlayButton(model, state, actions.onPlay)}
+      {renderSaveButton(model, state, actions.onSave)}
     </List.Item.Actions>
   );
 }
@@ -194,36 +242,14 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const isSaved = useIsSaved(item.id);
 
   const progress = useProgressStore((s) => s.progressMap[item.slug]);
-  const isInProgress = progress && progress.positionSeconds > 0 && !progress.completedAt;
+  const { isInProgress, progressPercent } = getFeedProgressState(progress);
 
-  const progressPercent = progress
-    ? getProgressPercent(progress.positionSeconds, progress.durationSeconds)
-    : 0;
+  const handlePlay = (event: React.MouseEvent) =>
+    playFeedItem(event, isCurrentTrack, isPlaying, play);
 
-  const handlePlay = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isCurrentTrack) {
-      if (isPlaying) {
-        await audioService.pause();
-      } else {
-        await audioService.resume();
-      }
-      return;
-    }
+  const handleSave = (event: React.MouseEvent) => saveFeedItem(event, item, isSaved);
 
-    await play();
-  };
-
-  const handleSave = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isSaved) {
-      markUnsaved(item.id, item.slug);
-    } else {
-      markSaved(item.id, item.slug);
-    }
-  };
-
-  const initial = scholarName ? scholarName.trim().charAt(0).toUpperCase() : "?";
+  const initial = getFeedInitial(scholarName);
 
   const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";
 

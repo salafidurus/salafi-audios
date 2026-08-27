@@ -19,6 +19,55 @@ export interface TranslationChildrenTabProps {
   onChildSaved: () => void;
 }
 
+function renderChildrenContent(
+  status: TranslationChildrenTabProps["status"],
+  error: string | null,
+  items: TranslationChildSummary[] | null,
+  onSelectChild: (id: string) => void,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  if (status === "loading") {
+    return <div className={styles.loading}>{t("common.loading", "Loading...")}</div>;
+  }
+  if (status === "error") {
+    return (
+      <div className={styles.error}>
+        {error ?? t("admin.contents.failedToLoad", "Failed to load")}
+      </div>
+    );
+  }
+  if (status === "ready" && (!items || items.length === 0)) {
+    return (
+      <div className={styles.emptyState}>
+        {t("admin.translations.childrenEmpty", "No sub-listings yet")}
+      </div>
+    );
+  }
+  if (status !== "ready" || !items) return null;
+  return (
+    <div className={styles.childrenList}>
+      {items.map((child) => (
+        <Button
+          key={child.id}
+          type="button"
+          variant="outline"
+          fullWidth
+          className={[
+            styles.childItem,
+            child.indent ? styles.childItemIndent : "",
+            child.kind === "module" ? styles.childItemModule : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          onClick={() => onSelectChild(child.id)}
+        >
+          {child.title}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
 /**
  * The "sub-listings" tab body: a flat list of modules/lessons (list state),
  * or — once one is clicked — that child's own translation editor (detail
@@ -52,41 +101,7 @@ export function TranslationChildrenTab({
 
   return (
     <div className={styles.childrenTab}>
-      {status === "loading" && (
-        <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
-      )}
-      {status === "error" && (
-        <div className={styles.error}>
-          {error ?? t("admin.contents.failedToLoad", "Failed to load")}
-        </div>
-      )}
-      {status === "ready" && (!items || items.length === 0) && (
-        <div className={styles.emptyState}>
-          {t("admin.translations.childrenEmpty", "No sub-listings yet")}
-        </div>
-      )}
-      {status === "ready" && items && items.length > 0 && (
-        <div className={styles.childrenList}>
-          {items.map((child) => (
-            <Button
-              key={child.id}
-              type="button"
-              variant="outline"
-              fullWidth
-              className={[
-                styles.childItem,
-                child.indent ? styles.childItemIndent : "",
-                child.kind === "module" ? styles.childItemModule : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              onClick={() => onSelectChild(child.id)}
-            >
-              {child.title}
-            </Button>
-          ))}
-        </div>
-      )}
+      {renderChildrenContent(status, error, items, onSelectChild, t)}
     </div>
   );
 }

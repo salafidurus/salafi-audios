@@ -16,6 +16,8 @@ type SearchRow = SearchCatalogItemDto & {
   scholarOriginalLanguage: Locale | null;
 };
 
+type SearchQueryRow = SearchRow & { format: string };
+
 @Injectable()
 export class SearchRepository {
   private readonly logger = new Logger(SearchRepository.name);
@@ -156,6 +158,17 @@ export class SearchRepository {
       `),
     );
 
+    return this.normalizeSearchRows(rows, locale);
+  }
+
+  private async normalizeSearchRows(
+    rows: SearchQueryRow[],
+    locale: Locale,
+  ): Promise<{
+    collections: SearchCatalogItemDto[];
+    series: SearchCatalogItemDto[];
+    singles: SearchCatalogItemDto[];
+  }> {
     // Batch fetch all translations at once (no per-format loop)
     const ids = rows.map((row) => row.id);
     const scholarIds = [...new Set(rows.map((row) => row.scholarId))];

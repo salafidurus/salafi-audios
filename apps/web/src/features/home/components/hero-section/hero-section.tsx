@@ -77,6 +77,47 @@ function getHeroScholarName(
   });
 }
 
+function startHeroPlayback(
+  hasHistory: boolean,
+  recentProgress: RecentProgressDto | null | undefined,
+  onResume: ((lectureSlug: string) => void) | undefined,
+  playHero: () => void,
+) {
+  if (hasHistory && recentProgress && onResume) {
+    onResume(recentProgress.lectureSlug);
+    return;
+  }
+  void playHero();
+}
+
+function getHeroEyebrow(hasHistory: boolean, headline: string | null | undefined) {
+  if (hasHistory) return "AS-SALAMU 'ALAYKUM · CONTINUE YOUR DURUS";
+  if (headline) return headline.toUpperCase();
+  return "AS-SALAMU 'ALAYKUM · FEATURED LISTING";
+}
+
+function renderFeaturedExtras(hasHistory: boolean) {
+  if (hasHistory) return null;
+  return (
+    <>
+      <p className={styles.recommendation}>
+        <Sparkles size={13} color="var(--action-primary)" /> Recommended starting point for new
+        students
+      </p>
+      <div className={styles.topicRail}>
+        <span className={styles.browseLabel}>Explore by topic:</span>
+        {(["aqeedah", "fiqh", "hadith"] as const).map((topic) => (
+          <Button asChild variant="outline" size="sm" className={styles.categoryPill} key={topic}>
+            <Link href={`${routes.search}?topic=${topic}`}>
+              {topic.charAt(0).toUpperCase() + topic.slice(1)}
+            </Link>
+          </Button>
+        ))}
+      </div>
+    </>
+  );
+}
+
 export function HeroSection({
   recentProgress,
   featuredContent,
@@ -109,17 +150,7 @@ export function HeroSection({
       : null,
   );
 
-  const handleStart = () => {
-    if (hasHistory && recentProgress) {
-      if (onResume) {
-        onResume(recentProgress.lectureSlug);
-      } else {
-        void playHero();
-      }
-    } else {
-      void playHero();
-    }
-  };
+  const handleStart = () => startHeroPlayback(hasHistory, recentProgress, onResume, playHero);
 
   if (isLoading) {
     return (
@@ -182,11 +213,7 @@ export function HeroSection({
       <div className={styles.bookmark} aria-hidden="true" />
       <div className={styles.content}>
         <p className={styles.eyebrow} data-testid="home-hero-eyebrow">
-          {hasHistory
-            ? "AS-SALAMU 'ALAYKUM · CONTINUE YOUR DURUS"
-            : headline
-              ? headline.toUpperCase()
-              : "AS-SALAMU 'ALAYKUM · FEATURED LISTING"}
+          {getHeroEyebrow(hasHistory, headline)}
         </p>
         <h1 className={styles.title} data-testid="home-hero-title">
           <Link href={routes.listings.detail(heroItem.slug)} className={styles.titleLink}>
@@ -198,12 +225,7 @@ export function HeroSection({
             {scholarName}
           </Link>
         </p>
-        {!hasHistory && (
-          <p className={styles.recommendation}>
-            <Sparkles size={13} color="var(--action-primary)" /> Recommended starting point for new
-            students
-          </p>
-        )}
+        {renderFeaturedExtras(hasHistory)}
         <div className={styles.ctaRow}>
           <Button
             type="button"
@@ -216,21 +238,6 @@ export function HeroSection({
           >
             {hasHistory ? t("home.hero.resume", "Resume") : t("home.hero.start", "Start listening")}
           </Button>
-
-          {!hasHistory && (
-            <div className={styles.topicRail}>
-              <span className={styles.browseLabel}>Explore by topic:</span>
-              <Button asChild variant="outline" size="sm" className={styles.categoryPill}>
-                <Link href={`${routes.search}?topic=aqeedah`}>Aqeedah</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm" className={styles.categoryPill}>
-                <Link href={`${routes.search}?topic=fiqh`}>Fiqh</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm" className={styles.categoryPill}>
-                <Link href={`${routes.search}?topic=hadith`}>Hadith</Link>
-              </Button>
-            </div>
-          )}
         </div>
       </div>
       <div className={styles.visualRegion}>

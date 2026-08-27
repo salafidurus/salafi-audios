@@ -89,6 +89,26 @@ function ProfileAccountStatus({
   );
 }
 
+function ProfileUpdateStatus({
+  isSuccess,
+  isError,
+  t,
+}: {
+  isSuccess: boolean;
+  isError: boolean;
+  t: ProfileEditActionsProps["t"];
+}) {
+  if (!isSuccess && !isError) return null;
+
+  return (
+    <p className={isSuccess ? styles.successText : styles.errorText}>
+      {isSuccess
+        ? t("account.profile.displayNameSaved", "Display name saved.")
+        : t("account.profile.displayNameSaveFailed", "Failed to save. Please try again.")}
+    </p>
+  );
+}
+
 function ProfileContent() {
   const { t } = useTranslation();
   const {
@@ -208,13 +228,7 @@ function ProfileContent() {
         </SettingsRow>
       </SettingsSection>
 
-      {(isUpdateSuccess || isUpdateError) && (
-        <p className={isUpdateSuccess ? styles.successText : styles.errorText}>
-          {isUpdateSuccess
-            ? t("account.profile.displayNameSaved", "Display name saved.")
-            : t("account.profile.displayNameSaveFailed", "Failed to save. Please try again.")}
-        </p>
-      )}
+      <ProfileUpdateStatus isSuccess={isUpdateSuccess} isError={isUpdateError} t={t} />
 
       <ProfileAccountStatus profile={profile} roles={nonListenerRoles} t={t} />
 

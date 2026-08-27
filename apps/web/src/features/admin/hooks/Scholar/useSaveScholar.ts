@@ -25,6 +25,56 @@ async function uploadStagedImage(
   return { url: presignedResponse.publicUrl, key: presignedResponse.objectKey };
 }
 
+function getScholarSaveErrorTabs(state: FormState): string[] {
+  const tabs: string[] = [];
+  if (!state.mainLanguage) tabs.push("general");
+  if (!state.isEditing && !state.name?.trim()) tabs.push("main");
+  if (!state.isEditing && !state.slug?.trim()) tabs.push("general");
+  return tabs;
+}
+
+async function persistScholar(state: FormState): Promise<void> {
+  const image = await uploadStagedImage(state);
+  if (state.isEditing) {
+    if (!state.id) throw new Error("Scholar ID required for update");
+    const payload: UpdateScholarDto = {
+      name: state.name,
+      bio: state.bio,
+      isActive: state.isActive,
+      country: state.country,
+      mainLanguage: state.mainLanguage,
+      title: state.title,
+      orderIndex: state.orderIndex,
+      socialTwitter: state.socialTwitter,
+      socialTelegram: state.socialTelegram,
+      socialYoutube: state.socialYoutube,
+      socialWebsite: state.socialWebsite,
+      imageUrl: image.url,
+      imageKey: image.key,
+    };
+    await updateScholar(state.id, payload);
+    return;
+  }
+
+  const payload: CreateScholarDto = {
+    name: state.name,
+    slug: state.slug,
+    bio: state.bio,
+    isActive: state.isActive,
+    country: state.country ?? "SA",
+    mainLanguage: state.mainLanguage,
+    title: state.title,
+    orderIndex: state.orderIndex,
+    socialTwitter: state.socialTwitter,
+    socialTelegram: state.socialTelegram,
+    socialYoutube: state.socialYoutube,
+    socialWebsite: state.socialWebsite,
+    imageUrl: image.url,
+    imageKey: image.key,
+  };
+  await createScholar(payload);
+}
+
 export function useSaveScholar(
   state: FormState,
   dispatch: (action: FormAction) => void,
@@ -36,17 +86,7 @@ export function useSaveScholar(
 
   return async (e: React.FormEvent) => {
     e.preventDefault();
-    const errTabs: string[] = [];
-
-    if (!state.mainLanguage) {
-      errTabs.push("general");
-    }
-    if (!state.isEditing && !state.name?.trim()) {
-      errTabs.push("main");
-    }
-    if (!state.isEditing && !state.slug?.trim()) {
-      errTabs.push("general");
-    }
+    const errTabs = getScholarSaveErrorTabs(state);
 
     if (errTabs.length > 0) {
       setErrorTabs(errTabs);
@@ -62,48 +102,7 @@ export function useSaveScholar(
     dispatch({ type: "SET_ERROR", error: null });
 
     try {
-      if (state.isEditing) {
-        if (!state.id) throw new Error("Scholar ID required for update");
-
-        const image = await uploadStagedImage(state);
-        const payload: UpdateScholarDto = {
-          name: state.name,
-          bio: state.bio,
-          isActive: state.isActive,
-          country: state.country,
-          mainLanguage: state.mainLanguage,
-          title: state.title,
-          orderIndex: state.orderIndex,
-          socialTwitter: state.socialTwitter,
-          socialTelegram: state.socialTelegram,
-          socialYoutube: state.socialYoutube,
-          socialWebsite: state.socialWebsite,
-          imageUrl: image.url,
-          imageKey: image.key,
-        };
-
-        await updateScholar(state.id, payload);
-      } else {
-        const image = await uploadStagedImage(state);
-        const payload: CreateScholarDto = {
-          name: state.name,
-          slug: state.slug,
-          bio: state.bio,
-          isActive: state.isActive,
-          country: state.country ?? "SA",
-          mainLanguage: state.mainLanguage,
-          title: state.title,
-          orderIndex: state.orderIndex,
-          socialTwitter: state.socialTwitter,
-          socialTelegram: state.socialTelegram,
-          socialYoutube: state.socialYoutube,
-          socialWebsite: state.socialWebsite,
-          imageUrl: image.url,
-          imageKey: image.key,
-        };
-
-        await createScholar(payload);
-      }
+      await persistScholar(state);
 
       await onSuccess();
       onClose();

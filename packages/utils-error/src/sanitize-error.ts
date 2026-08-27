@@ -8,7 +8,16 @@
  */
 export function sanitizeError(cause: unknown): string {
   const message = cause instanceof Error ? cause.message : String(cause);
+  const parsedMessage = parseStructuredMessage(message);
+  if (parsedMessage) return parsedMessage;
 
+  const matchedMessage = matchKnownError(message);
+  if (matchedMessage) return matchedMessage;
+
+  return getSafeShortMessage(message) ?? "Something went wrong. Please try again.";
+}
+
+function parseStructuredMessage(message: string): string | undefined {
   // Check for JSON block in the message (e.g. from NestJS validation filters)
   const jsonStartIdx = message.indexOf("{");
   if (jsonStartIdx !== -1) {
@@ -34,7 +43,10 @@ export function sanitizeError(cause: unknown): string {
     }
   }
 
-  // Map specific error patterns to user-friendly messages
+  return undefined;
+}
+
+function matchKnownError(message: string): string | undefined {
   const patterns: Array<[RegExp, string]> = [
     // Network/API errors
     [
@@ -60,13 +72,16 @@ export function sanitizeError(cause: unknown): string {
     }
   }
 
-  // For unknown errors, return a generic message
-  if (message && message.length > 0 && message.length < 50) {
+  return undefined;
+}
+
+function getSafeShortMessage(message: string): string | undefined {
+  if (message.length > 0 && message.length < 50) {
     // If the error is short and doesn't contain technical jargon, use it
     if (!/^[A-Z]+_|code:|Error:|at |function /.test(message)) {
       return message;
     }
   }
 
-  return "Something went wrong. Please try again.";
+  return undefined;
 }

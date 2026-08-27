@@ -10,39 +10,33 @@ export function defineAbilityFor(user: AbilityInput): AppAbility {
   }
 
   for (const grant of user.accessGrants ?? []) {
-    const conditions: Record<string, string> = {};
-    // CASL conditions must reference fields that exist on the subject object:
-    // a Scholar subject carries its own public slug, while Listing/Media/
-    // Translation subjects carry the owning scholar as `scholarSlug`.
-    if (grant.target === 'scholar') {
-      if (grant.scholarSlug) conditions.slug = grant.scholarSlug;
-    } else if (grant.scholarSlug) {
-      conditions.scholarSlug = grant.scholarSlug;
-    }
-    if (grant.locale) conditions.locale = grant.locale;
-
-    const subject =
-      grant.target === 'user'
-        ? 'UserAccess'
-        : `${grant.target.charAt(0).toUpperCase()}${grant.target.slice(1)}`;
-    const actions: AppActions[] =
-      grant.capability === 'write'
-        ? grant.target === 'media'
-          ? ['write', 'upload']
-          : ['write', 'create', 'update']
-        : [grant.capability];
-
-    for (const action of actions) {
+    for (const action of grantActions(grant)) {
       // SAFETY: the action/subject/conditions are all derived from the shared
       // access-grant vocabulary, but CASL's builder signature is not specific
       // enough to carry those narrowed unions through this dynamic mapping.
-      can(
-        action as never,
-        subject as never,
-        Object.keys(conditions).length ? (conditions as never) : undefined,
-      );
+      can(action as never, grantSubject(grant) as never, grantConditions(grant) as never);
     }
   }
 
   return build();
+}
+
+function grantConditions(grant: NonNullable<AbilityInput['accessGrants']>[number]) {
+  const conditions: Record<string, string> = {};
+  if (grant.scholarSlug) {
+    conditions[grant.target === 'scholar' ? 'slug' : 'scholarSlug'] = grant.scholarSlug;
+  }
+  if (grant.locale) conditions.locale = grant.locale;
+  return Object.keys(conditions).length ? conditions : undefined;
+}
+
+function grantSubject(grant: NonNullable<AbilityInput['accessGrants']>[number]) {
+  return grant.target === 'user'
+    ? 'UserAccess'
+    : `${grant.target.charAt(0).toUpperCase()}${grant.target.slice(1)}`;
+}
+
+function grantActions(grant: NonNullable<AbilityInput['accessGrants']>[number]): AppActions[] {
+  if (grant.capability !== 'write') return [grant.capability];
+  return grant.target === 'media' ? ['write', 'upload'] : ['write', 'create', 'update'];
 }

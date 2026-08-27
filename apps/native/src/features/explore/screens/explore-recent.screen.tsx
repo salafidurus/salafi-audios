@@ -35,6 +35,50 @@ type GroupedFeedItem =
       items: FeedContentItemDto[];
     };
 
+function filterFeedItems(items: FeedItemDto[], searchQuery: string): FeedItemDto[] {
+  const query = searchQuery.trim().toLowerCase();
+  if (!query) return items;
+
+  return items.filter((item) => {
+    if (item.kind === "scholar_row") {
+      return item.scholars.some((scholar) => scholar.name.toLowerCase().includes(query));
+    }
+    if (item.kind === "topic_row") {
+      return (
+        item.topicName.toLowerCase().includes(query) ||
+        item.items.some((content) => content.title.toLowerCase().includes(query))
+      );
+    }
+    return item.title.toLowerCase().includes(query);
+  });
+}
+
+function groupFeedItems(items: FeedItemDto[]): GroupedFeedItem[] {
+  const grouped: GroupedFeedItem[] = [];
+  let currentGroup: FeedContentItemDto[] = [];
+
+  items.forEach((item) => {
+    if (item.kind === "scholar_row" || item.kind === "topic_row") {
+      if (currentGroup.length > 0) {
+        grouped.push({
+          kind: "grouped_podcasts",
+          id: `group-${grouped.length}`,
+          items: currentGroup,
+        });
+        currentGroup = [];
+      }
+      grouped.push(item);
+    } else {
+      currentGroup.push(item);
+    }
+  });
+
+  if (currentGroup.length > 0) {
+    grouped.push({ kind: "grouped_podcasts", id: `group-${grouped.length}`, items: currentGroup });
+  }
+  return grouped;
+}
+
 function renderFeedItem(
   item: GroupedFeedItem,
   onNavigateToListing?: (slug: string) => void,
@@ -85,51 +129,7 @@ export function ExploreRecentScreen({
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
     useExploreRecentScreen();
   const rawItems = data?.pages.flatMap((p) => p.items) ?? [];
-
-  const filteredRawItems = searchQuery.trim()
-    ? rawItems.filter((item) => {
-        if (item.kind === "scholar_row") {
-          return item.scholars.some((s) =>
-            s.name.toLowerCase().includes(searchQuery.toLowerCase()),
-          );
-        }
-        if (item.kind === "topic_row") {
-          return (
-            item.topicName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.items.some((i) => i.title.toLowerCase().includes(searchQuery.toLowerCase()))
-          );
-        }
-        return item.title.toLowerCase().includes(searchQuery.toLowerCase());
-      })
-    : rawItems;
-
-  // Group sequential podcast items into a single container
-  const items: GroupedFeedItem[] = [];
-  let currentGroup: FeedContentItemDto[] = [];
-
-  filteredRawItems.forEach((item) => {
-    if (item.kind === "scholar_row" || item.kind === "topic_row") {
-      if (currentGroup.length > 0) {
-        items.push({
-          kind: "grouped_podcasts",
-          id: `group-${items.length}`,
-          items: currentGroup,
-        });
-        currentGroup = [];
-      }
-      items.push(item);
-    } else {
-      currentGroup.push(item);
-    }
-  });
-
-  if (currentGroup.length > 0) {
-    items.push({
-      kind: "grouped_podcasts",
-      id: `group-${items.length}`,
-      items: currentGroup,
-    });
-  }
+  const items = groupFeedItems(filterFeedItems(rawItems, searchQuery));
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<GroupedFeedItem>) =>

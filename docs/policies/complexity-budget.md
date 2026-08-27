@@ -24,7 +24,7 @@ proxy for naming, file size, switch readability, or architectural layering.
 
 ## Ratchet
 
-The initial maximum was **100**. The active maximum is **15** after the third
+The initial maximum was **100**. The active maximum is **10** after the fourth
 ratchet completed with zero violations. The budget may only decrease after a
 complete scan reports zero violations at the current maximum:
 
@@ -61,6 +61,32 @@ The completed scan covered production source under `apps/*/src` and
 refactoring of projection, authorization, form, modal, and screen-rendering
 boundaries, the scan reports **zero violations** at maximum 15. Focused API,
 web, and native behavioral tests remained green for the affected paths.
+
+### Ratchet 15 → 10
+
+Issue #625 began with **98 violations** at maximum 10 across API, native, web,
+and shared production code. The implementation refactored those violations in
+small behavior-preserving slices, with each slice committed independently.
+The final scan reports **zero violations** at maximum 10.
+
+For this ratchet, the authoritative scan is run from the repository root with
+a temporary configuration so the measurement is limited to the intended
+complexity rule and production paths:
+
+```bash
+scan_config=$(mktemp /tmp/oxlint-625-XXXXXX.json)
+jq 'del(.jsPlugins) | .rules |= with_entries(select(.key | startswith("anti-slop/") | not)) | .overrides[0].rules |= with_entries(select(.key | startswith("anti-slop/") | not)) | .rules["eslint/complexity"][1].max = 10' .oxlintrc.json > "$scan_config"
+bunx oxlint --config "$scan_config" --disable-nested-config --format=unix apps/*/src packages/*/src
+scan_status=$?
+rm -f "$scan_config"
+exit $scan_status
+```
+
+The final scan completed with exit status 0 and no output. Web and API
+behavior suites, lint, and typechecks passed for the affected slices. Native
+lint and typecheck passed; the native Bun test runner is environment-blocked
+by React Native's Flow-only `import typeof` syntax before test files load. No
+test coverage was removed or suppressed.
 
 ## Exceptions
 

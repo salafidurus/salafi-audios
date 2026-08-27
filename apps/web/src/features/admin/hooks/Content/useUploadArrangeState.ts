@@ -165,15 +165,28 @@ function nextOrderIndex(state: UploadArrangeState, moduleKey: ModuleKey): number
 }
 
 /** The slug an item/module must be prefixed by, given its immediate parent container. */
-export function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
-  if (moduleKey === ROOT_MODULE_KEY) return state.existing?.slug ?? "";
-  if (moduleKey.startsWith("new:")) {
-    const tempId = moduleKey.slice("new:".length);
-    return state.newModules.find((m) => m.tempId === tempId)?.slug ?? state.existing?.slug ?? "";
-  }
+function existingRootSlug(state: UploadArrangeState): string {
+  return state.existing?.slug ?? "";
+}
+
+function newModuleParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+  const tempId = moduleKey.slice("new:".length);
   return (
-    state.existing?.modules.find((m) => m.id === moduleKey)?.slug ?? state.existing?.slug ?? ""
+    state.newModules.find((module) => module.tempId === tempId)?.slug ?? existingRootSlug(state)
   );
+}
+
+function existingModuleParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+  return (
+    state.existing?.modules.find((module) => module.id === moduleKey)?.slug ??
+    existingRootSlug(state)
+  );
+}
+
+export function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+  if (moduleKey === ROOT_MODULE_KEY) return existingRootSlug(state);
+  if (moduleKey.startsWith("new:")) return newModuleParentSlug(state, moduleKey);
+  return existingModuleParentSlug(state, moduleKey);
 }
 
 function updateItem(
@@ -282,6 +295,72 @@ function buildStagedItems(state: UploadArrangeState, inputs: StagedItemInput[]):
   });
 }
 
+type EditModuleAction = Extract<UploadArrangeAction, { type: "EDIT_MODULE" }>;
+
+function editModule(mod: NewModule, action: EditModuleAction, rootSlug: string): NewModule {
+  if (action.field === "slug") {
+    return { ...mod, slug: String(action.value ?? ""), slugEdited: true };
+  }
+  if (action.field === "title") {
+    const title = String(action.value ?? "");
+    if (mod.slugEdited) return { ...mod, title };
+    return { ...mod, title, slug: deriveChildSlug(rootSlug, title) };
+  }
+  return {
+    ...mod,
+    [action.field]:
+      action.field === "orderIndex"
+        ? action.value === null
+          ? null
+          : Number(action.value)
+        : action.value,
+  };
+}
+
+function appendStagedItems(
+  state: UploadArrangeState,
+  inputs: StagedItemInput[],
+): UploadArrangeState {
+  if (!state.existing) return state;
+  if (state.existing.format === "single" && (state.items.length > 0 || inputs.length > 1)) {
+    return { ...state, error: "This listing holds a single audio file." };
+  }
+  const newItems = buildStagedItems(state, inputs);
+  return { ...state, items: [...state.items, ...newItems], error: null };
+}
+
+function addFiles(
+  state: UploadArrangeState,
+  action: Extract<UploadArrangeAction, { type: "ADD_FILES" }>,
+): UploadArrangeState {
+  return appendStagedItems(
+    state,
+    action.files.map(({ file, durationSeconds }) => ({
+      source: { kind: "local", file },
+      filename: file.name,
+      contentType: file.type,
+      sizeBytes: file.size,
+      durationSeconds,
+    })),
+  );
+}
+
+function addUrlItems(
+  state: UploadArrangeState,
+  action: Extract<UploadArrangeAction, { type: "ADD_URL_ITEMS" }>,
+): UploadArrangeState {
+  return appendStagedItems(
+    state,
+    action.items.map((entry) => ({
+      source: { kind: "url", url: entry.url },
+      filename: entry.filename,
+      contentType: entry.contentType,
+      sizeBytes: entry.sizeBytes,
+      durationSeconds: entry.durationSeconds,
+    })),
+  );
+}
+
 function reducer(state: UploadArrangeState, action: UploadArrangeAction): UploadArrangeState {
   switch (action.type) {
     case "INIT_EXISTING":
@@ -290,52 +369,11 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
       // spread INITIAL_STATE here too.
       return { ...state, existing: action.data };
 
-    case "ADD_FILES": {
-      if (!state.existing) return state;
-      // Single-format roots hold exactly one staged file.
-      if (
-        state.existing.format === "single" &&
-        (state.items.length > 0 || action.files.length > 1)
-      ) {
-        return { ...state, error: "This listing holds a single audio file." };
-      }
+    case "ADD_FILES":
+      return addFiles(state, action);
 
-      const newItems = buildStagedItems(
-        state,
-        action.files.map(({ file, durationSeconds }) => ({
-          source: { kind: "local", file },
-          filename: file.name,
-          contentType: file.type,
-          sizeBytes: file.size,
-          durationSeconds,
-        })),
-      );
-
-      return { ...state, items: [...state.items, ...newItems], error: null };
-    }
-
-    case "ADD_URL_ITEMS": {
-      if (!state.existing) return state;
-      if (
-        state.existing.format === "single" &&
-        (state.items.length > 0 || action.items.length > 1)
-      ) {
-        return { ...state, error: "This listing holds a single audio file." };
-      }
-
-      const newItems = buildStagedItems(
-        state,
-        action.items.map((entry) => ({
-          source: { kind: "url", url: entry.url },
-          filename: entry.filename,
-          contentType: entry.contentType,
-          sizeBytes: entry.sizeBytes,
-          durationSeconds: entry.durationSeconds,
-        })),
-      );
-
-      return { ...state, items: [...state.items, ...newItems], error: null };
-    }
+    case "ADD_URL_ITEMS":
+      return addUrlItems(state, action);
 
     case "RENAME_ITEM":
       return updateItem(state, action.itemId, (item) => {
@@ -449,26 +487,9 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
     }
 
     case "EDIT_MODULE": {
-      const newModules = state.newModules.map((mod) => {
-        if (mod.tempId !== action.tempId) return mod;
-        if (action.field === "slug") {
-          return { ...mod, slug: String(action.value ?? ""), slugEdited: true };
-        }
-        if (action.field === "title") {
-          const title = String(action.value ?? "");
-          if (mod.slugEdited) return { ...mod, title };
-          return { ...mod, title, slug: deriveChildSlug(state.existing?.slug ?? "", title) };
-        }
-        return {
-          ...mod,
-          [action.field]:
-            action.field === "orderIndex"
-              ? action.value === null
-                ? null
-                : Number(action.value)
-              : action.value,
-        };
-      });
+      const newModules = state.newModules.map((mod) =>
+        mod.tempId === action.tempId ? editModule(mod, action, state.existing?.slug ?? "") : mod,
+      );
 
       const editedModule = newModules.find((m) => m.tempId === action.tempId);
       const moduleKey = `new:${action.tempId}`;

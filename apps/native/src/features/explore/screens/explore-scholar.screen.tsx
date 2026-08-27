@@ -24,6 +24,15 @@ export type ExploreScholarScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
+function filterScholars(scholars: ScholarListItemDto[], searchQuery: string) {
+  const query = searchQuery.trim().toLowerCase();
+  if (!query) return scholars;
+  return scholars.filter(
+    (scholar) =>
+      scholar.name.toLowerCase().includes(query) || scholar.slug.toLowerCase().includes(query),
+  );
+}
+
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
@@ -34,13 +43,7 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
 
   const allScholars = data?.pages.flatMap((p) => p.items) ?? [];
 
-  const filteredScholars = searchQuery.trim()
-    ? allScholars.filter(
-        (scholar) =>
-          scholar.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          scholar.slug.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : allScholars;
+  const filteredScholars = filterScholars(allScholars, searchQuery);
 
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<ScholarListItemDto>) => (

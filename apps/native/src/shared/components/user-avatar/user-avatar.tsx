@@ -14,6 +14,58 @@ type UserAvatarProps = {
   testID?: string;
 };
 
+type AvatarTheme = ReturnType<typeof useUnistyles>["theme"];
+
+function renderAvatar(
+  image: string | null | undefined,
+  name: string | null | undefined,
+  size: number,
+  fill: boolean,
+  borderRadius: number,
+  theme: AvatarTheme,
+  testID?: string,
+): ReactNode {
+  if (image) {
+    return (
+      <Image
+        source={{ uri: image }}
+        style={
+          fill ? [styles.fillImage, { borderRadius }] : { width: size, height: size, borderRadius }
+        }
+        contentFit="cover"
+        testID={testID}
+      />
+    );
+  }
+  return (
+    <View
+      testID={testID}
+      style={[
+        fill ? styles.fillFallback : styles.fallback,
+        fill
+          ? { backgroundColor: theme.colors.surface.subtle, borderRadius }
+          : {
+              width: size,
+              height: size,
+              borderRadius,
+              backgroundColor: theme.colors.surface.subtle,
+            },
+      ]}
+    >
+      <AppText
+        variant={fill ? "titleMd" : "bodyLg"}
+        style={
+          fill
+            ? { color: theme.colors.content.muted }
+            : { color: theme.colors.content.muted, fontSize: size * 0.4 }
+        }
+      >
+        {name?.charAt(0)?.toUpperCase() ?? "?"}
+      </AppText>
+    </View>
+  );
+}
+
 export function UserAvatar({
   image,
   name,
@@ -24,66 +76,7 @@ export function UserAvatar({
   const { theme } = useUnistyles();
   const borderRadius = theme.radius.component.panelSm ?? theme.radius.scale.sm ?? 8;
 
-  if (fill) {
-    if (image) {
-      return (
-        <Image
-          source={{ uri: image }}
-          style={[styles.fillImage, { borderRadius }]}
-          contentFit="cover"
-          testID={testID}
-        />
-      );
-    }
-    return (
-      <View
-        style={[
-          styles.fillFallback,
-          { backgroundColor: theme.colors.surface.subtle, borderRadius },
-        ]}
-        testID={testID}
-      >
-        <AppText variant="titleMd" style={{ color: theme.colors.content.muted }}>
-          {name?.charAt(0)?.toUpperCase() ?? "?"}
-        </AppText>
-      </View>
-    );
-  }
-
-  const avatarSize = size;
-
-  if (image) {
-    return (
-      <Image
-        source={{ uri: image }}
-        style={{ width: avatarSize, height: avatarSize, borderRadius }}
-        contentFit="cover"
-        testID={testID}
-      />
-    );
-  }
-
-  return (
-    <View
-      testID={testID}
-      style={[
-        styles.fallback,
-        {
-          width: avatarSize,
-          height: avatarSize,
-          borderRadius,
-          backgroundColor: theme.colors.surface.subtle,
-        },
-      ]}
-    >
-      <AppText
-        variant="bodyLg"
-        style={{ color: theme.colors.content.muted, fontSize: avatarSize * 0.4 }}
-      >
-        {name?.charAt(0)?.toUpperCase() ?? "?"}
-      </AppText>
-    </View>
-  );
+  return renderAvatar(image, name, size, fill, borderRadius, theme, testID);
 }
 
 const styles = StyleSheet.create(() => ({

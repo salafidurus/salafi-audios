@@ -105,6 +105,33 @@ function ProfileRoles({
   );
 }
 
+function ProfileUpdateStatus({
+  isSuccess,
+  isError,
+  theme,
+  t,
+}: {
+  isSuccess: boolean;
+  isError: boolean;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+  t: ProfileEditControlsProps["t"];
+}) {
+  if (!isSuccess && !isError) return null;
+  return (
+    <AppText
+      variant="caption"
+      style={{
+        color: isSuccess ? theme.colors.state.successContent : theme.colors.state.dangerContent,
+        marginBottom: theme.spacing.scale.sm,
+      }}
+    >
+      {isSuccess
+        ? t("account.profile.displayNameSaved", "Display name saved.")
+        : t("account.profile.displayNameSaveFailed", "Failed to save. Please try again.")}
+    </AppText>
+  );
+}
+
 function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
@@ -213,19 +240,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
         <ProfileRoles roles={nonListenerRoles} theme={theme} t={t} />
       </SettingsSection>
 
-      {(isSuccess || isError) && (
-        <AppText
-          variant="caption"
-          style={{
-            color: isSuccess ? theme.colors.state.successContent : theme.colors.state.dangerContent,
-            marginBottom: theme.spacing.scale.sm,
-          }}
-        >
-          {isSuccess
-            ? t("account.profile.displayNameSaved", "Display name saved.")
-            : t("account.profile.displayNameSaveFailed", "Failed to save. Please try again.")}
-        </AppText>
-      )}
+      <ProfileUpdateStatus isSuccess={isSuccess} isError={isError} theme={theme} t={t} />
 
       {/* Actions */}
       <View style={styles.actionRow}>

@@ -41,59 +41,57 @@ function getErrorMessage(cause: unknown): string {
   return cause instanceof Error ? cause.message : "Unable to save series";
 }
 
-export function SeriesSheet({
-  isOpen,
-  scholarId,
-  scholarSlug,
+async function saveSeries(
+  state: FormState,
+  series: AdminListingDetailDto | undefined,
+  scholarId: string,
+  dispatch: (patch: Partial<FormState>) => void,
+  onSaved: () => void,
+  t: ReturnType<typeof useTranslation>["t"],
+): Promise<void> {
+  if (!state.title.trim()) {
+    dispatch({ error: t("admin.seriesEdit.titleRequired", "Title is required") });
+    return;
+  }
+  dispatch({ isSaving: true, error: null });
+  try {
+    if (series) {
+      await updateSeries(series.id, {
+        title: state.title,
+        description: state.description || undefined,
+        language: parseLocaleInput(state.language),
+      });
+    } else {
+      await createSeries({ scholarId, title: state.title, format: "series" });
+    }
+    onSaved();
+  } catch (cause) {
+    dispatch({ error: getErrorMessage(cause) });
+  } finally {
+    dispatch({ isSaving: false });
+  }
+}
+
+function SeriesSheetForm({
+  state,
   series,
+  canSave,
+  theme,
+  t,
+  onSave,
   onClose,
-  onSaved,
-}: SeriesSheetProps) {
-  const { theme } = useUnistyles();
-  const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
-  const { ability } = useAbility({ isAuthenticated });
-  const [state, dispatch] = useReducer(reduce, {
-    title: series?.title ?? "",
-    description: series?.description ?? "",
-    language: series?.language ?? "",
-    isSaving: false,
-    error: null,
-  });
-
-  if (!isOpen) return null;
-
+  dispatch,
+}: {
+  state: FormState;
+  series: AdminListingDetailDto | undefined;
+  canSave: boolean;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+  t: ReturnType<typeof useTranslation>["t"];
+  onSave: () => Promise<void>;
+  onClose: () => void;
+  dispatch: (patch: Partial<FormState>) => void;
+}) {
   const { title, description, language, isSaving, error } = state;
-  const canSave = ability.can(series ? "update" : "create", subject("Listing", { scholarSlug }));
-
-  const handleSave = async () => {
-    if (!title.trim()) {
-      dispatch({ error: t("admin.seriesEdit.titleRequired", "Title is required") });
-      return;
-    }
-    dispatch({ isSaving: true, error: null });
-    try {
-      if (series) {
-        await updateSeries(series.id, {
-          title,
-          description: description || undefined,
-          language: parseLocaleInput(language),
-        });
-      } else {
-        await createSeries({
-          scholarId,
-          title,
-          format: "series",
-        });
-      }
-      onSaved();
-    } catch (cause) {
-      dispatch({ error: getErrorMessage(cause) });
-    } finally {
-      dispatch({ isSaving: false });
-    }
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
@@ -127,7 +125,7 @@ export function SeriesSheet({
         {error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>
       <View style={styles.buttonRow}>
-        <Pressable onPress={handleSave} disabled={isSaving || !canSave} style={styles.saveBtn}>
+        <Pressable onPress={onSave} disabled={isSaving || !canSave} style={styles.saveBtn}>
           {isSaving ? (
             <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (
@@ -139,6 +137,46 @@ export function SeriesSheet({
         </Pressable>
       </View>
     </View>
+  );
+}
+
+export function SeriesSheet({
+  isOpen,
+  scholarId,
+  scholarSlug,
+  series,
+  onClose,
+  onSaved,
+}: SeriesSheetProps) {
+  const { theme } = useUnistyles();
+  const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const { ability } = useAbility({ isAuthenticated });
+  const [state, dispatch] = useReducer(reduce, {
+    title: series?.title ?? "",
+    description: series?.description ?? "",
+    language: series?.language ?? "",
+    isSaving: false,
+    error: null,
+  });
+
+  if (!isOpen) return null;
+
+  const canSave = ability.can(series ? "update" : "create", subject("Listing", { scholarSlug }));
+
+  const handleSave = () => saveSeries(state, series, scholarId, dispatch, onSaved, t);
+
+  return (
+    <SeriesSheetForm
+      state={state}
+      series={series}
+      canSave={canSave}
+      theme={theme}
+      t={t}
+      onSave={handleSave}
+      onClose={onClose}
+      dispatch={dispatch}
+    />
   );
 }
 

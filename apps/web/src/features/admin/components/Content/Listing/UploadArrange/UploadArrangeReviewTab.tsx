@@ -23,6 +23,36 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function renderStatusIcon(status: UploadItem["upload"]["status"]) {
+  if (status === "done") return <CheckCircle size={14} className={styles.statusIconSuccess} />;
+  if (status === "error") return <AlertCircle size={14} className={styles.statusIconError} />;
+  return null;
+}
+
+function renderProgress(item: UploadItem, isBusy: boolean) {
+  if (!isBusy && item.upload.status !== "error") return null;
+  return (
+    <div className={styles.progressTrack}>
+      <div
+        className={`${styles.progressFill} ${
+          item.upload.status === "error" ? styles.progressFillError : ""
+        }`}
+        style={{ width: `${item.upload.percent}%` }}
+      />
+    </div>
+  );
+}
+
+function renderUploadDetails(item: UploadItem, isBusy: boolean, statusLabel: string | null) {
+  const { loadedBytes, totalBytes } = item.upload;
+  if (!isBusy || !statusLabel || loadedBytes === undefined || totalBytes === undefined) return null;
+  return (
+    <span className={styles.fileMeta}>
+      {`${statusLabel} ${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`}
+    </span>
+  );
+}
+
 function ItemRow({ item, state }: { item: UploadItem; state: UploadArrangeState }) {
   const { t } = useTranslation();
   const isBusy = state.phase === "presigning" || state.phase === "uploading";
@@ -31,7 +61,7 @@ function ItemRow({ item, state }: { item: UploadItem; state: UploadArrangeState 
       ? t("admin.contents.listing.reviewNewLesson", "New lesson")
       : t("admin.contents.listing.reviewReplaceAudio", "Replace audio");
 
-  const { status, loadedBytes, totalBytes } = item.upload;
+  const { status } = item.upload;
   const statusLabel =
     status === "downloading"
       ? t("admin.contents.listing.statusDownloading", "Downloading…")
@@ -47,29 +77,11 @@ function ItemRow({ item, state }: { item: UploadItem; state: UploadArrangeState 
         </span>
         <span className={styles.reviewLabel}>
           {action}
-          {item.upload.status === "done" && (
-            <CheckCircle size={14} className={styles.statusIconSuccess} />
-          )}
-          {item.upload.status === "error" && (
-            <AlertCircle size={14} className={styles.statusIconError} />
-          )}
+          {renderStatusIcon(item.upload.status)}
         </span>
       </div>
-      {(isBusy || item.upload.status === "error") && (
-        <div className={styles.progressTrack}>
-          <div
-            className={`${styles.progressFill} ${
-              item.upload.status === "error" ? styles.progressFillError : ""
-            }`}
-            style={{ width: `${item.upload.percent}%` }}
-          />
-        </div>
-      )}
-      {isBusy && statusLabel && loadedBytes !== undefined && totalBytes !== undefined && (
-        <span className={styles.fileMeta}>
-          {`${statusLabel} ${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`}
-        </span>
-      )}
+      {renderProgress(item, isBusy)}
+      {renderUploadDetails(item, isBusy, statusLabel)}
       {item.upload.error && <span className={styles.conflictText}>{item.upload.error}</span>}
     </div>
   );

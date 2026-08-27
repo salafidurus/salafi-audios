@@ -17,6 +17,45 @@ export type MiniPlayerProps = {
   embedded?: boolean;
 };
 
+function PlayerArtwork({
+  uri,
+  size,
+  placeholderSize,
+  color,
+  placeholderStyle,
+}: {
+  uri?: string | null;
+  size: object;
+  placeholderSize: number;
+  color: string;
+  placeholderStyle: object;
+}) {
+  if (uri) return <Image source={{ uri }} style={size} />;
+  return (
+    <View style={[size, placeholderStyle]}>
+      <Music size={placeholderSize} color={color} />
+    </View>
+  );
+}
+
+function PlayPauseIcon({
+  isLoading,
+  isPlaying,
+  color,
+  pauseIcon,
+  playIcon,
+}: {
+  isLoading: boolean;
+  isPlaying: boolean;
+  color: string;
+  pauseIcon: React.ReactNode;
+  playIcon: React.ReactNode;
+}) {
+  if (isLoading) return <ActivityIndicator size="small" color={color} />;
+  if (isPlaying) return pauseIcon;
+  return <View style={{ marginStart: 2 }}>{playIcon}</View>;
+}
+
 export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
   const { currentTrack, isPlaying, isLoading, progressPercent, positionSeconds } = useAudio();
   const { theme } = useUnistyles();
@@ -55,13 +94,13 @@ export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
         </View>
 
         <View style={styles.content}>
-          {currentTrack.artworkUrl ? (
-            <Image source={{ uri: currentTrack.artworkUrl }} style={styles.artwork} />
-          ) : (
-            <View style={[styles.artwork, styles.artworkPlaceholder]}>
-              <Music size={20} color={theme.colors.content.muted} />
-            </View>
-          )}
+          <PlayerArtwork
+            uri={currentTrack.artworkUrl}
+            size={styles.artwork}
+            placeholderSize={20}
+            color={theme.colors.content.muted}
+            placeholderStyle={styles.artworkPlaceholder}
+          />
 
           <View style={styles.textContainer}>
             <Text style={styles.title} numberOfLines={1}>
@@ -73,13 +112,13 @@ export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
           </View>
 
           <Pressable onPress={handlePlayPause} style={styles.playButton} testID="play-button">
-            {isLoading ? (
-              <ActivityIndicator size="small" color={theme.colors.content.strong} />
-            ) : isPlaying ? (
-              PauseIcon
-            ) : (
-              <View style={{ marginStart: 2 }}>{PlayIcon}</View>
-            )}
+            <PlayPauseIcon
+              isLoading={isLoading}
+              isPlaying={isPlaying}
+              color={theme.colors.content.strong}
+              pauseIcon={PauseIcon}
+              playIcon={PlayIcon}
+            />
           </Pressable>
         </View>
       </Pressable>
@@ -101,13 +140,13 @@ export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
           </View>
 
           <View style={styles.modalBody}>
-            {currentTrack.artworkUrl ? (
-              <Image source={{ uri: currentTrack.artworkUrl }} style={styles.modalArtwork} />
-            ) : (
-              <View style={[styles.modalArtwork, styles.modalArtworkPlaceholder]}>
-                <Music size={80} color={theme.colors.content.muted} />
-              </View>
-            )}
+            <PlayerArtwork
+              uri={currentTrack.artworkUrl}
+              size={styles.modalArtwork}
+              placeholderSize={80}
+              color={theme.colors.content.muted}
+              placeholderStyle={styles.modalArtworkPlaceholder}
+            />
 
             <View style={styles.modalTextContainer}>
               <Text style={styles.modalTitle} numberOfLines={2}>

@@ -22,6 +22,51 @@ type AppAvatarProps = {
 
 type AvatarStage = "listing" | "scholar" | "image" | "fallback";
 
+function AvatarContent({
+  source,
+  fill,
+  sizes,
+  size,
+  className,
+  fallbackText,
+  onError,
+}: {
+  source: string | null | undefined;
+  fill: boolean;
+  sizes: string;
+  size: number;
+  className?: string;
+  fallbackText?: string | null;
+  onError: ImageProps["onError"];
+}) {
+  if (source) {
+    return (
+      <Image
+        src={source}
+        alt=""
+        fill={fill}
+        sizes={sizes}
+        width={fill ? undefined : size}
+        height={fill ? undefined : size}
+        className={`${styles.avatar} ${className ?? ""}`}
+        unoptimized
+        onError={onError}
+      />
+    );
+  }
+
+  const initial = fallbackText?.trim().charAt(0).toUpperCase() || "?";
+  return (
+    <div
+      className={`${fill ? styles.fallbackFill : styles.fallback} ${className ?? ""}`}
+      style={fill ? undefined : { width: size, height: size, fontSize: size * 0.4 }}
+      aria-hidden="true"
+    >
+      {initial}
+    </div>
+  );
+}
+
 function nextAvatarStage(
   currentStage: AvatarStage,
   scholarImageUrl?: string | null,
@@ -74,31 +119,16 @@ export function AppAvatar({
 
   const source = avatarSource(stage, listingArtwork, scholarImageUrl, image);
 
-  if (source) {
-    return (
-      <Image
-        src={source}
-        alt=""
-        fill={fill}
-        sizes={sizes}
-        width={fill ? undefined : size}
-        height={fill ? undefined : size}
-        className={`${styles.avatar} ${className ?? ""}`}
-        unoptimized
-        onError={handleError}
-      />
-    );
-  }
-
-  const initial = fallbackText?.trim().charAt(0).toUpperCase() || "?";
   return (
-    <div
-      className={`${fill ? styles.fallbackFill : styles.fallback} ${className ?? ""}`}
-      style={fill ? undefined : { width: size, height: size, fontSize: size * 0.4 }}
-      aria-hidden="true"
-    >
-      {initial}
-    </div>
+    <AvatarContent
+      source={source}
+      fill={fill}
+      sizes={sizes}
+      size={size}
+      className={className}
+      fallbackText={fallbackText}
+      onError={handleError}
+    />
   );
 }
 

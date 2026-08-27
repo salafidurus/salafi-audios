@@ -191,6 +191,16 @@ function isCurrentLectureTrack(
   return lecture !== undefined && currentTrack?.slug === lecture.slug;
 }
 
+function useLectureRedirect(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+) {
+  useEffect(() => {
+    if (lecture?.rootListing) {
+      router.replace(`/listings/${lecture.rootListing.slug}?anchor=${lecture.id}`);
+    }
+  }, [lecture]);
+}
+
 function LoadedLectureBody({ view }: { view: LoadedLectureView }) {
   const {
     lecture,
@@ -288,36 +298,33 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   // Slugs are flat and don't encode nesting, so a Lesson/Module's own slug
   // resolves to itself — redirect to the top-level page it belongs under,
   // anchored to this item so the parent page can scroll to and highlight it.
-  useEffect(() => {
-    if (lecture?.rootListing) {
-      router.replace(`/listings/${lecture.rootListing.slug}?anchor=${lecture.id}`);
-    }
-  }, [lecture]);
+  useLectureRedirect(lecture);
 
   const lectureStateView = getLectureStateView(isFetching, lecture, t);
   if (lectureStateView) return lectureStateView;
 
-  if (!lecture) return null;
+  // SAFETY: getLectureStateView returns a fallback whenever lecture is absent.
+  const loadedLecture = lecture as NonNullable<ReturnType<typeof useListingDetail>["data"]>;
 
-  const title = pickContentField(lecture.title, lecture.original?.title, showOriginal);
-  const description = lecture.description
-    ? pickContentField(lecture.description, lecture.original?.description, showOriginal)
+  const title = pickContentField(loadedLecture.title, loadedLecture.original?.title, showOriginal);
+  const description = loadedLecture.description
+    ? pickContentField(loadedLecture.description, loadedLecture.original?.description, showOriginal)
     : undefined;
 
   const handlePlay = async () => {
-    await playLecture(lecture, title, seriesContents, isCurrentTrack, isPlaying);
+    await playLecture(loadedLecture, title, seriesContents, isCurrentTrack, isPlaying);
   };
 
   const handleSave = () => {
     if (isSaved) {
-      markUnsaved(lecture.id, lecture.slug);
+      markUnsaved(loadedLecture.id, loadedLecture.slug);
     } else {
-      markSaved(lecture.id, lecture.slug);
+      markSaved(loadedLecture.id, loadedLecture.slug);
     }
   };
 
   const view: LoadedLectureView = {
-    lecture,
+    lecture: loadedLecture,
     title,
     description,
     anchor,

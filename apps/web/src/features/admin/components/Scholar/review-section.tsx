@@ -20,6 +20,13 @@ type ReviewFieldProps = {
   value: string | number;
 };
 
+const DETAIL_CHANGE_KEYS = ["name", "slug", "bio", "title", "country", "orderIndex"];
+const SOCIAL_CHANGE_KEYS = ["socialTwitter", "socialTelegram", "socialYoutube", "socialWebsite"];
+
+function hasChangedField(changedFields: Record<string, boolean>, keys: string[]) {
+  return keys.some((key) => changedFields[key]);
+}
+
 function ReviewField({ label, value }: ReviewFieldProps) {
   return (
     <div className={styles.field}>
@@ -82,18 +89,8 @@ export function ReviewSection({ formData, changedFields, stagedImagePreview }: R
   const { t } = useTranslation();
 
   // Check if any changed field should be displayed
-  const hasDetailChanges =
-    changedFields.name ||
-    changedFields.slug ||
-    changedFields.bio ||
-    changedFields.title ||
-    changedFields.country ||
-    changedFields.orderIndex;
-  const hasSocialChanges =
-    changedFields.socialTwitter ||
-    changedFields.socialTelegram ||
-    changedFields.socialYoutube ||
-    changedFields.socialWebsite;
+  const hasDetailChanges = hasChangedField(changedFields, DETAIL_CHANGE_KEYS);
+  const hasSocialChanges = hasChangedField(changedFields, SOCIAL_CHANGE_KEYS);
   const hasAnyData = hasDetailChanges || hasSocialChanges || stagedImagePreview;
 
   if (!hasAnyData) {

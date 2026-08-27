@@ -80,6 +80,30 @@ function ModalFooter({
   );
 }
 
+function resolveModalMaxWidth(width: ModalProps["width"]) {
+  const parsedWidth = z.union([modalWidthSchema, z.string()]).safeParse(width);
+  if (!parsedWidth.success || !isModalWidth(parsedWidth.data)) return undefined;
+  return widthClasses[parsedWidth.data];
+}
+
+function handleModalOpenChange(open: boolean, loading: boolean | undefined, onClose: () => void) {
+  if (!open && !loading) onClose();
+}
+
+function renderModalFooter(
+  hideFooter: boolean | undefined,
+  footer: ReactNode,
+  alignment: ModalProps["footerAlignment"],
+  border: boolean | undefined,
+) {
+  if (hideFooter || !footer) return null;
+  return (
+    <ModalFooter alignment={alignment} border={border}>
+      {footer}
+    </ModalFooter>
+  );
+}
+
 function ModalRoot({
   isOpen,
   onClose,
@@ -95,22 +119,18 @@ function ModalRoot({
   loading,
   contentClassName,
 }: ModalProps) {
-  const parsedWidth = z.union([modalWidthSchema, z.string()]).safeParse(width);
-  const maxWidth =
-    parsedWidth.success && isModalWidth(parsedWidth.data)
-      ? widthClasses[parsedWidth.data]
-      : undefined;
+  const maxWidth = resolveModalMaxWidth(width);
   return (
-    <Dialog open={isOpen} modal={modal} onOpenChange={(open) => !open && !loading && onClose()}>
+    <Dialog
+      open={isOpen}
+      modal={modal}
+      onOpenChange={(open) => handleModalOpenChange(open, loading, onClose)}
+    >
       <DialogContent className={cn(maxWidth, contentClassName)} data-size={size}>
         {title && <ModalHeader>{title}</ModalHeader>}
         <DialogDescription className="sr-only">Dialog content</DialogDescription>
         {children}
-        {!hideFooter && footer ? (
-          <ModalFooter alignment={footerAlignment} border={footerBorder}>
-            {footer}
-          </ModalFooter>
-        ) : null}
+        {renderModalFooter(hideFooter, footer, footerAlignment, footerBorder)}
       </DialogContent>
     </Dialog>
   );

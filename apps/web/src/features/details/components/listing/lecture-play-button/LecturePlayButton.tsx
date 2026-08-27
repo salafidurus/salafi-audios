@@ -16,6 +16,78 @@ export type LecturePlayButtonProps = {
   lecture: ListingDetailDto;
 };
 
+type SeriesContents = Awaited<ReturnType<typeof useListingContents>>["data"];
+
+async function toggleCurrentLecture(isPlaying: boolean) {
+  if (isPlaying) await audioService.pause();
+  else await audioService.resume();
+}
+
+function resolveSeriesLecture(
+  lecture: ListingDetailDto,
+  scholarName: string,
+  seriesContents: SeriesContents,
+) {
+  if (!lecture.seriesContext || !seriesContents) return null;
+
+  const queue = buildTrackQueue(
+    {
+      id: lecture.seriesContext.seriesId,
+      title: lecture.seriesContext.seriesTitle,
+      format: seriesContents.format,
+      scholarName,
+      scholarSlug: lecture.scholar.slug,
+    },
+    seriesContents,
+    { startAtId: lecture.id },
+  );
+  const track = queue.find((item) => item.id === lecture.id);
+  if (!track) return null;
+
+  return { queue, track };
+}
+
+function buildStandaloneTrack(
+  lecture: ListingDetailDto,
+  asset: NonNullable<ListingDetailDto["primaryAudioAsset"]>,
+  scholarName: string,
+): Track {
+  return {
+    id: lecture.id,
+    slug: lecture.slug,
+    title: lecture.title,
+    artist: scholarName,
+    url: asset.url,
+    durationSeconds: asset.durationSeconds ?? lecture.durationSeconds ?? 0,
+    artworkUrl: undefined,
+    seriesId: lecture.seriesContext?.seriesId ?? null,
+    seriesTitle: lecture.seriesContext?.seriesTitle ?? null,
+  };
+}
+
+async function playLecture(
+  lecture: ListingDetailDto,
+  asset: NonNullable<ListingDetailDto["primaryAudioAsset"]>,
+  isCurrentLecture: boolean,
+  isPlaying: boolean,
+  scholarName: string,
+  seriesContents: Awaited<ReturnType<typeof useListingContents>>["data"],
+) {
+  if (isCurrentLecture) {
+    await toggleCurrentLecture(isPlaying);
+    return;
+  }
+
+  const seriesLecture = resolveSeriesLecture(lecture, scholarName, seriesContents);
+  if (seriesLecture) {
+    await audioService.playListing(seriesLecture.track, seriesLecture.queue);
+    return;
+  }
+
+  const track = buildStandaloneTrack(lecture, asset, scholarName);
+  await audioService.playListing(track, [track]);
+}
+
 export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
   const { isPlaying, currentTrack } = useAudio();
   const formatScholarName = useFormatScholarName();
@@ -28,53 +100,9 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
   const asset = lecture.primaryAudioAsset;
   const isCurrentLecture = currentTrack?.slug === lecture.slug;
 
-  const handlePlay = async () => {
-    if (isCurrentLecture) {
-      if (isPlaying) {
-        await audioService.pause();
-      } else {
-        await audioService.resume();
-      }
-      return;
-    }
-
-    const scholarName = formatScholarName(lecture.scholar);
-
-    // When the immediate parent's contents have loaded, play the full ordered
-    // queue for that Series/Module so Next/auto-advance continue through it —
-    // not just a single lookahead track.
-    if (lecture.seriesContext && seriesContents) {
-      const queue = buildTrackQueue(
-        {
-          id: lecture.seriesContext.seriesId,
-          title: lecture.seriesContext.seriesTitle,
-          format: seriesContents.format,
-          scholarName,
-          scholarSlug: lecture.scholar.slug,
-        },
-        seriesContents,
-        { startAtId: lecture.id },
-      );
-      const track = queue.find((t) => t.id === lecture.id);
-      if (track) {
-        await audioService.playListing(track, queue);
-        return;
-      }
-    }
-
-    const track: Track = {
-      id: lecture.id,
-      slug: lecture.slug,
-      title: lecture.title,
-      artist: scholarName,
-      url: asset.url,
-      durationSeconds: asset.durationSeconds ?? lecture.durationSeconds ?? 0,
-      artworkUrl: undefined,
-      seriesId: lecture.seriesContext?.seriesId ?? null,
-      seriesTitle: lecture.seriesContext?.seriesTitle ?? null,
-    };
-    await audioService.playListing(track, [track]);
-  };
+  const scholarName = formatScholarName(lecture.scholar);
+  const handlePlay = () =>
+    playLecture(lecture, asset, isCurrentLecture, isPlaying, scholarName, seriesContents);
 
   const label = isCurrentLecture && isPlaying ? "⏸ Pause Lecture" : "▶ Play Lecture";
 

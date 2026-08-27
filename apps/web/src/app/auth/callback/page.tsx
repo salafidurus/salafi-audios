@@ -8,6 +8,17 @@ import { authClient } from "@/core/auth/auth-client";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { PublicShell } from "@/features/navigation/components/public-shell/public-shell";
 
+function resolveCallbackRedirect(
+  hasUser: boolean,
+  isPending: boolean,
+  hasTimeout: boolean,
+  hasError: boolean,
+  redirectTo: string | null,
+): string | undefined {
+  if (!hasUser || isPending || hasTimeout || hasError) return undefined;
+  return redirectTo?.startsWith("/") ? redirectTo : "/";
+}
+
 function AuthCallbackContent() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
@@ -28,11 +39,14 @@ function AuthCallbackContent() {
   }, [isPending]);
 
   // Redirect if session loaded successfully using Next.js redirect() function
-  if (session?.user && !isPending && !timeoutError && !error) {
-    const redirectTo = searchParams.get("redirect");
-    const safeRedirect = redirectTo?.startsWith("/") ? redirectTo : "/";
-    redirect(safeRedirect);
-  }
+  const safeRedirect = resolveCallbackRedirect(
+    Boolean(session?.user),
+    isPending,
+    timeoutError,
+    Boolean(error),
+    searchParams.get("redirect"),
+  );
+  if (safeRedirect) redirect(safeRedirect);
 
   if (timeoutError) {
     return (

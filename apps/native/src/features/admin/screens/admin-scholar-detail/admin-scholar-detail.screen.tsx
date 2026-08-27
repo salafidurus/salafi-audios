@@ -111,6 +111,128 @@ function SectionHeader({
   );
 }
 
+type ScholarDetailContentProps = {
+  scholar: ScholarDetailDto;
+  scholarId: string;
+  scholarSlug: string;
+  canAdd: boolean;
+  seriesExpanded: boolean;
+  collectionsExpanded: boolean;
+  showSeriesSheet: boolean;
+  showCollectionSheet: boolean;
+  displaySeries: AdminListingListItemDto[];
+  displayCollections: AdminListingListItemDto[];
+  onToggleSeries: () => void;
+  onToggleCollections: () => void;
+  onAddSeries: () => void;
+  onAddCollection: () => void;
+  onSeriesDragEnd: (params: {
+    data: AdminListingListItemDto[];
+    from: number;
+    to: number;
+  }) => Promise<void>;
+  onCollectionDragEnd: (params: {
+    data: AdminListingListItemDto[];
+    from: number;
+    to: number;
+  }) => Promise<void>;
+  onCloseSeries: () => void;
+  onCloseCollection: () => void;
+  onSeriesSaved: () => void;
+  onCollectionSaved: () => void;
+};
+
+function ScholarDetailContent({
+  scholar,
+  scholarId,
+  scholarSlug,
+  canAdd,
+  seriesExpanded,
+  collectionsExpanded,
+  showSeriesSheet,
+  showCollectionSheet,
+  displaySeries,
+  displayCollections,
+  onToggleSeries,
+  onToggleCollections,
+  onAddSeries,
+  onAddCollection,
+  onSeriesDragEnd,
+  onCollectionDragEnd,
+  onCloseSeries,
+  onCloseCollection,
+  onSeriesSaved,
+  onCollectionSaved,
+}: ScholarDetailContentProps) {
+  return (
+    <GestureHandlerRootView style={styles.root}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.scholarName}>{scholar.name}</Text>
+        <Text style={styles.scholarSlug}>@{scholar.slug}</Text>
+
+        <SectionHeader
+          title="Series"
+          isExpanded={seriesExpanded}
+          onToggle={onToggleSeries}
+          onAdd={onAddSeries}
+          canAdd={canAdd}
+        />
+        {seriesExpanded &&
+          (displaySeries.length === 0 ? (
+            <EmptyState message="No series added yet." variant="empty" />
+          ) : (
+            <DraggableList
+              data={displaySeries}
+              keyExtractor={(item) => item.id}
+              onDragEnd={onSeriesDragEnd}
+              scrollEnabled={false}
+              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
+                <SeriesItem item={item} drag={drag} isActive={isActive} />
+              )}
+            />
+          ))}
+
+        <SectionHeader
+          title="Collections"
+          isExpanded={collectionsExpanded}
+          onToggle={onToggleCollections}
+          onAdd={onAddCollection}
+          canAdd={canAdd}
+        />
+        {collectionsExpanded &&
+          (displayCollections.length === 0 ? (
+            <EmptyState message="No collections added yet." variant="empty" />
+          ) : (
+            <DraggableList
+              data={displayCollections}
+              keyExtractor={(item) => item.id}
+              onDragEnd={onCollectionDragEnd}
+              scrollEnabled={false}
+              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
+                <CollectionItem item={item} drag={drag} isActive={isActive} />
+              )}
+            />
+          ))}
+
+        <SeriesSheet
+          isOpen={showSeriesSheet}
+          scholarId={scholarId}
+          scholarSlug={scholarSlug}
+          onClose={onCloseSeries}
+          onSaved={onSeriesSaved}
+        />
+        <CollectionSheet
+          isOpen={showCollectionSheet}
+          scholarId={scholarId}
+          scholarSlug={scholarSlug}
+          onClose={onCloseCollection}
+          onSaved={onCollectionSaved}
+        />
+      </ScrollView>
+    </GestureHandlerRootView>
+  );
+}
+
 export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScreenProps) {
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
@@ -188,79 +310,34 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
   }
 
   return (
-    <GestureHandlerRootView style={styles.root}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.scholarName}>{scholar.name}</Text>
-        <Text style={styles.scholarSlug}>@{scholar.slug}</Text>
-
-        {/* Series section */}
-        <SectionHeader
-          title="Series"
-          isExpanded={seriesExpanded}
-          onToggle={() => dispatch({ seriesExpanded: !seriesExpanded })}
-          onAdd={() => dispatch({ showSeriesSheet: true })}
-          canAdd={canAdd}
-        />
-        {seriesExpanded &&
-          (displaySeries.length === 0 ? (
-            <EmptyState message="No series added yet." variant="empty" />
-          ) : (
-            <DraggableList
-              data={displaySeries}
-              keyExtractor={(item) => item.id}
-              onDragEnd={handleSeriesDragEnd}
-              scrollEnabled={false}
-              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
-                <SeriesItem item={item} drag={drag} isActive={isActive} />
-              )}
-            />
-          ))}
-
-        {/* Collections section */}
-        <SectionHeader
-          title="Collections"
-          isExpanded={collectionsExpanded}
-          onToggle={() => dispatch({ collectionsExpanded: !collectionsExpanded })}
-          onAdd={() => dispatch({ showCollectionSheet: true })}
-          canAdd={canAdd}
-        />
-        {collectionsExpanded &&
-          (displayCollections.length === 0 ? (
-            <EmptyState message="No collections added yet." variant="empty" />
-          ) : (
-            <DraggableList
-              data={displayCollections}
-              keyExtractor={(item) => item.id}
-              onDragEnd={handleCollectionDragEnd}
-              scrollEnabled={false}
-              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
-                <CollectionItem item={item} drag={drag} isActive={isActive} />
-              )}
-            />
-          ))}
-
-        <SeriesSheet
-          isOpen={showSeriesSheet}
-          scholarId={scholarId}
-          scholarSlug={scholarSlug}
-          onClose={() => dispatch({ showSeriesSheet: false })}
-          onSaved={() => {
-            dispatch({ showSeriesSheet: false, seriesOrder: null });
-            refetchSeries();
-          }}
-        />
-        <CollectionSheet
-          isOpen={showCollectionSheet}
-          scholarId={scholarId}
-          scholarSlug={scholarSlug}
-          onClose={() => dispatch({ showCollectionSheet: false })}
-          onSaved={() => {
-            dispatch({ showCollectionSheet: false, collectionOrder: null });
-            refetchCollections();
-          }}
-        />
-      </ScrollView>
-    </GestureHandlerRootView>
+    <ScholarDetailContent
+      scholar={scholar}
+      scholarId={scholarId}
+      scholarSlug={scholarSlug}
+      canAdd={canAdd}
+      seriesExpanded={seriesExpanded}
+      collectionsExpanded={collectionsExpanded}
+      showSeriesSheet={showSeriesSheet}
+      showCollectionSheet={showCollectionSheet}
+      displaySeries={displaySeries}
+      displayCollections={displayCollections}
+      onToggleSeries={() => dispatch({ seriesExpanded: !seriesExpanded })}
+      onToggleCollections={() => dispatch({ collectionsExpanded: !collectionsExpanded })}
+      onAddSeries={() => dispatch({ showSeriesSheet: true })}
+      onAddCollection={() => dispatch({ showCollectionSheet: true })}
+      onSeriesDragEnd={handleSeriesDragEnd}
+      onCollectionDragEnd={handleCollectionDragEnd}
+      onCloseSeries={() => dispatch({ showSeriesSheet: false })}
+      onCloseCollection={() => dispatch({ showCollectionSheet: false })}
+      onSeriesSaved={() => {
+        dispatch({ showSeriesSheet: false, seriesOrder: null });
+        refetchSeries();
+      }}
+      onCollectionSaved={() => {
+        dispatch({ showCollectionSheet: false, collectionOrder: null });
+        refetchCollections();
+      }}
+    />
   );
 }
 
