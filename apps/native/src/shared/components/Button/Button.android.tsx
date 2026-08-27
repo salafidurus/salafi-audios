@@ -73,6 +73,45 @@ function buildModifiers(t: ReturnType<typeof getButtonTokens>, testID?: string):
   return modifiers;
 }
 
+function resolveDisabled(disabled: boolean | undefined, loading: boolean) {
+  return disabled || loading;
+}
+
+function renderButtonContent(
+  loading: boolean,
+  icon: React.ReactNode,
+  iconPosition: "left" | "right",
+  gap: number,
+  indicatorColor: string,
+  textColor: string,
+  label: string,
+  labelStyle: ReturnType<typeof getButtonTokens>["labelStyle"],
+) {
+  if (loading) return <ActivityIndicator size="small" color={indicatorColor} />;
+  return (
+    <>
+      {icon && iconPosition === "left" ? (
+        <>
+          {icon}
+          <Spacer modifiers={[width(gap)]} />
+        </>
+      ) : null}
+      <ComposeText
+        color={getComposeTextColor(labelStyle.color, textColor)}
+        style={{ fontSize: labelStyle.fontSize, fontWeight: mapFontWeight(labelStyle.fontWeight) }}
+      >
+        {label}
+      </ComposeText>
+      {icon && iconPosition === "right" ? (
+        <>
+          <Spacer modifiers={[width(gap)]} />
+          {icon}
+        </>
+      ) : null}
+    </>
+  );
+}
+
 export function Button({
   variant = "surface",
   size = "md",
@@ -87,7 +126,7 @@ export function Button({
   testID,
 }: ButtonProps) {
   const { theme } = useUnistyles();
-  const isDisabled = disabled || loading;
+  const isDisabled = resolveDisabled(disabled, loading);
   const t = getButtonTokens(variant, size, theme);
   const ButtonComponent = VARIANT_COMPONENT[variant];
 
@@ -101,7 +140,7 @@ export function Button({
   };
 
   return (
-    <Host matchContents={!fullWidth} style={[fullWidth && base.stretch, style]}>
+    <Host matchContents={!fullWidth} style={[fullWidth ? base.stretch : null, style]}>
       <ButtonComponent
         onClick={isDisabled ? undefined : onPress}
         enabled={!isDisabled}
@@ -109,32 +148,15 @@ export function Button({
         contentPadding={{ start: t.paddingHorizontal, end: t.paddingHorizontal, top: 0, bottom: 0 }}
         modifiers={modifiers}
       >
-        {loading ? (
-          <ActivityIndicator size="small" color={t.indicatorColor} />
-        ) : (
-          <>
-            {icon && iconPosition === "left" ? (
-              <>
-                {icon}
-                <Spacer modifiers={[width(t.gap)]} />
-              </>
-            ) : null}
-            <ComposeText
-              color={getComposeTextColor(t.labelStyle.color, t.textColor)}
-              style={{
-                fontSize: t.labelStyle.fontSize,
-                fontWeight: mapFontWeight(t.labelStyle.fontWeight),
-              }}
-            >
-              {label}
-            </ComposeText>
-            {icon && iconPosition === "right" ? (
-              <>
-                <Spacer modifiers={[width(t.gap)]} />
-                {icon}
-              </>
-            ) : null}
-          </>
+        {renderButtonContent(
+          loading,
+          icon,
+          iconPosition,
+          t.gap,
+          t.indicatorColor,
+          t.textColor,
+          label,
+          t.labelStyle,
         )}
       </ButtonComponent>
     </Host>
