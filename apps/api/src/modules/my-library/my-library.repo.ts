@@ -14,6 +14,97 @@ import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { ListingRepository } from '../listing/listing.repo';
 import { ConfigService } from '../../core/config/config.service';
 
+type ProgressGroup = { latestUpdatedAt: Date };
+type ProgressBucket = {
+  topLevelId: string;
+  latestUpdatedAt: Date;
+  summary: ListingProgressSummaryDto;
+};
+
+type RecentParent = {
+  id: string;
+  title: string;
+  slug: string;
+  format: string;
+  language: Locale | null;
+  translations: { title: string }[];
+  coverImageUrl: string | null;
+  parent?: RecentParent | null;
+};
+
+function getRecentArtworkKey(listing: {
+  coverImageUrl: string | null;
+  parent?: RecentParent | null;
+}) {
+  return [
+    listing.coverImageUrl,
+    listing.parent?.coverImageUrl,
+    listing.parent?.parent?.coverImageUrl,
+  ].find((key): key is string => Boolean(key));
+}
+
+function getRecentSeriesContext(parent: RecentParent | null | undefined, locale: Locale) {
+  if (!parent) return null;
+  return {
+    seriesId: parent.id,
+    seriesTitle: resolveContentTranslation({
+      base: { title: parent.title },
+      originalLanguage: parent.language,
+      targetLocale: locale,
+      publishedTranslation: parent.translations[0] ?? null,
+    }).fields.title,
+    seriesSlug: parent.slug,
+  };
+}
+
+function getRecentRootListing(
+  parent: RecentParent | null | undefined,
+  grandparent: RecentParent | null | undefined,
+  seriesContext: { seriesTitle: string } | null,
+  locale: Locale,
+) {
+  if (grandparent) {
+    return {
+      id: grandparent.id,
+      slug: grandparent.slug,
+      title: resolveContentTranslation({
+        base: { title: grandparent.title },
+        originalLanguage: grandparent.language,
+        targetLocale: locale,
+        publishedTranslation: grandparent.translations[0] ?? null,
+      }).fields.title,
+    };
+  }
+  if (!parent) return null;
+  return { id: parent.id, slug: parent.slug, title: seriesContext?.seriesTitle ?? parent.title };
+}
+
+function groupProgressRecords(
+  records: ProgressLeafRecord[],
+  resolveTopLevelId: (record: ProgressLeafRecord) => string,
+) {
+  const groups = new Map<string, ProgressGroup>();
+  for (const record of records) {
+    const topLevelId = resolveTopLevelId(record);
+    const existing = groups.get(topLevelId);
+    if (!existing || record.updatedAt > existing.latestUpdatedAt)
+      groups.set(topLevelId, { latestUpdatedAt: record.updatedAt });
+  }
+  return groups;
+}
+
+function bucketProgressSummaries(
+  topLevelIds: string[],
+  summaries: (ListingProgressSummaryDto | null)[],
+  groups: Map<string, ProgressGroup>,
+  onlyCompleted: boolean,
+): ProgressBucket[] {
+  return topLevelIds.flatMap((topLevelId, index) => {
+    const summary = summaries[index];
+    if (!summary || summary.isCompleted !== onlyCompleted) return [];
+    return [{ topLevelId, latestUpdatedAt: groups.get(topLevelId)!.latestUpdatedAt, summary }];
+  });
+}
 const DEFAULT_PAGE_SIZE = 20;
 
 const listingRelationSelect = (locale: Locale) =>
@@ -139,14 +230,7 @@ export class MyLibraryRepository {
       },
     });
 
-    const groups = new Map<string, { latestUpdatedAt: Date }>();
-    for (const record of records) {
-      const topLevelId = this.resolveTopLevelId(record);
-      const existing = groups.get(topLevelId);
-      if (!existing || record.updatedAt > existing.latestUpdatedAt) {
-        groups.set(topLevelId, { latestUpdatedAt: record.updatedAt });
-      }
-    }
+    const groups = groupProgressRecords(records, (record) => this.resolveTopLevelId(record));
 
     const topLevelIds = Array.from(groups.keys());
     const summaries = await Promise.all(
@@ -155,20 +239,7 @@ export class MyLibraryRepository {
       ),
     );
 
-    const bucketed: {
-      topLevelId: string;
-      latestUpdatedAt: Date;
-      summary: ListingProgressSummaryDto;
-    }[] = [];
-    for (const [index, topLevelId] of topLevelIds.entries()) {
-      const summary = summaries[index];
-      if (!summary || summary.isCompleted !== onlyCompleted) continue;
-      bucketed.push({
-        topLevelId,
-        latestUpdatedAt: groups.get(topLevelId)!.latestUpdatedAt,
-        summary,
-      });
-    }
+    const bucketed = bucketProgressSummaries(topLevelIds, summaries, groups, onlyCompleted);
     bucketed.sort((a, b) => b.latestUpdatedAt.getTime() - a.latestUpdatedAt.getTime());
 
     const startIndex = cursor ? bucketed.findIndex((b) => b.topLevelId === cursor) + 1 : 0;
@@ -440,43 +511,12 @@ export class MyLibraryRepository {
       publishedTranslation: record.listing.scholar.translations[0] ?? null,
     }).fields.name;
 
-    const artworkKey =
-      record.listing.coverImageUrl ??
-      record.listing.parent?.coverImageUrl ??
-      record.listing.parent?.parent?.coverImageUrl;
+    const artworkKey = getRecentArtworkKey(record.listing);
 
     const parent = record.listing.parent;
     const grandparent = parent?.parent;
-    const seriesContext = parent
-      ? {
-          seriesId: parent.id,
-          seriesTitle: resolveContentTranslation({
-            base: { title: parent.title },
-            originalLanguage: parent.language,
-            targetLocale: locale,
-            publishedTranslation: parent.translations[0] ?? null,
-          }).fields.title,
-          seriesSlug: parent.slug,
-        }
-      : null;
-    const rootListing = grandparent
-      ? {
-          id: grandparent.id,
-          slug: grandparent.slug,
-          title: resolveContentTranslation({
-            base: { title: grandparent.title },
-            originalLanguage: grandparent.language,
-            targetLocale: locale,
-            publishedTranslation: grandparent.translations[0] ?? null,
-          }).fields.title,
-        }
-      : parent
-        ? {
-            id: parent.id,
-            slug: parent.slug,
-            title: seriesContext?.seriesTitle ?? parent.title,
-          }
-        : null;
+    const seriesContext = getRecentSeriesContext(parent, locale);
+    const rootListing = getRecentRootListing(parent, grandparent, seriesContext, locale);
 
     return {
       lectureTitle: listingTitle,
