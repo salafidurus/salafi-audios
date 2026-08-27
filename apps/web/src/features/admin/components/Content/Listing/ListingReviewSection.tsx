@@ -48,21 +48,16 @@ function getReviewChanges(state: FormState): ReviewChanges {
   };
 }
 
-type MainChangesProps = Pick<ReviewChanges, "titleChanged" | "descriptionChanged"> & {
+type MainChangesProps = {
   title: string;
   description: string;
   mainLocale: Locale;
   t: ReturnType<typeof useTranslation>["t"];
+  changes: Pick<ReviewChanges, "titleChanged" | "descriptionChanged">;
 };
 
-function MainChanges({
-  title,
-  description,
-  titleChanged,
-  descriptionChanged,
-  mainLocale,
-  t,
-}: MainChangesProps) {
+function MainChanges({ title, description, mainLocale, t, changes }: MainChangesProps) {
+  const { titleChanged, descriptionChanged } = changes;
   if (!titleChanged && !descriptionChanged) return null;
   return (
     <div style={{ marginBottom: "1.5rem" }}>
@@ -90,23 +85,26 @@ type DetailChangesProps = {
   language: Locale;
   topicNames: string[];
   t: ReturnType<typeof useTranslation>["t"];
-} & Pick<
-  ReviewChanges,
-  "statusChanged" | "orderIndexChanged" | "languageChanged" | "coverImageChanged" | "topicsChanged"
->;
+  changes: Pick<
+    ReviewChanges,
+    | "statusChanged"
+    | "orderIndexChanged"
+    | "languageChanged"
+    | "coverImageChanged"
+    | "topicsChanged"
+  >;
+};
 
 function DetailChanges({
   status,
   orderIndex,
   language,
   topicNames,
-  statusChanged,
-  orderIndexChanged,
-  languageChanged,
-  coverImageChanged,
-  topicsChanged,
   t,
+  changes,
 }: DetailChangesProps) {
+  const { statusChanged, orderIndexChanged, languageChanged, coverImageChanged, topicsChanged } =
+    changes;
   if (
     !statusChanged &&
     !orderIndexChanged &&
@@ -206,8 +204,7 @@ export function ListingReviewSection({ state, mainLocale, topics }: ListingRevie
         description={description}
         mainLocale={mainLocale}
         t={t}
-        titleChanged={changes.titleChanged}
-        descriptionChanged={changes.descriptionChanged}
+        changes={changes}
       />
       <DetailChanges
         t={t}
@@ -215,11 +212,7 @@ export function ListingReviewSection({ state, mainLocale, topics }: ListingRevie
         status={status}
         orderIndex={orderIndex}
         topicNames={topicNames}
-        statusChanged={changes.statusChanged}
-        orderIndexChanged={changes.orderIndexChanged}
-        languageChanged={changes.languageChanged}
-        coverImageChanged={changes.coverImageChanged}
-        topicsChanged={changes.topicsChanged}
+        changes={changes}
       />
     </div>
   );
