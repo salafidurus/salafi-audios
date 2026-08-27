@@ -24,6 +24,25 @@ type LectureRowProps = {
   className?: string;
 };
 
+function buildLectureMeta(category: string, duration: string, totalLessons: number): string {
+  return [
+    category,
+    duration,
+    totalLessons > 0 ? `${totalLessons} ${totalLessons === 1 ? "lesson" : "lessons"}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+function LectureProgress({ total, completed }: { total: number; completed: number }) {
+  if (total <= 1) return null;
+  return (
+    <span className={styles.progress}>
+      <SanadChain total={total} completed={completed} />
+    </span>
+  );
+}
+
 export function LectureRow({
   title,
   category,
@@ -46,11 +65,7 @@ export function LectureRow({
   const done = Math.round(progress * totalLessons);
   const t = totalLessons;
 
-  const metaParts: string[] = [];
-  if (category) metaParts.push(category);
-  if (duration) metaParts.push(duration);
-  if (t > 0) metaParts.push(`${t} ${t === 1 ? "lesson" : "lessons"}`);
-  const metaText = metaParts.join(" · ");
+  const metaText = buildLectureMeta(category, duration, t);
 
   return (
     <div className={`${styles.row} ${className ?? ""}`}>
@@ -72,11 +87,7 @@ export function LectureRow({
           <ChevronRight size={16} color="var(--content-muted)" />
         </span>
       </button>
-      {t > 1 ? (
-        <span className={styles.progress}>
-          <SanadChain total={t} completed={done} />
-        </span>
-      ) : null}
+      <LectureProgress total={t} completed={done} />
     </div>
   );
 }
