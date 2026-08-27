@@ -22,6 +22,33 @@ import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-languag
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { decodeCursor, buildPaginatedResult } from '../../shared/utils/pagination';
 
+function toOptional<T>(value: T | null | undefined): T | undefined {
+  return value ?? undefined;
+}
+
+function buildScholarUpdateData(dto: UpdateScholarDto): Prisma.ScholarUpdateInput {
+  const data: Prisma.ScholarUpdateInput = { updatedAt: new Date() };
+  const fields = [
+    'name',
+    'bio',
+    'imageUrl',
+    'imageKey',
+    'isActive',
+    'country',
+    'mainLanguage',
+    'title',
+    'orderIndex',
+    'socialTwitter',
+    'socialTelegram',
+    'socialYoutube',
+    'socialWebsite',
+  ] as const;
+  for (const field of fields) {
+    if (dto[field] !== undefined) data[field] = dto[field];
+  }
+  return data;
+}
+
 @Injectable()
 export class ScholarsRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -171,23 +198,23 @@ export class ScholarsRepository {
       id: record.id,
       slug: record.slug,
       name: resolved.fields.name,
-      bio: resolved.fields.bio ?? undefined,
+      bio: toOptional(resolved.fields.bio),
       country: normalizeCountryCode(record.country),
-      mainLanguage: record.mainLanguage ?? undefined,
-      title: record.title ?? undefined,
+      mainLanguage: toOptional(record.mainLanguage),
+      title: toOptional(record.title),
       originalLanguage: resolved.originalLanguage,
       original: resolved.original
         ? {
             name: resolved.original.name,
-            bio: resolved.original.bio ?? undefined,
+            bio: toOptional(resolved.original.bio),
           }
         : undefined,
-      imageUrl: record.imageUrl ?? undefined,
+      imageUrl: toOptional(record.imageUrl),
       isActive: record.isActive,
-      socialTwitter: record.socialTwitter ?? undefined,
-      socialTelegram: record.socialTelegram ?? undefined,
-      socialYoutube: record.socialYoutube ?? undefined,
-      socialWebsite: record.socialWebsite ?? undefined,
+      socialTwitter: toOptional(record.socialTwitter),
+      socialTelegram: toOptional(record.socialTelegram),
+      socialYoutube: toOptional(record.socialYoutube),
+      socialWebsite: toOptional(record.socialWebsite),
       createdAt: record.createdAt.toISOString(),
       updatedAt: record.updatedAt?.toISOString(),
       lectureCount: lectureStats._count.id,
@@ -599,21 +626,7 @@ export class ScholarsRepository {
         : null;
 
       // Update scholar fields if provided
-      const updateData: Prisma.ScholarUpdateInput = {};
-      if (dto.name !== undefined) updateData.name = dto.name;
-      if (dto.bio !== undefined) updateData.bio = dto.bio;
-      if (dto.imageUrl !== undefined) updateData.imageUrl = dto.imageUrl;
-      if (dto.imageKey !== undefined) updateData.imageKey = dto.imageKey;
-      if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
-      if (dto.country !== undefined) updateData.country = dto.country;
-      if (dto.mainLanguage !== undefined) updateData.mainLanguage = dto.mainLanguage;
-      if (dto.title !== undefined) updateData.title = dto.title;
-      if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
-      if (dto.socialTwitter !== undefined) updateData.socialTwitter = dto.socialTwitter;
-      if (dto.socialTelegram !== undefined) updateData.socialTelegram = dto.socialTelegram;
-      if (dto.socialYoutube !== undefined) updateData.socialYoutube = dto.socialYoutube;
-      if (dto.socialWebsite !== undefined) updateData.socialWebsite = dto.socialWebsite;
-      updateData.updatedAt = new Date();
+      const updateData = buildScholarUpdateData(dto);
 
       const scholar = await tx.scholar.update({
         where: { id },
