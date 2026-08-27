@@ -43,6 +43,12 @@ function canOpenAdminSection(
   );
 }
 
+function getDashboardTitle(isMobile: boolean, t: ReturnType<typeof useTranslation>["t"]): string {
+  return isMobile
+    ? t("admin.dashboard.titleMobile", "Admin")
+    : t("admin.dashboard.title", "Admin Dashboard");
+}
+
 export function AdminDashboardScreen() {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();
@@ -88,13 +94,7 @@ export function AdminDashboardScreen() {
   if (isAccessLoading || dashboardQuery.isLoading) {
     return (
       <ScreenView>
-        <PageHeader
-          title={
-            !isMobile
-              ? t("admin.dashboard.title", "Admin Dashboard")
-              : t("admin.dashboard.titleMobile", "Admin")
-          }
-        />
+        <PageHeader title={getDashboardTitle(isMobile, t)} />
         <EmptyState variant="loading" message={t("admin.dashboard.loading", "Loading…")} />
       </ScreenView>
     );
@@ -103,13 +103,7 @@ export function AdminDashboardScreen() {
   if (dashboardQuery.isError) {
     return (
       <ScreenView>
-        <PageHeader
-          title={
-            !isMobile
-              ? t("admin.dashboard.title", "Admin Dashboard")
-              : t("admin.dashboard.titleMobile", "Admin")
-          }
-        />
+        <PageHeader title={getDashboardTitle(isMobile, t)} />
         <EmptyState
           variant="error"
           message={t(
@@ -126,11 +120,7 @@ export function AdminDashboardScreen() {
   return (
     <ScreenView>
       <PageHeader
-        title={
-          !isMobile
-            ? t("admin.dashboard.title", "Admin Dashboard")
-            : t("admin.dashboard.titleMobile", "Admin")
-        }
+        title={getDashboardTitle(isMobile, t)}
         subtitle={t(
           "admin.dashboard.subtitle",
           "A focused view of the work and resources available to your role.",
