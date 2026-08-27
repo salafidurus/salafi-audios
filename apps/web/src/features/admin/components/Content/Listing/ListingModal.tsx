@@ -14,7 +14,11 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { fetchListingFormData } from "@/features/admin/api/admin-lectures.api";
-import { useListingForm } from "@/features/admin/hooks/Content/useListingForm";
+import {
+  useListingForm,
+  type FormAction,
+  type FormState,
+} from "@/features/admin/hooks/Content/useListingForm";
 import { useSaveListing } from "@/features/admin/hooks/Content/useSaveListing";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { Button } from "@/shared/components/ui/button";
@@ -95,25 +99,17 @@ function ListingModalFooter({
   );
 }
 
-export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingModalProps) {
-  const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
-  const [activeTab, setActiveTab] = useState<"general" | "main" | "sublistings" | "review">(
-    "general",
-  );
-  const [errorTabs, setErrorTabs] = useState<string[]>([]);
+function useListingFormHydration(
+  listingId: string | null | undefined,
+  dispatch: ReturnType<typeof useListingForm>["dispatch"],
+) {
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const loadingRef = useRef(false);
   const formDataLoadedRef = useRef(false);
 
-  // Starts in create mode; edit-mode data is hydrated via INIT_FORM once fetched.
-  const { state, dispatch } = useListingForm();
-
-  // Load form data if editing
   useEffect(() => {
-    if (!listingId || formDataLoadedRef.current) return;
-    if (loadingRef.current) return;
+    if (!listingId || formDataLoadedRef.current || loadingRef.current) return;
 
     loadingRef.current = true;
     setLoading(true);
@@ -131,6 +127,113 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
         loadingRef.current = false;
       });
   }, [listingId, dispatch]);
+
+  return { loading, fetchError };
+}
+
+type ListingModalTab = "general" | "main" | "sublistings" | "review";
+
+type ListingModalTabsProps = {
+  activeTab: ListingModalTab;
+  onTabChange: (tab: ListingModalTab) => void;
+  errorTabs: string[];
+  state: FormState;
+  dispatch: React.Dispatch<FormAction>;
+  scholars: ScholarListItemDto[];
+  topics: ReturnType<typeof useTopicsList>["data"];
+  handleTopicToggle: (topicId: string) => void;
+  handleTitleChange: (value: string) => void;
+  mainLocale: Locale;
+  handleImageStaged: (file: File | null, preview: string | null) => void;
+  showSublistingsTab: boolean;
+  stagedImagePreview: string | null;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function ListingModalTabs({
+  activeTab,
+  onTabChange,
+  errorTabs,
+  state,
+  dispatch,
+  scholars,
+  topics,
+  handleTopicToggle,
+  handleTitleChange,
+  mainLocale,
+  handleImageStaged,
+  showSublistingsTab,
+  stagedImagePreview,
+  t,
+}: ListingModalTabsProps) {
+  const tabs: ListingModalTab[] = showSublistingsTab
+    ? ["general", "main", "sublistings", "review"]
+    : ["general", "main", "review"];
+  const errorTabSet = new Set(errorTabs);
+
+  return (
+    <Tabs
+      value={activeTab}
+      onValueChange={(id) => {
+        if (isListingModalTab(id)) onTabChange(id);
+      }}
+      className="min-h-0"
+    >
+      <TabsList
+        className="no-scrollbar w-full justify-start overflow-x-auto overflow-y-hidden"
+        aria-label={t("admin.modal.tabsLabel", "Form sections")}
+      >
+        {tabs.map((tab) => (
+          <TabsTrigger
+            key={tab}
+            value={tab}
+            aria-invalid={errorTabSet.has(tab) || undefined}
+            onClick={() => onTabChange(tab)}
+          >
+            {tab === "general"
+              ? t("admin.modal.generalTab", "General")
+              : tab === "main"
+                ? getLocaleLabel(mainLocale)
+                : tab === "sublistings"
+                  ? t("admin.contents.listing.sublistingsTab", "Sub-listings")
+                  : t("admin.modal.reviewTab", "Review")}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {tabs.map((tab) => (
+        <TabsContent key={tab} value={tab}>
+          <ListingModalTabContent
+            state={state}
+            dispatch={dispatch}
+            activeTab={tab}
+            errorTabSet={errorTabSet}
+            scholars={scholars}
+            topics={topics ?? []}
+            handleTopicToggle={handleTopicToggle}
+            handleTitleChange={handleTitleChange}
+            mainLocale={mainLocale}
+            isEditing={state.isEditing}
+            onImageStaged={handleImageStaged}
+            stagedImagePreview={stagedImagePreview}
+            showSublistingsTab={showSublistingsTab}
+          />
+        </TabsContent>
+      ))}
+    </Tabs>
+  );
+}
+
+export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingModalProps) {
+  const { t } = useTranslation();
+  const isDesktop = useIsDesktop();
+  const [activeTab, setActiveTab] = useState<"general" | "main" | "sublistings" | "review">(
+    "general",
+  );
+  const [errorTabs, setErrorTabs] = useState<string[]>([]);
+
+  // Starts in create mode; edit-mode data is hydrated via INIT_FORM once fetched.
+  const { state, dispatch } = useListingForm();
+  const { loading, fetchError } = useListingFormHydration(listingId, dispatch);
 
   const handleClose = () => {
     setErrorTabs([]);
@@ -188,7 +291,6 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
   const topicsArray = topicsData ?? [];
   // SAFETY: listing form state stores only supported locale values for the main content language.
   const mainLocale = (state.language || "ar") as Locale;
-  const errorTabSet = new Set(errorTabs);
   const showSublistingsTab = hasSublistings(state);
 
   return (
@@ -202,119 +304,22 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
         </DialogHeader>
 
         <form id="lecture-form" onSubmit={handleSave} className={`${styles.form} min-h-0 flex-1`}>
-          <Tabs
-            value={activeTab}
-            onValueChange={(id) => {
-              if (isListingModalTab(id)) setActiveTab(id);
-            }}
-            className="min-h-0"
-          >
-            <TabsList
-              className="no-scrollbar w-full justify-start overflow-x-auto overflow-y-hidden"
-              aria-label={t("admin.modal.tabsLabel", "Form sections")}
-            >
-              <TabsTrigger
-                value="general"
-                aria-invalid={errorTabs.includes("general") || undefined}
-                onClick={() => setActiveTab("general")}
-              >
-                {t("admin.modal.generalTab", "General")}
-              </TabsTrigger>
-              <TabsTrigger
-                value="main"
-                aria-invalid={errorTabs.includes("main") || undefined}
-                onClick={() => setActiveTab("main")}
-              >
-                {getLocaleLabel(mainLocale)}
-              </TabsTrigger>
-              {showSublistingsTab && (
-                <TabsTrigger
-                  value="sublistings"
-                  aria-invalid={errorTabs.includes("sublistings") || undefined}
-                  onClick={() => setActiveTab("sublistings")}
-                >
-                  {t("admin.contents.listing.sublistingsTab", "Sub-listings")}
-                </TabsTrigger>
-              )}
-              <TabsTrigger
-                value="review"
-                aria-invalid={errorTabs.includes("review") || undefined}
-                onClick={() => setActiveTab("review")}
-              >
-                {t("admin.modal.reviewTab", "Review")}
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="general">
-              <ListingModalTabContent
-                state={state}
-                dispatch={dispatch}
-                activeTab="general"
-                errorTabSet={errorTabSet}
-                scholars={scholars}
-                topics={topicsArray}
-                handleTopicToggle={handleTopicToggle}
-                handleTitleChange={handleTitleChange}
-                mainLocale={mainLocale}
-                isEditing={state.isEditing}
-                onImageStaged={handleImageStaged}
-                stagedImagePreview={state.stagedImagePreview}
-                showSublistingsTab={showSublistingsTab}
-              />
-            </TabsContent>
-            <TabsContent value="main">
-              <ListingModalTabContent
-                state={state}
-                dispatch={dispatch}
-                activeTab="main"
-                errorTabSet={errorTabSet}
-                scholars={scholars}
-                topics={topicsArray}
-                handleTopicToggle={handleTopicToggle}
-                handleTitleChange={handleTitleChange}
-                mainLocale={mainLocale}
-                isEditing={state.isEditing}
-                onImageStaged={handleImageStaged}
-                stagedImagePreview={state.stagedImagePreview}
-                showSublistingsTab={showSublistingsTab}
-              />
-            </TabsContent>
-            {showSublistingsTab && (
-              <TabsContent value="sublistings">
-                <ListingModalTabContent
-                  state={state}
-                  dispatch={dispatch}
-                  activeTab="sublistings"
-                  errorTabSet={errorTabSet}
-                  scholars={scholars}
-                  topics={topicsArray}
-                  handleTopicToggle={handleTopicToggle}
-                  handleTitleChange={handleTitleChange}
-                  mainLocale={mainLocale}
-                  isEditing={state.isEditing}
-                  onImageStaged={handleImageStaged}
-                  stagedImagePreview={state.stagedImagePreview}
-                  showSublistingsTab={showSublistingsTab}
-                />
-              </TabsContent>
-            )}
-            <TabsContent value="review">
-              <ListingModalTabContent
-                state={state}
-                dispatch={dispatch}
-                activeTab="review"
-                errorTabSet={errorTabSet}
-                scholars={scholars}
-                topics={topicsArray}
-                handleTopicToggle={handleTopicToggle}
-                handleTitleChange={handleTitleChange}
-                mainLocale={mainLocale}
-                isEditing={state.isEditing}
-                onImageStaged={handleImageStaged}
-                stagedImagePreview={state.stagedImagePreview}
-                showSublistingsTab={showSublistingsTab}
-              />
-            </TabsContent>
-          </Tabs>
+          <ListingModalTabs
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            errorTabs={errorTabs}
+            state={state}
+            dispatch={dispatch}
+            scholars={scholars}
+            topics={topicsArray}
+            handleTopicToggle={handleTopicToggle}
+            handleTitleChange={handleTitleChange}
+            mainLocale={mainLocale}
+            handleImageStaged={handleImageStaged}
+            showSublistingsTab={showSublistingsTab}
+            stagedImagePreview={state.stagedImagePreview}
+            t={t}
+          />
 
           <ListingModalFooter
             activeTab={activeTab}
