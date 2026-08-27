@@ -20,14 +20,26 @@ function canGrantCapability(target: AccessTarget, capability: AccessCapability):
     case "scholar":
     case "listing":
     case "topic":
-      return capability === "write" || capability === "publish" || capability === "delete";
+      return canEditCatalog(capability);
     case "media":
-      return capability === "write" || capability === "delete";
+      return canEditMedia(capability);
     case "translation":
-      return capability === "translate" || capability === "publish" || capability === "delete";
+      return canEditTranslation(capability);
     case "user":
       return capability === "manage";
   }
+}
+
+function canEditCatalog(capability: AccessCapability): boolean {
+  return capability === "write" || capability === "publish" || capability === "delete";
+}
+
+function canEditMedia(capability: AccessCapability): boolean {
+  return capability === "write" || capability === "delete";
+}
+
+function canEditTranslation(capability: AccessCapability): boolean {
+  return capability === "translate" || capability === "publish" || capability === "delete";
 }
 
 export const AccessGrantRequestSchema = z

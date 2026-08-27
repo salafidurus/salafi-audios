@@ -13,16 +13,23 @@ const PLAIN_PATTERN = /^(.+)\.([A-Za-z0-9]+)$/;
 
 export function parseUploadFilename(name: string): ParsedUploadFilename {
   const prefixed = name.match(PREFIXED_PATTERN);
-  if (prefixed) {
-    const [, prefix = "", title = "", ext = ""] = prefixed;
-    return { title: title.trim(), numericPrefix: parseInt(prefix, 10), ext: ext.toLowerCase() };
-  }
+  if (prefixed) return parsePrefixedFilename(prefixed);
   const plain = name.match(PLAIN_PATTERN);
-  if (plain) {
-    const [, title = "", ext = ""] = plain;
-    return { title: title.trim(), numericPrefix: null, ext: ext.toLowerCase() };
-  }
+  if (plain) return parsePlainFilename(plain);
   return { title: name.trim(), numericPrefix: null, ext: "" };
+}
+
+function parsePrefixedFilename(match: RegExpMatchArray): ParsedUploadFilename {
+  const prefix = match[1] ?? "";
+  const title = match[2] ?? "";
+  const ext = match[3] ?? "";
+  return { title: title.trim(), numericPrefix: parseInt(prefix, 10), ext: ext.toLowerCase() };
+}
+
+function parsePlainFilename(match: RegExpMatchArray): ParsedUploadFilename {
+  const title = match[1] ?? "";
+  const ext = match[2] ?? "";
+  return { title: title.trim(), numericPrefix: null, ext: ext.toLowerCase() };
 }
 
 export function findSlugMatch(

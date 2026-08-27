@@ -35,13 +35,7 @@ export class DbHealthIndicator extends HealthIndicator {
     try {
       const response = await fetchNeonEndpoint(this.config, controller.signal);
 
-      if (!response.ok) throw new Error(`Neon API returned HTTP ${response.status}`);
-
-      const body = neonEndpointSchema.safeParse(await response.json());
-      const currentState = body.success ? body.data.endpoint?.current_state : undefined;
-      if (!currentState) {
-        throw new Error('Neon API response did not include endpoint.current_state');
-      }
+      const currentState = await readNeonState(response);
 
       return this.getStatus(key, true, { currentState });
     } catch (error) {
@@ -55,6 +49,14 @@ export class DbHealthIndicator extends HealthIndicator {
       clearTimeout(timer);
     }
   }
+}
+
+async function readNeonState(response: Response): Promise<string> {
+  if (!response.ok) throw new Error(`Neon API returned HTTP ${response.status}`);
+  const body = neonEndpointSchema.safeParse(await response.json());
+  const currentState = body.success ? body.data.endpoint?.current_state : undefined;
+  if (!currentState) throw new Error('Neon API response did not include endpoint.current_state');
+  return currentState;
 }
 
 function fetchNeonEndpoint(config: ConfigService, signal: AbortSignal): Promise<Response> {

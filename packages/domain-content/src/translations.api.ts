@@ -21,18 +21,20 @@ function resolveTranslationEndpoint(
 ): string {
   switch (target.entity) {
     case "scholar":
-      if (action === "list") return endpoints.translations.scholars.list(target.scholarId);
-      if (action === "save") return endpoints.translations.scholars.save(target.scholarId);
-      if (action === "publish")
-        return endpoints.translations.scholars.publish(target.scholarId, locale!);
-      return endpoints.translations.scholars.unpublish(target.scholarId, locale!);
+      return resolveEntityTranslationEndpoint(
+        endpoints.translations.scholars,
+        target.scholarId,
+        action,
+        locale,
+      );
 
     case "listing":
-      if (action === "list") return endpoints.translations.listings.list(target.listingId);
-      if (action === "save") return endpoints.translations.listings.save(target.listingId);
-      if (action === "publish")
-        return endpoints.translations.listings.publish(target.listingId, locale!);
-      return endpoints.translations.listings.unpublish(target.listingId, locale!);
+      return resolveEntityTranslationEndpoint(
+        endpoints.translations.listings,
+        target.listingId,
+        action,
+        locale,
+      );
 
     case "topic":
       if (action === "list") return endpoints.translations.topics.list(target.topicId);
@@ -40,6 +42,18 @@ function resolveTranslationEndpoint(
       // Topics have no status column — publish/unpublish is not a supported action.
       throw new Error("Topic translations do not support publish/unpublish");
   }
+}
+
+function resolveEntityTranslationEndpoint(
+  endpointsForEntity: typeof endpoints.translations.scholars,
+  id: string,
+  action: "list" | "save" | "publish" | "unpublish",
+  locale?: string,
+): string {
+  if (action === "list") return endpointsForEntity.list(id);
+  if (action === "save") return endpointsForEntity.save(id);
+  if (action === "publish") return endpointsForEntity.publish(id, locale!);
+  return endpointsForEntity.unpublish(id, locale!);
 }
 
 export function useContentTranslations(target: TranslationTarget) {
