@@ -48,13 +48,17 @@ export function formatScholarName(
   const title = isStringScholar(scholar) ? titleParam : scholar.title;
 
   if (!name) return "";
+  return formatNamedScholar(name, title, t);
+}
+
+function formatNamedScholar(
+  name: string,
+  title: ScholarTitle | string | null | undefined,
+  t: TranslateFn,
+): string {
   if (!title) return name;
-
   const prefix = getScholarTitleLabel(title, t);
-  if (!prefix) return name;
-
-  if (name.startsWith(prefix)) return name;
-
+  if (!prefix || name.startsWith(prefix)) return name;
   return `${prefix} ${name}`;
 }
 

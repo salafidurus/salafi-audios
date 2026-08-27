@@ -31,12 +31,20 @@ export function mergeLiveProgress(
     ? merged.some((item) => item.listingSlug === currentTrack.slug)
     : true;
 
-  if (shouldAddCurrentTrack(currentTrack, isStandaloneTrack, liveCurrent, alreadyListed)) {
-    if (!currentTrack || !liveCurrent) return merged;
-    merged.unshift(createCurrentTrackItem(currentTrack, liveCurrent));
-  }
+  addCurrentTrackIfNeeded(merged, currentTrack, isStandaloneTrack, liveCurrent, alreadyListed);
 
   return merged;
+}
+
+function addCurrentTrackIfNeeded(
+  items: MyLibraryItemDto[],
+  track: Track | null | undefined,
+  isStandalone: boolean,
+  live: ListingProgress | undefined,
+  alreadyListed: boolean,
+): void {
+  if (!shouldAddCurrentTrack(track, isStandalone, live, alreadyListed) || !track || !live) return;
+  items.unshift(createCurrentTrackItem(track, live));
 }
 
 function mergeItemProgress(item: MyLibraryItemDto, live?: ListingProgress): MyLibraryItemDto {
