@@ -15,6 +15,69 @@ interface ReviewSectionProps {
   stagedImagePreview: string | null;
 }
 
+type ReviewFieldProps = {
+  label: string;
+  value: string | number;
+};
+
+function ReviewField({ label, value }: ReviewFieldProps) {
+  return (
+    <div className={styles.field}>
+      <div className={styles.label}>{label}</div>
+      <div className={styles.value}>{value}</div>
+    </div>
+  );
+}
+
+type ReviewContentProps = Pick<ReviewSectionProps, "formData" | "changedFields"> & {
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function ReviewDetails({ formData, changedFields, t }: ReviewContentProps) {
+  const fields = [
+    [changedFields.name, formData.name, t("admin.scholars.nameLabel", "Name")],
+    [changedFields.slug, formData.slug, t("admin.scholars.slugLabel", "Slug")],
+    [changedFields.bio, formData.bio, t("admin.scholars.bioLabel", "Bio")],
+    [changedFields.title, formData.title, t("admin.scholars.titleLabel", "Title")],
+    [changedFields.country, formData.country, t("admin.scholars.countryLabel", "Country")],
+  ] as const;
+
+  return (
+    <FormSection title={t("admin.scholars.details", "Details")}>
+      <div className={styles.grid}>
+        {fields.map(([changed, value, label]) =>
+          changed && value ? <ReviewField key={label} label={label} value={value} /> : null,
+        )}
+        {changedFields.orderIndex && formData.orderIndex !== undefined ? (
+          <ReviewField
+            label={t("admin.scholars.orderIndexLabel", "Order Index")}
+            value={formData.orderIndex}
+          />
+        ) : null}
+      </div>
+    </FormSection>
+  );
+}
+
+function ReviewSocial({ formData, changedFields, t }: ReviewContentProps) {
+  const fields = [
+    [changedFields.socialTwitter, formData.socialTwitter, "Twitter"],
+    [changedFields.socialTelegram, formData.socialTelegram, "Telegram"],
+    [changedFields.socialYoutube, formData.socialYoutube, "YouTube"],
+    [changedFields.socialWebsite, formData.socialWebsite, "Website"],
+  ] as const;
+
+  return (
+    <FormSection title={t("admin.scholars.socialMedia", "Social Media")}>
+      <div className={styles.grid}>
+        {fields.map(([changed, value, label]) =>
+          changed && value ? <ReviewField key={label} label={label} value={value} /> : null,
+        )}
+      </div>
+    </FormSection>
+  );
+}
+
 export function ReviewSection({ formData, changedFields, stagedImagePreview }: ReviewSectionProps) {
   const { t } = useTranslation();
 
@@ -58,82 +121,12 @@ export function ReviewSection({ formData, changedFields, stagedImagePreview }: R
           </div>
         </FormSection>
       )}
-
-      {hasDetailChanges && (
-        <FormSection title={t("admin.scholars.details", "Details")}>
-          <div className={styles.grid}>
-            {changedFields.name && formData.name && (
-              <div className={styles.field}>
-                <div className={styles.label}>{t("admin.scholars.nameLabel", "Name")}</div>
-                <div className={styles.value}>{formData.name}</div>
-              </div>
-            )}
-            {changedFields.slug && formData.slug && (
-              <div className={styles.field}>
-                <div className={styles.label}>{t("admin.scholars.slugLabel", "Slug")}</div>
-                <div className={styles.value}>{formData.slug}</div>
-              </div>
-            )}
-            {changedFields.bio && formData.bio && (
-              <div className={styles.field}>
-                <div className={styles.label}>{t("admin.scholars.bioLabel", "Bio")}</div>
-                <div className={styles.value}>{formData.bio}</div>
-              </div>
-            )}
-            {changedFields.title && formData.title && (
-              <div className={styles.field}>
-                <div className={styles.label}>{t("admin.scholars.titleLabel", "Title")}</div>
-                <div className={styles.value}>{formData.title}</div>
-              </div>
-            )}
-            {changedFields.country && formData.country && (
-              <div className={styles.field}>
-                <div className={styles.label}>{t("admin.scholars.countryLabel", "Country")}</div>
-                <div className={styles.value}>{formData.country}</div>
-              </div>
-            )}
-            {changedFields.orderIndex && formData.orderIndex !== undefined && (
-              <div className={styles.field}>
-                <div className={styles.label}>
-                  {t("admin.scholars.orderIndexLabel", "Order Index")}
-                </div>
-                <div className={styles.value}>{formData.orderIndex}</div>
-              </div>
-            )}
-          </div>
-        </FormSection>
-      )}
-
-      {hasSocialChanges && (
-        <FormSection title={t("admin.scholars.socialMedia", "Social Media")}>
-          <div className={styles.grid}>
-            {changedFields.socialTwitter && formData.socialTwitter && (
-              <div className={styles.field}>
-                <div className={styles.label}>Twitter</div>
-                <div className={styles.value}>{formData.socialTwitter}</div>
-              </div>
-            )}
-            {changedFields.socialTelegram && formData.socialTelegram && (
-              <div className={styles.field}>
-                <div className={styles.label}>Telegram</div>
-                <div className={styles.value}>{formData.socialTelegram}</div>
-              </div>
-            )}
-            {changedFields.socialYoutube && formData.socialYoutube && (
-              <div className={styles.field}>
-                <div className={styles.label}>YouTube</div>
-                <div className={styles.value}>{formData.socialYoutube}</div>
-              </div>
-            )}
-            {changedFields.socialWebsite && formData.socialWebsite && (
-              <div className={styles.field}>
-                <div className={styles.label}>Website</div>
-                <div className={styles.value}>{formData.socialWebsite}</div>
-              </div>
-            )}
-          </div>
-        </FormSection>
-      )}
+      {hasDetailChanges ? (
+        <ReviewDetails formData={formData} changedFields={changedFields} t={t} />
+      ) : null}
+      {hasSocialChanges ? (
+        <ReviewSocial formData={formData} changedFields={changedFields} t={t} />
+      ) : null}
     </>
   );
 }

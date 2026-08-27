@@ -42,6 +42,45 @@ type QueryParams = Record<string, QueryParamValue | QueryParamValue[]>;
 
 let config: HttpClientConfig | null = null;
 
+function appendQueryParams(endpoint: URL, params?: QueryParams): void {
+  if (!params) return;
+
+  for (const [key, raw] of Object.entries(params)) {
+    const values = Array.isArray(raw) ? raw : [raw];
+    for (const item of values) {
+      if (item !== undefined && item !== null) {
+        endpoint.searchParams[Array.isArray(raw) ? "append" : "set"](key, String(item));
+      }
+    }
+  }
+}
+
+function buildHeaders(
+  options: { headers?: Record<string, string>; body?: unknown; data?: unknown },
+  auth: { token?: string; cookie?: string; locale?: string },
+) {
+  const headers = { ...options.headers };
+  const payload = options.body ?? options.data;
+
+  if (payload !== undefined && payload !== null) headers["Content-Type"] = "application/json";
+  if (auth.token) headers["Authorization"] ??= `Bearer ${auth.token}`;
+  if (auth.cookie) headers["Cookie"] ??= auth.cookie;
+  if (auth.locale) headers["Accept-Language"] ??= auth.locale;
+
+  return headers;
+}
+
+async function parseResponse<T>(response: Response): Promise<T> {
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    // SAFETY: callers choose T to match the endpoint's non-JSON response contract.
+    return (await response.text()) as T;
+  }
+
+  // SAFETY: callers choose T to match the endpoint's JSON response contract.
+  return (await response.json()) as T;
+}
+
 export function configureApiClient(next: HttpClientConfig) {
   config = next;
 }
@@ -71,22 +110,7 @@ export async function httpClient<T>(options: {
 
   const endpoint = new URL(`${config.baseUrl}${options.url}`);
 
-  if (options.params) {
-    for (const [key, raw] of Object.entries(options.params)) {
-      if (Array.isArray(raw)) {
-        for (const item of raw) {
-          if (item !== undefined && item !== null) {
-            endpoint.searchParams.append(key, String(item));
-          }
-        }
-        continue;
-      }
-
-      if (raw !== undefined && raw !== null) {
-        endpoint.searchParams.set(key, String(raw));
-      }
-    }
-  }
+  appendQueryParams(endpoint, options.params);
 
   const payload = options.body ?? options.data;
 
@@ -101,27 +125,13 @@ export async function httpClient<T>(options: {
   let res: Response;
 
   try {
-    const headers = { ...options.headers };
-    if (payload !== undefined && payload !== null) {
-      headers["Content-Type"] = "application/json";
-    }
-    if (token) {
-      headers["Authorization"] ??= `Bearer ${token}`;
-    }
-    if (cookie) {
-      headers["Cookie"] ??= cookie;
-    }
-    if (locale) {
-      headers["Accept-Language"] ??= locale;
-    }
-
     res = await fetch(endpoint.toString(), {
       method: options.method,
       // Send cookies automatically (web via browser, native via @better-auth/expo).
       // Cookies are sent via either credentials:"include" (web) or Cookie header
       // (native). For native, getCookie() will override via headers below.
       credentials: "include",
-      headers,
+      headers: buildHeaders(options, { token, cookie, locale }),
       body: payload ? JSON.stringify(payload) : undefined,
       signal: controller.signal,
     });
@@ -138,14 +148,6 @@ export async function httpClient<T>(options: {
   }
 
   // allow empty responses
-  const ct = res.headers.get("content-type") || "";
-  if (!ct.includes("application/json")) {
-    // SAFETY: non-JSON responses are delivered as the transport body text, and
-    // callers explicitly choose T to match that endpoint's response contract.
-    return (await res.text()) as T;
-  }
-
-  // SAFETY: JSON responses are decoded by the API contract; callers choose T to
-  // match the endpoint's declared payload shape.
-  return (await res.json()) as T;
+  // SAFETY: the caller chooses T to match the endpoint's declared response contract.
+  return parseResponse<T>(res);
 }

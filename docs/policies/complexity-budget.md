@@ -44,6 +44,15 @@ and `packages/*/src`. It reported **zero violations** and **no affected
 functions** at maximum 50. The highest measured function complexity was 47 in
 `apps/api/src/modules/listing/listing.repo.ts`.
 
+### Ratchet 50 → 25
+
+The completed 25-threshold scan covered 785 in-scope production source files
+under `apps/*/src` and `packages/*/src`. The initial scan reported seven
+violations: `httpClient` (32), `LectureDetailScreen` (33),
+`ListingDetailScreen` (31), `ReviewSection` (35), `FeedListRow` (34),
+`arrangeCommit` (47), and `MetaDataSection` (30). After behavior-preserving
+refactoring, the scan reports **zero violations** at maximum 25.
+
 ## Exceptions
 
 Ordinary production violations require behavior-preserving refactoring.

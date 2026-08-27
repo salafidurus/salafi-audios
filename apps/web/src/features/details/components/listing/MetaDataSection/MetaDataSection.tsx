@@ -27,11 +27,72 @@ function formatDuration(seconds?: number): string {
   return `${m} min`;
 }
 
+function formatLanguage(
+  language: string | undefined,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  if (!language) return "";
+  if (language === "ar") return t("common.arabic", "Arabic");
+  if (language === "en") return t("common.english", "English");
+  return language;
+}
+
 export type MetaDataSectionProps = {
   listing: ListingDetailDto;
   layout?: "inline" | "sidebar";
   moduleCount?: number;
 };
+
+type MetadataViewModel = {
+  listing: ListingDetailDto;
+  duration: string;
+  language: string;
+  hasLessonCount: boolean;
+  moduleCount?: number;
+};
+
+type MetadataRowsProps = {
+  metadata: MetadataViewModel;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function MetadataRows({ metadata, t }: MetadataRowsProps) {
+  const { listing, duration, language, hasLessonCount, moduleCount } = metadata;
+  const hasModuleCount = moduleCount !== undefined;
+  const hasMeta = Boolean(duration || language || hasLessonCount || hasModuleCount);
+
+  return (
+    <div className={styles.metaRow}>
+      {listing.topics.length > 0 && <TopicChips topics={listing.topics} />}
+      {listing.topics.length > 0 && hasMeta && <span className={styles.dot}>•</span>}
+      {duration && (
+        <AppText variant="bodySm" color="muted">
+          {duration}
+        </AppText>
+      )}
+      {duration && (language || hasLessonCount || hasModuleCount) && (
+        <span className={styles.dot}>•</span>
+      )}
+      {language && (
+        <AppText variant="bodySm" color="muted">
+          {language}
+        </AppText>
+      )}
+      {language && (hasLessonCount || hasModuleCount) && <span className={styles.dot}>•</span>}
+      {hasLessonCount && (
+        <Badge variant="outline">
+          {listing.publishedLectureCount} {t("listing.lessons", "lessons")}
+        </Badge>
+      )}
+      {hasLessonCount && hasModuleCount && <span className={styles.dot}>•</span>}
+      {hasModuleCount && (
+        <Badge variant="secondary">
+          {moduleCount} {t("listing.modules", "modules")}
+        </Badge>
+      )}
+    </div>
+  );
+}
 
 export function MetaDataSection({ listing, layout = "inline", moduleCount }: MetaDataSectionProps) {
   const { t } = useTranslation();
@@ -40,18 +101,18 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
   const title = pickContentField(listing.title, listing.original?.title, showOriginal);
 
   const durationStr = formatDuration(listing.publishedDurationSeconds ?? listing.durationSeconds);
-  const languageLabel =
-    listing.language === "ar"
-      ? t("common.arabic", "Arabic")
-      : listing.language === "en"
-        ? t("common.english", "English")
-        : listing.language;
-  const hasModuleCount = moduleCount !== undefined;
+  const languageLabel = formatLanguage(listing.language, t);
   const hasLessonCount = listing.format !== "single" && listing.publishedLectureCount !== undefined;
-  const hasMeta = Boolean(durationStr || languageLabel || hasLessonCount || hasModuleCount);
   const scholarTitle = listing.scholar.title
     ? t(`scholar.title.${listing.scholar.title}`, listing.scholar.title)
     : undefined;
+  const metadata: MetadataViewModel = {
+    listing,
+    duration: durationStr,
+    language: languageLabel,
+    hasLessonCount,
+    moduleCount,
+  };
 
   return (
     <div className={cn(styles.container, layout === "sidebar" && styles.sidebar)}>
@@ -79,46 +140,7 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
 
         {listing.description && <p className={styles.description}>{listing.description}</p>}
 
-        {/* Row 3: Meta info (topics, duration, language) */}
-        <div className={styles.metaRow}>
-          {listing.topics.length > 0 && <TopicChips topics={listing.topics} />}
-
-          {listing.topics.length > 0 && hasMeta && <span className={styles.dot}>•</span>}
-
-          {durationStr && (
-            <AppText variant="bodySm" color="muted">
-              {durationStr}
-            </AppText>
-          )}
-
-          {durationStr && (languageLabel || hasLessonCount || hasModuleCount) && (
-            <span className={styles.dot}>•</span>
-          )}
-
-          {languageLabel && (
-            <AppText variant="bodySm" color="muted">
-              {languageLabel}
-            </AppText>
-          )}
-
-          {languageLabel && (hasLessonCount || hasModuleCount) && (
-            <span className={styles.dot}>•</span>
-          )}
-
-          {hasLessonCount && (
-            <Badge variant="outline">
-              {listing.publishedLectureCount} {t("listing.lessons", "lessons")}
-            </Badge>
-          )}
-
-          {hasLessonCount && hasModuleCount && <span className={styles.dot}>•</span>}
-
-          {hasModuleCount && (
-            <Badge variant="secondary">
-              {moduleCount} {t("listing.modules", "modules")}
-            </Badge>
-          )}
-        </div>
+        <MetadataRows metadata={metadata} t={t} />
       </div>
     </div>
   );

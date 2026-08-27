@@ -26,6 +26,119 @@ export type FeedListRowProps = {
   onPress?: () => void;
 };
 
+type FeedRowModel = {
+  item: FeedContentItemDto;
+  title: string;
+  scholarName: string;
+  initial: string;
+  durationText: string;
+  publishedDateText: string;
+  isMobile: boolean;
+};
+
+type FeedRowState = {
+  isCurrentTrack: boolean;
+  isPlaying: boolean;
+  isSaved: boolean;
+  isInProgress: boolean | undefined;
+  progressPercent: number;
+};
+
+type FeedRowActions = {
+  onPlay: (event: React.MouseEvent) => void;
+  onSave: (event: React.MouseEvent) => void;
+  onPress?: () => void;
+};
+
+type FeedListRowContentProps = {
+  model: FeedRowModel;
+  state: FeedRowState;
+  actions: FeedRowActions;
+};
+
+function FeedListRowContent({ model, state, actions }: FeedListRowContentProps) {
+  const { item, title, scholarName, initial, durationText, publishedDateText, isMobile } = model;
+  const { isCurrentTrack, isPlaying, isSaved, isInProgress, progressPercent } = state;
+  const { onPlay, onSave, onPress } = actions;
+  return (
+    <List.Item interactive className={styles.row} onClick={onPress}>
+      <div className={styles.container}>
+        <div className={styles.avatarSection}>
+          {item.thumbnailUrl ? (
+            <Image
+              src={item.thumbnailUrl}
+              alt={scholarName}
+              fill
+              sizes="(max-width: 640px) 20vw, 14vw"
+              className={styles.avatarImage}
+            />
+          ) : (
+            <div className={styles.avatarFallback} aria-hidden="true">
+              {initial}
+            </div>
+          )}
+        </div>
+        <div className={styles.centerSection}>
+          <MarqueeText
+            text={title}
+            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
+          />
+          <MarqueeText
+            text={scholarName}
+            className="text-[var(--content-muted)] font-normal [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
+          />
+          <div className={styles.meta}>
+            {durationText}
+            {durationText && publishedDateText && " · "}
+            {publishedDateText}
+          </div>
+        </div>
+      </div>
+      <List.Item.Actions>
+        <Button
+          variant="primary"
+          size={!isMobile ? "icon" : "sm"}
+          fullWidth={isMobile}
+          aria-label={isCurrentTrack && isPlaying ? "Pause lecture" : "Play lecture"}
+          icon={
+            isCurrentTrack && isPlaying ? (
+              <Pause size={16} fill="currentColor" />
+            ) : (
+              <Play size={16} fill="currentColor" />
+            )
+          }
+          onClick={onPlay}
+        >
+          {isMobile && (isCurrentTrack && isPlaying ? "Pause" : "Play")}
+        </Button>
+        <Button
+          variant={!isMobile ? "ghost" : "outline"}
+          size={!isMobile ? "sm" : "icon"}
+          fullWidth={isMobile}
+          aria-label={isSaved ? "Remove from saved" : "Save lecture"}
+          icon={<Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />}
+          onClick={onSave}
+        >
+          {isMobile && (isSaved ? "Saved" : "Save")}
+        </Button>
+      </List.Item.Actions>
+      {isInProgress && (
+        <div
+          className={styles.progressBarContainer}
+          aria-hidden="true"
+          data-testid="progress-bar-container"
+        >
+          <div
+            className={styles.progressBar}
+            style={{ width: `${progressPercent}%` }}
+            data-testid="progress-bar"
+          />
+        </div>
+      )}
+    </List.Item>
+  );
+}
+
 export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
@@ -98,86 +211,23 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
     day: "numeric",
   });
   const publishedDateText = item.publishedAt ? publishedDateFormatted : "";
+  const model: FeedRowModel = {
+    item,
+    title,
+    scholarName,
+    initial,
+    durationText,
+    publishedDateText,
+    isMobile,
+  };
+  const state: FeedRowState = {
+    isCurrentTrack,
+    isPlaying,
+    isSaved,
+    isInProgress,
+    progressPercent,
+  };
+  const actions: FeedRowActions = { onPlay: handlePlay, onSave: handleSave, onPress };
 
-  return (
-    <List.Item interactive className={styles.row} onClick={onPress}>
-      <div className={styles.container}>
-        <div className={styles.avatarSection}>
-          {item.thumbnailUrl ? (
-            <Image
-              src={item.thumbnailUrl}
-              alt={scholarName}
-              fill
-              sizes="(max-width: 640px) 20vw, 14vw"
-              className={styles.avatarImage}
-            />
-          ) : (
-            <div className={styles.avatarFallback} aria-hidden="true">
-              {initial}
-            </div>
-          )}
-        </div>
-
-        <div className={styles.centerSection}>
-          <MarqueeText
-            text={title}
-            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
-          />
-          <MarqueeText
-            text={scholarName}
-            className="text-[var(--content-muted)] font-normal [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
-          />
-          <div className={styles.meta}>
-            {durationText}
-            {durationText && publishedDateText && " · "}
-            {publishedDateText}
-          </div>
-        </div>
-      </div>
-
-      <List.Item.Actions>
-        <Button
-          variant="primary"
-          size={!isMobile ? "icon" : "sm"}
-          fullWidth={isMobile}
-          aria-label={isCurrentTrack && isPlaying ? "Pause lecture" : "Play lecture"}
-          icon={
-            isCurrentTrack && isPlaying ? (
-              <Pause size={16} fill="currentColor" />
-            ) : (
-              <Play size={16} fill="currentColor" />
-            )
-          }
-          onClick={handlePlay}
-        >
-          {isMobile && (isCurrentTrack && isPlaying ? "Pause" : "Play")}
-        </Button>
-
-        <Button
-          variant={!isMobile ? "ghost" : "outline"}
-          size={!isMobile ? "sm" : "icon"}
-          fullWidth={isMobile}
-          aria-label={isSaved ? "Remove from saved" : "Save lecture"}
-          icon={<Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />}
-          onClick={handleSave}
-        >
-          {isMobile && (isSaved ? "Saved" : "Save")}
-        </Button>
-      </List.Item.Actions>
-
-      {isInProgress && (
-        <div
-          className={styles.progressBarContainer}
-          aria-hidden="true"
-          data-testid="progress-bar-container"
-        >
-          <div
-            className={styles.progressBar}
-            style={{ width: `${progressPercent}%` }}
-            data-testid="progress-bar"
-          />
-        </div>
-      )}
-    </List.Item>
-  );
+  return <FeedListRowContent model={model} state={state} actions={actions} />;
 }
