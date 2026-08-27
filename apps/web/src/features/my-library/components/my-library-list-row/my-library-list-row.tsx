@@ -58,6 +58,35 @@ function rightLabelFor(
   return "";
 }
 
+function seriesProgressFor(item: MyLibraryItemDto, t: ReturnType<typeof useTranslation>["t"]) {
+  if (!item.totalLeafCount || item.totalLeafCount <= 0) return null;
+  return t("myLibrary.seriesProgress", "{{completed}} of {{total}} lessons", {
+    completed: item.completedLeafCount ?? 0,
+    total: item.totalLeafCount,
+  });
+}
+
+function renderProgress(
+  variant: MyLibraryListRowProps["variant"],
+  progress: number | null,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  if (variant !== "progress" || progress === null) return null;
+  return (
+    <Progress
+      value={progress}
+      className={styles.progressBar}
+      aria-label={t("myLibrary.progressLabel", "{{percent}}% listened", { percent: progress })}
+      data-testid="progress-bar"
+    />
+  );
+}
+
+function renderChevron(isRtl: boolean) {
+  const Chevron = isRtl ? ChevronLeft : ChevronRight;
+  return <Chevron className={styles.chevron} size={20} />;
+}
+
 export function MyLibraryListRow({ item, variant }: MyLibraryListRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
@@ -69,13 +98,7 @@ export function MyLibraryListRow({ item, variant }: MyLibraryListRowProps) {
 
   const progress = getMyLibraryItemPercent(item);
   const statusLabel = statusLabelFor(variant, t);
-  const seriesProgress =
-    item.totalLeafCount && item.totalLeafCount > 0
-      ? t("myLibrary.seriesProgress", "{{completed}} of {{total}} lessons", {
-          completed: item.completedLeafCount ?? 0,
-          total: item.totalLeafCount,
-        })
-      : null;
+  const seriesProgress = seriesProgressFor(item, t);
 
   const savedAtFormatted = useFormattedDate(item.savedAt || "", {
     year: "numeric",
@@ -121,16 +144,7 @@ export function MyLibraryListRow({ item, variant }: MyLibraryListRowProps) {
               <Badge variant={badgeVariantFor(variant)}>{statusLabel}</Badge>
             </div>
             {seriesProgress && <div className={styles.seriesProgress}>{seriesProgress}</div>}
-            {variant === "progress" && progress !== null && (
-              <Progress
-                value={progress}
-                className={styles.progressBar}
-                aria-label={t("myLibrary.progressLabel", "{{percent}}% listened", {
-                  percent: progress,
-                })}
-                data-testid="progress-bar"
-              />
-            )}
+            {renderProgress(variant, progress, t)}
           </div>
 
           <div className={styles.rightSection}>
@@ -139,11 +153,7 @@ export function MyLibraryListRow({ item, variant }: MyLibraryListRowProps) {
                 {rightLabelText}
               </span>
             )}
-            {isRtl ? (
-              <ChevronLeft className={styles.chevron} size={20} />
-            ) : (
-              <ChevronRight className={styles.chevron} size={20} />
-            )}
+            {renderChevron(isRtl)}
           </div>
         </Link>
       </CardContent>
