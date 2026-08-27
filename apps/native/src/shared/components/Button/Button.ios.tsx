@@ -68,6 +68,28 @@ function buildModifiers(
   return modifiers;
 }
 
+function renderButtonContent(
+  loading: boolean,
+  icon: React.ReactNode,
+  iconPosition: "left" | "right",
+  textModifiers: ModifierConfig[],
+  label: string,
+  indicatorColor: string,
+) {
+  if (loading) return <ActivityIndicator size="small" color={indicatorColor} />;
+  return (
+    <>
+      {icon && iconPosition === "left" ? icon : null}
+      <SwiftUIText modifiers={textModifiers}>{label}</SwiftUIText>
+      {icon && iconPosition === "right" ? icon : null}
+    </>
+  );
+}
+
+function resolveDisabled(disabled: boolean | undefined, loading: boolean) {
+  return disabled || loading;
+}
+
 export function Button({
   variant = "surface",
   size = "md",
@@ -82,7 +104,7 @@ export function Button({
   testID,
 }: ButtonProps) {
   const { theme } = useUnistyles();
-  const isDisabled = disabled || loading;
+  const isDisabled = resolveDisabled(disabled, loading);
   const t = getButtonTokens(variant, size, theme);
 
   // "plain" has no built-in chrome — "filled"/"bordered" would paint their own
@@ -95,18 +117,10 @@ export function Button({
   ];
 
   return (
-    <Host matchContents={!fullWidth} style={[fullWidth && base.stretch, style]}>
+    <Host matchContents={!fullWidth} style={[fullWidth ? base.stretch : null, style]}>
       <SwiftUIButton onPress={onPress} modifiers={modifiers} testID={testID}>
         <HStack spacing={t.gap} alignment="center">
-          {loading ? (
-            <ActivityIndicator size="small" color={t.indicatorColor} />
-          ) : (
-            <>
-              {icon && iconPosition === "left" ? icon : null}
-              <SwiftUIText modifiers={textModifiers}>{label}</SwiftUIText>
-              {icon && iconPosition === "right" ? icon : null}
-            </>
-          )}
+          {renderButtonContent(loading, icon, iconPosition, textModifiers, label, t.indicatorColor)}
         </HStack>
       </SwiftUIButton>
     </Host>
