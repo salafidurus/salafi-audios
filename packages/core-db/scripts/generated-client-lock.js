@@ -47,4 +47,8 @@ async function withGeneratedClientLock(lockPath, operation) {
   }
 }
 
-module.exports = { withGeneratedClientLock };
+function getGeneratedClientLockPath(packageRoot) {
+  return path.join(packageRoot, ".generated-prisma.lock");
+}
+
+module.exports = { getGeneratedClientLockPath, withGeneratedClientLock };

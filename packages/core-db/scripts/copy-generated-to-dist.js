@@ -2,7 +2,10 @@
 
 const path = require("path");
 const fs = require("fs/promises");
-const { withGeneratedClientLock } = require("./generated-client-lock.js");
+const {
+  getGeneratedClientLockPath,
+  withGeneratedClientLock,
+} = require("./generated-client-lock.js");
 
 async function copyGeneratedClient(pkgRoot) {
   const src = path.join(pkgRoot, "src", "generated", "prisma");
@@ -16,8 +19,7 @@ async function copyGeneratedClient(pkgRoot) {
 
 async function main() {
   const pkgRoot = path.join(__dirname, "..");
-  const distRoot = path.join(pkgRoot, "dist");
-  const lockPath = path.join(distRoot, ".generated-prisma.lock");
+  const lockPath = getGeneratedClientLockPath(pkgRoot);
 
   await withGeneratedClientLock(lockPath, () => copyGeneratedClient(pkgRoot));
 }

@@ -2,18 +2,15 @@ const path = require("path");
 const { spawn } = require("child_process");
 
 const { copyGeneratedClient } = require("./copy-generated-to-dist.js");
+const { runPrismaGenerate } = require("./generate-prisma.js");
 const {
   getGeneratedClientLockPath,
   withGeneratedClientLock,
 } = require("./generated-client-lock.js");
 
-function runPrismaGenerate(pkgRoot) {
+function runCommand(command, args, cwd) {
   return new Promise((resolve, reject) => {
-    const child = spawn(
-      path.join(pkgRoot, "node_modules", ".bin", "prisma"),
-      ["generate", "--schema=./prisma/schema.prisma", "--config=./prisma.config.ts"],
-      { cwd: pkgRoot, stdio: "inherit" },
-    );
+    const child = spawn(command, args, { cwd, stdio: "inherit" });
 
     child.once("error", reject);
     child.once("exit", (code, signal) => {
@@ -22,7 +19,7 @@ function runPrismaGenerate(pkgRoot) {
         return;
       }
 
-      reject(new Error(`Prisma generation failed with ${signal ?? `exit code ${code}`}`));
+      reject(new Error(`${command} failed with ${signal ?? `exit code ${code}`}`));
     });
   });
 }
@@ -33,7 +30,13 @@ async function main() {
 
   await withGeneratedClientLock(lockPath, async () => {
     await runPrismaGenerate(pkgRoot);
+    await runCommand(
+      process.execPath,
+      ["run", "tsup", "src/index.ts", "--format", "esm,cjs", "--out-dir", "dist"],
+      pkgRoot,
+    );
     await copyGeneratedClient(pkgRoot);
+    await runCommand(process.execPath, ["run", "tsc", "-p", "tsconfig.build.json"], pkgRoot);
   });
 }
 
@@ -43,5 +46,3 @@ if (require.main === module) {
     process.exitCode = 1;
   });
 }
-
-module.exports = { runPrismaGenerate };
