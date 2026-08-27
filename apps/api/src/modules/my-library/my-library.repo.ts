@@ -2,6 +2,7 @@ import { Injectable, Optional } from '@nestjs/common';
 import { Prisma } from '@sd/core-db';
 import type {
   Locale,
+  ListingFormat,
   MyLibraryItemDto,
   RecentProgressDto,
   ListingProgressSummaryDto,
@@ -25,7 +26,7 @@ type RecentParent = {
   id: string;
   title: string;
   slug: string;
-  format: string;
+  format: ListingFormat;
   language: Locale | null;
   translations: { title: string }[];
   coverImageUrl: string | null;
@@ -37,7 +38,7 @@ type RecentProgressRecord = {
   listing: {
     title: string;
     slug: string;
-    format: string;
+    format: ListingFormat;
     orderIndex: number | null;
     publishedLectureCount: number | null;
     language: Locale | null;
@@ -289,23 +290,24 @@ export class MyLibraryRepository {
     const listingById = new Map(listings.map((l) => [l.id, l]));
     const leafById = new Map(records.map((r) => [r.listingId, r]));
 
-    const items: MyLibraryItemDto[] = [];
-    for (const { topLevelId, latestUpdatedAt, summary } of page) {
+    const items = page.flatMap(({ topLevelId, latestUpdatedAt, summary }) => {
       const listing = listingById.get(topLevelId);
-      if (!listing || !summary) continue;
+      if (!listing || !summary) return [];
 
       const leafRecord = summary.totalCount <= 1 ? leafById.get(topLevelId) : undefined;
 
-      items.push({
-        id: `${userId}-${topLevelId}`,
-        listingId: topLevelId,
-        ...this.resolveListingRelation(listing, locale),
-        progressSeconds: leafRecord?.positionSeconds,
-        totalLeafCount: summary.totalCount,
-        completedLeafCount: summary.completedCount,
-        completedAt: onlyCompleted ? latestUpdatedAt.toISOString() : undefined,
-      });
-    }
+      return [
+        {
+          id: `${userId}-${topLevelId}`,
+          listingId: topLevelId,
+          ...this.resolveListingRelation(listing, locale),
+          progressSeconds: leafRecord?.positionSeconds,
+          totalLeafCount: summary.totalCount,
+          completedLeafCount: summary.completedCount,
+          completedAt: onlyCompleted ? latestUpdatedAt.toISOString() : undefined,
+        },
+      ];
+    });
 
     return { items, nextCursor };
   }
