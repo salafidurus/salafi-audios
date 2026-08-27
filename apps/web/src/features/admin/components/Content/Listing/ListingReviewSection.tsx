@@ -48,13 +48,9 @@ function getReviewChanges(state: FormState): ReviewChanges {
   };
 }
 
-type ReviewSectionProps = ReviewChanges & {
+type MainChangesProps = Pick<ReviewChanges, "titleChanged" | "descriptionChanged"> & {
   title: string;
   description: string;
-  status: string;
-  orderIndex: number | null;
-  language: Locale;
-  topicNames: string[];
   mainLocale: Locale;
   t: ReturnType<typeof useTranslation>["t"];
 };
@@ -66,7 +62,7 @@ function MainChanges({
   descriptionChanged,
   mainLocale,
   t,
-}: ReviewSectionProps) {
+}: MainChangesProps) {
   if (!titleChanged && !descriptionChanged) return null;
   return (
     <div style={{ marginBottom: "1.5rem" }}>
@@ -88,6 +84,17 @@ function MainChanges({
   );
 }
 
+type DetailChangesProps = {
+  status: string;
+  orderIndex: number | null;
+  language: Locale;
+  topicNames: string[];
+  t: ReturnType<typeof useTranslation>["t"];
+} & Pick<
+  ReviewChanges,
+  "statusChanged" | "orderIndexChanged" | "languageChanged" | "coverImageChanged" | "topicsChanged"
+>;
+
 function DetailChanges({
   status,
   orderIndex,
@@ -99,7 +106,7 @@ function DetailChanges({
   coverImageChanged,
   topicsChanged,
   t,
-}: ReviewSectionProps) {
+}: DetailChangesProps) {
   if (
     !statusChanged &&
     !orderIndexChanged &&
@@ -157,6 +164,7 @@ export function ListingReviewSection({ state, mainLocale, topics }: ListingRevie
   // showing them as pending changes on create would be misleading. language,
   // topics, and coverImage ARE part of the create payload, so those are
   // shown whenever they've been set, mirroring how the title is handled.
+  const changes = getReviewChanges(state);
   const {
     titleChanged,
     descriptionChanged,
@@ -165,7 +173,7 @@ export function ListingReviewSection({ state, mainLocale, topics }: ListingRevie
     languageChanged,
     coverImageChanged,
     topicsChanged,
-  } = getReviewChanges(state);
+  } = changes;
 
   const hasMainChanges = titleChanged || descriptionChanged;
   const hasDetailChanges =
@@ -198,22 +206,20 @@ export function ListingReviewSection({ state, mainLocale, topics }: ListingRevie
         description={description}
         mainLocale={mainLocale}
         t={t}
-        {...getReviewChanges(state)}
-        language={language}
-        status={status}
-        orderIndex={orderIndex}
-        topicNames={topicNames}
+        titleChanged={changes.titleChanged}
+        descriptionChanged={changes.descriptionChanged}
       />
       <DetailChanges
-        title={title}
-        description={description}
-        mainLocale={mainLocale}
         t={t}
         language={language}
         status={status}
         orderIndex={orderIndex}
         topicNames={topicNames}
-        {...getReviewChanges(state)}
+        statusChanged={changes.statusChanged}
+        orderIndexChanged={changes.orderIndexChanged}
+        languageChanged={changes.languageChanged}
+        coverImageChanged={changes.coverImageChanged}
+        topicsChanged={changes.topicsChanged}
       />
     </div>
   );
