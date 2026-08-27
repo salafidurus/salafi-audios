@@ -44,6 +44,57 @@ function isListingModalTab(id: string): id is "general" | "main" | "sublistings"
   return id === "general" || id === "main" || id === "sublistings" || id === "review";
 }
 
+function hasSublistings(state: ReturnType<typeof useListingForm>["state"]): boolean {
+  return state.isEditing && Boolean(state.id) && state.format !== "single";
+}
+
+function getListingModalTitle(
+  state: ReturnType<typeof useListingForm>["state"],
+  isDesktop: boolean,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  if (!state.isEditing) return t("admin.contents.listing.newTitle", "New Listing Details");
+  const suffix = isDesktop && state.title ? ` (${state.title})` : "";
+  return `${t("admin.contents.listing.editTitle", "Edit Listing Details")}${suffix}`;
+}
+
+function toggleTopic(selectedTopics: string[], topicId: string): string[] {
+  return selectedTopics.includes(topicId)
+    ? selectedTopics.filter((id) => id !== topicId)
+    : [...selectedTopics, topicId];
+}
+
+function ListingModalFooter({
+  activeTab,
+  saving,
+  onClose,
+  onReview,
+  t,
+}: {
+  activeTab: string;
+  saving: boolean;
+  onClose: () => void;
+  onReview: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <DialogFooter>
+      <Button variant="outline" size="sm" onClick={onClose} disabled={saving}>
+        {t("common.cancel", "Cancel")}
+      </Button>
+      {activeTab === "review" ? (
+        <Button type="submit" form="lecture-form" variant="primary" loading={saving}>
+          {saving ? t("admin.access.saving", "Saving…") : t("common.save", "Save")}
+        </Button>
+      ) : (
+        <Button type="button" variant="primary" onClick={onReview}>
+          {t("admin.modal.reviewTab", "Review")}
+        </Button>
+      )}
+    </DialogFooter>
+  );
+}
+
 export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingModalProps) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
@@ -106,9 +157,7 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
     dispatch({
       type: "UPDATE_FIELD",
       field: "selectedTopics",
-      value: selectedTopics.includes(topicId)
-        ? selectedTopics.filter((id) => id !== topicId)
-        : [...selectedTopics, topicId],
+      value: toggleTopic(selectedTopics, topicId),
     });
   };
 
@@ -140,17 +189,13 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
   // SAFETY: listing form state stores only supported locale values for the main content language.
   const mainLocale = (state.language || "ar") as Locale;
   const errorTabSet = new Set(errorTabs);
-  const showSublistingsTab = state.isEditing && !!state.id && state.format !== "single";
+  const showSublistingsTab = hasSublistings(state);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && !state.saving && handleClose()}>
       <DialogContent className="max-h-[calc(100vh-2rem)] overflow-hidden sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>
-            {state.isEditing
-              ? `${t("admin.contents.listing.editTitle", "Edit Listing Details")}${isDesktop && state.title ? ` (${state.title})` : ""}`
-              : t("admin.contents.listing.newTitle", "New Listing Details")}
-          </DialogTitle>
+          <DialogTitle>{getListingModalTitle(state, isDesktop, t)}</DialogTitle>
           <DialogDescription className="sr-only">
             {t("admin.modal.formDescription", "Complete each tab before saving.")}
           </DialogDescription>
@@ -271,20 +316,13 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
             </TabsContent>
           </Tabs>
 
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={handleClose} disabled={state.saving}>
-              {t("common.cancel", "Cancel")}
-            </Button>
-            {activeTab === "review" ? (
-              <Button type="submit" form="lecture-form" variant="primary" loading={state.saving}>
-                {state.saving ? t("admin.access.saving", "Saving…") : t("common.save", "Save")}
-              </Button>
-            ) : (
-              <Button type="button" variant="primary" onClick={() => setActiveTab("review")}>
-                {t("admin.modal.reviewTab", "Review")}
-              </Button>
-            )}
-          </DialogFooter>
+          <ListingModalFooter
+            activeTab={activeTab}
+            saving={state.saving}
+            onClose={handleClose}
+            onReview={() => setActiveTab("review")}
+            t={t}
+          />
         </form>
       </DialogContent>
     </Dialog>
