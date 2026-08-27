@@ -121,6 +121,118 @@ const targetRowConfigs: TargetRowConfig[] = [
   },
 ];
 
+interface AccessDialogBodyProps {
+  snapshot?: UserAccessSnapshot;
+  error?: string;
+  saving: boolean;
+  targetIsSuperadmin: boolean;
+  currentUserIsSuperadmin?: boolean;
+  uiState: UiState;
+  scholarOptions: { slug: string; name: string }[];
+  onToggleTarget: (target: AccessTarget, enabled: boolean) => void;
+  onToggleCapability: (
+    target: AccessTarget,
+    capability: AccessCapability,
+    checked: boolean,
+  ) => void;
+  onUpdateScope: (
+    target: AccessTarget,
+    field: "scholarSlugs" | "locales",
+    values: string[],
+  ) => void;
+  onToggleSuperadmin: (enabled: boolean) => void;
+}
+
+function AccessDialogBody({
+  snapshot,
+  error,
+  saving,
+  targetIsSuperadmin,
+  currentUserIsSuperadmin,
+  uiState,
+  scholarOptions,
+  onToggleTarget,
+  onToggleCapability,
+  onUpdateScope,
+  onToggleSuperadmin,
+}: AccessDialogBodyProps) {
+  const showProtectedWarning = snapshot?.isSuperadmin && !currentUserIsSuperadmin;
+
+  return (
+    <Modal.Body className={styles.body}>
+      {error && (
+        <Alert variant="destructive" className={styles.error}>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      {!snapshot ? (
+        <p className={styles.loading}>Loading access…</p>
+      ) : showProtectedWarning ? (
+        <p className={styles.emptyText}>
+          Superadmin access is protected and cannot be edited here.
+        </p>
+      ) : (
+        <div className={styles.container}>
+          <RolesBanner roles={getPreviewRoles(uiState, targetIsSuperadmin)} />
+
+          {currentUserIsSuperadmin && (
+            <div className={styles.row}>
+              <div className={styles.rowHeader}>
+                <div className={styles.rowMeta}>
+                  <div className={styles.rowLabelSection}>
+                    <span className={styles.rowTitle}>Super Admin (Full Access)</span>
+                    <span className={styles.rowDesc}>
+                      Grants unrestricted administrative access to the entire platform. Superadmins
+                      can modify other administrators and manage global system settings.
+                    </span>
+                  </div>
+                </div>
+                <Toggle
+                  checked={targetIsSuperadmin}
+                  onChange={onToggleSuperadmin}
+                  disabled={saving}
+                  aria-label="Toggle super admin access"
+                />
+              </div>
+            </div>
+          )}
+
+          {currentUserIsSuperadmin && <Separator />}
+
+          {targetRowConfigs.map((config, index) => {
+            const targetState = uiState[config.target];
+            return (
+              <Fragment key={config.target}>
+                <PermissionRow
+                  key={`${config.target}-${targetState.enabled}`}
+                  title={config.title}
+                  description={config.description}
+                  target={config.target}
+                  enabled={targetState.enabled}
+                  capabilities={capabilitiesList(config.target)}
+                  selectedCapabilities={targetState.capabilities}
+                  scholarOptions={scholarOptions}
+                  selectedScholars={targetState.scholarSlugs}
+                  localeOptions={SUPPORTED_LOCALES}
+                  selectedLocales={targetState.locales}
+                  saving={saving}
+                  onToggleTarget={(checked) => onToggleTarget(config.target, checked)}
+                  onToggleCapability={(cap, checked) =>
+                    onToggleCapability(config.target, cap, checked)
+                  }
+                  onUpdateScholars={(slugs) => onUpdateScope(config.target, "scholarSlugs", slugs)}
+                  onUpdateLocales={(locales) => onUpdateScope(config.target, "locales", locales)}
+                />
+                {index < targetRowConfigs.length - 1 && <Separator />}
+              </Fragment>
+            );
+          })}
+        </div>
+      )}
+    </Modal.Body>
+  );
+}
+
 export function AccessDialog({
   userId,
   userName,
@@ -272,8 +384,6 @@ export function AccessDialog({
     }
   };
 
-  const showProtectedWarning = snapshot?.isSuperadmin && !currentUserIsSuperadmin;
-
   const scholarOptions = allScholars.map((s) => ({
     slug: s.slug,
     name: formatScholarName(s),
@@ -297,83 +407,19 @@ export function AccessDialog({
         </div>
       }
     >
-      <Modal.Body className={styles.body}>
-        {error && (
-          <Alert variant="destructive" className={styles.error}>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        {!snapshot ? (
-          <p className={styles.loading}>Loading access…</p>
-        ) : showProtectedWarning ? (
-          <p className={styles.emptyText}>
-            Superadmin access is protected and cannot be edited here.
-          </p>
-        ) : (
-          <div className={styles.container}>
-            <RolesBanner roles={getPreviewRoles(uiState, targetIsSuperadmin)} />
-
-            {/* Superadmin toggle row */}
-            {currentUserIsSuperadmin && (
-              <div className={styles.row}>
-                <div className={styles.rowHeader}>
-                  <div className={styles.rowMeta}>
-                    <div className={styles.rowLabelSection}>
-                      <span className={styles.rowTitle}>Super Admin (Full Access)</span>
-                      <span className={styles.rowDesc}>
-                        Grants unrestricted administrative access to the entire platform.
-                        Superadmins can modify other administrators and manage global system
-                        settings.
-                      </span>
-                    </div>
-                  </div>
-                  <Toggle
-                    checked={targetIsSuperadmin}
-                    onChange={setTargetIsSuperadmin}
-                    disabled={saving}
-                    aria-label="Toggle super admin access"
-                  />
-                </div>
-              </div>
-            )}
-
-            {currentUserIsSuperadmin && <Separator />}
-
-            {targetRowConfigs.map((config, index) => {
-              const targetState = uiState[config.target];
-              return (
-                <Fragment key={config.target}>
-                  <PermissionRow
-                    key={`${config.target}-${targetState.enabled}`}
-                    title={config.title}
-                    description={config.description}
-                    target={config.target}
-                    enabled={targetState.enabled}
-                    capabilities={capabilitiesList(config.target)}
-                    selectedCapabilities={targetState.capabilities}
-                    scholarOptions={scholarOptions}
-                    selectedScholars={targetState.scholarSlugs}
-                    localeOptions={SUPPORTED_LOCALES}
-                    selectedLocales={targetState.locales}
-                    saving={saving}
-                    onToggleTarget={(checked) => handleToggleTarget(config.target, checked)}
-                    onToggleCapability={(cap, checked) =>
-                      handleToggleCapability(config.target, cap, checked)
-                    }
-                    onUpdateScholars={(slugs) =>
-                      handleUpdateScope(config.target, "scholarSlugs", slugs)
-                    }
-                    onUpdateLocales={(locales) =>
-                      handleUpdateScope(config.target, "locales", locales)
-                    }
-                  />
-                  {index < targetRowConfigs.length - 1 && <Separator />}
-                </Fragment>
-              );
-            })}
-          </div>
-        )}
-      </Modal.Body>
+      <AccessDialogBody
+        snapshot={snapshot}
+        error={error}
+        saving={saving}
+        targetIsSuperadmin={targetIsSuperadmin}
+        currentUserIsSuperadmin={currentUserIsSuperadmin}
+        uiState={uiState}
+        scholarOptions={scholarOptions}
+        onToggleTarget={handleToggleTarget}
+        onToggleCapability={handleToggleCapability}
+        onUpdateScope={handleUpdateScope}
+        onToggleSuperadmin={setTargetIsSuperadmin}
+      />
     </Modal>
   );
 }
