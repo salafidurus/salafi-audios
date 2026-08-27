@@ -2008,6 +2008,13 @@ export class ListingRepository {
       return toPublicUrl(value);
     };
 
+    const getListingMetrics = (l: any) => ({
+      durationSeconds:
+        l.format === 'single' ? (l.durationSeconds ?? 0) : (l.publishedDurationSeconds ?? 0),
+      thumbnailUrl: l.format === 'single' ? null : toOptionalPublicUrl(l.coverImageUrl),
+      publishedLectureCount: l.format === 'single' ? 1 : (l.publishedLectureCount ?? 1),
+    });
+
     const mapListing = (l: any) => {
       const resolved = resolveContentTranslation({
         base: { title: l.title },
@@ -2022,10 +2029,7 @@ export class ListingRepository {
         publishedTranslation: l.scholar!.translations[0] ?? null,
       }).fields.name;
 
-      const durationSeconds =
-        l.format === 'single' ? (l.durationSeconds ?? 0) : (l.publishedDurationSeconds ?? 0);
-      const thumbnailUrl = l.format === 'single' ? null : toOptionalPublicUrl(l.coverImageUrl);
-      const publishedLectureCount = l.format === 'single' ? 1 : (l.publishedLectureCount ?? 1);
+      const { durationSeconds, thumbnailUrl, publishedLectureCount } = getListingMetrics(l);
 
       return {
         // SAFETY: listing formats are constrained by the shared listing schema to these three values.
