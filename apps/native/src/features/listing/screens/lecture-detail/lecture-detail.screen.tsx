@@ -103,6 +103,94 @@ type LoadedLectureView = {
   onSave: () => void;
 };
 
+function LectureActions({
+  isCurrentTrack,
+  isPlaying,
+  isSaved,
+  theme,
+  onPlay,
+  onSave,
+}: Pick<
+  LoadedLectureView,
+  "isCurrentTrack" | "isPlaying" | "isSaved" | "theme" | "onPlay" | "onSave"
+>) {
+  return (
+    <View style={styles.actionsRow}>
+      <View style={styles.actionBtnWrapper}>
+        <Button
+          variant="primary"
+          size="md"
+          label={isCurrentTrack && isPlaying ? "Pause" : "Play"}
+          icon={
+            isCurrentTrack && isPlaying ? (
+              <Pause size={18} color={theme.colors.content.onPrimary} />
+            ) : (
+              <Play size={18} color={theme.colors.content.onPrimary} />
+            )
+          }
+          onPress={onPlay}
+        />
+      </View>
+      <View style={styles.actionBtnWrapper}>
+        <Button
+          variant="surface"
+          size="md"
+          label={isSaved ? "Saved" : "Save"}
+          icon={
+            <Bookmark
+              size={18}
+              color={isSaved ? theme.colors.action.primary : theme.colors.content.strong}
+              fill={isSaved ? theme.colors.action.primary : "none"}
+            />
+          }
+          onPress={onSave}
+        />
+      </View>
+    </View>
+  );
+}
+
+function getLectureStateView(
+  isFetching: boolean,
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+  t: (key: string, fallback: string) => string,
+) {
+  if (isFetching || lecture?.rootListing) {
+    return (
+      <ScreenView center>
+        <EmptyState message={t("lecture.loading", "Loading lecture…")} variant="loading" />
+      </ScreenView>
+    );
+  }
+  if (!lecture) {
+    return (
+      <ScreenView center>
+        <EmptyState message={t("lecture.notFound", "Lecture not found")} variant="error" />
+      </ScreenView>
+    );
+  }
+  return null;
+}
+
+function isContainerLecture(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+): boolean {
+  return lecture?.format === "series" || lecture?.format === "collection";
+}
+
+function getOwnContentsSlug(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+): string {
+  return isContainerLecture(lecture) ? (lecture?.slug ?? "") : "";
+}
+
+function isCurrentLectureTrack(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+  currentTrack: Track | null,
+): boolean {
+  return lecture !== undefined && currentTrack?.slug === lecture.slug;
+}
+
 function LoadedLectureBody({ view }: { view: LoadedLectureView }) {
   const {
     lecture,
@@ -157,38 +245,14 @@ function LoadedLectureBody({ view }: { view: LoadedLectureView }) {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <AppText variant="titleLg">{title}</AppText>
         <LectureMeta lecture={lecture} />
-        <View style={styles.actionsRow}>
-          <View style={styles.actionBtnWrapper}>
-            <Button
-              variant="primary"
-              size="md"
-              label={isCurrentTrack && isPlaying ? "Pause" : "Play"}
-              icon={
-                isCurrentTrack && isPlaying ? (
-                  <Pause size={18} color={theme.colors.content.onPrimary} />
-                ) : (
-                  <Play size={18} color={theme.colors.content.onPrimary} />
-                )
-              }
-              onPress={onPlay}
-            />
-          </View>
-          <View style={styles.actionBtnWrapper}>
-            <Button
-              variant="surface"
-              size="md"
-              label={isSaved ? "Saved" : "Save"}
-              icon={
-                <Bookmark
-                  size={18}
-                  color={isSaved ? theme.colors.action.primary : theme.colors.content.strong}
-                  fill={isSaved ? theme.colors.action.primary : "none"}
-                />
-              }
-              onPress={onSave}
-            />
-          </View>
-        </View>
+        <LectureActions
+          isCurrentTrack={isCurrentTrack}
+          isPlaying={isPlaying}
+          isSaved={isSaved}
+          theme={theme}
+          onPlay={onPlay}
+          onSave={onSave}
+        />
         <DownloadProgress listingSlug={lecture.slug} />
         {lecture.primaryAudioAsset?.url ? (
           <DownloadButton listingSlug={lecture.slug} audioUrl={lecture.primaryAudioAsset.url} />
@@ -212,13 +276,12 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { anchor } = useLocalSearchParams<{ slug: string; anchor?: string }>();
   const { data: lecture, isFetching } = useListingDetail(slug);
   const { data: seriesContents } = useListingContents(lecture?.seriesContext?.seriesSlug ?? "");
-  const isContainer = lecture?.format === "series" || lecture?.format === "collection";
-  const { data: ownContents } = useListingContents(isContainer ? lecture!.slug : "");
+  const { data: ownContents } = useListingContents(getOwnContentsSlug(lecture));
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
 
   const { isPlaying, currentTrack } = useAudio();
-  const isCurrentTrack = lecture ? currentTrack?.slug === lecture.slug : false;
+  const isCurrentTrack = isCurrentLectureTrack(lecture, currentTrack);
 
   const isSaved = useIsSaved(lecture?.id ?? "");
 
@@ -231,29 +294,10 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
     }
   }, [lecture]);
 
-  if (isFetching) {
-    return (
-      <ScreenView center>
-        <EmptyState message={t("lecture.loading", "Loading lecture…")} variant="loading" />
-      </ScreenView>
-    );
-  }
+  const lectureStateView = getLectureStateView(isFetching, lecture, t);
+  if (lectureStateView) return lectureStateView;
 
-  if (!lecture) {
-    return (
-      <ScreenView center>
-        <EmptyState message={t("lecture.notFound", "Lecture not found")} variant="error" />
-      </ScreenView>
-    );
-  }
-
-  if (lecture.rootListing) {
-    return (
-      <ScreenView center>
-        <EmptyState message={t("lecture.loading", "Loading lecture…")} variant="loading" />
-      </ScreenView>
-    );
-  }
+  if (!lecture) return null;
 
   const title = pickContentField(lecture.title, lecture.original?.title, showOriginal);
   const description = lecture.description
