@@ -9,6 +9,8 @@ import {
   ROOT_MODULE_KEY,
   localSlugConflicts,
   useUploadArrangeState,
+  type UploadArrangeAction,
+  type UploadArrangeState,
 } from "@/features/admin/hooks/Content/useUploadArrangeState";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -73,6 +75,69 @@ function ArrangeFooter({ activeTab, busy, savingLabel, onClose, onReview, t }: A
   );
 }
 
+function handleArrangeSubmit(
+  event: React.FormEvent,
+  state: UploadArrangeState,
+  busy: boolean,
+  conflicts: string[],
+  unassignedCount: number,
+  dispatch: React.Dispatch<UploadArrangeAction>,
+  setActiveTab: (tab: "upload" | "arrange" | "review") => void,
+  runCommit: () => Promise<void> | void,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  event.preventDefault();
+  if (busy || !state.existing) return;
+  if (state.items.length === 0) {
+    dispatch({
+      type: "SET_ERROR",
+      error: t("admin.contents.listing.noFilesStaged", "Add at least one audio file first."),
+    });
+    setActiveTab("upload");
+    return;
+  }
+  if (conflicts.length > 0) {
+    dispatch({
+      type: "SET_ERROR",
+      error: t(
+        "admin.contents.listing.resolveConflicts",
+        "Resolve the slug conflicts in the Arrange tab first.",
+      ),
+    });
+    setActiveTab("arrange");
+    return;
+  }
+  if (unassignedCount > 0) {
+    dispatch({
+      type: "SET_ERROR",
+      error: t(
+        "admin.contents.listing.resolveUnassigned",
+        "Assign every file to a module in the Arrange tab first.",
+      ),
+    });
+    setActiveTab("arrange");
+    return;
+  }
+  void runCommit();
+}
+
+function getUnassignedCount(state: UploadArrangeState): number {
+  if (state.existing?.format !== "collection") return 0;
+  return state.items.filter(
+    (item) =>
+      item.assignment.kind === "new-lesson" && item.assignment.moduleKey === ROOT_MODULE_KEY,
+  ).length;
+}
+
+function getArrangeTitle(
+  state: UploadArrangeState,
+  isDesktop: boolean,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  const title = t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange");
+  return state.existing && isDesktop ? `${title} (${state.existing.title})` : title;
+}
+
 export function ListingUploadArrangeModal({
   isOpen,
   onClose,
@@ -104,52 +169,10 @@ export function ListingUploadArrangeModal({
   const runCommit = useUploadArrangeCommit(state, dispatch, onSuccess);
 
   const conflicts = localSlugConflicts(state);
-  const unassignedCount =
-    state.existing?.format === "collection"
-      ? state.items.filter(
-          (item) =>
-            item.assignment.kind === "new-lesson" && item.assignment.moduleKey === ROOT_MODULE_KEY,
-        ).length
-      : 0;
+  const unassignedCount = getUnassignedCount(state);
 
   const busy =
     state.phase === "presigning" || state.phase === "uploading" || state.phase === "committing";
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (busy || !state.existing) return;
-    if (state.items.length === 0) {
-      dispatch({
-        type: "SET_ERROR",
-        error: t("admin.contents.listing.noFilesStaged", "Add at least one audio file first."),
-      });
-      setActiveTab("upload");
-      return;
-    }
-    if (conflicts.length > 0) {
-      dispatch({
-        type: "SET_ERROR",
-        error: t(
-          "admin.contents.listing.resolveConflicts",
-          "Resolve the slug conflicts in the Arrange tab first.",
-        ),
-      });
-      setActiveTab("arrange");
-      return;
-    }
-    if (unassignedCount > 0) {
-      dispatch({
-        type: "SET_ERROR",
-        error: t(
-          "admin.contents.listing.resolveUnassigned",
-          "Assign every file to a module in the Arrange tab first.",
-        ),
-      });
-      setActiveTab("arrange");
-      return;
-    }
-    void runCommit();
-  };
 
   const savingLabel =
     state.phase === "committing"
@@ -165,11 +188,7 @@ export function ListingUploadArrangeModal({
     <Dialog open={isOpen} onOpenChange={(open) => !open && !busy && onClose()}>
       <DialogContent className="max-h-[calc(100vh-2rem)] overflow-hidden sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>
-            {state.existing && isDesktop
-              ? `${t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange")} (${state.existing.title})`
-              : t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange")}
-          </DialogTitle>
+          <DialogTitle>{getArrangeTitle(state, isDesktop, t)}</DialogTitle>
           <DialogDescription className="sr-only">
             {t("admin.modal.formDescription", "Complete each tab before saving.")}
           </DialogDescription>
@@ -177,7 +196,19 @@ export function ListingUploadArrangeModal({
 
         <form
           id="listing-upload-arrange-form"
-          onSubmit={handleSubmit}
+          onSubmit={(event) =>
+            handleArrangeSubmit(
+              event,
+              state,
+              busy,
+              conflicts,
+              unassignedCount,
+              dispatch,
+              setActiveTab,
+              runCommit,
+              t,
+            )
+          }
           className={`${styles.form} min-h-0 flex-1`}
         >
           <Tabs
