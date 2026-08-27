@@ -15,49 +15,71 @@ type DashboardUser = AbilityInput & { id: string };
 
 const CONTENT_ACTIONS: AppActions[] = ['read', 'write', 'publish', 'delete'];
 
+function buildDashboardMetrics(values: {
+  scholars: number | undefined;
+  listings: number | undefined;
+  topics: number | undefined;
+  users: number | undefined;
+}): AdminDashboardDto['metrics'] {
+  const metrics: AdminDashboardDto['metrics'] = {};
+  if (values.scholars !== undefined) metrics.scholars = values.scholars;
+  if (values.listings !== undefined) metrics.listings = values.listings;
+  if (values.topics !== undefined) metrics.topics = values.topics;
+  if (values.users !== undefined) metrics.users = values.users;
+  return metrics;
+}
+
 @Injectable()
 export class AdminDashboardService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getDashboard(user: DashboardUser): Promise<AdminDashboardDto> {
     const ability = defineAbilityFor(user);
+    const access = this.dashboardAccess(ability);
+    this.assertDashboardAccess(access);
+    return this.loadDashboard(access);
+  }
+
+  private dashboardAccess(ability: AppAbility) {
     const scholarScope = this.scopeFor(ability, 'Scholar', 'slug');
     const listingScope = this.scopeFor(ability, 'Listing', 'scholarSlug');
-    const canSeeScholars = scholarScope !== null;
-    const canSeeListings = listingScope !== null;
-    const canSeeTopics = this.hasAnyCapability(ability, 'Topic');
-    const canSeeUsers = ability.can('manage', 'UserAccess');
+    return {
+      scholarScope,
+      listingScope,
+      canSeeScholars: scholarScope !== null,
+      canSeeListings: listingScope !== null,
+      canSeeTopics: this.hasAnyCapability(ability, 'Topic'),
+      canSeeUsers: ability.can('manage', 'UserAccess'),
+    };
+  }
 
-    if (!canSeeScholars && !canSeeListings && !canSeeTopics && !canSeeUsers) {
+  private assertDashboardAccess(access: ReturnType<AdminDashboardService['dashboardAccess']>) {
+    if (
+      !access.canSeeScholars &&
+      !access.canSeeListings &&
+      !access.canSeeTopics &&
+      !access.canSeeUsers
+    ) {
       throw new ForbiddenException('Missing admin dashboard access');
     }
+  }
 
-    const scholarWhere = this.scholarWhere(scholarScope);
+  private async loadDashboard(access: ReturnType<AdminDashboardService['dashboardAccess']>) {
+    const scholarWhere = this.scholarWhere(access.scholarScope);
     const listingWhere = {
       deletedAt: null,
-      scholar:
-        listingScope === undefined || listingScope === null
-          ? undefined
-          : { slug: { in: listingScope } },
+      scholar: access.listingScope ? { slug: { in: access.listingScope } } : undefined,
     };
-
     const [scholars, listings, topics, users, activity, pendingWork] = await Promise.all([
-      canSeeScholars ? this.prisma.scholar.count({ where: scholarWhere }) : undefined,
-      canSeeListings ? this.prisma.listing.count({ where: listingWhere }) : undefined,
-      canSeeTopics ? this.prisma.topic.count() : undefined,
-      canSeeUsers ? this.prisma.user.count() : undefined,
-      this.getActivity({ scholarScope, listingScope }),
-      this.getPendingWork(listingScope),
+      access.canSeeScholars ? this.prisma.scholar.count({ where: scholarWhere }) : undefined,
+      access.canSeeListings ? this.prisma.listing.count({ where: listingWhere }) : undefined,
+      access.canSeeTopics ? this.prisma.topic.count() : undefined,
+      access.canSeeUsers ? this.prisma.user.count() : undefined,
+      this.getActivity({ scholarScope: access.scholarScope, listingScope: access.listingScope }),
+      this.getPendingWork(access.listingScope),
     ]);
-
-    const metrics: AdminDashboardDto['metrics'] = {};
-    if (scholars !== undefined) metrics.scholars = scholars;
-    if (listings !== undefined) metrics.listings = listings;
-    if (topics !== undefined) metrics.topics = topics;
-    if (users !== undefined) metrics.users = users;
-
     return {
-      metrics,
+      metrics: buildDashboardMetrics({ scholars, listings, topics, users }),
       activity,
       pendingWork,
     };
