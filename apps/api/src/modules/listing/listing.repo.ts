@@ -40,6 +40,49 @@ import {
   type ListingEditorialTransition,
 } from './listing-editorial.transitions';
 
+function toOptional<T>(value: T | null | undefined): T | undefined {
+  return value ?? undefined;
+}
+
+async function createListingTopics(
+  tx: Prisma.TransactionClient,
+  listingId: string,
+  topics: string[] | undefined,
+): Promise<void> {
+  if (!topics?.length) return;
+  await tx.listingTopic.createMany({ data: topics.map((topicId) => ({ listingId, topicId })) });
+}
+
+async function createListingAudioAsset(
+  tx: Prisma.TransactionClient,
+  listingId: string,
+  dto: CreateListingDto & { publicUrl?: string },
+): Promise<void> {
+  if (dto.format !== 'single' || !dto.publicUrl) return;
+  await tx.audioAsset.create({
+    data: {
+      listingId,
+      url: dto.publicUrl,
+      objectKey: dto.audioKey ?? undefined,
+      format: dto.publicUrl.endsWith('.mp3') ? 'mp3' : undefined,
+      sizeBytes: dto.sizeBytes ?? undefined,
+      durationSeconds: dto.durationSeconds ?? undefined,
+      isPrimary: true,
+      source: 'r2',
+    },
+  });
+}
+
+async function replaceListingTopics(
+  tx: Prisma.TransactionClient,
+  listingId: string,
+  topics: string[] | undefined,
+): Promise<void> {
+  if (topics === undefined) return;
+  await tx.listingTopic.deleteMany({ where: { listingId } });
+  await createListingTopics(tx, listingId, topics);
+}
+
 @Injectable()
 export class ListingRepository {
   constructor(
@@ -154,27 +197,27 @@ export class ListingRepository {
       id: listing.id,
       slug: listing.slug,
       title: resolved.fields.title,
-      description: resolved.fields.description ?? undefined,
+      description: toOptional(resolved.fields.description),
       format: listing.format,
       coverImageUrl: this.toPublicAssetUrl(listing.coverImageUrl),
-      language: listing.language ?? undefined,
+      language: toOptional(listing.language),
       originalLanguage: resolved.originalLanguage,
       original: resolved.original
         ? {
             title: resolved.original.title,
-            description: resolved.original.description ?? undefined,
+            description: toOptional(resolved.original.description),
           }
         : undefined,
-      durationSeconds: listing.durationSeconds ?? undefined,
-      publishedLectureCount: listing.publishedLectureCount ?? undefined,
-      publishedDurationSeconds: listing.publishedDurationSeconds ?? undefined,
+      durationSeconds: toOptional(listing.durationSeconds),
+      publishedLectureCount: toOptional(listing.publishedLectureCount),
+      publishedDurationSeconds: toOptional(listing.publishedDurationSeconds),
       publishedAt: listing.publishedAt?.toISOString(),
       scholar: {
         id: listing.scholar.id,
         slug: listing.scholar.slug,
         name: scholarName,
-        imageUrl: listing.scholar.imageUrl ?? undefined,
-        title: listing.scholar.title ?? undefined,
+        imageUrl: toOptional(listing.scholar.imageUrl),
+        title: toOptional(listing.scholar.title),
       },
       topics: listing.topics.map((lt) => ({
         id: lt.topic.id,
@@ -185,9 +228,9 @@ export class ListingRepository {
         ? {
             id: primaryAudio.id,
             url: primaryAudio.url,
-            format: primaryAudio.format ?? undefined,
-            bitrateKbps: primaryAudio.bitrateKbps ?? undefined,
-            durationSeconds: primaryAudio.durationSeconds ?? undefined,
+            format: toOptional(primaryAudio.format),
+            bitrateKbps: toOptional(primaryAudio.bitrateKbps),
+            durationSeconds: toOptional(primaryAudio.durationSeconds),
           }
         : null,
       seriesContext,
@@ -1131,29 +1174,8 @@ export class ListingRepository {
         select: { id: true, title: true, parentId: true },
       });
 
-      if (dto.topics?.length) {
-        await tx.listingTopic.createMany({
-          data: dto.topics.map((topicId: string) => ({
-            listingId: listing.id,
-            topicId,
-          })),
-        });
-      }
-
-      if (dto.format === 'single' && dto.publicUrl) {
-        await tx.audioAsset.create({
-          data: {
-            listingId: listing.id,
-            url: dto.publicUrl,
-            objectKey: dto.audioKey ?? undefined,
-            format: dto.publicUrl.endsWith('.mp3') ? 'mp3' : undefined,
-            sizeBytes: dto.sizeBytes ?? undefined,
-            durationSeconds: dto.durationSeconds ?? undefined,
-            isPrimary: true,
-            source: 'r2',
-          },
-        });
-      }
+      await createListingTopics(tx, listing.id, dto.topics);
+      await createListingAudioAsset(tx, listing.id, dto);
 
       if (listing.parentId) {
         await this.syncListingCounters(listing.parentId, tx);
@@ -1243,23 +1265,7 @@ export class ListingRepository {
           });
         }
 
-        // If topics were provided in the DTO, update them
-        if (topics !== undefined) {
-          // Delete all existing topic associations
-          await tx.listingTopic.deleteMany({
-            where: { listingId: id },
-          });
-
-          // Create new topic associations if provided
-          if (topics.length > 0) {
-            await tx.listingTopic.createMany({
-              data: topics.map((topicId: string) => ({
-                listingId: id,
-                topicId,
-              })),
-            });
-          }
-        }
+        await replaceListingTopics(tx, id, topics);
 
         // Sync old parent if it exists
         if (original.parentId) {
@@ -1617,6 +1623,28 @@ export class ListingRepository {
       const affectedIds: string[] = [rootId];
       const touchedParents = new Set<string>();
 
+      const syncLessonAudio = async (listingId: string, audio: ArrangeAudioRef): Promise<void> => {
+        const primary = await tx.audioAsset.findFirst({
+          where: { listingId, isPrimary: true },
+          select: { id: true },
+        });
+        if (primary) {
+          await tx.audioAsset.update({
+            where: { id: primary.id },
+            data: this.arrangeAudioAssetData(audio),
+          });
+          return;
+        }
+        await tx.audioAsset.create({
+          data: {
+            listingId,
+            ...this.arrangeAudioAssetData(audio),
+            isPrimary: true,
+            source: 'r2',
+          },
+        });
+      };
+
       const applyLessonOp = async (op: ArrangeLessonOp, parentId: string): Promise<void> => {
         if (op.op === 'create') {
           const status = op.status ?? Status.draft;
@@ -1665,25 +1693,7 @@ export class ListingRepository {
           await tx.listing.update({ where: { id: op.id }, data });
 
           if (op.audio) {
-            const primary = await tx.audioAsset.findFirst({
-              where: { listingId: op.id, isPrimary: true },
-              select: { id: true },
-            });
-            if (primary) {
-              await tx.audioAsset.update({
-                where: { id: primary.id },
-                data: this.arrangeAudioAssetData(op.audio),
-              });
-            } else {
-              await tx.audioAsset.create({
-                data: {
-                  listingId: op.id,
-                  ...this.arrangeAudioAssetData(op.audio),
-                  isPrimary: true,
-                  source: 'r2',
-                },
-              });
-            }
+            await syncLessonAudio(op.id, op.audio);
           }
           result.updatedLessons += 1;
           affectedIds.push(op.id);
