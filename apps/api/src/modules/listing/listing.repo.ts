@@ -39,10 +39,7 @@ import {
   assertListingTransition,
   type ListingEditorialTransition,
 } from './listing-editorial.transitions';
-
-function toOptional<T>(value: T | null | undefined): T | undefined {
-  return value ?? undefined;
-}
+import { toOptional } from '../../shared/utils/to-optional';
 
 async function createListingTopics(
   tx: Prisma.TransactionClient,

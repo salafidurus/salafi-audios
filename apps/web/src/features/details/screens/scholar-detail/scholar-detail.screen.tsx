@@ -17,6 +17,7 @@ import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@/shared/component
 import { Separator } from "@/shared/components/ui/separator";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
+import { formatDuration } from "@/shared/utils/format";
 
 import styles from "./scholar-detail.screen.module.css";
 
@@ -110,21 +111,6 @@ function ScholarLoadingState({ t }: { t: ScholarStateProps["t"] }) {
       </StickyHeaderLayout>
     </ScreenView>
   );
-}
-
-function formatDuration(durationSeconds?: number): string {
-  if (!durationSeconds || durationSeconds <= 0) {
-    return "";
-  }
-  const hours = Math.floor(durationSeconds / 3600);
-  const minutes = Math.round((durationSeconds % 3600) / 60);
-  if (hours > 0) {
-    return `${hours}h ${String(minutes).padStart(2, "0")}m`;
-  }
-  if (minutes <= 0) {
-    return "";
-  }
-  return `${minutes}m`;
 }
 
 function handleBack() {

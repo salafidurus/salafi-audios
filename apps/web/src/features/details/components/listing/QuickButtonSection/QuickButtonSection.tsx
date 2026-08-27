@@ -2,7 +2,13 @@
 
 import type { ListingDetailDto, ListingContentsDto } from "@sd/core-contracts";
 
-import { useAudio, useProgressStore, buildTrackQueue, type Track } from "@sd/domain-audio";
+import {
+  isTrackActiveForListing,
+  useAudio,
+  useProgressStore,
+  buildTrackQueue,
+  type Track,
+} from "@sd/domain-audio";
 import { useLastPlayedLesson } from "@sd/domain-content";
 import { Play, Pause, RotateCcw } from "lucide-react";
 import React from "react";
@@ -28,12 +34,6 @@ function hasListingProgress(
   if (isSingle)
     return !!singleProgress && singleProgress.positionSeconds > 0 && !singleProgress.completedAt;
   return !!lastPlayed && lastPlayed.positionSeconds > 0 && !lastPlayed.isCompleted;
-}
-
-function trackMatchesListing(listing: ListingDetailDto, currentTrack: Track | null | undefined) {
-  if (listing.format === "single") return currentTrack?.slug === listing.slug;
-  if (listing.format === "series") return currentTrack?.seriesId === listing.id;
-  return currentTrack?.collectionId === listing.id;
 }
 
 function buildListingTracks(
@@ -87,7 +87,7 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
   // single -> currentTrack.slug === listing.slug
   // series -> currentTrack.seriesId === listing.id
   // collection -> currentTrack.collectionId === listing.id
-  const isCurrentActive = trackMatchesListing(listing, currentTrack);
+  const isCurrentActive = isTrackActiveForListing(listing, currentTrack);
   const isCurrentlyPlaying = isCurrentActive && isPlaying;
 
   // Builds the full ordered queue from contents, optionally starting eager

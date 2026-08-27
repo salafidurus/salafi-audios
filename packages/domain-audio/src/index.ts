@@ -22,3 +22,9 @@ export type { ListeningPlayOptions } from "./session/listening.session";
 export { useAudio } from "./hooks/use-audio";
 export { useListingProgress } from "./hooks/use-listing-progress";
 export { useQueue } from "./hooks/use-queue";
+export {
+  getProgressPercent,
+  isListingFormat,
+  isTrackActiveForListing,
+} from "./playback/playback.utils";
+export type { ListingPlaybackRef } from "./playback/playback.utils";

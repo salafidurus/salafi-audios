@@ -3,7 +3,13 @@
 import type { FeedContentItemDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
-import { useAudio, useProgressStore } from "@sd/domain-audio";
+import {
+  getProgressPercent,
+  isListingFormat,
+  isTrackActiveForListing,
+  useAudio,
+  useProgressStore,
+} from "@sd/domain-audio";
 import { useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
 import { Play, Pause, Bookmark } from "lucide-react";
 import Image from "next/image";
@@ -115,27 +121,6 @@ function FeedRowActions({ model, state, actions }: FeedListRowContentProps) {
   );
 }
 
-function isFeedRowTrack(
-  item: FeedContentItemDto,
-  currentTrack:
-    | { slug?: string; seriesId?: string | null; collectionId?: string | null }
-    | null
-    | undefined,
-): boolean {
-  return (
-    currentTrack?.slug === item.slug ||
-    currentTrack?.seriesId === item.id ||
-    currentTrack?.collectionId === item.id
-  );
-}
-
-function getProgressPercent(
-  progress: { positionSeconds: number; durationSeconds: number } | null | undefined,
-): number {
-  if (!progress?.durationSeconds) return 0;
-  return Math.min(Math.max((progress.positionSeconds / progress.durationSeconds) * 100, 0), 100);
-}
-
 function FeedListRowContent({ model, state, actions }: FeedListRowContentProps) {
   const { item, title, scholarName, initial, durationText, publishedDateText } = model;
   const { isInProgress, progressPercent } = state;
@@ -189,7 +174,9 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   // A series/collection row is "current" whenever any of its own lessons is
   // playing, not just when the current track's slug equals this row's slug
   // (which only happens for a single).
-  const isCurrentTrack = isFeedRowTrack(item, currentTrack);
+  const isCurrentTrack =
+    isListingFormat(item.kind) &&
+    isTrackActiveForListing({ id: item.id, slug: item.slug, format: item.kind }, currentTrack);
 
   const { play } = usePlayListing(
     {
@@ -209,7 +196,9 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const progress = useProgressStore((s) => s.progressMap[item.slug]);
   const isInProgress = progress && progress.positionSeconds > 0 && !progress.completedAt;
 
-  const progressPercent = getProgressPercent(progress);
+  const progressPercent = progress
+    ? getProgressPercent(progress.positionSeconds, progress.durationSeconds)
+    : 0;
 
   const handlePlay = async (e: React.MouseEvent) => {
     e.stopPropagation();

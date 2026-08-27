@@ -21,10 +21,7 @@ import { resolveContentTranslation } from '../../shared/i18n/resolve-content-tra
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { decodeCursor, buildPaginatedResult } from '../../shared/utils/pagination';
-
-function toOptional<T>(value: T | null | undefined): T | undefined {
-  return value ?? undefined;
-}
+import { toOptional } from '../../shared/utils/to-optional';
 
 function buildScholarUpdateData(dto: UpdateScholarDto): Prisma.ScholarUpdateInput {
   const data: Prisma.ScholarUpdateInput = { updatedAt: new Date() };

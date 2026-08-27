@@ -22,6 +22,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 
+import { FormErrorBanner } from "./FormErrorBanner";
 import styles from "./listing-modal.module.css";
 import {
   UploadArrangeArrangeTab,
@@ -42,10 +43,6 @@ function getErrorMessage(error: Error | null, fallback: string): string {
 
 function isUploadArrangeTabId(id: string): id is "upload" | "arrange" | "review" {
   return id === "upload" || id === "arrange" || id === "review";
-}
-
-function TabError({ error }: { error: string | null }) {
-  return error ? <div className={styles.errorBanner}>{error}</div> : null;
 }
 
 type ArrangeFooterProps = {
@@ -206,17 +203,17 @@ export function ListingUploadArrangeModal({
               <TabsTrigger value="review">{t("admin.modal.reviewTab", "Review")}</TabsTrigger>
             </TabsList>
             <TabsContent value="upload">
-              <TabError error={state.error} />
+              <FormErrorBanner error={state.error} />
               <UploadArrangeUploadTab state={state} dispatch={dispatch} />
             </TabsContent>
 
             <TabsContent value="arrange">
-              <TabError error={state.error} />
+              <FormErrorBanner error={state.error} />
               <UploadArrangeArrangeTab state={state} dispatch={dispatch} />
             </TabsContent>
 
             <TabsContent value="review">
-              <TabError error={state.error} />
+              <FormErrorBanner error={state.error} />
               <UploadArrangeReviewTab state={state} dispatch={dispatch} />
             </TabsContent>
           </Tabs>

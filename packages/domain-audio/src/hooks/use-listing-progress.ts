@@ -1,3 +1,4 @@
+import { getProgressPercent } from "../playback/playback.utils";
 import { useProgressStore } from "../progress/progress.store";
 
 export function useListingProgress(listingSlug: string) {
@@ -5,10 +6,9 @@ export function useListingProgress(listingSlug: string) {
 
   const isCompleted = !!progress?.completedAt;
   const resumePositionSeconds = progress?.positionSeconds ?? 0;
-  const progressPercent =
-    progress && progress.durationSeconds > 0
-      ? (progress.positionSeconds / progress.durationSeconds) * 100
-      : 0;
+  const progressPercent = progress
+    ? getProgressPercent(progress.positionSeconds, progress.durationSeconds)
+    : 0;
 
   return {
     isCompleted,
