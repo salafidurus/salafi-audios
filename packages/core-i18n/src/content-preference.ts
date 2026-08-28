@@ -1,5 +1,6 @@
 import type { LanguageStorageAdapter } from "./language-store";
 
+/** Coordinates the original-content preference across framework-neutral storage adapters. */
 const STORAGE_KEY = "sd_show_original_content";
 
 /**
@@ -34,6 +35,7 @@ export interface ContentPreferenceStore {
   hydrate(): Promise<void>;
 }
 
+/** Creates a reactive preference store with synchronous reads and asynchronous persistence. */
 export function createContentPreferenceStore(
   adapter: LanguageStorageAdapter,
   initial = false,
