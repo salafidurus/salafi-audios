@@ -70,11 +70,9 @@ function buildListingTracks(
   ];
 }
 
-async function toggleCurrentPlayback(isCurrentActive: boolean, isPlaying: boolean) {
-  if (!isCurrentActive) return false;
+async function toggleCurrentPlayback(isPlaying: boolean) {
   if (isPlaying) await audioService.pause();
   else await audioService.resume();
-  return true;
 }
 
 async function playFirstTrack(allTracks: Track[]) {
@@ -114,12 +112,18 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
     buildListingTracks(listing, contents, formatScholarName, startAtId);
 
   const handlePlayPauseToggle = async () => {
-    if (await toggleCurrentPlayback(isCurrentActive, isPlaying)) return;
+    if (isCurrentActive) {
+      await toggleCurrentPlayback(isPlaying);
+      return;
+    }
     await playFirstTrack(getAllTracks());
   };
 
   const handleContinuePlaying = async () => {
-    if (await toggleCurrentPlayback(isCurrentActive, isPlaying)) return;
+    if (isCurrentActive) {
+      await toggleCurrentPlayback(isPlaying);
+      return;
+    }
     const resumeId = isSingle ? listing.slug : lastPlayed?.listingSlug;
     await playResumeTrack(getAllTracks(resumeId), resumeId);
   };
