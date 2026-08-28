@@ -111,6 +111,11 @@ function getRecentNextCursor<T extends { createdAt: Date }>(
   return hasMore && lastItem ? encodeCursor(lastItem.createdAt, pageNumber + 1) : undefined;
 }
 
+function getRecentContentLimit(pageNumber: number, limit: number): number {
+  const moduleCount = pageNumber % 2 === 0 ? 2 : 0;
+  return Math.max(1, limit - moduleCount);
+}
+
 function applyRecentFilters(
   where: Prisma.ListingWhereInput,
   topicSlug?: string,
@@ -142,8 +147,7 @@ export class RecentListingsRepo {
     };
     applyRecentFilters(where, topicSlug, cursorDate);
 
-    const moduleCount = pageNumber % 2 === 0 ? 2 : 0;
-    const contentLimit = Math.max(1, limit - moduleCount);
+    const contentLimit = getRecentContentLimit(pageNumber, limit);
     const queryArgs = {
       where,
       include: {
