@@ -37,6 +37,13 @@ export function ListItem({
 }: ListItemProps) {
   const isClickable = Boolean(onClick);
   const showHoverStates = isClickable || interactive;
+  const attributes = getListItemAttributes({
+    id,
+    highlighted,
+    isClickable,
+    showHoverStates,
+    className,
+  });
 
   const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     // Don't trigger onClick if the click came from a nested interactive element
@@ -51,18 +58,34 @@ export function ListItem({
 
   return (
     <div
-      id={id}
-      data-highlighted={highlighted ? "true" : undefined}
-      role={isClickable ? "button" : undefined}
-      tabIndex={isClickable ? 0 : undefined}
+      {...attributes}
+      role={attributes.role}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      className={`${styles.item} ${showHoverStates ? styles.interactive : ""} ${className ?? ""}`}
-      style={{ cursor: isClickable ? "pointer" : "default" }}
+      style={{ cursor: attributes.role ? "pointer" : "default" }}
     >
       {children}
     </div>
   );
+}
+
+function getListItemAttributes({
+  id,
+  highlighted,
+  isClickable,
+  showHoverStates,
+  className,
+}: Pick<ListItemProps, "id" | "highlighted" | "className"> & {
+  isClickable: boolean;
+  showHoverStates: boolean;
+}) {
+  return {
+    id,
+    "data-highlighted": highlighted ? "true" : undefined,
+    role: isClickable ? ("button" as const) : undefined,
+    tabIndex: isClickable ? 0 : undefined,
+    className: `${styles.item} ${showHoverStates ? styles.interactive : ""} ${className ?? ""}`,
+  };
 }
 
 function isIgnoredClickTarget(target: EventTarget | null): boolean {
