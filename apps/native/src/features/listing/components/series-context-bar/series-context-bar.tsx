@@ -1,4 +1,5 @@
 import type { SeriesContextDto } from "@sd/core-contracts";
+import type { Track } from "@sd/domain-audio";
 
 import { useQueue } from "@sd/domain-audio";
 import { Pressable, View } from "react-native";
@@ -14,7 +15,7 @@ export type SeriesContextBarProps = {
 };
 
 function getPreviousTrack(
-  queue: { slug: string }[],
+  queue: Track[],
   currentIndex: number,
   isActiveQueue: boolean,
   hasPrevious: boolean,
@@ -23,7 +24,7 @@ function getPreviousTrack(
 }
 
 function getNextTrack(
-  queue: { slug: string }[],
+  queue: Track[],
   currentIndex: number,
   isActiveQueue: boolean,
   hasNext: boolean,

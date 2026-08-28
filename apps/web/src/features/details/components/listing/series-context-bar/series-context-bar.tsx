@@ -1,6 +1,7 @@
 "use client";
 
 import type { SeriesContextDto } from "@sd/core-contracts";
+import type { Track } from "@sd/domain-audio";
 
 import { useQueue } from "@sd/domain-audio";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -19,7 +20,7 @@ export type SeriesContextBarProps = {
 };
 
 function getPreviousTrack(
-  queue: { slug: string }[],
+  queue: Track[],
   currentIndex: number,
   isActiveQueue: boolean,
   hasPrevious: boolean,
@@ -28,7 +29,7 @@ function getPreviousTrack(
 }
 
 function getNextTrack(
-  queue: { slug: string }[],
+  queue: Track[],
   currentIndex: number,
   isActiveQueue: boolean,
   hasNext: boolean,
@@ -37,7 +38,7 @@ function getNextTrack(
 }
 
 function renderNavigationButton(
-  track: { title: string } | null,
+  track: Track | null,
   direction: "previous" | "next",
   isRtl: boolean,
 ) {

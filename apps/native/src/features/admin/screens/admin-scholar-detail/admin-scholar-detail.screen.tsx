@@ -299,7 +299,16 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     to: number;
   }) => {
     const prevOrder = getDisplayList(seriesOrder, seriesList);
-    await persistOrder(data, to, prevOrder, dispatch, updateSeries, "seriesOrder");
+    await persistOrder(
+      data,
+      to,
+      prevOrder,
+      dispatch,
+      async (id, patch) => {
+        await updateSeries(id, patch);
+      },
+      "seriesOrder",
+    );
   };
 
   const handleCollectionDragEnd = async ({
@@ -311,7 +320,16 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     to: number;
   }) => {
     const prevOrder = getDisplayList(collectionOrder, collectionList);
-    await persistOrder(data, to, prevOrder, dispatch, updateCollection, "collectionOrder");
+    await persistOrder(
+      data,
+      to,
+      prevOrder,
+      dispatch,
+      async (id, patch) => {
+        await updateCollection(id, patch);
+      },
+      "collectionOrder",
+    );
   };
 
   if (!scholar) {

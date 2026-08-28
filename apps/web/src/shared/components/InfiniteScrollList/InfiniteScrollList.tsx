@@ -171,13 +171,13 @@ function renderEmptyState<TData>({
   observerTarget,
 }: {
   data: TData[];
-  isError: boolean;
+  isError?: boolean;
   errorMessage: string;
-  onRetry: () => void;
-  isLoading: boolean;
+  onRetry?: () => void;
+  isLoading?: boolean;
   emptyMessage: string;
   hasMore: boolean;
-  isFetchingNextPage: boolean;
+  isFetchingNextPage?: boolean;
   observerTarget: React.RefObject<HTMLDivElement | null>;
 }): ReactNode | null {
   if (isError && data.length === 0) return <ErrorState message={errorMessage} onRetry={onRetry} />;
@@ -231,13 +231,13 @@ export function InfiniteScrollList<TData>({
 
   const emptyState = renderEmptyState({
     data,
-    isError,
+    isError: isError ?? false,
     errorMessage,
     onRetry,
-    isLoading,
+    isLoading: isLoading ?? false,
     emptyMessage,
     hasMore,
-    isFetchingNextPage,
+    isFetchingNextPage: isFetchingNextPage ?? false,
     observerTarget,
   });
   if (emptyState) return emptyState;

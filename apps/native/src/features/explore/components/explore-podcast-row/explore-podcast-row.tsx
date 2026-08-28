@@ -135,7 +135,7 @@ function getIsCurrentTrack(item: FeedContentItemDto, currentTrack: Track | null)
   return isTrackActiveForListing({ id: item.id, slug: item.slug, format: item.kind }, currentTrack);
 }
 
-function getDurationText(seconds?: number) {
+function getDurationText(seconds?: number | null) {
   return seconds ? `${Math.round(seconds / 60)} min` : "";
 }
 
