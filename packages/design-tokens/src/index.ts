@@ -1,3 +1,4 @@
+/** Public cross-platform design-token types and semantic token constructors. */
 // Shared platform-agnostic tokens — consumed by both apps/native and apps/web
 export { createColors } from "./colors/shared";
 export type { AppColors } from "./colors/shared";
