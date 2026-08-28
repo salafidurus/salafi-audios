@@ -103,6 +103,14 @@ type LoadedLectureView = {
   onSave: () => void;
 };
 
+function getPlayLabel(isCurrentlyPlaying: boolean) {
+  return isCurrentlyPlaying ? "Pause" : "Play";
+}
+
+function getSaveLabel(isSaved: boolean) {
+  return isSaved ? "Saved" : "Save";
+}
+
 function LectureActions({
   isCurrentTrack,
   isPlaying,
@@ -114,15 +122,16 @@ function LectureActions({
   LoadedLectureView,
   "isCurrentTrack" | "isPlaying" | "isSaved" | "theme" | "onPlay" | "onSave"
 >) {
+  const isCurrentlyPlaying = isCurrentTrack && isPlaying;
   return (
     <View style={styles.actionsRow}>
       <View style={styles.actionBtnWrapper}>
         <Button
           variant="primary"
           size="md"
-          label={isCurrentTrack && isPlaying ? "Pause" : "Play"}
+          label={getPlayLabel(isCurrentlyPlaying)}
           icon={
-            isCurrentTrack && isPlaying ? (
+            isCurrentlyPlaying ? (
               <Pause size={18} color={theme.colors.content.onPrimary} />
             ) : (
               <Play size={18} color={theme.colors.content.onPrimary} />
@@ -135,7 +144,7 @@ function LectureActions({
         <Button
           variant="surface"
           size="md"
-          label={isSaved ? "Saved" : "Save"}
+          label={getSaveLabel(isSaved)}
           icon={
             <Bookmark
               size={18}
