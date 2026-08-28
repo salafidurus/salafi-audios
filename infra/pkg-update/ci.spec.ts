@@ -1,4 +1,5 @@
 import { describe, it, expect, mock, beforeAll, beforeEach, afterEach } from "bun:test";
+import { join } from "node:path";
 
 import type { UpdateCandidate } from "./utils/ui";
 
@@ -165,10 +166,9 @@ describe("branchName", () => {
 });
 
 describe("worktreeDir", () => {
-  it("generates worktree path under .worktrees", () => {
+  it("generates worktree path under .worktree", () => {
     const result = worktreeDir("/repo", "typescript");
-    expect(result).toContain(".worktrees");
-    expect(result).toContain("deps-typescript");
+    expect(result).toBe(join("/repo", ".worktree", "deps-typescript"));
   });
 
   it("sanitizes special characters in group name", () => {
@@ -207,7 +207,6 @@ describe("buildPrBody", () => {
 describe("runCi", () => {
   let tmpDir: string;
   const { mkdtempSync, writeFileSync } = require("fs") as typeof import("fs");
-  const { join } = require("path") as typeof import("path");
   const { tmpdir } = require("os") as typeof import("os");
 
   // Mock child_process globally — ci.ts uses spawnSync
@@ -246,7 +245,7 @@ describe("runCi", () => {
     const summaries = await runCi(tmpDir, { dryRun: true });
     const { existsSync } = require("fs") as typeof import("fs");
     expect(summaries).toEqual([]);
-    expect(existsSync(join(tmpDir, ".worktrees"))).toBe(false);
+    expect(existsSync(join(tmpDir, ".worktree"))).toBe(false);
   });
 });
 

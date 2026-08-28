@@ -274,7 +274,7 @@ export function branchName(group: string): string {
 }
 
 export function worktreeDir(rootDir: string, group: string): string {
-  return resolve(rootDir, ".worktrees", `deps-${sanitizeBranchName(group)}`); // nosemgrep
+  return resolve(rootDir, ".worktree", `deps-${sanitizeBranchName(group)}`); // nosemgrep
 }
 
 async function isPrMergeable(prNumber: number): Promise<boolean> {
