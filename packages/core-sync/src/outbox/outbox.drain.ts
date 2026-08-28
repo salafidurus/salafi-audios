@@ -1,7 +1,11 @@
 import type { Outbox, OutboxEntry, JsonValue } from "./outbox.store";
 
+/** Outbox-drain result contract for delivery and retry reporting. */
+/** Counts entries delivered and retained during one outbox drain attempt. */
 export type DrainResult = {
+  /** Number of entries whose handlers resolved and were removed. */
   succeeded: number;
+  /** Number of entries whose handlers rejected and remain queued for retry. */
   failed: number;
 };
 

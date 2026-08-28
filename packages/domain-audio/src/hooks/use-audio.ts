@@ -1,5 +1,7 @@
 import { usePlaybackStore } from "../store/playback.store";
 
+/** Playback hook module exposing reactive state for Listening UI consumers. */
+/** Returns reactive playback state and derived UI convenience flags. */
 export function useAudio() {
   const currentTrack = usePlaybackStore((s) => s.currentTrack);
   const status = usePlaybackStore((s) => s.status);

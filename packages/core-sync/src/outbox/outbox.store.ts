@@ -3,15 +3,23 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { StorageAdapter } from "../storage/storage-adapter";
 
+/** Durable JSON-backed queue used to recover unsent personal-state intent. */
 type JsonPrimitive = string | number | boolean | null;
 type JsonObject = { [key: string]: JsonValue };
+/** JSON-safe payload accepted by the persisted outbox. */
 export type JsonValue = JsonPrimitive | JsonObject | JsonValue[];
 
+/** Durable personal-state intent waiting to be delivered to the backend. */
 export type OutboxEntry<TPayload extends JsonValue = JsonValue> = {
+  /** Locally unique identifier used to remove or retry this entry. */
   id: string;
+  /** Domain-specific operation label interpreted by the owning sync engine. */
   type: string;
+  /** Serialized JSON-safe intent payload. */
   payload: TPayload;
+  /** Client creation time, used for ordering and diagnostics. */
   createdAt: number;
+  /** Number of failed delivery attempts retained for retry visibility. */
   retries: number;
 };
 
@@ -29,6 +37,7 @@ type OutboxState<TPayload extends JsonValue> = {
 
 type OutboxStore<TPayload extends JsonValue> = UseBoundStore<StoreApi<OutboxState<TPayload>>>;
 
+/** Public outbox store and hydration lifecycle for a namespaced payload queue. */
 export type Outbox<TPayload extends JsonValue = JsonValue> = {
   useOutboxStore: OutboxStore<TPayload>;
   /** Loads any entries persisted by a previous process/session into the store. */

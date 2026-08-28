@@ -1,11 +1,18 @@
 import { resolveLastWriteWins } from "@sd/core-sync";
 import { create } from "zustand";
 
+/** Local progress module for optimistic Listening continuity and reconciliation. */
+/** Personal Listening position and completion state for one Listing. */
 export type ListingProgress = {
+  /** Client-facing Listing identity; not an internal database identifier. */
   listingSlug: string;
+  /** Latest playback position in seconds. */
   positionSeconds: number;
+  /** Track duration in seconds used to calculate continuity. */
   durationSeconds: number;
+  /** Timestamp recorded when the track reaches natural completion. */
   completedAt?: string;
+  /** Timestamp used to reconcile local and server representations. */
   updatedAt: string;
 };
 
@@ -42,6 +49,7 @@ type ProgressState = {
   };
 };
 
+/** Reactive personal progress store used by playback and sync adapters. */
 export const useProgressStore = create<ProgressState>((set, get) => ({
   progressMap: {},
   lastSyncedAt: null,

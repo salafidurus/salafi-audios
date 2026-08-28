@@ -1,3 +1,4 @@
+/** Public platform-agnostic primitives for local-first personal-state synchronization. */
 export type { StorageAdapter } from "./storage/storage-adapter";
 
 export {
