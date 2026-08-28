@@ -159,6 +159,42 @@ function LoadedState<TData>({
   );
 }
 
+function renderEmptyState<TData>({
+  data,
+  isError,
+  errorMessage,
+  onRetry,
+  isLoading,
+  emptyMessage,
+  hasMore,
+  isFetchingNextPage,
+  observerTarget,
+}: {
+  data: TData[];
+  isError: boolean;
+  errorMessage: string;
+  onRetry: () => void;
+  isLoading: boolean;
+  emptyMessage: string;
+  hasMore: boolean;
+  isFetchingNextPage: boolean;
+  observerTarget: React.RefObject<HTMLDivElement | null>;
+}): ReactNode | null {
+  if (isError && data.length === 0) return <ErrorState message={errorMessage} onRetry={onRetry} />;
+  if (isLoading && data.length === 0) return <LoadingState />;
+  if (data.length === 0) {
+    return (
+      <EmptyState
+        message={emptyMessage}
+        hasMore={hasMore}
+        isFetchingNextPage={isFetchingNextPage}
+        observerTarget={observerTarget}
+      />
+    );
+  }
+  return null;
+}
+
 // react-doctor-disable-next-line react-doctor/no-many-boolean-props
 export function InfiniteScrollList<TData>({
   data,
@@ -193,24 +229,18 @@ export function InfiniteScrollList<TData>({
     return () => observer.disconnect();
   }, [hasMore, onLoadMore, isFetchingNextPage]);
 
-  if (isError && data.length === 0) {
-    return <ErrorState message={errorMessage} onRetry={onRetry} />;
-  }
-
-  if (isLoading && data.length === 0) {
-    return <LoadingState />;
-  }
-
-  if (data.length === 0) {
-    return (
-      <EmptyState
-        message={emptyMessage}
-        hasMore={hasMore}
-        isFetchingNextPage={isFetchingNextPage}
-        observerTarget={observerTarget}
-      />
-    );
-  }
+  const emptyState = renderEmptyState({
+    data,
+    isError,
+    errorMessage,
+    onRetry,
+    isLoading,
+    emptyMessage,
+    hasMore,
+    isFetchingNextPage,
+    observerTarget,
+  });
+  if (emptyState) return emptyState;
 
   return (
     <LoadedState
