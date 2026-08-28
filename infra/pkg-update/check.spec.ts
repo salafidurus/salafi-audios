@@ -63,6 +63,14 @@ describe("filterByGroups", () => {
   });
 });
 
+describe("pkg-update ownership contract", () => {
+  it("does not configure ordinary dependency groups", () => {
+    expect(Object.keys(config.groups)).toEqual([]);
+    expect(config.bun.enabled).toBe(true);
+    expect(config.expo.enabled).toBe(true);
+  });
+});
+
 describe("dedupeCandidates", () => {
   it("keeps latest version per package", () => {
     const candidates = [
@@ -200,19 +208,19 @@ describe("updateTypes cap", () => {
 
   it("groups @babel/runtime under babel via the runtime config", async () => {
     const dir = createTempPkg({ workspaces: { catalog: { "@babel/runtime": "7.24.0" } } });
-    const result = await checkCatalog(dir, config);
+    const result = await checkCatalog(dir, capCfg);
     expect(result[0]!.group).toBe("babel");
   });
 
   it("excludes a typescript major bump via the runtime config", async () => {
     const dir = createTempPkg({ workspaces: { catalog: { typescript: "4.0.0" } } });
-    const result = await checkCatalog(dir, config);
+    const result = await checkCatalog(dir, capCfg);
     expect(result).toHaveLength(0);
   });
 
   it("includes a typescript minor bump when the cap allows minor/patch", async () => {
     const dir = createTempPkg({ workspaces: { catalog: { typescript: "5.5.0" } } });
-    const result = await checkCatalog(dir, config);
+    const result = await checkCatalog(dir, capCfg);
     expect(result).toHaveLength(1);
     expect(result[0]!.group).toBe("typescript");
   });

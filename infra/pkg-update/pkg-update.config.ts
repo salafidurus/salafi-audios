@@ -9,35 +9,8 @@ export interface PkupdateConfig {
 
 export const config: PkupdateConfig = {
   groups: {
-    nestjs: { patterns: ["@nestjs/*"] },
-    prisma: { patterns: ["prisma", "@prisma/*"] },
-    fastify: { patterns: ["@fastify/*"] },
-    "better-auth": { patterns: ["better-auth", "@better-auth/*"] },
-    turbo: { patterns: ["turbo"] },
-    testing: { patterns: ["@testing-library/*"] },
-    typescript: { patterns: ["typescript"], updateTypes: ["minor", "patch"] },
-    babel: {
-      patterns: ["@babel/core", "@babel/runtime"],
-      updateTypes: ["minor", "patch"],
-    },
-    expo: {
-      patterns: [
-        "expo",
-        "expo-*",
-        "@expo/*",
-        "eslint-config-expo",
-        "react",
-        "react-dom",
-        "@types/react",
-        "@types/react-dom",
-        "react-native",
-        "react-native-*",
-        "@react-native/*",
-        "@react-navigation/*",
-        "@sentry/*",
-        "@react-native-async-storage/*",
-      ],
-    },
+    // Ordinary dependency updates belong to Dependabot. The Expo and Bun
+    // pipelines below are the only pkg-update entry points.
   },
   skip: [],
   never: ["typescript"],

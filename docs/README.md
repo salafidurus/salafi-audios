@@ -18,6 +18,11 @@ without updating this index.
 - [`policies/`](policies/): rules that govern development and delivery
 - [`runbooks/`](runbooks/): repeatable operational procedures
 
+Key policies:
+
+- [`Dependency automation`](policies/dependency-automation.md): ownership
+  boundaries for Dependabot, `pkg-update`, and catalog tooling
+
 ## Reading order
 
 1. [`../AGENT.md`](../AGENT.md)

@@ -7,6 +7,7 @@
 #   - Keep major bumps ungrouped so each is individually reviewable
 #   - Explicitly ignore SDK-coupled and infrastructure-managed deps
 #   - Separate github-actions ecosystem entry
+# Ownership rationale: ../docs/policies/dependency-automation.md
 
 version: 2
 
@@ -31,6 +32,9 @@ updates:
       - dependency-name: "expo"
       - dependency-name: "expo-*"
       - dependency-name: "@expo/*"
+      # jest-expo is updated only through the Expo compatibility pipeline,
+      # which runs expo install --fix and expo-doctor.
+      - dependency-name: "jest-expo"
       # eslint-config-expo — versioned in lockstep with the Expo SDK. A
       # standalone bump crashes the native flat ESLint config; upgrade it
       # only as part of a coordinated Expo SDK upgrade.
@@ -113,6 +117,8 @@ updates:
           - "source-map-support"
           - "pino-pretty"
           - "bun-types"
+        exclude-patterns:
+          - "@types/jest"
         update-types:
           - major
           - minor
@@ -139,15 +145,39 @@ updates:
           - minor
           - patch
 
-      # Unit test tooling (Jest + testing-library).
-      test-unit:
+      # Exact Jest runtime/types pair. Keep this boundary narrow: Jest major
+      # updates must be reviewed separately from the native Expo pipeline.
+      test-jest:
         applies-to: version-updates
         patterns:
           - "jest"
+          - "@types/jest"
+        update-types:
+          - minor
+          - patch
+
+      # Other Jest-family packages remain independently reviewable from the
+      # exact Jest runtime/types pair. jest-expo is ignored above because the
+      # Expo pipeline owns it.
+      test-jest-family:
+        applies-to: version-updates
+        patterns:
           - "jest-*"
           - "@jest/*"
           - "ts-jest"
-          - "@testing-library/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Web Testing Library packages. Native Testing Library remains outside
+      # this group and is reviewed independently.
+      test-testing-library-web:
+        applies-to: version-updates
+        patterns:
+          - "@testing-library/dom"
+          - "@testing-library/jest-dom"
+          - "@testing-library/react"
         update-types:
           - major
           - minor

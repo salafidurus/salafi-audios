@@ -64,49 +64,50 @@ describe("groupCandidates", () => {
     expect(groupCandidates([])).toEqual([]);
   });
 
-  it("follows group order (alphabetical between bun/expo and ungrouped)", () => {
+  it("places ungrouped candidates after the special pipelines", () => {
     const a = makeCandidate({ group: "ungrouped" });
-    const b = makeCandidate({ group: "typescript" });
-    const c = makeCandidate({ group: "turbo" });
+    const b = makeCandidate({ group: "beta" });
+    const c = makeCandidate({ group: "alpha" });
     const d = makeCandidate({ group: "bun" });
 
     const batches = groupCandidates([a, b, c, d]);
     const names = batches.map((b) => b.groupName);
 
     const bunIdx = names.indexOf("bun");
-    const turboIdx = names.indexOf("turbo");
-    const typescriptIdx = names.indexOf("typescript");
+    const alphaIdx = names.indexOf("alpha");
+    const betaIdx = names.indexOf("beta");
     const ungroupedIdx = names.indexOf("ungrouped");
     expect(bunIdx).toBe(0);
-    expect(turboIdx).toBeLessThan(typescriptIdx);
-    expect(turboIdx).toBeLessThan(ungroupedIdx);
-    expect(typescriptIdx).toBeLessThan(ungroupedIdx);
+    expect(ungroupedIdx).toBe(1);
+    expect(alphaIdx).toBe(3);
+    expect(betaIdx).toBe(2);
   });
 
   it("includes dynamic groups (e.g. never packages) after known groups", () => {
     const a = makeCandidate({ group: "ungrouped" });
-    const b = makeCandidate({ group: "dynamic-pkg" });
-    const c = makeCandidate({ group: "typescript" });
+    const b = makeCandidate({ group: "zeta" });
+    const c = makeCandidate({ group: "alpha" });
 
     const batches = groupCandidates([a, b, c]);
     const names = batches.map((b) => b.groupName);
 
-    expect(names).toContain("dynamic-pkg");
-    const dynIdx = names.indexOf("dynamic-pkg");
+    expect(names).toContain("zeta");
+    const dynIdx = names.indexOf("zeta");
     const ungroupedIdx = names.indexOf("ungrouped");
-    const typescriptIdx = names.indexOf("typescript");
-    expect(typescriptIdx).toBeLessThan(dynIdx);
+    const alphaIdx = names.indexOf("alpha");
     expect(ungroupedIdx).toBeLessThan(dynIdx);
+    expect(dynIdx).toBe(1);
+    expect(alphaIdx).toBe(2);
   });
 
-  it("sorts configured groups alphabetically, including typescript", () => {
-    const a = makeCandidate({ group: "testing" });
-    const b = makeCandidate({ group: "typescript" });
+  it("preserves input order for dynamic groups", () => {
+    const a = makeCandidate({ group: "beta" });
+    const b = makeCandidate({ group: "alpha" });
 
     const batches = groupCandidates([a, b]);
     const names = batches.map((x) => x.groupName);
 
-    expect(names.indexOf("testing")).toBeLessThan(names.indexOf("typescript"));
+    expect(names.indexOf("beta")).toBeLessThan(names.indexOf("alpha"));
   });
 });
 

@@ -96,3 +96,27 @@ describe("Dependabot workflow safety contract", () => {
     expect(workflow).not.toContain("git add -A");
   });
 });
+
+describe("dependency update ownership contract", () => {
+  it("keeps Jest ownership separate from the Expo pipeline", () => {
+    const dependabot = readFileSync(
+      resolve(import.meta.dirname, "../../../.github/dependabot.yml"),
+      "utf8",
+    );
+
+    expect(dependabot).toContain("test-jest:");
+    expect(dependabot).toContain('          - "jest"');
+    expect(dependabot).toContain('          - "@types/jest"');
+    expect(dependabot).toContain('      - dependency-name: "jest-expo"');
+    expect(dependabot).toContain("        exclude-patterns:");
+    expect(dependabot).toContain('          - "@types/jest"');
+
+    const jestStart = dependabot.indexOf("      test-jest:");
+    const familyStart = dependabot.indexOf("      test-jest-family:");
+    expect(jestStart).toBeGreaterThanOrEqual(0);
+    expect(familyStart).toBeGreaterThan(jestStart);
+    expect(dependabot.slice(jestStart, familyStart)).toContain("          - minor");
+    expect(dependabot.slice(jestStart, familyStart)).toContain("          - patch");
+    expect(dependabot.slice(jestStart, familyStart)).not.toContain("          - major");
+  });
+});

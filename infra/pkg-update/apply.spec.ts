@@ -15,6 +15,12 @@ import {
 } from "./apply";
 import { config } from "./pkg-update.config";
 
+const versionLockedConfig = {
+  ...config,
+  groups: { "better-auth": { patterns: ["better-auth", "@better-auth/*"] } },
+  versionLocked: ["better-auth"],
+};
+
 mock.module("child_process", () => ({
   spawnSync: () => ({ status: 0, stdout: "", stderr: "" }),
 }));
@@ -150,7 +156,7 @@ describe("applyCatalogUpdate", () => {
       currentVersion: "1.6.18",
       latestVersion: "1.6.23",
     };
-    await applyCatalogUpdate(candidate, tmpDir, config);
+    await applyCatalogUpdate(candidate, tmpDir, versionLockedConfig);
 
     const content = JSON.parse(readFileSync(join(tmpDir, "package.json"), "utf-8"));
     expect(content.workspaces.catalog["better-auth"]).toBe("1.6.23");
@@ -255,7 +261,7 @@ describe("syncWorkspaceDeps", () => {
       currentVersion: "1.6.18",
       latestVersion: "1.6.23",
     };
-    const updated = syncWorkspaceDeps(candidate, tmpDir, config);
+    const updated = syncWorkspaceDeps(candidate, tmpDir, versionLockedConfig);
 
     const apiPkg = JSON.parse(readFileSync(join(tmpDir, "apps", "api", "package.json"), "utf-8"));
     expect(apiPkg.dependencies["better-auth"]).toBe("1.6.23");
