@@ -55,6 +55,33 @@ function selectScholarItems(
   return parsedContent.success ? parsedContent.data.items : [];
 }
 
+function formatLectureCount(
+  item: ScholarContentItemDto,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  if (item.lectureCount == null || item.lectureCount <= 0) return "";
+  if (item.lectureCount === 1) return t("scholarContent.statLectureSingular", "1 lecture");
+  return t("scholarContent.statLecturesFormat", "{{count}} lectures", {
+    count: item.lectureCount,
+  });
+}
+
+function formatDuration(item: ScholarContentItemDto): string {
+  if (item.durationSeconds == null || item.durationSeconds <= 0) return "";
+  const hours = Math.floor(item.durationSeconds / 3600);
+  const minutes = Math.round((item.durationSeconds % 3600) / 60);
+  if (hours > 0) return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+  return `${minutes}m`;
+}
+
+function formatMetadataText(
+  item: ScholarContentItemDto,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  const parts = [formatLectureCount(item, t), formatDuration(item)].filter(Boolean);
+  return parts.join(" · ");
+}
+
 export function ContentRow({
   item,
   scholarImageUrl,
@@ -68,34 +95,6 @@ export function ContentRow({
 
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const artworkUrl = item.coverImageUrl || item.scholarImageUrl || scholarImageUrl;
-
-  const getMetadataText = () => {
-    const parts: string[] = [];
-
-    if (item.lectureCount != null && item.lectureCount > 0) {
-      if (item.lectureCount === 1) {
-        parts.push(t("scholarContent.statLectureSingular", "1 lecture"));
-      } else {
-        parts.push(
-          t("scholarContent.statLecturesFormat", "{{count}} lectures", {
-            count: item.lectureCount,
-          }),
-        );
-      }
-    }
-
-    if (item.durationSeconds != null && item.durationSeconds > 0) {
-      const hours = Math.floor(item.durationSeconds / 3600);
-      const minutes = Math.round((item.durationSeconds % 3600) / 60);
-      if (hours > 0) {
-        parts.push(minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`);
-      } else {
-        parts.push(`${minutes}m`);
-      }
-    }
-
-    return parts.join(" · ");
-  };
 
   return (
     <Link href={contentHref(item)} className={`${styles.row} listRow`}>
@@ -118,7 +117,7 @@ export function ContentRow({
 
       <div className={styles.centerSection}>
         <h3 className={styles.title}>{title}</h3>
-        <span className={styles.metadata}>{getMetadataText()}</span>
+        <span className={styles.metadata}>{formatMetadataText(item, t)}</span>
       </div>
 
       <div className={styles.rightSection}>
