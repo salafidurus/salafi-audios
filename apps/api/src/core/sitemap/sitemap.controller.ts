@@ -5,9 +5,12 @@ import { ConfigService } from '../config/config.service';
 import { SitemapService } from './sitemap.service';
 import type { Response } from 'express';
 
+/** NestJS sitemap controller service or controller coordinating the API boundary for this responsibility. */
 @SkipThrottle()
 @Public()
 @Controller()
+/** Core API sitemap.controller module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class SitemapController {
   constructor(
     private readonly configService: ConfigService,

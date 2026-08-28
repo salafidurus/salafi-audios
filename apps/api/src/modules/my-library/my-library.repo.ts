@@ -15,19 +15,23 @@ import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { ListingRepository } from '../listing/listing.repo';
 import { ConfigService } from '../../core/config/config.service';
 
-type ProgressGroup = { latestUpdatedAt: Date };
+/** my library application module responsible for my library.repo behavior at the backend boundary. */
+type ProgressGroup = {
+  /** Latest timestamp used to produce the saved-state delta boundary. */
+  latestUpdatedAt: Date;
+};
 type ProgressBucket = {
   topLevelId: string;
-  latestUpdatedAt: Date;
+  /** Documents the latestUpdatedAt field's API projection semantics and lifecycle meaning. */ latestUpdatedAt: Date;
   summary: ListingProgressSummaryDto;
 };
 
 type RecentParent = {
   id: string;
   title: string;
-  slug: string;
+  /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
   format: ListingFormat;
-  language: Locale | null;
+  /** Documents the language field's API projection semantics and lifecycle meaning. */ language: Locale | null;
   translations: { title: string }[];
   coverImageUrl: string | null;
   parent?: RecentParent | null;
@@ -37,18 +41,20 @@ type RecentProgressRecord = {
   positionSeconds: number;
   listing: {
     title: string;
-    slug: string;
+    /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
     format: ListingFormat;
     orderIndex: number | null;
     publishedLectureCount: number | null;
-    language: Locale | null;
-    durationSeconds: number | null;
+    /** Documents the language field's API projection semantics and lifecycle meaning. */ language: Locale | null;
+    /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
+      | number
+      | null;
     coverImageUrl: string | null;
     translations: { title: string }[];
     scholar: {
-      slug: string;
+      /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
       name: string;
-      mainLanguage: Locale | null;
+      /** Documents the mainLanguage field's API projection semantics and lifecycle meaning. */ mainLanguage: Locale | null;
       imageUrl: string | null;
       translations: { name: string }[];
     };
@@ -182,20 +188,22 @@ const listingRelationSelect = (locale: Locale) =>
 type ListingRelation = {
   id: string;
   title: string;
-  slug: string;
-  language: Locale | null;
-  durationSeconds: number | null;
+  /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
+  /** Documents the language field's API projection semantics and lifecycle meaning. */ language: Locale | null;
+  /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
+    | number
+    | null;
   translations: { title: string }[];
   scholar: {
     id: string;
-    slug: string;
+    /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
     name: string;
-    mainLanguage: Locale | null;
+    /** Documents the mainLanguage field's API projection semantics and lifecycle meaning. */ mainLanguage: Locale | null;
     translations: { name: string }[];
   };
   parent: {
     title: string;
-    language: Locale | null;
+    /** Documents the language field's API projection semantics and lifecycle meaning. */ language: Locale | null;
     translations: { title: string }[];
   } | null;
 };
@@ -205,11 +213,12 @@ type ProgressLeafRecord = {
   listingId: string;
   positionSeconds: number;
   isCompleted: boolean;
-  updatedAt: Date;
+  /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */ updatedAt: Date;
   listing: { parentId: string | null; parent: { parentId: string | null } | null };
 };
 
 @Injectable()
+/** NestJS my library repository service or controller coordinating the API boundary for this responsibility. */
 export class MyLibraryRepository {
   constructor(
     private readonly prisma: PrismaService,

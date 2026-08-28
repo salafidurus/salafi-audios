@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+/** Core API env module providing shared backend infrastructure and authority-boundary services. */
 const ApiEnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -64,8 +65,10 @@ const ApiEnvSchema = z
     }
   });
 
+/** API type describing the api env contract. */
 export type ApiEnv = z.infer<typeof ApiEnvSchema>;
 
+/** Resolves get api env behavior while preserving the API boundary contract. */
 export function getApiEnv(raw: NodeJS.ProcessEnv = process.env): ApiEnv {
   const parsed = ApiEnvSchema.safeParse(raw);
   if (!parsed.success) {

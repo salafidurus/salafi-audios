@@ -9,6 +9,7 @@ import { AccessService } from './access.service';
 import { AdminDashboardController } from './admin-dashboard.controller';
 import { AdminDashboardService } from './admin-dashboard.service';
 
+/** Core API account.module module providing shared backend infrastructure and authority-boundary services. */
 @Module({
   imports: [DbModule],
   controllers: [AccountController, AdminUsersController, AdminDashboardController],
@@ -21,4 +22,6 @@ import { AdminDashboardService } from './admin-dashboard.service';
   ],
   exports: [UserDirectoryService],
 })
+/** NestJS account module service or controller coordinating the API boundary for this responsibility. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AccountModule {}

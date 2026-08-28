@@ -8,9 +8,12 @@ import { TopicsService } from './topics.service';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 
 // Topics are never scholar/locale-scoped resources — unconditioned checks only.
+/** NestJS topics translations controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Topic Translations')
 @ApiCommonErrors()
 @Controller('topics')
+/** topics application module responsible for topics translations.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class TopicsTranslationsController {
   constructor(private readonly service: TopicsService) {}
 

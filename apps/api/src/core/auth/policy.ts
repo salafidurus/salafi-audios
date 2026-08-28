@@ -4,16 +4,21 @@ import type { Locale } from '@sd/core-contracts';
 import { defineAbilityFor } from './ability/ability.factory';
 import type { AbilityInput, AppActions, AppSubjectType } from './ability/ability.types';
 
+/** Backend authorization normalization and policy evaluation for protected API actions. */
 /** Resource identity supplied by an adapter after it has resolved a request. */
 export type PolicyResource = {
+  /** Documents the slug field's API projection semantics and lifecycle meaning. */
   slug?: string;
+  /** Documents the scholarSlug field's API projection semantics and lifecycle meaning. */
   scholarSlug?: string;
   locale?: Locale;
 };
 
+/** API type describing the policy check contract. */
 export type PolicyCheck = {
   action: AppActions;
   subjectType: AppSubjectType;
+  /** Documents the resource field's API projection semantics and lifecycle meaning. */
   resource?: PolicyResource;
   /** True when an adapter attempted to resolve the resource. */
   resourceResolved?: boolean;

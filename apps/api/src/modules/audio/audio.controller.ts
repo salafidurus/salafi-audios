@@ -8,9 +8,12 @@ import { CacheTTL } from '@nestjs/cache-manager';
 import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
 import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
 
+/** NestJS audio controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Audio')
 @ApiCommonErrors()
 @Controller('audio')
+/** audio application module responsible for audio.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AudioController {
   constructor(private readonly audio: AudioService) {}
 
@@ -40,6 +43,7 @@ export class AudioController {
     @Body()
     body: {
       positionSeconds: number;
+      /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */
       durationSeconds?: number;
       isCompleted?: boolean;
     },

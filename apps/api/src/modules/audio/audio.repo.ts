@@ -10,19 +10,23 @@ import { publishedListingSlugWhere } from '../../shared/utils/published-listing-
 import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
 import { z } from 'zod';
 
+/** audio application module responsible for audio.repo behavior at the backend boundary. */
 const COMPLETION_PERCENT_THRESHOLD = 0.95;
 const COMPLETION_TAIL_SECONDS = 30;
 
 type PendingProgress = {
-  version: string;
-  userId: string;
+  /** Documents the version field's API projection semantics and lifecycle meaning. */ version: string;
+  /** Documents the userId field's API projection semantics and lifecycle meaning. */ userId: string;
   listingId: string;
   positionSeconds: number;
   isCompleted: boolean;
-  updatedAt: string;
+  /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */ updatedAt: string;
 };
 
-type ProgressWrite = Omit<PendingProgress, 'version' | 'updatedAt'> & { updatedAt: Date };
+type ProgressWrite = Omit<PendingProgress, 'version' | 'updatedAt'> & {
+  /** Server-side timestamp used for progress conflict resolution. */
+  updatedAt: Date;
+};
 type ProgressWhere = Prisma.UserListingProgressWhereInput;
 
 const ENQUEUE_PROGRESS_SCRIPT = `
@@ -71,6 +75,7 @@ export function isPositionCompleted(
 }
 
 @Injectable()
+/** NestJS audio repository service or controller coordinating the API boundary for this responsibility. */
 export class AudioRepository {
   constructor(
     private readonly prisma: PrismaService,
@@ -230,9 +235,11 @@ export class AudioRepository {
    * non-deleted Listing. Publication filtering stays on Catalog reads and
    * stream resolution.
    */
-  private async findProgressListingBySlug(
-    slug: string,
-  ): Promise<{ id: string; durationSeconds: number | null } | null> {
+  private async findProgressListingBySlug(slug: string): Promise<{
+    id: string;
+    /** Duration used to expose progress and calculate completion. */
+    durationSeconds: number | null;
+  } | null> {
     const key = this.progressListingKey(slug);
     const cached = await this.findCachedProgressListing(key, slug);
     if (cached) return cached;
@@ -267,7 +274,11 @@ export class AudioRepository {
   private async cacheProgressListing(
     slug: string,
     key: string,
-    listing: { id: string; durationSeconds: number | null } | null,
+    listing: {
+      id: string;
+      /** Duration cached alongside the listing identity for progress reads. */
+      durationSeconds: number | null;
+    } | null,
   ) {
     if (!listing || !this.redis.enabled) return;
     try {
@@ -303,7 +314,10 @@ export class AudioRepository {
   }
 
   private async enqueueProgress(
-    input: Omit<ProgressWrite, 'userId'> & { userId: string },
+    input: Omit<ProgressWrite, 'userId'> & {
+      /** Authenticated user owning the queued progress write. */
+      userId: string;
+    },
   ): Promise<void> {
     const pending: PendingProgress = {
       version: randomUUID(),

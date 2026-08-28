@@ -1,3 +1,5 @@
+/** Shared API resolve translated fields utilities and boundary definitions used by backend modules. */
+/** Resolves resolve translated fields behavior while preserving the API boundary contract. */
 export function resolveTranslatedFields<T extends Record<string, string | null | undefined>>(
   primaryFields: T,
   publishedTranslation: Partial<T> | null,

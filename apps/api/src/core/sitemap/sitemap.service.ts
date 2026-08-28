@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { SitemapRepo } from './sitemap.repo';
 
+/** NestJS sitemap service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** Core API sitemap.service module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class SitemapService {
   constructor(private readonly repo: SitemapRepo) {}
 

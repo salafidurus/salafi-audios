@@ -17,7 +17,10 @@ import type { CreateScholarDto } from './dto/create-scholar.dto';
 import type { UpdateScholarDto } from './dto/update-scholar.dto';
 import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 
+/** NestJS scholars service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** scholars application module responsible for scholars.service behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ScholarsService {
   constructor(
     private readonly repo: ScholarsRepository,

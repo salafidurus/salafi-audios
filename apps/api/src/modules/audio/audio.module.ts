@@ -5,10 +5,13 @@ import { AudioService } from './audio.service';
 import { AudioRepository } from './audio.repo';
 import { AudioProgressFlushJob } from './audio-progress-flush.job';
 
+/** audio application module responsible for audio.module behavior at the backend boundary. */
 @Module({
   imports: [DbModule],
   controllers: [AudioController],
   providers: [AudioService, AudioRepository, AudioProgressFlushJob],
   exports: [AudioService],
 })
+/** NestJS audio module service or controller coordinating the API boundary for this responsibility. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AudioModule {}

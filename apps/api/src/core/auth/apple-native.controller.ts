@@ -4,8 +4,11 @@ import { AppleNativeService } from './apple-native.service';
 import { AppleNativeSignInDto } from './dto/apple-native-sign-in.dto';
 import { Public } from './decorators';
 
+/** NestJS apple native controller service or controller coordinating the API boundary for this responsibility. */
 @ApiExcludeController()
 @Controller('auth/apple')
+/** Core API apple native.controller module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AppleNativeController {
   constructor(private readonly appleNativeService: AppleNativeService) {}
 

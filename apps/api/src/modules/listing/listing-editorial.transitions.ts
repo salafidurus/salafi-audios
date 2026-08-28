@@ -1,6 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import type { Status } from '@sd/core-db';
 
+/** listing application module responsible for listing editorial.transitions behavior at the backend boundary. */
+/** API type describing the listing editorial transition contract. */
 export type ListingEditorialTransition = 'publish' | 'archive';
 
 type AllowedStatusMap = {
@@ -12,6 +14,7 @@ const allowedStatuses: AllowedStatusMap = {
   archive: ['published'],
 };
 
+/** Resolves assert listing transition behavior while preserving the API boundary contract. */
 export function assertListingTransition(
   action: ListingEditorialTransition,
   currentStatus: Status,

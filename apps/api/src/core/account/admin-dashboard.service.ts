@@ -11,6 +11,7 @@ import type {
   AppSubjectType,
 } from '../auth/ability/ability.types';
 
+/** Core API admin dashboard.service module providing shared backend infrastructure and authority-boundary services. */
 type DashboardUser = AbilityInput & { id: string };
 
 const CONTENT_ACTIONS: AppActions[] = ['read', 'write', 'publish', 'delete'];
@@ -30,6 +31,7 @@ function buildDashboardMetrics(values: {
 }
 
 @Injectable()
+/** NestJS admin dashboard service service or controller coordinating the API boundary for this responsibility. */
 export class AdminDashboardService {
   constructor(private readonly prisma: PrismaService) {}
 

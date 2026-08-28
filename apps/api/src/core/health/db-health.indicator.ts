@@ -4,6 +4,7 @@ import type { HealthIndicatorResult } from '@nestjs/terminus';
 import { z } from 'zod';
 import { ConfigService } from '../config/config.service';
 
+/** Core API db health.indicator module providing shared backend infrastructure and authority-boundary services. */
 const NEON_API_BASE_URL = 'https://console.neon.tech/api/v2';
 const neonEndpointSchema = z.object({
   endpoint: z.object({ current_state: z.string().min(1) }).optional(),
@@ -14,6 +15,7 @@ function isNeonConfigured(config: ConfigService): boolean {
 }
 
 @Injectable()
+/** NestJS db health indicator service or controller coordinating the API boundary for this responsibility. */
 export class DbHealthIndicator extends HealthIndicator {
   constructor(private readonly config: ConfigService) {
     super();

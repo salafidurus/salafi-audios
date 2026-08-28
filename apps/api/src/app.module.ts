@@ -31,6 +31,7 @@ import { CacheInvalidationInterceptor } from './shared/interceptors/cache-invali
 
 import { ThrottlerGuard } from '@nestjs/throttler';
 
+/** Root NestJS module composing the API application and its infrastructure dependencies. */
 @Module({
   imports: [
     ConfigModule,
@@ -68,6 +69,8 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     { provide: APP_INTERCEPTOR, useClass: LocaleInterceptor },
   ],
 })
+/** NestJS app module service or controller coordinating the API boundary for this responsibility. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer.apply(LocaleMiddleware).forRoutes('*');

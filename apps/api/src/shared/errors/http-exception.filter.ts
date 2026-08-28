@@ -6,6 +6,7 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import { ZodValidationException } from 'nestjs-zod';
 import { z } from 'zod';
 
+/** Shared API http exception.filter utilities and boundary definitions used by backend modules. */
 const httpExceptionBodySchema = z
   .object({
     message: z.union([z.string(), z.array(z.string())]).optional(),
@@ -33,10 +34,13 @@ type ErrorExtras = Record<string, string | number | boolean | string[] | null | 
 type DevDetails =
   | string[]
   | {
+      /** Documents the kind field's API projection semantics and lifecycle meaning. */
       kind: string;
       message?: string;
+      /** Documents the clientVersion field's API projection semantics and lifecycle meaning. */
       clientVersion?: string;
       code?: string;
+      /** Documents the errorCode field's API projection semantics and lifecycle meaning. */
       errorCode?: string;
       stack?: string;
       meta?: unknown;
@@ -45,6 +49,7 @@ type DevDetails =
 type ErrorExtraSource = z.infer<typeof errorExtraSourceSchema>;
 
 type ExceptionResolution = {
+  /** Documents the statusCode field's API projection semantics and lifecycle meaning. */
   statusCode: number;
   message: string;
   details?: DevDetails;
@@ -52,6 +57,7 @@ type ExceptionResolution = {
 };
 
 @Catch()
+/** NestJS all exceptions filter service or controller coordinating the API boundary for this responsibility. */
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly config: ConfigService) {}
 

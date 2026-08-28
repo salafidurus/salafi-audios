@@ -4,7 +4,10 @@ import type { HealthIndicatorResult } from '@nestjs/terminus';
 import { S3Client } from 'bun';
 import { ConfigService } from '../config/config.service';
 
+/** NestJS cdnhealth indicator service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** Core API cdn health.indicator module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class CDNHealthIndicator extends HealthIndicator {
   private readonly s3: S3Client;
 

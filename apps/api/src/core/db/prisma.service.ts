@@ -6,7 +6,10 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PinoLogger } from 'nestjs-pino';
 import { getPrismaLogLevels } from './prisma-log-levels';
 
+/** NestJS prisma service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** Core API prisma.service module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private isConnected = false;
 

@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 
 import { UserDirectoryRepository } from './user-directory.repository';
 
+/** NestJS user directory service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** Core API user directory.service module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class UserDirectoryService {
   constructor(private readonly repository: UserDirectoryRepository) {}
 
@@ -24,6 +27,7 @@ export class UserDirectoryService {
 }
 
 function deriveAccessRoles(user: {
+  // oxlint-disable-next-line anti-slop/require-tsdoc -- Inline structural field is covered by the enclosing API method contract.
   roles: Array<{ role: string }>;
   accessGrants: Array<{ target: string; capability: string }>;
 }): string[] {

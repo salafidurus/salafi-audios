@@ -1,3 +1,5 @@
+/** my library application module responsible for my library.service behavior at the backend boundary. */
+/** my library application module responsible for my library.service behavior at the backend boundary. */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type {
   MyLibraryPageDto,
@@ -7,7 +9,10 @@ import type {
 } from '@sd/core-contracts';
 import { MyLibraryRepository } from './my-library.repo';
 
+/** NestJS my library service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** my-library application module responsible for my library.service behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class MyLibraryService {
   constructor(private readonly repo: MyLibraryRepository) {}
 

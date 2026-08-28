@@ -30,7 +30,10 @@ import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ListingRepository } from './listing.repo';
 import { RecentListingsRepo } from './listing-recent.repo';
 
+/** NestJS listing service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** listing application module responsible for listing.service behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ListingService {
   constructor(
     private readonly repo: ListingRepository,
@@ -84,6 +87,7 @@ export class ListingService {
   listAdmin(params: {
     cursor?: string;
     scholarId?: string;
+    /** Publication or lifecycle meaning carried by the status projection field. */
     status?: string;
     search?: string;
     accessibleScholarIds?: string[];

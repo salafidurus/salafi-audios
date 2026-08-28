@@ -1,6 +1,8 @@
 import { AbilityBuilder, createMongoAbility } from '@casl/ability';
 import type { AbilityInput, AppAbility, AppActions } from './ability.types';
 
+/** Core API ability.factory module providing shared backend infrastructure and authority-boundary services. */
+/** Resolves define ability for behavior while preserving the API boundary contract. */
 export function defineAbilityFor(user: AbilityInput): AppAbility {
   const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
 

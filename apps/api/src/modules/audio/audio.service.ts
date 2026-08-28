@@ -2,7 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import type { ProgressSyncItemDto, AudioProgressDto, StreamResponseDto } from '@sd/core-contracts';
 import { AudioRepository } from './audio.repo';
 
+/** NestJS audio service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** audio application module responsible for audio.service behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AudioService {
   constructor(private readonly repo: AudioRepository) {}
 

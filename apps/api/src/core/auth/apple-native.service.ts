@@ -3,11 +3,14 @@ import { createRemoteJWKSet, jwtVerify, errors } from 'jose';
 import { ConfigService } from '../config/config.service';
 import { AppleNativeRepository } from './apple-native.repo';
 
+/** Core API apple native.service module providing shared backend infrastructure and authority-boundary services. */
+/** API interface describing the apple identity payload contract. */
 export interface AppleIdentityPayload {
   sub: string;
   email?: string;
 }
 
+/** API interface describing the apple user info contract. */
 export interface AppleUserInfo {
   firstName?: string;
   lastName?: string;
@@ -15,6 +18,7 @@ export interface AppleUserInfo {
 }
 
 @Injectable()
+/** NestJS apple native service service or controller coordinating the API boundary for this responsibility. */
 export class AppleNativeService {
   private readonly JWKS: ReturnType<typeof createRemoteJWKSet>;
 

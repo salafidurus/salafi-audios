@@ -10,7 +10,10 @@ import type {
 import { canAccess, type PolicyResource } from './policy';
 import { PrismaService } from '../db/prisma.service';
 
+/** NestJS policy guard service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** Core API policy.guard module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class PolicyGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,

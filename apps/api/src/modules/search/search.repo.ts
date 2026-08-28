@@ -8,17 +8,21 @@ import { isTrigramSearchFailure } from './search-error.utils';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 
+/** search application module responsible for search.repo behavior at the backend boundary. */
 const SIMILARITY_THRESHOLD = 0.12;
 
 type SearchRow = SearchCatalogItemDto & {
+  /** Documents the originalLanguage field's API projection semantics and lifecycle meaning. */
   originalLanguage: Locale | null;
   scholarId: string;
+  /** Documents the scholarOriginalLanguage field's API projection semantics and lifecycle meaning. */
   scholarOriginalLanguage: Locale | null;
 };
 
 type SearchQueryRow = SearchRow & { format: string };
 
 @Injectable()
+/** NestJS search repository service or controller coordinating the API boundary for this responsibility. */
 export class SearchRepository {
   private readonly logger = new Logger(SearchRepository.name);
 
