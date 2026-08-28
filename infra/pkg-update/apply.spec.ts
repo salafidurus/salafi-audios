@@ -45,7 +45,22 @@ beforeAll(() => {
   mkdirSync(nativeDir, { recursive: true });
   writeFileSync(
     join(nativeDir, "package.json"),
-    JSON.stringify({ name: "native", dependencies: { expo: "~52.0.0" } }),
+    JSON.stringify({ name: "native", dependencies: { expo: "~52.0.0", react: "19.0.0" } }),
+  );
+  writeFileSync(
+    join(tmpDir, "catalog.config.json"),
+    JSON.stringify({
+      groups: [],
+      policies: [],
+      compatibilityGroups: [
+        {
+          name: "expo-sdk",
+          packages: ["expo", "expo-*", "react"],
+          workspaces: ["apps/native"],
+          owner: "expo-pipeline",
+        },
+      ],
+    }),
   );
   const apiDir = join(tmpDir, "apps", "api");
   mkdirSync(apiDir, { recursive: true });
@@ -248,7 +263,7 @@ describe("syncWorkspaceDeps", () => {
     expect(updated.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("does not update packages in expo group", () => {
+  it("updates shared packages outside the Expo-owned workspace", () => {
     const webPkg = JSON.parse(readFileSync(join(tmpDir, "apps", "web", "package.json"), "utf-8"));
     const oldReact = webPkg.dependencies.react;
 
@@ -261,7 +276,12 @@ describe("syncWorkspaceDeps", () => {
     syncWorkspaceDeps(candidate, tmpDir, config);
 
     const updated = JSON.parse(readFileSync(join(tmpDir, "apps", "web", "package.json"), "utf-8"));
-    expect(updated.dependencies.react).toBe(oldReact);
+    expect(updated.dependencies.react).toBe("20.0.0");
+
+    const native = JSON.parse(
+      readFileSync(join(tmpDir, "apps", "native", "package.json"), "utf-8"),
+    );
+    expect(native.dependencies.react).toBe(oldReact);
   });
 
   it("updates packages in never list (each gets own PR)", () => {

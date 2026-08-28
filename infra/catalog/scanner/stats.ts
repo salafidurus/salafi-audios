@@ -18,7 +18,7 @@ export function runCatalogStats(rootDir: string): CatalogStats {
   for (const pkg of allPackages) {
     const depTypes = ["dependencies", "devDependencies"] as const;
     for (const depType of depTypes) {
-      const deps = (pkg.content as any)[depType] || {};
+      const deps = pkg.content[depType] ?? {};
       for (const [name, version] of Object.entries(deps)) {
         if (version.startsWith("workspace:") || name.startsWith("@sd/")) continue;
         externalDepNames.add(name);
@@ -97,7 +97,7 @@ export function runCatalogStats(rootDir: string): CatalogStats {
     let wsMiscatalogued = 0;
     const depTypes = ["dependencies", "devDependencies"] as const;
     for (const depType of depTypes) {
-      const deps = (ws.content as any)[depType] || {};
+      const deps = ws.content[depType] ?? {};
       for (const [name, version] of Object.entries(deps)) {
         if (version.startsWith("workspace:") || name.startsWith("@sd/")) continue;
         const usesCatalog = version === "catalog:" || version.startsWith("catalog:");
@@ -122,7 +122,7 @@ export function runCatalogStats(rootDir: string): CatalogStats {
   let rootMiscatalogued = 0;
   const rootDepTypes = ["dependencies", "devDependencies"] as const;
   for (const depType of rootDepTypes) {
-    const deps = (rootJson as any)[depType] || {};
+    const deps = rootJson[depType] ?? {};
     for (const [name, version] of Object.entries(deps)) {
       if (version.startsWith("workspace:") || name.startsWith("@sd/")) continue;
       const usesCatalog = version === "catalog:" || version.startsWith("catalog:");

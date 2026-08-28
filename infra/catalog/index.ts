@@ -10,6 +10,7 @@ export type {
   CatalogUpdateCeiling,
   DependencySection,
   CatalogPolicyRule,
+  CatalogCompatibilityGroup,
   CatalogPolicyMatch,
   CatalogRepairMutation,
   CatalogRepairReport,
@@ -24,6 +25,7 @@ export {
   getDependencyGroup,
   sanitizeGroupName,
   matchPattern,
+  resolveCompatibilityGroup,
 } from "./helpers";
 
 export { getAllPackages } from "./scanner/shared";

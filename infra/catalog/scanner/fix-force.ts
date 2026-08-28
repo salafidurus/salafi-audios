@@ -58,13 +58,15 @@ export function runCatalogFixForce(rootDir: string): { updatedFiles: string[] } 
       const patternSet = new Set(patterns);
       const depTypes = ["dependencies", "devDependencies"] as const;
       for (const depType of depTypes) {
-        const deps = (pkg.content as any)[depType] || {};
+        const deps = pkg.content[depType] ?? {};
         for (const [name, version] of Object.entries(deps)) {
           if (version.startsWith("workspace:") || name.startsWith("@sd/")) continue;
           if (!patternSet.has(name)) continue;
 
-          if (!catalogs.named[group.name][name]) {
-            catalogs.named[group.name][name] = version as string;
+          const namedCatalog = catalogs.named[group.name];
+          if (!namedCatalog) continue;
+          if (!namedCatalog[name]) {
+            namedCatalog[name] = version;
           }
 
           if (version !== `catalog:${group.name}`) {
@@ -88,7 +90,7 @@ export function runCatalogFixForce(rootDir: string): { updatedFiles: string[] } 
 
       const depTypes = ["dependencies", "devDependencies"] as const;
       for (const depType of depTypes) {
-        const deps = (pkg.content as any)[depType] || {};
+        const deps = pkg.content[depType] ?? {};
         for (const [name, version] of Object.entries(deps)) {
           if (name !== depName) continue;
           if (version.startsWith("workspace:") || name.startsWith("@sd/")) continue;
@@ -110,8 +112,9 @@ export function runCatalogFixForce(rootDir: string): { updatedFiles: string[] } 
   if (refUpdates.length > 0) {
     let rootModified = false;
     for (const group of groupEntries) {
-      if (catalogs.named[group.name]) {
-        for (const [name, version] of Object.entries(catalogs.named[group.name])) {
+      const namedCatalog = catalogs.named[group.name];
+      if (namedCatalog) {
+        for (const [name, version] of Object.entries(namedCatalog)) {
           if (!(rootJson as any).workspaces?.catalogs?.[group.name]?.[name]) {
             if (!rootJson.workspaces) rootJson.workspaces = {};
             if (!(rootJson as any).workspaces.catalogs) (rootJson as any).workspaces.catalogs = {};

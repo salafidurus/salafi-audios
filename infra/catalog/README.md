@@ -86,6 +86,16 @@ Policy rules can define `rangePrefix`, `fixedVersion`, and update ceilings of
 more specific than wildcard matches. Equal-specificity conflicts are reported
 as ambiguity rather than resolved silently.
 
+Compatibility groups are also workspace-scoped. They declare the owning updater
+and validation contract without pinning a permanent version. For example, the
+Expo group uses an `expo-sdk` target resolver; each update run selects the SDK
+target and then runs the configured compatibility commands. A shared dependency
+can therefore have Expo ownership in `apps/native` and Dependabot ownership in
+another workspace.
+
+Use `bun run catalog fix --report-only` to evaluate the repair report without
+writing catalog, manifest, or lockfile changes.
+
 ### `fix --force`
 
 The reverse of `fix`: reads root catalogs and `catalog.config.json` groups and enforces them onto workspace `package.json` files. Every dependency matching a group is rewritten to use `catalog:<group>`; everything else in the default catalog uses `catalog:`.

@@ -1,9 +1,10 @@
 import { spawnSync } from "child_process";
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from "fs";
-import { resolve, dirname } from "path";
+import { resolve, dirname, relative } from "path";
 
 import type { UpdateCandidate } from "./utils/ui";
 
+import { loadConfig, resolveCompatibilityGroup } from "../catalog/helpers";
 import { config, type PkupdateConfig } from "./pkg-update.config";
 
 export function findWorkspacePkgFiles(rootDir: string): string[] {
@@ -36,15 +37,17 @@ function matchesPattern(name: string, pattern: string): boolean {
   return name === pattern;
 }
 
-function shouldSkipPackage(name: string, cfg: PkupdateConfig): boolean {
+function shouldSkipPackage(
+  name: string,
+  cfg: PkupdateConfig,
+  rootDir: string,
+  workspacePath: string,
+): boolean {
   for (const s of cfg.skip) {
     if (matchesPattern(name, s)) return true;
   }
-  const expoGroup = cfg.groups["expo"];
-  if (expoGroup) {
-    return expoGroup.patterns.some((p) => matchesPattern(name, p));
-  }
-  return false;
+  const compatibility = resolveCompatibilityGroup(name, workspacePath, loadConfig(rootDir));
+  return compatibility?.owner === "expo-pipeline";
 }
 
 function getGroupPatterns(name: string, cfg: PkupdateConfig): string[] | null {
@@ -91,7 +94,14 @@ export function syncWorkspaceDeps(
       if (
         currentDep !== undefined &&
         currentDep !== "catalog:" &&
-        !shouldSkipPackage(candidate.packageName, cfg)
+        !shouldSkipPackage(
+          candidate.packageName,
+          cfg,
+          rootDir,
+          relative(rootDir, file)
+            .replace(/\\/g, "/")
+            .replace(/\/package\.json$/, ""),
+        )
       ) {
         deps[candidate.packageName] = catalog?.[candidate.packageName] ?? candidate.latestVersion;
         dirty = true;
@@ -100,7 +110,17 @@ export function syncWorkspaceDeps(
       if (isVersionLocked && groupPatterns) {
         for (const depName of Object.keys(deps)) {
           const matchesGroup = groupPatterns.some((p) => matchesPattern(depName, p));
-          if (matchesGroup && !shouldSkipPackage(depName, cfg)) {
+          if (
+            matchesGroup &&
+            !shouldSkipPackage(
+              depName,
+              cfg,
+              rootDir,
+              relative(rootDir, file)
+                .replace(/\\/g, "/")
+                .replace(/\/package\.json$/, ""),
+            )
+          ) {
             const ld = deps[depName];
             if (ld !== "catalog:") {
               deps[depName] = catalog?.[depName] ?? candidate.latestVersion;
@@ -224,7 +244,12 @@ export async function applyExpoUpdate(
     cwd: nativeDir,
     stdio: "inherit",
   });
-  return result.status === 0;
+  if (result.status !== 0) return false;
+  const doctor = spawnSync("bunx", ["expo-doctor"], {
+    cwd: nativeDir,
+    stdio: "inherit",
+  });
+  return doctor.status === 0;
 }
 
 export async function runVerification(rootDir: string): Promise<string> {

@@ -399,7 +399,15 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
     if (!dryRun) {
       fs.writeFileSync(
         path.join(rootDir, "catalog.config.json"),
-        JSON.stringify({ groups: configGroups, policies: config.policies }, null, 2) + "\n",
+        JSON.stringify(
+          {
+            groups: configGroups,
+            policies: config.policies,
+            compatibilityGroups: config.compatibilityGroups ?? [],
+          },
+          null,
+          2,
+        ) + "\n",
       );
     }
     updatedFilesSet.add("catalog.config.json");
