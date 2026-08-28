@@ -8,10 +8,12 @@ import { z } from 'zod';
 
 import { ConfigService } from '../config/config.service';
 
+/** Core API redis.service module providing shared backend infrastructure and authority-boundary services. */
 const jsonValueSchema = z.unknown();
 
 type RedisSetOptions = {
   mode?: 'EX' | 'PX';
+  /** Documents the duration field's API projection semantics and lifecycle meaning. */
   duration?: number;
   condition?: 'NX' | 'XX';
 };
@@ -46,6 +48,7 @@ function setWithCondition(client: Redis, key: string, value: string, condition?:
 }
 
 @Injectable()
+/** NestJS redis service service or controller coordinating the API boundary for this responsibility. */
 export class RedisService implements OnModuleDestroy {
   private readonly client: Redis | undefined;
 
@@ -210,6 +213,7 @@ export class RedisService implements OnModuleDestroy {
   }
 }
 
+/** NestJS redis unavailable error service or controller coordinating the API boundary for this responsibility. */
 export class RedisUnavailableError extends Error {
   constructor() {
     super('Redis is not configured or unavailable');

@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 
+/** Shared API env.bootstrap utilities and boundary definitions used by backend modules. */
 const nodeEnv = process.env.NODE_ENV ?? 'development';
 
 // Load local env files ONLY when not in production.

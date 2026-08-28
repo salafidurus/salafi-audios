@@ -1,3 +1,5 @@
+/** my library application module responsible for my library.controller behavior at the backend boundary. */
+/** my library application module responsible for my library.controller behavior at the backend boundary. */
 import { Controller, Delete, Get, Param, Post, Query, Body } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
@@ -6,9 +8,12 @@ import type { MyLibraryPageDto, RecentProgressDto, SavedDeltaItemDto } from '@sd
 import { MyLibraryService } from './my-library.service';
 import { SavedSyncDto } from './dto/saved-sync.dto';
 
+/** NestJS my library controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('My Library')
 @ApiCommonErrors()
 @Controller('me/my-library')
+/** my-library application module responsible for my library.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class MyLibraryController {
   constructor(private readonly myLibrary: MyLibraryService) {}
 

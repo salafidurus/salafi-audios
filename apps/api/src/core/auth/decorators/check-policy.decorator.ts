@@ -3,21 +3,26 @@ import type { PrismaService } from '../../db/prisma.service';
 import type { AppActions, AppSubjectType } from '../ability/ability.types';
 import type { PolicyResource } from '../policy';
 
+/** Core API check policy.decorator module providing shared backend infrastructure and authority-boundary services. */
 export type { PolicyResource } from '../policy';
 
+/** Runtime API declaration for check policy key. */
 export const CHECK_POLICY_KEY = 'checkPolicy';
 
+/** API type describing the policy request context contract. */
 export type PolicyRequestContext = {
   params: Record<string, string>;
   body: unknown;
   query: Record<string, string | string[] | undefined>;
 };
 
+/** API type describing the policy resource resolver contract. */
 export type PolicyResourceResolver = (
   ctx: PolicyRequestContext,
   prisma: PrismaService,
 ) => Promise<PolicyResource> | PolicyResource;
 
+/** API type describing the check policy metadata contract. */
 export type CheckPolicyMetadata = {
   action: AppActions;
   subjectType: AppSubjectType;

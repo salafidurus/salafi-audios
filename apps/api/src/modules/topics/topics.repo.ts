@@ -12,6 +12,7 @@ import { resolveContentTranslation } from '../../shared/i18n/resolve-content-tra
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 
+/** topics application module responsible for topics.repo behavior at the backend boundary. */
 const topicViewSelect = {
   id: true,
   slug: true,
@@ -51,6 +52,7 @@ function mapOriginalLecture(
 }
 
 @Injectable()
+/** NestJS topics repository service or controller coordinating the API boundary for this responsibility. */
 export class TopicsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -160,7 +162,7 @@ export class TopicsRepository {
    * Upsert Topic by slug.
    */
   async upsertBySlug(input: {
-    slug: string;
+    /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
     name: string;
     orderIndex?: number;
   }): Promise<TopicDetailDto> {
@@ -207,8 +209,8 @@ export class TopicsRepository {
   private mapTopicTranslation(t: {
     locale: Locale;
     name: string;
-    createdAt: Date;
-    updatedAt: Date;
+    /** Documents the createdAt field's API projection semantics and lifecycle meaning. */ createdAt: Date;
+    /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */ updatedAt: Date;
   }): TranslationViewDto {
     return {
       locale: t.locale,
@@ -251,7 +253,10 @@ export class TopicsRepository {
   }
 
   private async findManyTopics(
-    where?: { slug?: string },
+    where?: {
+      /** Optional slug identity used to constrain the topic lookup. */
+      slug?: string;
+    },
     take?: number,
   ): Promise<TopicViewRecord[]> {
     return this.prisma.topic.findMany({

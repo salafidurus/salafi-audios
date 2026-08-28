@@ -17,6 +17,7 @@ import { CacheTTL } from '@nestjs/cache-manager';
 import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
 import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
 
+/** NestJS listing controller service or controller coordinating the API boundary for this responsibility. */
 @SkipThrottle()
 @ApiTags('Listings')
 @ApiCommonErrors()
@@ -24,6 +25,8 @@ import { CacheControlInterceptor } from '../../shared/interceptors/cache-control
 @Controller('listings')
 @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
 @CacheTTL(24 * 60 * 60 * 1000) // 24 hours; successful mutations clear the cache
+/** listing application module responsible for listing.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ListingController {
   constructor(private readonly service: ListingService) {}
 

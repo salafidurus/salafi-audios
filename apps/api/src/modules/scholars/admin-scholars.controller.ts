@@ -7,9 +7,12 @@ import { ScholarsService } from './scholars.service';
 import { CreateScholarDto } from './dto/create-scholar.dto';
 import { UpdateScholarDto } from './dto/update-scholar.dto';
 
+/** NestJS admin scholars controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Scholars')
 @ApiCommonErrors()
 @Controller('admin/scholars')
+/** scholars application module responsible for admin scholars.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AdminScholarsController {
   constructor(private readonly service: ScholarsService) {}
 

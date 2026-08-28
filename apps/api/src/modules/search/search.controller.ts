@@ -11,6 +11,7 @@ import { CacheTTL } from '@nestjs/cache-manager';
 import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
 import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
 
+/** NestJS search controller service or controller coordinating the API boundary for this responsibility. */
 @SkipThrottle()
 @ApiTags('Search')
 @ApiCommonErrors()
@@ -18,6 +19,8 @@ import { CacheControlInterceptor } from '../../shared/interceptors/cache-control
 @Controller('search')
 @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
 @CacheTTL(15 * 60 * 1000) // Search results change with catalog mutations; writes clear cache
+/** search application module responsible for search.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 

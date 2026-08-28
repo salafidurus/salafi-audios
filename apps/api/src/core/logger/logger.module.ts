@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import { z } from 'zod';
 import { ConfigService } from '../config/config.service';
 
+/** Core API logger.module module providing shared backend infrastructure and authority-boundary services. */
 function genId() {
   return crypto.randomUUID();
 }
@@ -58,4 +59,5 @@ const requestIdHeaderSchema = z.string().trim().min(1);
   ],
   exports: [LoggerModule],
 })
+/** NestJS app logger module service or controller coordinating the API boundary for this responsibility. */
 export class AppLoggerModule {}

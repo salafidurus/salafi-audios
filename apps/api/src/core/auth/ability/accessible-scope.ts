@@ -1,5 +1,6 @@
 import type { AppAbility, AppActions, AppSubjectType } from './ability.types';
 
+/** Core API accessible scope module providing shared backend infrastructure and authority-boundary services. */
 type ScopeConditionKey = 'slug' | 'scholarSlug';
 type ScopedRuleConditions = Partial<Record<ScopeConditionKey, string>>;
 

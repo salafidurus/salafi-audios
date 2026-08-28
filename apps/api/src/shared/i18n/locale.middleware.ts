@@ -6,6 +6,7 @@ import { type Locale, LocaleSchema } from '@sd/core-contracts';
 import { z } from 'zod';
 import { runWithLocale } from './locale-context';
 
+/** Shared API locale.middleware utilities and boundary definitions used by backend modules. */
 const localeQuerySchema = z.looseObject({ locale: LocaleSchema.optional() });
 
 /**
@@ -16,6 +17,7 @@ const localeQuerySchema = z.looseObject({ locale: LocaleSchema.optional() });
  * authenticated user's preference once the auth guard has run.
  */
 @Injectable()
+/** NestJS locale middleware service or controller coordinating the API boundary for this responsibility. */
 export class LocaleMiddleware implements NestMiddleware {
   use(req: Request & { locale?: Locale }, _res: Response, next: NextFunction): void {
     const parsedQuery = localeQuerySchema.safeParse(req.query);

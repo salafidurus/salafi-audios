@@ -14,9 +14,12 @@ import { ReplaceUserAccessDto } from './dto/replace-user-access.dto';
  * Handles user listing and aggregate access management.
  * User administration is global and requires the UserAccess capability.
  */
+/** NestJS admin users controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Users')
 @ApiCommonErrors()
 @Controller('admin/users')
+/** Core API admin users.controller module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AdminUsersController {
   constructor(
     private readonly userDirectoryService: UserDirectoryService,

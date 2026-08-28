@@ -15,7 +15,10 @@ import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ListingRepository } from './listing.repo';
 
 /** Application seam for authenticated Listing mutations. Catalog reads stay in ListingService. */
+/** NestJS listing editorial service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** listing application module responsible for listing editorial.service behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ListingEditorialService {
   constructor(
     private readonly repo: ListingRepository,

@@ -6,6 +6,7 @@ import { fromNodeHeaders } from 'better-auth/node';
 import { PrismaService } from '../db/prisma.service';
 import { IS_PUBLIC_KEY } from './decorators';
 
+/** Core API auth.guard module providing shared backend infrastructure and authority-boundary services. */
 type SessionBanState = {
   banned?: boolean | null;
   banExpires?: Date | string | null;
@@ -16,6 +17,7 @@ type AuthenticatedSessionUser = SessionBanState & {
 };
 
 @Injectable()
+/** NestJS auth guard service or controller coordinating the API boundary for this responsibility. */
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,

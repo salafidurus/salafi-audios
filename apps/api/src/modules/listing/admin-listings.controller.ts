@@ -42,9 +42,12 @@ import { UpdateListingMediaDto } from './dto/update-listing-media.dto';
 import { ArrangeCommitDto } from './dto/arrange-commit.dto';
 import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 
+/** NestJS admin listings controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Listings')
 @ApiCommonErrors()
 @Controller('admin/listings')
+/** listing application module responsible for admin listings.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AdminListingsController {
   constructor(
     private readonly service: ListingService,

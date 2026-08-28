@@ -14,12 +14,16 @@ import type {
 
 import { PrismaService } from '../db/prisma.service';
 
+/** Core API access.service module providing shared backend infrastructure and authority-boundary services. */
 type AccessGrant = {
   target: AccessTarget;
   capability: AccessCapability;
   scholarId: string | null;
   locale: Locale | null;
-  scholar: { slug: string } | null;
+  scholar: {
+    /** Stable scholar identity used to preserve scoped access grants. */
+    slug: string;
+  } | null;
 };
 
 function groupAccessGrants(grants: AccessGrant[]) {
@@ -28,7 +32,7 @@ function groupAccessGrants(grants: AccessGrant[]) {
     {
       target: AccessTarget;
       capability: AccessCapability;
-      scholarSlugs: Set<string>;
+      /** Documents the scholarSlugs field's API projection semantics and lifecycle meaning. */ scholarSlugs: Set<string>;
       locales: Set<Locale>;
     }
   >();
@@ -72,6 +76,7 @@ function deriveAccessRoles(
 }
 
 @Injectable()
+/** NestJS access service service or controller coordinating the API boundary for this responsibility. */
 export class AccessService {
   constructor(private readonly prisma: PrismaService) {}
 

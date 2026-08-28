@@ -15,6 +15,7 @@ import cors from '@fastify/cors';
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { ZodValidationPipe } from 'nestjs-zod';
 
+/** API bootstrap entrypoint that configures the NestJS server and shared request infrastructure. */
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,

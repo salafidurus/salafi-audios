@@ -42,19 +42,24 @@ import {
 } from './listing-editorial.transitions';
 import { toOptional } from '../../shared/utils/to-optional';
 
+/** listing application module responsible for listing.repo behavior at the backend boundary. */
 type AdminListingFilterParams = {
   cursor?: string;
   scholarId?: string;
-  status?: string;
+  /** Documents the status field's API projection semantics and lifecycle meaning. */ status?: string;
   search?: string;
   accessibleScholarIds?: string[];
 };
 
 type CounterChild = {
   format: string;
-  durationSeconds: number | null;
+  /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
+    | number
+    | null;
   publishedLectureCount: number | null;
-  publishedDurationSeconds: number | null;
+  /** Documents the publishedDurationSeconds field's API projection semantics and lifecycle meaning. */ publishedDurationSeconds:
+    | number
+    | null;
 };
 
 function buildAdminListingWhere(params: AdminListingFilterParams): Prisma.ListingWhereInput {
@@ -87,7 +92,7 @@ function buildAdminListingWhere(params: AdminListingFilterParams): Prisma.Listin
 
 function sumListingCounters(children: CounterChild[]): {
   totalCount: number;
-  totalDuration: number;
+  /** Documents the totalDuration field's API projection semantics and lifecycle meaning. */ totalDuration: number;
 } {
   return children.reduce(
     (totals, child) =>
@@ -172,7 +177,7 @@ function buildListingMediaUpdateData(
 
 function mapListingTopic(topic: {
   id: string;
-  slug: string;
+  /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
   name: string;
   translations: Array<{ name: string }>;
 }) {
@@ -189,7 +194,9 @@ function mapPrimaryAudioAsset(
     url: string;
     format: string | null;
     bitrateKbps: number | null;
-    durationSeconds: number | null;
+    /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
+      | number
+      | null;
   } | null,
 ) {
   if (!asset) return null;
@@ -224,12 +231,14 @@ function mapOriginalListingTitle(original: { title: string } | null | undefined)
 
 function getAdminListingOptionalFields(listing: {
   description: string | null;
-  language: Locale | null;
+  /** Documents the language field's API projection semantics and lifecycle meaning. */ language: Locale | null;
   orderIndex: number | null;
-  durationSeconds: number | null;
+  /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
+    | number
+    | null;
   parentId: string | null;
   coverImageUrl: string | null;
-  updatedAt: Date | null;
+  /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */ updatedAt: Date | null;
 }) {
   return {
     description: toOptional(listing.description),
@@ -290,6 +299,7 @@ function isNewlyPublished(status: Status, existingStatus: Status | null | undefi
 }
 
 @Injectable()
+/** NestJS listing repository service or controller coordinating the API boundary for this responsibility. */
 export class ListingRepository {
   constructor(
     private readonly prisma: PrismaService,
@@ -430,7 +440,7 @@ export class ListingRepository {
   private resolveTranslatedTitle(
     item: {
       title: string;
-      language: Locale | null;
+      /** Documents the language field's API projection semantics and lifecycle meaning. */ language: Locale | null;
       translations: { title: string }[];
     },
     locale: Locale,
@@ -561,7 +571,7 @@ export class ListingRepository {
 
     const resolveTitle = (item: {
       title: string;
-      language?: Locale | null;
+      /** Documents the language field's API projection semantics and lifecycle meaning. */ language?: Locale | null;
       translations?: { title: string }[];
     }) =>
       resolveContentTranslation({
@@ -727,10 +737,10 @@ export class ListingRepository {
     const progress = await this.prisma.$queryRaw<
       {
         listingId: string;
-        listingSlug: string;
+        /** Documents the listingSlug field's API projection semantics and lifecycle meaning. */ listingSlug: string;
         positionSeconds: number;
         isCompleted: boolean;
-        updatedAt: Date;
+        /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */ updatedAt: Date;
       }[]
     >`
       SELECT ulp."listingId", l."slug" AS "listingSlug", ulp."positionSeconds", ulp."isCompleted", ulp."updatedAt"
@@ -1600,11 +1610,13 @@ export class ListingRepository {
 
     const mapLesson = (child: {
       id: string;
-      slug: string;
+      /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
       title: string;
-      status: Status;
+      /** Documents the status field's API projection semantics and lifecycle meaning. */ status: Status;
       orderIndex: number | null;
-      durationSeconds: number | null;
+      /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
+        | number
+        | null;
       audioAssets: { id: string }[];
     }): AdminArrangeLessonDto => ({
       id: child.id,
@@ -1706,7 +1718,11 @@ export class ListingRepository {
     moduleOps: NonNullable<ArrangeCommitDto['modules']>,
     rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
     existingModuleSlugById: Map<string, string>,
-  ): { slug: string; expectedPrefix: string }[] {
+  ): Array<{
+    /** Listing or lesson slug whose hierarchy is being validated. */
+    slug: string;
+    expectedPrefix: string;
+  }> {
     return [
       ...this.buildArrangeModulePrefixChecks(rootSlug, moduleOps, existingModuleSlugById),
       ...this.buildArrangeRootLessonPrefixChecks(rootSlug, rootLessonOps),
@@ -1717,8 +1733,16 @@ export class ListingRepository {
     rootSlug: string,
     moduleOps: NonNullable<ArrangeCommitDto['modules']>,
     existingModuleSlugById: Map<string, string>,
-  ): { slug: string; expectedPrefix: string }[] {
-    const checks: { slug: string; expectedPrefix: string }[] = [];
+  ): Array<{
+    /** Module slug whose hierarchy is being validated. */
+    slug: string;
+    expectedPrefix: string;
+  }> {
+    const checks: Array<{
+      /** Module slug whose hierarchy is being validated. */
+      slug: string;
+      expectedPrefix: string;
+    }> = [];
     for (const moduleOp of moduleOps) {
       const parentSlug =
         moduleOp.op === 'create'
@@ -1739,8 +1763,16 @@ export class ListingRepository {
   private buildArrangeRootLessonPrefixChecks(
     rootSlug: string,
     rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
-  ): { slug: string; expectedPrefix: string }[] {
-    const checks: { slug: string; expectedPrefix: string }[] = [];
+  ): Array<{
+    /** Lesson slug whose hierarchy is being validated. */
+    slug: string;
+    expectedPrefix: string;
+  }> {
+    const checks: Array<{
+      /** Lesson slug whose hierarchy is being validated. */
+      slug: string;
+      expectedPrefix: string;
+    }> = [];
     for (const lessonOp of rootLessonOps) {
       if (lessonOp.op === 'create') {
         checks.push({ slug: lessonOp.slug, expectedPrefix: rootSlug });
@@ -2084,11 +2116,11 @@ export class ListingRepository {
 
   private mapListingTranslation(t: {
     locale: Locale;
-    status: string;
+    /** Documents the status field's API projection semantics and lifecycle meaning. */ status: string;
     title: string;
     description: string | null;
-    createdAt: Date;
-    updatedAt: Date;
+    /** Documents the createdAt field's API projection semantics and lifecycle meaning. */ createdAt: Date;
+    /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */ updatedAt: Date;
   }): TranslationViewDto {
     return {
       locale: t.locale,

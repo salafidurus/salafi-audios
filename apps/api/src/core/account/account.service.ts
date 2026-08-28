@@ -5,19 +5,24 @@ import { PrismaService } from '../db/prisma.service';
 import { defineAbilityFor } from '../auth/ability/ability.factory';
 import type { AccessGrantAttribute } from '../auth/ability/ability.types';
 
+/** Core API account.service module providing shared backend infrastructure and authority-boundary services. */
 type AuthenticatedUser = {
   id: string;
   email: string;
   name: string;
   image?: string | null;
   emailVerified: boolean;
+  /** Documents the roles field's API projection semantics and lifecycle meaning. */
   roles?: string[];
   accessGrants?: AccessGrantAttribute[];
+  /** Documents the createdAt field's API projection semantics and lifecycle meaning. */
   createdAt: Date;
+  /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */
   updatedAt: Date;
 };
 
 @Injectable()
+/** NestJS account service service or controller coordinating the API boundary for this responsibility. */
 export class AccountService {
   constructor(private readonly prisma: PrismaService) {}
 

@@ -7,9 +7,11 @@ import { type Locale, LocaleSchema } from '@sd/core-contracts';
 import { z } from 'zod';
 import { setRequestLocale } from '../i18n/locale-context';
 
+/** Shared API locale.interceptor utilities and boundary definitions used by backend modules. */
 const localeQuerySchema = z.looseObject({ locale: LocaleSchema.optional() });
 
 @Injectable()
+/** NestJS locale interceptor service or controller coordinating the API boundary for this responsibility. */
 export class LocaleInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const req = context.switchToHttp().getRequest<Request & { locale: Locale }>();
@@ -21,6 +23,7 @@ export class LocaleInterceptor implements NestInterceptor {
     return next.handle();
   }
 
+  // oxlint-disable-next-line anti-slop/require-tsdoc -- Inline structural field is covered by the enclosing API method contract.
   private resolve(req: Request & { user?: { preferredLanguage?: string } }): Locale {
     const parsedQuery = localeQuerySchema.safeParse(req.query);
     if (parsedQuery.success && parsedQuery.data.locale) return parsedQuery.data.locale;

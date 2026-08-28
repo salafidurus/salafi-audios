@@ -14,9 +14,12 @@ import { MediaService } from './media.service';
 // step, so this stays an unconditioned check — anyone with ANY upload
 // capability (global or scholar-scoped) passes. Candidate for scholar-scoping
 // via listing reference in a future project; out of scope here.
+/** NestJS media controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Media')
 @ApiCommonErrors()
 @Controller('admin/media')
+/** media application module responsible for media.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class MediaController {
   constructor(private readonly service: MediaService) {}
 

@@ -23,6 +23,7 @@ import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { decodeCursor, buildPaginatedResult } from '../../shared/utils/pagination';
 import { toOptional } from '../../shared/utils/to-optional';
 
+/** scholars application module responsible for scholars.repo behavior at the backend boundary. */
 function buildScholarUpdateData(dto: UpdateScholarDto): Prisma.ScholarUpdateInput {
   const data: Prisma.ScholarUpdateInput = { updatedAt: new Date() };
   const fields = [
@@ -53,10 +54,12 @@ function hasScholarTranslationChange(dto: UpdateScholarDto): boolean {
 type ScholarFormRecord = {
   id: string;
   name: string;
+  /** Documents the slug field's API projection semantics and lifecycle meaning. */
   slug: string;
   bio: string | null;
   imageUrl: string | null;
   country: string | null;
+  /** Documents the mainLanguage field's API projection semantics and lifecycle meaning. */
   mainLanguage: string | null;
   isActive: boolean;
   title: string | null;
@@ -65,14 +68,19 @@ type ScholarFormRecord = {
   socialTelegram: string | null;
   socialYoutube: string | null;
   socialWebsite: string | null;
+  /** Documents the createdAt field's API projection semantics and lifecycle meaning. */
   createdAt: Date;
+  /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */
   updatedAt: Date | null;
   translations: Array<{
     locale: string;
+    /** Documents the status field's API projection semantics and lifecycle meaning. */
     status: string;
     name: string;
     bio: string | null;
+    /** Documents the createdAt field's API projection semantics and lifecycle meaning. */
     createdAt: Date;
+    /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */
     updatedAt: Date;
   }>;
 };
@@ -80,7 +88,9 @@ type ScholarFormRecord = {
 function getListingStats(listing: {
   format: string;
   publishedLectureCount: number | null;
+  /** Documents the publishedDurationSeconds field's API projection semantics and lifecycle meaning. */
   publishedDurationSeconds: number | null;
+  /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */
   durationSeconds: number | null;
 }) {
   const isSingle = listing.format === 'single';
@@ -123,6 +133,7 @@ function mapScholarFormData(scholar: ScholarFormRecord) {
 }
 
 @Injectable()
+/** NestJS scholars repository service or controller coordinating the API boundary for this responsibility. */
 export class ScholarsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -725,10 +736,13 @@ export class ScholarsRepository {
 
   private mapScholarTranslation(t: {
     locale: Locale;
+    /** Documents the status field's API projection semantics and lifecycle meaning. */
     status: string;
     name: string;
     bio: string | null;
+    /** Documents the createdAt field's API projection semantics and lifecycle meaning. */
     createdAt: Date;
+    /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */
     updatedAt: Date;
   }): TranslationViewDto {
     return {

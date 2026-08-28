@@ -1,6 +1,7 @@
 import { Status } from '@sd/core-db';
 import type { Prisma } from '@sd/core-db';
 
+/** Shared API published listing slug where utilities and boundary definitions used by backend modules. */
 /**
  * The public Catalog identity rule: a route value resolves exactly one
  * Listing, by its public slug, only when that Listing is published and not

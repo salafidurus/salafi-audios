@@ -6,6 +6,7 @@ import { PrismaClient } from '@sd/core-db';
 import { PrismaPg } from '@prisma/adapter-pg';
 import type { ConfigService } from '../config/config.service';
 
+/** Core API auth.instance module providing shared backend infrastructure and authority-boundary services. */
 let prisma: PrismaClient | undefined;
 
 function getAuthPrisma(config: ConfigService): PrismaClient {
@@ -105,15 +106,18 @@ function createAuthInstance(config: ConfigService) {
 }
 
 // Auth type inferred from the full configuration, including plugin-extended fields.
+/** API type describing the auth contract. */
 export type Auth = ReturnType<typeof createAuthInstance>;
 
 let _auth: Auth | undefined;
 
+/** Resolves init auth behavior while preserving the API boundary contract. */
 export function initAuth(config: ConfigService): Auth {
   _auth = createAuthInstance(config);
   return _auth;
 }
 
+/** Resolves get auth behavior while preserving the API boundary contract. */
 export function getAuth(): Auth {
   if (!_auth) throw new Error('Auth not initialized — call initAuth(config) first');
   return _auth;

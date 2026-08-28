@@ -1,5 +1,6 @@
 import type { Locale } from '@sd/core-contracts';
 
+/** Shared API sync main language translation utilities and boundary definitions used by backend modules. */
 /**
  * Keeps a `*Translation` row for the current main language in sync with an
  * entity's base (main-language) columns, and preserves the previous main

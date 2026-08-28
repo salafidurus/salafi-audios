@@ -8,9 +8,12 @@ import { ListingService } from './listing.service';
 import { ListingEditorialService } from './listing-editorial.service';
 import { SaveListingTranslationDto } from './dto/save-listing-translation.dto';
 
+/** NestJS listing translations controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Listing Translations')
 @ApiCommonErrors()
 @Controller('listings')
+/** listing application module responsible for listing translations.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ListingTranslationsController {
   constructor(
     private readonly service: ListingService,

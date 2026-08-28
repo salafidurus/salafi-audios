@@ -14,28 +14,33 @@ import { resolveContentTranslation } from '../../shared/i18n/resolve-content-tra
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { ConfigService } from '../../core/config/config.service';
 
+/** listing application module responsible for listing recent.repo behavior at the backend boundary. */
 type RecentListingRecord = {
   format: ListingFormat;
-  durationSeconds: number | null;
-  publishedDurationSeconds: number | null;
+  /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
+    | number
+    | null;
+  /** Documents the publishedDurationSeconds field's API projection semantics and lifecycle meaning. */ publishedDurationSeconds:
+    | number
+    | null;
   coverImageUrl: string | null;
   publishedLectureCount: number | null;
 };
 
 type RecentFeedListing = RecentListingRecord & {
   id: string;
-  slug: string;
+  /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
   title: string;
-  language: Locale | null;
-  publishedAt: Date | null;
-  createdAt: Date;
+  /** Documents the language field's API projection semantics and lifecycle meaning. */ language: Locale | null;
+  /** Documents the publishedAt field's API projection semantics and lifecycle meaning. */ publishedAt: Date | null;
+  /** Documents the createdAt field's API projection semantics and lifecycle meaning. */ createdAt: Date;
   translations: Array<{ title: string }>;
   scholar: {
     name: string;
-    slug: string;
+    /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
     title: ScholarTitle | null;
     imageUrl: string | null;
-    mainLanguage: Locale;
+    /** Documents the mainLanguage field's API projection semantics and lifecycle meaning. */ mainLanguage: Locale;
     translations: Array<{ name: string }>;
   };
 };
@@ -72,7 +77,7 @@ function buildRecentContentItem(
   record: RecentFeedListing,
   resolved: {
     fields: { title: string };
-    originalLanguage?: Locale;
+    /** Documents the originalLanguage field's API projection semantics and lifecycle meaning. */ originalLanguage?: Locale;
     original?: { title: string | null } | null;
   },
   scholarName: string,
@@ -101,7 +106,12 @@ function paginateRecentListings<T>(items: T[], limit: number) {
   return { hasMore, page: hasMore ? items.slice(0, limit) : items };
 }
 
-function getRecentNextCursor<T extends { createdAt: Date }>(
+function getRecentNextCursor<
+  T extends {
+    /** Creation time used as the stable cursor boundary. */
+    createdAt: Date;
+  },
+>(
   page: T[],
   hasMore: boolean,
   pageNumber: number,
@@ -126,6 +136,7 @@ function applyRecentFilters(
 }
 
 @Injectable()
+/** NestJS recent listings repo service or controller coordinating the API boundary for this responsibility. */
 export class RecentListingsRepo {
   constructor(
     private readonly prisma: PrismaService,
@@ -246,9 +257,9 @@ export class RecentListingsRepo {
     listings: Array<{
       scholar: {
         name: string;
-        slug: string;
+        /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
         imageUrl: string | null;
-        mainLanguage: Locale;
+        /** Documents the mainLanguage field's API projection semantics and lifecycle meaning. */ mainLanguage: Locale;
         translations: Array<{ name: string }>;
       } | null;
     }>,

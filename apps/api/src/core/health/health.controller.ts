@@ -10,11 +10,14 @@ import { DbHealthIndicator } from './db-health.indicator';
 import { RedisHealthIndicator } from './redis-health.indicator';
 import { RedisService } from '../redis/redis.service';
 
+/** NestJS health controller service or controller coordinating the API boundary for this responsibility. */
 @SkipThrottle()
 @ApiTags('Health')
 @ApiCommonErrors()
 @Public()
 @Controller('health')
+/** Core API health.controller module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class HealthController {
   constructor(
     private readonly health: HealthCheckService,

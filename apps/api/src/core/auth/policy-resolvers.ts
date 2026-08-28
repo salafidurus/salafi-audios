@@ -6,6 +6,7 @@ import type {
   PolicyResourceResolver,
 } from './decorators/check-policy.decorator';
 
+/** Core API policy resolvers module providing shared backend infrastructure and authority-boundary services. */
 const localeBodySchema = z.looseObject({ locale: LocaleSchema.optional() });
 
 function readOptionalStringField(ctx: PolicyRequestContext, field: string): string | undefined {

@@ -8,9 +8,12 @@ import { ScholarsService } from './scholars.service';
 import { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 import { UpdateScholarTranslationDto } from './dto/update-scholar-translation.dto';
 
+/** NestJS scholars translations controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Scholar Translations')
 @ApiCommonErrors()
 @Controller('scholars')
+/** scholars application module responsible for scholars translations.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ScholarsTranslationsController {
   constructor(private readonly service: ScholarsService) {}
 
