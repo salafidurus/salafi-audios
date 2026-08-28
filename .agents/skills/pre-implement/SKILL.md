@@ -39,9 +39,20 @@ Read and cross-reference:
    affected scripts.
 6. Platform-specific constraints, including whether the change touches
    `apps/native`.
+7. `./tsdoc-policy.md` when the ticket changes code, contracts, or
+   agent-facing implementation guidance.
 
 Resolve facts by inspecting the repository and issue tracker. Surface only
 decisions, assumptions, risks, and ambiguities that require human judgment.
+
+## Documentation impact
+
+For every affected public seam, read the implementation and tests and record
+the documentation contract in the plan. Identify routes, API clients, hooks,
+components, types, adapters, state machines, and meaningful semantic fields.
+Explain the behavior, invariant, side effect, and failure mode that callers
+need to preserve. Use `./tsdoc-policy.md` for planning examples; do not plan
+generic comments or documentation for trivial locals.
 
 ## Output
 
@@ -57,6 +68,7 @@ Produce a clear implementation plan in the conversation with:
 - Required environment-file copy, dependency-install, and pre-work verification
   steps for the selected checkout.
 - Ordered implementation stages and completion criteria.
+- Documentation seams, TSDoc requirements, examples, and validation steps.
 - Risks, migrations, follow-up work, and unresolved decisions.
 
 The default output is conversation-only. Add the plan as a GitHub issue

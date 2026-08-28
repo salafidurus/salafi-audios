@@ -9,6 +9,8 @@ disable-model-invocation: true
 Complete the delivery lifecycle for one implemented ticket after implementation.
 This skill has two explicit phases: PR preparation and merge-gated cleanup.
 
+Read `./tsdoc-policy.md` before preparing the PR.
+
 ## PR preparation
 
 Run the applicable post-work checks before publishing. The repository baseline
@@ -39,6 +41,15 @@ reported for human review and never trigger automatic deletion.
 
 Skip a check only when the plan records why it cannot apply. Diagnose failures
 against the pre-work baseline before pushing.
+
+## Documentation verification
+
+Review every changed public declaration against `./tsdoc-policy.md`. Confirm
+that TSDoc describes actual behavior, invariants, side effects, and failure
+modes rather than names or types. Search the changed scope for generic,
+placeholder, stale, duplicated, or mechanically generated prose. Run final-mode
+TSDoc lint and report intentionally undocumented internals or remaining legacy
+baseline gaps.
 
 Verify the implementation evidence, then prepare the PR with this minimal body:
 
