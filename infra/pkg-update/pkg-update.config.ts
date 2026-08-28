@@ -9,9 +9,10 @@ export interface PkupdateConfig {
   expo: { enabled: boolean };
 }
 
-const versionLocked = dependabotHelperPolicy.families
-  .filter((family) => family.mode === "helper-check" && family.versionLocked)
-  .map((family) => family.name);
+const versionLocked = dependabotHelperPolicy.families.reduce<string[]>((locked, family) => {
+  if (family.mode === "helper-check" && family.versionLocked) locked.push(family.name);
+  return locked;
+}, []);
 
 const expoOwned = dependabotHelperPolicy.families.some(
   (family) => family.mode === "helper-update" && family.pipeline === "expo-sdk",

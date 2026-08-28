@@ -68,9 +68,11 @@ function packageVersionMap(rootDir: string, family: DependencyFamily): Map<strin
     if (!workspace.endsWith("/*")) return [workspace];
     const parent = resolve(rootDir, workspace.slice(0, -2));
     if (!existsSync(parent)) return [];
-    return readdirSync(parent, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => `${workspace.slice(0, -1)}${entry.name}`);
+    const resolved: string[] = [];
+    for (const entry of readdirSync(parent, { withFileTypes: true })) {
+      if (entry.isDirectory()) resolved.push(`${workspace.slice(0, -1)}${entry.name}`);
+    }
+    return resolved;
   });
 
   for (const workspace of resolvedWorkspaces) {
