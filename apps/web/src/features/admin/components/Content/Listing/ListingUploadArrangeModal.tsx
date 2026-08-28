@@ -160,6 +160,12 @@ function getErrorTabs(
   return conflicts.length > 0 || conflictSlugs.length > 0 || unassignedCount > 0 ? ["arrange"] : [];
 }
 
+/**
+ * Coordinates the upload, arrangement, review, and commit steps for a
+ * listing's audio items. It loads existing listing data when opened, keeps
+ * close actions disabled during active work, and reports a successful commit
+ * through `onSuccess`.
+ */
 export function ListingUploadArrangeModal({
   isOpen,
   onClose,
