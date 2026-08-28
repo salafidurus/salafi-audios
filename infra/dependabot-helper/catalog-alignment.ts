@@ -2,9 +2,9 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { CatalogConfig, CatalogRepairReport } from "../catalog/types";
+import type { CatalogConfig, CatalogRepairReport } from "./catalog/types";
 
-import { runCatalogFix } from "../catalog/scanner/fix";
+import { runCatalogFix } from "./catalog/scanner/fix";
 
 /**
  * Describes the already-authorized dependency update that alignment may repair.
@@ -43,7 +43,6 @@ function defaultInstall(rootDir: string) {
 function snapshotFiles(rootDir: string): Map<string, string | null> {
   const paths = [
     "package.json",
-    "catalog.config.json",
     "bun.lock",
     ...readWorkspacePackagePaths(rootDir),
   ];

@@ -4,8 +4,8 @@ import { resolve, dirname, relative } from "path";
 
 import type { UpdateCandidate } from "./utils/ui";
 
-import { loadConfig, resolveCompatibilityGroup } from "../catalog/helpers";
-import { config, type PkupdateConfig } from "./pkg-update.config";
+import { dependabotHelperPolicy, resolveDependencyFamily } from "../policy";
+import { config, type PkupdateConfig } from "./update.config";
 
 export function findWorkspacePkgFiles(rootDir: string): string[] {
   const rootPkg = JSON.parse(
@@ -46,8 +46,8 @@ function shouldSkipPackage(
   for (const s of cfg.skip) {
     if (matchesPattern(name, s)) return true;
   }
-  const compatibility = resolveCompatibilityGroup(name, workspacePath, loadConfig(rootDir));
-  return compatibility?.owner === "expo-pipeline";
+  const family = resolveDependencyFamily(dependabotHelperPolicy, name, workspacePath);
+  return family?.mode === "helper-update" && family.pipeline === "expo-sdk";
 }
 
 function getGroupPatterns(name: string, cfg: PkupdateConfig): string[] | null {

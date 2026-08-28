@@ -3,8 +3,8 @@ import { resolve } from "path";
 
 import type { UpdateCandidate } from "./utils/ui";
 
-import { loadConfig, resolveCompatibilityGroup } from "../catalog/helpers";
-import { config, type PkupdateConfig } from "./pkg-update.config";
+import { dependabotHelperPolicy, resolveDependencyFamily } from "../policy";
+import { config, type PkupdateConfig } from "./update.config";
 import { fetchLatestVersion } from "./utils/npm";
 import { categorizeBump, isNewer } from "./utils/semver";
 
@@ -142,9 +142,8 @@ export async function checkExpo(
   const current = deps.expo;
   if (!current) return null;
 
-  const expoPolicy = resolveCompatibilityGroup("expo", "apps/native", loadConfig(rootDir));
-  const latest =
-    expoPolicy?.target?.resolver === "explicit" ? expoPolicy.target.value : await fetcher("expo");
+  const expoFamily = resolveDependencyFamily(dependabotHelperPolicy, "expo", "apps/native");
+  const latest = expoFamily?.mode === "helper-update" ? await fetcher("expo") : null;
   if (!latest) return null;
 
   const raw = current.replace(/^[\^~]/, "");

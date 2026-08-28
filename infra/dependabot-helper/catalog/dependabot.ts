@@ -20,7 +20,6 @@ export interface DependabotFileValidation {
 function isAllowedFile(filePath: string): boolean {
   return (
     filePath === "bun.lock" ||
-    filePath === "catalog.config.json" ||
     /(^|\/)package\.json$/.test(filePath)
   );
 }

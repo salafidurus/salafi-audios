@@ -2,13 +2,13 @@ import { spawnSync } from "child_process";
 import { existsSync, mkdirSync, rmSync } from "fs";
 import { resolve } from "path";
 
-import type { CatalogRepairReport } from "../catalog";
+import type { CatalogRepairReport } from "../catalog/types";
 import type { UpdateCandidate } from "./utils/ui";
 
-import { runCatalogAlignment } from "../dependabot-helper/catalog-alignment";
+import { runCatalogAlignment } from "../catalog-alignment";
 import { applyUpdate } from "./apply";
 import { checkAll } from "./check";
-import { config } from "./pkg-update.config";
+import { config } from "./update.config";
 import {
   readCache,
   writeCache,
@@ -685,7 +685,7 @@ export async function runCi(rootDir: string, options: CiOptions = {}): Promise<C
 }
 
 if (__ciMain) {
-  const { findMonorepoRoot } = await import("../../scripts/utils/paths.mjs");
+  const { findMonorepoRoot } = await import("../../../scripts/utils/paths.mjs");
   const rootDir = findMonorepoRoot();
   const options: CiOptions = {};
   if (process.argv.includes("--dry-run") || process.argv.includes("--report-only")) {

@@ -13,7 +13,7 @@ import {
   findWorkspacePkgFiles,
   syncWorkspaceDeps,
 } from "./apply";
-import { config } from "./pkg-update.config";
+import { config } from "./update.config";
 
 const versionLockedConfig = {
   ...config,
@@ -28,7 +28,7 @@ mock.module("child_process", () => ({
 let tmpDir: string;
 
 beforeAll(() => {
-  tmpDir = mkdtempSync(join(tmpdir(), "pkg-update-apply-test-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "dependabot-helper-apply-test-"));
   writeFileSync(
     join(tmpDir, "package.json"),
     JSON.stringify({
@@ -52,21 +52,6 @@ beforeAll(() => {
   writeFileSync(
     join(nativeDir, "package.json"),
     JSON.stringify({ name: "native", dependencies: { expo: "~52.0.0", react: "19.0.0" } }),
-  );
-  writeFileSync(
-    join(tmpDir, "catalog.config.json"),
-    JSON.stringify({
-      groups: [],
-      policies: [],
-      compatibilityGroups: [
-        {
-          name: "expo-sdk",
-          packages: ["expo", "expo-*", "react"],
-          workspaces: ["apps/native"],
-          owner: "expo-pipeline",
-        },
-      ],
-    }),
   );
   const apiDir = join(tmpDir, "apps", "api");
   mkdirSync(apiDir, { recursive: true });

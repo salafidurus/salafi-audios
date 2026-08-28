@@ -1,4 +1,4 @@
-import { dependabotHelperPolicy } from "../dependabot-helper/policy";
+import { dependabotHelperPolicy } from "../policy";
 
 export interface PkupdateConfig {
   groups: Record<string, { patterns: string[]; updateTypes?: ("major" | "minor" | "patch")[] }>;
@@ -18,11 +18,11 @@ const expoOwned = dependabotHelperPolicy.families.some(
   (family) => family.mode === "helper-update" && family.pipeline === "expo-sdk",
 );
 
-/** Transitional runtime adapter; dependency ownership comes from Helper policy. */
+/** Runtime update settings derived from the canonical Helper policy. */
 export const config: PkupdateConfig = {
   groups: {
     // Ordinary dependency updates belong to Dependabot. The Expo and Bun
-    // pipelines below are the only pkg-update entry points.
+    // Pipelines below are the only Helper-owned update entry points.
   },
   skip: [],
   never: ["typescript"],

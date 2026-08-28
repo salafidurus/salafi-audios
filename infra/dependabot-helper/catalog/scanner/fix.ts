@@ -3,14 +3,12 @@ import path from "node:path";
 
 import type {
   PackageJson,
-  CatalogConfigGroup,
   CatalogRepairMutation,
   CatalogRepairReport,
 } from "../types";
 
 import {
   parseCatalogs,
-  loadConfig,
   getWorkspaces,
   getDependencyGroup,
   sanitizeGroupName,
@@ -21,7 +19,7 @@ import { type DepUsage } from "./shared";
 export interface CatalogFixOptions {
   /** Runs the repair calculation without writing catalog or manifest files. */
   dryRun?: boolean;
-  /** Supplies the already-authorized catalog policy instead of reading legacy config. */
+  /** Supplies the already-authorized catalog policy for this repair. */
   config?: import("../types").CatalogConfig;
 }
 
@@ -39,7 +37,7 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
   const originalNamedCatalogs = Object.fromEntries(
     Object.entries(catalogs.named).map(([name, entries]) => [name, { ...entries }]),
   );
-  const config = options.config ?? loadConfig(rootDir);
+  const config = options.config ?? { groups: [], policies: [], compatibilityGroups: [] };
   const workspaces = getWorkspaces(rootDir);
   const updatedFilesSet = new Set<string>();
   let policyError: string | undefined;
@@ -82,7 +80,6 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
 
   const defaultCatalogUpdates = new Map<string, string>();
   const namedCatalogUpdates = new Map<string, Map<string, string>>();
-  const configGroupEntries = new Map<string, { packages: Set<string>; workspaces: Set<string> }>();
   const refUpdates: {
     pkgName: string;
     filePath: string;
@@ -112,15 +109,6 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
       namedCatalogUpdates.set(groupName, new Map());
     }
     namedCatalogUpdates.get(groupName)!.set(depName, version);
-  }
-
-  function addConfigGroup(groupName: string, depName: string, workspacePath: string) {
-    if (!configGroupEntries.has(groupName)) {
-      configGroupEntries.set(groupName, { packages: new Set(), workspaces: new Set() });
-    }
-    const entry = configGroupEntries.get(groupName)!;
-    entry.packages.add(depName);
-    entry.workspaces.add(workspacePath);
   }
 
   const depsByName = new Map<string, DepUsage[]>();
@@ -185,7 +173,6 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
           } else {
             const groupName = sanitizeGroupName(depName, u.version);
             addNamedCatalogEntry(groupName, depName, u.version);
-            addConfigGroup(groupName, depName, u.relativePath);
             addRefUpdate(u.pkgName, u.filePath, depName, u.depType, groupName);
           }
         }
@@ -383,37 +370,6 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
   } else if (orphanRemovals.length > 0) {
     if (!dryRun) fs.writeFileSync(rootJsonPath, JSON.stringify(rootJson, null, 2) + "\n");
     updatedFilesSet.add("root");
-  }
-
-  if (configGroupEntries.size > 0) {
-    const configGroups: CatalogConfigGroup[] = [...config.groups];
-    const existingGroupNames = new Set(config.groups.map((g) => g.name));
-
-    for (const [groupName, data] of configGroupEntries) {
-      if (!existingGroupNames.has(groupName)) {
-        configGroups.push({
-          name: groupName,
-          packages: [...data.packages].toSorted(),
-          workspaces: [...data.workspaces].toSorted(),
-        });
-      }
-    }
-
-    if (!dryRun) {
-      fs.writeFileSync(
-        path.join(rootDir, "catalog.config.json"),
-        JSON.stringify(
-          {
-            groups: configGroups,
-            policies: config.policies,
-            compatibilityGroups: config.compatibilityGroups ?? [],
-          },
-          null,
-          2,
-        ) + "\n",
-      );
-    }
-    updatedFilesSet.add("catalog.config.json");
   }
 
   const writtenWorkspaces = new Set<string>();

@@ -58,11 +58,12 @@ describe("Dependabot Helper catalog alignment boundary", () => {
     expect(fs.readFileSync(path.join(rootDir, "package.json"), "utf8")).toBe(before);
   });
 
-  it("does not read the legacy catalog policy file", () => {
+  it("does not create a deprecated catalog policy file", () => {
     const rootDir = fixture();
-    fs.writeFileSync(path.join(rootDir, "catalog.config.json"), "not json");
 
-    expect(() => runCatalogAlignment({ rootDir, authorizedDependencies: ["zod"] })).not.toThrow();
+    runCatalogAlignment({ rootDir, authorizedDependencies: ["zod"] });
+
+    expect(fs.existsSync(path.join(rootDir, ["catalog", "config.json"].join(".")))).toBe(false);
   });
 
   it("rejects and rolls back when lockfile validation fails", () => {
