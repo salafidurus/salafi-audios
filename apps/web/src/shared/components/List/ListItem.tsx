@@ -41,27 +41,12 @@ export function ListItem({
   const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     // Don't trigger onClick if the click came from a nested interactive element
     const target = e.target;
-    if (!isHtmlElement(target)) {
-      return;
-    }
-    if (
-      target.tagName === "BUTTON" ||
-      target.closest("button") ||
-      target.closest("[data-testid='list-item-actions']")
-    ) {
-      return;
-    }
-
-    if (onClick) {
-      onClick();
-    }
+    if (isIgnoredClickTarget(target)) return;
+    onClick?.();
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (onClick && (e.key === "Enter" || e.key === " ")) {
-      e.preventDefault();
-      onClick();
-    }
+    handleListItemKeyDown(e, onClick);
   };
 
   return (
@@ -78,4 +63,22 @@ export function ListItem({
       {children}
     </div>
   );
+}
+
+function isIgnoredClickTarget(target: EventTarget | null): boolean {
+  if (!isHtmlElement(target)) return true;
+  return Boolean(
+    target.tagName === "BUTTON" ||
+    target.closest("button") ||
+    target.closest("[data-testid='list-item-actions']"),
+  );
+}
+
+function handleListItemKeyDown(
+  event: KeyboardEvent<HTMLDivElement>,
+  onClick: (() => void) | undefined,
+): void {
+  if (!onClick || (event.key !== "Enter" && event.key !== " ")) return;
+  event.preventDefault();
+  onClick();
 }
