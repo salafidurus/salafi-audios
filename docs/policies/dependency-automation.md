@@ -6,11 +6,11 @@ dependency update must have one owning updater.
 
 ## Ownership summary
 
-| System | Owns | Must not do |
-| --- | --- | --- |
-| Dependabot | Ordinary dependency and GitHub Actions updates | Update dependencies owned by a compatibility pipeline |
-| `dependabot-helper` | Compatibility-sensitive updates and invariant checks that Dependabot cannot safely resolve alone | Re-propose ordinary dependencies or create proposals for checks |
-| Catalog tooling | Workspace version alignment, policy evaluation, repair reporting, and lockfile validation | Act as a competing dependency-version source or updater |
+| System                                | Owns                                                                                             | Must not do                                                     |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| Dependabot                            | Ordinary dependency and GitHub Actions updates                                                   | Update dependencies owned by a compatibility pipeline           |
+| `dependabot-helper`                   | Compatibility-sensitive updates and invariant checks that Dependabot cannot safely resolve alone | Re-propose ordinary dependencies or create proposals for checks |
+| `dependabot-helper` catalog alignment | Workspace version alignment, policy evaluation, repair reporting, and lockfile validation        | Act as a competing dependency-version source or updater         |
 
 ## Dependabot
 
@@ -52,18 +52,19 @@ the current repository state without creating update proposals. A failed
 resolver, validation command, install, or lockfile operation rejects the
 update transaction and must not leave an accepted partial update.
 
-## Catalog tooling
+## Catalog alignment
 
-The catalog is the workspace alignment layer. It synchronizes workspace
-`package.json` references with the root catalog and reports or repairs catalog
-drift. `catalog.config.json` is the source of truth for workspace-scoped group
-and compatibility ownership.
+The Dependabot Helper owns catalog alignment as a bounded repair capability. It
+synchronizes workspace `package.json` references with the root Bun catalog and
+reports or repairs catalog drift after an update has already been authorized.
+Package-manager catalog data remains in `package.json`; automation ownership
+and compatibility policy remain in the typed helper policy.
 
-Catalog tooling does not independently decide that a package should be updated
-to the latest version. For Dependabot pull requests, `dependabot-sync` applies
-the catalog repair report, installs to validate the lockfile, checks the output
-file allowlist, and writes back only the generated dependency files. A rejected
-repair fails closed and produces an audit result.
+Catalog alignment does not independently select dependency versions. For
+Dependabot pull requests, `dependabot-sync` invokes the helper, applies the
+repair report, installs to validate the lockfile, checks the output file
+allowlist, and writes back only generated dependency files. A rejected repair
+fails closed and produces an audit result.
 
 For compatibility groups, the catalog records the owning pipeline and its
 validation commands. The Expo group is owned by `expo-pipeline` and is executed
