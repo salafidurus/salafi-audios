@@ -1861,6 +1861,48 @@ export class ListingRepository {
     this.assertArrangeLessonTargets(lessonUpdateTargets, found);
   }
 
+  private async applyArrangeModule(
+    tx: Prisma.TransactionClient,
+    moduleOp: NonNullable<ArrangeCommitDto['modules']>[number],
+    rootId: string,
+    scholarId: string,
+    userId: string | undefined,
+    result: ArrangeCommitResultDto,
+    touchedParents: Set<string>,
+  ): Promise<string> {
+    if (moduleOp.op === 'create') {
+      const status = moduleOp.status ?? Status.draft;
+      const created = await tx.listing.create({
+        data: {
+          slug: moduleOp.slug,
+          title: moduleOp.title,
+          description: moduleOp.description ?? undefined,
+          format: 'series',
+          status,
+          publishedAt: status === Status.published ? new Date() : undefined,
+          orderIndex: moduleOp.orderIndex ?? undefined,
+          scholarId,
+          parentId: rootId,
+          createdBy: userId,
+        },
+        select: { id: true },
+      });
+      result.createdModules += 1;
+      touchedParents.add(rootId);
+      return created.id;
+    }
+
+    if (moduleOp.orderIndex !== undefined) {
+      await tx.listing.update({
+        where: { id: moduleOp.id },
+        data: { orderIndex: moduleOp.orderIndex, updatedAt: new Date(), updatedBy: userId },
+      });
+      touchedParents.add(rootId);
+    }
+    result.updatedModules += 1;
+    return moduleOp.id;
+  }
+
   async arrangeCommit(
     rootId: string,
     dto: ArrangeCommitDto,
@@ -1893,38 +1935,15 @@ export class ListingRepository {
       await Promise.all(rootLessonOps.map((lessonOp) => applyLessonOp(lessonOp, rootId)));
 
       for (const moduleOp of moduleOps) {
-        let moduleId: string;
-        if (moduleOp.op === 'create') {
-          const status = moduleOp.status ?? Status.draft;
-          const created = await tx.listing.create({
-            data: {
-              slug: moduleOp.slug,
-              title: moduleOp.title,
-              description: moduleOp.description ?? undefined,
-              format: 'series',
-              status,
-              publishedAt: status === Status.published ? new Date() : undefined,
-              orderIndex: moduleOp.orderIndex ?? undefined,
-              scholarId: root.scholarId,
-              parentId: rootId,
-              createdBy: userId,
-            },
-            select: { id: true },
-          });
-          moduleId = created.id;
-          result.createdModules += 1;
-          touchedParents.add(rootId);
-        } else {
-          moduleId = moduleOp.id;
-          if (moduleOp.orderIndex !== undefined) {
-            await tx.listing.update({
-              where: { id: moduleId },
-              data: { orderIndex: moduleOp.orderIndex, updatedAt: new Date(), updatedBy: userId },
-            });
-            touchedParents.add(rootId);
-          }
-          result.updatedModules += 1;
-        }
+        const moduleId = await this.applyArrangeModule(
+          tx,
+          moduleOp,
+          rootId,
+          root.scholarId,
+          userId,
+          result,
+          touchedParents,
+        );
         affectedIds.push(moduleId);
         await Promise.all(moduleOp.lessons.map((lessonOp) => applyLessonOp(lessonOp, moduleId)));
       }
