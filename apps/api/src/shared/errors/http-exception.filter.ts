@@ -151,50 +151,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return existingDetails;
     }
 
-    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
-      return {
-        kind: 'prisma-known-request-error',
-        code: exception.code,
-        clientVersion: exception.clientVersion,
-        message: exception.message,
-        meta: exception.meta,
-      };
-    }
-
-    if (exception instanceof Prisma.PrismaClientValidationError) {
-      return {
-        kind: 'prisma-validation-error',
-        clientVersion: exception.clientVersion,
-        message: exception.message,
-      };
-    }
-
-    if (exception instanceof Prisma.PrismaClientUnknownRequestError) {
-      return {
-        kind: 'prisma-unknown-request-error',
-        clientVersion: exception.clientVersion,
-        message: exception.message,
-      };
-    }
-
-    if (exception instanceof Prisma.PrismaClientInitializationError) {
-      return {
-        kind: 'prisma-initialization-error',
-        errorCode: exception.errorCode,
-        clientVersion: exception.clientVersion,
-        message: exception.message,
-      };
-    }
-
-    if (exception instanceof Error) {
-      return {
-        kind: exception.name || 'error',
-        message: exception.message,
-        stack: exception.stack,
-      };
-    }
-
-    return existingDetails;
+    if (!(exception instanceof Error)) return undefined;
+    const prismaDetails = getPrismaDevDetails(exception);
+    return prismaDetails ?? getGenericDevDetails(exception);
   }
 
   private isPrismaConnectionRefused(
@@ -204,6 +163,53 @@ export class AllExceptionsFilter implements ExceptionFilter {
       exception instanceof Prisma.PrismaClientKnownRequestError && exception.code === 'ECONNREFUSED'
     );
   }
+}
+
+function getPrismaDevDetails(exception: Error): DevDetails | undefined {
+  if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+    return {
+      kind: 'prisma-known-request-error',
+      code: exception.code,
+      clientVersion: exception.clientVersion,
+      message: exception.message,
+      meta: exception.meta,
+    };
+  }
+
+  if (exception instanceof Prisma.PrismaClientValidationError) {
+    return {
+      kind: 'prisma-validation-error',
+      clientVersion: exception.clientVersion,
+      message: exception.message,
+    };
+  }
+
+  if (exception instanceof Prisma.PrismaClientUnknownRequestError) {
+    return {
+      kind: 'prisma-unknown-request-error',
+      clientVersion: exception.clientVersion,
+      message: exception.message,
+    };
+  }
+
+  if (exception instanceof Prisma.PrismaClientInitializationError) {
+    return {
+      kind: 'prisma-initialization-error',
+      errorCode: exception.errorCode,
+      clientVersion: exception.clientVersion,
+      message: exception.message,
+    };
+  }
+
+  return undefined;
+}
+
+function getGenericDevDetails(exception: Error): DevDetails {
+  return {
+    kind: exception.name || 'error',
+    message: exception.message,
+    stack: exception.stack,
+  };
 }
 
 function toErrorExtras(input: ErrorExtraSource): ErrorExtras {
