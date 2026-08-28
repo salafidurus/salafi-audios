@@ -68,6 +68,34 @@ function listingLectureCount(record: RecentListingRecord): number {
   return record.format === 'single' ? 1 : (record.publishedLectureCount ?? 1);
 }
 
+function buildRecentContentItem(
+  record: RecentFeedListing,
+  resolved: {
+    fields: { title: string };
+    originalLanguage?: Locale;
+    original?: { title: string | null } | null;
+  },
+  scholarName: string,
+  presentation: ReturnType<typeof recentListingPresentation>,
+): FeedContentItemDto {
+  return {
+    kind: record.format,
+    id: record.id,
+    title: resolved.fields.title,
+    slug: record.slug,
+    scholarName,
+    scholarSlug: record.scholar.slug,
+    scholarTitle: record.scholar.title ?? undefined,
+    scholarImageUrl: record.scholar.imageUrl ?? undefined,
+    thumbnailUrl: presentation.thumbnailUrl ?? null,
+    durationSeconds: presentation.durationSeconds,
+    publishedLectureCount: presentation.publishedLectureCount,
+    publishedAt: (record.publishedAt ?? record.createdAt).toISOString(),
+    originalLanguage: resolved.originalLanguage,
+    original: resolved.original ? { title: resolved.original.title ?? undefined } : undefined,
+  };
+}
+
 function applyRecentFilters(
   where: Prisma.ListingWhereInput,
   topicSlug?: string,
@@ -158,24 +186,7 @@ export class RecentListingsRepo {
     }).fields.name;
 
     const presentation = recentListingPresentation(r, (value) => this.toOptionalPublicUrl(value));
-    const kind: ListingFormat = r.format;
-
-    return {
-      kind,
-      id: r.id,
-      title: resolved.fields.title,
-      slug: r.slug,
-      scholarName,
-      scholarSlug: r.scholar!.slug,
-      scholarTitle: r.scholar!.title ?? undefined,
-      scholarImageUrl: r.scholar!.imageUrl ?? undefined,
-      thumbnailUrl: presentation.thumbnailUrl ?? null,
-      durationSeconds: presentation.durationSeconds,
-      publishedLectureCount: presentation.publishedLectureCount,
-      publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
-      originalLanguage: resolved.originalLanguage,
-      original: resolved.original ? { title: resolved.original.title } : undefined,
-    };
+    return buildRecentContentItem(r, resolved, scholarName, presentation);
   }
   private async appendDiscoveryRows(
     items: FeedPageDto['items'],
