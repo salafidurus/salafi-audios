@@ -42,11 +42,11 @@ function getRuntimeExtra(): RuntimeExtraCandidate {
   // the optional `extra` objects if present.
   const constants = Constants as ConstantsWithLegacyManifests;
 
-  return (
-    constants.expoConfig?.extra ??
-    constants.manifest2?.extra?.expoClient?.extra ??
-    constants.manifest?.extra
-  );
+  return [
+    constants.expoConfig?.extra,
+    constants.manifest2?.extra?.expoClient?.extra,
+    constants.manifest?.extra,
+  ].reduce<RuntimeExtraCandidate>((selected, candidate) => selected ?? candidate, undefined);
 }
 
 export function getRuntimeEnv(): NativeRuntimeExtra | null {
