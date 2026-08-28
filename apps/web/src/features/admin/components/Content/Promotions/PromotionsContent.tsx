@@ -2,7 +2,7 @@
 
 import { useAbility } from "@sd/domain-account";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
@@ -40,6 +40,22 @@ function findActiveHero(
   fallback: PromotionListingOption | undefined,
 ) {
   return options.find((option) => option.id === selectedId) ?? fallback;
+}
+
+type PromotionState = {
+  hero?: { listingId?: string | null; headline?: string | null } | null;
+  editorsPicks?: Array<{ listing: PromotionListingOption }> | null;
+};
+
+function applyPromotionState(
+  promotions: PromotionState,
+  setHeroListingId: (value: string) => void,
+  setHeroHeadline: (value: string) => void,
+  setEditorsPicks: (value: PromotionListingOption[]) => void,
+) {
+  setHeroListingId(promotions.hero?.listingId ?? "");
+  setHeroHeadline(promotions.hero?.headline ?? "");
+  setEditorsPicks(promotions.editorsPicks?.map((pick) => pick.listing) ?? []);
 }
 
 function PromotionsStatus({
@@ -97,6 +113,30 @@ function PromotionsFooter({
   );
 }
 
+function PromotionsGate({
+  canManage,
+  status,
+  children,
+}: {
+  canManage: boolean;
+  status: { isLoading: boolean; isError: boolean; onRetry: () => void };
+  children: ReactNode;
+}) {
+  const { t } = useTranslation();
+  if (!canManage) return <AdminAccessState status="denied" />;
+  if (status.isLoading || status.isError) {
+    return (
+      <PromotionsStatus
+        isLoading={status.isLoading}
+        isError={status.isError}
+        onRetry={status.onRetry}
+        t={t}
+      />
+    );
+  }
+  return children;
+}
+
 export function PromotionsContent() {
   const { t } = useTranslation();
   const { ability } = useAbility();
@@ -137,12 +177,7 @@ export function PromotionsContent() {
 
   useEffect(() => {
     if (!promotions) return;
-    setHeroListingId(promotions.hero?.listingId ?? "");
-    setHeroHeadline(promotions.hero?.headline ?? "");
-    setEditorsPicks(
-      promotions.editorsPicks?.map((pick: { listing: PromotionListingOption }) => pick.listing) ??
-        [],
-    );
+    applyPromotionState(promotions, setHeroListingId, setHeroHeadline, setEditorsPicks);
   }, [promotions]);
 
   const mutation = useMutation({
@@ -172,50 +207,44 @@ export function PromotionsContent() {
     promotions?.hero?.listing,
   );
 
-  if (!canManagePromotions) return <AdminAccessState status="denied" />;
-  const status = (
-    <PromotionsStatus
-      isLoading={isLoading}
-      isError={isError}
-      onRetry={() => void refetchPromotions()}
-      t={t}
-    />
-  );
-  if (status) return status;
-
   return (
-    <div className={styles.container}>
-      <PromotionsHeroSection
-        search={heroSearch}
-        onSearchChange={setHeroSearch}
-        selectedSearchId={selectedHeroSearchId}
-        onSelectedSearchIdChange={setSelectedHeroSearchId}
-        onListingIdChange={setHeroListingId}
-        headline={heroHeadline}
-        onHeadlineChange={setHeroHeadline}
-        searchOptions={heroSearchOptions}
-        activeListing={activeHeroListing}
-      />
-      <EditorsPicksSection
-        search={picksSearch}
-        onSearchChange={setPicksSearch}
-        selectedSearchId={selectedPicksSearchId}
-        onSelectedSearchIdChange={setSelectedPicksSearchId}
-        searchOptions={picksSearchOptions}
-        editorsPicks={editorsPicks}
-        onEditorsPicksChange={setEditorsPicks}
-        onError={(message) => {
-          setSaveFeedback("error");
-          setSaveError(message);
-        }}
-      />
-      <PromotionsFooter
-        feedback={saveFeedback}
-        error={saveError}
-        pending={mutation.isPending}
-        onSave={handleSave}
-        t={t}
-      />
-    </div>
+    <PromotionsGate
+      canManage={canManagePromotions}
+      status={{ isLoading, isError, onRetry: () => void refetchPromotions() }}
+    >
+      <div className={styles.container}>
+        <PromotionsHeroSection
+          search={heroSearch}
+          onSearchChange={setHeroSearch}
+          selectedSearchId={selectedHeroSearchId}
+          onSelectedSearchIdChange={setSelectedHeroSearchId}
+          onListingIdChange={setHeroListingId}
+          headline={heroHeadline}
+          onHeadlineChange={setHeroHeadline}
+          searchOptions={heroSearchOptions}
+          activeListing={activeHeroListing}
+        />
+        <EditorsPicksSection
+          search={picksSearch}
+          onSearchChange={setPicksSearch}
+          selectedSearchId={selectedPicksSearchId}
+          onSelectedSearchIdChange={setSelectedPicksSearchId}
+          searchOptions={picksSearchOptions}
+          editorsPicks={editorsPicks}
+          onEditorsPicksChange={setEditorsPicks}
+          onError={(message) => {
+            setSaveFeedback("error");
+            setSaveError(message);
+          }}
+        />
+        <PromotionsFooter
+          feedback={saveFeedback}
+          error={saveError}
+          pending={mutation.isPending}
+          onSave={handleSave}
+          t={t}
+        />
+      </div>
+    </PromotionsGate>
   );
 }
