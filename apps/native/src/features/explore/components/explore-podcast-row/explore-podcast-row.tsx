@@ -29,6 +29,43 @@ export type ExplorePodcastRowProps = {
   hideBorder?: boolean;
 };
 
+async function toggleActiveTrack(isCurrentTrack: boolean, isPlaying: boolean) {
+  if (!isCurrentTrack) return false;
+  if (isPlaying) await audioService.pause();
+  else await audioService.resume();
+  return true;
+}
+
+async function tryPlayExploreQueue(
+  item: FeedContentItemDto,
+  title: string,
+  scholarName: string,
+): Promise<boolean> {
+  try {
+    const contents = await httpClient<ListingContentsDto>({
+      url: endpoints.listings.contents(item.slug),
+      method: "GET",
+    });
+    const queue = buildTrackQueue(
+      {
+        id: item.id,
+        title,
+        format: item.kind,
+        scholarName,
+        scholarSlug: item.scholarSlug,
+        artworkUrl: item.thumbnailUrl ?? undefined,
+      },
+      contents,
+    );
+    const firstTrack = queue[0];
+    if (!firstTrack) return false;
+    await audioService.playListing(firstTrack, queue);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function playExploreItem(
   item: FeedContentItemDto,
   title: string,
@@ -36,37 +73,10 @@ async function playExploreItem(
   isCurrentTrack: boolean,
   isPlaying: boolean,
 ) {
-  if (isCurrentTrack) {
-    if (isPlaying) await audioService.pause();
-    else await audioService.resume();
-    return;
-  }
+  if (await toggleActiveTrack(isCurrentTrack, isPlaying)) return;
 
   if (item.kind !== "single") {
-    try {
-      const contents = await httpClient<ListingContentsDto>({
-        url: endpoints.listings.contents(item.slug),
-        method: "GET",
-      });
-      const queue = buildTrackQueue(
-        {
-          id: item.id,
-          title,
-          format: item.kind,
-          scholarName,
-          scholarSlug: item.scholarSlug,
-          artworkUrl: item.thumbnailUrl ?? undefined,
-        },
-        contents,
-      );
-      const firstTrack = queue[0];
-      if (firstTrack) {
-        await audioService.playListing(firstTrack, queue);
-        return;
-      }
-    } catch {
-      // Fall through to the single-track fallback below.
-    }
+    if (await tryPlayExploreQueue(item, title, scholarName)) return;
   }
 
   const track: Track = {
