@@ -30,6 +30,26 @@ type TopicViewRecord = Prisma.TopicGetPayload<{
   select: typeof topicViewSelect;
 }>;
 
+function optionalValue<T>(value: T | null | undefined): T | undefined {
+  return value ?? undefined;
+}
+
+function mapOriginalLecture(
+  original:
+    | {
+        title: string;
+        description: string | null;
+      }
+    | null
+    | undefined,
+) {
+  if (!original) return undefined;
+  return {
+    title: original.title,
+    description: optionalValue(original.description),
+  };
+}
+
 @Injectable()
 export class TopicsRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -116,21 +136,16 @@ export class TopicsRepository {
         id: r.id,
         scholarId: r.scholarId,
         scholarSlug: r.scholar.slug,
-        seriesId: r.parentId ?? undefined,
+        seriesId: optionalValue(r.parentId),
         slug: r.slug,
         title: resolved.fields.title,
-        description: resolved.fields.description ?? undefined,
-        language: r.language ?? undefined,
+        description: optionalValue(resolved.fields.description),
+        language: optionalValue(r.language),
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? {
-              title: resolved.original.title,
-              description: resolved.original.description ?? undefined,
-            }
-          : undefined,
+        original: mapOriginalLecture(resolved.original),
         status: r.status,
         publishedAt: r.publishedAt?.toISOString(),
-        durationSeconds: r.durationSeconds ?? undefined,
+        durationSeconds: optionalValue(r.durationSeconds),
       };
     });
   }
