@@ -659,38 +659,59 @@ export function itemTargetSlug(state: UploadArrangeState, item: UploadItem): str
   return state.existing?.slug ?? "";
 }
 
+function createLessonOp(
+  item: UploadItem,
+  assignment: Extract<UploadItem["assignment"], { kind: "new-lesson" }>,
+): ArrangeLessonOp {
+  return {
+    op: "create",
+    slug: assignment.slug,
+    title: item.title,
+    description: assignment.description || undefined,
+    status: assignment.status,
+    orderIndex: assignment.orderIndex ?? undefined,
+    audio: itemAudioRef(item),
+  };
+}
+
+function getReplaceLessonOp(
+  item: UploadItem,
+  assignment: Extract<UploadItem["assignment"], { kind: "replace-audio" }>,
+  existing: NonNullable<UploadArrangeState["existing"]>,
+  moduleKey: ModuleKey,
+): ArrangeLessonOp | null {
+  const parentKey =
+    existing.modules.find((m) => m.lessons.some((l) => l.id === assignment.lessonId))?.id ??
+    ROOT_MODULE_KEY;
+  return parentKey === moduleKey
+    ? { op: "update", id: assignment.lessonId, audio: itemAudioRef(item) }
+    : null;
+}
+
+function buildLessonOps(
+  state: UploadArrangeState,
+  existing: NonNullable<UploadArrangeState["existing"]>,
+  moduleKey: ModuleKey,
+): ArrangeLessonOp[] {
+  const ops: ArrangeLessonOp[] = [];
+  for (const item of state.items) {
+    const assignment = item.assignment;
+    if (assignment.kind === "new-lesson" && assignment.moduleKey === moduleKey) {
+      ops.push(createLessonOp(item, assignment));
+    } else if (assignment.kind === "replace-audio") {
+      const operation = getReplaceLessonOp(item, assignment, existing, moduleKey);
+      if (operation) ops.push(operation);
+    }
+  }
+  return ops;
+}
+
 export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
   const { existing } = state;
   if (!existing) return { lessons: [] };
 
-  const lessonOpsFor = (moduleKey: ModuleKey): ArrangeLessonOp[] => {
-    const ops: ArrangeLessonOp[] = [];
-    for (const item of state.items) {
-      const assignment = item.assignment;
-      if (assignment.kind === "new-lesson" && assignment.moduleKey === moduleKey) {
-        ops.push({
-          op: "create",
-          slug: assignment.slug,
-          title: item.title,
-          description: assignment.description || undefined,
-          status: assignment.status,
-          orderIndex: assignment.orderIndex ?? undefined,
-          audio: itemAudioRef(item),
-        });
-      } else if (assignment.kind === "replace-audio") {
-        const parentKey =
-          existing.modules.find((m) => m.lessons.some((l) => l.id === assignment.lessonId))?.id ??
-          ROOT_MODULE_KEY;
-        if (parentKey === moduleKey) {
-          ops.push({ op: "update", id: assignment.lessonId, audio: itemAudioRef(item) });
-        }
-      }
-    }
-    return ops;
-  };
-
   if (existing.format === "series") {
-    return { lessons: lessonOpsFor(ROOT_MODULE_KEY) };
+    return { lessons: buildLessonOps(state, existing, ROOT_MODULE_KEY) };
   }
 
   const modules: ArrangeModuleOp[] = [];
@@ -702,11 +723,11 @@ export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
       description: mod.description || undefined,
       status: mod.status,
       orderIndex: mod.orderIndex ?? undefined,
-      lessons: lessonOpsFor(`new:${mod.tempId}`),
+      lessons: buildLessonOps(state, existing, `new:${mod.tempId}`),
     });
   }
   for (const mod of existing.modules) {
-    const lessons = lessonOpsFor(mod.id);
+    const lessons = buildLessonOps(state, existing, mod.id);
     if (lessons.length > 0) {
       modules.push({ op: "update", id: mod.id, lessons });
     }
