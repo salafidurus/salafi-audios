@@ -1784,10 +1784,27 @@ export class ListingRepository {
     rootLessonOps: ArrangeCommitDto['lessons'],
     rootId: string,
   ): Array<{ id: string; parentId: string }> {
+    return [
+      ...this.collectRootLessonUpdateTargets(rootLessonOps, rootId),
+      ...this.collectModuleLessonUpdateTargets(moduleOps),
+    ];
+  }
+
+  private collectRootLessonUpdateTargets(
+    rootLessonOps: ArrangeCommitDto['lessons'],
+    rootId: string,
+  ): Array<{ id: string; parentId: string }> {
     const targets: Array<{ id: string; parentId: string }> = [];
     for (const lessonOp of rootLessonOps ?? []) {
       if (lessonOp.op === 'update') targets.push({ id: lessonOp.id, parentId: rootId });
     }
+    return targets;
+  }
+
+  private collectModuleLessonUpdateTargets(
+    moduleOps: ArrangeCommitDto['modules'],
+  ): Array<{ id: string; parentId: string }> {
+    const targets: Array<{ id: string; parentId: string }> = [];
     for (const moduleOp of moduleOps ?? []) {
       if (moduleOp.op !== 'update') continue;
       for (const lessonOp of moduleOp.lessons) {
