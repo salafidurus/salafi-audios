@@ -151,26 +151,26 @@ export function updateListingMedia(id: string, data: UpdateListingMediaDto) {
   });
 }
 
-export function fetchAdminLectures(params?: {
+function buildLectureListQuery(params?: {
   cursor?: string;
   search?: string;
   status?: string;
   scholarId?: string;
 }) {
   const query = new URLSearchParams();
-  if (params?.cursor) {
-    query.append("cursor", params.cursor);
+  for (const [key, value] of Object.entries(params ?? {})) {
+    if (value) query.append(key, value);
   }
-  if (params?.search) {
-    query.append("search", params.search);
-  }
-  if (params?.status) {
-    query.append("status", params.status);
-  }
-  if (params?.scholarId) {
-    query.append("scholarId", params.scholarId);
-  }
-  const queryString = query.toString();
+  return query.toString();
+}
+
+export function fetchAdminLectures(params?: {
+  cursor?: string;
+  search?: string;
+  status?: string;
+  scholarId?: string;
+}) {
+  const queryString = buildLectureListQuery(params);
   const url = queryString
     ? `${endpoints.admin.listings.list}?${queryString}`
     : endpoints.admin.listings.list;
