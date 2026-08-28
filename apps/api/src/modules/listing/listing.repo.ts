@@ -242,6 +242,10 @@ function getAdminListingOptionalFields(listing: {
   };
 }
 
+function nullableValue<T>(value: T | null | undefined): T | null {
+  return value ?? null;
+}
+
 @Injectable()
 export class ListingRepository {
   constructor(
@@ -1194,28 +1198,22 @@ export class ListingRepository {
         id: listing.id,
         slug: listing.slug,
         title: listing.title,
-        description: listing.description ?? undefined,
+        ...getAdminListingOptionalFields(listing),
         format: listing.format,
-        language: listing.language ?? undefined,
         status: listing.status,
-        orderIndex: listing.orderIndex ?? undefined,
-        durationSeconds: listing.durationSeconds ?? undefined,
         scholarId: listing.scholarId,
         scholarSlug: listing.scholar.slug,
         scholarName: listing.scholar.name,
-        parentId: listing.parentId ?? undefined,
         topics: listing.topics.map((t) => t.topic.id),
         audioUrl: listing.audioAssets[0]?.url,
-        coverImageUrl: listing.coverImageUrl ?? undefined,
         createdAt: listing.createdAt.toISOString(),
-        updatedAt: listing.updatedAt?.toISOString(),
       },
       translations: listing.translations.map((t) => ({
         locale: t.locale,
         status: t.status,
         fields: {
           title: t.title,
-          description: t.description ?? null,
+          description: nullableValue(t.description),
         },
         createdAt: t.createdAt.toISOString(),
         updatedAt: t.updatedAt.toISOString(),
