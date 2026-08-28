@@ -84,10 +84,11 @@ disappears when `completedAt` is accepted.
 ## Engineering vocabulary
 
 **Complexity budget** is the maximum cyclomatic complexity permitted for an
-in-scope production function. The repository measures it with Oxlint's
-`eslint/complexity` rule using the `modified` variant. It is a control-flow
-maintainability measure, not a synonym for file size, naming quality, or
-general readability.
+in-scope production function. The repository currently sets that budget to 7
+and measures it with Oxlint's `eslint/complexity` rule using the `modified`
+variant. It is a control-flow maintainability measure, not a synonym for file
+size, naming quality, or general readability. A lower budget may be adopted
+only when behavior-preserving decomposition remains clear.
 
 ## Dead-code governance vocabulary
 
