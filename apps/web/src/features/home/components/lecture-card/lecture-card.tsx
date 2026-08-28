@@ -50,22 +50,13 @@ export function LectureCard({
         role="button"
         tabIndex={0}
         onClick={onClick}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onClick?.();
-          }
-        }}
+        onKeyDown={(e) => handleCardKeyDown(e, onClick)}
         className={styles.card}
       >
         <span className={styles.corner} aria-hidden="true" />
         <span className={styles.badge}>{category.toUpperCase()}</span>
         <h3 className={styles.title}>{title}</h3>
-        <p className={styles.meta}>
-          {displayScholar}
-          {displayScholar && duration ? " · " : ""}
-          {duration}
-        </p>
+        <p className={styles.meta}>{formatLectureMeta(displayScholar, duration)}</p>
         <div className={styles.footer}>
           <SanadChain total={lessons} completed={done} />
         </div>
@@ -76,12 +67,23 @@ export function LectureCard({
         className={styles.playBtn}
         aria-label={isPlaying ? "Pause" : "Play"}
       >
-        {isPlaying ? (
-          <Pause size={14} fill="currentColor" />
-        ) : (
-          <Play size={14} fill="currentColor" />
-        )}
+        <PlayIcon isPlaying={isPlaying} />
       </button>
     </div>
   );
+}
+
+function handleCardKeyDown(event: React.KeyboardEvent<HTMLDivElement>, onClick?: () => void): void {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  onClick?.();
+}
+
+function formatLectureMeta(scholar: string, duration: string): string {
+  return `${scholar}${scholar && duration ? " · " : ""}${duration}`;
+}
+
+function PlayIcon({ isPlaying }: { isPlaying: boolean }) {
+  const Icon = isPlaying ? Pause : Play;
+  return <Icon size={14} fill="currentColor" />;
 }
