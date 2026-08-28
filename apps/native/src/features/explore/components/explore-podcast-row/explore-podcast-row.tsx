@@ -130,6 +130,19 @@ function renderProgressBar(progressPercent: number) {
   );
 }
 
+function getIsCurrentTrack(item: FeedContentItemDto, currentTrack: Track | null) {
+  if (!isListingFormat(item.kind)) return false;
+  return isTrackActiveForListing({ id: item.id, slug: item.slug, format: item.kind }, currentTrack);
+}
+
+function getDurationText(seconds?: number) {
+  return seconds ? `${Math.round(seconds / 60)} min` : "";
+}
+
+function getPublishedDateText(publishedAt?: string | null) {
+  return publishedAt ? new Date(publishedAt).toLocaleDateString() : "";
+}
+
 export function ExplorePodcastRow({
   item,
   onPress,
@@ -143,16 +156,14 @@ export function ExplorePodcastRow({
   const { progressPercent } = useListingProgress(item.slug);
 
   const { isPlaying, currentTrack } = useAudio();
-  const isCurrentTrack =
-    isListingFormat(item.kind) &&
-    isTrackActiveForListing({ id: item.id, slug: item.slug, format: item.kind }, currentTrack);
+  const isCurrentTrack = getIsCurrentTrack(item, currentTrack);
 
   const isSaved = useIsSaved(item.id);
 
   const handlePlay = () => playExploreItem(item, title, scholarName, isCurrentTrack, isPlaying);
 
-  const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";
-  const publishedDateText = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : "";
+  const durationText = getDurationText(item.durationSeconds);
+  const publishedDateText = getPublishedDateText(item.publishedAt);
 
   const actions: MenuAction[] = [
     { id: "details", title: "Details" },
