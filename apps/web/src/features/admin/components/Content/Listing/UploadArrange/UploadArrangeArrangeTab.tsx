@@ -703,10 +703,58 @@ function SeriesFormatView({
   );
 }
 
+function ArrangeFormatContent({
+  state,
+  dispatch,
+  openModuleKey,
+  openDetailsKey,
+  newModuleTitle,
+  setNewModuleTitle,
+  onToggleModuleKey,
+  onToggleDetailsKey,
+  t,
+}: UploadArrangeArrangeTabProps & {
+  openModuleKey: ModuleKey | null;
+  openDetailsKey: string | null;
+  newModuleTitle: string;
+  setNewModuleTitle: (value: string) => void;
+  onToggleModuleKey: (key: ModuleKey) => void;
+  onToggleDetailsKey: (tempId: string) => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  const { existing } = state;
+  if (!existing) return null;
+  if (state.items.length === 0 && state.newModules.length === 0) {
+    return (
+      <div className={styles.emptyHint}>
+        {t("admin.contents.listing.arrangeEmpty", "Add audio files in the Upload tab first.")}
+      </div>
+    );
+  }
+
+  const conflictSlugs = new Set([...localSlugConflicts(state), ...state.conflictSlugs]);
+  if (existing.format === "single") return <SingleFormatView state={state} />;
+  if (existing.format === "series") {
+    return <SeriesFormatView state={state} dispatch={dispatch} conflictSlugs={conflictSlugs} />;
+  }
+  return (
+    <CollectionView
+      state={state}
+      dispatch={dispatch}
+      conflictSlugs={conflictSlugs}
+      openModuleKey={openModuleKey}
+      openDetailsKey={openDetailsKey}
+      newModuleTitle={newModuleTitle}
+      setNewModuleTitle={setNewModuleTitle}
+      onToggleModuleKey={onToggleModuleKey}
+      onToggleDetailsKey={onToggleDetailsKey}
+    />
+  );
+}
+
 export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrangeTabProps) {
   const { t } = useTranslation();
   const [newModuleTitle, setNewModuleTitle] = useState("");
-  const { existing } = state;
 
   const defaultOpenModuleKey = (() => {
     for (const item of state.items) {
@@ -730,31 +778,10 @@ export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrang
     prevNewModulesLengthRef.current = curr;
   }, [state.newModules]);
 
-  if (!existing) return null;
-
-  if (state.items.length === 0 && state.newModules.length === 0) {
-    return (
-      <div className={styles.emptyHint}>
-        {t("admin.contents.listing.arrangeEmpty", "Add audio files in the Upload tab first.")}
-      </div>
-    );
-  }
-
-  const conflictSlugs = new Set([...localSlugConflicts(state), ...state.conflictSlugs]);
-
-  if (existing.format === "single") {
-    return <SingleFormatView state={state} />;
-  }
-
-  if (existing.format === "series") {
-    return <SeriesFormatView state={state} dispatch={dispatch} conflictSlugs={conflictSlugs} />;
-  }
-
   return (
-    <CollectionView
+    <ArrangeFormatContent
       state={state}
       dispatch={dispatch}
-      conflictSlugs={conflictSlugs}
       openModuleKey={openModuleKey}
       openDetailsKey={openDetailsKey}
       newModuleTitle={newModuleTitle}
@@ -763,6 +790,7 @@ export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrang
       onToggleDetailsKey={(tempId) =>
         setOpenDetailsKey((prev) => (prev === tempId ? null : tempId))
       }
+      t={t}
     />
   );
 }
