@@ -35,6 +35,9 @@ jobs:
         with:
           bun-version: "1.4.0"
 
+      - name: Validate Dependabot Helper policy
+        run: bun infra/dependabot-helper/cli.ts validate
+
       - name: Determine changed files
         id: files
         env:
