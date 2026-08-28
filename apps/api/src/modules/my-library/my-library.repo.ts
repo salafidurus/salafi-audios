@@ -567,7 +567,7 @@ export class MyLibraryRepository {
       scholarSlug: record.listing.scholar.slug,
       durationSeconds: scalars.durationSeconds,
       positionSeconds: record.positionSeconds,
-      artworkUrl: artworkKey ? this.toPublicUrl(artworkKey) : undefined,
+      artworkUrl: getRecentArtworkUrl(artworkKey, (value) => this.toPublicUrl(value)),
       scholarImageUrl: scalars.scholarImageUrl,
       seriesContext,
       rootListing,
@@ -648,4 +648,11 @@ export class MyLibraryRepository {
       savedAt: r.createdAt.toISOString(),
     };
   }
+}
+
+function getRecentArtworkUrl(
+  artworkKey: string | null | undefined,
+  toPublicUrl: (value: string) => string,
+): string | undefined {
+  return artworkKey ? toPublicUrl(artworkKey) : undefined;
 }
