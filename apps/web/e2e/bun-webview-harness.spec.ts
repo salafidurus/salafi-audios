@@ -1,6 +1,11 @@
 import { describe, expect, it } from "bun:test";
 
-import { DEFAULT_E2E_PORT, getE2EPort, getDiagnosticDirectory } from "./bun-webview-harness";
+import {
+  DEFAULT_E2E_PORT,
+  getE2EPort,
+  getDiagnosticDirectory,
+  waitForBrowserCondition,
+} from "./bun-webview-harness";
 
 describe("Bun.WebView E2E configuration", () => {
   it("uses the dedicated default port", () => {
@@ -23,5 +28,15 @@ describe("Bun.WebView diagnostic paths", () => {
     expect(getDiagnosticDirectory("home page / loads study landing")).toContain(
       "home-page-loads-study-landing",
     );
+  });
+});
+
+describe("Bun.WebView application conditions", () => {
+  it("exposes a bounded condition wait for browser journeys", async () => {
+    const view = {
+      evaluate: async () => true,
+    } as unknown as Bun.WebView;
+
+    await waitForBrowserCondition(view, "test condition", "true", { timeoutMs: 10 });
   });
 });

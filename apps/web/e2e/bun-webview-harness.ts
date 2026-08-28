@@ -1,6 +1,8 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdtempSync } from "node:fs";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import { request as httpRequest } from "node:http";
-import { resolve } from "node:path";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 
 if (process.env.BUN_WEBVIEW_E2E === "1") {
   const { GlobalRegistrator } = require("@happy-dom/global-registrator");
@@ -29,6 +31,14 @@ export type BrowserJourney = {
   view: Bun.WebView;
   origin: string;
   console: BrowserConsoleEntry[];
+  /** Temporary browser profile removed after the journey closes. */
+  profileDirectory: string;
+};
+
+/** Defines the CSS viewport used by an isolated browser journey. */
+export type BrowserViewport = {
+  width: number;
+  height: number;
 };
 
 export type WebServer = {
@@ -190,6 +200,25 @@ export async function waitForWebReady(
   throw new Error(`Web server was not ready at ${origin} within ${timeoutMs}ms: ${lastError}`);
 }
 
+/** Waits for a named application condition without recreating browser auto-waiting. */
+export async function waitForBrowserCondition(
+  view: Bun.WebView,
+  description: string,
+  condition: string,
+  options: { timeoutMs?: number; intervalMs?: number } = {},
+): Promise<void> {
+  const timeoutMs = options.timeoutMs ?? DEFAULT_READY_TIMEOUT_MS;
+  const intervalMs = options.intervalMs ?? DEFAULT_READY_INTERVAL_MS;
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    if (await view.evaluate<boolean>(condition)) return;
+    await Bun.sleep(intervalMs);
+  }
+
+  throw new Error(`Application condition was not met within ${timeoutMs}ms: ${description}`);
+}
+
 function serializeConsoleArgs(args: unknown[]): unknown[] {
   return args.map((value) => {
     try {
@@ -202,18 +231,22 @@ function serializeConsoleArgs(args: unknown[]): unknown[] {
 }
 
 /** Creates an isolated Chromium view and records page console calls. */
-export function createBrowserJourney(origin: string): BrowserJourney {
+export function createBrowserJourney(
+  origin: string,
+  viewport: BrowserViewport = { width: 1280, height: 800 },
+): BrowserJourney {
   const consoleEntries: BrowserConsoleEntry[] = [];
+  const profileDirectory = mkdtempSync(join(tmpdir(), "salafi-durus-bun-webview-"));
   const view = new Bun.WebView({
     backend: { type: "chrome", url: false },
-    dataStore: "ephemeral",
-    width: 1280,
-    height: 800,
+    dataStore: { directory: profileDirectory },
+    width: viewport.width,
+    height: viewport.height,
     console: (type, ...args) => {
       consoleEntries.push({ type, args: serializeConsoleArgs(args) });
     },
   });
-  return { view, origin, console: consoleEntries };
+  return { view, origin, console: consoleEntries, profileDirectory };
 }
 
 /** Writes the required failure evidence for a journey before its view closes. */
@@ -248,8 +281,9 @@ export async function withBrowserJourney<T>(
   testName: string,
   origin: string,
   callback: (journey: BrowserJourney) => Promise<T>,
+  viewport?: BrowserViewport,
 ): Promise<T> {
-  const journey = createBrowserJourney(origin);
+  const journey = createBrowserJourney(origin, viewport);
   try {
     return await callback(journey);
   } catch (error) {
@@ -261,5 +295,6 @@ export async function withBrowserJourney<T>(
     throw error;
   } finally {
     journey.view.close();
+    await rm(journey.profileDirectory, { recursive: true, force: true });
   }
 }
