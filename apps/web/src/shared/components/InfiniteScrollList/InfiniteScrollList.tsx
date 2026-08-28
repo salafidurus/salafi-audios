@@ -195,24 +195,13 @@ function renderEmptyState<TData>({
   return null;
 }
 
-// react-doctor-disable-next-line react-doctor/no-many-boolean-props
-export function InfiniteScrollList<TData>({
-  data,
-  renderItem,
-  isLoading,
-  isError,
-  onRetry,
-  hasMore,
-  onLoadMore,
-  isFetchingNextPage,
-  emptyMessage = "No items found",
-  errorMessage = "Failed to load content. Please try again.",
-  layout = "list",
-  tableHeader,
-}: InfiniteScrollListProps<TData>): ReactNode {
+function useInfiniteScrollObserver(
+  hasMore: boolean,
+  onLoadMore: () => void,
+  isFetchingNextPage: boolean,
+) {
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  // Setup intersection observer for infinite scroll
   useEffect(() => {
     if (!observerTarget.current) return;
 
@@ -229,15 +218,48 @@ export function InfiniteScrollList<TData>({
     return () => observer.disconnect();
   }, [hasMore, onLoadMore, isFetchingNextPage]);
 
+  return observerTarget;
+}
+
+function normalizeListFlags(
+  isLoading: boolean | undefined,
+  isError: boolean | undefined,
+  isFetchingNextPage: boolean | undefined,
+) {
+  return {
+    isLoading: isLoading ?? false,
+    isError: isError ?? false,
+    isFetchingNextPage: isFetchingNextPage ?? false,
+  };
+}
+
+// react-doctor-disable-next-line react-doctor/no-many-boolean-props
+export function InfiniteScrollList<TData>({
+  data,
+  renderItem,
+  isLoading,
+  isError,
+  onRetry,
+  hasMore,
+  onLoadMore,
+  isFetchingNextPage,
+  emptyMessage = "No items found",
+  errorMessage = "Failed to load content. Please try again.",
+  layout = "list",
+  tableHeader,
+}: InfiniteScrollListProps<TData>): ReactNode {
+  const flags = normalizeListFlags(isLoading, isError, isFetchingNextPage);
+  const observerTarget = useInfiniteScrollObserver(hasMore, onLoadMore, flags.isFetchingNextPage);
+
   const emptyState = renderEmptyState({
     data,
-    isError: isError ?? false,
+    isError: flags.isError,
     errorMessage,
     onRetry,
-    isLoading: isLoading ?? false,
+    isLoading: flags.isLoading,
     emptyMessage,
     hasMore,
-    isFetchingNextPage: isFetchingNextPage ?? false,
+    isFetchingNextPage: flags.isFetchingNextPage,
     observerTarget,
   });
   if (emptyState) return emptyState;
@@ -249,7 +271,7 @@ export function InfiniteScrollList<TData>({
       layout={layout}
       tableHeader={tableHeader}
       observerTarget={observerTarget}
-      isFetchingNextPage={isFetchingNextPage}
+      isFetchingNextPage={flags.isFetchingNextPage}
     />
   );
 }
