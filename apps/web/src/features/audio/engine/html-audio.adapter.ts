@@ -2,10 +2,13 @@ import type { PlaybackEngine, PlaybackEngineEvents, Track } from "@sd/domain-aud
 
 import { hasMediaMetadataConstructor, hasNavigator, hasWindow } from "@/shared/lib/runtime-guards";
 
+/** Reports whether this browser exposes Media Session controls for lock-screen playback. */
 function hasMediaSession(): boolean {
   return hasNavigator() && "mediaSession" in navigator;
 }
 
+/** Provides the browser media-element adapter. */
+/** Adapts the browser media element to the domain audio engine contract. */
 export class HTMLAudioAdapter implements PlaybackEngine {
   private audio: HTMLAudioElement | null = null;
   private events: PlaybackEngineEvents = {};

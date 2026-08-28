@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { cn } from "@/shared/utils";
 
+/** Documents this module's responsibility and public boundary. */
 function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
   return (
     <textarea

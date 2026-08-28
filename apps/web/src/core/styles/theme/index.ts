@@ -7,6 +7,7 @@ import { createShadowsWeb, type ShadowsWebTheme } from "./shadows";
 import { spacingWeb, type SpacingWeb } from "./spacing";
 import { typographyWeb, type TypographyWeb } from "./typography";
 
+/** Documents this module's responsibility and public boundary. */
 export type AppThemeWeb = {
   colors: AppColors;
   recipes: AccentRecipesWeb;

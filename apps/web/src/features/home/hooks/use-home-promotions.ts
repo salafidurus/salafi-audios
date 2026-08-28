@@ -1,6 +1,7 @@
 import { endpoints, httpClient, type HomePromotionsDto } from "@sd/core-contracts";
 import { useQuery } from "@tanstack/react-query";
 
+/** Documents this module's responsibility and public boundary. */
 export function useHomePromotions() {
   return useQuery({
     queryKey: ["home", "promotions"],

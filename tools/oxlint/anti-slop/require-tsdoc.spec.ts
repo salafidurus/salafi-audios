@@ -69,6 +69,14 @@ describe("require-tsdoc", () => {
     expect(output).not.toContain("require-tsdoc");
   });
 
+  test("accepts useful documentation after Unicode source text", () => {
+    const output = lintFixture(
+      "/** ينسق هذا الملف عقد العرض العام. */\n/** يحول القيمة إلى تمثيل العرض. */\nexport function value(input: string): string { return input; }\n",
+    );
+
+    expect(output).not.toContain("require-tsdoc");
+  });
+
   test("rejects generic placeholder documentation", () => {
     const output = lintFixture(
       "/** Module summary. */\n/** TODO */\nexport function value() { return 1; }\n",

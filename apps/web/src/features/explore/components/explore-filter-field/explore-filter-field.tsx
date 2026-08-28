@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import {
@@ -22,8 +23,10 @@ import type { FilterOption } from "../filter-select/filter-select";
 
 import styles from "./explore-filter-field.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type ExploreFilterFieldMode = "select" | "combobox";
 
+/** Documents the intent and contract of this declaration. */
 export type ExploreFilterFieldProps = {
   id: string;
   label: string;
@@ -127,6 +130,7 @@ function SelectField({
   );
 }
 
+/** Documents the intent and contract of this declaration. */
 export function ExploreFilterField({
   id,
   label,

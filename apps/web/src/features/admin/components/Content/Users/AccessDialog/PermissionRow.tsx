@@ -12,6 +12,7 @@ import { Switch as Toggle } from "@/shared/components/ui/switch";
 import styles from "./AccessDialog.module.css";
 import { ScopeSelector } from "./ScopeSelector";
 
+/** Documents this module's responsibility and public boundary. */
 interface PermissionRowProps {
   title: string;
   description: string;

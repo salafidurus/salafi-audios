@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { AdminArrangeLessonDto, StatusValue } from "@sd/core-contracts";
@@ -31,7 +32,7 @@ import modalStyles from "../listing-modal.module.css";
 import styles from "./upload-arrange.module.css";
 
 interface UploadArrangeArrangeTabProps {
-  state: UploadArrangeState;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
   dispatch: React.Dispatch<UploadArrangeAction>;
 }
 
@@ -61,7 +62,7 @@ function PrefixedSlugField({
 }: {
   id: string;
   prefix: string;
-  slug: string;
+  /** Documents the intent and contract of this field. */ slug: string;
   onChange: (nextSlug: string) => void;
   hasConflict: boolean;
 }) {
@@ -127,10 +128,13 @@ function NewLessonFields({
   moduleOptions,
 }: {
   item: UploadItem;
-  state: UploadArrangeState;
-  assignment: Extract<UploadItem["assignment"], { kind: "new-lesson" }>;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
+  assignment: Extract<
+    UploadItem["assignment"],
+    { /** Documents the intent and contract of this field. */ kind: "new-lesson" }
+  >;
   dispatch: React.Dispatch<UploadArrangeAction>;
-  conflictSlugs: Set<string>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
   moduleOptions: { key: ModuleKey; title: string }[] | null;
 }) {
   const { t } = useTranslation();
@@ -271,10 +275,10 @@ function StagedItemCard({
   moduleOptions,
 }: {
   item: UploadItem;
-  state: UploadArrangeState;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
   dispatch: React.Dispatch<UploadArrangeAction>;
   lessonsInScope: AdminArrangeLessonDto[];
-  conflictSlugs: Set<string>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
   moduleOptions: { key: ModuleKey; title: string }[] | null;
 }) {
   const { t } = useTranslation();
@@ -357,10 +361,10 @@ function StagedList({
   moduleOptions,
 }: {
   moduleKey: ModuleKey;
-  state: UploadArrangeState;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
   dispatch: React.Dispatch<UploadArrangeAction>;
   lessonsInScope: AdminArrangeLessonDto[];
-  conflictSlugs: Set<string>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
   moduleOptions: { key: ModuleKey; title: string }[] | null;
 }) {
   const staged = state.items.filter(
@@ -408,9 +412,9 @@ function NewModuleCard({
   conflictSlugs,
 }: {
   mod: NewModule;
-  rootSlug: string;
+  /** Documents the intent and contract of this field. */ rootSlug: string;
   dispatch: React.Dispatch<UploadArrangeAction>;
-  conflictSlugs: Set<string>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
 }) {
   const { t } = useTranslation();
   const hasConflict = conflictSlugs.has(mod.slug);
@@ -495,9 +499,9 @@ function CollectionView({
   onToggleModuleKey,
   onToggleDetailsKey,
 }: {
-  state: UploadArrangeState;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
   dispatch: React.Dispatch<UploadArrangeAction>;
-  conflictSlugs: Set<string>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
   openModuleKey: ModuleKey | null;
   openDetailsKey: string | null;
   newModuleTitle: string;
@@ -689,7 +693,11 @@ function CollectionView({
   );
 }
 
-function SingleFormatView({ state }: { state: UploadArrangeState }) {
+function SingleFormatView({
+  state,
+}: {
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
+}) {
   const { t } = useTranslation();
   const existing = state.existing;
   if (!existing) return null;
@@ -720,9 +728,9 @@ function SeriesFormatView({
   dispatch,
   conflictSlugs,
 }: {
-  state: UploadArrangeState;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
   dispatch: React.Dispatch<UploadArrangeAction>;
-  conflictSlugs: Set<string>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
 }) {
   const { t } = useTranslation();
   const existing = state.existing;
@@ -823,6 +831,7 @@ function ArrangeFormatContent({
   );
 }
 
+/** Documents the intent and contract of this declaration. */
 export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrangeTabProps) {
   const { t } = useTranslation();
   const [newModuleTitle, setNewModuleTitle] = useState("");

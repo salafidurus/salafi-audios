@@ -8,6 +8,7 @@ import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
 
 import type { FormAction, FormState } from "./useScholarForm";
 
+/** Documents this module's responsibility and public boundary. */
 async function uploadStagedImage(
   state: FormState,
 ): Promise<{ url: string | undefined; key: string | undefined }> {

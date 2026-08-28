@@ -3,7 +3,14 @@ import web from "oxlint-config-universe/web";
 
 export default defineConfig({
   extends: [web],
-  ignorePatterns: [".agents/**", ".claude/**", ".cursor/**", "tools/oxlint/anti-slop/**"],
+  ignorePatterns: [
+    ".agents/**",
+    ".claude/**",
+    ".cursor/**",
+    "tools/oxlint/anti-slop/**",
+    "src/test-setup.ts",
+    "src/test-matchers.d.ts",
+  ],
   jsPlugins: [{ name: "anti-slop", specifier: "./tools/oxlint/anti-slop/index.ts" }],
   rules: {
     "anti-slop/no-chained-type-assertions": "error",
@@ -46,6 +53,8 @@ export default defineConfig({
         "**/__tests__/**/*.{ts,tsx}",
         "src/test-setup.ts",
         "src/test-matchers.d.ts",
+        "**/test-setup.ts",
+        "**/test-matchers.d.ts",
       ],
       rules: {
         "anti-slop/no-chained-type-assertions": "off",

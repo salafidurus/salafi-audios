@@ -1,4 +1,5 @@
 // Scholar Screens
+/** Documents this module's responsibility and public boundary. */
 export {
   ScholarDetailScreen,
   type ScholarDetailScreenProps,

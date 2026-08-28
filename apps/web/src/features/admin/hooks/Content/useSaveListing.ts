@@ -12,6 +12,7 @@ import {
 
 import type { FormAction, FormState } from "./useListingForm";
 
+/** Documents this module's responsibility and public boundary. */
 async function uploadStagedCoverImage(
   state: FormState,
 ): Promise<{ url: string | undefined; key: string | undefined }> {

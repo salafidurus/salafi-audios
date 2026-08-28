@@ -10,13 +10,14 @@ import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-na
 import { SanadChain } from "../sanad-chain/sanad-chain";
 import styles from "./featured-lecture-card.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 type FeaturedLectureCardProps = {
   title: string;
   category: string;
   scholarName: string;
-  scholarSlug?: string;
+  /** Documents the intent and contract of this field. */ scholarSlug?: string;
   scholarTitle?: ScholarTitle | string | null;
-  duration: string;
+  /** Documents the intent and contract of this field. */ duration: string;
   progress: number;
   totalLessons: number;
   eyebrow?: string;
@@ -24,6 +25,7 @@ type FeaturedLectureCardProps = {
   onPlay?: () => void;
 };
 
+/** Documents the intent and contract of this declaration. */
 export function FeaturedLectureCard({
   title,
   category,

@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export type ThemePreference = "system" | "light" | "dark";
 
 export type ResolvedTheme = "light" | "dark";

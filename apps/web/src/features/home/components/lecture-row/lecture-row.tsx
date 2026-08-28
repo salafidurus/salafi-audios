@@ -9,15 +9,16 @@ import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-na
 import { SanadChain } from "../sanad-chain/sanad-chain";
 import styles from "./lecture-row.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 type LectureRowProps = {
   title: string;
   category: string;
   scholarName: string;
-  scholarSlug?: string;
+  /** Documents the intent and contract of this field. */ scholarSlug?: string;
   scholarTitle?: ScholarTitle | string | null;
   scholarImageUrl?: string | null;
   listingArtwork?: string | null;
-  duration: string;
+  /** Documents the intent and contract of this field. */ duration: string;
   totalLessons: number;
   progress?: number;
   onClick?: () => void;
@@ -43,6 +44,7 @@ function LectureProgress({ total, completed }: { total: number; completed: numbe
   );
 }
 
+/** Documents the intent and contract of this declaration. */
 export function LectureRow({
   title,
   category,

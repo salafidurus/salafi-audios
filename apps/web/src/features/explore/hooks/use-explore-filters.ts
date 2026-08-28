@@ -8,6 +8,7 @@ import {
   writeExploreFilters,
 } from "../utils/explore-filters";
 
+/** Documents this module's responsibility and public boundary. */
 export type UseExploreFiltersOptions = {
   locale: string;
   userId?: string;

@@ -8,6 +8,7 @@ import { z } from "zod";
 import { getApiBaseUrl } from "@/core/config/env";
 import { ListingDetailScreen } from "@/features/details/screens/listing-detail/listing-detail.screen";
 
+/** Documents this module's responsibility and public boundary. */
 const ListingDetailSchema = z.object({
   id: z.string(),
   title: z.string(),

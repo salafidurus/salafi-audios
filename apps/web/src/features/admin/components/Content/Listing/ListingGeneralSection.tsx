@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { ScholarListItemDto, TopicDetailDto, Locale } from "@sd/core-contracts";

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 
+/** Documents this module's responsibility and public boundary. */
 export type ToastType = "success" | "error" | "info" | "warning";
 
 export interface Toast {

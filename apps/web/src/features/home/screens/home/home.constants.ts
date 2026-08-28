@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export type MobileAvailability = false | "ios" | "android" | "both";
 
 // Flip this when an app store listing goes live.

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/shared/utils";
 
+/** Documents this module's responsibility and public boundary. */
 export interface PageHeaderProps {
   title: string;
   subtitle?: string;

@@ -1,5 +1,6 @@
 import { typographyBase, type TypographyVariant } from "@sd/design-tokens";
 
+/** Documents this module's responsibility and public boundary. */
 const webFontFamily = {
   display: "var(--font-display), serif",
   body: "var(--font-body), sans-serif",

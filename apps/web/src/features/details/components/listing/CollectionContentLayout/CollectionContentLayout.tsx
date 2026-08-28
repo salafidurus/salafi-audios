@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { ListingModuleDto, ListingContentItemDto } from "@sd/core-contracts";
@@ -11,15 +12,17 @@ import { CollectionToc } from "../CollectionToc/CollectionToc";
 import { ContentListItem } from "../ContentListItem/ContentListItem";
 import styles from "./CollectionContentLayout.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type CollectionContentLayoutProps = {
   modules: ListingModuleDto[];
   scholarName?: string;
-  scholarSlug?: string;
+  /** Documents the intent and contract of this field. */ scholarSlug?: string;
   collectionId?: string;
   /** Item id to scroll to and briefly highlight on mount (e.g. a lesson linked via URL anchor). */
   highlightItemId?: string;
 };
 
+/** Documents the intent and contract of this declaration. */
 export function CollectionContentLayout({
   modules,
   scholarName = "",

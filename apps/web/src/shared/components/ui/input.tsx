@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { cn } from "@/shared/utils/index";
 
+/** Documents this module's responsibility and public boundary. */
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
     <input

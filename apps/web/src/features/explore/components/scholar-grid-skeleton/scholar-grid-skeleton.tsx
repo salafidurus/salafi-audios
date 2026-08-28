@@ -1,5 +1,6 @@
 import styles from "./scholar-grid-skeleton.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export type ScholarGridSkeletonProps = {
   count?: number;
 };

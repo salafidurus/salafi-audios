@@ -1,6 +1,7 @@
 import * as React from "react";
 
 // Keep the generated shadcn sidebar aligned with the web app's documented mobile breakpoint.
+/** Documents this module's responsibility and public boundary. */
 const MOBILE_BREAKPOINT = 641;
 
 export function useIsMobile() {

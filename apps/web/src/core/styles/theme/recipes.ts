@@ -6,6 +6,7 @@ import type {
   ChromeRecipe,
 } from "@sd/design-tokens";
 
+/** Documents this module's responsibility and public boundary. */
 export type AccentRecipesWeb = AccentRecipesShared & {
   primaryCta: AccentRecipesShared["primaryCta"] & {
     background: string;

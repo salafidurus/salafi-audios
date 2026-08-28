@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import Image from "next/image";
@@ -7,12 +8,14 @@ import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 
 import styles from "./store-download-badge.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type StoreDownloadBadgeProps = {
   store: "appStore" | "googlePlay";
   isAvailable: boolean;
   href?: string;
 };
 
+/** Documents the intent and contract of this declaration. */
 export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBadgeProps) {
   const isRtl = useIsRtl();
   const { t } = useTranslation();

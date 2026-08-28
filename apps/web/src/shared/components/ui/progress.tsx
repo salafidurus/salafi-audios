@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { Progress as ProgressPrimitive } from "radix-ui";

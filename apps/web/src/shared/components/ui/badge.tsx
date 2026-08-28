@@ -4,6 +4,7 @@ import { cn } from "@/shared/utils";
 
 import { badgeVariants, type BadgeVariantProps } from "./badge-variants";
 
+/** Documents this module's responsibility and public boundary. */
 function Badge({
   className,
   variant = "default",

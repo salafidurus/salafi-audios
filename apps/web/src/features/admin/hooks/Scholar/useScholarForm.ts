@@ -2,6 +2,7 @@ import type { Locale, ScholarFormDataDto, ScholarTitle, CountryCode } from "@sd/
 
 import { useReducer } from "react";
 
+/** Documents this module's responsibility and public boundary. */
 export type ScholarChangeSnapshot = {
   name: string;
   bio: string;

@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { AlertCircle, CheckCircle } from "lucide-react";
@@ -15,7 +16,7 @@ import {
 import styles from "./upload-arrange.module.css";
 
 interface UploadArrangeReviewTabProps {
-  state: UploadArrangeState;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
   dispatch: React.Dispatch<UploadArrangeAction>;
 }
 
@@ -53,7 +54,13 @@ function renderUploadDetails(item: UploadItem, isBusy: boolean, statusLabel: str
   );
 }
 
-function ItemRow({ item, state }: { item: UploadItem; state: UploadArrangeState }) {
+function ItemRow({
+  item,
+  state,
+}: {
+  item: UploadItem;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
+}) {
   const { t } = useTranslation();
   const isBusy = state.phase === "presigning" || state.phase === "uploading";
   const action =
@@ -136,6 +143,7 @@ function buildReviewGroups(
   return groups;
 }
 
+/** Documents the intent and contract of this declaration. */
 export function UploadArrangeReviewTab({ state }: UploadArrangeReviewTabProps) {
   const { t } = useTranslation();
   const { existing } = state;

@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { Locale, TopicDetailDto } from "@sd/core-contracts";

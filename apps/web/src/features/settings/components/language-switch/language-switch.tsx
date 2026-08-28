@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";

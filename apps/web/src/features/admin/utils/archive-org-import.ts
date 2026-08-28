@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { AUDIO_EXTENSIONS } from "./fetch-remote-file";
 
+/** Documents this module's responsibility and public boundary. */
 const IDENTIFIER_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 const ArchiveMetadataSchema = z.object({
   files: z.array(z.object({ name: z.string() })).optional(),
