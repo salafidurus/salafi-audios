@@ -29,10 +29,10 @@ import { Button } from "@/shared/components/Button/Button";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
-/** Provides the native features listing screens lecture-detail lecture-detail.screen module responsibility. */
-/** Describes the LectureDetailScreenProps native type contract and behavior. */
+/** Builds native lecture and scholar content surfaces from canonical identities. */
+/** Describes the inputs, callbacks, and optional state accepted by Lecture Detail Screen. */
 export type LectureDetailScreenProps = {
-  /** Describes the slug native field contract and behavior. */
+  /** Carries the canonical route identity used to load the selected content. */
   slug: string;
 };
 
@@ -318,12 +318,12 @@ function LoadedLectureBody({ view }: { view: LoadedLectureView }) {
   return isContainer ? <ContainerLectureBody view={view} /> : <SingleLectureBody view={view} />;
 }
 
-/** Describes the LectureDetailScreen native function contract and behavior. */
+/** Renders the native lecture detail screen surface and coordinates its user-facing state. */
 export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { theme } = useUnistyles();
-  /** Describes the slug native field contract and behavior. */
+  /** Carries the canonical route identity used to load the selected content. */
   const { anchor } = useLocalSearchParams<{
-    /** Describes the slug native field contract and behavior. */
+    /** Carries the canonical route identity used to load the selected content. */
     slug: string;
     anchor?: string;
   }>();

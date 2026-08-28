@@ -2,10 +2,10 @@ import { UnistylesRuntime } from "react-native-unistyles";
 
 import { createTypography } from "./typography";
 
-/** Provides the native core styles theme typography-sync module responsibility. */
+/** Configures native themes, breakpoints, and the Unistyles runtime. */
 type Locale = "en" | "ar";
 
-/** Describes the syncTypographyToLocale native function contract and behavior. */
+/** Defines the native sync typography to locale contract used by this module. */
 export function syncTypographyToLocale(locale: Locale): void {
   const typography = createTypography(locale);
   const themes = ["system", "light", "dark"] as const;

@@ -1,6 +1,6 @@
 import type { AppThemeNative } from "@/core/styles/theme";
 
-/** Provides the native features navigation utils stack-header-options module responsibility. */
+/** Defines native tab, subroute, and accessory navigation behavior. */
 function getThemedHeaderColors(theme: AppThemeNative) {
   return {
     headerStyle: { backgroundColor: theme.colors.surface.default },
@@ -12,7 +12,7 @@ function getThemedHeaderColors(theme: AppThemeNative) {
   };
 }
 
-/** Describes the getTabStackScreenOptions native function contract and behavior. */
+/** Returns the the tab stack screen options used by native consumers. */
 export function getTabStackScreenOptions(theme: AppThemeNative) {
   return {
     headerShown: true,
@@ -22,7 +22,7 @@ export function getTabStackScreenOptions(theme: AppThemeNative) {
   };
 }
 
-/** Describes the getFormSheetScreenOptions native function contract and behavior. */
+/** Returns the the form sheet screen options used by native consumers. */
 export function getFormSheetScreenOptions(theme: AppThemeNative) {
   return {
     headerShown: true,

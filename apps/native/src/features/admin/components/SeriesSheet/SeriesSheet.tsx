@@ -12,11 +12,11 @@ import { TextInput } from "@/shared/components/TextInput/TextInput";
 
 import { createSeries, updateSeries } from "../../api/admin-scholars.api";
 
-/** Provides the native features admin components SeriesSheet SeriesSheet module responsibility. */
+/** Provides authenticated native administration workflows and their data boundaries. */
 type SeriesSheetProps = {
   isOpen: boolean;
   scholarId: string;
-  /** Describes the scholarSlug native field contract and behavior. */
+  /** Carries the canonical scholar identity used to scope content and admin requests. */
   scholarSlug: string;
   series?: AdminListingDetailDto;
   onClose: () => void;
@@ -26,10 +26,10 @@ type SeriesSheetProps = {
 type FormState = {
   title: string;
   description: string;
-  /** Describes the language native field contract and behavior. */
+  /** Stores the selected content locale used for validation, display, and persistence. */
   language: string;
   isSaving: boolean;
-  /** Describes the error native field contract and behavior. */
+  /** Stores the user-facing or diagnostic failure associated with the current operation. */
   error: string | null;
 };
 
@@ -96,7 +96,7 @@ function SeriesSheetForm({
   onClose,
   dispatch,
 }: {
-  /** Describes the state native field contract and behavior. */
+  /** Holds the current state machine value that controls the surrounding workflow. */
   state: FormState;
   series: AdminListingDetailDto | undefined;
   canSave: boolean;
@@ -155,7 +155,7 @@ function SeriesSheetForm({
   );
 }
 
-/** Describes the SeriesSheet native function contract and behavior. */
+/** Defines the native series sheet contract used by this module. */
 export function SeriesSheet({
   isOpen,
   scholarId,

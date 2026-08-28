@@ -1,7 +1,7 @@
 import { CurationScreen } from "@/features/explore/screens/curation.screen";
 
-/** Provides the native app (tabs) (explore) curation module responsibility. */
-/** Describes the ExploreCurationRoute native function contract and behavior. */
+/** Defines the Expo Router entrypoint for the native (tabs)/(explore)/curation route and delegates behavior to the feature layer. */
+/** Renders the native explore curation route surface and coordinates its user-facing state. */
 export default function ExploreCurationRoute() {
   return <CurationScreen />;
 }

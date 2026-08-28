@@ -6,7 +6,7 @@ import { BottomAccessory } from "@/features/navigation";
 
 import { Providers } from "../core/providers";
 
-/** Provides the native app _layout module responsibility. */
+/** Defines the Expo Router entrypoint for the native _layout route and delegates behavior to the feature layer. */
 function RootLayout() {
   return (
     <Providers>

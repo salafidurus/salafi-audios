@@ -1,8 +1,8 @@
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenInProgress } from "@/shared/components/ScreenInProgress/ScreenInProgress";
 
-/** Provides the native features explore screens curation.screen module responsibility. */
-/** Describes the CurationScreen native function contract and behavior. */
+/** Composes native explore and catalog surfaces for browsing available content. */
+/** Renders the native curation screen surface and coordinates its user-facing state. */
 export function CurationScreen() {
   const { t } = useTranslation();
 

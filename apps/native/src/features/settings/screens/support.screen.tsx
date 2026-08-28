@@ -1,7 +1,7 @@
 import { View, Text, ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-/** Provides the native features settings screens support.screen module responsibility. */
+/** Provides native account, preference, support, and settings workflows. */
 const SUPPORT_SECTIONS = [
   {
     title: "FAQ",
@@ -74,7 +74,7 @@ const styles = StyleSheet.create((theme) => ({
   },
 }));
 
-/** Describes the SupportScreen native function contract and behavior. */
+/** Renders the native support screen surface and coordinates its user-facing state. */
 export function SupportScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>

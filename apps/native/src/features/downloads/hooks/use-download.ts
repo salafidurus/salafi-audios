@@ -4,10 +4,10 @@ import { downloadLecture, removeLecture } from "@/features/downloads/engine/down
 import { useDownloadsStore } from "@/features/downloads/store/downloads.store";
 
 /** UI-only status — "idle" means no registry row exists yet for this listing. */
-/** Describes the UiDownloadStatus native contract and behavior. */
+/** Enumerates the lifecycle values used by the native ui download workflow. */
 export type UiDownloadStatus = "idle" | "pending" | "downloading" | "paused" | "complete" | "error";
 
-/** Describes the useDownload native contract and behavior. */
+/** Exposes download state and actions to native consumers. */
 export function useDownload(listingSlug: string, audioUrl?: string) {
   const row = useDownloadsStore((s) => s.downloads[listingSlug]);
 

@@ -2,8 +2,8 @@ import { useRouter } from "expo-router";
 
 import { AdminDashboardScreen } from "@/features/admin/screens/admin-dashboard/admin-dashboard.screen";
 
-/** Provides the native app (tabs) admin index module responsibility. */
-/** Describes the AdminDashboardRoute native function contract and behavior. */
+/** Defines the Expo Router entrypoint for the native (tabs)/admin route and delegates behavior to the feature layer. */
+/** Renders the native admin dashboard route surface and coordinates its user-facing state. */
 export default function AdminDashboardRoute() {
   const router = useRouter();
 

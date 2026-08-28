@@ -2,8 +2,8 @@ import { ListContainer, type ListContainerProps } from "./ListContainer";
 import { ListItem, type ListItemProps } from "./ListItem";
 import { ListItemActions, type ListItemActionsProps } from "./ListItemActions";
 
-/** Provides the native shared components List index module responsibility. */
-/** Describes the const List = Object.assign(ListContainer, { native declaration contract and behavior. */
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Exposes the list container and item primitives as one reusable native list API. */
 export const List = Object.assign(ListContainer, {
   Item: Object.assign(ListItem, {
     Actions: ListItemActions,

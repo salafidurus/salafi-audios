@@ -1,5 +1,5 @@
-/** Provides the native core styles theme shadows module responsibility. */
-/** Describes the const shadowsNative = { native declaration contract and behavior. */
+/** Configures native themes, breakpoints, and the Unistyles runtime. */
+/** Defines the native shadows token set consumed by themed components. */
 export const shadowsNative = {
   xs: {
     light: {
@@ -83,7 +83,7 @@ export const shadowsNative = {
   },
 } as const;
 
-/** Describes the ShadowsNativeVariant native type contract and behavior. */
+/** Defines the native shadows native variant contract shared by its consumers. */
 export type ShadowsNativeVariant = {
   shadowColor: string;
   shadowOffset: { width: number; height: number };
@@ -92,7 +92,7 @@ export type ShadowsNativeVariant = {
   elevation: number;
 };
 
-/** Describes the ShadowsNativeTheme native type contract and behavior. */
+/** Defines the native shadows native theme contract shared by its consumers. */
 export type ShadowsNativeTheme = {
   xs: ShadowsNativeVariant;
   sm: ShadowsNativeVariant;
@@ -101,7 +101,7 @@ export type ShadowsNativeTheme = {
   elevated: ShadowsNativeVariant;
 };
 
-/** Describes the const createShadowsNative = (mode: "light" | "dark"): ShadowsNativeTheme => { native declaration contract and behavior. */
+/** Builds the native shadows theme values from the active platform mode. */
 export const createShadowsNative = (mode: "light" | "dark"): ShadowsNativeTheme => {
   const isLight = mode === "light";
 

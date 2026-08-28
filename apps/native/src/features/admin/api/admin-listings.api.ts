@@ -11,8 +11,8 @@ import type {
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { File, UploadTask, UploadType, type UploadProgress } from "expo-file-system";
 
-/** Describes the getPresignedUrl native contract and behavior. */
-/** Describes the getPresignedUrl native function contract and behavior. */
+/** Requests the signed upload target used to transfer admin audio to object storage. */
+/** Returns the the presigned url used by native consumers. */
 export async function getPresignedUrl(
   data: PresignedUrlRequestDto,
 ): Promise<PresignedUrlResponseDto> {
@@ -23,7 +23,7 @@ export async function getPresignedUrl(
   });
 }
 
-/** Describes the uploadToR2 native contract and behavior. */
+/** Uploads admin audio to the signed object-storage target and reports transfer completion. */
 export async function uploadToR2(
   uploadUrl: string,
   fileUri: string,
@@ -52,7 +52,7 @@ export async function uploadToR2(
   }
 }
 
-/** Describes the updateListing native contract and behavior. */
+/** Sends an authoritative listing update through the admin API boundary. */
 export async function updateListing(
   id: string,
   data: UpdateListingDetailsDto,
@@ -64,7 +64,7 @@ export async function updateListing(
   });
 }
 
-/** Describes the createListing native contract and behavior. */
+/** Creates a listing through the admin API boundary and returns its server identity. */
 export async function createListing(data: CreateListingDto): Promise<AdminListingDetailDto> {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.create,
@@ -73,7 +73,7 @@ export async function createListing(data: CreateListingDto): Promise<AdminListin
   });
 }
 
-/** Describes the fetchAdminListingDetail native contract and behavior. */
+/** Loads the authoritative admin listing detail used by the edit workflow. */
 export async function fetchAdminListingDetail(id: string): Promise<AdminListingDetailDto> {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.detail(id),
@@ -81,7 +81,7 @@ export async function fetchAdminListingDetail(id: string): Promise<AdminListingD
   });
 }
 
-/** Describes the bulkListingAction native contract and behavior. */
+/** Applies one server-authoritative action to the selected listings. */
 export async function bulkListingAction(data: BulkActionDto): Promise<BulkActionResultDto> {
   return httpClient<BulkActionResultDto>({
     url: endpoints.admin.listings.bulk,

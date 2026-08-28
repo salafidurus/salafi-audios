@@ -12,7 +12,7 @@ import { TextInput } from "@/shared/components/TextInput/TextInput";
 
 import { fetchAdminListingDetail, updateListing } from "../../api/admin-listings.api";
 
-/** Provides the native features admin components ListingEditSheet ListingEditSheet module responsibility. */
+/** Provides authenticated native administration workflows and their data boundaries. */
 type ListingEditSheetProps = {
   listingId: string | null;
   onClose: () => void;
@@ -23,10 +23,10 @@ type FormState = {
   listing: AdminListingDetailDto | null;
   title: string;
   description: string;
-  /** Describes the language native contract and behavior. */
+  /** Stores the selected content locale used for validation, display, and persistence. */
   language: string;
   isSaving: boolean;
-  /** Describes the error native contract and behavior. */
+  /** Stores the user-facing or diagnostic failure associated with the current operation. */
   error: string | null;
 };
 
@@ -56,11 +56,11 @@ async function saveListingChanges(
       title,
       description: description || undefined,
       language: parseLocaleInput(language),
-      /** Describes the language native contract and behavior. */
+      /** Stores the selected content locale used for validation, display, and persistence. */
     } satisfies {
       title: string;
       description?: string;
-      /** Describes the language native field contract and behavior. */
+      /** Stores the selected content locale used for validation, display, and persistence. */
       language?: Locale;
     };
     await updateListing(listing.id, update);
@@ -80,7 +80,7 @@ function canSaveListing(
   return ability.can("update", subject("Listing", { scholarSlug: listing.scholarSlug }));
 }
 
-/** Describes the ListingEditSheet native contract and behavior. */
+/** Renders the native listing edit sheet surface and coordinates its user-facing state. */
 export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditSheetProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();

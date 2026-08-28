@@ -6,8 +6,8 @@ import type {
 
 import { httpClient, endpoints } from "@sd/core-contracts";
 
-/** Provides the native features admin api admin-scholars.api module responsibility. */
-/** Describes the createSeries native contract and behavior. */
+/** Provides authenticated native administration workflows and their data boundaries. */
+/** Initializes series for the native runtime. */
 export async function createSeries(data: CreateListingDto): Promise<AdminListingDetailDto> {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.create,
@@ -16,7 +16,7 @@ export async function createSeries(data: CreateListingDto): Promise<AdminListing
   });
 }
 
-/** Describes the updateSeries native contract and behavior. */
+/** Sends the series update through the native API boundary. */
 export async function updateSeries(
   id: string,
   data: UpdateListingDetailsDto,
@@ -28,7 +28,7 @@ export async function updateSeries(
   });
 }
 
-/** Describes the createCollection native contract and behavior. */
+/** Initializes collection for the native runtime. */
 export async function createCollection(data: CreateListingDto): Promise<AdminListingDetailDto> {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.create,
@@ -37,7 +37,7 @@ export async function createCollection(data: CreateListingDto): Promise<AdminLis
   });
 }
 
-/** Describes the updateCollection native contract and behavior. */
+/** Sends the collection update through the native API boundary. */
 export async function updateCollection(
   id: string,
   data: UpdateListingDetailsDto,

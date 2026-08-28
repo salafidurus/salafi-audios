@@ -2,8 +2,8 @@ import type { AdminListingListItemDto } from "@sd/core-contracts";
 
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 
-/** Describes the useAdminSeries native contract and behavior. */
-/** Describes the useAdminSeries native function contract and behavior. */
+/** Exposes admin series state and actions to native consumers. */
+/** Provides admin series state and behavior to native consumers. */
 export function useAdminSeries(scholarId: string) {
   return useApiQuery<AdminListingListItemDto[]>(["admin", "series", scholarId], () =>
     httpClient<AdminListingListItemDto[]>({
@@ -14,7 +14,7 @@ export function useAdminSeries(scholarId: string) {
   );
 }
 
-/** Describes the useAdminCollections native contract and behavior. */
+/** Exposes admin collections state and actions to native consumers. */
 export function useAdminCollections(scholarId: string) {
   return useApiQuery<AdminListingListItemDto[]>(["admin", "collections", scholarId], () =>
     httpClient<AdminListingListItemDto[]>({

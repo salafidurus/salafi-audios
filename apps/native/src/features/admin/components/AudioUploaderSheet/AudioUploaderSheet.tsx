@@ -13,7 +13,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 
 import { getPresignedUrl, uploadToR2, createListing } from "../../api/admin-listings.api";
 
-/** Provides the native features admin components AudioUploaderSheet AudioUploaderSheet module responsibility. */
+/** Provides authenticated native administration workflows and their data boundaries. */
 async function getNativeAudioDuration(uri: string): Promise<number | undefined> {
   try {
     const { createAudioPlayer } = await import("expo-audio");
@@ -49,9 +49,9 @@ type UploadItem = {
   uri: string;
   mimeType: string;
   progress: number;
-  /** Describes the status native contract and behavior. */
+  /** Records the lifecycle state used to decide which transition or UI state is valid. */
   status: "pending" | "uploading" | "done" | "error";
-  /** Describes the error native contract and behavior. */
+  /** Stores the user-facing or diagnostic failure associated with the current operation. */
   error?: string;
 };
 
@@ -190,7 +190,7 @@ function isUploadDisabled(queueLength: number, isUploading: boolean, scholarId: 
   return queueLength === 0 || isUploading || !scholarId;
 }
 
-/** Describes the AudioUploaderSheet native contract and behavior. */
+/** Renders the native audio uploader sheet surface and coordinates its user-facing state. */
 export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioUploaderSheetProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();

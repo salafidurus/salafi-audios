@@ -2,10 +2,10 @@ import { createOutboxStore, type Outbox } from "@sd/core-sync";
 
 import { createSqliteKvAdapter } from "@/core/sync/sqlite-kv-adapter";
 
-/** Provides the native features downloads outbox outbox.store module responsibility. */
-/** Describes the DownloadOutboxPayload native type contract and behavior. */
+/** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
+/** Defines the native download outbox payload contract shared by its consumers. */
 export type DownloadOutboxPayload = {
-  /** Describes the listingSlug native field contract and behavior. */
+  /** Carries the canonical lecture identity used to reconcile local and remote state. */
   listingSlug: string;
   audioUrl: string;
 };

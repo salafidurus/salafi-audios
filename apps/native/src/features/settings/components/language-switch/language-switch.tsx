@@ -7,7 +7,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { changeLocale } from "@/core/i18n/i18n";
 import { useTranslation } from "@/core/i18n/use-translation";
 
-/** Provides the native features settings components language-switch language-switch module responsibility. */
+/** Provides native account, preference, support, and settings workflows. */
 const LOCALE_LABELS = {
   en: "English",
   ar: "العربية",
@@ -17,7 +17,7 @@ function parseLocale(locale: string): Locale {
   return locale === "ar" ? "ar" : "en";
 }
 
-/** Describes the LanguageSwitch native function contract and behavior. */
+/** Renders the native language switch surface and coordinates its user-facing state. */
 export function LanguageSwitch() {
   const { i18n } = useTranslation();
   const queryClient = useQueryClient();

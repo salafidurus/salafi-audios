@@ -3,8 +3,8 @@ import { useRouter } from "expo-router";
 
 import { ExploreScholarScreen } from "@/features/explore/screens/explore-scholar.screen";
 
-/** Provides the native app (tabs) (explore) scholar module responsibility. */
-/** Describes the ExploreScholarRoute native function contract and behavior. */
+/** Defines the Expo Router entrypoint for the native (tabs)/(explore)/scholar route and delegates behavior to the feature layer. */
+/** Renders the native explore scholar route surface and coordinates its user-facing state. */
 export default function ExploreScholarRoute() {
   const router = useRouter();
 

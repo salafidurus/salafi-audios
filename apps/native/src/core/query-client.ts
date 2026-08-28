@@ -1,5 +1,5 @@
 import { createQueryClient } from "@sd/core-contracts";
 
-/** Provides the native core query-client module responsibility. */
-/** Describes the const queryClient = createQueryClient(); native declaration contract and behavior. */
+/** Provides shared native runtime infrastructure used by feature modules. */
+/** Creates the shared query client used for native server-state caching. */
 export const queryClient = createQueryClient();

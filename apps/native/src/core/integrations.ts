@@ -5,8 +5,8 @@ import { vexo } from "vexo-analytics";
 
 import { getRuntimeEnv, isDev } from "./config/runtime-env";
 
-/** Provides the native core integrations module responsibility. */
-/** Describes the initIntegrations native function contract and behavior. */
+/** Initializes native integrations and wraps platform-specific layout behavior. */
+/** Initializes the integrations used by the native runtime. */
 export function initIntegrations(): void {
   if (isDev()) {
     return;
@@ -27,7 +27,7 @@ export function initIntegrations(): void {
   }
 }
 
-/** Describes the getWrappedLayout native function contract and behavior. */
+/** Returns the the wrapped layout used by native consumers. */
 export function getWrappedLayout<T extends ComponentType<unknown>>(
   Layout: T,
 ): T | ReturnType<typeof Sentry.wrap> {

@@ -1,5 +1,5 @@
-/** Provides the native features settings utils rtl-text-align module responsibility. */
-/** Describes the getRtlAwareTextAlign native function contract and behavior. */
+/** Provides native account, preference, support, and settings workflows. */
+/** Returns the the rtl aware text align used by native consumers. */
 export function getRtlAwareTextAlign(direction: "ltr" | "rtl"): "left" | "right" {
   return direction === "rtl" ? "right" : "left";
 }

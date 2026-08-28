@@ -6,20 +6,20 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { SearchResultEmpty } from "../SearchResultEmpty/SearchResultEmpty";
 
-/** Provides the native features search components SearchResultsList SearchResultsList module responsibility. */
+/** Implements native search input, filtering, results, and empty states. */
 export type { SearchResultRow };
 
-/** Describes the SearchResultsListProps native contract and behavior. */
+/** Describes the inputs and callbacks accepted by Search Results List. */
 export type SearchResultsListProps = {
   items: SearchResultRow[];
   isFetching: boolean;
   shouldSearch: boolean;
-  /** Describes the errorMessage native contract and behavior. */
+  /** Renders the native error message surface and coordinates its user-facing state. */
   errorMessage?: string;
   renderItem: (item: SearchResultRow) => React.ReactElement | null;
 };
 
-/** Describes the SearchResultsList native contract and behavior. */
+/** Renders the native search results list surface and coordinates its user-facing state. */
 export function SearchResultsList({
   items,
   isFetching,

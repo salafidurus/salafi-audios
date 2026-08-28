@@ -1,8 +1,8 @@
 import { MyLibraryScreen } from "@/features/my-library/screens/my-library.screen";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
-/** Provides the native app (tabs) my-library index module responsibility. */
-/** Describes the MyLibraryIndexRoute native function contract and behavior. */
+/** Defines the Expo Router entrypoint for the native (tabs)/my-library route and delegates behavior to the feature layer. */
+/** Renders the native my library index route surface and coordinates its user-facing state. */
 export default function MyLibraryIndexRoute() {
   const { navigateToListing } = useListingNavigation();
 

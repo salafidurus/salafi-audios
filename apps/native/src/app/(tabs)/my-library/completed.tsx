@@ -7,8 +7,8 @@ import { MyLibraryCompletedScreen } from "@/features/my-library/screens/my-libra
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
-/** Provides the native app (tabs) my-library completed module responsibility. */
-/** Describes the MyLibraryCompleted native function contract and behavior. */
+/** Defines the Expo Router entrypoint for the native (tabs)/my-library/completed route and delegates behavior to the feature layer. */
+/** Defines the native my library completed contract used by this module. */
 export default function MyLibraryCompleted() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();

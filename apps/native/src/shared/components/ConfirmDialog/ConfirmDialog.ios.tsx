@@ -1,8 +1,8 @@
 import { Host } from "@expo/ui";
 import { Alert, Button, Text } from "@expo/ui/swift-ui";
 
-/** Provides the native shared components ConfirmDialog ConfirmDialog.ios module responsibility. */
-/** Describes the ConfirmDialogProps native type contract and behavior. */
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Describes the inputs, callbacks, and optional state accepted by Confirm Dialog. */
 export type ConfirmDialogProps = {
   visible: boolean;
   onDismiss: () => void;

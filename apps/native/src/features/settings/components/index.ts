@@ -1,4 +1,4 @@
-/** Provides the native features settings components index module responsibility. */
+/** Provides native account, preference, support, and settings workflows. */
 export { SettingsSection } from "./SettingsSection/SettingsSection";
 export { SettingsRow } from "./SettingsRow/SettingsRow";
 export { LanguageSwitch } from "./language-switch/language-switch";

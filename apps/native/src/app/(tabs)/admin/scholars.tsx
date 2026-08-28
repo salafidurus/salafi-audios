@@ -2,8 +2,8 @@ import { useRouter } from "expo-router";
 
 import { AdminScholarsScreen } from "@/features/admin/screens/admin-scholars/admin-scholars.screen";
 
-/** Provides the native app (tabs) admin scholars module responsibility. */
-/** Describes the AdminScholarsRoute native function contract and behavior. */
+/** Defines the Expo Router entrypoint for the native (tabs)/admin/scholars route and delegates behavior to the feature layer. */
+/** Renders the native admin scholars route surface and coordinates its user-facing state. */
 export default function AdminScholarsRoute() {
   const router = useRouter();
 

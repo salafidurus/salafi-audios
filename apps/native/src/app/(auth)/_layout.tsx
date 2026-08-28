@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 
-/** Provides the native app (auth) _layout module responsibility. */
-/** Describes the AuthLayout native function contract and behavior. */
+/** Defines the Expo Router entrypoint for the native (auth) route and delegates behavior to the feature layer. */
+/** Renders the native auth layout surface and coordinates its user-facing state. */
 export default function AuthLayout() {
   return <Stack screenOptions={{ headerShown: false }} />;
 }

@@ -1,32 +1,32 @@
 import * as SQLite from "expo-sqlite";
 
-/** Provides the native features downloads registry downloads.registry module responsibility. */
+/** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
 const DB_NAME = "sd-downloads.db";
 const TABLE_NAME = "downloads";
 
-/** Describes the DownloadStatus native type contract and behavior. */
+/** Enumerates the lifecycle values used by the native download workflow. */
 export type DownloadStatus = "pending" | "downloading" | "paused" | "complete" | "error";
 
-/** Describes the DownloadRow native type contract and behavior. */
+/** Defines the native download row contract shared by its consumers. */
 export type DownloadRow = {
-  /** Describes the listingSlug native field contract and behavior. */
+  /** Carries the canonical lecture identity used to reconcile local and remote state. */
   listingSlug: string;
   url: string;
   localUri: string | null;
-  /** Describes the status native field contract and behavior. */
+  /** Records the lifecycle state used to decide which transition or UI state is valid. */
   status: DownloadStatus;
   bytesTotal: number;
   bytesDownloaded: number;
   /** Serialized `DownloadPauseState`, present only while paused. */
   pauseState: string | null;
-  /** Describes the createdAt native field contract and behavior. */
+  /** Records when the local record was created, preserving ordering and reconciliation metadata. */
   createdAt: number;
-  /** Describes the updatedAt native field contract and behavior. */
+  /** Records the last local update used when reconciling persisted state. */
   updatedAt: number;
 };
 
 type DownloadUpdate = Partial<Omit<DownloadRow, "listingSlug" | "createdAt" | "updatedAt">> & {
-  /** Describes the listingSlug native field contract and behavior. */
+  /** Carries the canonical lecture identity used to reconcile local and remote state. */
   listingSlug: string;
 };
 
@@ -116,7 +116,7 @@ export async function upsertDownload(row: DownloadUpdate): Promise<void> {
   );
 }
 
-/** Describes the getDownload native function contract and behavior. */
+/** Loads one persisted download row by its canonical lecture identity. */
 export async function getDownload(listingSlug: string): Promise<DownloadRow | null> {
   const db = await getDb();
   const row = await db.getFirstAsync<DownloadRow>(
@@ -126,13 +126,13 @@ export async function getDownload(listingSlug: string): Promise<DownloadRow | nu
   return row ?? null;
 }
 
-/** Describes the getAllDownloads native function contract and behavior. */
+/** Returns every persisted download row for offline-library reconciliation. */
 export async function getAllDownloads(): Promise<DownloadRow[]> {
   const db = await getDb();
   return db.getAllAsync<DownloadRow>(`SELECT * FROM ${TABLE_NAME}`);
 }
 
-/** Describes the removeDownload native function contract and behavior. */
+/** Deletes the persisted download row for a canonical lecture identity. */
 export async function removeDownload(listingSlug: string): Promise<void> {
   const db = await getDb();
   await db.runAsync(`DELETE FROM ${TABLE_NAME} WHERE listingSlug = ?`, listingSlug);

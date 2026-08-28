@@ -7,14 +7,14 @@ import { StyleSheet } from "react-native-unistyles";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
-/** Describes the ExploreScholarRowProps native contract and behavior. */
-/** Describes the ExploreScholarRowProps native type contract and behavior. */
+/** Describes the inputs and callbacks accepted by Explore Scholar Row. */
+/** Describes the inputs, callbacks, and optional state accepted by Explore Scholar Row. */
 export type ExploreScholarRowProps = {
   scholars: ScholarChipDto[];
   onScholarPress?: (slug: string) => void;
 };
 
-/** Describes the ExploreScholarRow native contract and behavior. */
+/** Renders the native explore scholar row surface and coordinates its user-facing state. */
 export function ExploreScholarRow({ scholars, onScholarPress }: ExploreScholarRowProps) {
   function renderScholar({ item: scholar }: ListRenderItemInfo<ScholarChipDto>) {
     return (

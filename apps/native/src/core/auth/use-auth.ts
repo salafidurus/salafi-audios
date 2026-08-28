@@ -1,7 +1,7 @@
 import { authClient } from "./auth-client";
 
-/** Provides the native core auth use-auth module responsibility. */
-/** Describes the useAuth native contract and behavior. */
+/** Bridges the authentication client into native session, loading, and account state. */
+/** Returns authentication session state with loading and signed-in status for native consumers. */
 export function useAuth() {
   const { data: session, isPending } = authClient.useSession();
 

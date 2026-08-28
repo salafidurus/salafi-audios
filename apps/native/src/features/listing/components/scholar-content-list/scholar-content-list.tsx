@@ -14,13 +14,13 @@ import { MarqueeText } from "@/shared/components/MarqueeText";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
-/** Describes the ScholarContentListProps native contract and behavior. */
-/** Describes the ScholarContentListProps native type contract and behavior. */
+/** Describes the inputs and callbacks accepted by Scholar Content List. */
+/** Describes the inputs, callbacks, and optional state accepted by Scholar Content List. */
 export type ScholarContentListProps = {
   items: ScholarContentItemDto[];
 };
 
-/** Describes the ScholarContentList native contract and behavior. */
+/** Renders the native scholar content list surface and coordinates its user-facing state. */
 export function ScholarContentList({ items }: ScholarContentListProps) {
   const { theme } = useUnistyles();
   const { navigateToListing } = useListingNavigation();

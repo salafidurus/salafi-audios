@@ -6,13 +6,13 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 
-/** Provides the native features audio components mini-player-icon-button module responsibility. */
-/** Describes the MiniPlayerIconButtonProps native type contract and behavior. */
+/** Adapts the platform audio engine to the native playback contract and lifecycle. */
+/** Describes the inputs, callbacks, and optional state accepted by Mini Player Icon Button. */
 export type MiniPlayerIconButtonProps = {
   onPress: () => void;
 };
 
-/** Describes the MiniPlayerIconButton native function contract and behavior. */
+/** Renders the native mini player icon button surface and coordinates its user-facing state. */
 export function MiniPlayerIconButton({ onPress }: MiniPlayerIconButtonProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();

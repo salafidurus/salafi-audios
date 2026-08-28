@@ -22,8 +22,8 @@ import {
 } from "../components/explore-status/explore-status";
 import { ExploreTopicRow } from "../components/explore-topic-row/explore-topic-row";
 
-/** Provides the native features explore screens explore-recent.screen module responsibility. */
-/** Describes the ExploreRecentScreenProps native type contract and behavior. */
+/** Composes native explore and catalog surfaces for browsing available content. */
+/** Describes the inputs, callbacks, and optional state accepted by Explore Recent Screen. */
 export type ExploreRecentScreenProps = {
   onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
@@ -32,7 +32,7 @@ export type ExploreRecentScreenProps = {
 type GroupedFeedItem =
   | FeedItemDto
   | {
-      /** Describes the kind native field contract and behavior. */
+      /** Defines the native kind contract used by this module. */
       kind: "grouped_podcasts";
       id: string;
       items: FeedContentItemDto[];
@@ -49,7 +49,7 @@ function ExploreRecentStatus({
   refetch,
 }: {
   headerSearchOptions: StackScreenOptions;
-  /** Describes the isError native field contract and behavior. */
+  /** Indicates that the associated request or operation failed and should render its error state. */
   isError: boolean;
   isFetching: boolean;
   hasItems: boolean;
@@ -171,7 +171,7 @@ function getItemKey(item: GroupedFeedItem, index: number): string {
   return item.id;
 }
 
-/** Describes the ExploreRecentScreen native function contract and behavior. */
+/** Renders the native explore recent screen surface and coordinates its user-facing state. */
 export function ExploreRecentScreen({
   onNavigateToListing,
   onNavigateToScholar,

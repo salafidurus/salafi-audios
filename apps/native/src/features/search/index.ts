@@ -1,4 +1,4 @@
-/** Provides the native features search index module responsibility. */
+/** Implements native search input, filtering, results, and empty states. */
 export { SearchFilter, type SearchFilterProps } from "./components/SearchFilter/SearchFilter";
 export {
   SearchResultItem,

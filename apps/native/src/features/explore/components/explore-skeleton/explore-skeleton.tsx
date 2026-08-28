@@ -1,14 +1,14 @@
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-/** Provides the native features explore components explore-skeleton explore-skeleton module responsibility. */
-/** Describes the ExploreSkeletonProps native type contract and behavior. */
+/** Composes native explore and catalog surfaces for browsing available content. */
+/** Describes the inputs, callbacks, and optional state accepted by Explore Skeleton. */
 export type ExploreSkeletonProps = {
   /** Number of placeholder cards to render. */
   count?: number;
 };
 
-/** Describes the ExploreSkeleton native function contract and behavior. */
+/** Defines the native explore skeleton contract used by this module. */
 export function ExploreSkeleton({ count = 6 }: ExploreSkeletonProps) {
   return (
     <View style={styles.container}>

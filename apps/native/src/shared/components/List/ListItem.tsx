@@ -7,8 +7,8 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { ListItemActions, type ListItemActionsProps } from "./ListItemActions";
 
-/** Describes the ListItemProps native contract and behavior. */
-/** Describes the ListItemProps native type contract and behavior. */
+/** Describes the inputs and callbacks accepted by List Item. */
+/** Describes the inputs, callbacks, and optional state accepted by List Item. */
 export type ListItemProps = {
   children: ReactNode;
   onPress?: () => void;
@@ -22,7 +22,7 @@ function isActionsElement(child: ReactNode): child is ReactElement<ListItemActio
   return isValidElement(child) && child.type === ListItemActions;
 }
 
-/** Describes the ListItem native contract and behavior. */
+/** Renders the native list item surface and coordinates its user-facing state. */
 export function ListItem({
   children,
   onPress,

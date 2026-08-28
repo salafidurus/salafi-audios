@@ -17,16 +17,16 @@ import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 import { getRtlAwareTextAlign } from "../utils/rtl-text-align";
 
-/** Provides the native features settings screens settings-profile.screen module responsibility. */
-/** Describes the SettingsProfileScreenProps native type contract and behavior. */
+/** Provides native account, preference, support, and settings workflows. */
+/** Describes the inputs, callbacks, and optional state accepted by Settings Profile Screen. */
 export type SettingsProfileScreenProps = {
   onSignOut?: () => void;
   onSignIn?: () => void;
 };
 
-/** Describes the roles native field contract and behavior. */
+/** Contains the account roles used to decide which profile or administrative controls are visible. */
 function getVisibleRoles(profile: {
-  /** Describes the roles native field contract and behavior. */
+  /** Contains the account roles used to decide which profile or administrative controls are visible. */
   roles?: string[];
 }): string[] {
   return profile.roles?.filter((role) => role !== "listener") ?? [];
@@ -88,7 +88,7 @@ function ProfileRoles({
   theme,
   t,
 }: {
-  /** Describes the roles native field contract and behavior. */
+  /** Contains the account roles used to decide which profile or administrative controls are visible. */
   roles: string[];
   theme: ReturnType<typeof useUnistyles>["theme"];
   t: ProfileEditControlsProps["t"];
@@ -119,7 +119,7 @@ function ProfileUpdateStatus({
   t,
 }: {
   isSuccess: boolean;
-  /** Describes the isError native field contract and behavior. */
+  /** Indicates that the associated request or operation failed and should render its error state. */
   isError: boolean;
   theme: ReturnType<typeof useUnistyles>["theme"];
   t: ProfileEditControlsProps["t"];
@@ -355,7 +355,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   );
 }
 
-/** Describes the SettingsProfileScreen native function contract and behavior. */
+/** Renders the native settings profile screen surface and coordinates its user-facing state. */
 export function SettingsProfileScreen({ onSignOut, onSignIn }: SettingsProfileScreenProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation();

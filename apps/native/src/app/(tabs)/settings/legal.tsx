@@ -1,7 +1,7 @@
 import { LegalToggleScreen } from "@/features/settings";
 
-/** Provides the native app (tabs) settings legal module responsibility. */
-/** Describes the AccountLegalRoute native function contract and behavior. */
+/** Defines the Expo Router entrypoint for the native (tabs)/settings/legal route and delegates behavior to the feature layer. */
+/** Renders the native account legal route surface and coordinates its user-facing state. */
 export default function AccountLegalRoute() {
   return <LegalToggleScreen />;
 }

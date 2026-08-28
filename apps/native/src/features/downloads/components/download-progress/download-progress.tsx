@@ -3,13 +3,13 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { useDownload } from "@/features/downloads/hooks/use-download";
 
-/** Provides the native features downloads components download-progress download-progress module responsibility. */
+/** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
 type DownloadProgressProps = {
-  /** Describes the listingSlug native contract and behavior. */
+  /** Carries the canonical lecture identity used to reconcile local and remote state. */
   listingSlug: string;
 };
 
-/** Describes the DownloadProgress native contract and behavior. */
+/** Renders the native download progress surface and coordinates its user-facing state. */
 export function DownloadProgress({ listingSlug }: DownloadProgressProps) {
   const { isDownloading, progress } = useDownload(listingSlug);
 

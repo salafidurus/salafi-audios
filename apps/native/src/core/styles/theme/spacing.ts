@@ -1,5 +1,5 @@
-/** Provides the native core styles theme spacing module responsibility. */
-/** Describes the const spacingNative = { native declaration contract and behavior. */
+/** Configures native themes, breakpoints, and the Unistyles runtime. */
+/** Defines the native spacing token set consumed by themed components. */
 export const spacingNative = {
   scale: {
     xs: 4,
@@ -31,5 +31,5 @@ export const spacingNative = {
   },
 } as const;
 
-/** Describes the SpacingNative native type contract and behavior. */
+/** Defines shared native spacing tokens consumed by the application theme. */
 export type SpacingNative = typeof spacingNative;

@@ -6,8 +6,8 @@ import { StyleSheet } from "react-native-unistyles";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
-/** Provides the native features listing components lecture-meta lecture-meta module responsibility. */
-/** Describes the LectureMetaProps native type contract and behavior. */
+/** Builds native lecture and scholar content surfaces from canonical identities. */
+/** Describes the inputs, callbacks, and optional state accepted by Lecture Meta. */
 export type LectureMetaProps = {
   lecture: ListingDetailDto;
 };
@@ -45,7 +45,7 @@ function formatPublishedAt(publishedAt?: string): string | null {
   });
 }
 
-/** Describes the LectureMeta native function contract and behavior. */
+/** Defines the native lecture meta contract used by this module. */
 export function LectureMeta({ lecture }: LectureMetaProps) {
   const metaDetails = [
     lecture.language ? lecture.language.toUpperCase() : null,

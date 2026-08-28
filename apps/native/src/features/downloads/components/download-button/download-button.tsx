@@ -3,14 +3,14 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useDownload } from "@/features/downloads/hooks/use-download";
 
-/** Provides the native features downloads components download-button download-button module responsibility. */
+/** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
 type DownloadButtonProps = {
-  /** Describes the listingSlug native field contract and behavior. */
+  /** Carries the canonical lecture identity used to reconcile local and remote state. */
   listingSlug: string;
   audioUrl: string;
 };
 
-/** Describes the DownloadButton native function contract and behavior. */
+/** Renders the native download button surface and coordinates its user-facing state. */
 export function DownloadButton({ listingSlug, audioUrl }: DownloadButtonProps) {
   const { status, isDownloaded, isDownloading, startDownload, removeDownload } = useDownload(
     listingSlug,

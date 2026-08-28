@@ -1,7 +1,7 @@
 import type { AdminListingListItemDto } from "@sd/core-contracts";
 
-/** Provides the native features admin screens admin-listings filter-listings module responsibility. */
-/** Describes the filterListings native function contract and behavior. */
+/** Provides authenticated native administration workflows and their data boundaries. */
+/** Transforms listings into the shape expected by native consumers. */
 export function filterListings(
   items: AdminListingListItemDto[],
   query: string,

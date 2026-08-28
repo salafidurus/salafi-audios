@@ -2,7 +2,7 @@ import { createContentPreferenceStore, type LanguageStorageAdapter } from "@sd/c
 import * as SecureStore from "expo-secure-store";
 import { useSyncExternalStore } from "react";
 
-/** Provides the native features settings content-preference module responsibility. */
+/** Provides native account, preference, support, and settings workflows. */
 const secureStoreAdapter: LanguageStorageAdapter = {
   async getItem(key) {
     try {
@@ -28,7 +28,7 @@ export function useShowOriginalContent(): boolean {
   return useSyncExternalStore(store.subscribe, store.getShowOriginal);
 }
 
-/** Describes the setShowOriginalContent native contract and behavior. */
+/** Persists the listener’s original-language content preference for native readers. */
 export function setShowOriginalContent(value: boolean): void {
   store.setShowOriginal(value);
 }

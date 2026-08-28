@@ -15,8 +15,8 @@ import {
 import { SubrouteIconButton } from "./SubrouteIconButton";
 import { SubrouteTabsBar } from "./SubrouteTabsBar";
 
-/** Describes the BottomAccessoryContent native contract and behavior. */
-/** Describes the BottomAccessoryContent native function contract and behavior. */
+/** Renders the native bottom accessory content surface and coordinates its user-facing state. */
+/** Defines the native bottom accessory content contract used by this module. */
 export function BottomAccessoryContent() {
   const { currentTrack } = useAudio();
   const pathname = usePathname();

@@ -1,5 +1,5 @@
 /** Native tab paths remain Expo Router paths; web/API paths live in core-contracts. */
-/** Describes the const nativeRoutes = { native contract and behavior. */
+/** Renders the native const native routes = { surface and coordinates its user-facing state. */
 export const nativeRoutes = {
   myLibrary: {
     index: "/my-library",

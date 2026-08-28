@@ -2,12 +2,12 @@ import type { AdminListingListDto } from "@sd/core-contracts";
 
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 
-/** Provides the native features admin hooks use-admin-listings module responsibility. */
-/** Describes the status native field contract and behavior. */
-/** Describes the useAdminListings native function contract and behavior. */
+/** Provides authenticated native administration workflows and their data boundaries. */
+/** Records the lifecycle state used to decide which transition or UI state is valid. */
+/** Provides admin listings state and behavior to native consumers. */
 export function useAdminListings(params?: {
   scholarId?: string;
-  /** Describes the status native field contract and behavior. */
+  /** Records the lifecycle state used to decide which transition or UI state is valid. */
   status?: string;
   page?: number;
 }) {

@@ -8,8 +8,8 @@ import { syncTypographyToLocale } from "../styles/theme/typography-sync";
 import { getStoredLocale, storeLocale } from "./locale-storage";
 import { mergeLocaleMessages, type LocaleMessages } from "./merge-locale-messages";
 
-/** Provides the native core i18n i18n module responsibility. */
-/** Describes the const i18n = i18next; native declaration contract and behavior. */
+/** Initializes native localization, locale persistence, and translated message lookup. */
+/** Exposes the configured i18next instance used by native localization. */
 export const i18n = i18next;
 
 const loadedLocaleBundles = new Set<Locale>();
@@ -60,7 +60,7 @@ if (!i18n.isInitialized) {
 
 let initPromise: Promise<void> | null = null;
 
-/** Describes the initI18n native function contract and behavior. */
+/** Initializes the i18n used by the native runtime. */
 export async function initI18n(): Promise<void> {
   if (!initPromise) {
     initPromise = (async () => {
@@ -84,7 +84,7 @@ export async function initI18n(): Promise<void> {
   await initPromise;
 }
 
-/** Describes the changeLocale native function contract and behavior. */
+/** Defines the native change locale contract used by this module. */
 export async function changeLocale(locale: Locale): Promise<void> {
   await storeLocale(locale);
   ensureLocaleLoaded(locale);

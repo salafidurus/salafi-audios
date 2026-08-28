@@ -4,8 +4,8 @@ import { StyleSheet } from "react-native-unistyles";
 import { Button } from "../Button/Button";
 import { ScreenView } from "../ScreenView/ScreenView";
 
-/** Provides the native shared components AuthRequiredState AuthRequiredState module responsibility. */
-/** Describes the AuthRequiredStateProps native type contract and behavior. */
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Describes the inputs, callbacks, and optional state accepted by Auth Required State. */
 export type AuthRequiredStateProps = {
   title: string;
   description: string;
@@ -13,7 +13,7 @@ export type AuthRequiredStateProps = {
   onPress: () => void;
 };
 
-/** Describes the AuthRequiredState native function contract and behavior. */
+/** Enumerates the lifecycle values used by the native auth required workflow. */
 export function AuthRequiredState({
   title,
   description,

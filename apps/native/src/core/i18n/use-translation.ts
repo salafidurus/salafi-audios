@@ -1,7 +1,7 @@
 import { useTranslation as useI18nextTranslation } from "react-i18next";
 
-/** Describes the useTranslation native contract and behavior. */
-/** Describes the useTranslation native function contract and behavior. */
+/** Provides the active-locale translator used by native screens and components. */
+/** Provides translation state and behavior to native consumers. */
 export function useTranslation(namespace?: string) {
   return useI18nextTranslation(namespace ?? "translation");
 }

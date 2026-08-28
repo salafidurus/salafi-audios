@@ -3,15 +3,15 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 
-/** Provides the native features explore components explore-status explore-status module responsibility. */
-/** Describes the ExploreStatusViewProps native type contract and behavior. */
+/** Composes native explore and catalog surfaces for browsing available content. */
+/** Describes the inputs, callbacks, and optional state accepted by Explore Status View. */
 export type ExploreStatusViewProps = {
   message: string;
   onRetry?: () => void;
   retryLabel?: string;
 };
 
-/** Describes the ExploreStatusView native function contract and behavior. */
+/** Renders the native explore status view surface and coordinates its user-facing state. */
 export function ExploreStatusView({ message, onRetry, retryLabel }: ExploreStatusViewProps) {
   return (
     <View style={styles.container}>

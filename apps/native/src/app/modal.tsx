@@ -1,7 +1,7 @@
 import { ScreenInProgress } from "../shared/components/ScreenInProgress/ScreenInProgress";
 
-/** Provides the native app modal module responsibility. */
-/** Describes the Modal native function contract and behavior. */
+/** Defines the Expo Router entrypoint for the native modal route and delegates behavior to the feature layer. */
+/** Defines the native modal contract used by this module. */
 export default function Modal() {
   return <ScreenInProgress />;
 }

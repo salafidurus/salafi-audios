@@ -6,7 +6,7 @@ import { z } from "zod";
 import { refreshSession } from "@/core/auth";
 import { getApiBaseUrl } from "@/core/config/runtime-env";
 
-/** Provides the native features auth hooks use-native-apple-sign-in module responsibility. */
+/** Encapsulates a user-facing native feature and its local integration boundaries. */
 const AppleNativeSessionResponseSchema = z.object({
   session: z.object({
     id: z.string(),
@@ -65,7 +65,7 @@ async function completeAppleSignIn() {
   await refreshSession();
 }
 
-/** Describes the useNativeAppleSignIn native function contract and behavior. */
+/** Provides native apple sign in state and behavior to native consumers. */
 export function useNativeAppleSignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

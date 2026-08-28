@@ -11,10 +11,10 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
-/** Describes the ScholarDetailScreenProps native contract and behavior. */
-/** Describes the ScholarDetailScreenProps native type contract and behavior. */
+/** Describes the inputs and callbacks accepted by Scholar Detail Screen. */
+/** Describes the inputs, callbacks, and optional state accepted by Scholar Detail Screen. */
 export type ScholarDetailScreenProps = {
-  /** Describes the slug native contract and behavior. */
+  /** Carries the canonical route identity used to load the selected content. */
   slug: string;
 };
 
@@ -87,7 +87,7 @@ function TopicSections({
   );
 }
 
-/** Describes the ScholarDetailScreen native contract and behavior. */
+/** Renders the native scholar detail screen surface and coordinates its user-facing state. */
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { data: scholar, isFetching: isScholarFetching } = useScholarDetail(slug);
   const { data: content, isFetching: isContentFetching } = useScholarContent(slug);

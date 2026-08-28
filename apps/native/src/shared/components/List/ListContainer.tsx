@@ -3,14 +3,14 @@ import type { ReactNode } from "react";
 import { View, type ViewStyle, type StyleProp } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-/** Provides the native shared components List ListContainer module responsibility. */
-/** Describes the ListContainerProps native type contract and behavior. */
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Describes the inputs, callbacks, and optional state accepted by List Container. */
 export type ListContainerProps = {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
 };
 
-/** Describes the ListContainer native function contract and behavior. */
+/** Defines the native list container contract used by this module. */
 export function ListContainer({ children, style }: ListContainerProps) {
   return <View style={[styles.container, style]}>{children}</View>;
 }

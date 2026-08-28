@@ -5,13 +5,13 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
 
-/** Provides the native features listing components topic-chips topic-chips module responsibility. */
-/** Describes the TopicChipsProps native type contract and behavior. */
+/** Builds native lecture and scholar content surfaces from canonical identities. */
+/** Describes the inputs, callbacks, and optional state accepted by Topic Chips. */
 export type TopicChipsProps = {
   topics: TopicRefDto[];
 };
 
-/** Describes the TopicChips native function contract and behavior. */
+/** Defines the native topic chips contract used by this module. */
 export function TopicChips({ topics }: TopicChipsProps) {
   if (topics.length === 0) {
     return null;

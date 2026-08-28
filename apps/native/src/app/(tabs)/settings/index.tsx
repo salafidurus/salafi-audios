@@ -1,7 +1,7 @@
 import { SettingsGeneralScreen } from "@/features/settings/screens/settings-general.screen";
 
-/** Provides the native app (tabs) settings index module responsibility. */
-/** Describes the SettingsIndexRoute native function contract and behavior. */
+/** Defines the Expo Router entrypoint for the native (tabs)/settings route and delegates behavior to the feature layer. */
+/** Renders the native settings index route surface and coordinates its user-facing state. */
 export default function SettingsIndexRoute() {
   return <SettingsGeneralScreen />;
 }

@@ -10,13 +10,13 @@ import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
-/** Provides the native features my-library screens my-library-saved.screen module responsibility. */
-/** Describes the MyLibrarySavedScreenProps native type contract and behavior. */
+/** Projects native library state into saved, completed, and in-progress content views. */
+/** Describes the inputs, callbacks, and optional state accepted by My Library Saved Screen. */
 export type MyLibrarySavedScreenProps = {
   onNavigateToListing?: (slug: string) => void;
 };
 
-/** Describes the MyLibrarySavedScreen native function contract and behavior. */
+/** Renders the native my library saved screen surface and coordinates its user-facing state. */
 export function MyLibrarySavedScreen({ onNavigateToListing }: MyLibrarySavedScreenProps) {
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useMyLibrarySavedScreen(isAuthenticated);

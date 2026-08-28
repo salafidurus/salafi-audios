@@ -11,8 +11,8 @@ import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 import { getRtlAwareTextAlign } from "../utils/rtl-text-align";
 
-/** Provides the native features settings screens account-profile.screen module responsibility. */
-/** Describes the AccountProfileScreenProps native type contract and behavior. */
+/** Provides native account, preference, support, and settings workflows. */
+/** Describes the inputs, callbacks, and optional state accepted by Account Profile Screen. */
 export type AccountProfileScreenProps = {
   onBack?: () => void;
 };
@@ -21,7 +21,7 @@ type AccountProfileFormProps = {
   profile: NonNullable<ReturnType<typeof useAccountProfile>["data"]>;
   isPending: boolean;
   isSuccess: boolean;
-  /** Describes the isError native field contract and behavior. */
+  /** Indicates that the associated request or operation failed and should render its error state. */
   isError: boolean;
   updateProfile: ReturnType<typeof useUpdateProfile>["mutate"];
 };
@@ -119,7 +119,7 @@ function AccountProfileForm({
   );
 }
 
-/** Describes the AccountProfileScreen native function contract and behavior. */
+/** Renders the native account profile screen surface and coordinates its user-facing state. */
 export function AccountProfileScreen(_props: AccountProfileScreenProps) {
   const { t } = useTranslation();
   const { data: profile, isLoading } = useAccountProfile();
