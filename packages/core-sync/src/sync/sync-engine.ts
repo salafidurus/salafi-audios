@@ -5,8 +5,10 @@ import type { EntityStoreState, SyncableEntity } from "../store/entity-store";
 
 import { drainOutbox } from "../outbox/outbox.drain";
 
+/** Debounced coordinator for optimistic pushes, retries, and delta hydration. */
 const DEFAULT_DEBOUNCE_MS = 120_000;
 
+/** Minimal store boundary required for local-first synchronization. */
 export type SyncStore<T extends SyncableEntity> = {
   get: (id: string) => T | undefined;
   upsert: (entity: T) => void;
@@ -17,6 +19,7 @@ type ZustandSyncStore<T extends SyncableEntity> = UseBoundStore<StoreApi<EntityS
 
 type SyncStoreInput<T extends SyncableEntity> = SyncStore<T> | ZustandSyncStore<T>;
 
+/** Backend and local-store dependencies used to construct a sync engine. */
 export type SyncEngineOptions<T extends SyncableEntity & JsonValue> = {
   store: SyncStoreInput<T>;
   outbox: Outbox<T>;
@@ -32,6 +35,7 @@ export type SyncEngineOptions<T extends SyncableEntity & JsonValue> = {
   pullSince: (since?: string) => Promise<T[]>;
 };
 
+/** Operations for optimistic writes, persisted retries, and server reconciliation. */
 export type SyncEngine<T extends SyncableEntity & JsonValue> = {
   /** Optimistically writes the entity locally, then schedules a debounced push. */
   scheduleSync: (entity: T) => void;
@@ -61,6 +65,7 @@ function normalizeStore<T extends SyncableEntity>(store: SyncStoreInput<T>): Syn
   };
 }
 
+/** Creates a debounced sync coordinator without making the client authoritative. */
 export function createSyncEngine<T extends SyncableEntity & JsonValue>(
   options: SyncEngineOptions<T>,
 ): SyncEngine<T> {

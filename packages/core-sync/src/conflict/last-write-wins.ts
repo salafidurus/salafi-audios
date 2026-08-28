@@ -1,4 +1,7 @@
+/** Conflict-resolution module implementing the client/server timestamp contract. */
+/** Timestamp contract used by client/server last-write-wins reconciliation. */
 export type Timestamped = {
+  /** ISO timestamp used to order competing representations of an entity. */
   updatedAt: string;
 };
 

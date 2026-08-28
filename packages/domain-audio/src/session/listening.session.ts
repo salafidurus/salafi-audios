@@ -8,8 +8,10 @@ import { flushPendingProgress, syncProgressToBackend } from "../progress/progres
 import { QueueManager } from "../queue/queue.manager";
 import { usePlaybackStore } from "../store/playback.store";
 
+/** Platform-neutral orchestration module for a Listening session lifecycle. */
 type StreamUrlResponse = { url: string };
 
+/** Options controlling resume behavior when starting a track. */
 export type ListeningPlayOptions = {
   /** Skip resuming from any saved position and start the track from 0. */
   fromStart?: boolean;

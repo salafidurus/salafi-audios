@@ -1,5 +1,7 @@
 import type { Track } from "../types/track.types";
 
+/** Mutable queue module for ordered track navigation within a Listening session. */
+/** Queue state and navigation operations for the active Listening session. */
 export class QueueManager {
   private queue: Track[] = [];
   private currentIndex = -1;

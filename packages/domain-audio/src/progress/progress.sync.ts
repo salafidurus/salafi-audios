@@ -15,9 +15,13 @@ import {
 
 import { useProgressStore, type ListingProgress, type ProgressSyncEntity } from "./progress.store";
 
+/** Progress synchronization module bridging local Listening state and the backend. */
 type ProgressUpdateBody = {
+  /** Latest playback position in seconds. */
   positionSeconds: number;
+  /** Track duration in seconds. */
   durationSeconds: number;
+  /** Whether the backend should record natural completion. */
   isCompleted?: boolean;
 };
 
@@ -118,8 +122,10 @@ export async function initProgressSync(adapter: StorageAdapter, userId: string):
 
 /** Enqueues a progress update for shared debounced synchronization. */
 export function syncProgressToBackend(update: {
+  /** Client-facing Listing identity used by the progress endpoint. */
   listingSlug: string;
   positionSeconds: number;
+  /** Track duration in seconds sent with the progress update. */
   durationSeconds: number;
 }): void {
   const current = useProgressStore.getState().actions.getProgress(update.listingSlug);

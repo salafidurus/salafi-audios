@@ -1,3 +1,4 @@
+/** Public Listening domain exports for playback, queues, progress, and sessions. */
 export type { Track } from "./types/track.types";
 export type { PlaybackStatus } from "./types/state.types";
 export type { PlaybackEngineEvents, PlaybackEngine } from "./engine/playback.engine";
