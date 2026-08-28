@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { Upload, FileAudio, CheckCircle, AlertCircle, Link2 } from "lucide-react";

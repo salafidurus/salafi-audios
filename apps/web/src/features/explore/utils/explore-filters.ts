@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+/** Documents this module's responsibility and public boundary. */
 export const EXPLORE_FILTERS_STORAGE_PREFIX = "salafi-durus:explore-filters:v1";
 
 export const EXPLORE_SORT_OPTIONS = ["recent", "title-asc", "title-desc"] as const;

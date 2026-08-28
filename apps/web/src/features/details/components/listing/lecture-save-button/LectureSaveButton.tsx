@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
@@ -10,12 +11,14 @@ import { cn } from "@/shared/utils";
 
 import styles from "./LectureSaveButton.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type LectureSaveButtonProps = {
   lectureId: string;
   /** Required for the save/unsave push to resolve server-side (it resolves by slug, not id). */
   lectureSlug?: string;
 };
 
+/** Documents the intent and contract of this declaration. */
 export function LectureSaveButton({ lectureId, lectureSlug }: LectureSaveButtonProps) {
   const { isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);

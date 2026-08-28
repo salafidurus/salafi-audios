@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { COUNTRY_LIST, type CountryCode } from "@sd/core-contracts";

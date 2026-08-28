@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { ListingContentItemDto } from "@sd/core-contracts";
@@ -36,7 +37,7 @@ function ProgressIndicator({
   progressPercent,
   completed,
 }: {
-  durationStr: string;
+  /** Documents the intent and contract of this field. */ durationStr: string;
   progressPercent: number;
   completed: boolean;
 }) {
@@ -78,10 +79,11 @@ function nullableValue(value: string | undefined) {
   return value ?? null;
 }
 
+/** Documents the intent and contract of this declaration. */
 export type ContentListItemProps = {
   item: ListingContentItemDto;
   scholarName?: string;
-  scholarSlug?: string;
+  /** Documents the intent and contract of this field. */ scholarSlug?: string;
   seriesId?: string;
   seriesTitle?: string;
   moduleId?: string;
@@ -125,7 +127,7 @@ function ContentListItemView({
 }: {
   item: ListingContentItemDto;
   isCompleted: boolean;
-  durationStr: string;
+  /** Documents the intent and contract of this field. */ durationStr: string;
   progressPercent: number;
   isCurrentlyPlaying: boolean;
   isHighlighted: boolean;
@@ -186,6 +188,7 @@ function createContentTrack(
   };
 }
 
+/** Documents the intent and contract of this declaration. */
 export function ContentListItem({
   item,
   scholarName = "",

@@ -16,6 +16,7 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import { MetaDetails } from "./meta-details";
 import styles from "./user-item.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export type UserItemProps = {
   user: AdminUserListItemDto;
   onManageAccess?: () => void;

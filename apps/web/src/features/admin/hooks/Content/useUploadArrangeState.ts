@@ -1,3 +1,4 @@
+/** Owns the reducer-backed client state for staging, arranging, uploading, and committing audio. */
 "use client";
 
 import type {
@@ -21,41 +22,57 @@ import {
 /** Existing module id, `new:${tempId}` for a staged module, or "root" (series/single). */
 export type ModuleKey = string;
 
+/** Identifies the synthetic root module used for series and single-listing uploads. */
 export const ROOT_MODULE_KEY = "root";
 
+/** Describes where a staged audio item will be committed in the listing tree. */
 export type UploadItemAssignment =
   | {
-      kind: "new-lesson";
+      /** A new lesson is created under this existing or staged module. */ kind: "new-lesson";
       moduleKey: ModuleKey;
-      slug: string;
-      slugEdited: boolean;
+      /** The proposed lesson slug, including any user edits. */ slug: string;
+      /** Prevents filename-derived suggestions from overwriting a user edit. */ slugEdited: boolean;
       description: string;
-      status: StatusValue;
+      /** Publication status assigned when the lesson is committed. */ status: StatusValue;
       orderIndex: number | null;
     }
-  | { kind: "replace-audio"; lessonId: string }
-  | { kind: "replace-root-audio" };
+  | {
+      /** Replaces media for an existing lesson without creating a new lesson. */ kind: "replace-audio";
+      lessonId: string;
+    }
+  | { /** Replaces the audio attached directly to the root listing. */ kind: "replace-root-audio" };
 
+/** Tracks each item's transfer state and storage metadata across the upload pipeline. */
 export interface UploadItemProgress {
-  status: "pending" | "downloading" | "uploading" | "done" | "error";
+  /** Tracks the current transfer stage; `percent` applies to the active stage. */ status:
+    | "pending"
+    | "downloading"
+    | "uploading"
+    | "done"
+    | "error";
   percent: number;
   loadedBytes?: number;
   totalBytes?: number;
   objectKey?: string;
   uploadUrl?: string;
-  error?: string;
+  /** User-facing failure detail retained for retry or inline error rendering. */ error?: string;
 }
 
 /** Where an item's bytes come from: already-picked local File, or a URL fetched at upload time. */
-export type UploadItemSource = { kind: "local"; file: File } | { kind: "url"; url: string };
+export type UploadItemSource =
+  | { /** Bytes already available in the browser. */ kind: "local"; file: File }
+  | { /** Bytes fetched just before upload begins. */ kind: "url"; url: string };
 
+/** Complete client-side representation of one audio item before arrange commit. */
 export interface UploadItem {
   id: string;
-  source: UploadItemSource;
+  /** Original bytes or remote source used by the upload pipeline. */ source: UploadItemSource;
   filename: string;
   title: string;
   numericPrefix: number | null;
-  durationSeconds: number | null;
+  /** Duration discovered from metadata; null when the browser could not determine it. */ durationSeconds:
+    | number
+    | null;
   sizeBytes: number;
   contentType: string;
   ext: string;
@@ -64,30 +81,42 @@ export interface UploadItem {
   upload: UploadItemProgress;
 }
 
+/** Client-only module draft that becomes persisted during commit. */
 export interface NewModule {
   tempId: string;
-  slug: string;
-  slugEdited: boolean;
+  /** Proposed child-prefix slug used to derive lesson slugs. */ slug: string;
+  /** Keeps automatic slug derivation from replacing an explicit edit. */ slugEdited: boolean;
   title: string;
   description: string;
-  status: StatusValue;
+  /** Publication status sent for the newly created module. */ status: StatusValue;
   orderIndex: number | null;
 }
 
+/** Phase of the arrange workflow, from local editing through server commit. */
 export type UploadArrangePhase = "editing" | "presigning" | "uploading" | "committing" | "done";
 
+/** Reducer state for staged files, module drafts, transfer progress, and conflicts. */
 export interface UploadArrangeState {
   existing: AdminArrangeDataDto | null;
   items: UploadItem[];
   newModules: NewModule[];
   phase: UploadArrangePhase;
-  error: string | null;
-  conflictSlugs: string[];
+  /** Last workflow error, cleared when a new operation begins. */ error: string | null;
+  /** Slugs rejected by the server during commit and shown for correction. */ conflictSlugs: string[];
 }
 
+/** Events accepted by the arrange reducer; actions preserve immutable staged state. */
 export type UploadArrangeAction =
   | { type: "INIT_EXISTING"; data: AdminArrangeDataDto }
-  | { type: "ADD_FILES"; files: { file: File; durationSeconds: number | null }[] }
+  | {
+      type: "ADD_FILES";
+      files: {
+        file: File;
+        /** Duration discovered for the local file before it enters the queue. */ durationSeconds:
+          | number
+          | null;
+      }[];
+    }
   | {
       type: "ADD_URL_ITEMS";
       items: {
@@ -95,7 +124,9 @@ export type UploadArrangeAction =
         filename: string;
         contentType: string;
         sizeBytes: number;
-        durationSeconds: number | null;
+        /** Duration retained for a remote item before its bytes are downloaded. */ durationSeconds:
+          | number
+          | null;
       }[];
     }
   | { type: "RENAME_ITEM"; itemId: string; title: string }
@@ -123,16 +154,31 @@ export type UploadArrangeAction =
   | {
       type: "UPLOAD_PROGRESS";
       itemId: string;
-      status: "downloading" | "uploading";
+      /** Identifies whether progress is downloading a URL source or uploading bytes. */ status:
+        | "downloading"
+        | "uploading";
       percent: number;
       loadedBytes?: number;
       totalBytes?: number;
     }
   | { type: "UPLOAD_DONE"; itemId: string }
-  | { type: "UPLOAD_ERROR"; itemId: string; error: string }
-  | { type: "COMMIT_CONFLICT"; conflictSlugs: string[] }
-  | { type: "SET_ERROR"; error: string | null }
-  | { type: "SET_ALL_LESSON_STATUS"; status: StatusValue };
+  | {
+      type: "UPLOAD_ERROR";
+      itemId: string;
+      /** Failure detail associated with the item transfer. */ error: string;
+    }
+  | {
+      type: "COMMIT_CONFLICT";
+      /** Slugs rejected by the server's uniqueness checks. */ conflictSlugs: string[];
+    }
+  | {
+      type: "SET_ERROR";
+      /** Sets or clears the workflow-level error. */ error: string | null;
+    }
+  | {
+      type: "SET_ALL_LESSON_STATUS";
+      /** Applies a publication status to every staged new lesson. */ status: StatusValue;
+    };
 
 const INITIAL_STATE: UploadArrangeState = {
   existing: null,
@@ -183,6 +229,7 @@ function existingModuleParentSlug(state: UploadArrangeState, moduleKey: ModuleKe
   );
 }
 
+/** Resolves the slug prefix inherited by a root, existing, or staged module. */
 export function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
   if (moduleKey === ROOT_MODULE_KEY) return existingRootSlug(state);
   if (moduleKey.startsWith("new:")) return newModuleParentSlug(state, moduleKey);
@@ -236,11 +283,11 @@ function sortItemsByOrderIndex(items: UploadItem[]): UploadItem[] {
 }
 
 interface StagedItemInput {
-  source: UploadItemSource;
+  /** Source retained until the transfer worker consumes the item. */ source: UploadItemSource;
   filename: string;
   contentType: string;
   sizeBytes: number;
-  durationSeconds: number | null;
+  /** Audio duration discovered before staging, when available. */ durationSeconds: number | null;
 }
 
 /** Shared by ADD_FILES and ADD_URL_ITEMS — identical sorting/slug-derivation/order-cursor
@@ -634,6 +681,7 @@ function itemAudioRef(item: UploadItem) {
   };
 }
 
+/** Converts staged items into the batch request used to obtain upload URLs. */
 export function buildPresignRequest(state: UploadArrangeState): BatchPresignAudioRequestDto {
   const rootSlug = state.existing?.slug ?? "";
   return {
@@ -661,7 +709,10 @@ export function itemTargetSlug(state: UploadArrangeState, item: UploadItem): str
 
 function createLessonOp(
   item: UploadItem,
-  assignment: Extract<UploadItem["assignment"], { kind: "new-lesson" }>,
+  assignment: Extract<
+    UploadItem["assignment"],
+    { /** Narrows the assignment to a lesson creation operation. */ kind: "new-lesson" }
+  >,
 ): ArrangeLessonOp {
   return {
     op: "create",
@@ -676,7 +727,10 @@ function createLessonOp(
 
 function getReplaceLessonOp(
   item: UploadItem,
-  assignment: Extract<UploadItem["assignment"], { kind: "replace-audio" }>,
+  assignment: Extract<
+    UploadItem["assignment"],
+    { /** Narrows the assignment to an existing lesson media replacement. */ kind: "replace-audio" }
+  >,
   existing: NonNullable<UploadArrangeState["existing"]>,
   moduleKey: ModuleKey,
 ): ArrangeLessonOp | null {
@@ -729,6 +783,7 @@ function buildCollectionCommitDto(
   return { modules };
 }
 
+/** Converts the staged tree into the atomic arrange payload sent to the API. */
 export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
   const { existing } = state;
   if (!existing) return { lessons: [] };
@@ -770,10 +825,12 @@ function findSlugConflicts(staged: string[], existingSlugs: Set<string>): string
   return [...conflicts];
 }
 
+/** Finds duplicate staged slugs and slugs already used by the listing. */
 export function localSlugConflicts(state: UploadArrangeState): string[] {
   return findSlugConflicts(getStagedSlugs(state), getExistingSlugs(state));
 }
 
+/** Exposes arrange state and its reducer dispatcher to the upload editor. */
 export function useUploadArrangeState() {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   return { state, dispatch };

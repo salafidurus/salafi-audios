@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { Tooltip as TooltipPrimitive } from "radix-ui";

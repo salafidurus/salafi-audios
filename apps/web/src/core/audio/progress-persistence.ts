@@ -1,3 +1,4 @@
+/** Coordinates local progress caches with deferred authenticated server synchronization. */
 "use client";
 
 import { ListingProgressDtoSchema } from "@sd/core-contracts";
@@ -22,6 +23,7 @@ import { hasWindow } from "@/shared/lib/runtime-guards";
 
 import { createLocalStorageAdapter } from "../sync/local-storage-adapter";
 
+/** Bridges authenticated browser state with per-user local caches and deferred server sync. */
 const STORAGE_KEY_PREFIX = "sd:progress-cache:v1:";
 const DEFAULT_PERSIST_THROTTLE_MS = 5000;
 

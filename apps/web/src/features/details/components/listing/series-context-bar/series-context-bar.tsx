@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { SeriesContextDto } from "@sd/core-contracts";
@@ -13,6 +14,7 @@ import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 
 import styles from "./series-context-bar.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type SeriesContextBarProps = {
   seriesContext: SeriesContextDto;
   /** The lesson this bar is shown for — Previous/Next only act when it's the one currently playing. */
@@ -68,6 +70,7 @@ function renderNavigationButton(
   );
 }
 
+/** Documents the intent and contract of this declaration. */
 export function SeriesContextBar({ seriesContext, listingSlug }: SeriesContextBarProps) {
   const isRtl = useIsRtl();
   const { queue, currentIndex, currentTrack, hasNext, hasPrevious } = useQueue();

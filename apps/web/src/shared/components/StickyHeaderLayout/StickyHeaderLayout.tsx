@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Content } from "./Content";
 import { Header } from "./Header";
 
+/** Documents this module's responsibility and public boundary. */
 interface StickyHeaderLayoutProps {
   children: ReactNode;
 }

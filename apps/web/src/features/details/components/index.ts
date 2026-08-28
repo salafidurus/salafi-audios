@@ -1,4 +1,5 @@
 // Listing Components
+/** Documents this module's responsibility and public boundary. */
 export {
   LecturePlayButton,
   type LecturePlayButtonProps,

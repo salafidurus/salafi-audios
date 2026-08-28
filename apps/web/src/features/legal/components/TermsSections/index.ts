@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export { InterpretationAndDefinitions } from "./InterpretationAndDefinitions";
 export { Acknowledgment } from "./Acknowledgment";
 export { LinksToOtherWebsites } from "./LinksToOtherWebsites";

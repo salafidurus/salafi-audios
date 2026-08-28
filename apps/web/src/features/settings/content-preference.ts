@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { createContentPreferenceStore, type LanguageStorageAdapter } from "@sd/core-i18n";
@@ -40,6 +41,7 @@ export function useShowOriginalContent(): boolean {
   return useSyncExternalStore(store.subscribe, store.getShowOriginal, () => false);
 }
 
+/** Documents the intent and contract of this declaration. */
 export function setShowOriginalContent(value: boolean): void {
   store.setShowOriginal(value);
 }

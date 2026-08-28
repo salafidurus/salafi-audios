@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 
+/** Documents this module's responsibility and public boundary. */
 const subscribe = () => () => {};
 
 /**

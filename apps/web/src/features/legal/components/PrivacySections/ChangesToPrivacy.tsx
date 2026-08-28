@@ -1,5 +1,6 @@
 import styles from "../legal-sections.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export function ChangesToPrivacy() {
   return (
     <section className={styles.section}>

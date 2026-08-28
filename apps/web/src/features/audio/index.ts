@@ -1,3 +1,4 @@
+/** Public audio feature exports used by listing pages and the persistent player. */
 export { audioService } from "./audio-service";
 
 // Export hooks

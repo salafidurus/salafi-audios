@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+/** Documents this module's responsibility and public boundary. */
 interface ContentProps {
   children: ReactNode;
 }

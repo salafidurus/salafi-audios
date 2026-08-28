@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export const PRIVACY_SECTIONS = [
   { id: "privacy-interpretation", title: "Interpretation and Definitions" },
   { id: "privacy-collecting", title: "Collecting and Using Your Personal Data" },

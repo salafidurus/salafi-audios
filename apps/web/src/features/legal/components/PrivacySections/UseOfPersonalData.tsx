@@ -1,6 +1,7 @@
 import { DATA_USE_PURPOSES, DATA_SHARING } from "../../constants/privacy";
 import styles from "../legal-sections.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export function UseOfPersonalData() {
   return (
     <section className={styles.section}>

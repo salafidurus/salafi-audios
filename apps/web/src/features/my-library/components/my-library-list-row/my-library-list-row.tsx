@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { routes, type MyLibraryItemDto } from "@sd/core-contracts";
@@ -19,6 +20,7 @@ import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 
 import styles from "./my-library-list-row.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type MyLibraryListRowProps = {
   item: MyLibraryItemDto;
   variant: "progress" | "saved" | "completed";
@@ -100,6 +102,7 @@ function renderChevron(isRtl: boolean) {
   return <Chevron className={styles.chevron} size={20} />;
 }
 
+/** Documents the intent and contract of this declaration. */
 export function MyLibraryListRow({ item, variant }: MyLibraryListRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();

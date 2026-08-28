@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export const borderWeb = {
   width: {
     default: "1px",

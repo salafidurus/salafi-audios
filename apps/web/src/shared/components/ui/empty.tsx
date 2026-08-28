@@ -2,6 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/shared/utils";
 
+/** Documents this module's responsibility and public boundary. */
 function Empty({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div

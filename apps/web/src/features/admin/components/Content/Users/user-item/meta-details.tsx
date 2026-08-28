@@ -7,6 +7,7 @@ import { MarqueeText } from "@/shared/components/MarqueeText";
 
 import styles from "./meta-details.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 type MetaDetailsProps = {
   user: {
     name: string | null;

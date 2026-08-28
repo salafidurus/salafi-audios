@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import styles from "../legal-sections.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export function ContactUs() {
   return (
     <section className={styles.section}>

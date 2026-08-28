@@ -1,7 +1,9 @@
 import type { AdminArrangeLessonDto } from "@sd/core-contracts";
 
+/** Documents this module's responsibility and public boundary. */
 export { slugify, deriveChildSlug } from "./slugify";
 
+/** Describes the parsed title, numeric prefix, and normalized extension of an upload filename. */
 export interface ParsedUploadFilename {
   title: string;
   numericPrefix: number | null;
@@ -11,6 +13,7 @@ export interface ParsedUploadFilename {
 const PREFIXED_PATTERN = /^(\d{1,4})[\s._-]+(.+)\.([A-Za-z0-9]+)$/;
 const PLAIN_PATTERN = /^(.+)\.([A-Za-z0-9]+)$/;
 
+/** Parses supported upload filename conventions into metadata used by staging. */
 export function parseUploadFilename(name: string): ParsedUploadFilename {
   const prefixed = name.match(PREFIXED_PATTERN);
   if (prefixed) return parsePrefixedFilename(prefixed);
@@ -32,6 +35,7 @@ function parsePlainFilename(match: RegExpMatchArray): ParsedUploadFilename {
   return { title: title.trim(), numericPrefix: null, ext: ext.toLowerCase() };
 }
 
+/** Finds the staged lesson whose slug matches a candidate upload assignment. */
 export function findSlugMatch(
   candidateSlug: string,
   lessons: AdminArrangeLessonDto[],

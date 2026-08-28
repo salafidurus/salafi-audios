@@ -1,3 +1,4 @@
+/** Renders responsive tables with consistent loading, error, empty, and sort behavior. */
 "use client";
 
 import type { ReactNode } from "react";
@@ -19,9 +20,13 @@ import {
 
 import styles from "./AdaptiveDataView.module.css";
 
+/** Renders responsive tables with consistent loading, error, empty, and sort behavior. */
+/** Feedback modes rendered before the table when data is unavailable. */
 export type AdaptiveDataViewState = "loading" | "error" | "empty";
+/** The ordering direction announced by the table header and passed to the caller. */
 export type AdaptiveDataViewSortDirection = "ascending" | "descending";
 
+/** Describes one responsive table column and its optional cell renderer. */
 export interface AdaptiveDataViewColumn<TData> {
   key: string;
   header: string;
@@ -30,16 +35,19 @@ export interface AdaptiveDataViewColumn<TData> {
   render?: (row: TData) => ReactNode;
 }
 
+/** Supplies rows, accessibility text, and state transitions for an adaptive data view. */
 export interface AdaptiveDataViewProps<TData extends object> {
   ariaLabel: string;
   columns: AdaptiveDataViewColumn<TData>[];
   data: TData[];
   getRowKey: (row: TData) => string;
+  /** Selects feedback UI before rows are rendered. */
   state?: AdaptiveDataViewState;
   sort?: { key: string; direction: AdaptiveDataViewSortDirection };
   onSort?: (key: string) => void;
   loadingMessage?: string;
   emptyMessage?: string;
+  /** Accessible message announced when the data request fails. */
   errorMessage?: string;
 }
 
@@ -78,6 +86,7 @@ function renderHeaderCell<TData extends object>(
   );
 }
 
+/** Renders loading, error, empty, or sortable tabular content from one consistent contract. */
 export function AdaptiveDataView<TData extends object>({
   ariaLabel,
   columns,

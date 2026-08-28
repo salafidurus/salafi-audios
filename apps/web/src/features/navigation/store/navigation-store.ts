@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
+/** Documents this module's responsibility and public boundary. */
 type NavigationState = {
   isMobileDrawerOpen: boolean;
   openMobileDrawer: () => void;

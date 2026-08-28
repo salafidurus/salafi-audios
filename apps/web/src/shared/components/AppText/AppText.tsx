@@ -4,6 +4,8 @@ import React from "react";
 
 import styles from "./app-text.module.css";
 
+/** Provides token-backed typography primitives. */
+/** Props for token-backed typography with optional color and line clamping. */
 export type AppTextProps = {
   variant: TypographyVariant;
   children: React.ReactNode;
@@ -19,6 +21,7 @@ const COLOR_CLASS_MAP = {
   inherit: styles.colorInherit,
 } as const;
 
+/** Applies design-token typography without introducing a second text-style vocabulary. */
 export function AppText({
   variant,
   children,

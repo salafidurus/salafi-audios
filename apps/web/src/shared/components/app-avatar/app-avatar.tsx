@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { ImageProps } from "next/image";
@@ -16,7 +17,7 @@ type AppAvatarProps = {
   size?: number;
   className?: string;
   fill?: boolean;
-  onError?: ImageProps["onError"];
+  /** Documents the intent and contract of this field. */ onError?: ImageProps["onError"];
   sizes?: string;
 };
 
@@ -31,13 +32,13 @@ function AvatarContent({
   fallbackText,
   onError,
 }: {
-  source: string | null | undefined;
+  /** Documents the intent and contract of this field. */ source: string | null | undefined;
   fill: boolean;
   sizes: string;
   size: number;
   className?: string;
   fallbackText?: string | null;
-  onError: ImageProps["onError"];
+  /** Documents the intent and contract of this field. */ onError: ImageProps["onError"];
 }) {
   if (source)
     return (
@@ -132,6 +133,7 @@ function avatarSource(
   return null;
 }
 
+/** Documents the intent and contract of this declaration. */
 export function AppAvatar({
   image,
   listingArtwork,

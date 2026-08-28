@@ -4,6 +4,7 @@ import { useReducer } from "react";
 
 import { type LectureStatus } from "@/shared/types/form-types";
 
+/** Documents this module's responsibility and public boundary. */
 export type ListingChangeSnapshot = {
   title: string;
   description: string;

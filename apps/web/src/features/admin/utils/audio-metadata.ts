@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 function waitForAudioDuration(src: string): Promise<number> {
   return new Promise<number>((resolve, reject) => {
     const audio = new Audio();
@@ -37,6 +38,7 @@ function waitForAudioDuration(src: string): Promise<number> {
   });
 }
 
+/** Documents the intent and contract of this declaration. */
 export async function extractAudioDuration(file: File): Promise<number> {
   const objectUrl = URL.createObjectURL(file);
   try {

@@ -47,6 +47,7 @@ import { SearchBar, type SearchBarProps } from "./Search.Bar";
 import { SearchButton, type SearchButtonProps } from "./Search.Button";
 import { SearchFilter, type SearchFilterProps, type FilterChip } from "./Search.Filter";
 
+/** Documents this module's responsibility and public boundary. */
 export const Search = Object.assign({
   Bar: SearchBar,
   Filter: SearchFilter,

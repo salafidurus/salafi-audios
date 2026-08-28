@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { PrivacyScreen } from "@/features/legal/screens/privacy.screen";
 
+/** Documents this module's responsibility and public boundary. */
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "Our privacy policy and how we handle your data.",

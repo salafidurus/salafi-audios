@@ -9,6 +9,8 @@ import { getThemeBootstrapScript } from "../core/styles/theme-bootstrap";
 import { ThemeSync } from "../core/styles/ThemeSync";
 import { themeCss } from "./theme-css";
 
+/** Defines the root document shell and global font assets. */
+/** Supplies metadata shared by every web route. */
 const fraunces = localFont({
   variable: "--font-display-en",
   display: "swap",
@@ -150,6 +152,7 @@ try {
   metadataBase = new URL("http://localhost:3000");
 }
 
+/** Publishes canonical site metadata using the safe runtime base URL above. */
 export const metadata: Metadata = {
   metadataBase,
   title: {
@@ -168,6 +171,7 @@ export const metadata: Metadata = {
   },
 };
 
+/** Documents the intent and contract of this declaration. */
 export default function RootLayout({
   children,
 }: Readonly<{

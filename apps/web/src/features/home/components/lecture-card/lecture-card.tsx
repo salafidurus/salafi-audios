@@ -6,6 +6,7 @@ import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-na
 import { SanadChain } from "../sanad-chain/sanad-chain";
 import styles from "./lecture-card.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export type LectureCardProps = {
   title: string;
   category: string;

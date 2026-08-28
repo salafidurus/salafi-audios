@@ -1,5 +1,6 @@
 import type { Matchers } from "bun:test";
 
+/** Extends Bun's matcher types with the DOM assertions used by web tests. */
 declare global {
   type DomMatcherValue = string | number | boolean | null | undefined;
 

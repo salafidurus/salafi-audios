@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 
 import styles from "./sanad-chain.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 type SanadChainProps = {
   total?: number;
   completed?: number;

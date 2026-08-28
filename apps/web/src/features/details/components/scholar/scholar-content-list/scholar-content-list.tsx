@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import {
@@ -19,8 +20,9 @@ import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 
 import styles from "./scholar-content-list.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type ScholarContentListProps = {
-  slug: string;
+  /** Documents the intent and contract of this field. */ slug: string;
   searchQuery?: string;
   selectedTopicId?: string | null;
   scholarImageUrl?: string;
@@ -82,6 +84,7 @@ function formatMetadataText(
   return parts.join(" · ");
 }
 
+/** Documents the intent and contract of this declaration. */
 export function ContentRow({
   item,
   scholarImageUrl,
@@ -131,6 +134,7 @@ export function ContentRow({
   );
 }
 
+/** Documents the intent and contract of this declaration. */
 export function ScholarContentList({
   slug,
   searchQuery = "",

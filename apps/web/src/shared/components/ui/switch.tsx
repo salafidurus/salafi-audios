@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { Switch as SwitchPrimitive } from "radix-ui";
@@ -10,12 +11,7 @@ type SwitchProps = Omit<React.ComponentProps<typeof SwitchPrimitive.Root>, "onCh
   onChange?: (checked: boolean) => void;
 };
 
-function Switch({
-  className,
-  size = "default",
-  onChange,
-  ...props
-}: SwitchProps) {
+function Switch({ className, size = "default", onChange, ...props }: SwitchProps) {
   return (
     <SwitchPrimitive.Root
       data-slot="switch"

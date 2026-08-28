@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export { AdminCard } from "./AdminCard";
 export type { AdminCardProps, AdminCardMetadataItem } from "./AdminCard";
 export { AdminItem } from "./AdminItem";

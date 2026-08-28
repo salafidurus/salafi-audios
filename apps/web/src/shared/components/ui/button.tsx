@@ -5,6 +5,7 @@ import { cn } from "@/shared/utils/index";
 
 import { buttonVariants, type ButtonVariantProps } from "./button-variants";
 
+/** Maps the app's semantic button names onto the underlying shadcn variants. */
 function normalizeButtonVariant(
   variant: ButtonVariantProps["variant"] | "primary" | "surface" | "danger",
 ) {

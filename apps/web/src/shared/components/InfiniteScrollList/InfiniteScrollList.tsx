@@ -11,6 +11,8 @@ import { Table, TableBody, TableHeader } from "@/shared/components/ui/table";
 import { List } from "../List";
 import styles from "./InfiniteScrollList.module.css";
 
+/** Provides append-on-intersection list rendering with accessible feedback states. */
+/** Props for a paginated list that appends pages and observes its loading sentinel. */
 export interface InfiniteScrollListProps<TData> {
   /** Flattened array of all loaded items */
   data: TData[];
@@ -18,7 +20,7 @@ export interface InfiniteScrollListProps<TData> {
   renderItem: (item: TData, index: number) => ReactNode;
   /** Whether data is loading */
   isLoading?: boolean;
-  /** Whether an error occurred */
+  /** Whether the current page request failed. */
   isError?: boolean;
   /** Callback to retry loading on error */
   onRetry?: () => void;
@@ -171,8 +173,8 @@ function renderEmptyState<TData>({
   observerTarget,
 }: {
   data: TData[];
-  isError?: boolean;
-  errorMessage: string;
+  /** Whether the current page request failed. */ isError?: boolean;
+  /** Accessible message shown with the retry action. */ errorMessage: string;
   onRetry?: () => void;
   isLoading?: boolean;
   emptyMessage: string;
@@ -233,7 +235,8 @@ function normalizeListFlags(
   };
 }
 
-// react-doctor-disable-next-line react-doctor/no-many-boolean-props
+/** Appends pages when its sentinel enters view and keeps feedback states accessible. */
+// react-doctor-disable-next-line react-doctor/no-many-boolean-props -- state flags are intentionally unified for list consumers
 export function InfiniteScrollList<TData>({
   data,
   renderItem,

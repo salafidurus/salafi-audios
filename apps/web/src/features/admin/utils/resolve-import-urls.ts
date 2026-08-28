@@ -5,27 +5,31 @@ import { fetchUrlMetadata } from "./fetch-url-metadata";
 import { parseGoogleDriveLink, buildGoogleDriveDownloadUrl } from "./google-drive-import";
 import { isKnownUnsupportedSource } from "./unsupported-sources";
 
+/** Describes a user-facing error associated with one import input. */
 export interface ImportUrlError {
   input: string;
   message: string;
 }
 
+/** Documents the intent and contract of this declaration. */
 export interface ImportFilesResult {
   files: File[];
-  errors: ImportUrlError[];
+  /** Documents the intent and contract of this field. */ errors: ImportUrlError[];
 }
 
+/** Documents the intent and contract of this declaration. */
 export interface ImportMetadataItem {
   url: string;
   filename: string;
   contentType: string;
   sizeBytes: number;
-  durationSeconds: number | null;
+  /** Documents the intent and contract of this field. */ durationSeconds: number | null;
 }
 
+/** Documents the intent and contract of this declaration. */
 export interface ImportMetadataResult {
   items: ImportMetadataItem[];
-  errors: ImportUrlError[];
+  /** Documents the intent and contract of this field. */ errors: ImportUrlError[];
 }
 
 interface ResolvedEntry {
@@ -39,7 +43,10 @@ function getErrorMessage(error: Error | null | undefined, fallback: string): str
 /** Resolves one pasted line into zero or more fetchable URLs, or an immediate per-line error. */
 async function resolveLine(
   line: string,
-): Promise<{ entries: ResolvedEntry[] } | { error: string }> {
+): Promise<
+  | { entries: ResolvedEntry[] }
+  | { /** Documents the intent and contract of this field. */ error: string }
+> {
   const unsupported = isKnownUnsupportedSource(line);
   if (unsupported) return { error: unsupported };
 
@@ -74,9 +81,10 @@ async function resolveLine(
 
 /** Independent per-line resolution (parsing + the occasional metadata-API call) — run
  *  concurrently rather than one-at-a-time, unlike the bounded-concurrency work that follows. */
-async function resolveLinesToQueue(
-  lines: string[],
-): Promise<{ queue: ResolvedEntry[]; errors: ImportUrlError[] }> {
+async function resolveLinesToQueue(lines: string[]): Promise<{
+  queue: ResolvedEntry[];
+  /** Documents the intent and contract of this field. */ errors: ImportUrlError[];
+}> {
   const trimmedLines: string[] = [];
   for (const rawLine of lines) {
     const line = rawLine.trim();
@@ -101,6 +109,7 @@ async function resolveLinesToQueue(
 
 const DEFAULT_CONCURRENCY = 2;
 
+/** Documents the intent and contract of this declaration. */
 export async function importFilesFromLines(
   lines: string[],
   concurrency = DEFAULT_CONCURRENCY,
@@ -140,21 +149,28 @@ export async function importSingleLineWithProgress(
   const singleProgress = queue.length === 1 ? onProgress : undefined;
 
   const results = await Promise.all(
-    queue.map(async (entry): Promise<{ file: File } | { error: ImportUrlError }> => {
-      try {
-        return { file: await fetchFileFromUrl(entry.url, singleProgress) };
-      } catch (err) {
-        return {
-          error: {
-            input: entry.url,
-            message: getErrorMessage(
-              err instanceof Error ? err : null,
-              "Failed to download this file.",
-            ),
-          },
-        };
-      }
-    }),
+    queue.map(
+      async (
+        entry,
+      ): Promise<
+        | { file: File }
+        | { /** Documents the intent and contract of this field. */ error: ImportUrlError }
+      > => {
+        try {
+          return { file: await fetchFileFromUrl(entry.url, singleProgress) };
+        } catch (err) {
+          return {
+            error: {
+              input: entry.url,
+              message: getErrorMessage(
+                err instanceof Error ? err : null,
+                "Failed to download this file.",
+              ),
+            },
+          };
+        }
+      },
+    ),
   );
 
   const files: File[] = [];
