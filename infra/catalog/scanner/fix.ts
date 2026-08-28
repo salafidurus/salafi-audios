@@ -1,7 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import type { PackageJson, CatalogConfigGroup } from "../types";
+import type {
+  PackageJson,
+  CatalogConfigGroup,
+  CatalogRepairMutation,
+  CatalogRepairReport,
+} from "../types";
 
 import {
   parseCatalogs,
@@ -10,14 +15,31 @@ import {
   getDependencyGroup,
   sanitizeGroupName,
 } from "../helpers";
+import { resolveCatalogPolicy } from "../policy";
 import { type DepUsage } from "./shared";
 
-export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
+export interface CatalogFixOptions {
+  dryRun?: boolean;
+}
+
+export interface CatalogFixResult {
+  updatedFiles: string[];
+  report: CatalogRepairReport;
+}
+
+export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}): CatalogFixResult {
+  const dryRun = options.dryRun ?? false;
   const rootJsonPath = path.join(rootDir, "package.json");
   const rootJson: PackageJson = JSON.parse(fs.readFileSync(rootJsonPath, "utf-8"));
   const catalogs = parseCatalogs(rootJson);
+  const originalDefaultCatalog = { ...catalogs.default };
+  const originalNamedCatalogs = Object.fromEntries(
+    Object.entries(catalogs.named).map(([name, entries]) => [name, { ...entries }]),
+  );
   const config = loadConfig(rootDir);
   const workspaces = getWorkspaces(rootDir);
+  const updatedFilesSet = new Set<string>();
+  let policyError: string | undefined;
 
   const allWorkspacePkgs = workspaces.map((w) => ({
     name: w.name,
@@ -179,7 +201,7 @@ export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
     }
   }
 
-  // Step 3: Force-align remaining explicit deps to catalog entries
+  // Step 3: Align remaining explicit deps only when an explicit managed policy authorizes it.
   const trackedRefs = new Set(refUpdates.map((r) => `${r.pkgName}:${r.depName}`));
   for (const pkg of allWorkspacePkgs) {
     const depTypes = ["dependencies", "devDependencies"] as const;
@@ -190,6 +212,12 @@ export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
         if (v.startsWith("workspace:") || name.startsWith("@sd/")) continue;
         if (v.startsWith("catalog:")) continue;
         if (trackedRefs.has(`${pkg.name}:${name}`)) continue;
+        const policy = resolveCatalogPolicy(name, pkg.relativePath, depType, config);
+        if (policy.status === "ambiguous") {
+          policyError = policy.reason;
+          continue;
+        }
+        if (policy.status !== "matched" || policy.rule?.mode !== "managed") continue;
         if (catalogs.default[name]) {
           refUpdates.push({
             pkgName: pkg.name,
@@ -215,6 +243,8 @@ export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
       }
     }
   }
+
+  if (policyError) return createFixResult(dryRun, [], [], policyError, "rejected");
 
   // Step 4: Build set of force-aligned deps that should not be orphaned
   const forceAlignedDeps = new Set<string>();
@@ -305,10 +335,10 @@ export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
       }
     }
     if (hadEmptyGroupCleanup) {
-      fs.writeFileSync(rootJsonPath, JSON.stringify(rootJson, null, 2) + "\n");
-      return { updatedFiles: ["root"] };
+      if (!dryRun) fs.writeFileSync(rootJsonPath, JSON.stringify(rootJson, null, 2) + "\n");
+      return createFixResult(dryRun, ["root"], [], "empty catalog groups removed");
     }
-    return { updatedFiles: [] };
+    return createFixResult(dryRun, [], [], "catalogs are already aligned");
   }
 
   // Step 7: Clean up empty named catalog groups
@@ -322,8 +352,6 @@ export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
       delete (rootJson as any).workspaces.catalogs;
     }
   }
-
-  const updatedFilesSet = new Set<string>();
 
   if (orphanRemovals.length > 0) {
     updatedFilesSet.add("root");
@@ -347,10 +375,10 @@ export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
       }
     }
 
-    fs.writeFileSync(rootJsonPath, JSON.stringify(rootJson, null, 2) + "\n");
+    if (!dryRun) fs.writeFileSync(rootJsonPath, JSON.stringify(rootJson, null, 2) + "\n");
     updatedFilesSet.add("root");
   } else if (orphanRemovals.length > 0) {
-    fs.writeFileSync(rootJsonPath, JSON.stringify(rootJson, null, 2) + "\n");
+    if (!dryRun) fs.writeFileSync(rootJsonPath, JSON.stringify(rootJson, null, 2) + "\n");
     updatedFilesSet.add("root");
   }
 
@@ -368,10 +396,12 @@ export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
       }
     }
 
-    fs.writeFileSync(
-      path.join(rootDir, "catalog.config.json"),
-      JSON.stringify({ groups: configGroups }, null, 2) + "\n",
-    );
+    if (!dryRun) {
+      fs.writeFileSync(
+        path.join(rootDir, "catalog.config.json"),
+        JSON.stringify({ groups: configGroups, policies: config.policies }, null, 2) + "\n",
+      );
+    }
     updatedFilesSet.add("catalog.config.json");
   }
 
@@ -387,9 +417,75 @@ export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
       raw[fu.depType][fu.depName] = fu.newRef;
       pkgName = fu.pkgName;
     }
-    fs.writeFileSync(update.filePath, JSON.stringify(raw, null, 2) + "\n");
+    if (!dryRun) fs.writeFileSync(update.filePath, JSON.stringify(raw, null, 2) + "\n");
     updatedFilesSet.add(pkgName);
   }
 
-  return { updatedFiles: [...updatedFilesSet] };
+  const mutations: CatalogRepairMutation[] = refUpdates.map((update) => {
+    const packageState = allWorkspacePkgs.find((pkg) => pkg.filePath === update.filePath);
+    const before =
+      (packageState?.content as any)?.[update.depType]?.[update.depName] ?? "<missing>";
+    return {
+      filePath: update.filePath,
+      workspace: update.pkgName,
+      dependency: update.depName,
+      section: update.depType,
+      before,
+      after: update.newRef,
+      reason: "catalog alignment authorized by the repair policy",
+    };
+  });
+
+  for (const [dependency, after] of Object.entries(catalogs.default)) {
+    if (originalDefaultCatalog[dependency] !== after) {
+      mutations.push({
+        filePath: rootJsonPath,
+        workspace: "root",
+        dependency,
+        section: "dependencies",
+        before: originalDefaultCatalog[dependency] ?? "<missing>",
+        after,
+        reason: "default Bun catalog update",
+      });
+    }
+  }
+
+  for (const [group, entries] of Object.entries(catalogs.named)) {
+    for (const [dependency, after] of Object.entries(entries)) {
+      if (originalNamedCatalogs[group]?.[dependency] !== after) {
+        mutations.push({
+          filePath: rootJsonPath,
+          workspace: `catalog:${group}`,
+          dependency,
+          section: "dependencies",
+          before: originalNamedCatalogs[group]?.[dependency] ?? "<missing>",
+          after,
+          reason: `named Bun catalog '${group}' update`,
+        });
+      }
+    }
+  }
+
+  return createFixResult(dryRun, [...updatedFilesSet], mutations);
+}
+
+function createFixResult(
+  dryRun: boolean,
+  updatedFiles: string[],
+  mutations: CatalogRepairMutation[],
+  reason?: string,
+  forcedStatus?: CatalogRepairReport["status"],
+): CatalogFixResult {
+  return {
+    updatedFiles,
+    report: {
+      status:
+        forcedStatus ?? (updatedFiles.length === 0 ? "no-op" : dryRun ? "planned" : "applied"),
+      mutations,
+      updatedFiles,
+      issues: [],
+      reason,
+      lockfile: updatedFiles.length === 0 ? "unchanged" : "requires-install",
+    },
+  };
 }

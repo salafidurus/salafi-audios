@@ -1,6 +1,7 @@
 import type { CatalogIssue, CatalogDuplicate } from "../types";
 
 import { parseCatalogs, loadConfig, getDependencyGroup } from "../helpers";
+import { resolveCatalogPolicy } from "../policy";
 import { getAllPackages } from "./shared";
 
 export function runCatalogCheck(rootDir: string): {
@@ -56,6 +57,19 @@ export function runCatalogCheck(rootDir: string): {
         } else {
           const groupName = getDependencyGroup(name, pkg.relativePath, config);
           const v = version as string;
+          const policy = resolveCatalogPolicy(name, pkg.relativePath, depType, config);
+
+          if (policy.status === "ambiguous") {
+            issues.push({
+              type: "policy",
+              pkgName: pkg.name,
+              depName: name,
+              details: policy.reason,
+            });
+            continue;
+          }
+
+          if (policy.rule?.mode === "explicit" || policy.rule?.mode === "ignored") continue;
 
           if (groupName && catalogs.named[groupName]?.[name]) {
             const expected = catalogs.named[groupName][name];

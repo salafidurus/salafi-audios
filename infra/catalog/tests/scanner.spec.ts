@@ -13,6 +13,8 @@ import {
   getDependencyGroup,
   loadConfig,
   sanitizeGroupName,
+  resolveCatalogPolicy,
+  evaluateCatalogUpdate,
 } from "../index";
 
 const TEMP_DIR = path.join(import.meta.dirname || "", "temp_test_monorepo");
@@ -104,6 +106,56 @@ describe("getDependencyGroup", () => {
   });
 });
 
+describe("evaluateCatalogUpdate", () => {
+  afterEach(() => teardownMockMonorepo());
+
+  it("allows a minor update under a minor ceiling with the required prefix", () => {
+    const decision = evaluateCatalogUpdate(
+      {
+        name: "web-react",
+        packages: ["react"],
+        workspaces: ["apps/web"],
+        rangePrefix: "^",
+        updateCeiling: "minor",
+        reason: "web compatibility policy",
+      },
+      "^19.2.3",
+      "^19.3.0",
+    );
+
+    expect(decision.status).toBe("allowed");
+  });
+
+  it("rejects major updates, prefix changes, and non-semver updates", () => {
+    const rule = {
+      name: "web-react",
+      packages: ["react"],
+      workspaces: ["apps/web"],
+      rangePrefix: "^" as const,
+      updateCeiling: "minor" as const,
+      reason: "web compatibility policy",
+    };
+
+    expect(evaluateCatalogUpdate(rule, "^19.2.3", "^20.0.0").status).toBe("rejected");
+    expect(evaluateCatalogUpdate(rule, "^19.2.3", "~19.3.0").status).toBe("rejected");
+    expect(evaluateCatalogUpdate(rule, "latest", "next").status).toBe("rejected");
+  });
+
+  it("requires the configured fixed target", () => {
+    const rule = {
+      name: "prisma",
+      packages: ["@prisma/client"],
+      workspaces: ["packages/core-db"],
+      updateCeiling: "fixed" as const,
+      fixedVersion: "7.10.0",
+      reason: "Prisma packages must remain synchronized",
+    };
+
+    expect(evaluateCatalogUpdate(rule, "7.9.0", "7.10.0").status).toBe("allowed");
+    expect(evaluateCatalogUpdate(rule, "7.9.0", "7.11.0").status).toBe("rejected");
+  });
+});
+
 describe("loadConfig", () => {
   afterEach(() => teardownMockMonorepo());
 
@@ -114,6 +166,7 @@ describe("loadConfig", () => {
     });
     const config = loadConfig(TEMP_DIR);
     expect(config.groups).toEqual([]);
+    expect(config.policies).toEqual([]);
   });
 
   it("returns parsed config when file exists", () => {
@@ -127,6 +180,74 @@ describe("loadConfig", () => {
     const config = loadConfig(TEMP_DIR);
     expect(config.groups).toHaveLength(1);
     expect(config.groups[0].name).toBe("g1");
+    expect(config.policies).toEqual([]);
+  });
+
+  it("loads and resolves a dependency policy by exact dependency and workspace", () => {
+    setupMockMonorepo({
+      rootPackageJson: { name: "root", workspaces: { packages: ["apps/*"] } },
+      workspaces: {},
+    });
+    writeConfig(TEMP_DIR, {
+      groups: [],
+      policies: [
+        {
+          name: "native-react",
+          packages: ["react"],
+          workspaces: ["apps/native"],
+          mode: "explicit",
+          updateCeiling: "minor",
+          reason: "React Native compatibility is managed separately",
+        },
+      ],
+    });
+
+    const match = resolveCatalogPolicy(
+      "react",
+      "apps/native",
+      "dependencies",
+      loadConfig(TEMP_DIR),
+    );
+
+    expect(match.status).toBe("matched");
+    expect(match.rule?.name).toBe("native-react");
+    expect(match.rule?.mode).toBe("explicit");
+  });
+
+  it("fails closed when equally specific policies conflict", () => {
+    setupMockMonorepo({
+      rootPackageJson: { name: "root", workspaces: { packages: ["apps/*"] } },
+      workspaces: {},
+    });
+    writeConfig(TEMP_DIR, {
+      groups: [],
+      policies: [
+        {
+          name: "first",
+          packages: ["react"],
+          workspaces: ["apps/native"],
+          mode: "explicit",
+          reason: "first policy",
+        },
+        {
+          name: "second",
+          packages: ["react"],
+          workspaces: ["apps/native"],
+          mode: "managed",
+          reason: "second policy",
+        },
+      ],
+    });
+
+    const match = resolveCatalogPolicy(
+      "react",
+      "apps/native",
+      "dependencies",
+      loadConfig(TEMP_DIR),
+    );
+
+    expect(match.status).toBe("ambiguous");
+    expect(match.candidates).toHaveLength(2);
   });
 });
 
@@ -154,6 +275,42 @@ describe("runCatalogCheck", () => {
     const hardcoded = issues.find((i) => i.depName === "react" && i.type === "hardcoded");
     expect(hardcoded).toBeDefined();
     expect(hardcoded?.pkgName).toBe("@sd/web");
+  });
+
+  it("accepts an explicitly divergent dependency under an explicit policy", () => {
+    setupMockMonorepo({
+      rootPackageJson: {
+        name: "root",
+        workspaces: { packages: ["apps/*"], catalog: { react: "19.2.3" } },
+      },
+      workspaces: {
+        "apps/native/package.json": {
+          name: "@sd/native",
+          dependencies: { react: "18.3.1" },
+        },
+      },
+    });
+    writeConfig(TEMP_DIR, {
+      groups: [],
+      policies: [
+        {
+          name: "native-react",
+          packages: ["react"],
+          workspaces: ["apps/native"],
+          mode: "explicit",
+          reason: "Native runtime compatibility requires a separate React line",
+        },
+      ],
+    });
+
+    const { issues } = runCatalogCheck(TEMP_DIR);
+    expect(
+      issues.some(
+        (issue) =>
+          issue.depName === "react" &&
+          (issue.type === "hardcoded" || issue.type === "mismatch" || issue.type === "policy"),
+      ),
+    ).toBe(false);
   });
 
   it("finds mismatch from default catalog", () => {
@@ -473,7 +630,7 @@ describe("runCatalogFix (reality -> config)", () => {
     expect(webContent.dependencies.react).toBe("19.2.3");
   });
 
-  it("force-aligns single-workspace dep with pre-existing catalog entry", () => {
+  it("preserves a single-workspace explicit version with a pre-existing catalog entry", () => {
     setupMockMonorepo({
       rootPackageJson: {
         name: "root",
@@ -491,12 +648,15 @@ describe("runCatalogFix (reality -> config)", () => {
     });
 
     const { updatedFiles } = runCatalogFix(TEMP_DIR);
-    expect(updatedFiles).toContain("@sd/web");
+    expect(updatedFiles).toContain("root");
 
     const webContent = JSON.parse(
       fs.readFileSync(path.join(TEMP_DIR, "apps/web/package.json"), "utf-8"),
     );
-    expect(webContent.dependencies.zod).toBe("catalog:");
+    expect(webContent.dependencies.zod).toBe("^4.4.3");
+
+    const rootContent = JSON.parse(fs.readFileSync(path.join(TEMP_DIR, "package.json"), "utf-8"));
+    expect(rootContent.workspaces.catalog.zod).toBeUndefined();
   });
 
   it("adds dep to default catalog when all workspaces use same version", () => {
@@ -536,6 +696,33 @@ describe("runCatalogFix (reality -> config)", () => {
       fs.readFileSync(path.join(TEMP_DIR, "packages/core-db/package.json"), "utf-8"),
     );
     expect(dbContent.dependencies.react).toBe("catalog:");
+  });
+
+  it("reports authorized catalog repairs without writing in dry-run mode", () => {
+    setupMockMonorepo({
+      rootPackageJson: {
+        name: "root",
+        workspaces: { packages: ["apps/*"], catalog: {} },
+      },
+      workspaces: {
+        "apps/web/package.json": {
+          name: "@sd/web",
+          dependencies: { zod: "^4.4.3" },
+        },
+        "apps/api/package.json": {
+          name: "@sd/api",
+          dependencies: { zod: "^4.4.3" },
+        },
+      },
+    });
+
+    const beforeRoot = fs.readFileSync(path.join(TEMP_DIR, "package.json"), "utf-8");
+    const result = runCatalogFix(TEMP_DIR, { dryRun: true });
+
+    expect(result.report.status).toBe("planned");
+    expect(result.report.lockfile).toBe("requires-install");
+    expect(result.report.mutations.some((mutation) => mutation.after === "catalog:")).toBe(true);
+    expect(fs.readFileSync(path.join(TEMP_DIR, "package.json"), "utf-8")).toBe(beforeRoot);
   });
 
   it("creates group when version conflict, canonical stays in default", () => {
