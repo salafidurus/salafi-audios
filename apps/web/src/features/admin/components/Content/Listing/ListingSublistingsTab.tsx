@@ -45,6 +45,31 @@ function hasChildren(data: TabData) {
   return data.modules.length > 0 || data.topLevelLessons.length > 0;
 }
 
+function renderTabStatus(
+  state: TabState,
+  containsChildren: boolean,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  if (state.status === "loading") {
+    return <div className={styles.loading}>{t("common.loading", "Loading...")}</div>;
+  }
+  if (state.status === "error") {
+    return (
+      <div className={styles.error}>
+        {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
+      </div>
+    );
+  }
+  if (!containsChildren) {
+    return (
+      <div className={styles.emptyState}>
+        {t("admin.translations.childrenEmpty", "No sub-listings yet")}
+      </div>
+    );
+  }
+  return null;
+}
+
 /**
  * The listing modal's "Sub-listings" tab: lists modules + lessons with an
  * accordion for modules, bulk Publish All / Draft All buttons, and a
@@ -130,19 +155,7 @@ export function ListingSublistingsTab({ rootListingId }: ListingSublistingsTabPr
 
   return (
     <div className={styles.childrenTab}>
-      {state.status === "loading" && (
-        <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
-      )}
-      {state.status === "error" && (
-        <div className={styles.error}>
-          {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
-        </div>
-      )}
-      {state.status === "ready" && !containsChildren && (
-        <div className={styles.emptyState}>
-          {t("admin.translations.childrenEmpty", "No sub-listings yet")}
-        </div>
-      )}
+      {renderTabStatus(state, containsChildren, t)}
       {state.status === "ready" && containsChildren && (
         <>
           {/* Bulk actions */}
