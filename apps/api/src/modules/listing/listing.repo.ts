@@ -1694,6 +1694,17 @@ export class ListingRepository {
     rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
     existingModuleSlugById: Map<string, string>,
   ): { slug: string; expectedPrefix: string }[] {
+    return [
+      ...this.buildArrangeModulePrefixChecks(rootSlug, moduleOps, existingModuleSlugById),
+      ...this.buildArrangeRootLessonPrefixChecks(rootSlug, rootLessonOps),
+    ];
+  }
+
+  private buildArrangeModulePrefixChecks(
+    rootSlug: string,
+    moduleOps: NonNullable<ArrangeCommitDto['modules']>,
+    existingModuleSlugById: Map<string, string>,
+  ): { slug: string; expectedPrefix: string }[] {
     const checks: { slug: string; expectedPrefix: string }[] = [];
     for (const moduleOp of moduleOps) {
       const parentSlug =
@@ -1709,6 +1720,14 @@ export class ListingRepository {
         }
       }
     }
+    return checks;
+  }
+
+  private buildArrangeRootLessonPrefixChecks(
+    rootSlug: string,
+    rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
+  ): { slug: string; expectedPrefix: string }[] {
+    const checks: { slug: string; expectedPrefix: string }[] = [];
     for (const lessonOp of rootLessonOps) {
       if (lessonOp.op === 'create') {
         checks.push({ slug: lessonOp.slug, expectedPrefix: rootSlug });
