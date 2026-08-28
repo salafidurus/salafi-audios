@@ -736,11 +736,14 @@ export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
 }
 
 /** Slugs staged more than once, or colliding with existing children. */
-export function localSlugConflicts(state: UploadArrangeState): string[] {
-  const existingSlugs = new Set([
+function getExistingSlugs(state: UploadArrangeState): Set<string> {
+  return new Set([
     ...allExistingLessons(state.existing).map((l) => l.slug),
     ...(state.existing?.modules.map((m) => m.slug) ?? []),
   ]);
+}
+
+function getStagedSlugs(state: UploadArrangeState): string[] {
   const staged: string[] = [];
   for (const item of state.items) {
     if (item.assignment.kind === "new-lesson") staged.push(item.assignment.slug);
@@ -748,6 +751,10 @@ export function localSlugConflicts(state: UploadArrangeState): string[] {
   for (const mod of state.newModules) {
     staged.push(mod.slug);
   }
+  return staged;
+}
+
+function findSlugConflicts(staged: string[], existingSlugs: Set<string>): string[] {
   const seen = new Set<string>();
   const conflicts = new Set<string>();
   for (const slug of staged) {
@@ -756,6 +763,10 @@ export function localSlugConflicts(state: UploadArrangeState): string[] {
     seen.add(slug);
   }
   return [...conflicts];
+}
+
+export function localSlugConflicts(state: UploadArrangeState): string[] {
+  return findSlugConflicts(getStagedSlugs(state), getExistingSlugs(state));
 }
 
 export function useUploadArrangeState() {
