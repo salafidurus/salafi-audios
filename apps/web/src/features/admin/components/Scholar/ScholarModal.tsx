@@ -78,6 +78,13 @@ function shouldShowScholarTabError(
 }
 
 function getChangedScholarFields(state: FormState) {
+  return {
+    ...getBasicScholarFields(state),
+    ...getSocialScholarFields(state),
+  };
+}
+
+function getBasicScholarFields(state: FormState) {
   const initial = state.initialSnapshot;
   return {
     name: changedScholarField(state.isEditing, state.name, initial?.name, !!state.name),
@@ -91,6 +98,12 @@ function getChangedScholarFields(state: FormState) {
       initial?.orderIndex,
       state.orderIndex !== 999,
     ),
+  };
+}
+
+function getSocialScholarFields(state: FormState) {
+  const initial = state.initialSnapshot;
+  return {
     socialTwitter: changedScholarField(
       state.isEditing,
       state.socialTwitter,
