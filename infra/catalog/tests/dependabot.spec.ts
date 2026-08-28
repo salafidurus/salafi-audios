@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import type { CatalogRepairReport } from "../types";
@@ -97,6 +97,33 @@ describe("Dependabot workflow safety contract", () => {
     );
     expect(workflow).not.toContain('git read-tree "$PR_HEAD_SHA"');
     expect(workflow).not.toContain("git add -A");
+  });
+
+  it("validates the Helper policy before synchronizing Dependabot changes", () => {
+    const workflow = readFileSync(
+      resolve(import.meta.dirname, "../../../.github/workflows/dependabot-sync.yml"),
+      "utf8",
+    );
+
+    expect(workflow).toContain("run: bun infra/dependabot-helper/cli.ts validate");
+    expect(workflow).toContain("bun infra/dependabot-helper/cli.ts align");
+  });
+
+  it("routes scheduled auxiliary work through the Helper entry points", () => {
+    const auxiliaryWorkflow = resolve(
+      import.meta.dirname,
+      "../../../.github/workflows/dependabot-aux-updates.yml",
+    );
+    const workflow = readFileSync(auxiliaryWorkflow, "utf8");
+
+    expect(
+      existsSync(resolve(import.meta.dirname, "../../../.github/workflows/deps-update.yml")),
+    ).toBe(false);
+    expect(workflow).toContain("name: Dependabot Auxiliary Updates");
+    expect(workflow).toContain("bun infra/dependabot-helper/cli.ts check");
+    expect(workflow).toContain("bun infra/dependabot-helper/cli.ts update");
+    expect(workflow).toContain("--report-only");
+    expect(workflow).not.toContain("pkg-update:ci");
   });
 });
 

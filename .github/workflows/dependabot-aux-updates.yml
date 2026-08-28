@@ -1,4 +1,4 @@
-name: Dependency Update
+name: Dependabot Auxiliary Updates
 
 on:
   schedule:
@@ -41,12 +41,15 @@ jobs:
           path: .cache/deps-state.json
           key: deps-state
 
-      - name: Run dependency update
+      - name: Validate Helper policy and checks
+        run: bun infra/dependabot-helper/cli.ts check
+
+      - name: Run Helper-owned dependency update
         run: |
           if [ "${{ inputs.report_only }}" = "true" ]; then
-            bun run pkg-update:ci --report-only
+            bun infra/dependabot-helper/cli.ts update --report-only
           else
-            bun run pkg-update:ci
+            bun infra/dependabot-helper/cli.ts update
           fi
         env:
           GH_TOKEN: ${{ secrets.SALAFIDURUS_PR_WRITE }}
