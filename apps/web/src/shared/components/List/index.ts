@@ -32,6 +32,7 @@ import { ListItemActions, type ListItemActionsProps } from "./ListItemActions";
  * - No divider separator between content and actions
  * - Orientation control for flexible action stacking (horizontal/vertical per breakpoint)
  */
+/** Exposes the list container and its Item and Item.Actions compound components. */
 export const List = Object.assign(ListContainer, {
   Item: Object.assign(ListItem, {
     Actions: ListItemActions,

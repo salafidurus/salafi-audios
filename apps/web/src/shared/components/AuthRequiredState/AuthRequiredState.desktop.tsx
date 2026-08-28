@@ -1,8 +1,9 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides the copy and action used when a desktop user must authenticate. */
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
 
+/** Configures the desktop authentication-required empty state. */
 export type AuthRequiredStateDesktopProps = {
   title: string;
   description: string;
@@ -10,6 +11,7 @@ export type AuthRequiredStateDesktopProps = {
   onPress: () => void;
 };
 
+/** Renders a desktop-sized sign-in prompt for protected content. */
 export function AuthRequiredStateDesktop({
   title,
   description,

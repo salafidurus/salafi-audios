@@ -5,7 +5,8 @@ import { fetchUrlMetadata } from "./fetch-url-metadata";
 import { parseGoogleDriveLink, buildGoogleDriveDownloadUrl } from "./google-drive-import";
 import { isKnownUnsupportedSource } from "./unsupported-sources";
 
-/** Describes a user-facing error associated with one import input. */
+/** Resolves pasted source links and downloads their audio files for admin imports. */
+/** Reports a recoverable import failure together with the input that caused it. */
 export interface ImportUrlError {
   input: string;
   message: string;

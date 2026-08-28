@@ -11,16 +11,19 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 
+/** Configures the controlled select primitive and its visual error state. */
 export interface DropdownProps {
   value: string;
   onValueChange: (value: string) => void;
   children: ReactNode;
   disabled?: boolean;
+  /** Marks the field invalid; a string can carry an associated validation message. */
   error?: boolean | string;
   direction?: "up" | "down";
   className?: string;
 }
 
+/** Wraps the select primitive with shared validation styling and composition slots. */
 export function Dropdown({
   value,
   onValueChange,
@@ -38,6 +41,7 @@ export function Dropdown({
   );
 }
 
+/** Configures the button that opens a Dropdown and its accessible labeling. */
 export interface DropdownTriggerProps {
   placeholder?: string;
   className?: string;
@@ -48,6 +52,7 @@ export interface DropdownTriggerProps {
   children?: ReactNode;
 }
 
+/** Renders the trigger while preserving placeholder and accessibility options. */
 export function DropdownTrigger({
   placeholder = "Select...",
   className,
@@ -70,6 +75,7 @@ export function DropdownTrigger({
   );
 }
 
+/** Renders the menu content associated with a Dropdown trigger. */
 export function DropdownContent({
   children,
   className,
@@ -81,6 +87,7 @@ export function DropdownContent({
   return <SelectContent className={className}>{children}</SelectContent>;
 }
 
+/** Renders one selectable option in a Dropdown menu. */
 export function DropdownItem({
   value,
   children,

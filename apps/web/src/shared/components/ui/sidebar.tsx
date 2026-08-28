@@ -26,6 +26,7 @@ const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
 type SidebarContextProps = {
+  /** Current visual mode derived from the effective open state. */
   state: "expanded" | "collapsed";
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -153,6 +154,7 @@ type SidebarRenderProps = {
   className?: string;
   children?: React.ReactNode;
   dir?: React.ComponentProps<"div">["dir"];
+  /** Remaining div props forwarded to the rendered sidebar surface. */
   props: React.ComponentProps<"div">;
 };
 
@@ -209,7 +211,10 @@ function renderDesktopSidebar({
   children,
   state,
   props,
-}: SidebarRenderProps & { state: "expanded" | "collapsed" }) {
+}: SidebarRenderProps & {
+  /** Visual mode applied to the desktop sidebar data attributes and styles. */
+  state: "expanded" | "collapsed";
+}) {
   return (
     <div
       className="group peer hidden text-sidebar-foreground md:block"
