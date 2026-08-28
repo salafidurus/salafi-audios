@@ -37,19 +37,14 @@ type PaletteTopics = NonNullable<ReturnType<typeof useTopicsList>["data"]>;
 type PaletteScholarPages = NonNullable<ReturnType<typeof useInfiniteScholarsList>["data"]>;
 type PaletteListingData = NonNullable<ReturnType<typeof useSearchCatalog>["data"]>;
 
-function buildPaletteResults(
-  normalizedQuery: string,
+function buildTopicResults(
+  query: string,
   topics: PaletteTopics,
-  scholarPages: PaletteScholarPages | undefined,
-  listingData: PaletteListingData | undefined,
   language: string,
-  t: ReturnType<typeof useTranslation>["t"],
 ): PaletteResult[] {
-  if (!normalizedQuery) return [];
-
-  const topicResults = topics.reduce<PaletteResult[]>((matches, topic) => {
+  return topics.reduce<PaletteResult[]>((matches, topic) => {
     const label = getLocalizedName(topic.name, language);
-    if (includesQuery(label, normalizedQuery)) {
+    if (includesQuery(label, query)) {
       matches.push({
         id: `topic-${topic.id}`,
         label,
@@ -59,34 +54,40 @@ function buildPaletteResults(
     }
     return matches;
   }, []);
+}
 
-  const scholarResults = (scholarPages?.pages.flatMap((page) => page.items) ?? []).reduce<
-    PaletteResult[]
-  >((matches, scholar) => {
-    if (includesQuery(scholar.name, normalizedQuery)) {
-      matches.push({
-        id: `scholar-${scholar.id}`,
-        label: scholar.name,
-        type: "scholar",
-        href: routes.scholars.detail(scholar.slug),
-        metadata: t("navigation.searchCatalogScholarMetadata", "{{count}} listings", {
-          count: scholar.lectureCount,
-        }),
-      });
-    }
-    return matches;
-  }, []);
+function buildScholarResults(
+  query: string,
+  pages: PaletteScholarPages | undefined,
+  t: ReturnType<typeof useTranslation>["t"],
+): PaletteResult[] {
+  return (pages?.pages.flatMap((page) => page.items) ?? []).reduce<PaletteResult[]>(
+    (matches, scholar) => {
+      if (includesQuery(scholar.name, query)) {
+        matches.push({
+          id: `scholar-${scholar.id}`,
+          label: scholar.name,
+          type: "scholar",
+          href: routes.scholars.detail(scholar.slug),
+          metadata: t("navigation.searchCatalogScholarMetadata", "{{count}} listings", {
+            count: scholar.lectureCount,
+          }),
+        });
+      }
+      return matches;
+    },
+    [],
+  );
+}
 
+function buildListingResults(query: string, data: PaletteListingData | undefined): PaletteResult[] {
   const listings = [
-    ...(listingData?.collections ?? []),
-    ...(listingData?.series ?? []),
-    ...(listingData?.singles ?? []),
+    ...(data?.collections ?? []),
+    ...(data?.series ?? []),
+    ...(data?.singles ?? []),
   ];
-  const listingResults = listings.reduce<PaletteResult[]>((matches, listing) => {
-    if (
-      includesQuery(listing.title, normalizedQuery) ||
-      includesQuery(listing.scholarName, normalizedQuery)
-    ) {
+  return listings.reduce<PaletteResult[]>((matches, listing) => {
+    if (includesQuery(listing.title, query) || includesQuery(listing.scholarName, query)) {
       matches.push({
         id: `listing-${listing.id}`,
         label: listing.title,
@@ -97,8 +98,23 @@ function buildPaletteResults(
     }
     return matches;
   }, []);
+}
 
-  return [...topicResults, ...scholarResults, ...listingResults];
+function buildPaletteResults(
+  normalizedQuery: string,
+  topics: PaletteTopics,
+  scholarPages: PaletteScholarPages | undefined,
+  listingData: PaletteListingData | undefined,
+  language: string,
+  t: ReturnType<typeof useTranslation>["t"],
+): PaletteResult[] {
+  if (!normalizedQuery) return [];
+
+  return [
+    ...buildTopicResults(normalizedQuery, topics, language),
+    ...buildScholarResults(normalizedQuery, scholarPages, t),
+    ...buildListingResults(normalizedQuery, listingData),
+  ];
 }
 
 function handlePaletteKeyDown(
