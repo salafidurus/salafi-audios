@@ -140,16 +140,28 @@ function ScholarMedallion({
   );
 }
 
+type ScholarListItem = NonNullable<
+  ReturnType<typeof useInfiniteScholarsList>["data"]
+>["pages"][number]["items"][number];
+
+function selectScholarGroups(scholars: ScholarListItem[], featuredScholarSlug?: string) {
+  const featuredScholar = featuredScholarSlug
+    ? scholars.find((scholar) => scholar.slug === featuredScholarSlug)
+    : undefined;
+
+  return {
+    featuredScholar,
+    regularScholars: featuredScholar
+      ? scholars.filter((scholar) => scholar.id !== featuredScholar.id)
+      : scholars,
+  };
+}
+
 export function ScholarMedallions({ featuredScholarSlug }: ScholarMedallionsProps) {
   const { t } = useTranslation();
   const { data, isLoading } = useInfiniteScholarsList();
   const scholars = data?.pages.flatMap((page) => page.items) ?? [];
-  const featuredScholar = featuredScholarSlug
-    ? scholars.find((scholar) => scholar.slug === featuredScholarSlug)
-    : undefined;
-  const regularScholars = featuredScholar
-    ? scholars.filter((scholar) => scholar.id !== featuredScholar.id)
-    : scholars;
+  const { featuredScholar, regularScholars } = selectScholarGroups(scholars, featuredScholarSlug);
 
   if (isLoading && scholars.length === 0) {
     return <LoadingScholars t={t} />;
