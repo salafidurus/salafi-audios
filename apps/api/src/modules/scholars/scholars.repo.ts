@@ -263,7 +263,7 @@ export class ScholarsRepository {
         }),
       ]);
 
-    return {
+    const buildDetail = () => ({
       id: record.id,
       slug: record.slug,
       name: resolved.fields.name,
@@ -293,7 +293,9 @@ export class ScholarsRepository {
       totalContentDurationSeconds:
         (singleDuration._sum.durationSeconds ?? 0) +
         (aggregateDuration._sum.publishedDurationSeconds ?? 0),
-    };
+    });
+
+    return buildDetail();
   }
 
   async getContent(slug: string): Promise<ScholarContentUnifiedDto | null> {
