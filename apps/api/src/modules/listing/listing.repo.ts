@@ -246,6 +246,26 @@ function nullableValue<T>(value: T | null | undefined): T | null {
   return value ?? null;
 }
 
+function buildCreateListingData(
+  dto: CreateListingDto & { publicUrl?: string },
+  slug: string,
+  createdBy?: string,
+): Prisma.ListingUncheckedCreateInput {
+  return {
+    title: dto.title,
+    slug,
+    format: dto.format,
+    status: dto.status ?? Status.draft,
+    language: dto.language ?? 'ar',
+    durationSeconds: dto.durationSeconds ?? undefined,
+    scholarId: dto.scholarId,
+    parentId: dto.parentId ?? undefined,
+    coverImageUrl: dto.coverImageUrl ?? undefined,
+    coverImageKey: dto.coverImageKey ?? undefined,
+    createdBy,
+  };
+}
+
 @Injectable()
 export class ListingRepository {
   constructor(
@@ -1229,19 +1249,7 @@ export class ListingRepository {
 
     return this.prisma.$transaction(async (tx) => {
       const listing = await tx.listing.create({
-        data: {
-          title: dto.title,
-          slug,
-          format: dto.format,
-          status: dto.status ?? Status.draft,
-          language: dto.language ?? 'ar',
-          durationSeconds: dto.durationSeconds ?? undefined,
-          scholarId: dto.scholarId,
-          parentId: dto.parentId ?? undefined,
-          coverImageUrl: dto.coverImageUrl ?? undefined,
-          coverImageKey: dto.coverImageKey ?? undefined,
-          createdBy,
-        },
+        data: buildCreateListingData(dto, slug, createdBy),
         select: { id: true, title: true, parentId: true },
       });
 
