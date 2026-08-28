@@ -3,7 +3,7 @@ import { resolve } from "path";
 
 import type { UpdateCandidate } from "./utils/ui";
 
-import { loadConfig, resolveCompatibilityGroup } from "../catalog";
+import { loadConfig, resolveCompatibilityGroup } from "../catalog/helpers";
 import { config, type PkupdateConfig } from "./pkg-update.config";
 import { fetchLatestVersion } from "./utils/npm";
 import { categorizeBump, isNewer } from "./utils/semver";

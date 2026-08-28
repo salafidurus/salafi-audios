@@ -4,7 +4,7 @@ import { resolve, dirname, relative } from "path";
 
 import type { UpdateCandidate } from "./utils/ui";
 
-import { loadConfig, resolveCompatibilityGroup } from "../catalog";
+import { loadConfig, resolveCompatibilityGroup } from "../catalog/helpers";
 import { config, type PkupdateConfig } from "./pkg-update.config";
 
 export function findWorkspacePkgFiles(rootDir: string): string[] {
