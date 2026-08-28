@@ -97,6 +97,20 @@ const ArrangeConflictBodySchema = z.object({
   conflictingSlugs: z.array(z.string()).optional(),
 });
 
+function raiseArrangeConflict(message: string): void {
+  if (!message.startsWith("API 409")) return;
+  const jsonStart = message.indexOf("{");
+  if (jsonStart === -1) return;
+  try {
+    const body = ArrangeConflictBodySchema.parse(JSON.parse(message.slice(jsonStart)));
+    if (body.conflictingSlugs?.length) {
+      throw new ArrangeConflictError(body.conflictingSlugs);
+    }
+  } catch (parseErr) {
+    if (parseErr instanceof ArrangeConflictError) throw parseErr;
+  }
+}
+
 export async function commitArrange(id: string, data: ArrangeCommitDto) {
   try {
     return await httpClient<ArrangeCommitResultDto>({
@@ -108,19 +122,7 @@ export async function commitArrange(id: string, data: ArrangeCommitDto) {
     // httpClient flattens non-2xx bodies into the error message — recover the
     // structured conflictingSlugs payload from a 409 so the UI can highlight rows.
     const message = err instanceof Error ? err.message : "";
-    if (message.startsWith("API 409")) {
-      const jsonStart = message.indexOf("{");
-      if (jsonStart !== -1) {
-        try {
-          const body = ArrangeConflictBodySchema.parse(JSON.parse(message.slice(jsonStart)));
-          if (body.conflictingSlugs?.length) {
-            throw new ArrangeConflictError(body.conflictingSlugs);
-          }
-        } catch (parseErr) {
-          if (parseErr instanceof ArrangeConflictError) throw parseErr;
-        }
-      }
-    }
+    raiseArrangeConflict(message);
     throw err;
   }
 }
