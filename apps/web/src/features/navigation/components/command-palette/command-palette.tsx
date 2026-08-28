@@ -201,6 +201,20 @@ function PaletteResultsView({
   );
 }
 
+function getPaletteLoadingState(
+  isOpen: boolean,
+  query: string,
+  isListingsLoading: boolean,
+  isTopicsLoading: boolean,
+  isScholarsLoading: boolean,
+) {
+  return isOpen && query.length > 0 && (isListingsLoading || isTopicsLoading || isScholarsLoading);
+}
+
+function getActivePaletteResult(results: PaletteResult[], activeIndex: number) {
+  return activeIndex >= 0 ? results[activeIndex] : undefined;
+}
+
 export function CommandPalette() {
   const { i18n, t } = useTranslation();
   const router = useRouter();
@@ -230,10 +244,13 @@ export function CommandPalette() {
     );
   }, [i18n.language, listingData, normalizedQuery, scholarPages, t, topics]);
 
-  const isLoading =
-    isOpen &&
-    normalizedQuery.length > 0 &&
-    (isListingsLoading || isTopicsLoading || isScholarsLoading);
+  const isLoading = getPaletteLoadingState(
+    isOpen,
+    normalizedQuery,
+    isListingsLoading,
+    isTopicsLoading,
+    isScholarsLoading,
+  );
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -262,7 +279,7 @@ export function CommandPalette() {
   };
 
   const searchLabel = t("navigation.searchCatalog", "Search catalog");
-  const activeResult = activeIndex >= 0 ? results[activeIndex] : undefined;
+  const activeResult = getActivePaletteResult(results, activeIndex);
 
   return (
     <>
