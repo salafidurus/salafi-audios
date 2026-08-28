@@ -69,6 +69,75 @@ function UploadModeToggle({ mode, setMode, reset, t }: ModeToggleProps) {
   );
 }
 
+function ImportingContent({
+  downloadProgress,
+  t,
+}: {
+  downloadProgress: { loaded: number; total: number | null } | null;
+  t: (key: string, fallback: string) => string;
+}) {
+  return (
+    <>
+      <Link2 className={`${styles.icon} ${styles.spin}`} size={40} />
+      <p className={styles.primaryText}>
+        {t(
+          "admin.contents.listing.importingFromLink",
+          "Downloading from link… this can take a while for large files.",
+        )}
+      </p>
+      {downloadProgress && (
+        <p className={styles.fileName}>
+          {downloadProgress.total
+            ? `${formatBytes(downloadProgress.loaded)} / ${formatBytes(downloadProgress.total)}`
+            : formatBytes(downloadProgress.loaded)}
+        </p>
+      )}
+    </>
+  );
+}
+
+function ErrorContent({
+  error,
+  mode,
+  onBrowse,
+  onReset,
+}: {
+  error: string | null;
+  mode: UploadMode;
+  onBrowse: () => void;
+  onReset: () => void;
+}) {
+  return (
+    <>
+      <AlertCircle className={styles.iconError} size={40} />
+      <p className={styles.primaryText}>Upload failed</p>
+      <p className={styles.errorMessage}>{error}</p>
+      <Button
+        variant="ghost"
+        className={styles.secondaryText}
+        onClick={() => (mode === "file" ? onBrowse() : onReset())}
+      >
+        Click to try again
+      </Button>
+    </>
+  );
+}
+
+async function importAudioFile(
+  url: string,
+  onProgress: (loaded: number, total: number | null) => void,
+): Promise<File> {
+  const { files, errors } = await importSingleLineWithProgress(url, onProgress);
+  if (files.length > 1) {
+    throw new Error(
+      "This link resolved to multiple files — use the batch Upload & Arrange flow instead.",
+    );
+  }
+  const [file] = files;
+  if (!file) throw new Error(errors[0]?.message ?? "Couldn't import this link.");
+  return file;
+}
+
 function UploadStateContent({
   uploadState,
   fileName,
@@ -102,22 +171,7 @@ function UploadStateContent({
         </>
       )}
       {uploadState === "importing" && (
-        <>
-          <Link2 className={`${styles.icon} ${styles.spin}`} size={40} />
-          <p className={styles.primaryText}>
-            {t(
-              "admin.contents.listing.importingFromLink",
-              "Downloading from link… this can take a while for large files.",
-            )}
-          </p>
-          {downloadProgress && (
-            <p className={styles.fileName}>
-              {downloadProgress.total
-                ? `${formatBytes(downloadProgress.loaded)} / ${formatBytes(downloadProgress.total)}`
-                : formatBytes(downloadProgress.loaded)}
-            </p>
-          )}
-        </>
+        <ImportingContent downloadProgress={downloadProgress} t={t} />
       )}
       {uploadState === "extracting" && (
         <>
@@ -145,18 +199,7 @@ function UploadStateContent({
         </>
       )}
       {uploadState === "error" && (
-        <>
-          <AlertCircle className={styles.iconError} size={40} />
-          <p className={styles.primaryText}>Upload failed</p>
-          <p className={styles.errorMessage}>{error}</p>
-          <Button
-            variant="ghost"
-            className={styles.secondaryText}
-            onClick={() => (mode === "file" ? onBrowse() : onReset())}
-          >
-            Click to try again
-          </Button>
-        </>
+        <ErrorContent error={error} mode={mode} onBrowse={onBrowse} onReset={onReset} />
       )}
     </div>
   );
@@ -229,18 +272,9 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
     setDownloadProgress(null);
 
     try {
-      const { files, errors } = await importSingleLineWithProgress(url, (loaded, total) =>
+      const file = await importAudioFile(url, (loaded, total) =>
         setDownloadProgress({ loaded, total }),
       );
-      if (files.length > 1) {
-        throw new Error(
-          "This link resolved to multiple files — use the batch Upload & Arrange flow instead.",
-        );
-      }
-      const [file] = files;
-      if (!file) {
-        throw new Error(errors[0]?.message ?? "Couldn't import this link.");
-      }
       await handleFile(file);
     } catch (err) {
       setError(
