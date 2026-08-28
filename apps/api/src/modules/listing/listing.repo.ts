@@ -266,6 +266,29 @@ function buildCreateListingData(
   };
 }
 
+function buildArrangeLessonUpdateData(
+  op: Extract<ArrangeLessonOp, { op: 'update' }>,
+  existingStatus: Status | null | undefined,
+  userId?: string,
+): Prisma.ListingUpdateInput {
+  const data: Prisma.ListingUpdateInput = { updatedAt: new Date(), updatedBy: userId };
+  if (op.title !== undefined) data.title = op.title;
+  if (op.description !== undefined) data.description = op.description;
+  if (op.status !== undefined) {
+    data.status = op.status;
+    if (isNewlyPublished(op.status, existingStatus)) {
+      data.publishedAt = new Date();
+    }
+  }
+  if (op.orderIndex !== undefined) data.orderIndex = op.orderIndex;
+  if (op.audio) data.durationSeconds = op.audio.durationSeconds;
+  return data;
+}
+
+function isNewlyPublished(status: Status, existingStatus: Status | null | undefined): boolean {
+  return status === Status.published && existingStatus !== Status.published;
+}
+
 @Injectable()
 export class ListingRepository {
   constructor(
@@ -1373,17 +1396,7 @@ export class ListingRepository {
       where: { id: op.id },
       select: { status: true },
     });
-    const data: Prisma.ListingUpdateInput = { updatedAt: new Date(), updatedBy: userId };
-    if (op.title !== undefined) data.title = op.title;
-    if (op.description !== undefined) data.description = op.description;
-    if (op.status !== undefined) {
-      data.status = op.status;
-      if (op.status === Status.published && existing?.status !== Status.published) {
-        data.publishedAt = new Date();
-      }
-    }
-    if (op.orderIndex !== undefined) data.orderIndex = op.orderIndex;
-    if (op.audio) data.durationSeconds = op.audio.durationSeconds;
+    const data = buildArrangeLessonUpdateData(op, existing?.status, userId);
     await tx.listing.update({ where: { id: op.id }, data });
     if (op.audio) await this.syncArrangeLessonAudio(tx, op.id, op.audio);
   }
