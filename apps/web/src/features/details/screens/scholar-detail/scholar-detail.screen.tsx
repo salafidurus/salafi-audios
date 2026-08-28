@@ -119,6 +119,31 @@ function ScholarLoadingState({ t }: { t: ScholarStateProps["t"] }) {
   );
 }
 
+function buildTopicChips(
+  topics: { topicId: string; topicName: string }[] | undefined,
+): FilterChip[] {
+  return (topics ?? [])
+    .map((topic) => ({ id: topic.topicId, label: topic.topicName }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+function selectTopicItems(
+  items: ScholarContentItemDto[],
+  topics: { topicId: string; items: ScholarContentItemDto[] }[] | undefined,
+  selectedTopicId: string | null,
+) {
+  if (!selectedTopicId || !topics) return items;
+  return topics.find((topic) => topic.topicId === selectedTopicId)?.items ?? [];
+}
+
+function filterTopicItems(items: ScholarContentItemDto[], query: string, showOriginal: boolean) {
+  if (!query) return items;
+  return items.filter((item) => {
+    const title = pickContentField(item.title, item.original?.title, showOriginal).toLowerCase();
+    return title.includes(query);
+  });
+}
+
 function handleBack() {
   window.history.back();
 }
@@ -256,12 +281,7 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { data: contentData } = useScholarContent(slug);
   const { data: topicsData } = useScholarTopics(slug);
 
-  const topicChips: FilterChip[] = useMemo(() => {
-    if (!topicsData?.topics) return [];
-    return topicsData.topics
-      .map((t) => ({ id: t.topicId, label: t.topicName }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-  }, [topicsData]);
+  const topicChips: FilterChip[] = useMemo(() => buildTopicChips(topicsData?.topics), [topicsData]);
 
   const handleChipChange = (topicId: string) => {
     if (topicId === "all") {
@@ -289,18 +309,9 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   }
   if (!scholar) return null;
 
-  let rawItems = contentData?.items ?? [];
-  if (selectedTopicId && topicsData?.topics) {
-    const topic = topicsData.topics.find((t) => t.topicId === selectedTopicId);
-    rawItems = topic?.items ?? [];
-  }
-
+  const rawItems = selectTopicItems(contentData?.items ?? [], topicsData?.topics, selectedTopicId);
   const query = searchQuery.trim().toLowerCase();
-  const filteredItems = rawItems.filter((item) => {
-    if (!query) return true;
-    const title = pickContentField(item.title, item.original?.title, showOriginal).toLowerCase();
-    return title.includes(query);
-  });
+  const filteredItems = filterTopicItems(rawItems, query, showOriginal);
 
   return (
     <ScholarLoadedView
