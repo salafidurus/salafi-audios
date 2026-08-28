@@ -9,8 +9,8 @@ export type UiDownloadStatus = "idle" | "pending" | "downloading" | "paused" | "
 export function useDownload(listingSlug: string, audioUrl?: string) {
   const row = useDownloadsStore((s) => s.downloads[listingSlug]);
 
-  const status: UiDownloadStatus = row?.status ?? "idle";
-  const progress = row && row.bytesTotal > 0 ? (row.bytesDownloaded / row.bytesTotal) * 100 : 0;
+  const status = getDownloadStatus(row);
+  const progress = getDownloadProgress(row);
   const localUri = row?.localUri ?? undefined;
   const isDownloaded = status === "complete";
   const isDownloading = status === "downloading" || status === "pending";
@@ -36,4 +36,16 @@ export function useDownload(listingSlug: string, audioUrl?: string) {
     }),
     [status, progress, localUri, isDownloaded, isDownloading, startDownload, removeDownload],
   );
+}
+
+function getDownloadStatus(
+  row: ReturnType<typeof useDownloadsStore.getState>["downloads"][string] | undefined,
+): UiDownloadStatus {
+  return row?.status ?? "idle";
+}
+
+function getDownloadProgress(
+  row: ReturnType<typeof useDownloadsStore.getState>["downloads"][string] | undefined,
+): number {
+  return row && row.bytesTotal > 0 ? (row.bytesDownloaded / row.bytesTotal) * 100 : 0;
 }
