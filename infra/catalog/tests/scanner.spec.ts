@@ -773,6 +773,7 @@ describe("runCatalogFix (reality -> config)", () => {
     expect(result.report.status).toBe("planned");
     expect(result.report.lockfile).toBe("requires-install");
     expect(result.report.mutations.some((mutation) => mutation.after === "catalog:")).toBe(true);
+    expect(result.report.mutations.every((mutation) => mutation.rule)).toBe(true);
     expect(fs.readFileSync(path.join(TEMP_DIR, "package.json"), "utf-8")).toBe(beforeRoot);
   });
 

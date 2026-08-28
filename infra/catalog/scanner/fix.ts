@@ -433,6 +433,15 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
     const packageState = allWorkspacePkgs.find((pkg) => pkg.filePath === update.filePath);
     const before =
       (packageState?.content as any)?.[update.depType]?.[update.depName] ?? "<missing>";
+    const policy = resolveCatalogPolicy(
+      update.depName,
+      packageState?.relativePath ?? "",
+      update.depType,
+      config,
+    );
+    const catalogGroup = update.newRef.startsWith("catalog:")
+      ? update.newRef.slice("catalog:".length)
+      : "";
     return {
       filePath: update.filePath,
       workspace: update.pkgName,
@@ -440,7 +449,16 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
       section: update.depType,
       before,
       after: update.newRef,
-      reason: "catalog alignment authorized by the repair policy",
+      rule:
+        policy.status === "matched"
+          ? policy.rule?.name
+          : catalogGroup
+            ? `catalog:${catalogGroup}`
+            : "default-catalog",
+      reason:
+        policy.status === "matched"
+          ? policy.reason
+          : "catalog alignment authorized by the repair policy",
     };
   });
 
@@ -453,6 +471,7 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
         section: "dependencies",
         before: originalDefaultCatalog[dependency] ?? "<missing>",
         after,
+        rule: "default-catalog",
         reason: "default Bun catalog update",
       });
     }
@@ -468,6 +487,7 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
           section: "dependencies",
           before: originalNamedCatalogs[group]?.[dependency] ?? "<missing>",
           after,
+          rule: `catalog:${group}`,
           reason: `named Bun catalog '${group}' update`,
         });
       }

@@ -58,6 +58,11 @@ closed.
 reasons, and whether `bun install` is required. The tool does not claim
 lockfile validation until installation has occurred.
 
+Dependabot invokes `bun run catalog fix --json` and publishes the resulting
+report before any write-back. The report is rejected without mutation when the
+repair is ambiguous or invalid; the workflow also validates the final diff
+against the dependency-file allowlist before pushing.
+
 ### Policy matrix
 
 `catalog.config.json` may contain legacy catalog groups and policy rules:
