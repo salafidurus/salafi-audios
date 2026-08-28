@@ -433,6 +433,27 @@ const sidebarMenuButtonVariants = cva(
   },
 );
 
+function withSidebarTooltip(
+  button: React.ReactNode,
+  tooltip: string | React.ComponentProps<typeof TooltipContent> | undefined,
+  state: string,
+  isMobile: boolean,
+) {
+  if (!tooltip) return button;
+  const tooltipProps = isTooltipProps(tooltip) ? tooltip : { children: String(tooltip) };
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{button}</TooltipTrigger>
+      <TooltipContent
+        side="right"
+        align="center"
+        hidden={state !== "collapsed" || isMobile}
+        {...tooltipProps}
+      />
+    </Tooltip>
+  );
+}
+
 function SidebarMenuButton({
   asChild = false,
   isActive = false,
@@ -460,23 +481,7 @@ function SidebarMenuButton({
     />
   );
 
-  if (!tooltip) {
-    return button;
-  }
-
-  const tooltipProps = isTooltipProps(tooltip) ? tooltip : { children: String(tooltip) };
-
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>{button}</TooltipTrigger>
-      <TooltipContent
-        side="right"
-        align="center"
-        hidden={state !== "collapsed" || isMobile}
-        {...tooltipProps}
-      />
-    </Tooltip>
-  );
+  return withSidebarTooltip(button, tooltip, state, isMobile);
 }
 
 export {
