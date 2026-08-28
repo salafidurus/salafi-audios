@@ -13,12 +13,14 @@ import {
   type ScholarTopicsDto,
 } from "@sd/core-contracts";
 
+/** Query hooks and presentation grouping for public scholar catalog content. */
 type SplitScholarContentResult = {
   featured: ScholarContentItemDto | undefined;
   recommended: ScholarContentItemDto[];
   browse: ScholarContentItemDto[];
 };
 
+/** Reads the public scholar list, optionally using a supplied query client. */
 export function useScholarsList(
   options?: Omit<
     UseQueryOptions<{ scholars: ScholarListItemDto[] }, Error, { scholars: ScholarListItemDto[] }>,
@@ -38,6 +40,7 @@ export function useScholarsList(
   );
 }
 
+/** Reads one scholar by its public, locale-independent slug. */
 export function useScholarDetail(slug: string) {
   return useApiQuery(
     queryKeys.scholars.detail(slug),
@@ -50,6 +53,7 @@ export function useScholarDetail(slug: string) {
   );
 }
 
+/** Reads the API-composed Catalog content associated with a scholar slug. */
 export function useScholarContent(
   slug: string,
   options?: Omit<
@@ -68,6 +72,7 @@ export function useScholarContent(
   );
 }
 
+/** Splits scholar content into featured, recommended, and browse sections. */
 export function splitScholarContent(
   items: ScholarContentItemDto[],
   recommendedCount = 4,
@@ -79,6 +84,7 @@ export function splitScholarContent(
   };
 }
 
+/** Reads the public topics associated with a scholar slug. */
 export function useScholarTopics(slug: string) {
   return useApiQuery(
     queryKeys.scholars.topics(slug),

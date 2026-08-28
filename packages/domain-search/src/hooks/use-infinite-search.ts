@@ -3,17 +3,23 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { buildSearchResultRows } from "../utils/build-search-result-rows";
 
+/** Adapts the non-paginated catalog search endpoint to an infinite-query seam. */
+/** Discovery filters and presentation options for catalog search. */
 export interface UseInfiniteSearchOptions {
   query?: string;
+  /** Uses the scholar's public, locale-independent identity as a filter. */
   scholarSlug?: string;
+  /** Selects the requested translation language for returned content. */
   language?: string;
   showOriginal?: boolean;
   enabled?: boolean;
+  /** Narrows results by public topic identities. */
   topicSlugs?: string[];
   format?: string;
   limit?: number;
 }
 
+/** Searches published Listings and exposes the result as one query page. */
 export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
   const initialPageParam: string | undefined = undefined;
 

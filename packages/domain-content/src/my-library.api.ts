@@ -1,3 +1,4 @@
+/** Query hooks for the authenticated user's saved, completed, and in-progress Library. */
 import {
   endpoints,
   httpClient,
@@ -6,6 +7,8 @@ import {
   type MyLibraryPageDto,
 } from "@sd/core-contracts";
 
+/** Provides API queries for the three distinct My Library relationship states. */
+/** Reads saved Listing relationships, optionally starting after a cursor. */
 export function useMyLibrarySaved(cursor?: string, enabled = true) {
   return useApiQuery(
     queryKeys.myLibrary.saved.all(),
@@ -19,6 +22,7 @@ export function useMyLibrarySaved(cursor?: string, enabled = true) {
   );
 }
 
+/** Reads completed Listing relationships, optionally starting after a cursor. */
 export function useMyLibraryCompleted(cursor?: string, enabled = true) {
   return useApiQuery(
     queryKeys.myLibrary.completed.all(),
@@ -32,6 +36,7 @@ export function useMyLibraryCompleted(cursor?: string, enabled = true) {
   );
 }
 
+/** Reads unfinished Listing relationships, optionally starting after a cursor. */
 export function useMyLibraryProgress(cursor?: string, enabled = true) {
   return useApiQuery(
     queryKeys.myLibrary.progress.all(),

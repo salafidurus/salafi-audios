@@ -5,6 +5,8 @@ import { useMyLibraryProgress } from "./my-library.api";
 import { localProgressItems } from "./my-library.local";
 import { mergeLiveProgress } from "./utils/merge-live-progress";
 
+/** Selects in-progress My Library rows and overlays live playback state. */
+/** Returns authenticated remote progress or anonymous local progress rows. */
 export function useMyLibraryProgressScreen(isAuthenticated = false) {
   const { data, isFetching, error } = useMyLibraryProgress(undefined, isAuthenticated);
   const progressMap = useProgressStore((s) => s.progressMap);

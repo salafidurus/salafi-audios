@@ -7,10 +7,13 @@ import {
 } from "@sd/core-contracts";
 import { HttpError } from "@sd/core-contracts/http";
 
+/** Exposes the authenticated user's unfinished listening projection for Home. */
+/** Controls whether the Continue Listening projection is requested. */
 export type UseContinueListeningOptions = {
   enabled?: boolean;
 };
 
+/** Reads Continue Listening while treating an unauthenticated response as empty. */
 export function useContinueListening(options?: UseContinueListeningOptions) {
   const query = useApiQuery<RecentProgressDto | null>(
     queryKeys.myLibrary.recentProgress(),

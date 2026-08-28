@@ -1,5 +1,6 @@
 import { createEntityStore, type SyncableEntity } from "@sd/core-sync";
 
+/** Maintains optimistic saved Listing state and its tombstone-aware selectors. */
 /**
  * `id` is the stable listingId (uuid) — this is what the rest of the app
  * keys "is this saved" lookups on. `slug` is carried alongside for the
@@ -9,11 +10,14 @@ import { createEntityStore, type SyncableEntity } from "@sd/core-sync";
  */
 export type SavedEntry = SyncableEntity & {
   savedAt?: string;
+  /** Public Listing slug retained for endpoint resolution during sync. */
   slug?: string;
 };
 
+/** Shared local entity store for saved Listing relationships. */
 export const useSavedStore = createEntityStore<SavedEntry>();
 
+/** Returns whether a Listing has an active, non-tombstoned saved entry. */
 export function isSaved(listingId: string): boolean {
   const entry = useSavedStore.getState().actions.get(listingId);
   return !!entry && !entry.deletedAt;

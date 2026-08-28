@@ -14,6 +14,7 @@ import {
   type SavedEntry,
 } from "./saved.store";
 
+/** Synchronizes optimistic saved Listing intent with the authoritative API. */
 function createInMemoryStorageAdapter(): StorageAdapter {
   const backing = new Map<string, string>();
   return {

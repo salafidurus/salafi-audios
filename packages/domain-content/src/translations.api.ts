@@ -10,6 +10,7 @@ import {
 } from "@sd/core-contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+/** Reads and mutates Catalog translations while preserving content identity. */
 function translationQueryKey(target: TranslationTarget) {
   return ["translations", target.entity, target] as const;
 }
@@ -56,6 +57,7 @@ function resolveEntityTranslationEndpoint(
   return endpointsForEntity.unpublish(id, locale!);
 }
 
+/** Reads translations for a scholar, Listing, or topic target. */
 export function useContentTranslations(target: TranslationTarget) {
   return useApiQuery(
     translationQueryKey(target),
@@ -68,6 +70,7 @@ export function useContentTranslations(target: TranslationTarget) {
   );
 }
 
+/** Saves a translation draft through the backend translation authority. */
 export function useSaveTranslation(target: TranslationTarget) {
   const qc = useQueryClient();
   return useMutation({
@@ -81,6 +84,7 @@ export function useSaveTranslation(target: TranslationTarget) {
   });
 }
 
+/** Requests publication of one locale's translation for a supported target. */
 export function usePublishTranslation(target: TranslationTarget) {
   const qc = useQueryClient();
   return useMutation({
@@ -93,6 +97,7 @@ export function usePublishTranslation(target: TranslationTarget) {
   });
 }
 
+/** Requests removal of one locale's published translation. */
 export function useUnpublishTranslation(target: TranslationTarget) {
   const qc = useQueryClient();
   return useMutation({

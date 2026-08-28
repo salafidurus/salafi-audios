@@ -1,6 +1,7 @@
 import type { MyLibraryItemDto } from "@sd/core-contracts";
 import type { ListingProgress, Track } from "@sd/domain-audio";
 
+/** Overlays live playback progress onto server-backed My Library rows. */
 /**
  * Overlays live, per-tick playback progress onto the server-fetched "In
  * Progress" list so a position update shows up immediately instead of
