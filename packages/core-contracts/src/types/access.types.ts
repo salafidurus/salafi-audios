@@ -16,19 +16,17 @@ export const AccessCapabilityEnum = z.enum(["write", "translate", "publish", "de
 export type AccessCapability = z.infer<typeof AccessCapabilityEnum>;
 
 function canGrantCapability(target: AccessTarget, capability: AccessCapability): boolean {
-  switch (target) {
-    case "scholar":
-    case "listing":
-    case "topic":
-      return canEditCatalog(capability);
-    case "media":
-      return canEditMedia(capability);
-    case "translation":
-      return canEditTranslation(capability);
-    case "user":
-      return capability === "manage";
-  }
+  return capabilityValidators[target](capability);
 }
+
+const capabilityValidators = {
+  scholar: canEditCatalog,
+  listing: canEditCatalog,
+  topic: canEditCatalog,
+  media: canEditMedia,
+  translation: canEditTranslation,
+  user: (capability) => capability === "manage",
+} satisfies Record<AccessTarget, (capability: AccessCapability) => boolean>;
 
 function canEditCatalog(capability: AccessCapability): boolean {
   return capability === "write" || capability === "publish" || capability === "delete";
@@ -49,40 +47,52 @@ export const AccessGrantRequestSchema = z
     scholarSlugs: z.array(z.string()).default([]),
     locales: z.array(LocaleSchema).default([]),
   })
-  .superRefine((grant, ctx) => {
-    const scholarScopedTargets = ["scholar", "listing", "media", "translation"];
-    if (!scholarScopedTargets.includes(grant.target) && grant.scholarSlugs.length) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["scholarSlugs"],
-        message: "This target cannot be scholar-scoped",
-      });
-    }
-
-    if (!canGrantCapability(grant.target, grant.capability)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["capability"],
-        message: "This capability cannot be granted for this target",
-      });
-    }
-
-    if (grant.target === "translation" && grant.locales.length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["locales"],
-        message: "Translation grants require at least one locale",
-      });
-    }
-    if (grant.target !== "translation" && grant.locales.length) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["locales"],
-        message: "Locale scope is only valid for translation grants",
-      });
-    }
-  });
+  .superRefine(validateAccessGrant);
 export type AccessGrantRequest = z.infer<typeof AccessGrantRequestSchema>;
+
+function validateAccessGrant(grant: AccessGrantRequest, ctx: z.RefinementCtx): void {
+  validateScholarScope(grant, ctx);
+  validateCapability(grant, ctx);
+  validateLocaleScope(grant, ctx);
+}
+
+function validateScholarScope(grant: AccessGrantRequest, ctx: z.RefinementCtx): void {
+  const scholarScopedTargets = ["scholar", "listing", "media", "translation"];
+  if (!scholarScopedTargets.includes(grant.target) && grant.scholarSlugs.length) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["scholarSlugs"],
+      message: "This target cannot be scholar-scoped",
+    });
+  }
+}
+
+function validateCapability(grant: AccessGrantRequest, ctx: z.RefinementCtx): void {
+  if (!canGrantCapability(grant.target, grant.capability)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["capability"],
+      message: "This capability cannot be granted for this target",
+    });
+  }
+}
+
+function validateLocaleScope(grant: AccessGrantRequest, ctx: z.RefinementCtx): void {
+  if (grant.target === "translation" && grant.locales.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["locales"],
+      message: "Translation grants require at least one locale",
+    });
+  }
+  if (grant.target !== "translation" && grant.locales.length) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["locales"],
+      message: "Locale scope is only valid for translation grants",
+    });
+  }
+}
 
 export const UserAccessSnapshotSchema = z.object({
   userId: z.string(),

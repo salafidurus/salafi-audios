@@ -47,15 +47,28 @@ function rightLabelFor(
   completedAt: string,
   t: ReturnType<typeof useTranslation>["t"],
 ) {
+  const statusLabel = getStatusLabel(variant, progress, item, savedAt, completedAt, t);
+  if (statusLabel) return statusLabel;
+  if (item.durationSeconds)
+    return t("lecture.minutes", "{{count}} min", { count: Math.round(item.durationSeconds / 60) });
+  return "";
+}
+
+function getStatusLabel(
+  variant: MyLibraryListRowProps["variant"],
+  progress: number | null,
+  item: MyLibraryItemDto,
+  savedAt: string,
+  completedAt: string,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
   if (variant === "progress" && progress !== null)
     return t("myLibrary.percentListened", "{{percent}}% listened", { percent: progress });
   if (variant === "saved" && item.savedAt)
     return t("myLibrary.savedOn", "Saved {{date}}", { date: savedAt });
   if (variant === "completed" && item.completedAt)
     return t("myLibrary.completedOn", "Completed {{date}}", { date: completedAt });
-  if (item.durationSeconds)
-    return t("lecture.minutes", "{{count}} min", { count: Math.round(item.durationSeconds / 60) });
-  return "";
+  return null;
 }
 
 function seriesProgressFor(item: MyLibraryItemDto, t: ReturnType<typeof useTranslation>["t"]) {
