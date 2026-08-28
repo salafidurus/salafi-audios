@@ -5,6 +5,8 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
 
+/** Provides the native features settings components SettingsRow SettingsRow module responsibility. */
+/** Describes the SettingsRowProps native interface contract and behavior. */
 export interface SettingsRowProps {
   label?: string;
   sublabel?: string;
@@ -55,6 +57,7 @@ function SettingsRowContent({
   );
 }
 
+/** Describes the SettingsRow native function contract and behavior. */
 export function SettingsRow({
   label,
   sublabel,

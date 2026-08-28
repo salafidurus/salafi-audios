@@ -7,7 +7,9 @@ import {
   type DownloadRow,
 } from "@/features/downloads/registry/downloads.registry";
 
+/** Provides the native features downloads store downloads.store module responsibility. */
 type UpsertInput = Partial<Omit<DownloadRow, "listingSlug" | "createdAt" | "updatedAt">> & {
+  /** Describes the listingSlug native field contract and behavior. */
   listingSlug: string;
 };
 

@@ -12,9 +12,11 @@ import { TextInput } from "@/shared/components/TextInput/TextInput";
 
 import { createCollection, updateCollection } from "../../api/admin-scholars.api";
 
+/** Provides the native features admin components CollectionSheet CollectionSheet module responsibility. */
 type CollectionSheetProps = {
   isOpen: boolean;
   scholarId: string;
+  /** Describes the scholarSlug native contract and behavior. */
   scholarSlug: string;
   collection?: AdminListingDetailDto;
   onClose: () => void;
@@ -24,8 +26,10 @@ type CollectionSheetProps = {
 type FormState = {
   title: string;
   description: string;
+  /** Describes the language native contract and behavior. */
   language: string;
   isSaving: boolean;
+  /** Describes the error native contract and behavior. */
   error: string | null;
 };
 
@@ -92,6 +96,7 @@ function CollectionSheetForm({
   onClose,
   dispatch,
 }: {
+  /** Describes the state native contract and behavior. */
   state: FormState;
   collection: AdminListingDetailDto | undefined;
   canSave: boolean;
@@ -152,6 +157,7 @@ function CollectionSheetForm({
   );
 }
 
+/** Describes the CollectionSheet native contract and behavior. */
 export function CollectionSheet({
   isOpen,
   scholarId,

@@ -4,6 +4,8 @@ import { StyleSheet } from "react-native-unistyles";
 import { Button } from "../Button/Button";
 import { ScreenView } from "../ScreenView/ScreenView";
 
+/** Provides the native shared components AuthRequiredState AuthRequiredState module responsibility. */
+/** Describes the AuthRequiredStateProps native type contract and behavior. */
 export type AuthRequiredStateProps = {
   title: string;
   description: string;
@@ -11,6 +13,7 @@ export type AuthRequiredStateProps = {
   onPress: () => void;
 };
 
+/** Describes the AuthRequiredState native function contract and behavior. */
 export function AuthRequiredState({
   title,
   description,

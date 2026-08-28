@@ -3,11 +3,13 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { ScreenView } from "../ScreenView/ScreenView";
 
+/** Provides the native shared components ScreenInProgress ScreenInProgress module responsibility. */
 type ScreenInProgressProps = {
   title?: string;
   description?: string;
 };
 
+/** Describes the ScreenInProgress native function contract and behavior. */
 export function ScreenInProgress({
   title = "Coming Soon",
   description = "This feature is under development",

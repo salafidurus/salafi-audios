@@ -22,6 +22,8 @@ import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
+/** Describes the ExplorePodcastRowProps native contract and behavior. */
+/** Describes the ExplorePodcastRowProps native type contract and behavior. */
 export type ExplorePodcastRowProps = {
   item: FeedContentItemDto;
   onPress?: () => void;
@@ -143,6 +145,7 @@ function getPublishedDateText(publishedAt?: string | null) {
   return publishedAt ? new Date(publishedAt).toLocaleDateString() : "";
 }
 
+/** Describes the ExplorePodcastRow native contract and behavior. */
 export function ExplorePodcastRow({
   item,
   onPress,

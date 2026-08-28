@@ -1,5 +1,7 @@
 import type { MenuAction } from "@expo/ui/community/menu";
 
+/** Provides the native shared components List ListItemActions module responsibility. */
+/** Describes the ListItemActionsProps native type contract and behavior. */
 export type ListItemActionsProps = {
   /** Actions shown in the native menu opened by long-pressing the row. */
   actions: MenuAction[];

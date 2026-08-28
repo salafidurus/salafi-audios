@@ -17,12 +17,18 @@ import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 import { getRtlAwareTextAlign } from "../utils/rtl-text-align";
 
+/** Provides the native features settings screens settings-profile.screen module responsibility. */
+/** Describes the SettingsProfileScreenProps native type contract and behavior. */
 export type SettingsProfileScreenProps = {
   onSignOut?: () => void;
   onSignIn?: () => void;
 };
 
-function getVisibleRoles(profile: { roles?: string[] }): string[] {
+/** Describes the roles native field contract and behavior. */
+function getVisibleRoles(profile: {
+  /** Describes the roles native field contract and behavior. */
+  roles?: string[];
+}): string[] {
   return profile.roles?.filter((role) => role !== "listener") ?? [];
 }
 
@@ -82,6 +88,7 @@ function ProfileRoles({
   theme,
   t,
 }: {
+  /** Describes the roles native field contract and behavior. */
   roles: string[];
   theme: ReturnType<typeof useUnistyles>["theme"];
   t: ProfileEditControlsProps["t"];
@@ -112,6 +119,7 @@ function ProfileUpdateStatus({
   t,
 }: {
   isSuccess: boolean;
+  /** Describes the isError native field contract and behavior. */
   isError: boolean;
   theme: ReturnType<typeof useUnistyles>["theme"];
   t: ProfileEditControlsProps["t"];
@@ -347,6 +355,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   );
 }
 
+/** Describes the SettingsProfileScreen native function contract and behavior. */
 export function SettingsProfileScreen({ onSignOut, onSignIn }: SettingsProfileScreenProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation();

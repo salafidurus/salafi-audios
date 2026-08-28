@@ -15,6 +15,8 @@ import {
   isSection,
 } from "@/features/navigation/utils/tab-route-config";
 
+/** Describes the SubrouteTabsBar native contract and behavior. */
+/** Describes the SubrouteTabsBar native function contract and behavior. */
 export function SubrouteTabsBar() {
   const pathname = usePathname();
   const router = useRouter();

@@ -8,6 +8,7 @@ import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 
+/** Provides the native features admin screens admin-dashboard admin-dashboard.screen module responsibility. */
 type AdminDashboardScreenProps = {
   onNavigateToListings?: () => void;
   onNavigateToScholars?: () => void;
@@ -24,6 +25,7 @@ type AdminCard = {
   subject: AppSubjectType;
 };
 
+/** Describes the AdminDashboardScreen native contract and behavior. */
 export function AdminDashboardScreen({
   onNavigateToListings,
   onNavigateToScholars,

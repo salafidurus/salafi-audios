@@ -11,7 +11,10 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
+/** Describes the ScholarDetailScreenProps native contract and behavior. */
+/** Describes the ScholarDetailScreenProps native type contract and behavior. */
 export type ScholarDetailScreenProps = {
+  /** Describes the slug native contract and behavior. */
   slug: string;
 };
 
@@ -84,6 +87,7 @@ function TopicSections({
   );
 }
 
+/** Describes the ScholarDetailScreen native contract and behavior. */
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { data: scholar, isFetching: isScholarFetching } = useScholarDetail(slug);
   const { data: content, isFetching: isContentFetching } = useScholarContent(slug);

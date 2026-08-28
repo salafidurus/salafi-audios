@@ -1,3 +1,5 @@
+/** Provides the native core styles theme spacing module responsibility. */
+/** Describes the const spacingNative = { native declaration contract and behavior. */
 export const spacingNative = {
   scale: {
     xs: 4,
@@ -29,4 +31,5 @@ export const spacingNative = {
   },
 } as const;
 
+/** Describes the SpacingNative native type contract and behavior. */
 export type SpacingNative = typeof spacingNative;

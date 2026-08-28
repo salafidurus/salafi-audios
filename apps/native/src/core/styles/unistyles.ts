@@ -2,6 +2,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { lightNativeTheme, darkNativeTheme } from "./theme";
 
+/** Provides the native core styles unistyles module responsibility. */
 const breakpoints = {
   xs: 0,
   sm: 576,
@@ -16,7 +17,9 @@ type NativeBreakpoints = typeof breakpoints;
 
 declare module "react-native-unistyles" {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  /** Describes the UnistylesBreakpoints native interface contract and behavior. */
   export interface UnistylesBreakpoints extends NativeBreakpoints {}
+  /** Describes the UnistylesThemes native interface contract and behavior. */
   export interface UnistylesThemes {
     system: typeof lightNativeTheme;
     light: typeof lightNativeTheme;

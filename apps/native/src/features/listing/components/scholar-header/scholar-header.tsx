@@ -7,10 +7,13 @@ import { StyleSheet } from "react-native-unistyles";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
+/** Describes the ScholarHeaderProps native contract and behavior. */
+/** Describes the ScholarHeaderProps native type contract and behavior. */
 export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {
     lectureCount: number;
     seriesCount: number;
+    /** Describes the totalDurationSeconds native contract and behavior. */
     totalDurationSeconds: number;
   };
 };
@@ -60,6 +63,7 @@ function renderSocialLinks(scholar: ScholarHeaderProps["scholar"]) {
   );
 }
 
+/** Describes the ScholarHeader native contract and behavior. */
 export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   const formatScholarName = useFormatScholarName();
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);

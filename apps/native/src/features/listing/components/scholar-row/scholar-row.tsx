@@ -9,12 +9,15 @@ import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
+/** Provides the native features listing components scholar-row scholar-row module responsibility. */
+/** Describes the ScholarRowProps native type contract and behavior. */
 export type ScholarRowProps = {
   scholar: ScholarListItemDto;
   onPress?: (slug: string) => void;
   hideBorder?: boolean;
 };
 
+/** Describes the ScholarRow native function contract and behavior. */
 export function ScholarRow({ scholar, onPress, hideBorder }: ScholarRowProps) {
   const formatScholarName = useFormatScholarName();
 

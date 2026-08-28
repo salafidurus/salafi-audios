@@ -12,6 +12,7 @@ import { DownloadButton } from "@/features/downloads/components/download-button/
 import { DownloadProgress } from "@/features/downloads/components/download-progress/download-progress";
 import { AppText } from "@/shared/components/AppText/AppText";
 
+/** Provides the native features listing components lesson-row lesson-row module responsibility. */
 function formatDuration(seconds?: number): string {
   if (!seconds) return "";
   const h = Math.floor(seconds / 3600);
@@ -56,6 +57,7 @@ function LessonRowContent({
   isCompleted,
 }: {
   item: ListingContentItemDto;
+  /** Describes the duration native contract and behavior. */
   duration: string;
   progressPercent: number;
   isCompleted: boolean;
@@ -94,6 +96,7 @@ function LessonRowPlayButton({
   );
 }
 
+/** Describes the LessonRowProps native contract and behavior. */
 export type LessonRowProps = {
   item: ListingContentItemDto;
   queue: Track[];
@@ -103,6 +106,7 @@ export type LessonRowProps = {
   onLayout?: (id: string, y: number) => void;
 };
 
+/** Describes the LessonRow native contract and behavior. */
 export function LessonRow({ item, queue, highlighted = false, onLayout }: LessonRowProps) {
   const { theme } = useUnistyles();
   const { isPlaying, currentTrack } = useAudio();

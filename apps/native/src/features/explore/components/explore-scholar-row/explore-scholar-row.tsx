@@ -7,11 +7,14 @@ import { StyleSheet } from "react-native-unistyles";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
+/** Describes the ExploreScholarRowProps native contract and behavior. */
+/** Describes the ExploreScholarRowProps native type contract and behavior. */
 export type ExploreScholarRowProps = {
   scholars: ScholarChipDto[];
   onScholarPress?: (slug: string) => void;
 };
 
+/** Describes the ExploreScholarRow native contract and behavior. */
 export function ExploreScholarRow({ scholars, onScholarPress }: ExploreScholarRowProps) {
   function renderScholar({ item: scholar }: ListRenderItemInfo<ScholarChipDto>) {
     return (

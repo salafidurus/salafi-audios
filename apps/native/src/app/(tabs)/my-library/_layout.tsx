@@ -4,6 +4,8 @@ import { useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { getTabStackScreenOptions } from "@/features/navigation/utils/stack-header-options";
 
+/** Provides the native app (tabs) my-library _layout module responsibility. */
+/** Describes the MyLibraryLayout native function contract and behavior. */
 export default function MyLibraryLayout() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();

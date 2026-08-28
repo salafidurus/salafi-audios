@@ -13,6 +13,8 @@ import { audioService } from "../audio-service";
 import { PlaybackControls } from "./playback-controls";
 import { ProgressBar } from "./progress-bar";
 
+/** Provides the native features audio components mini-player module responsibility. */
+/** Describes the MiniPlayerProps native type contract and behavior. */
 export type MiniPlayerProps = {
   embedded?: boolean;
 };
@@ -56,6 +58,7 @@ function PlayPauseIcon({
   return <View style={{ marginStart: 2 }}>{playIcon}</View>;
 }
 
+/** Describes the MiniPlayer native function contract and behavior. */
 export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
   const { currentTrack, isPlaying, isLoading, progressPercent, positionSeconds } = useAudio();
   const { theme } = useUnistyles();

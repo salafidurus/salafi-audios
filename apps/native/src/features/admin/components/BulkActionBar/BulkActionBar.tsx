@@ -1,6 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+/** Provides the native features admin components BulkActionBar BulkActionBar module responsibility. */
 type BulkActionBarProps = {
   selectedCount: number;
   onPublish: () => void;
@@ -10,6 +11,7 @@ type BulkActionBarProps = {
   isLoading?: boolean;
 };
 
+/** Describes the BulkActionBar native function contract and behavior. */
 export function BulkActionBar({
   selectedCount,
   onPublish,

@@ -4,6 +4,8 @@ import { useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { getTabStackScreenOptions } from "@/features/navigation/utils/stack-header-options";
 
+/** Provides the native app (tabs) settings _layout module responsibility. */
+/** Describes the SettingsLayout native function contract and behavior. */
 export default function SettingsLayout() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();

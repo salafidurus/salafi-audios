@@ -14,6 +14,7 @@ import { getGoogleWebClientId } from "@/core/config/runtime-env";
 // types `signIn()` as `Promise<User>` instead of the real native
 // `SignInResponse` union. Metro still bundles the real native implementation;
 // this local type just corrects what TS sees it returning.
+/** Provides the native features auth hooks use-native-google-sign-in module responsibility. */
 type NativeGoogleSignInResponse =
   | { type: "success"; data: { idToken: string | null } }
   | { type: "cancelled"; data: null };
@@ -40,6 +41,7 @@ function parseNativeGoogleSignInResponse(
   return NativeGoogleSignInResponseSchema.parse(candidate);
 }
 
+/** Describes the useNativeGoogleSignIn native function contract and behavior. */
 export function useNativeGoogleSignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

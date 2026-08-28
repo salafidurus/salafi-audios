@@ -3,8 +3,11 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
 
+/** Describes the EmptyStateVariant native contract and behavior. */
+/** Describes the EmptyStateVariant native type contract and behavior. */
 export type EmptyStateVariant = "empty" | "loading" | "error";
 
+/** Describes the EmptyStateProps native contract and behavior. */
 export type EmptyStateProps = {
   message: string;
   variant?: EmptyStateVariant;
@@ -12,6 +15,7 @@ export type EmptyStateProps = {
   retryLabel?: string;
 };
 
+/** Describes the EmptyState native contract and behavior. */
 export function EmptyState({
   message,
   variant = "empty",

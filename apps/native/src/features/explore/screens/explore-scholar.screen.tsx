@@ -20,6 +20,8 @@ import {
   ExploreStatusView,
 } from "../components/explore-status/explore-status";
 
+/** Provides the native features explore screens explore-scholar.screen module responsibility. */
+/** Describes the ExploreScholarScreenProps native type contract and behavior. */
 export type ExploreScholarScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
@@ -36,6 +38,7 @@ function ExploreScholarStatus({
   refetch,
 }: {
   headerSearchOptions: StackScreenOptions;
+  /** Describes the isError native field contract and behavior. */
   isError: boolean;
   isFetching: boolean;
   hasItems: boolean;
@@ -83,6 +86,7 @@ function filterScholars(scholars: ScholarListItemDto[], searchQuery: string) {
   );
 }
 
+/** Describes the ExploreScholarScreen native function contract and behavior. */
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();

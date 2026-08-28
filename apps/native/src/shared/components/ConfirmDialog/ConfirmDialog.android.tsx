@@ -2,6 +2,8 @@ import { Host } from "@expo/ui";
 import { AlertDialog, TextButton, Text } from "@expo/ui/jetpack-compose";
 import { useUnistyles } from "react-native-unistyles";
 
+/** Provides the native shared components ConfirmDialog ConfirmDialog.android module responsibility. */
+/** Describes the ConfirmDialogProps native type contract and behavior. */
 export type ConfirmDialogProps = {
   visible: boolean;
   onDismiss: () => void;
@@ -13,6 +15,7 @@ export type ConfirmDialogProps = {
   destructive?: boolean;
 };
 
+/** Describes the ConfirmDialog native function contract and behavior. */
 export function ConfirmDialog({
   visible,
   onDismiss,

@@ -1,7 +1,10 @@
 import type { AppColors, AccentRecipesShared } from "@sd/design-tokens";
 
+/** Provides the native core styles theme recipes module responsibility. */
+/** Describes the AccentRecipesNative native type contract and behavior. */
 export type AccentRecipesNative = AccentRecipesShared;
 
+/** Describes the const createAccentRecipesNative = ( native declaration contract and behavior. */
 export const createAccentRecipesNative = (
   colors: AppColors,
   focusRingColor: string,

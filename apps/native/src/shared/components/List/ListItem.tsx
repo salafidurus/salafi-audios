@@ -7,6 +7,8 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { ListItemActions, type ListItemActionsProps } from "./ListItemActions";
 
+/** Describes the ListItemProps native contract and behavior. */
+/** Describes the ListItemProps native type contract and behavior. */
 export type ListItemProps = {
   children: ReactNode;
   onPress?: () => void;
@@ -20,6 +22,7 @@ function isActionsElement(child: ReactNode): child is ReactElement<ListItemActio
   return isValidElement(child) && child.type === ListItemActions;
 }
 
+/** Describes the ListItem native contract and behavior. */
 export function ListItem({
   children,
   onPress,

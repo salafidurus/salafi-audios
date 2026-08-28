@@ -10,6 +10,8 @@ import { AppText } from "@/shared/components/AppText/AppText";
 
 import { LessonRow } from "../lesson-row/lesson-row";
 
+/** Describes the ListingContentViewProps native contract and behavior. */
+/** Describes the ListingContentViewProps native type contract and behavior. */
 export type ListingContentViewProps = {
   contents: ListingContentsDto;
   listingRef: QueueListingRef;

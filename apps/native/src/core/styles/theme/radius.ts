@@ -1,3 +1,5 @@
+/** Provides the native core styles theme radius module responsibility. */
+/** Describes the const radiusNative = { native declaration contract and behavior. */
 export const radiusNative = {
   scale: {
     xs: 4,
@@ -16,4 +18,5 @@ export const radiusNative = {
   },
 } as const;
 
+/** Describes the RadiusNative native type contract and behavior. */
 export type RadiusNative = typeof radiusNative;

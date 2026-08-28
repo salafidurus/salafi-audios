@@ -8,6 +8,8 @@ import { StyleSheet } from "react-native-unistyles";
 import { audioService } from "@/features/audio";
 import { AppText } from "@/shared/components/AppText/AppText";
 
+/** Describes the SeriesContextBarProps native contract and behavior. */
+/** Describes the SeriesContextBarProps native type contract and behavior. */
 export type SeriesContextBarProps = {
   seriesContext: SeriesContextDto;
   /** The lesson this bar is shown for — Previous/Next only act when it's the one currently playing. */
@@ -32,6 +34,7 @@ function getNextTrack(
   return isActiveQueue && hasNext ? (queue[currentIndex + 1] ?? null) : null;
 }
 
+/** Describes the SeriesContextBar native contract and behavior. */
 export function SeriesContextBar({ seriesContext, listingSlug }: SeriesContextBarProps) {
   const { queue, currentIndex, currentTrack, hasNext, hasPrevious } = useQueue();
 

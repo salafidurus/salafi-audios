@@ -2,6 +2,8 @@ import { View, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+/** Provides the native shared components ScreenView ScreenView module responsibility. */
+/** Describes the ScreenViewProps native interface contract and behavior. */
 export interface ScreenViewProps {
   children: React.ReactNode;
   style?: ViewStyle;
@@ -10,6 +12,7 @@ export interface ScreenViewProps {
   backgroundVariant?: "canvas" | "primaryWash" | "secondaryWash" | "mixedWash";
 }
 
+/** Describes the ScreenView native function contract and behavior. */
 export function ScreenView({
   children,
   style,

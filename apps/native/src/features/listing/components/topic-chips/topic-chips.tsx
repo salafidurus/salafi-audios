@@ -5,10 +5,13 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
 
+/** Provides the native features listing components topic-chips topic-chips module responsibility. */
+/** Describes the TopicChipsProps native type contract and behavior. */
 export type TopicChipsProps = {
   topics: TopicRefDto[];
 };
 
+/** Describes the TopicChips native function contract and behavior. */
 export function TopicChips({ topics }: TopicChipsProps) {
   if (topics.length === 0) {
     return null;

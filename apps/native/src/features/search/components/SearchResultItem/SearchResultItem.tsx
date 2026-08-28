@@ -5,15 +5,19 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { MarqueeText } from "@/shared/components/MarqueeText";
 
+/** Provides the native features search components SearchResultItem SearchResultItem module responsibility. */
+/** Describes the SearchResultItemProps native type contract and behavior. */
 export type SearchResultItemProps = {
   title: string;
   scholarName: string;
   imageUrl?: string;
   lectureCount: number;
+  /** Describes the durationSeconds native field contract and behavior. */
   durationSeconds?: number;
   onPress?: () => void;
 };
 
+/** Describes the SearchResultItem native function contract and behavior. */
 export function SearchResultItem({
   title,
   scholarName,

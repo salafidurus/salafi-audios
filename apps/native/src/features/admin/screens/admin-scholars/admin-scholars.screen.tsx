@@ -14,10 +14,12 @@ import { MarqueeText } from "@/shared/components/MarqueeText";
 
 import { filterScholars } from "./filter-scholars";
 
+/** Provides the native features admin screens admin-scholars admin-scholars.screen module responsibility. */
 type AdminScholarsScreenProps = {
   onNavigateToScholar: (slug: string) => void;
 };
 
+/** Describes the AdminScholarsScreen native function contract and behavior. */
 export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreenProps) {
   const { theme } = useUnistyles();
   const { data, isLoading } = useApiQuery<ScholarListItemDto[]>(["scholars", "list"], () =>

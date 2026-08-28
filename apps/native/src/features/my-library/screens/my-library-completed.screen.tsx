@@ -10,10 +10,13 @@ import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
+/** Provides the native features my-library screens my-library-completed.screen module responsibility. */
+/** Describes the MyLibraryCompletedScreenProps native type contract and behavior. */
 export type MyLibraryCompletedScreenProps = {
   onNavigateToListing?: (slug: string) => void;
 };
 
+/** Describes the MyLibraryCompletedScreen native function contract and behavior. */
 export function MyLibraryCompletedScreen({ onNavigateToListing }: MyLibraryCompletedScreenProps) {
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useMyLibraryCompletedScreen(isAuthenticated);

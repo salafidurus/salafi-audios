@@ -6,6 +6,8 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { BottomAccessoryContent } from "./BottomAccessoryContent";
 
+/** Describes the BottomAccessoryParent native contract and behavior. */
+/** Describes the BottomAccessoryParent native function contract and behavior. */
 export function BottomAccessoryParent({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
   const { theme } = useUnistyles();
@@ -36,6 +38,7 @@ export function BottomAccessoryParent({ children }: { children: React.ReactNode 
   );
 }
 
+/** Describes the BottomAccessory native contract and behavior. */
 export function BottomAccessory() {
   if (Platform.OS === "ios") {
     return null;

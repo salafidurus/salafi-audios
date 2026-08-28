@@ -6,10 +6,13 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 
+/** Describes the SubrouteIconButtonProps native contract and behavior. */
+/** Describes the SubrouteIconButtonProps native type contract and behavior. */
 export type SubrouteIconButtonProps = {
   onPress: () => void;
 };
 
+/** Describes the SubrouteIconButton native contract and behavior. */
 export function SubrouteIconButton({ onPress }: SubrouteIconButtonProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();

@@ -5,6 +5,8 @@ import { authClient } from "@/core/auth/auth-client";
 import { queryClient } from "@/core/query-client";
 import { SettingsProfileScreen } from "@/features/settings/screens/settings-profile.screen";
 
+/** Provides the native app (tabs) settings profile module responsibility. */
+/** Describes the SettingsProfileRoute native function contract and behavior. */
 export default function SettingsProfileRoute() {
   const router = useRouter();
 

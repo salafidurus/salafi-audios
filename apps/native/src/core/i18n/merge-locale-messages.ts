@@ -1,4 +1,7 @@
+/** Provides the native core i18n merge-locale-messages module responsibility. */
+/** Describes the LocaleMessageValue native type contract and behavior. */
 export type LocaleMessageValue = string | LocaleMessages;
+/** Describes the LocaleMessages native type contract and behavior. */
 export type LocaleMessages = { [key: string]: LocaleMessageValue };
 
 function isLocaleMessages(
@@ -11,6 +14,7 @@ function isLocaleMessages(
   );
 }
 
+/** Describes the mergeLocaleMessages native function contract and behavior. */
 export function mergeLocaleMessages<T extends LocaleMessages>(shared: T, overrides: Partial<T>): T;
 export function mergeLocaleMessages(shared: LocaleMessages, overrides: Partial<LocaleMessages>) {
   const result = { ...shared };

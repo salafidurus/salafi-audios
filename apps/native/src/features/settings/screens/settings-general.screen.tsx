@@ -18,12 +18,14 @@ import { LanguageSwitch } from "../components/language-switch/language-switch";
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 
+/** Provides the native features settings screens settings-general.screen module responsibility. */
 interface NotificationState {
   master: boolean;
   scholars: boolean;
   lectures: boolean;
 }
 
+/** Describes the SettingsGeneralScreen native function contract and behavior. */
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
   const [themePreference, setThemePreference] = useState<ThemePreference>("system");

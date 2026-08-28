@@ -35,6 +35,7 @@ import {
 } from "./styles/theme/theme-preference";
 import { syncTypographyToLocale } from "./styles/theme/typography-sync";
 
+/** Provides the native core providers module responsibility. */
 LogBox.ignoreLogs(["API client initialization failed", "Open debugger to view warnings"]);
 
 function getSupportedLocale(locale: string): "en" | "ar" {
@@ -95,6 +96,7 @@ type Props = {
   apiBaseUrl?: string;
 };
 
+/** Describes the Providers native function contract and behavior. */
 export function Providers({ children, apiBaseUrl }: Props) {
   const [i18nReady, setI18nReady] = useState(false);
   const [themeReady, setThemeReady] = useState(false);

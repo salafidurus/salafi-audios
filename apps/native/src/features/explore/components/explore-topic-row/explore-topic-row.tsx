@@ -11,6 +11,8 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 
+/** Describes the ExploreTopicRowProps native contract and behavior. */
+/** Describes the ExploreTopicRowProps native type contract and behavior. */
 export type ExploreTopicRowProps = {
   topicName: string;
   items: ContentSuggestionDto[];
@@ -42,6 +44,7 @@ function TopicCard({ item, showOriginal, onItemPress }: TopicCardProps) {
   );
 }
 
+/** Describes the ExploreTopicRow native contract and behavior. */
 export function ExploreTopicRow({ topicName, items, onItemPress }: ExploreTopicRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();

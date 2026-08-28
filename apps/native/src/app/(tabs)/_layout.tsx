@@ -7,6 +7,8 @@ import { RouteAccessGuard, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { BottomAccessoryInnerContent } from "@/features/navigation";
 
+/** Provides the native app (tabs) _layout module responsibility. */
+/** Describes the TabsLayout native function contract and behavior. */
 export default function TabsLayout() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();

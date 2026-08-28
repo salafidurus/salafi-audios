@@ -7,6 +7,8 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { getTabStackScreenOptions } from "@/features/navigation/utils/stack-header-options";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 
+/** Provides the native app (tabs) admin _layout module responsibility. */
+/** Describes the AdminLayout native function contract and behavior. */
 export default function AdminLayout() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();

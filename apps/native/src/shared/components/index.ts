@@ -1,3 +1,4 @@
+/** Provides the native shared components index module responsibility. */
 export * from "./EmptyState/EmptyState";
 export * from "./List";
 export * from "./MarqueeText";

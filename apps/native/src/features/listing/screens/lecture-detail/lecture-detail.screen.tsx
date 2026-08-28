@@ -29,7 +29,10 @@ import { Button } from "@/shared/components/Button/Button";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
+/** Provides the native features listing screens lecture-detail lecture-detail.screen module responsibility. */
+/** Describes the LectureDetailScreenProps native type contract and behavior. */
 export type LectureDetailScreenProps = {
+  /** Describes the slug native field contract and behavior. */
   slug: string;
 };
 
@@ -315,9 +318,15 @@ function LoadedLectureBody({ view }: { view: LoadedLectureView }) {
   return isContainer ? <ContainerLectureBody view={view} /> : <SingleLectureBody view={view} />;
 }
 
+/** Describes the LectureDetailScreen native function contract and behavior. */
 export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { theme } = useUnistyles();
-  const { anchor } = useLocalSearchParams<{ slug: string; anchor?: string }>();
+  /** Describes the slug native field contract and behavior. */
+  const { anchor } = useLocalSearchParams<{
+    /** Describes the slug native field contract and behavior. */
+    slug: string;
+    anchor?: string;
+  }>();
   const { data: lecture, isFetching } = useListingDetail(slug);
   const { data: seriesContents } = useListingContents(getSeriesContentsSlug(lecture));
   const { data: ownContents } = useListingContents(getOwnContentsSlug(lecture));

@@ -12,6 +12,8 @@ import { LanguageSwitch } from "../components/language-switch/language-switch";
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 
+/** Provides the native features settings screens account.screen module responsibility. */
+/** Describes the AccountScreenProps native type contract and behavior. */
 export type AccountScreenProps = {
   onNavigateToProfile?: () => void;
   onNavigateToLegal?: () => void;
@@ -20,6 +22,7 @@ export type AccountScreenProps = {
   onSignOut?: () => void;
 };
 
+/** Describes the AccountScreen native function contract and behavior. */
 export function AccountScreen({
   onNavigateToProfile,
   onNavigateToLegal,

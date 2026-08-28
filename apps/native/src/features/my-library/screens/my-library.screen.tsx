@@ -12,10 +12,13 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useAuth } from "../../../core/auth/use-auth";
 import { useTranslation } from "../../../core/i18n/use-translation";
 
+/** Provides the native features my-library screens my-library.screen module responsibility. */
+/** Describes the MyLibraryScreenProps native type contract and behavior. */
 export type MyLibraryScreenProps = {
   onNavigateToListing?: (slug: string) => void;
 };
 
+/** Describes the MyLibraryScreen native function contract and behavior. */
 export function MyLibraryScreen({ onNavigateToListing }: MyLibraryScreenProps) {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();

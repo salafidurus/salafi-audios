@@ -9,6 +9,8 @@ import { createShadowsNative, type ShadowsNativeTheme } from "./shadows";
 import { spacingNative, type SpacingNative } from "./spacing";
 import { typographyNative, type TypographyNative } from "./typography";
 
+/** Provides the native core styles theme index module responsibility. */
+/** Describes the AppThemeNative native type contract and behavior. */
 export type AppThemeNative = {
   colors: AppColors;
   recipes: AccentRecipesNative;
@@ -20,6 +22,7 @@ export type AppThemeNative = {
   direction: "ltr" | "rtl";
 };
 
+/** Describes the const createThemeNative = (mode: "light" | "dark"): AppThemeNative => { native declaration contract and behavior. */
 export const createThemeNative = (mode: "light" | "dark"): AppThemeNative => {
   const colors = createColors(mode);
 
@@ -35,5 +38,7 @@ export const createThemeNative = (mode: "light" | "dark"): AppThemeNative => {
   };
 };
 
+/** Describes the const lightNativeTheme = createThemeNative("light"); native declaration contract and behavior. */
 export const lightNativeTheme = createThemeNative("light");
+/** Describes the const darkNativeTheme = createThemeNative("dark"); native declaration contract and behavior. */
 export const darkNativeTheme = createThemeNative("dark");

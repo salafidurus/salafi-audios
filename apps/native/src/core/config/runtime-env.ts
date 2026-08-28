@@ -2,6 +2,7 @@ import Constants from "expo-constants";
 import { Platform } from "react-native";
 import { z } from "zod";
 
+/** Provides the native core config runtime-env module responsibility. */
 const NativeRuntimeExtraSchema = z.object({
   appEnv: z.enum(["development", "preview", "production"]).optional(),
   apiUrl: z.url().optional(),
@@ -12,9 +13,11 @@ const NativeRuntimeExtraSchema = z.object({
   vexoProjectId: z.string().optional(),
 });
 
+/** Describes the NativeRuntimeExtra native type contract and behavior. */
 export type NativeRuntimeExtra = z.infer<typeof NativeRuntimeExtraSchema>;
 type RuntimeExtraCandidate = Partial<NativeRuntimeExtra> | null | undefined;
 
+/** Describes the parseNativeRuntimeExtra native function contract and behavior. */
 export function parseNativeRuntimeExtra(extra: RuntimeExtraCandidate): NativeRuntimeExtra | null {
   const parsed = NativeRuntimeExtraSchema.safeParse(extra);
   return parsed.success ? parsed.data : null;
@@ -49,6 +52,7 @@ function getRuntimeExtra(): RuntimeExtraCandidate {
   ].reduce<RuntimeExtraCandidate>((selected, candidate) => selected ?? candidate, undefined);
 }
 
+/** Describes the getRuntimeEnv native function contract and behavior. */
 export function getRuntimeEnv(): NativeRuntimeExtra | null {
   if (cachedEnv !== undefined) {
     return cachedEnv;
@@ -66,6 +70,7 @@ export function getRuntimeEnv(): NativeRuntimeExtra | null {
   return cachedEnv;
 }
 
+/** Describes the isDev native function contract and behavior. */
 export function isDev(): boolean {
   return getRuntimeEnv()?.appEnv === "development";
 }
@@ -76,6 +81,7 @@ function rewriteLoopbackForAndroidEmulator(url: string): string {
   return url.replace(/^(https?:\/\/)(localhost|127\.0\.0\.1)(?=[:/]|$)/, "$110.0.2.2");
 }
 
+/** Describes the getApiBaseUrl native function contract and behavior. */
 export function getApiBaseUrl(): string | undefined {
   const apiUrl = getRuntimeEnv()?.apiUrl;
   if (!apiUrl) {
@@ -85,6 +91,7 @@ export function getApiBaseUrl(): string | undefined {
   return __DEV__ && Platform.OS === "android" ? rewriteLoopbackForAndroidEmulator(apiUrl) : apiUrl;
 }
 
+/** Describes the getGoogleWebClientId native function contract and behavior. */
 export function getGoogleWebClientId(): string | undefined {
   return getRuntimeEnv()?.googleWebClientId;
 }

@@ -11,6 +11,8 @@ import type {
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { File, UploadTask, UploadType, type UploadProgress } from "expo-file-system";
 
+/** Describes the getPresignedUrl native contract and behavior. */
+/** Describes the getPresignedUrl native function contract and behavior. */
 export async function getPresignedUrl(
   data: PresignedUrlRequestDto,
 ): Promise<PresignedUrlResponseDto> {
@@ -21,6 +23,7 @@ export async function getPresignedUrl(
   });
 }
 
+/** Describes the uploadToR2 native contract and behavior. */
 export async function uploadToR2(
   uploadUrl: string,
   fileUri: string,
@@ -49,6 +52,7 @@ export async function uploadToR2(
   }
 }
 
+/** Describes the updateListing native contract and behavior. */
 export async function updateListing(
   id: string,
   data: UpdateListingDetailsDto,
@@ -60,6 +64,7 @@ export async function updateListing(
   });
 }
 
+/** Describes the createListing native contract and behavior. */
 export async function createListing(data: CreateListingDto): Promise<AdminListingDetailDto> {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.create,
@@ -68,6 +73,7 @@ export async function createListing(data: CreateListingDto): Promise<AdminListin
   });
 }
 
+/** Describes the fetchAdminListingDetail native contract and behavior. */
 export async function fetchAdminListingDetail(id: string): Promise<AdminListingDetailDto> {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.detail(id),
@@ -75,6 +81,7 @@ export async function fetchAdminListingDetail(id: string): Promise<AdminListingD
   });
 }
 
+/** Describes the bulkListingAction native contract and behavior. */
 export async function bulkListingAction(data: BulkActionDto): Promise<BulkActionResultDto> {
   return httpClient<BulkActionResultDto>({
     url: endpoints.admin.listings.bulk,

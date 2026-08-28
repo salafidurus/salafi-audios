@@ -6,13 +6,17 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AccentGradientFill } from "@/shared/components/AccentGradientFill/AccentGradientFill";
 
+/** Provides the native features auth screens sign-in sign-in.screen module responsibility. */
+/** Describes the SignInScreenProps native type contract and behavior. */
 export type SignInScreenProps = {
   onSignInWithGoogle: () => void;
   onSignInWithApple: () => void;
   onBack?: () => void;
   appleLoading?: boolean;
   googleLoading?: boolean;
+  /** Describes the appleError native field contract and behavior. */
   appleError?: string | null;
+  /** Describes the googleError native field contract and behavior. */
   googleError?: string | null;
 };
 
@@ -95,6 +99,7 @@ function getSignInError(googleError?: string | null, appleError?: string | null)
   return googleError ?? appleError;
 }
 
+/** Describes the SignInScreen native function contract and behavior. */
 export function SignInScreen({
   onSignInWithGoogle,
   onSignInWithApple,

@@ -22,6 +22,7 @@ import { ListingEditSheet } from "../../components/ListingEditSheet/ListingEditS
 import { useAdminListings } from "../../hooks/use-admin-listings";
 import { filterListings } from "./filter-listings";
 
+/** Provides the native features admin screens admin-listings admin-listings.screen module responsibility. */
 type AdminListingRowProps = {
   item: AdminListingListItemDto;
   isSelected: boolean;
@@ -73,6 +74,7 @@ function AdminListingRow({
   );
 }
 
+/** Describes the AdminListingsScreen native function contract and behavior. */
 export function AdminListingsScreen() {
   const { theme } = useUnistyles();
   const { isAuthenticated } = useAuth();

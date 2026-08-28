@@ -18,7 +18,9 @@ import { CollectionSheet } from "../../components/CollectionSheet/CollectionShee
 import { SeriesSheet } from "../../components/SeriesSheet/SeriesSheet";
 import { useAdminSeries, useAdminCollections } from "../../hooks/use-admin-scholars";
 
+/** Provides the native features admin screens admin-scholar-detail admin-scholar-detail.screen module responsibility. */
 type AdminScholarDetailScreenProps = {
+  /** Describes the scholarSlug native contract and behavior. */
   scholarSlug: string;
 };
 
@@ -137,6 +139,7 @@ function SectionHeader({
 type ScholarDetailContentProps = {
   scholar: ScholarDetailDto;
   scholarId: string;
+  /** Describes the scholarSlug native contract and behavior. */
   scholarSlug: string;
   canAdd: boolean;
   seriesExpanded: boolean;
@@ -256,6 +259,7 @@ function ScholarDetailContent({
   );
 }
 
+/** Describes the AdminScholarDetailScreen native contract and behavior. */
 export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScreenProps) {
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });

@@ -3,10 +3,13 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { useDownload } from "@/features/downloads/hooks/use-download";
 
+/** Provides the native features downloads components download-progress download-progress module responsibility. */
 type DownloadProgressProps = {
+  /** Describes the listingSlug native contract and behavior. */
   listingSlug: string;
 };
 
+/** Describes the DownloadProgress native contract and behavior. */
 export function DownloadProgress({ listingSlug }: DownloadProgressProps) {
   const { isDownloading, progress } = useDownload(listingSlug);
 

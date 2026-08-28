@@ -1,3 +1,5 @@
+/** Provides the native core styles theme shadows module responsibility. */
+/** Describes the const shadowsNative = { native declaration contract and behavior. */
 export const shadowsNative = {
   xs: {
     light: {
@@ -81,6 +83,7 @@ export const shadowsNative = {
   },
 } as const;
 
+/** Describes the ShadowsNativeVariant native type contract and behavior. */
 export type ShadowsNativeVariant = {
   shadowColor: string;
   shadowOffset: { width: number; height: number };
@@ -89,6 +92,7 @@ export type ShadowsNativeVariant = {
   elevation: number;
 };
 
+/** Describes the ShadowsNativeTheme native type contract and behavior. */
 export type ShadowsNativeTheme = {
   xs: ShadowsNativeVariant;
   sm: ShadowsNativeVariant;
@@ -97,6 +101,7 @@ export type ShadowsNativeTheme = {
   elevated: ShadowsNativeVariant;
 };
 
+/** Describes the const createShadowsNative = (mode: "light" | "dark"): ShadowsNativeTheme => { native declaration contract and behavior. */
 export const createShadowsNative = (mode: "light" | "dark"): ShadowsNativeTheme => {
   const isLight = mode === "light";
 

@@ -7,6 +7,8 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { audioService } from "../audio-service";
 
+/** Provides the native features audio components progress-bar module responsibility. */
+/** Describes the ProgressBar native function contract and behavior. */
 export function ProgressBar() {
   const { durationSeconds, progressPercent } = useAudio();
   const progressBarRef = useRef<View>(null);

@@ -15,6 +15,8 @@ import { SearchResultsList } from "@/features/search/components/SearchResultsLis
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
+/** Provides the native app (tabs) (explore) index module responsibility. */
+/** Describes the ErrorBoundary native function contract and behavior. */
 export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
   return (
     <View style={styles.errorBoundary}>
@@ -26,6 +28,7 @@ export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
   );
 }
 
+/** Describes the ExploreIndexRoute native function contract and behavior. */
 export default function ExploreIndexRoute() {
   const router = useRouter();
   const navigation = useNavigation();

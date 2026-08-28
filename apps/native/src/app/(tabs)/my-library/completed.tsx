@@ -7,6 +7,8 @@ import { MyLibraryCompletedScreen } from "@/features/my-library/screens/my-libra
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
+/** Provides the native app (tabs) my-library completed module responsibility. */
+/** Describes the MyLibraryCompleted native function contract and behavior. */
 export default function MyLibraryCompleted() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();

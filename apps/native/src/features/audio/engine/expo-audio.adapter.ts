@@ -3,6 +3,8 @@ import type { AudioPlayer, AudioStatus } from "expo-audio";
 
 import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
 
+/** Provides the native features audio engine expo-audio.adapter module responsibility. */
+/** Describes the ExpoAudioAdapter native class contract and behavior. */
 export class ExpoAudioAdapter implements PlaybackEngine {
   private player: AudioPlayer | null = null;
   private events: PlaybackEngineEvents = {};

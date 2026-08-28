@@ -2,6 +2,8 @@ import { drainOutbox, type DrainResult } from "@sd/core-sync";
 
 import { downloadsOutbox, type DownloadOutboxPayload } from "./outbox.store";
 
+/** Provides the native features downloads outbox outbox.drain module responsibility. */
+/** Describes the DownloadMutationHandler native type contract and behavior. */
 export type DownloadMutationHandler = (
   type: string,
   payload: DownloadOutboxPayload,

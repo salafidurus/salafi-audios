@@ -7,6 +7,8 @@ import { MyLibrarySavedScreen } from "@/features/my-library/screens/my-library-s
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
+/** Provides the native app (tabs) my-library saved module responsibility. */
+/** Describes the MyLibrarySaved native function contract and behavior. */
 export default function MyLibrarySaved() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();

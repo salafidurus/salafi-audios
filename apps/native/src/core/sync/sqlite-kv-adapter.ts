@@ -2,6 +2,7 @@ import type { StorageAdapter } from "@sd/core-sync";
 
 import * as SQLite from "expo-sqlite";
 
+/** Provides the native core sync sqlite-kv-adapter module responsibility. */
 const DB_NAME = "sd-sync.db";
 const TABLE_NAME = "kv_store";
 

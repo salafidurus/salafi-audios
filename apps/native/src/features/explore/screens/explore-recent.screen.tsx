@@ -22,6 +22,8 @@ import {
 } from "../components/explore-status/explore-status";
 import { ExploreTopicRow } from "../components/explore-topic-row/explore-topic-row";
 
+/** Provides the native features explore screens explore-recent.screen module responsibility. */
+/** Describes the ExploreRecentScreenProps native type contract and behavior. */
 export type ExploreRecentScreenProps = {
   onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
@@ -30,6 +32,7 @@ export type ExploreRecentScreenProps = {
 type GroupedFeedItem =
   | FeedItemDto
   | {
+      /** Describes the kind native field contract and behavior. */
       kind: "grouped_podcasts";
       id: string;
       items: FeedContentItemDto[];
@@ -46,6 +49,7 @@ function ExploreRecentStatus({
   refetch,
 }: {
   headerSearchOptions: StackScreenOptions;
+  /** Describes the isError native field contract and behavior. */
   isError: boolean;
   isFetching: boolean;
   hasItems: boolean;
@@ -167,6 +171,7 @@ function getItemKey(item: GroupedFeedItem, index: number): string {
   return item.id;
 }
 
+/** Describes the ExploreRecentScreen native function contract and behavior. */
 export function ExploreRecentScreen({
   onNavigateToListing,
   onNavigateToScholar,

@@ -4,6 +4,8 @@ import { useMemo } from "react";
 import { Pressable, ScrollView, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+/** Provides the native features search components SearchFilter SearchFilter module responsibility. */
+/** Describes the SearchFilterValue native type contract and behavior. */
 export type SearchFilterValue = TopicSlug[];
 
 type FilterOption = {
@@ -11,12 +13,14 @@ type FilterOption = {
   label: string;
 };
 
+/** Describes the SearchFilterProps native type contract and behavior. */
 export type SearchFilterProps = {
   value: SearchFilterValue;
   onChange: (value: SearchFilterValue) => void;
   topics: TopicDetailDto[];
 };
 
+/** Describes the SearchFilter native function contract and behavior. */
 export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
   const options = useMemo<FilterOption[]>(() => {
     const sortedTopics = [...topics].sort((a, b) => a.name.ar.localeCompare(b.name.ar));

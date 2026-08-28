@@ -1,10 +1,12 @@
 import { Text, View } from "react-native";
 
+/** Provides the native shared components placeholder-route-screen module responsibility. */
 type Props = {
   description: string;
   title: string;
 };
 
+/** Describes the PlaceholderRouteScreen native function contract and behavior. */
 export function PlaceholderRouteScreen({ description, title }: Props) {
   return (
     <View

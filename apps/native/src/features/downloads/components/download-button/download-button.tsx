@@ -3,11 +3,14 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useDownload } from "@/features/downloads/hooks/use-download";
 
+/** Provides the native features downloads components download-button download-button module responsibility. */
 type DownloadButtonProps = {
+  /** Describes the listingSlug native field contract and behavior. */
   listingSlug: string;
   audioUrl: string;
 };
 
+/** Describes the DownloadButton native function contract and behavior. */
 export function DownloadButton({ listingSlug, audioUrl }: DownloadButtonProps) {
   const { status, isDownloaded, isDownloading, startDownload, removeDownload } = useDownload(
     listingSlug,

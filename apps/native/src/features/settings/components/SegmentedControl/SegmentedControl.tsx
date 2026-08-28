@@ -2,6 +2,7 @@ import { SegmentedControl as NativeSegmentedControl } from "@expo/ui/community/s
 import { I18nManager, View, type DimensionValue } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
+/** Provides the native features settings components SegmentedControl SegmentedControl module responsibility. */
 const FULL_WIDTH: DimensionValue = "100%";
 
 const base = {
@@ -9,11 +10,13 @@ const base = {
   control: { width: FULL_WIDTH },
 };
 
+/** Describes the SegmentedControlOption native contract and behavior. */
 export interface SegmentedControlOption<T extends string> {
   value: T;
   label: string;
 }
 
+/** Describes the SegmentedControlProps native contract and behavior. */
 export interface SegmentedControlProps<T extends string> {
   options: SegmentedControlOption<T>[];
   value: T;
@@ -21,6 +24,7 @@ export interface SegmentedControlProps<T extends string> {
   ariaLabel?: string;
 }
 
+/** Describes the SegmentedControl native contract and behavior. */
 export function SegmentedControl<T extends string>({
   options,
   value,

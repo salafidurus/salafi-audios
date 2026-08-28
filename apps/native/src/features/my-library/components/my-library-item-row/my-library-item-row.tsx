@@ -13,6 +13,8 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 
+/** Describes the MyLibraryItemRowProps native contract and behavior. */
+/** Describes the MyLibraryItemRowProps native type contract and behavior. */
 export type MyLibraryItemRowProps = {
   item: MyLibraryItemDto;
   variant: "progress" | "saved" | "completed";
@@ -105,6 +107,7 @@ function renderActions(
   return <List.Item.Actions actions={actions} onAction={onAction} />;
 }
 
+/** Describes the MyLibraryItemRow native contract and behavior. */
 export function MyLibraryItemRow({
   item,
   variant,

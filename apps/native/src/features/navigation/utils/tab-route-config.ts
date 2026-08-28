@@ -4,12 +4,16 @@ import { nativeRoutes } from "@/core/navigation/routes";
 
 import { DEFAULT_TABS, SECTION_TABS, type Section } from "../types";
 
+/** Describes the RootTab native contract and behavior. */
+/** Describes the RootTab native type contract and behavior. */
 export type RootTab = Section | "search";
 
+/** Describes the isSection native contract and behavior. */
 export function isSection(value: RootTab): value is Section {
   return value !== "search";
 }
 
+/** Describes the getRootTabFromPathname native contract and behavior. */
 export function getRootTabFromPathname(pathname: string): RootTab {
   if (pathname.startsWith("/search")) return "search";
   return getSectionFromPathname(pathname);
@@ -29,6 +33,7 @@ function isExplorePath(pathname: string): boolean {
   );
 }
 
+/** Describes the isTabRoute native contract and behavior. */
 export function isTabRoute(pathname: string): boolean {
   return (
     pathname === "/" ||
@@ -38,6 +43,7 @@ export function isTabRoute(pathname: string): boolean {
   );
 }
 
+/** Describes the getActiveSubsection native contract and behavior. */
 export function getActiveSubsection(pathname: string, section: Section): string {
   const normalizedPath =
     pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
@@ -57,6 +63,7 @@ function getExploreSubsection(candidate: string | undefined): string {
     : "recent";
 }
 
+/** Describes the buildSectionPath native contract and behavior. */
 export function buildSectionPath(section: Section, tabId?: string): string {
   const activeTab = getActiveTab(section, tabId);
   if (section === "explore") return activeTab === "recent" ? "/" : `/${activeTab}`;

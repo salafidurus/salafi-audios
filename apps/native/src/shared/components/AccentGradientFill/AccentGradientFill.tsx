@@ -2,6 +2,7 @@ import { useId } from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
 
+/** Provides the native shared components AccentGradientFill AccentGradientFill module responsibility. */
 type AccentGradientFillProps = {
   borderRadius: number | string;
   linearColors: [string, string];
@@ -13,6 +14,7 @@ type AccentGradientFillProps = {
   radialEdgeColor: string;
 };
 
+/** Describes the AccentGradientFill native function contract and behavior. */
 export function AccentGradientFill({
   borderRadius,
   linearColors,

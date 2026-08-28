@@ -1,5 +1,6 @@
 import { typographyBase, getWeightKey, type TypographyVariant } from "@sd/design-tokens";
 
+/** Provides the native core styles theme typography module responsibility. */
 type Locale = "en" | "ar";
 
 const fontFamilies = {
@@ -70,6 +71,7 @@ function createVariantConfig(locale: Locale, variant: TypographyVariant): Typogr
   };
 }
 
+/** Describes the const createTypography = ( native declaration contract and behavior. */
 export const createTypography = (
   locale: Locale = "en",
 ): Record<TypographyVariant, TypographyVariantConfig> => {
@@ -88,6 +90,8 @@ export const createTypography = (
   );
 };
 
+/** Describes the const typographyNative = createTypography("en"); native declaration contract and behavior. */
 export const typographyNative = createTypography("en");
 
+/** Describes the TypographyNative native type contract and behavior. */
 export type TypographyNative = typeof typographyNative;
