@@ -20,7 +20,7 @@ export function runCatalogCheck(rootDir: string): {
   for (const pkg of allPackages) {
     const depTypes = ["dependencies", "devDependencies"] as const;
     for (const depType of depTypes) {
-      const deps = (pkg.content as any)[depType] || {};
+      const deps = pkg.content[depType] ?? {};
       for (const [name, version] of Object.entries(deps)) {
         if (version.startsWith("workspace:") || name.startsWith("@sd/")) continue;
 
@@ -46,7 +46,7 @@ export function runCatalogCheck(rootDir: string): {
           }
         } else if (version.startsWith("catalog:")) {
           const groupName = (version as string).split(":")[1];
-          if (!catalogs.named[groupName] || !catalogs.named[groupName][name]) {
+          if (!groupName || !catalogs.named[groupName] || !catalogs.named[groupName][name]) {
             issues.push({
               type: "missing",
               pkgName: pkg.name,

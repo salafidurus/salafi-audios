@@ -17,6 +17,18 @@ relevant ticket/dependency graph first, then plan only the selected ticket.
 
 ## Investigation
 
+When planning isolated work, recommend a worktree under the repository-root
+`.worktree/`, based on `origin/main`. Choose a concise slug of two or three
+short words and use the same slug in the worktree path and branch name. Apply
+the appropriate prefix:
+
+- Chore or CI: `.worktree/c-<slug>`, branch `c/<slug>`
+- Feature: `.worktree/f-<slug>`, branch `f/<slug>`
+- Bug fix or hotfix: `.worktree/fix-<slug>`, branch `fix/<slug>`
+
+For example, use the slug `audio-improve` to recommend
+`.worktree/c-audio-improve` with branch `c/audio-improve`.
+
 Read and cross-reference:
 
 1. The ticket, comments, labels, dependencies, and acceptance criteria.

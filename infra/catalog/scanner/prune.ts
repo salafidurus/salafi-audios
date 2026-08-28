@@ -18,13 +18,13 @@ export function getUnusedCatalogEntries(rootDir: string) {
   for (const pkg of allPackages) {
     const depTypes = ["dependencies", "devDependencies"] as const;
     for (const depType of depTypes) {
-      const deps = (pkg.content as any)[depType] || {};
+      const deps = pkg.content[depType] ?? {};
       for (const [name, version] of Object.entries(deps)) {
         if (version === "catalog:") {
           usedInDefault.add(name);
         } else if (version.startsWith("catalog:")) {
           const groupName = (version as string).split(":")[1];
-          if (usedInNamed[groupName]) {
+          if (groupName && usedInNamed[groupName]) {
             usedInNamed[groupName].add(name);
           }
         }

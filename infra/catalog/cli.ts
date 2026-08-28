@@ -17,7 +17,7 @@ Commands:
   fix        Adapts catalogs to reality: adds new catalog entries and creates
              named groups for version conflicts. Use --force (-f) to enforce
              the config onto workspaces instead.
-             Use --dry-run to print the repair report without writing files.
+             Use --dry-run or --report-only to print the repair report without writing files.
   stats      Shows catalog alignment metrics
   unused     Lists catalog items that are not referenced anywhere
   prune      Removes unused catalog items from the root package.json
@@ -56,7 +56,7 @@ function main() {
 
     case "fix": {
       const force = process.argv.includes("--force") || process.argv.includes("-f");
-      const dryRun = process.argv.includes("--dry-run");
+      const dryRun = process.argv.includes("--dry-run") || process.argv.includes("--report-only");
       if (force && dryRun) throw new Error("--dry-run cannot be combined with --force");
       const result = force ? undefined : runCatalogFix(rootDir, { dryRun });
       const updatedFiles = force ? runCatalogFixForce(rootDir).updatedFiles : result!.updatedFiles;
@@ -64,7 +64,10 @@ function main() {
         console.log(
           `\x1b[32m${dryRun ? "Planned" : "Successfully aligned"} catalog changes in: ${updatedFiles.join(", ")}\x1b[0m`,
         );
-        if (result) console.log(`Mutations: ${result.report.mutations.length}`);
+        if (result) {
+          console.log(`Mutations: ${result.report.mutations.length}`);
+          if (dryRun) console.log(JSON.stringify(result.report));
+        }
         if (!dryRun) console.log("Run 'bun install' to regenerate the lockfile.");
       } else {
         console.log("\x1b[32mAll catalog references are already aligned.\x1b[0m");

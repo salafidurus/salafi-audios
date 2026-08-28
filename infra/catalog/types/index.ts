@@ -65,9 +65,23 @@ export interface CatalogPolicyRule {
   reason: string;
 }
 
+export interface CatalogCompatibilityGroup {
+  name: string;
+  packages: string | string[];
+  workspaces: string | string[];
+  owner: string;
+  target?: {
+    resolver: string;
+    value?: string;
+  };
+  catalogMode?: CatalogPolicyMode;
+  validationCommands?: string[];
+}
+
 export interface CatalogConfig {
   groups: CatalogConfigGroup[];
   policies: CatalogPolicyRule[];
+  compatibilityGroups?: CatalogCompatibilityGroup[];
 }
 
 export interface CatalogPolicyMatch {
