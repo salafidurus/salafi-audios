@@ -264,6 +264,10 @@ type AuthenticatedAccountMenuProps = AccountMenuBaseProps & {
   accountMenuRef: React.RefObject<HTMLDivElement | null>;
 };
 
+function getUserDisplayName(user: NonNullable<ReturnType<typeof useAuth>["user"]>) {
+  return user.name || user.email;
+}
+
 function AuthenticatedAccountMenu({
   compact,
   isOpen,
@@ -274,7 +278,8 @@ function AuthenticatedAccountMenu({
   accountMenuRef,
 }: AuthenticatedAccountMenuProps) {
   const { t } = useTranslation();
-  const userInitial = (user.name || user.email || "?").charAt(0).toUpperCase();
+  const displayName = getUserDisplayName(user);
+  const userInitial = displayName.charAt(0).toUpperCase();
 
   return (
     <div ref={accountMenuRef} className={styles.accountMenu}>
@@ -289,14 +294,14 @@ function AuthenticatedAccountMenu({
         )}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        aria-label={`${t("navigation.account", "Account")}: ${user.name || user.email}`}
+        aria-label={`${t("navigation.account", "Account")}: ${displayName}`}
         onClick={toggleMenu}
       >
         <Avatar size="default" aria-hidden="true">
           {user.image ? <AvatarImage src={user.image} alt="" /> : null}
           <AvatarFallback>{userInitial}</AvatarFallback>
         </Avatar>
-        <span className={styles.accountName}>{user.name || user.email}</span>
+        <span className={styles.accountName}>{displayName}</span>
         <ChevronDown aria-hidden="true" size={15} />
       </Button>
       {isOpen && (
@@ -419,14 +424,116 @@ function UtilityControls({
   );
 }
 
+function isAdminWorkspacePath(pathname: string) {
+  return pathname === routes.admin.index || pathname.startsWith(`${routes.admin.index}/`);
+}
+
+type NavigationActionsProps = {
+  items: ReturnType<typeof getAdminNavItems>;
+  pathname: string;
+  ariaLabel: string;
+  isAdminWorkspace: boolean;
+  hasAdminAccess: boolean;
+  returnPath: string;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function MobileNavigationActions({
+  items,
+  pathname,
+  ariaLabel,
+  isAdminWorkspace,
+  hasAdminAccess,
+  returnPath,
+  t,
+  isRtl,
+}: NavigationActionsProps & { isRtl: boolean }) {
+  return (
+    <div className={styles.mobileActions}>
+      <SearchControl />
+      <AccountMenu compact />
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className={styles.menuTrigger} aria-label={ariaLabel}>
+            <Menu aria-hidden="true" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side={isRtl ? "left" : "right"} className={styles.sheet}>
+          <SheetHeader className={styles.sheetHeader}>
+            <div className={styles.sheetBrand}>
+              <span className={styles.sheetBrandMark} aria-hidden="true">
+                <Image src="/logo/logo_72.png" alt="" width={24} height={24} />
+              </span>
+              <div className={styles.sheetHeading}>
+                <SheetTitle>{t("navigation.siteTitle", "Salafi Durus")}</SheetTitle>
+                <SheetDescription>
+                  {t("navigation.mobileDescription", "Navigate your study space")}
+                </SheetDescription>
+              </div>
+            </div>
+          </SheetHeader>
+          <div className={styles.sheetNavigation}>
+            {isAdminWorkspace && (
+              <WorkspaceSwitch
+                isAdminWorkspace={isAdminWorkspace}
+                hasAdminAccess={hasAdminAccess}
+                returnPath={returnPath}
+              />
+            )}
+            <NavigationLinks
+              items={items}
+              pathname={pathname}
+              ariaLabel={ariaLabel}
+              isAdminWorkspace={isAdminWorkspace}
+              closeWithSheet
+            />
+          </div>
+          <div className={styles.sheetLanguage}>
+            <LanguageSwitch direction="down" />
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
+function DesktopNavigationActions({
+  items,
+  pathname,
+  ariaLabel,
+  isAdminWorkspace,
+  hasAdminAccess,
+  returnPath,
+}: NavigationActionsProps) {
+  return (
+    <div className={styles.actions}>
+      <div className={styles.searchSlot}>
+        <SearchControl />
+      </div>
+      <NavigationLinks
+        items={items}
+        pathname={pathname}
+        ariaLabel={ariaLabel}
+        isAdminWorkspace={isAdminWorkspace}
+      />
+      <div className={styles.rightActions}>
+        <UtilityControls
+          hasAdminAccess={hasAdminAccess}
+          isAdminWorkspace={isAdminWorkspace}
+          returnPath={returnPath}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function PublicNavigation() {
   const { t, i18n } = useTranslation();
   const { isMobile } = useResponsive();
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
-  const isAdminWorkspace =
-    pathname === routes.admin.index || pathname.startsWith(`${routes.admin.index}/`);
+  const isAdminWorkspace = isAdminWorkspacePath(pathname);
   const mainNavLabel = t("navigation.mainNav", "Main");
   const hasAdminAccess = isAuthenticated && hasAnyAdminAccess(ability);
   const [returnPath, setReturnPath] = useState<string>(routes.home);
@@ -466,75 +573,26 @@ export function PublicNavigation() {
         </Link>
 
         {isCompact ? (
-          <div className={styles.mobileActions}>
-            <SearchControl />
-            <AccountMenu compact />
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={styles.menuTrigger}
-                  aria-label={t("navigation.mainNav", "Main")}
-                >
-                  <Menu aria-hidden="true" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side={isRtl ? "left" : "right"} className={styles.sheet}>
-                <SheetHeader className={styles.sheetHeader}>
-                  <div className={styles.sheetBrand}>
-                    <span className={styles.sheetBrandMark} aria-hidden="true">
-                      <Image src="/logo/logo_72.png" alt="" width={24} height={24} />
-                    </span>
-                    <div className={styles.sheetHeading}>
-                      <SheetTitle>{t("navigation.siteTitle", "Salafi Durus")}</SheetTitle>
-                      <SheetDescription>
-                        {t("navigation.mobileDescription", "Navigate your study space")}
-                      </SheetDescription>
-                    </div>
-                  </div>
-                </SheetHeader>
-                <div className={styles.sheetNavigation}>
-                  {isAdminWorkspace && (
-                    <WorkspaceSwitch
-                      isAdminWorkspace={isAdminWorkspace}
-                      hasAdminAccess={hasAdminAccess}
-                      returnPath={returnPath}
-                    />
-                  )}
-                  <NavigationLinks
-                    items={items}
-                    pathname={pathname}
-                    ariaLabel={mainNavLabel}
-                    isAdminWorkspace={isAdminWorkspace}
-                    closeWithSheet
-                  />
-                </div>
-                <div className={styles.sheetLanguage}>
-                  <LanguageSwitch direction="down" />
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+          <MobileNavigationActions
+            items={items}
+            pathname={pathname}
+            ariaLabel={mainNavLabel}
+            isAdminWorkspace={isAdminWorkspace}
+            hasAdminAccess={hasAdminAccess}
+            returnPath={returnPath}
+            t={t}
+            isRtl={isRtl}
+          />
         ) : (
-          <div className={styles.actions}>
-            <div className={styles.searchSlot}>
-              <SearchControl />
-            </div>
-            <NavigationLinks
-              items={items}
-              pathname={pathname}
-              ariaLabel={mainNavLabel}
-              isAdminWorkspace={isAdminWorkspace}
-            />
-            <div className={styles.rightActions}>
-              <UtilityControls
-                hasAdminAccess={hasAdminAccess}
-                isAdminWorkspace={isAdminWorkspace}
-                returnPath={returnPath}
-              />
-            </div>
-          </div>
+          <DesktopNavigationActions
+            items={items}
+            pathname={pathname}
+            ariaLabel={mainNavLabel}
+            isAdminWorkspace={isAdminWorkspace}
+            hasAdminAccess={hasAdminAccess}
+            returnPath={returnPath}
+            t={t}
+          />
         )}
       </div>
     </header>
