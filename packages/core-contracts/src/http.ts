@@ -8,6 +8,7 @@
  * 3. **Legacy (bearer tokens)**: For backward compatibility. Use `getAccessToken()`
  *    to provide a bearer token. Note: this mode is deprecated.
  */
+/** Defines the contract type for http client config. */
 export type HttpClientConfig = {
   baseUrl: string;
   /** (Optional) Legacy bearer token provider for backward compatibility.
@@ -25,6 +26,7 @@ export type HttpClientConfig = {
   onError?: (status: number) => void;
 };
 
+/** Defines the runtime contract value for http error. */
 export class HttpError extends Error {
   constructor(
     public readonly status: number,
@@ -36,8 +38,10 @@ export class HttpError extends Error {
   }
 }
 
+/** Defines the contract type for query param value. */
 type QueryParamValue = string | number | boolean | null | undefined;
 
+/** Defines the contract type for query params. */
 type QueryParams = Record<string, QueryParamValue | QueryParamValue[]>;
 
 let config: HttpClientConfig | null = null;

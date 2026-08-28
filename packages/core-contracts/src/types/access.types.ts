@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { LocaleSchema } from "./localization.types";
 
+/** Schemas for scoped capabilities, access grants, and backend-provided access snapshots. */
+/** Defines the runtime contract value for access target enum. */
 export const AccessTargetEnum = z.enum([
   "scholar",
   "listing",
@@ -10,15 +12,19 @@ export const AccessTargetEnum = z.enum([
   "translation",
   "user",
 ]);
+/** Defines the contract type for access target. */
 export type AccessTarget = z.infer<typeof AccessTargetEnum>;
 
+/** Defines the runtime contract value for access capability enum. */
 export const AccessCapabilityEnum = z.enum(["write", "translate", "publish", "delete", "manage"]);
+/** Defines the contract type for access capability. */
 export type AccessCapability = z.infer<typeof AccessCapabilityEnum>;
 
 function canGrantCapability(target: AccessTarget, capability: AccessCapability): boolean {
   return capabilityValidators[target](capability);
 }
 
+/** Defines the runtime contract value for capability validators. */
 const capabilityValidators = {
   scholar: canEditCatalog,
   listing: canEditCatalog,
@@ -40,6 +46,7 @@ function canEditTranslation(capability: AccessCapability): boolean {
   return capability === "translate" || capability === "publish" || capability === "delete";
 }
 
+/** Defines the runtime contract value for access grant request schema. */
 export const AccessGrantRequestSchema = z
   .object({
     target: AccessTargetEnum,
@@ -48,6 +55,7 @@ export const AccessGrantRequestSchema = z
     locales: z.array(LocaleSchema).default([]),
   })
   .superRefine(validateAccessGrant);
+/** Defines the contract type for access grant request. */
 export type AccessGrantRequest = z.infer<typeof AccessGrantRequestSchema>;
 
 function validateAccessGrant(grant: AccessGrantRequest, ctx: z.RefinementCtx): void {
@@ -94,6 +102,7 @@ function validateLocaleScope(grant: AccessGrantRequest, ctx: z.RefinementCtx): v
   }
 }
 
+/** Defines the runtime contract value for user access snapshot schema. */
 export const UserAccessSnapshotSchema = z.object({
   userId: z.string(),
   version: z.number().int().nonnegative(),
@@ -102,11 +111,14 @@ export const UserAccessSnapshotSchema = z.object({
   isSuperadmin: z.boolean(),
   scholars: z.array(z.object({ slug: z.string(), name: z.string() })),
 });
+/** Defines the contract type for user access snapshot. */
 export type UserAccessSnapshot = z.infer<typeof UserAccessSnapshotSchema>;
 
+/** Defines the runtime contract value for replace user access request schema. */
 export const ReplaceUserAccessRequestSchema = z.object({
   version: z.number().int().nonnegative(),
   grants: z.array(AccessGrantRequestSchema),
   isSuperadmin: z.boolean().optional(),
 });
+/** Defines the contract type for replace user access request. */
 export type ReplaceUserAccessRequest = z.infer<typeof ReplaceUserAccessRequestSchema>;

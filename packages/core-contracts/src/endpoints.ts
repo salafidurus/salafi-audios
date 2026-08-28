@@ -1,3 +1,5 @@
+/** Canonical API endpoint paths shared by web, native, and backend-facing clients. */
+/** Defines the runtime contract value for endpoints. */
 export const endpoints = {
   search: {
     general: "/search",

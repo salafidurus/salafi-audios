@@ -9,6 +9,8 @@ import type { HttpClientConfig } from "../../http";
 
 import { configureApiClient } from "../../http";
 
+/** React Query hooks and client initialization helpers built on shared API contracts. */
+/** Runs a typed API query with shared retry and cache defaults. */
 export function useApiQuery<TData, TError = Error>(
   key: QueryKey,
   fn: () => Promise<TData>,
@@ -31,6 +33,7 @@ export function useApiQuery<TData, TError = Error>(
   );
 }
 
+/** Installs the shared HTTP client configuration used by query functions. */
 export function initApiClient(config: HttpClientConfig) {
   configureApiClient(config);
 }
