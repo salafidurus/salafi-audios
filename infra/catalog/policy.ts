@@ -46,7 +46,10 @@ export function resolveCatalogPolicy(
     .map((rule) => ({ rule, score: specificity(rule, dependency, workspace) }))
     .sort((left, right) => right.score - left.score);
   const best = ranked[0]!;
-  const tied = ranked.filter((entry) => entry.score === best.score).map((entry) => entry.rule);
+  const tied: CatalogPolicyRule[] = [];
+  for (const entry of ranked) {
+    if (entry.score === best.score) tied.push(entry.rule);
+  }
 
   if (tied.length > 1) {
     return {
