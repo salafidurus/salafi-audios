@@ -19,6 +19,50 @@ interface ListingProps {
   onTranslate?: (id: string) => void;
 }
 
+function ListingActions({
+  listing,
+  variant,
+  permissions,
+  onEdit,
+  onUpload,
+  onTranslate,
+}: ListingProps & {
+  variant: "outline" | "ghost";
+  permissions: { update: boolean; translate: boolean; upload: boolean };
+}) {
+  return (
+    <List.Item.Actions mobileOrientation="horizontal" className={styles.mobileActions}>
+      {permissions.update && (
+        <Button
+          variant={variant}
+          size="icon"
+          icon={<Pencil size={16} />}
+          onClick={() => onEdit(listing.id)}
+          aria-label={`Edit ${listing.title}`}
+        />
+      )}
+      {permissions.translate && (
+        <Button
+          variant={variant}
+          size="icon"
+          icon={<Languages size={16} />}
+          onClick={() => onTranslate?.(listing.id)}
+          aria-label={`Translate ${listing.title}`}
+        />
+      )}
+      {permissions.upload && (
+        <Button
+          variant={variant}
+          size="icon"
+          icon={<Upload size={16} />}
+          onClick={() => onUpload?.(listing.id)}
+          aria-label={`Upload ${listing.title}`}
+        />
+      )}
+    </List.Item.Actions>
+  );
+}
+
 export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps) {
   const { isMobile } = useResponsive();
   const { ability } = useAbility();
@@ -58,35 +102,18 @@ export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps
           />
         </div>
       </div>
-      <List.Item.Actions mobileOrientation="horizontal" className={styles.mobileActions}>
-        {ability.can("update", "Listing") && (
-          <Button
-            variant={isMobile ? "outline" : "ghost"}
-            size="icon"
-            icon={<Pencil size={16} />}
-            onClick={() => onEdit(listing.id)}
-            aria-label={`Edit ${listing.title}`}
-          ></Button>
-        )}
-        {ability.can("read", "Translation") && (
-          <Button
-            variant={isMobile ? "outline" : "ghost"}
-            size="icon"
-            icon={<Languages size={16} />}
-            onClick={() => onTranslate?.(listing.id)}
-            aria-label={`Translate ${listing.title}`}
-          ></Button>
-        )}
-        {ability.can("upload", "Media") && (
-          <Button
-            variant={isMobile ? "outline" : "ghost"}
-            size="icon"
-            icon={<Upload size={16} />}
-            onClick={() => onUpload?.(listing.id)}
-            aria-label={`Upload ${listing.title}`}
-          ></Button>
-        )}
-      </List.Item.Actions>
+      <ListingActions
+        listing={listing}
+        variant={isMobile ? "outline" : "ghost"}
+        permissions={{
+          update: ability.can("update", "Listing"),
+          translate: ability.can("read", "Translation"),
+          upload: ability.can("upload", "Media"),
+        }}
+        onEdit={onEdit}
+        onUpload={onUpload}
+        onTranslate={onTranslate}
+      />
     </List.Item>
   );
 }
