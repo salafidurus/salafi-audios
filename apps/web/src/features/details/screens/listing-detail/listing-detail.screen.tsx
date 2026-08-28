@@ -106,18 +106,51 @@ function filterContentModules(contents: ListingContents | undefined, query: stri
   });
 }
 
-function ListingContentSection({ model, t }: ListingContentSectionProps) {
+function ListingContentBody({ model }: { model: ListingContentModel }) {
   const {
     contents,
-    contentCount,
-    contentCountLabel,
-    contentHeading,
     filteredSingleOrSeriesItems,
     filteredModules,
     formatScholarName,
     highlightItemId,
     listing,
   } = model;
+  if (contents.format === "single") {
+    return (
+      <ContentList
+        items={filteredSingleOrSeriesItems}
+        format="single"
+        scholarName={formatScholarName(listing.scholar)}
+        scholarSlug={listing.scholar.slug}
+      />
+    );
+  }
+  if (contents.format === "series") {
+    return (
+      <ContentList
+        items={filteredSingleOrSeriesItems}
+        format="series"
+        scholarName={formatScholarName(listing.scholar)}
+        scholarSlug={listing.scholar.slug}
+        seriesId={listing.id}
+        seriesTitle={listing.title}
+        highlightItemId={highlightItemId}
+      />
+    );
+  }
+  return (
+    <CollectionContentLayout
+      modules={filteredModules}
+      scholarName={formatScholarName(listing.scholar)}
+      scholarSlug={listing.scholar.slug}
+      collectionId={listing.id}
+      highlightItemId={highlightItemId}
+    />
+  );
+}
+
+function ListingContentSection({ model, t }: ListingContentSectionProps) {
+  const { contents, contentCount, contentCountLabel, contentHeading } = model;
   return (
     <section
       aria-label={contentHeading ? undefined : t("listing.collectionContent", "Collection content")}
@@ -142,36 +175,7 @@ function ListingContentSection({ model, t }: ListingContentSectionProps) {
         </>
       )}
 
-      {contents.format === "single" && (
-        <ContentList
-          items={filteredSingleOrSeriesItems}
-          format="single"
-          scholarName={formatScholarName(listing.scholar)}
-          scholarSlug={listing.scholar.slug}
-        />
-      )}
-
-      {contents.format === "series" && (
-        <ContentList
-          items={filteredSingleOrSeriesItems}
-          format="series"
-          scholarName={formatScholarName(listing.scholar)}
-          scholarSlug={listing.scholar.slug}
-          seriesId={listing.id}
-          seriesTitle={listing.title}
-          highlightItemId={highlightItemId}
-        />
-      )}
-
-      {contents.format === "collection" && (
-        <CollectionContentLayout
-          modules={filteredModules}
-          scholarName={formatScholarName(listing.scholar)}
-          scholarSlug={listing.scholar.slug}
-          collectionId={listing.id}
-          highlightItemId={highlightItemId}
-        />
-      )}
+      <ListingContentBody model={model} />
     </section>
   );
 }
