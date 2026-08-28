@@ -114,6 +114,55 @@ async function playContentItem(
   await audioService.playListing(track, queueContext);
 }
 
+function ContentListItemView({
+  item,
+  isCompleted,
+  durationStr,
+  progressPercent,
+  isCurrentlyPlaying,
+  isHighlighted,
+  onPlay,
+}: {
+  item: ListingContentItemDto;
+  isCompleted: boolean;
+  durationStr: string;
+  progressPercent: number;
+  isCurrentlyPlaying: boolean;
+  isHighlighted: boolean;
+  onPlay: (event?: React.MouseEvent) => void;
+}) {
+  return (
+    <List.Item
+      interactive
+      onClick={() => void onPlay()}
+      id={contentItemAnchorId(item.id)}
+      highlighted={isHighlighted}
+      className={`${styles.container} ${isHighlighted ? styles.highlighted : ""}`}
+    >
+      <div className={styles.leftGroup}>
+        <StatusCircle completed={isCompleted} />
+        <div className={styles.titleGroup}>
+          <p className={styles.itemTitle}>{item.title}</p>
+          <ProgressIndicator
+            durationStr={durationStr}
+            progressPercent={progressPercent}
+            completed={isCompleted}
+          />
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={onPlay}
+        aria-label={isCurrentlyPlaying ? `Pause ${item.title}` : `Play ${item.title}`}
+        className={styles.playCircleBtn}
+      >
+        <PlayIcon playing={isCurrentlyPlaying} />
+      </button>
+    </List.Item>
+  );
+}
+
 function createContentTrack(
   item: ListingContentItemDto,
   artist: string,
@@ -174,35 +223,14 @@ export function ContentListItem({
   const isHighlighted = highlightItemId === item.id;
 
   return (
-    <List.Item
-      interactive
-      onClick={() => void handlePlayClick()}
-      id={contentItemAnchorId(item.id)}
-      highlighted={isHighlighted}
-      className={`${styles.container} ${isHighlighted ? styles.highlighted : ""}`}
-    >
-      <div className={styles.leftGroup}>
-        {/* Status circle: checkmark if completed, otherwise empty circle */}
-        <StatusCircle completed={isCompleted} />
-
-        <div className={styles.titleGroup}>
-          <p className={styles.itemTitle}>{item.title}</p>
-          <ProgressIndicator
-            durationStr={durationStr}
-            progressPercent={progressPercent}
-            completed={isCompleted}
-          />
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={handlePlayClick}
-        aria-label={isCurrentlyPlaying ? `Pause ${item.title}` : `Play ${item.title}`}
-        className={styles.playCircleBtn}
-      >
-        <PlayIcon playing={isCurrentlyPlaying} />
-      </button>
-    </List.Item>
+    <ContentListItemView
+      item={item}
+      isCompleted={isCompleted}
+      durationStr={durationStr}
+      progressPercent={progressPercent}
+      isCurrentlyPlaying={isCurrentlyPlaying}
+      isHighlighted={isHighlighted}
+      onPlay={handlePlayClick}
+    />
   );
 }
