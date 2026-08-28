@@ -70,7 +70,17 @@ function renderMeta(
   const duration = item.durationSeconds
     ? t("lecture.minutes", "{{count}} min", { count: Math.round(item.durationSeconds / 60) })
     : "";
-  const annotations = [
+  const annotations = getMetaAnnotations(item, variant, progress, t);
+  return `${duration}${annotations.map((part) => ` · ${part}`).join("")}`;
+}
+
+function getMetaAnnotations(
+  item: MyLibraryItemDto,
+  variant: MyLibraryItemRowProps["variant"],
+  progress: number | null,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  return [
     variant === "progress" && progress !== null
       ? t("myLibrary.percentListened", "{{percent}}% listened", { percent: progress })
       : "",
@@ -85,7 +95,6 @@ function renderMeta(
         })
       : "",
   ].filter(Boolean);
-  return `${duration}${annotations.map((part) => ` · ${part}`).join("")}`;
 }
 
 function renderActions(
