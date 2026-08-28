@@ -1,3 +1,4 @@
+/** Exposes listing and scholar detail screens plus their shared presentation components. */
 // Screens
 export { LectureDetailScreen } from "./screens/lecture-detail/lecture-detail.screen";
 export { ScholarDetailScreen } from "./screens/scholar-detail/scholar-detail.screen";

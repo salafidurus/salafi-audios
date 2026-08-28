@@ -1,3 +1,4 @@
+/** Renders the audio position and optionally exposes a seekable range control. */
 "use client";
 
 import type { CSSProperties } from "react";
@@ -15,6 +16,7 @@ type ProgressBarStyleVars = CSSProperties & {
   "--progress-percent": string;
 };
 
+/** Displays playback progress and forwards range changes when seeking is enabled. */
 export function ProgressBar({ progressPercent, onSeek }: ProgressBarProps) {
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (onSeek) {

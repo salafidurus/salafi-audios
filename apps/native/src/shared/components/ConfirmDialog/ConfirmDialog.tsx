@@ -1,3 +1,4 @@
+/** Bridges extensionless ConfirmDialog imports to the platform-specific native implementation. */
 // Type-resolution shim only — never bundled. Metro resolves the extensionless
 // "./ConfirmDialog" import to ConfirmDialog.ios.tsx or ConfirmDialog.android.tsx
 // at build time for both platforms this app ships (see app.config.ts:
