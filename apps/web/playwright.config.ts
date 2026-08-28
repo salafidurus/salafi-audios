@@ -25,6 +25,7 @@ const fallbackTestMode = process.env.PW_FALLBACK_FAULTS !== "0";
 export default defineConfig({
   testDir: "./e2e",
   testMatch: "**/*.e2e.ts",
+  testIgnore: "**/*.bun.e2e.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 2,

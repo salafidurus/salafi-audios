@@ -1,0 +1,265 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import { request as httpRequest } from "node:http";
+import { resolve } from "node:path";
+
+if (process.env.BUN_WEBVIEW_E2E === "1") {
+  const { GlobalRegistrator } = require("@happy-dom/global-registrator");
+  GlobalRegistrator.unregister();
+}
+
+export const DEFAULT_E2E_PORT = 3008;
+const DEFAULT_READY_TIMEOUT_MS = 120_000;
+const DEFAULT_READY_INTERVAL_MS = 100;
+const ARTIFACT_ROOT = resolve(process.cwd(), "test-results", "bun-webview");
+
+export type BrowserConsoleEntry = {
+  type: string;
+  args: unknown[];
+};
+
+export type E2EConfig = {
+  port: number;
+  origin: string;
+  apiOrigin: string;
+  readyTimeoutMs: number;
+  skipBuild: boolean;
+};
+
+export type BrowserJourney = {
+  view: Bun.WebView;
+  origin: string;
+  console: BrowserConsoleEntry[];
+};
+
+export type WebServer = {
+  process: Bun.Subprocess;
+  origin: string;
+  stop: () => Promise<void>;
+};
+
+function positiveInteger(value: string | undefined): number | undefined {
+  if (!value || !/^\d+$/.test(value)) return undefined;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 && parsed <= 65534 ? parsed : undefined;
+}
+
+function requestWithNodeHttp(url: URL, method: string, request?: Request): Promise<Response> {
+  return new Promise((resolveRequest, rejectRequest) => {
+    const headers: Record<string, string> = {};
+    request?.headers.forEach((value, key) => {
+      headers[key] = value;
+    });
+
+    const clientRequest = httpRequest(url, { method, headers }, (response) => {
+      const chunks: Buffer[] = [];
+      response.on("data", (chunk: Buffer) => chunks.push(chunk));
+      response.on("end", () => {
+        const responseHeaders = new Headers();
+        for (const [key, value] of Object.entries(response.headers)) {
+          if (Array.isArray(value)) responseHeaders.set(key, value.join(", "));
+          else if (value !== undefined) responseHeaders.set(key, value);
+        }
+        resolveRequest(
+          new Response(Buffer.concat(chunks), {
+            status: response.statusCode ?? 500,
+            headers: responseHeaders,
+          }),
+        );
+      });
+    });
+    clientRequest.on("error", rejectRequest);
+
+    if (request && method !== "GET" && method !== "HEAD") {
+      void request.arrayBuffer().then((body) => {
+        clientRequest.end(Buffer.from(body));
+      }, rejectRequest);
+    } else {
+      clientRequest.end();
+    }
+  });
+}
+
+/**
+ * Reads the isolated web E2E port, falling back when the value is invalid.
+ * Invalid configuration is deliberately made deterministic so parallel
+ * worktrees can override it explicitly rather than silently selecting a port.
+ */
+export function getE2EPort(env: Record<string, string | undefined>): number {
+  return positiveInteger(env.BUN_E2E_PORT) ?? DEFAULT_E2E_PORT;
+}
+
+/** Returns a filesystem-safe directory name for one failed journey. */
+export function getDiagnosticDirectory(testName: string): string {
+  const slug = testName
+    .normalize("NFKD")
+    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase()
+    .slice(0, 120);
+  return resolve(ARTIFACT_ROOT, slug || "unnamed-test");
+}
+
+export function getE2EConfig(env: Record<string, string | undefined> = process.env): E2EConfig {
+  const port = getE2EPort(env);
+  const origin = `http://127.0.0.1:${port}`;
+  return {
+    port,
+    origin,
+    apiOrigin: env.BUN_E2E_API_ORIGIN ?? origin,
+    readyTimeoutMs: positiveInteger(env.BUN_E2E_READY_TIMEOUT_MS) ?? DEFAULT_READY_TIMEOUT_MS,
+    skipBuild: env.BUN_E2E_SKIP_BUILD === "1",
+  };
+}
+
+/** Starts the already-built Next.js app and owns its process until stopped. */
+export async function startWebServer(config: E2EConfig = getE2EConfig()): Promise<WebServer> {
+  const upstreamPort = config.port + 1;
+  const child = Bun.spawn(["bun", "--bun", "next", "start", "--port", String(upstreamPort)], {
+    cwd: process.cwd(),
+    env: {
+      ...process.env,
+      NEXT_PUBLIC_API_URL: config.apiOrigin.replace(`:${config.port}`, `:${upstreamPort}`),
+      NEXT_PUBLIC_WEB_URL: config.origin,
+      FALLBACK_TEST_MODE: "1",
+    },
+    stdout: "inherit",
+    stderr: "ignore",
+  });
+  let adapter: ReturnType<typeof Bun.serve>;
+  try {
+    adapter = Bun.serve({
+      port: config.port,
+      async fetch(request) {
+        const url = new URL(request.url);
+        url.port = String(upstreamPort);
+        const method = request.method === "OPTIONS" ? "GET" : request.method;
+        let response: Response;
+        try {
+          response = await requestWithNodeHttp(url, method, request);
+        } catch {
+          return new Response("upstream unavailable", { status: 503 });
+        }
+        if (request.method !== "OPTIONS") return response;
+        const headers = new Headers(response.headers);
+        headers.set("access-control-allow-origin", "*");
+        headers.set("access-control-allow-methods", "GET,HEAD,OPTIONS");
+        return new Response(response.body, {
+          status: response.status,
+          headers,
+        });
+      },
+    });
+  } catch (error) {
+    child.kill("SIGINT");
+    await child.exited;
+    throw error;
+  }
+
+  return {
+    process: child,
+    origin: config.origin,
+    stop: async () => {
+      await adapter.stop(true);
+      child.kill("SIGINT");
+      await child.exited;
+    },
+  };
+}
+
+/** Waits for the production web server to answer before opening a browser. */
+export async function waitForWebReady(
+  origin: string,
+  options: { timeoutMs?: number; intervalMs?: number } = {},
+): Promise<void> {
+  const timeoutMs = options.timeoutMs ?? DEFAULT_READY_TIMEOUT_MS;
+  const intervalMs = options.intervalMs ?? DEFAULT_READY_INTERVAL_MS;
+  const deadline = Date.now() + timeoutMs;
+  let lastError = "no response";
+
+  while (Date.now() < deadline) {
+    try {
+      const response = await requestWithNodeHttp(new URL(`${origin}/`), "HEAD");
+      if (response.status >= 200 && response.status < 500) return;
+      lastError = `HTTP ${response.status}`;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+    }
+    await Bun.sleep(intervalMs);
+  }
+
+  throw new Error(`Web server was not ready at ${origin} within ${timeoutMs}ms: ${lastError}`);
+}
+
+function serializeConsoleArgs(args: unknown[]): unknown[] {
+  return args.map((value) => {
+    try {
+      const serialized = JSON.stringify(value);
+      return serialized === undefined ? String(value) : JSON.parse(serialized);
+    } catch {
+      return String(value);
+    }
+  });
+}
+
+/** Creates an isolated Chromium view and records page console calls. */
+export function createBrowserJourney(origin: string): BrowserJourney {
+  const consoleEntries: BrowserConsoleEntry[] = [];
+  const view = new Bun.WebView({
+    backend: { type: "chrome", url: false },
+    dataStore: "ephemeral",
+    width: 1280,
+    height: 800,
+    console: (type, ...args) => {
+      consoleEntries.push({ type, args: serializeConsoleArgs(args) });
+    },
+  });
+  return { view, origin, console: consoleEntries };
+}
+
+/** Writes the required failure evidence for a journey before its view closes. */
+export async function captureFailureDiagnostics(
+  journey: BrowserJourney,
+  testName: string,
+  error: Error,
+): Promise<string> {
+  const directory = getDiagnosticDirectory(testName);
+  await mkdir(directory, { recursive: true });
+  const dom = await journey.view
+    .evaluate<string>("document.documentElement.outerHTML")
+    .catch(() => "");
+  const screenshot = await journey.view
+    .screenshot({ encoding: "buffer" })
+    .catch(() => Buffer.alloc(0));
+  const failure = `${error.name}: ${error.message}\n${error.stack ?? ""}`;
+
+  await Promise.all([
+    writeFile(resolve(directory, "test-name.txt"), testName),
+    writeFile(resolve(directory, "url.txt"), journey.view.url),
+    writeFile(resolve(directory, "dom.html"), dom),
+    writeFile(resolve(directory, "console.json"), JSON.stringify(journey.console, null, 2)),
+    writeFile(resolve(directory, "error.txt"), failure),
+    writeFile(resolve(directory, "screenshot.png"), screenshot),
+  ]);
+  return directory;
+}
+
+/** Runs one journey and guarantees browser cleanup after success or failure. */
+export async function withBrowserJourney<T>(
+  testName: string,
+  origin: string,
+  callback: (journey: BrowserJourney) => Promise<T>,
+): Promise<T> {
+  const journey = createBrowserJourney(origin);
+  try {
+    return await callback(journey);
+  } catch (error) {
+    await captureFailureDiagnostics(
+      journey,
+      testName,
+      error instanceof Error ? error : new Error(String(error)),
+    );
+    throw error;
+  } finally {
+    journey.view.close();
+  }
+}
