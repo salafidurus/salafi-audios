@@ -40,6 +40,17 @@ export type FeedRecentScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
+function getExploreLocale(language: string) {
+  return language === "ar" ? "ar" : "en";
+}
+
+function getScholarNavigator(
+  onNavigateToScholar: FeedRecentScreenProps["onNavigateToScholar"],
+  router: ReturnType<typeof useRouter>,
+) {
+  return onNavigateToScholar ?? ((slug: string) => router.push(routes.scholars.detail(slug)));
+}
+
 function formatDuration(durationSeconds?: number | null): string {
   if (!durationSeconds || durationSeconds <= 0) return "";
   const hours = Math.floor(durationSeconds / 3600);
@@ -268,11 +279,10 @@ export function FeedRecentScreen({
   const router = useRouter();
   const { navigateToListing } = useListingNavigation();
   const handleNavigateToListing = onNavigateToListing ?? navigateToListing;
-  const handleNavigateToScholar =
-    onNavigateToScholar ?? ((slug) => router.push(routes.scholars.detail(slug)));
+  const handleNavigateToScholar = getScholarNavigator(onNavigateToScholar, router);
 
   // Topic steering state. The API owns the mixed feed composition.
-  const locale = i18n.language === "ar" ? "ar" : "en";
+  const locale = getExploreLocale(i18n.language);
   const { filters, isHydrated, updateFilter } = useExploreFilters({ locale, userId: user?.id });
 
   const hasHydratedUrlTopic = useRef(false);
