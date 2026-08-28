@@ -1,3 +1,4 @@
+/** Exposes navigation accessory components shared by the native route surfaces. */
 // Screens (none currently — navigation uses Expo Router tabs directly)
 
 // Components (used outside this feature)

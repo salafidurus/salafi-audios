@@ -1,3 +1,4 @@
+/** Renders playback transport controls and delegates actions to the audio service. */
 "use client";
 
 import { useAudio, useQueue } from "@sd/domain-audio";
@@ -64,6 +65,7 @@ function handlePrevious() {
   audioService.skipToPrevious();
 }
 
+/** Coordinates play/pause, skip, and speed controls with the active audio queue. */
 export function PlaybackControls() {
   const { isPlaying, isLoading, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
   const { hasNext } = useQueue();

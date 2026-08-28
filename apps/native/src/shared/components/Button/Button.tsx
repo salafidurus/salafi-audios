@@ -1,3 +1,4 @@
+/** Bridges extensionless Button imports to the platform-specific native implementation. */
 // Type-resolution shim only — never bundled. Metro resolves the extensionless
 // "./Button" import to Button.ios.tsx or Button.android.tsx at build time for
 // both platforms this app ships (see app.config.ts: platforms: ["ios", "android"]).

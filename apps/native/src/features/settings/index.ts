@@ -1,3 +1,4 @@
+/** Exposes account, support, legal, language, and content-preference settings surfaces. */
 // Screens
 export { AccountScreen, type AccountScreenProps } from "./screens/account.screen";
 export {
