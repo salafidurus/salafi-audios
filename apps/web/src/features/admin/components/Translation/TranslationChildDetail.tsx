@@ -113,6 +113,44 @@ function TranslationChildReadyView({
   );
 }
 
+function TranslationChildStatus({
+  config,
+  childId,
+  state,
+  dispatch,
+  locale,
+  secondaryLocales,
+  onSave,
+  onPublishToggle,
+  onLocaleChange,
+}: Omit<TranslationChildDetailViewProps, "onBack">) {
+  const { t } = useTranslation();
+  if (state.status === "loading") {
+    return <div className={styles.loading}>{t("common.loading", "Loading...")}</div>;
+  }
+  if (state.status === "error" && !state.entityId) {
+    return (
+      <div className={styles.error}>
+        {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
+      </div>
+    );
+  }
+  if (state.status !== "ready" || !locale) return null;
+  return (
+    <TranslationChildReadyView
+      config={config}
+      childId={childId}
+      state={state}
+      dispatch={dispatch}
+      locale={locale}
+      secondaryLocales={secondaryLocales}
+      onSave={onSave}
+      onPublishToggle={onPublishToggle}
+      onLocaleChange={onLocaleChange}
+    />
+  );
+}
+
 function TranslationChildDetailView({
   config,
   childId,
@@ -144,29 +182,17 @@ function TranslationChildDetailView({
         {sourceTitle && <span className={styles.childDetailTitle}>{sourceTitle}</span>}
       </div>
 
-      {state.status === "loading" && (
-        <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
-      )}
-
-      {state.status === "error" && !state.entityId && (
-        <div className={styles.error}>
-          {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
-        </div>
-      )}
-
-      {state.status === "ready" && locale && (
-        <TranslationChildReadyView
-          config={config}
-          childId={childId}
-          state={state}
-          dispatch={dispatch}
-          locale={locale}
-          secondaryLocales={secondaryLocales}
-          onSave={onSave}
-          onPublishToggle={onPublishToggle}
-          onLocaleChange={onLocaleChange}
-        />
-      )}
+      <TranslationChildStatus
+        config={config}
+        childId={childId}
+        state={state}
+        dispatch={dispatch}
+        locale={locale}
+        secondaryLocales={secondaryLocales}
+        onSave={onSave}
+        onPublishToggle={onPublishToggle}
+        onLocaleChange={onLocaleChange}
+      />
     </div>
   );
 }
@@ -212,20 +238,25 @@ export function TranslationChildDetail({
   const secondaryLocales = getSecondaryLocales(state.mainLocale);
   const locale = activeLocale ?? secondaryLocales[0] ?? null;
 
-  async function handlePublishToggle(targetLocale: Locale) {
-    if (!config.supportsPublish || !state.entityId) return;
+  function getPublishOperation(targetLocale: Locale) {
+    if (!config.supportsPublish || !state.entityId) return null;
     const currentlyPublished = state.translationStatus[targetLocale] === "published";
     const action = currentlyPublished ? config.unpublish : config.publish;
-    if (!action) return;
+    return action ? { action, currentlyPublished } : null;
+  }
+
+  async function handlePublishToggle(targetLocale: Locale) {
+    const operation = getPublishOperation(targetLocale);
+    if (!operation || !state.entityId) return;
 
     dispatch({ type: "SET_SAVING", saving: true });
     dispatch({ type: "SET_ERROR", error: null });
     try {
-      const result = await action(state.entityId, targetLocale);
+      const result = await operation.action(state.entityId, targetLocale);
       dispatch({
         type: "SET_STATUS",
         locale: targetLocale,
-        status: result.status ?? (currentlyPublished ? "draft" : "published"),
+        status: result.status ?? (operation.currentlyPublished ? "draft" : "published"),
       });
     } catch (err) {
       dispatch({ type: "SET_ERROR", error: sanitizeError(err) });
