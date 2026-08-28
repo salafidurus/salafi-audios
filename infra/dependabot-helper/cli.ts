@@ -1,8 +1,12 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { dependabotHelperPolicy, validatePolicy } from "./policy";
-import { runHelperChecks, type HelperCheckResult } from "./auxiliary";
+import {
+  runAuxiliaryUpdates,
+  runHelperChecks,
+  validateHelperPolicy,
+  type HelperCheckResult,
+} from "./auxiliary";
 
 /** Reads native Dependabot ignore entries without making YAML a runtime dependency. */
 export function extractDependabotIgnoredPatterns(source: string): string[] {
@@ -14,9 +18,7 @@ export function extractDependabotIgnoredPatterns(source: string): string[] {
 
 /** Validates the typed helper policy against the repository's native Dependabot file. */
 export function validateRepositoryPolicy(rootDir: string): string[] {
-  const dependabotPath = resolve(rootDir, ".github/dependabot.yml");
-  const source = readFileSync(dependabotPath, "utf8");
-  return validatePolicy(dependabotHelperPolicy, extractDependabotIgnoredPatterns(source));
+  return validateHelperPolicy(rootDir);
 }
 
 /** Runs helper-owned invariant checks without creating update proposals. */
@@ -26,13 +28,23 @@ export function checkRepository(rootDir: string): HelperCheckResult {
   return runHelperChecks(rootDir);
 }
 
-function main(args: string[], rootDir: string): number {
-  if (args[0] !== "validate" && args[0] !== "check") {
-    console.error("Usage: bun infra/dependabot-helper/cli.ts <validate|check>");
+/** Executes one Helper CLI command and returns its process exit status. */
+export async function main(args: string[], rootDir: string): Promise<number> {
+  if (args[0] !== "validate" && args[0] !== "check" && args[0] !== "update") {
+    console.error("Usage: bun infra/dependabot-helper/cli.ts <validate|check|update>");
     return 1;
   }
 
-  const errors = args[0] === "check" ? checkRepository(rootDir).errors : validateRepositoryPolicy(rootDir);
+  if (args[0] === "update") {
+    await runAuxiliaryUpdates(rootDir, {
+      dryRun: args.includes("--dry-run") || args.includes("--report-only"),
+      reportOnly: args.includes("--report-only"),
+    });
+    return 0;
+  }
+
+  const errors =
+    args[0] === "check" ? checkRepository(rootDir).errors : validateRepositoryPolicy(rootDir);
   if (errors.length > 0) {
     console.error("Invalid Dependabot Helper policy:");
     for (const error of errors) console.error(`- ${error}`);
@@ -43,4 +55,4 @@ function main(args: string[], rootDir: string): number {
   return 0;
 }
 
-if (import.meta.main) process.exitCode = main(process.argv.slice(2), process.cwd());
+if (import.meta.main) process.exitCode = await main(process.argv.slice(2), process.cwd());

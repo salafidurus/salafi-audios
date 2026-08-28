@@ -1,9 +1,12 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 
+import type { CiOptions, CiSummary } from "../pkg-update/ci";
+
 import {
   dependabotHelperPolicy,
   matchesDependencyFamily,
+  validatePolicy,
   type DependencyFamily,
 } from "./policy";
 
@@ -17,6 +20,32 @@ interface PackageJson {
 export interface HelperCheckResult {
   accepted: boolean;
   errors: string[];
+}
+
+/** Validates Helper policy against the repository's native Dependabot ignores. */
+export function validateHelperPolicy(rootDir: string): string[] {
+  const source = readFileSync(resolve(rootDir, ".github/dependabot.yml"), "utf8");
+  const ignored = Array.from(
+    source.matchAll(/^\s*-\s*dependency-name:\s*["']?([^"'\s]+)["']?\s*$/gm),
+    (match) => match[1]!,
+  );
+  return validatePolicy(dependabotHelperPolicy, ignored);
+}
+
+/** Runs the scheduled auxiliary update pipeline owned by Dependabot Helper. */
+export function runAuxiliaryUpdates(
+  rootDir: string,
+  options: CiOptions = {},
+): Promise<CiSummary[]> {
+  const policyErrors = validateHelperPolicy(rootDir);
+  if (policyErrors.length > 0) {
+    return Promise.reject(new Error(`Helper policy failed: ${policyErrors.join("; ")}`));
+  }
+  const checks = runHelperChecks(rootDir);
+  if (!checks.accepted) {
+    return Promise.reject(new Error(`Helper checks failed: ${checks.errors.join("; ")}`));
+  }
+  return import("../pkg-update/ci").then(({ runCi }) => runCi(rootDir, options));
 }
 
 function readCatalog(rootDir: string): Record<string, string> {
@@ -52,7 +81,7 @@ function packageVersionMap(rootDir: string, family: DependencyFamily): Map<strin
       for (const [name, version] of Object.entries(section ?? {})) {
         if (matchesDependencyFamily(family, name)) {
           const resolved = version === "catalog:" ? catalog[name] : version;
-          if (resolved) versions.set(name, normalizeVersion(resolved));
+          if (resolved) versions.set(`${workspace}/${name}`, normalizeVersion(resolved));
         }
       }
     }

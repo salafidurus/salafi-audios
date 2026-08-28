@@ -146,9 +146,7 @@ export function resolveDependencyFamily(
     policy.families.find(
       (family) =>
         familyIncludes(family, packageName) &&
-        asPatterns(family.workspaces ?? ["*"]).some((pattern) =>
-          matches(workspacePath, pattern),
-        ),
+        asPatterns(family.workspaces ?? ["*"]).some((pattern) => matches(workspacePath, pattern)),
     ) ?? null
   );
 }

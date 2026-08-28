@@ -1,15 +1,15 @@
 # Dependency automation policy
 
-This document defines the ownership boundary between Dependabot, `pkg-update`,
-and the catalog tooling. The boundary is intentional: one dependency update
-must have one owning updater.
+This document defines the ownership boundary between Dependabot,
+`dependabot-helper`, and catalog alignment. The boundary is intentional: one
+dependency update must have one owning updater.
 
 ## Ownership summary
 
 | System | Owns | Must not do |
 | --- | --- | --- |
 | Dependabot | Ordinary dependency and GitHub Actions updates | Update dependencies owned by a compatibility pipeline |
-| `pkg-update` | Compatibility-sensitive edge cases that Dependabot cannot safely resolve | Re-propose ordinary dependencies already owned by Dependabot |
+| `dependabot-helper` | Compatibility-sensitive updates and invariant checks that Dependabot cannot safely resolve alone | Re-propose ordinary dependencies or create proposals for checks |
 | Catalog tooling | Workspace version alignment, policy evaluation, repair reporting, and lockfile validation | Act as a competing dependency-version source or updater |
 
 ## Dependabot
@@ -29,22 +29,28 @@ compatibility pipeline.
 Web Testing Library packages may be grouped together. Native Testing Library
 packages remain outside that web group and are reviewed independently.
 
-## `pkg-update`
+## `dependabot-helper`
 
-`pkg-update` exists for updates that require repository-aware coordination.
-Its ordinary catalog groups must not duplicate Dependabot ownership.
+`dependabot-helper` is the single public boundary for updates that require
+repository-aware coordination and for checks that enforce dependency
+invariants. Its typed policy classifies each family as Dependabot-owned,
+helper-owned, or helper-checked.
 
-The Expo pipeline is a `pkg-update` compatibility pipeline. It selects the Expo
-SDK target, updates the Expo dependency, runs `expo install --fix`, and then
-runs `expo-doctor`. `jest-expo` is managed only as part of this pipeline; it is
-not a standalone `pkg-update` candidate.
+The Expo pipeline selects the Expo SDK target, updates the Expo dependency,
+runs `expo install --fix`, and then runs `expo-doctor`. `jest-expo` is managed
+only as part of this pipeline; it is not a standalone candidate.
 
-The Bun pipeline is also a `pkg-update` edge case because it updates the package
-manager declaration and related Bun metadata together.
+The Bun pipeline updates the package manager declaration and related Bun
+metadata together.
 
-If a future compatibility-sensitive dependency needs `pkg-update` ownership,
-it must be declared in the compatibility configuration with an owner and a
+If a future compatibility-sensitive dependency needs helper ownership, it must
+be declared in the typed helper policy with an ecosystem-specific pipeline and
 validation contract. It must also be removed from ordinary Dependabot groups.
+
+Helper checks, including Prisma and Better Auth exact-version checks, validate
+the current repository state without creating update proposals. A failed
+resolver, validation command, install, or lockfile operation rejects the
+update transaction and must not leave an accepted partial update.
 
 ## Catalog tooling
 
@@ -61,7 +67,7 @@ repair fails closed and produces an audit result.
 
 For compatibility groups, the catalog records the owning pipeline and its
 validation commands. The Expo group is owned by `expo-pipeline` and is executed
-by `pkg-update`; the catalog does not compete with that pipeline.
+by `dependabot-helper`; the catalog does not compete with that pipeline.
 
 ## Change checklist
 

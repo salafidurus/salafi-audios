@@ -94,7 +94,7 @@ describe("Dependabot Helper CLI boundary", () => {
     expect(checkRepository(fixtureRoot)).toEqual({
       accepted: false,
       errors: [
-        "family 'prisma' failed exact-version check: prisma=7.10.0, @prisma/client=7.10.1",
+        "family 'prisma' failed exact-version check: apps/api/prisma=7.10.0, packages/core-db/@prisma/client=7.10.1",
       ],
     });
   });
