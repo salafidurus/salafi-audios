@@ -218,6 +218,10 @@ function mapOriginalListingTranslation(
   };
 }
 
+function mapOriginalListingTitle(original: { title: string } | null | undefined) {
+  return original ? { title: original.title } : undefined;
+}
+
 @Injectable()
 export class ListingRepository {
   constructor(
@@ -928,23 +932,15 @@ export class ListingRepository {
         slug: r.slug,
         title: resolved.fields.title,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original ? { title: resolved.original.title } : undefined,
-        durationSeconds: r.durationSeconds ?? undefined,
+        original: mapOriginalListingTitle(resolved.original),
+        durationSeconds: toOptional(r.durationSeconds),
         scholar: {
           id: r.scholar.id,
           slug: r.scholar.slug,
           name: scholarName,
-          imageUrl: r.scholar.imageUrl ?? undefined,
+          imageUrl: toOptional(r.scholar.imageUrl),
         },
-        primaryAudioAsset: r.audioAssets[0]
-          ? {
-              id: r.audioAssets[0].id,
-              url: r.audioAssets[0].url,
-              format: r.audioAssets[0].format ?? undefined,
-              bitrateKbps: r.audioAssets[0].bitrateKbps ?? undefined,
-              durationSeconds: r.audioAssets[0].durationSeconds ?? undefined,
-            }
-          : null,
+        primaryAudioAsset: mapPrimaryAudioAsset(r.audioAssets[0] ?? null),
       };
     });
   }
