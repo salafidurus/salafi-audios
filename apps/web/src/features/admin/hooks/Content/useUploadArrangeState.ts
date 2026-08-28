@@ -706,14 +706,10 @@ function buildLessonOps(
   return ops;
 }
 
-export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
-  const { existing } = state;
-  if (!existing) return { lessons: [] };
-
-  if (existing.format === "series") {
-    return { lessons: buildLessonOps(state, existing, ROOT_MODULE_KEY) };
-  }
-
+function buildCollectionCommitDto(
+  state: UploadArrangeState,
+  existing: NonNullable<UploadArrangeState["existing"]>,
+): ArrangeCommitDto {
   const modules: ArrangeModuleOp[] = [];
   for (const mod of state.newModules) {
     modules.push({
@@ -728,11 +724,20 @@ export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
   }
   for (const mod of existing.modules) {
     const lessons = buildLessonOps(state, existing, mod.id);
-    if (lessons.length > 0) {
-      modules.push({ op: "update", id: mod.id, lessons });
-    }
+    if (lessons.length > 0) modules.push({ op: "update", id: mod.id, lessons });
   }
   return { modules };
+}
+
+export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
+  const { existing } = state;
+  if (!existing) return { lessons: [] };
+
+  if (existing.format === "series") {
+    return { lessons: buildLessonOps(state, existing, ROOT_MODULE_KEY) };
+  }
+
+  return buildCollectionCommitDto(state, existing);
 }
 
 /** Slugs staged more than once, or colliding with existing children. */
