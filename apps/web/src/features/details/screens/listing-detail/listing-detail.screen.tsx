@@ -41,6 +41,14 @@ function getContentCountLabel(
 ) {
   const isCollection = format === "collection";
   const count = isCollection ? moduleCount : itemCount;
+  return getCountTranslation(isCollection, count, t);
+}
+
+function getCountTranslation(
+  isCollection: boolean,
+  count: number,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
   const singular = count === 1;
   return t(
     isCollection
