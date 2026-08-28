@@ -1,4 +1,3 @@
-/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { useAudio, useQueue } from "@sd/domain-audio";

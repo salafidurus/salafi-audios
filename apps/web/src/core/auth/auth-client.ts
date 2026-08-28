@@ -1,7 +1,8 @@
 import { adminClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
-/** Documents this module's responsibility and public boundary. */
+/** Exposes the browser authentication boundary. */
+/** Sends browser auth requests to the API with credentials so its session cookie is included. */
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_API_URL!,
   plugins: [adminClient()],
@@ -10,5 +11,5 @@ export const authClient = createAuthClient({
   },
 });
 
-/** Documents the intent and contract of this declaration. */
+/** Mirrors the authenticated user shape inferred from the configured Better Auth client. */
 export type User = typeof authClient.$Infer.Session.user;

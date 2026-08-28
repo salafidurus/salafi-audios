@@ -4,7 +4,8 @@ import { isHtmlElement } from "@/shared/lib/runtime-guards";
 
 import styles from "./list-item.module.css";
 
-/** Documents this module's responsibility and public boundary. */
+/** Provides a responsive list-row primitive. */
+/** Props for a responsive row that may be activated as a keyboard-accessible button. */
 export type ListItemProps = {
   children: ReactNode;
   onClick?: () => void;
@@ -78,7 +79,7 @@ function getListItemAttributes({
   className,
 }: Pick<ListItemProps, "id" | "highlighted" | "className"> & {
   isClickable: boolean;
-  /** Documents the intent and contract of this field. */ showHoverStates: boolean;
+  /** Enables visual affordances for rows with nested actions but no row click. */ showHoverStates: boolean;
 }) {
   return {
     id,

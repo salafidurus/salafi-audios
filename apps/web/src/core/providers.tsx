@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Installs the shared runtime providers used by every web route. */
 "use client";
 
 import { initApiClient, setLocaleProvider, setUnauthorizedHandler } from "@sd/core-api";
@@ -16,6 +16,8 @@ import { hasDocument, hasWindow } from "@/shared/lib/runtime-guards";
 import { initProgressPersistence } from "./audio/progress-persistence";
 import { createI18n } from "./i18n/i18n";
 
+/** Installs the shared runtime providers used by every web route. */
+/** Composes API, query, auth, locale, toast, and local-first persistence for every web route. */
 // Initialize the API client at module load time to prevent race conditions during hydration/mount
 if (process.env.NEXT_PUBLIC_API_URL) {
   initApiClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL });
@@ -36,6 +38,7 @@ type Props = {
   initialLocale: Locale;
 };
 
+/** Installs the shared clients and synchronizes authenticated progress with the API. */
 export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   const [i18n] = useState(() => createI18n(initialLocale));
   const { isAuthenticated, user } = useAuth();

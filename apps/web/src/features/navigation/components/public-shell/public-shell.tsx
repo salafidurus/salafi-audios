@@ -1,15 +1,18 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides the navigation, content, and footer boundary for public consent pages. */
 "use client";
 
 import { Footer } from "../footer/footer";
 import { PublicNavigation } from "../public-navigation/public-navigation";
 
+/** Provides the navigation, content, and footer boundary for public consent pages. */
+/** Supplies the navigation and footer boundary shared by public consent pages. */
 type PublicShellProps = {
   children: React.ReactNode;
   beforeFooter?: React.ReactNode;
   simulateFailure?: boolean;
 };
 
+/** Wraps public pages with navigation, consent-aware content spacing, and the footer. */
 export function PublicShell({ children, beforeFooter, simulateFailure = false }: PublicShellProps) {
   if (simulateFailure) {
     throw new Error("Intentional public shell failure");

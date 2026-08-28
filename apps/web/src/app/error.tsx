@@ -1,13 +1,15 @@
-/** Documents this module's responsibility and public boundary. */
+/** Renders a provider-independent recovery page when the application shell fails. */
 "use client";
 
 import styles from "./error.module.css";
 
 type ErrorProps = {
+  /** Framework error retained for logging or diagnostics by the boundary. */
   error: Error & { digest?: string };
   reset: () => void;
 };
 
+/** Renders a provider-independent recovery page when the application shell fails. */
 export default function Error({ error, reset }: ErrorProps) {
   // Keep the last-resort boundary independent from the application runtime.
   void error;

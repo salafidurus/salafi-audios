@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides the responsive sign-in prompt used when protected content is unavailable. */
 "use client";
 
 import React, { useState } from "react";
@@ -10,14 +10,14 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import { AuthRequiredStateDesktop } from "./AuthRequiredState.desktop";
 import { AuthRequiredStateMobile } from "./AuthRequiredState.mobile";
 
-/** Documents the intent and contract of this declaration. */
+/** Text and optional action label shown when a feature requires authentication. */
 export type AuthRequiredStateProps = {
   title: string;
   description: string;
   actionLabel?: string;
 };
 
-/** Documents the intent and contract of this declaration. */
+/** Shows the responsive sign-in prompt and opens the shared authentication modal. */
 export function AuthRequiredState({ title, description, actionLabel }: AuthRequiredStateProps) {
   const isHydrated = useIsHydrated();
   const { isMobile, isTablet } = useResponsive();

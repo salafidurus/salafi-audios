@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 
-/** Documents this module's responsibility and public boundary. */
+/** Lists authenticated and administrative routes that search engines must not crawl. */
 const DISALLOW_PATHS = ["/admin", "/settings", "/sign-in", "/my-library", "/auth"] as const;
 
+/** Produces environment-aware crawler rules and links to the web and API sitemaps. */
 export default function robots(): MetadataRoute.Robots {
   const isProduction =
     process.env.NODE_ENV === "production" &&

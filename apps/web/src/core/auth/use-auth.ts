@@ -1,6 +1,7 @@
 import { authClient } from "./auth-client";
 
-/** Documents this module's responsibility and public boundary. */
+/** Reads the Better Auth session for web consumers. */
+/** Projects the Better Auth session into stable loading, identity, and authentication flags. */
 export function useAuth() {
   const { data: session, isPending } = authClient.useSession();
   return {

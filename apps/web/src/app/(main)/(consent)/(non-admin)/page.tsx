@@ -1,5 +1,5 @@
 // react-doctor-disable-next-line react-doctor/nextjs-missing-metadata
-/** Documents this module's responsibility and public boundary. */
+/** Hosts the public study landing page and its resume-listening entry point. */
 "use client";
 
 import { routes } from "@sd/core-contracts";
@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { HomeScreen } from "@/features/home";
 
+/** Hosts the public study landing page and routes resume actions to lecture details. */
 export default function HomePage() {
   const { push } = useRouter();
 

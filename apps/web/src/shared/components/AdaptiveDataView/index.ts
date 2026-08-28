@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Re-exports the responsive data table and its state/sort contracts. */
 export { AdaptiveDataView } from "./AdaptiveDataView";
 export type {
   AdaptiveDataViewColumn,

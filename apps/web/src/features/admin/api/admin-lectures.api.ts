@@ -17,7 +17,8 @@ import type {
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { z } from "zod";
 
-/** Documents this module's responsibility and public boundary. */
+/** Exposes listing administration, media upload, and arrange API operations. */
+/** Fetches a short-lived object-storage URL authorized for one audio upload. */
 export function getPresignedUrl(data: PresignedUrlRequestDto) {
   return httpClient<PresignedUrlResponseDto>({
     url: endpoints.admin.media.presignedUrl,
@@ -26,7 +27,7 @@ export function getPresignedUrl(data: PresignedUrlRequestDto) {
   });
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Uploads audio directly to object storage after the API has authorized the URL. */
 export async function uploadToR2(
   uploadUrl: string,
   file: Blob,
@@ -44,7 +45,7 @@ export async function uploadToR2(
   }
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Requests object-storage URLs for a batch of staged audio items. */
 export function getBatchPresignedUrls(data: BatchPresignAudioRequestDto) {
   return httpClient<BatchPresignAudioResponseDto>({
     url: endpoints.admin.media.presignBatch,
@@ -82,7 +83,7 @@ export function uploadToR2WithProgress(
   });
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Loads the existing lessons and modules needed to arrange a listing. */
 export function fetchArrangeData(id: string) {
   return httpClient<AdminArrangeDataDto>({
     url: endpoints.admin.listings.arrangeData(id),
@@ -90,7 +91,7 @@ export function fetchArrangeData(id: string) {
   });
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Identifies a commit conflict so the editor can mark the conflicting slugs. */
 export class ArrangeConflictError extends Error {
   constructor(public readonly conflictingSlugs: string[]) {
     super("Some slugs are already in use");
@@ -116,7 +117,7 @@ function raiseArrangeConflict(message: string): void {
   }
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Commits staged lesson, module, ordering, and media changes atomically. */
 export async function commitArrange(id: string, data: ArrangeCommitDto) {
   try {
     return await httpClient<ArrangeCommitResultDto>({
@@ -133,7 +134,7 @@ export async function commitArrange(id: string, data: ArrangeCommitDto) {
   }
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Creates a listing and returns its administrative detail representation. */
 export function createLecture(data: CreateListingDto) {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.create,
@@ -142,7 +143,7 @@ export function createLecture(data: CreateListingDto) {
   });
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Updates metadata fields without changing the listing's uploaded media. */
 export function updateListingDetails(id: string, data: UpdateListingDetailsDto) {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.updateDetails(id),
@@ -151,7 +152,7 @@ export function updateListingDetails(id: string, data: UpdateListingDetailsDto) 
   });
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Updates the media references associated with an existing listing. */
 export function updateListingMedia(id: string, data: UpdateListingMediaDto) {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.updateMedia(id),
@@ -163,7 +164,7 @@ export function updateListingMedia(id: string, data: UpdateListingMediaDto) {
 function buildLectureListQuery(params?: {
   cursor?: string;
   search?: string;
-  /** Documents the intent and contract of this field. */ status?: string;
+  /** Filters by the server's listing publication status. */ status?: string;
   scholarId?: string;
 }) {
   const query = new URLSearchParams();
@@ -173,11 +174,11 @@ function buildLectureListQuery(params?: {
   return query.toString();
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Fetches the filtered, cursor-paginated listing inventory for administrators. */
 export function fetchAdminLectures(params?: {
   cursor?: string;
   search?: string;
-  /** Documents the intent and contract of this field. */ status?: string;
+  /** Filters by the server's listing publication status. */ status?: string;
   scholarId?: string;
 }) {
   const queryString = buildLectureListQuery(params);
@@ -191,7 +192,7 @@ export function fetchAdminLectures(params?: {
   });
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Loads the normalized form options and current values for a listing editor. */
 export function fetchListingFormData(id: string) {
   return httpClient<ListingFormDataDto>({
     url: endpoints.admin.listings.formData(id),
@@ -199,7 +200,7 @@ export function fetchListingFormData(id: string) {
   });
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Loads promotion settings used by the administrative listing tools. */
 export function getAdminPromotions() {
   return httpClient<any>({
     url: endpoints.admin.listings.promotions,
@@ -207,7 +208,7 @@ export function getAdminPromotions() {
   });
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Persists promotion settings through the administrative API. */
 export function updateAdminPromotions(body: any) {
   return httpClient<any>({
     url: endpoints.admin.listings.promotions,

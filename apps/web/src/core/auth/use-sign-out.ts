@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Signs out the current user and returns the browser to the public home route. */
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import { hasWindow } from "@/shared/lib/runtime-guards";
 
 import { authClient } from "./auth-client";
 
+/** Signs out the current user, reports a localized failure, and returns to the public home route. */
 export function useSignOut() {
   const router = useRouter();
   const { t } = useTranslation();

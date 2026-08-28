@@ -4,14 +4,17 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 
 import styles from "./EmptyState.module.css";
 
-/** Documents this module's responsibility and public boundary. */
+/** Provides semantic feedback cards for content states. */
+/** Selects the icon and live-region urgency for an empty, loading, denied, or failed panel. */
 export type EmptyStateVariant = "empty" | "loading" | "denied" | "error";
 
+/** Message and semantic state for a compact card-level feedback panel. */
 export type EmptyStateProps = {
   message: string;
   variant?: EmptyStateVariant;
 };
 
+/** Renders accessible feedback for absent, loading, denied, or failed content. */
 export function EmptyState({ message, variant = "empty" }: EmptyStateProps) {
   const Icon = getStateIcon(variant);
   const isAlert = isAlertVariant(variant);

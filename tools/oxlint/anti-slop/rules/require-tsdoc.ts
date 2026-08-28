@@ -31,8 +31,15 @@ function nearestDocumentation(
   node: ESTree.Node,
   sourceCode: SourceCode,
 ): ESTree.Comment | undefined {
-  const comment = sourceCode.getCommentsBefore(node).at(-1);
-  if (comment === undefined || comment.loc.end.line + 1 < node.loc.start.line) return undefined;
+  // Ignore line comments used by neighboring linters for suppressions. A valid
+  // TSDoc block may intentionally sit immediately before such a suppression.
+  const comment = sourceCode
+    .getCommentsBefore(node)
+    .toReversed()
+    .find((candidate) => candidate.type === "Block");
+  // Permit one intervening line comment, such as a React Doctor suppression,
+  // between the TSDoc block and the declaration it documents.
+  if (comment === undefined || comment.loc.end.line + 2 < node.loc.start.line) return undefined;
   return comment;
 }
 

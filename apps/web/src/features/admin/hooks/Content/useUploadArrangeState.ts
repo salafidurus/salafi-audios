@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Owns the reducer-backed client state for staging, arranging, uploading, and committing audio. */
 "use client";
 
 import type {
@@ -25,26 +25,26 @@ export type ModuleKey = string;
 /** Identifies the synthetic root module used for series and single-listing uploads. */
 export const ROOT_MODULE_KEY = "root";
 
-/** Documents the intent and contract of this declaration. */
+/** Describes where a staged audio item will be committed in the listing tree. */
 export type UploadItemAssignment =
   | {
-      /** Documents the intent and contract of this field. */ kind: "new-lesson";
+      /** A new lesson is created under this existing or staged module. */ kind: "new-lesson";
       moduleKey: ModuleKey;
-      /** Documents the intent and contract of this field. */ slug: string;
-      /** Documents the intent and contract of this field. */ slugEdited: boolean;
+      /** The proposed lesson slug, including any user edits. */ slug: string;
+      /** Prevents filename-derived suggestions from overwriting a user edit. */ slugEdited: boolean;
       description: string;
-      /** Documents the intent and contract of this field. */ status: StatusValue;
+      /** Publication status assigned when the lesson is committed. */ status: StatusValue;
       orderIndex: number | null;
     }
   | {
-      /** Documents the intent and contract of this field. */ kind: "replace-audio";
+      /** Replaces media for an existing lesson without creating a new lesson. */ kind: "replace-audio";
       lessonId: string;
     }
-  | { /** Documents the intent and contract of this field. */ kind: "replace-root-audio" };
+  | { /** Replaces the audio attached directly to the root listing. */ kind: "replace-root-audio" };
 
-/** Documents the intent and contract of this declaration. */
+/** Tracks each item's transfer state and storage metadata across the upload pipeline. */
 export interface UploadItemProgress {
-  /** Documents the intent and contract of this field. */ status:
+  /** Tracks the current transfer stage; `percent` applies to the active stage. */ status:
     | "pending"
     | "downloading"
     | "uploading"
@@ -55,22 +55,24 @@ export interface UploadItemProgress {
   totalBytes?: number;
   objectKey?: string;
   uploadUrl?: string;
-  /** Documents the intent and contract of this field. */ error?: string;
+  /** User-facing failure detail retained for retry or inline error rendering. */ error?: string;
 }
 
 /** Where an item's bytes come from: already-picked local File, or a URL fetched at upload time. */
 export type UploadItemSource =
-  | { /** Documents the intent and contract of this field. */ kind: "local"; file: File }
-  | { /** Documents the intent and contract of this field. */ kind: "url"; url: string };
+  | { /** Bytes already available in the browser. */ kind: "local"; file: File }
+  | { /** Bytes fetched just before upload begins. */ kind: "url"; url: string };
 
-/** Documents the intent and contract of this declaration. */
+/** Complete client-side representation of one audio item before arrange commit. */
 export interface UploadItem {
   id: string;
-  /** Documents the intent and contract of this field. */ source: UploadItemSource;
+  /** Original bytes or remote source used by the upload pipeline. */ source: UploadItemSource;
   filename: string;
   title: string;
   numericPrefix: number | null;
-  /** Documents the intent and contract of this field. */ durationSeconds: number | null;
+  /** Duration discovered from metadata; null when the browser could not determine it. */ durationSeconds:
+    | number
+    | null;
   sizeBytes: number;
   contentType: string;
   ext: string;
@@ -79,38 +81,40 @@ export interface UploadItem {
   upload: UploadItemProgress;
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Client-only module draft that becomes persisted during commit. */
 export interface NewModule {
   tempId: string;
-  /** Documents the intent and contract of this field. */ slug: string;
-  /** Documents the intent and contract of this field. */ slugEdited: boolean;
+  /** Proposed child-prefix slug used to derive lesson slugs. */ slug: string;
+  /** Keeps automatic slug derivation from replacing an explicit edit. */ slugEdited: boolean;
   title: string;
   description: string;
-  /** Documents the intent and contract of this field. */ status: StatusValue;
+  /** Publication status sent for the newly created module. */ status: StatusValue;
   orderIndex: number | null;
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Phase of the arrange workflow, from local editing through server commit. */
 export type UploadArrangePhase = "editing" | "presigning" | "uploading" | "committing" | "done";
 
-/** Documents the intent and contract of this declaration. */
+/** Reducer state for staged files, module drafts, transfer progress, and conflicts. */
 export interface UploadArrangeState {
   existing: AdminArrangeDataDto | null;
   items: UploadItem[];
   newModules: NewModule[];
   phase: UploadArrangePhase;
-  /** Documents the intent and contract of this field. */ error: string | null;
-  /** Documents the intent and contract of this field. */ conflictSlugs: string[];
+  /** Last workflow error, cleared when a new operation begins. */ error: string | null;
+  /** Slugs rejected by the server during commit and shown for correction. */ conflictSlugs: string[];
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Events accepted by the arrange reducer; actions preserve immutable staged state. */
 export type UploadArrangeAction =
   | { type: "INIT_EXISTING"; data: AdminArrangeDataDto }
   | {
       type: "ADD_FILES";
       files: {
         file: File;
-        /** Documents the intent and contract of this field. */ durationSeconds: number | null;
+        /** Duration discovered for the local file before it enters the queue. */ durationSeconds:
+          | number
+          | null;
       }[];
     }
   | {
@@ -120,7 +124,9 @@ export type UploadArrangeAction =
         filename: string;
         contentType: string;
         sizeBytes: number;
-        /** Documents the intent and contract of this field. */ durationSeconds: number | null;
+        /** Duration retained for a remote item before its bytes are downloaded. */ durationSeconds:
+          | number
+          | null;
       }[];
     }
   | { type: "RENAME_ITEM"; itemId: string; title: string }
@@ -148,7 +154,9 @@ export type UploadArrangeAction =
   | {
       type: "UPLOAD_PROGRESS";
       itemId: string;
-      /** Documents the intent and contract of this field. */ status: "downloading" | "uploading";
+      /** Identifies whether progress is downloading a URL source or uploading bytes. */ status:
+        | "downloading"
+        | "uploading";
       percent: number;
       loadedBytes?: number;
       totalBytes?: number;
@@ -157,19 +165,19 @@ export type UploadArrangeAction =
   | {
       type: "UPLOAD_ERROR";
       itemId: string;
-      /** Documents the intent and contract of this field. */ error: string;
+      /** Failure detail associated with the item transfer. */ error: string;
     }
   | {
       type: "COMMIT_CONFLICT";
-      /** Documents the intent and contract of this field. */ conflictSlugs: string[];
+      /** Slugs rejected by the server's uniqueness checks. */ conflictSlugs: string[];
     }
   | {
       type: "SET_ERROR";
-      /** Documents the intent and contract of this field. */ error: string | null;
+      /** Sets or clears the workflow-level error. */ error: string | null;
     }
   | {
       type: "SET_ALL_LESSON_STATUS";
-      /** Documents the intent and contract of this field. */ status: StatusValue;
+      /** Applies a publication status to every staged new lesson. */ status: StatusValue;
     };
 
 const INITIAL_STATE: UploadArrangeState = {
@@ -221,7 +229,7 @@ function existingModuleParentSlug(state: UploadArrangeState, moduleKey: ModuleKe
   );
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Resolves the slug prefix inherited by a root, existing, or staged module. */
 export function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
   if (moduleKey === ROOT_MODULE_KEY) return existingRootSlug(state);
   if (moduleKey.startsWith("new:")) return newModuleParentSlug(state, moduleKey);
@@ -275,11 +283,11 @@ function sortItemsByOrderIndex(items: UploadItem[]): UploadItem[] {
 }
 
 interface StagedItemInput {
-  /** Documents the intent and contract of this field. */ source: UploadItemSource;
+  /** Source retained until the transfer worker consumes the item. */ source: UploadItemSource;
   filename: string;
   contentType: string;
   sizeBytes: number;
-  /** Documents the intent and contract of this field. */ durationSeconds: number | null;
+  /** Audio duration discovered before staging, when available. */ durationSeconds: number | null;
 }
 
 /** Shared by ADD_FILES and ADD_URL_ITEMS — identical sorting/slug-derivation/order-cursor
@@ -673,7 +681,7 @@ function itemAudioRef(item: UploadItem) {
   };
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Converts staged items into the batch request used to obtain upload URLs. */
 export function buildPresignRequest(state: UploadArrangeState): BatchPresignAudioRequestDto {
   const rootSlug = state.existing?.slug ?? "";
   return {
@@ -703,7 +711,7 @@ function createLessonOp(
   item: UploadItem,
   assignment: Extract<
     UploadItem["assignment"],
-    { /** Documents the intent and contract of this field. */ kind: "new-lesson" }
+    { /** Narrows the assignment to a lesson creation operation. */ kind: "new-lesson" }
   >,
 ): ArrangeLessonOp {
   return {
@@ -721,7 +729,7 @@ function getReplaceLessonOp(
   item: UploadItem,
   assignment: Extract<
     UploadItem["assignment"],
-    { /** Documents the intent and contract of this field. */ kind: "replace-audio" }
+    { /** Narrows the assignment to an existing lesson media replacement. */ kind: "replace-audio" }
   >,
   existing: NonNullable<UploadArrangeState["existing"]>,
   moduleKey: ModuleKey,
@@ -775,7 +783,7 @@ function buildCollectionCommitDto(
   return { modules };
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Converts the staged tree into the atomic arrange payload sent to the API. */
 export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
   const { existing } = state;
   if (!existing) return { lessons: [] };
@@ -817,12 +825,12 @@ function findSlugConflicts(staged: string[], existingSlugs: Set<string>): string
   return [...conflicts];
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Finds duplicate staged slugs and slugs already used by the listing. */
 export function localSlugConflicts(state: UploadArrangeState): string[] {
   return findSlugConflicts(getStagedSlugs(state), getExistingSlugs(state));
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Exposes arrange state and its reducer dispatcher to the upload editor. */
 export function useUploadArrangeState() {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   return { state, dispatch };

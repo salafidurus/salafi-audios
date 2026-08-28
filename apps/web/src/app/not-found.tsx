@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Renders the localized public 404 state without exposing protected navigation. */
 "use client";
 
 import { routes } from "@sd/core-contracts";
@@ -9,6 +9,7 @@ import { PublicShell } from "@/features/navigation/components/public-shell/publi
 
 import styles from "./not-found.module.css";
 
+/** Renders the localized public 404 state without exposing protected navigation. */
 export default function NotFound() {
   const { t } = useTranslation();
 

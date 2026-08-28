@@ -1,7 +1,8 @@
 import { resolveRouteAccess } from "@sd/core-contracts";
 import { NextResponse, type NextRequest } from "next/server";
 
-/** Documents this module's responsibility and public boundary. */
+/** Provides route-level access enforcement for the web application. */
+/** Enforces route authentication from the session cookie before Next renders a page. */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie =
@@ -24,6 +25,7 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
+/** Excludes API and static asset paths from the authentication proxy. */
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon\\.ico|.*\\.png$).*)"],
 };

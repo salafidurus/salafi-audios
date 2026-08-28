@@ -7,12 +7,13 @@ import { LocaleMessagesSchema, mergeLocaleMessages } from "./merge-locale-messag
 
 // JSON locale files from the shared core-i18n package
 // Using require() because Next.js handles JSON imports differently in RSC vs client
-/** Documents this module's responsibility and public boundary. */
+/** Loads shared and web-specific locale messages into an isolated React i18next instance. */
 const enShared = LocaleMessagesSchema.parse(require("@sd/core-i18n/locales/en.json"));
 const arShared = LocaleMessagesSchema.parse(require("@sd/core-i18n/locales/ar.json"));
 const enOverrides = LocaleMessagesSchema.parse(require("./overrides.en.json"));
 const arOverrides = LocaleMessagesSchema.parse(require("./overrides.ar.json"));
 
+/** Creates an i18n instance with English fallback and validated Arabic/English resources. */
 export function createI18n(initialLocale: Locale): i18n {
   const instance = i18next.createInstance();
   instance.use(initReactI18next).init({
