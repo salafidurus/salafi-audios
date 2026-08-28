@@ -10,6 +10,7 @@ coverage/
 dist/
 **/dist/
 .worktrees/
+.worktree/
 .superpowers/
 
 .antigravitycli/
