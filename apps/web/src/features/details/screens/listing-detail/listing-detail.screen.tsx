@@ -191,6 +191,27 @@ type LoadedListingView = {
   t: Translation["t"];
 };
 
+function ListingSearch({
+  visible,
+  search,
+  t,
+}: {
+  visible: boolean;
+  search: { value: string; onChange: (value: string) => void };
+  t: Translation["t"];
+}) {
+  if (!visible) return null;
+  return (
+    <div className={styles.searchWrapper}>
+      <Search.Bar
+        value={search.value}
+        onChange={search.onChange}
+        placeholder={t("listing.searchPlaceholder", "Search lessons…")}
+      />
+    </div>
+  );
+}
+
 function LoadedListing({ view }: { view: LoadedListingView }) {
   const { listing, contents, isFetchingContents, isMultiItem, content, search, router, t } = view;
   return (
@@ -214,15 +235,7 @@ function LoadedListing({ view }: { view: LoadedListingView }) {
             moduleCount={contents?.format === "collection" ? contents.modules.length : undefined}
           />
           <QuickButtonSection listing={listing} contents={contents} />
-          {isMultiItem ? (
-            <div className={styles.searchWrapper}>
-              <Search.Bar
-                value={search.value}
-                onChange={search.onChange}
-                placeholder={t("listing.searchPlaceholder", "Search lessons…")}
-              />
-            </div>
-          ) : null}
+          <ListingSearch visible={isMultiItem} search={search} t={t} />
         </aside>
         <main className={styles.contentColumn}>
           <StickyHeaderLayout>
@@ -394,22 +407,54 @@ function useListingContentModel({
     t,
   );
   const contentHeading = getContentHeading(listing?.format, t);
-  const content =
-    contents && listing
-      ? {
-          contents,
-          listing,
-          contentCount,
-          contentCountLabel,
-          contentHeading,
-          filteredSingleOrSeriesItems,
-          filteredModules,
-          formatScholarName,
-          highlightItemId,
-        }
-      : undefined;
+  const content = buildListingContentModel({
+    contents,
+    listing,
+    contentCount,
+    contentCountLabel,
+    contentHeading,
+    filteredSingleOrSeriesItems,
+    filteredModules,
+    formatScholarName,
+    highlightItemId,
+  });
 
   return { isMultiItem, content };
+}
+
+function buildListingContentModel({
+  contents,
+  listing,
+  contentCount,
+  contentCountLabel,
+  contentHeading,
+  filteredSingleOrSeriesItems,
+  filteredModules,
+  formatScholarName,
+  highlightItemId,
+}: {
+  contents: ListingContents | undefined;
+  listing: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined;
+  contentCount: number;
+  contentCountLabel: string;
+  contentHeading: string | null;
+  filteredSingleOrSeriesItems: React.ComponentProps<typeof ContentList>["items"];
+  filteredModules: React.ComponentProps<typeof CollectionContentLayout>["modules"];
+  formatScholarName: FormatScholarName;
+  highlightItemId: string | undefined;
+}): ListingContentModel | undefined {
+  if (!contents || !listing) return undefined;
+  return {
+    contents,
+    listing,
+    contentCount,
+    contentCountLabel,
+    contentHeading,
+    filteredSingleOrSeriesItems,
+    filteredModules,
+    formatScholarName,
+    highlightItemId,
+  };
 }
 
 export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
