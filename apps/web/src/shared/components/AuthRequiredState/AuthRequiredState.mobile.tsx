@@ -1,8 +1,9 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides the copy and action used when a mobile user must authenticate. */
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
 
+/** Configures the mobile authentication-required empty state. */
 export type AuthRequiredStateMobileProps = {
   title: string;
   description: string;
@@ -10,6 +11,7 @@ export type AuthRequiredStateMobileProps = {
   onPress: () => void;
 };
 
+/** Renders a mobile-sized sign-in prompt for protected content. */
 export function AuthRequiredStateMobile({
   title,
   description,

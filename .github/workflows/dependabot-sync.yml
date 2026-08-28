@@ -7,7 +7,6 @@ on:
     paths:
       - "**/package.json"
       - "bun.lock"
-      - "catalog.config.json"
 
 permissions:
   contents: write
@@ -63,7 +62,7 @@ jobs:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           git fetch origin "$PR_HEAD_SHA"
-          git checkout "$PR_HEAD_SHA" -- ':(glob)**/package.json' 'bun.lock' 'catalog.config.json'
+          git checkout "$PR_HEAD_SHA" -- ':(glob)**/package.json' 'bun.lock'
 
       - name: Normalize catalog and produce repair report
         id: repair
@@ -101,8 +100,8 @@ jobs:
         env:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          git add -- ':(glob)**/package.json' 'bun.lock' 'catalog.config.json'
-          if git diff --cached --quiet "$PR_HEAD_SHA" -- ':(glob)**/package.json' 'bun.lock' 'catalog.config.json'; then
+          git add -- ':(glob)**/package.json' 'bun.lock'
+          if git diff --cached --quiet "$PR_HEAD_SHA" -- ':(glob)**/package.json' 'bun.lock'; then
             echo "committed=false" >> "$GITHUB_OUTPUT"
           else
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

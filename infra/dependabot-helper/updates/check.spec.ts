@@ -11,7 +11,7 @@ import {
   checkBun as checkBunWithRealFetcher,
   checkExpo as checkExpoWithRealFetcher,
 } from "./check";
-import { config, type PkupdateConfig } from "./pkg-update.config";
+import { config, type PkupdateConfig } from "./update.config";
 
 const fetchLatestVersionMock = async (name: string): Promise<string | null> => {
   const versions: Record<string, string> = {
@@ -35,7 +35,7 @@ const checkAll = (rootDir: string, cfg: PkupdateConfig) =>
   checkAllWithRealFetcher(rootDir, cfg, fetchLatestVersionMock);
 
 function createTempPkg(content: Record<string, unknown>): string {
-  const dir = mkdtempSync(join(tmpdir(), "pkg-update-test-"));
+  const dir = mkdtempSync(join(tmpdir(), "dependabot-helper-check-test-"));
   writeFileSync(join(dir, "package.json"), JSON.stringify(content));
   return dir;
 }
@@ -63,7 +63,7 @@ describe("filterByGroups", () => {
   });
 });
 
-describe("pkg-update ownership contract", () => {
+describe("Dependabot Helper ownership contract", () => {
   it("does not configure ordinary dependency groups", () => {
     expect(Object.keys(config.groups)).toEqual([]);
     expect(config.bun.enabled).toBe(true);

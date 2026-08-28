@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 
-import type { CatalogRepairReport } from "../catalog/types";
+import type { CatalogRepairReport } from "./catalog/types";
 
-import { formatDependabotAuditComment, validateDependabotFiles } from "../catalog/dependabot";
+import { formatDependabotAuditComment, validateDependabotFiles } from "./catalog/dependabot";
 import {
   runAuxiliaryUpdates,
   runHelperChecks,

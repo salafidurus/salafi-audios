@@ -1,9 +1,10 @@
-/** Documents this module's responsibility and public boundary. */
+/** Exposes shared viewport breakpoints and an SSR-safe responsive hook. */
 "use client";
 
 import { useSyncExternalStore } from "react";
 
 const MOBILE_MAX = 640;
+/** The inclusive upper bound for the tablet viewport classification. */
 export const TABLET_MAX = 900;
 
 type ResponsiveState = {
@@ -17,6 +18,7 @@ function subscribeToResize(callback: () => void) {
   return () => window.removeEventListener("resize", callback);
 }
 
+/** Tracks viewport width and classifies it as mobile, tablet, or desktop web. */
 export function useResponsive(): ResponsiveState {
   const width = useSyncExternalStore(
     subscribeToResize,

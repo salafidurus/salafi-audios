@@ -7,7 +7,6 @@ import type {
   Workspace,
   Catalogs,
   CatalogConfig,
-  CatalogPolicyRule,
   CatalogCompatibilityGroup,
 } from "../types";
 
@@ -45,74 +44,6 @@ export function getWorkspaces(rootDir: string): Workspace[] {
   }
 
   return workspaces;
-}
-
-export function loadConfig(rootDir: string): CatalogConfig {
-  const configPath = path.join(rootDir, "catalog.config.json");
-  if (fs.existsSync(configPath)) {
-    try {
-      const parsed = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-      const groups = parsed.groups ?? [];
-      const policies = parsed.policies ?? [];
-      const compatibilityGroups = parsed.compatibilityGroups ?? [];
-      if (
-        !Array.isArray(groups) ||
-        !Array.isArray(policies) ||
-        !Array.isArray(compatibilityGroups)
-      ) {
-        throw new Error(
-          "catalog.config.json groups, policies, and compatibilityGroups must be arrays",
-        );
-      }
-      const errors = policies.flatMap(validateCatalogPolicyRule);
-      errors.push(...compatibilityGroups.flatMap(validateCompatibilityGroup));
-      if (errors.length > 0) throw new Error(`Invalid catalog policy: ${errors.join("; ")}`);
-      return { groups, policies, compatibilityGroups };
-    } catch (error) {
-      if (error instanceof Error && error.message.startsWith("Invalid catalog policy:"))
-        throw error;
-      throw new Error(`Unable to load catalog.config.json: ${error}`);
-    }
-  }
-  return { groups: [], policies: [], compatibilityGroups: [] };
-}
-
-function validateCatalogPolicyRule(rule: CatalogPolicyRule): string[] {
-  const errors: string[] = [];
-  if (!rule) return ["policy entries must be objects"];
-  if (!rule.name?.trim()) errors.push("policy name must not be empty");
-  if (!rule.reason?.trim()) errors.push(`policy '${rule.name}' must include a reason`);
-  if (rule.updateCeiling === "fixed" && !rule.fixedVersion) {
-    errors.push(`policy '${rule.name}' requires fixedVersion for a fixed update ceiling`);
-  }
-  if (rule.fixedVersion && rule.updateCeiling !== "fixed") {
-    errors.push(`policy '${rule.name}' cannot define fixedVersion unless updateCeiling is fixed`);
-  }
-  return errors;
-}
-
-function validateCompatibilityGroup(group: CatalogCompatibilityGroup): string[] {
-  const errors: string[] = [];
-  if (!group || !group.name?.trim()) errors.push("compatibility group name must not be empty");
-  if (!group?.owner?.trim()) errors.push(`compatibility group '${group?.name}' requires an owner`);
-  if (group?.owner && !["dependabot", "expo-pipeline"].includes(group.owner)) {
-    errors.push(`compatibility group '${group.name}' has unsupported owner '${group.owner}'`);
-  }
-  if (!group?.packages || !group?.workspaces) {
-    errors.push(`compatibility group '${group?.name}' requires packages and workspaces`);
-  }
-  if (group?.target && !group.target.resolver?.trim()) {
-    errors.push(`compatibility group '${group.name}' target requires a resolver`);
-  }
-  if (group?.target && !["expo-sdk", "explicit"].includes(group.target.resolver)) {
-    errors.push(
-      `compatibility group '${group.name}' has unsupported target resolver '${group.target.resolver}'`,
-    );
-  }
-  if (group?.validationCommands && !group.validationCommands.every((command) => command?.trim())) {
-    errors.push(`compatibility group '${group.name}' validationCommands must contain commands`);
-  }
-  return errors;
 }
 
 export function matchPattern(value: string, pattern: string | string[]): boolean {

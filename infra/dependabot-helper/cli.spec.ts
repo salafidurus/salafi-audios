@@ -22,7 +22,7 @@ describe("Dependabot Helper CLI boundary", () => {
     expect(validateRepositoryPolicy(rootDir)).toEqual([]);
   });
 
-  it("validates without requiring legacy catalog or pkg-update policy files", () => {
+  it("validates without requiring retired policy files", () => {
     const fixtureRoot = mkdtempSync(resolve(tmpdir(), "dependabot-helper-test-"));
     mkdirSync(resolve(fixtureRoot, ".github"));
     writeFileSync(

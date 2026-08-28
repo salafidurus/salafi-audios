@@ -4,7 +4,8 @@ import {
   resolveContentType,
 } from "./fetch-remote-file";
 
-/** Documents this module's responsibility and public boundary. */
+/** Extracts lightweight audio-link metadata for import previews without downloading bodies. */
+/** Describes metadata obtained without downloading an audio response body. */
 export interface UrlMetadata {
   filename: string;
   contentType: string;

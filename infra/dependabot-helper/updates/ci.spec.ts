@@ -218,7 +218,7 @@ describe("runCi", () => {
   });
 
   beforeEach(() => {
-    tmpDir = mkdtempSync(join(tmpdir(), "pkg-update-ci-test-"));
+    tmpDir = mkdtempSync(join(tmpdir(), "dependabot-helper-ci-test-"));
     writeFileSync(
       join(tmpDir, "package.json"),
       JSON.stringify({

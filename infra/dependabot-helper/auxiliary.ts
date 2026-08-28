@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { CiOptions, CiSummary } from "../pkg-update/ci";
+import type { CiOptions, CiSummary } from "./updates/ci";
 
 import {
   dependabotHelperPolicy,
@@ -45,7 +45,7 @@ export function runAuxiliaryUpdates(
   if (!checks.accepted) {
     return Promise.reject(new Error(`Helper checks failed: ${checks.errors.join("; ")}`));
   }
-  return import("../pkg-update/ci").then(({ runCi }) => runCi(rootDir, options));
+  return import("./updates/ci").then(({ runCi }) => runCi(rootDir, options));
 }
 
 function readCatalog(rootDir: string): Record<string, string> {

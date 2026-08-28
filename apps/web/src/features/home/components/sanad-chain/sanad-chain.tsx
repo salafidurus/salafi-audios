@@ -8,13 +8,14 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 
 import styles from "./sanad-chain.module.css";
 
-/** Documents this module's responsibility and public boundary. */
+/** Describes the lesson-count inputs used to render the sanad progress chain. */
 type SanadChainProps = {
   total?: number;
   completed?: number;
   size?: number;
 };
 
+/** Renders a capped lesson-progress chain with an accessible textual summary. */
 export function SanadChain({ total = 6, completed = 3, size = 8 }: SanadChainProps) {
   const safeTotal = Math.max(0, total);
   const capped = Math.min(safeTotal, 8);

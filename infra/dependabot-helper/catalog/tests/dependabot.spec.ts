@@ -31,15 +31,11 @@ const report: CatalogRepairReport = {
 };
 
 describe("validateDependabotFiles", () => {
-  it("allows dependency manifests, catalog configuration, and the Bun lockfile", () => {
-    expect(
-      validateDependabotFiles([
-        "package.json",
-        "apps/api/package.json",
-        "catalog.config.json",
-        "bun.lock",
-      ]),
-    ).toEqual({ allowed: true, unexpected: [] });
+  it("allows dependency manifests and the Bun lockfile", () => {
+    expect(validateDependabotFiles(["package.json", "apps/api/package.json", "bun.lock"])).toEqual({
+      allowed: true,
+      unexpected: [],
+    });
   });
 
   it("rejects workflow, source, and arbitrary generated files", () => {
@@ -79,7 +75,7 @@ describe("formatDependabotAuditComment", () => {
 describe("Dependabot workflow safety contract", () => {
   it("keeps the trusted index and stages only dependency files", () => {
     const workflow = readFileSync(
-      resolve(import.meta.dirname, "../../../.github/workflows/dependabot-sync.yml"),
+      resolve(import.meta.dirname, "../../../../.github/workflows/dependabot-sync.yml"),
       "utf8",
     );
 
@@ -87,21 +83,18 @@ describe("Dependabot workflow safety contract", () => {
     expect(workflow).toContain("bun infra/dependabot-helper/cli.ts align");
     expect(workflow).toContain("bun infra/dependabot-helper/cli.ts validate-files");
     expect(workflow).toContain("bun infra/dependabot-helper/cli.ts render");
-    expect(workflow).not.toContain("bun infra/catalog/");
     expect(workflow).toContain("id: push");
     expect(workflow).toContain(
-      "git checkout \"$PR_HEAD_SHA\" -- ':(glob)**/package.json' 'bun.lock' 'catalog.config.json'",
+      "git checkout \"$PR_HEAD_SHA\" -- ':(glob)**/package.json' 'bun.lock'",
     );
-    expect(workflow).toContain(
-      "git add -- ':(glob)**/package.json' 'bun.lock' 'catalog.config.json'",
-    );
+    expect(workflow).toContain("git add -- ':(glob)**/package.json' 'bun.lock'");
     expect(workflow).not.toContain('git read-tree "$PR_HEAD_SHA"');
     expect(workflow).not.toContain("git add -A");
   });
 
   it("validates the Helper policy before synchronizing Dependabot changes", () => {
     const workflow = readFileSync(
-      resolve(import.meta.dirname, "../../../.github/workflows/dependabot-sync.yml"),
+      resolve(import.meta.dirname, "../../../../.github/workflows/dependabot-sync.yml"),
       "utf8",
     );
 
@@ -112,25 +105,24 @@ describe("Dependabot workflow safety contract", () => {
   it("routes scheduled auxiliary work through the Helper entry points", () => {
     const auxiliaryWorkflow = resolve(
       import.meta.dirname,
-      "../../../.github/workflows/dependabot-aux-updates.yml",
+      "../../../../.github/workflows/dependabot-aux-updates.yml",
     );
     const workflow = readFileSync(auxiliaryWorkflow, "utf8");
 
     expect(
-      existsSync(resolve(import.meta.dirname, "../../../.github/workflows/deps-update.yml")),
+      existsSync(resolve(import.meta.dirname, "../../../../.github/workflows/deps-update.yml")),
     ).toBe(false);
     expect(workflow).toContain("name: Dependabot Auxiliary Updates");
     expect(workflow).toContain("bun infra/dependabot-helper/cli.ts check");
     expect(workflow).toContain("bun infra/dependabot-helper/cli.ts update");
     expect(workflow).toContain("--report-only");
-    expect(workflow).not.toContain("pkg-update:ci");
   });
 });
 
 describe("dependency update ownership contract", () => {
   it("keeps Jest ownership separate from the Expo pipeline", () => {
     const dependabot = readFileSync(
-      resolve(import.meta.dirname, "../../../.github/dependabot.yml"),
+      resolve(import.meta.dirname, "../../../../.github/dependabot.yml"),
       "utf8",
     );
 

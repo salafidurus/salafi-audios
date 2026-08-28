@@ -5,5 +5,9 @@
   "scripts": {
     "test": "bun test",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.7.0",
+    "picocolors": "^1.1.1"
   }
 }
