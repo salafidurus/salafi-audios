@@ -13,10 +13,16 @@ export function parseGoogleDriveLink(input: string): GoogleDriveLink | null {
     return null;
   }
 
-  const isDriveHost =
-    url.hostname === "drive.google.com" || url.hostname === "drive.usercontent.google.com";
-  if (!isDriveHost) return null;
+  if (!isDriveHost(url)) return null;
 
+  return parseDrivePath(url);
+}
+
+function isDriveHost(url: URL): boolean {
+  return url.hostname === "drive.google.com" || url.hostname === "drive.usercontent.google.com";
+}
+
+function parseDrivePath(url: URL): GoogleDriveLink | null {
   if (url.pathname.startsWith("/drive/folders/")) {
     return { kind: "unsupported-folder" };
   }

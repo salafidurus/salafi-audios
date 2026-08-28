@@ -49,6 +49,15 @@ function getLiveRecentProgress(
   if (!recentProgress || localProgress?.completedAt) return null;
   return {
     ...recentProgress,
+    ...mergeLocalProgress(recentProgress, localProgress),
+  };
+}
+
+function mergeLocalProgress(
+  recentProgress: NonNullable<ReturnType<typeof useContinueListening>["recentProgress"]>,
+  localProgress: Parameters<typeof getLiveRecentProgress>[1],
+) {
+  return {
     positionSeconds: localProgress?.positionSeconds ?? recentProgress.positionSeconds,
     durationSeconds: localProgress?.durationSeconds ?? recentProgress.durationSeconds,
   };
@@ -66,16 +75,28 @@ function getHomeContentData(
   localProgress: Parameters<typeof getLiveRecentProgress>[1],
 ) {
   const items = getContentItems(exploreData);
-  const featuredContent = promoData?.hero?.listing ?? items[0] ?? null;
-  const recentItems = featuredContent
-    ? items.filter((item) => item.id !== featuredContent.id)
-    : items;
+  const featuredContent = getFeaturedContent(promoData, items);
   return {
     featuredContent,
-    recentItems,
-    curatedItems: promoData?.editorsPicks?.map((pick) => pick.listing) ?? [],
+    recentItems: getRecentItems(items, featuredContent),
+    curatedItems: getCuratedItems(promoData),
     liveRecentProgress: getLiveRecentProgress(recentProgress, localProgress),
   };
+}
+
+function getFeaturedContent(
+  promoData: Parameters<typeof getHomeContentData>[0],
+  items: FeedContentItemDto[],
+): FeedContentItemDto | null {
+  return promoData?.hero?.listing ?? items[0] ?? null;
+}
+
+function getRecentItems(items: FeedContentItemDto[], featuredContent: FeedContentItemDto | null) {
+  return featuredContent ? items.filter((item) => item.id !== featuredContent.id) : items;
+}
+
+function getCuratedItems(promoData: Parameters<typeof getHomeContentData>[0]) {
+  return promoData?.editorsPicks?.map((pick) => pick.listing) ?? [];
 }
 
 type HomeContentProps = {
