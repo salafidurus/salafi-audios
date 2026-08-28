@@ -19,31 +19,23 @@ export interface TranslationChildrenTabProps {
   onChildSaved: () => void;
 }
 
-function renderChildrenContent(
-  status: TranslationChildrenTabProps["status"],
-  error: string | null,
-  items: TranslationChildSummary[] | null,
-  onSelectChild: (id: string) => void,
-  t: ReturnType<typeof useTranslation>["t"],
-) {
-  if (status === "loading") {
-    return <div className={styles.loading}>{t("common.loading", "Loading...")}</div>;
-  }
-  if (status === "error") {
-    return (
-      <div className={styles.error}>
-        {error ?? t("admin.contents.failedToLoad", "Failed to load")}
-      </div>
-    );
-  }
-  if (status === "ready" && (!items || items.length === 0)) {
+function ReadyChildren({
+  items,
+  onSelectChild,
+  t,
+}: {
+  items: TranslationChildSummary[] | null;
+  onSelectChild: (id: string) => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  if (!items || items.length === 0) {
     return (
       <div className={styles.emptyState}>
         {t("admin.translations.childrenEmpty", "No sub-listings yet")}
       </div>
     );
   }
-  if (status !== "ready" || !items) return null;
+
   return (
     <div className={styles.childrenList}>
       {items.map((child) => (
@@ -66,6 +58,27 @@ function renderChildrenContent(
       ))}
     </div>
   );
+}
+
+function renderChildrenContent(
+  status: TranslationChildrenTabProps["status"],
+  error: string | null,
+  items: TranslationChildSummary[] | null,
+  onSelectChild: (id: string) => void,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  if (status === "loading") {
+    return <div className={styles.loading}>{t("common.loading", "Loading...")}</div>;
+  }
+  if (status === "error") {
+    return (
+      <div className={styles.error}>
+        {error ?? t("admin.contents.failedToLoad", "Failed to load")}
+      </div>
+    );
+  }
+  if (status !== "ready") return null;
+  return <ReadyChildren items={items} onSelectChild={onSelectChild} t={t} />;
 }
 
 /**
