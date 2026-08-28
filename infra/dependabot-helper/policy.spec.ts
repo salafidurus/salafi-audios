@@ -1,6 +1,11 @@
 import { describe, expect, it } from "bun:test";
 
-import { dependabotHelperPolicy, validatePolicy, type DependencyAutomationPolicy } from "./policy";
+import {
+  dependabotHelperPolicy,
+  resolveDependencyFamily,
+  validatePolicy,
+  type DependencyAutomationPolicy,
+} from "./policy";
 
 describe("Dependabot Helper policy", () => {
   it("classifies the approved ownership families", () => {
@@ -26,6 +31,15 @@ describe("Dependabot Helper policy", () => {
         packages: ["jest", "@types/jest"],
         updateTypes: ["minor", "patch"],
       }),
+    );
+  });
+
+  it("routes representative update and check paths through classified families", () => {
+    expect(resolveDependencyFamily(dependabotHelperPolicy, "expo", "apps/native")).toEqual(
+      expect.objectContaining({ name: "expo", mode: "helper-update", pipeline: "expo-sdk" }),
+    );
+    expect(resolveDependencyFamily(dependabotHelperPolicy, "prisma", "apps/api")).toEqual(
+      expect.objectContaining({ name: "prisma", mode: "helper-check", checker: "exact-version" }),
     );
   });
 
