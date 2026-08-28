@@ -2,6 +2,7 @@ import { spawnSync } from "child_process";
 import { existsSync, mkdirSync, rmSync } from "fs";
 import { resolve } from "path";
 
+import type { CatalogRepairReport } from "../catalog";
 import type { UpdateCandidate } from "./utils/ui";
 
 import { runCatalogFix } from "../catalog/scanner/fix";
@@ -23,6 +24,7 @@ const __ciMain = import.meta.path.replace(/\\/g, "/") === process.argv[1]?.repla
 
 export interface CiOptions {
   dryRun?: boolean;
+  reportOnly?: boolean;
   gitHubRunId?: string;
   gitHubSha?: string;
   patToken?: string;
@@ -35,6 +37,7 @@ export interface CiSummary {
   prNumber: number | null;
   skipped: boolean;
   error?: string;
+  repairReport?: CatalogRepairReport;
 }
 
 interface GroupBatch {
@@ -483,7 +486,7 @@ async function processBatch(
       }
     }
 
-    if (options.dryRun) {
+    if (options.dryRun || options.reportOnly) {
       return {
         groupName: batch.groupName,
         branch,
@@ -518,8 +521,14 @@ async function processBatch(
     console.log(`[${batch.groupName}] Package updates applied`);
 
     console.log(`[${batch.groupName}] Running catalog alignment fix...`);
+    let repairReport: CatalogRepairReport | undefined;
     try {
       const fixResult = runCatalogFix(wtDir);
+      repairReport = fixResult.report;
+      console.log(`[${batch.groupName}] Catalog repair report: ${JSON.stringify(repairReport)}`);
+      if (repairReport.status === "rejected" || repairReport.status === "invalid") {
+        throw new Error(repairReport.reason ?? "Catalog repair rejected by policy");
+      }
       if (fixResult.updatedFiles.length > 0) {
         console.log(
           `[${batch.groupName}] Catalog fix updated: ${fixResult.updatedFiles.join(", ")}`,
@@ -528,7 +537,7 @@ async function processBatch(
         console.log(`[${batch.groupName}] Catalog already aligned`);
       }
     } catch (fixErr) {
-      console.log(`[${batch.groupName}] Catalog fix warning: ${fixErr}`);
+      throw new Error(`Catalog repair failed: ${fixErr}`);
     }
 
     console.log(`[${batch.groupName}] Installing updated dependencies...`);
@@ -588,6 +597,7 @@ async function processBatch(
       branch,
       prNumber,
       skipped: false,
+      repairReport,
     };
   } finally {
     if (existsSync(wtDir)) {
@@ -675,7 +685,10 @@ if (__ciMain) {
   const { findMonorepoRoot } = await import("../../scripts/utils/paths.mjs");
   const rootDir = findMonorepoRoot();
   const options: CiOptions = {};
-  if (process.argv.includes("--dry-run")) options.dryRun = true;
+  if (process.argv.includes("--dry-run") || process.argv.includes("--report-only")) {
+    options.dryRun = true;
+    options.reportOnly = true;
+  }
   if (process.env.GITHUB_RUN_ID) options.gitHubRunId = process.env.GITHUB_RUN_ID;
   if (process.env.GITHUB_SHA) options.gitHubSha = process.env.GITHUB_SHA;
   if (process.env.PAT_TOKEN) options.patToken = process.env.PAT_TOKEN;

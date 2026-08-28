@@ -247,6 +247,13 @@ describe("runCi", () => {
     expect(summaries).toEqual([]);
     expect(existsSync(join(tmpDir, ".worktree"))).toBe(false);
   });
+
+  it("report-only mode does not create update worktrees", async () => {
+    const summaries = await runCi(tmpDir, { reportOnly: true });
+    const { existsSync } = require("fs") as typeof import("fs");
+    expect(summaries).toEqual([]);
+    expect(existsSync(join(tmpDir, ".worktree"))).toBe(false);
+  });
 });
 
 describe("suppressHeldCandidates", () => {

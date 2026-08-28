@@ -1,4 +1,35 @@
 {
   "groups": [],
-  "policies": []
+  "policies": [],
+  "compatibilityGroups": [
+    {
+      "name": "expo-sdk",
+      "packages": [
+        "expo",
+        "expo-*",
+        "@expo/*",
+        "react-native",
+        "react-native-*",
+        "@react-native/*",
+        "@react-navigation/*",
+        "@sentry/react-native",
+        "@react-native-async-storage/*"
+      ],
+      "workspaces": ["apps/native"],
+      "owner": "expo-pipeline",
+      "target": {
+        "resolver": "expo-sdk"
+      },
+      "catalogMode": "explicit",
+      "validationCommands": ["expo install --fix", "expo-doctor"]
+    },
+    {
+      "name": "prisma",
+      "packages": ["prisma", "@prisma/*"],
+      "workspaces": ["apps/api", "packages/core-db"],
+      "owner": "dependabot",
+      "catalogMode": "managed",
+      "validationCommands": ["bun test --filter @sd/core-db"]
+    }
+  ]
 }

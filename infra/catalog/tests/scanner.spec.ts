@@ -15,6 +15,7 @@ import {
   sanitizeGroupName,
   resolveCatalogPolicy,
   evaluateCatalogUpdate,
+  resolveCompatibilityGroup,
 } from "../index";
 
 const TEMP_DIR = path.join(import.meta.dirname || "", "temp_test_monorepo");
@@ -167,6 +168,56 @@ describe("loadConfig", () => {
     const config = loadConfig(TEMP_DIR);
     expect(config.groups).toEqual([]);
     expect(config.policies).toEqual([]);
+    expect(config.compatibilityGroups).toEqual([]);
+  });
+
+  it("loads workspace-scoped compatibility groups", () => {
+    setupMockMonorepo({
+      rootPackageJson: { name: "root", workspaces: { packages: ["apps/*"] } },
+      workspaces: {},
+    });
+    writeConfig(TEMP_DIR, {
+      groups: [],
+      policies: [],
+      compatibilityGroups: [
+        {
+          name: "expo-sdk",
+          packages: ["expo", "expo-*"],
+          workspaces: ["apps/native"],
+          owner: "expo-pipeline",
+          target: { resolver: "explicit", value: "57.0.17" },
+          validationCommands: ["expo install --fix", "expo-doctor"],
+        },
+      ],
+    });
+
+    const config = loadConfig(TEMP_DIR);
+    expect(resolveCompatibilityGroup("expo-router", "apps/native", config)?.owner).toBe(
+      "expo-pipeline",
+    );
+    expect(resolveCompatibilityGroup("expo-router", "apps/web", config)).toBeNull();
+  });
+
+  it("rejects unsupported compatibility owners and target resolvers", () => {
+    setupMockMonorepo({
+      rootPackageJson: { name: "root", workspaces: { packages: ["apps/*"] } },
+      workspaces: {},
+    });
+    writeConfig(TEMP_DIR, {
+      groups: [],
+      policies: [],
+      compatibilityGroups: [
+        {
+          name: "invalid",
+          packages: ["example"],
+          workspaces: ["apps/web"],
+          owner: "unknown",
+          target: { resolver: "latest" },
+        },
+      ],
+    });
+
+    expect(() => loadConfig(TEMP_DIR)).toThrow(/unsupported owner.*unsupported target resolver/);
   });
 
   it("returns parsed config when file exists", () => {

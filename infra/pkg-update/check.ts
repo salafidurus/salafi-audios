@@ -3,6 +3,7 @@ import { resolve } from "path";
 
 import type { UpdateCandidate } from "./utils/ui";
 
+import { loadConfig, resolveCompatibilityGroup } from "../catalog";
 import { config, type PkupdateConfig } from "./pkg-update.config";
 import { fetchLatestVersion } from "./utils/npm";
 import { categorizeBump, isNewer } from "./utils/semver";
@@ -42,7 +43,7 @@ function readJson(path: string): PackageJson {
   return JSON.parse(readFileSync(path, "utf-8")) as PackageJson;
 }
 
-function matchesSkip(name: string, skip: string[], cfg: PkupdateConfig): boolean {
+function matchesSkip(name: string, skip: string[]): boolean {
   if (
     skip.some((s) => {
       if (s.endsWith("*")) return name.startsWith(s.slice(0, -1));
@@ -51,12 +52,7 @@ function matchesSkip(name: string, skip: string[], cfg: PkupdateConfig): boolean
   )
     return true;
 
-  const expoGroup = cfg.groups["expo"];
-  if (!expoGroup) return false;
-  return expoGroup.patterns.some((p) => {
-    if (p.endsWith("*")) return name.startsWith(p.slice(0, -1));
-    return name === p;
-  });
+  return false;
 }
 
 function matchesNever(name: string, never: string[]): boolean {
@@ -74,7 +70,7 @@ export async function checkCatalog(
   const rootPkg = readJson(resolve(rootDir, "package.json")); // nosemgrep
   const catalog = rootPkg.workspaces?.catalog ?? {};
 
-  const entries = Object.entries(catalog).filter(([pkg]) => !matchesSkip(pkg, cfg.skip, cfg));
+  const entries = Object.entries(catalog).filter(([pkg]) => !matchesSkip(pkg, cfg.skip));
 
   const versions = await Promise.all(entries.map(([pkg]) => fetcher(pkg)));
 
@@ -146,7 +142,9 @@ export async function checkExpo(
   const current = deps.expo;
   if (!current) return null;
 
-  const latest = await fetcher("expo");
+  const expoPolicy = resolveCompatibilityGroup("expo", "apps/native", loadConfig(rootDir));
+  const latest =
+    expoPolicy?.target?.resolver === "explicit" ? expoPolicy.target.value : await fetcher("expo");
   if (!latest) return null;
 
   const raw = current.replace(/^[\^~]/, "");

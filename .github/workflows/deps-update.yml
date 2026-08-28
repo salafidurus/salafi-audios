@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: "0 6 * * *"
   workflow_dispatch:
+    inputs:
+      report_only:
+        description: Evaluate policy and compatibility updates without creating PRs
+        required: false
+        default: false
+        type: boolean
 
 concurrency: deps-update
 
@@ -34,7 +40,12 @@ jobs:
           key: deps-state
 
       - name: Run dependency update
-        run: bun run pkg-update:ci
+        run: |
+          if [ "${{ inputs.report_only }}" = "true" ]; then
+            bun run pkg-update:ci --report-only
+          else
+            bun run pkg-update:ci
+          fi
         env:
           GH_TOKEN: ${{ secrets.SALAFIDURUS_PR_WRITE }}
           GITHUB_RUN_ID: ${{ github.run_id }}
