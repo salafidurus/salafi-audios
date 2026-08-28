@@ -2,6 +2,7 @@ import { z } from "zod";
 
 /** Administrator dashboard metrics, activity, and pending-work response contracts. */
 /** Optional aggregate counts; omitted values represent unavailable metrics, not zero. */
+/** Defines the runtime contract value for admin dashboard metric schema. */
 export const AdminDashboardMetricSchema = z.object({
   scholars: z.number().int().nonnegative().optional(),
   listings: z.number().int().nonnegative().optional(),

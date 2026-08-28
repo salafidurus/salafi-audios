@@ -2,6 +2,7 @@ import { z } from "zod";
 
 /** Locale, direction, and original-content field contracts used for localized catalog data. */
 /** Ordered locale allowlist used to construct the runtime locale validator. */
+/** Defines the runtime contract value for supported locales. */
 export const SUPPORTED_LOCALES = ["en", "ar"] as const;
 
 /** Runtime validator for the locales supported by the platform. */

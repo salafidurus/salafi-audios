@@ -10,6 +10,7 @@ import { TranslationViewDtoSchema } from "./translation.types";
 
 /** Scholar identity, profile, catalog-summary, and statistics contracts. */
 /** Allowed honorifics used when presenting a scholar's name. */
+/** Defines the runtime contract value for scholar title schema. */
 export const ScholarTitleSchema = z.enum(["allamah", "sheikh", "ustadh", "akh"]);
 /** Scholar honorific union inferred from {@link ScholarTitleSchema}. */
 export type ScholarTitle = z.infer<typeof ScholarTitleSchema>;
@@ -250,6 +251,7 @@ export const ScholarFormDataDtoSchema = z.object({
 /** Validated scholar form-data response. */
 export type ScholarFormDataDto = z.infer<typeof ScholarFormDataDtoSchema>;
 
+/** Defines the runtime contract value for admin scholar translation schema. */
 const AdminScholarTranslationSchema = z.object({
   locale: LocaleSchema,
   name: z.string(),

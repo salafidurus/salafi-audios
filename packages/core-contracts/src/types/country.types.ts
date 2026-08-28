@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 /** Supported country-code values and validation helpers used by profile and catalog contracts. */
+/** Defines the runtime contract value for country codes. */
 export const COUNTRY_CODES = [
   "SA",
   "AE",

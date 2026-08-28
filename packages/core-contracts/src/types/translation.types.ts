@@ -4,6 +4,7 @@ import { LocaleSchema } from "./localization.types";
 
 /** Translation status, localized content, and locale-update contracts for catalog entities. */
 /** Editorial state of a localized translation. */
+/** Defines the runtime contract value for translation status schema. */
 export const TranslationStatusSchema = z.enum(["draft", "published"]);
 /** Translation editorial-state union inferred from {@link TranslationStatusSchema}. */
 export type TranslationStatus = z.infer<typeof TranslationStatusSchema>;

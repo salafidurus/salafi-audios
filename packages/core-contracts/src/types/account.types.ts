@@ -2,6 +2,7 @@ import { z } from "zod";
 
 /** Account profile response and profile-update contracts shared by authenticated clients. */
 /** Runtime validator for the authenticated user's profile projection. */
+/** Defines the runtime contract value for user profile dto schema. */
 export const UserProfileDtoSchema = z.object({
   id: z.string(),
   email: z.email(),

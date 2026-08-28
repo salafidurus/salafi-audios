@@ -8,6 +8,7 @@
  *   auth-optional — full UI for everyone; anonymous = local storage, authenticated = API
  *   auth-required — requires a signed-in session; redirects to sign-in if absent
  */
+/** Defines the runtime contract value for routes. */
 export const routes = {
   home: "/",
   search: "/search",
@@ -64,6 +65,7 @@ export const routes = {
  */
 export type RouteAccess = "public" | "auth-optional" | "auth-required";
 
+/** Defines the contract type for route definition. */
 export interface RouteDefinition {
   path: string;
   access: RouteAccess;

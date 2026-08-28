@@ -4,6 +4,7 @@ import { LocaleSchema } from "./localization.types";
 
 /** Personal saved, completed, and progress-backed library response contracts. */
 /** A personal library row combining catalog identity with saved and progress state. */
+/** Defines the runtime contract value for my library item dto schema. */
 export const MyLibraryItemDtoSchema = z.object({
   id: z.string(),
   listingId: z.string(),

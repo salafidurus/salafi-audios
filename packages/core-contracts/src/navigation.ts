@@ -8,6 +8,7 @@ import { routes } from "./routes";
 
 /** Canonical navigation metadata shared by web and native clients. */
 /** Identifies a top-level navigation section with shared tab metadata. */
+/** Defines the contract type for section. */
 export type Section = "explore" | "myLibrary" | "settings" | "adminContents";
 
 /** Platform-neutral metadata required to render one navigation tab. */

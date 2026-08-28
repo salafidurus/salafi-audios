@@ -2,6 +2,7 @@ import { z } from "zod";
 
 /** Administrative user-list response contracts, including cursor pagination metadata. */
 /** One administrator-visible user row and its account metadata. */
+/** Defines the runtime contract value for admin user list item dto schema. */
 export const AdminUserListItemDtoSchema = z.object({
   id: z.string(),
   name: z.string(),

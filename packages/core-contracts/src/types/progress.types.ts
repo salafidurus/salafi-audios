@@ -2,6 +2,7 @@ import { z } from "zod";
 
 /** Listening-progress and synchronization contracts keyed by stable public listing identity. */
 /** Persisted listening position and completion projection for a public listing. */
+/** Defines the runtime contract value for listing progress dto schema. */
 export const ListingProgressDtoSchema = z.object({
   listingSlug: z.string(),
   positionSeconds: z.number(),

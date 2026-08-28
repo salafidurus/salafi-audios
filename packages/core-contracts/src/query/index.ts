@@ -6,6 +6,7 @@ import { HttpError } from "../http";
 
 /** Shared React Query configuration and stable cache-key vocabulary for API data. */
 // Centralized query client configuration
+/** Defines the runtime contract value for create query client. */
 export const createQueryClient = () =>
   new QueryClient({
     defaultOptions: {
@@ -28,6 +29,7 @@ export const createQueryClient = () =>
 
 // Common query keys for type-safe cache management
 // NOTE: Extended with pagination/infinite keys while maintaining full backward compatibility
+/** Defines the runtime contract value for query keys. */
 export const queryKeys = {
   scholars: {
     all: ["scholars"] as const,
