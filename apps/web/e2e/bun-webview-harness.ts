@@ -31,6 +31,12 @@ export type BrowserJourney = {
   console: BrowserConsoleEntry[];
 };
 
+/** Configures the viewport used by one isolated browser journey. */
+export type BrowserJourneyOptions = {
+  width?: number;
+  height?: number;
+};
+
 export type WebServer = {
   process: Bun.Subprocess;
   origin: string;
@@ -202,13 +208,16 @@ function serializeConsoleArgs(args: unknown[]): unknown[] {
 }
 
 /** Creates an isolated Chromium view and records page console calls. */
-export function createBrowserJourney(origin: string): BrowserJourney {
+export function createBrowserJourney(
+  origin: string,
+  options: BrowserJourneyOptions = {},
+): BrowserJourney {
   const consoleEntries: BrowserConsoleEntry[] = [];
   const view = new Bun.WebView({
     backend: { type: "chrome", url: false },
     dataStore: "ephemeral",
-    width: 1280,
-    height: 800,
+    width: options.width ?? 1280,
+    height: options.height ?? 800,
     console: (type, ...args) => {
       consoleEntries.push({ type, args: serializeConsoleArgs(args) });
     },
@@ -248,8 +257,9 @@ export async function withBrowserJourney<T>(
   testName: string,
   origin: string,
   callback: (journey: BrowserJourney) => Promise<T>,
+  options?: BrowserJourneyOptions,
 ): Promise<T> {
-  const journey = createBrowserJourney(origin);
+  const journey = createBrowserJourney(origin, options);
   try {
     return await callback(journey);
   } catch (error) {

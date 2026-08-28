@@ -18,3 +18,11 @@ to the follow-up migration slices below.
 The new `home.bun.e2e.ts` preserves the meaningful home assertions through
 `Bun.WebView`: non-empty document title, study header presence, exactly one
 topic tablist, and absence of the removed global search control.
+
+The #718 Bun.WebView journey in `navigation-library.bun.e2e.ts` preserves the
+navigation and My Library intents. Its coverage includes public destinations,
+search affordance, settings URL state, canonical library tabs, anonymous
+library state, invalid-tab fallback, and both browser-history directions.
+Arabic/RTL, accessibility, and narrow-screen interaction assertions remain
+assigned to issue 719; authentication and capability assertions remain assigned
+to issue 717.
