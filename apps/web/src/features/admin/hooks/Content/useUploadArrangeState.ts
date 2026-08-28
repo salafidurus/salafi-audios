@@ -320,6 +320,30 @@ function editModule(mod: NewModule, action: EditModuleAction, rootSlug: string):
   return { ...mod, [action.field]: action.value };
 }
 
+type SetLessonFieldAction = Extract<UploadArrangeAction, { type: "SET_LESSON_FIELD" }>;
+
+function normalizeOrderIndex(value: SetLessonFieldAction["value"]): number | null {
+  return value === null ? null : Number(value);
+}
+
+function updateLessonField(item: UploadItem, action: SetLessonFieldAction): UploadItem {
+  if (item.assignment.kind !== "new-lesson") return item;
+  const assignment = { ...item.assignment };
+  if (action.field === "slug") {
+    assignment.slug = String(action.value ?? "");
+    assignment.slugEdited = true;
+  } else if (action.field === "description") {
+    assignment.description = String(action.value ?? "");
+  } else if (action.field === "status") {
+    // SAFETY: the status editor dispatches only domain `StatusValue` options for the
+    // `"status"` field branch of this reducer action.
+    assignment.status = action.value as StatusValue;
+  } else {
+    assignment.orderIndex = normalizeOrderIndex(action.value);
+  }
+  return { ...item, assignment };
+}
+
 function appendStagedItems(
   state: UploadArrangeState,
   inputs: StagedItemInput[],
@@ -415,23 +439,7 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
       });
 
     case "SET_LESSON_FIELD": {
-      const updated = updateItem(state, action.itemId, (item) => {
-        if (item.assignment.kind !== "new-lesson") return item;
-        const assignment = { ...item.assignment };
-        if (action.field === "slug") {
-          assignment.slug = String(action.value ?? "");
-          assignment.slugEdited = true;
-        } else if (action.field === "description") {
-          assignment.description = String(action.value ?? "");
-        } else if (action.field === "status") {
-          // SAFETY: the status editor dispatches only domain `StatusValue` options for the
-          // `"status"` field branch of this reducer action.
-          assignment.status = action.value as StatusValue;
-        } else {
-          assignment.orderIndex = action.value === null ? null : Number(action.value);
-        }
-        return { ...item, assignment };
-      });
+      const updated = updateItem(state, action.itemId, (item) => updateLessonField(item, action));
       // Re-sort within each module group when the orderIndex field changes.
       if (action.field === "orderIndex") {
         return { ...updated, items: sortItemsByOrderIndex(updated.items) };
