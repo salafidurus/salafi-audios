@@ -96,6 +96,21 @@ function buildRecentContentItem(
   };
 }
 
+function paginateRecentListings<T>(items: T[], limit: number) {
+  const hasMore = items.length > limit;
+  return { hasMore, page: hasMore ? items.slice(0, limit) : items };
+}
+
+function getRecentNextCursor<T extends { createdAt: Date }>(
+  page: T[],
+  hasMore: boolean,
+  pageNumber: number,
+  encodeCursor: (date: Date, page: number) => string,
+): string | undefined {
+  const lastItem = page[page.length - 1];
+  return hasMore && lastItem ? encodeCursor(lastItem.createdAt, pageNumber + 1) : undefined;
+}
+
 function applyRecentFilters(
   where: Prisma.ListingWhereInput,
   topicSlug?: string,
@@ -157,16 +172,15 @@ export class RecentListingsRepo {
     } satisfies Prisma.ListingFindManyArgs;
     const listings = await this.prisma.listing.findMany(queryArgs);
 
-    const hasMore = listings.length > contentLimit;
-    const page = hasMore ? listings.slice(0, contentLimit) : listings;
+    const { hasMore, page } = paginateRecentListings(listings, contentLimit);
 
     const contentItems: FeedContentItemDto[] = page.map((r) => this.toRecentContentItem(r, locale));
     const items: FeedPageDto['items'] = [...contentItems];
     await this.appendDiscoveryRows(items, page, contentItems, pageNumber, topicSlug, locale);
 
-    const lastItem = page[page.length - 1];
-    const nextCursor =
-      hasMore && lastItem ? this.encodeCursor(lastItem.createdAt, pageNumber + 1) : undefined;
+    const nextCursor = getRecentNextCursor(page, hasMore, pageNumber, (date, page) =>
+      this.encodeCursor(date, page),
+    );
 
     return { items, nextCursor, exhausted: !nextCursor };
   }
