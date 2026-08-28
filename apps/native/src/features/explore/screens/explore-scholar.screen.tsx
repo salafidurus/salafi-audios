@@ -24,6 +24,56 @@ export type ExploreScholarScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
+type StackScreenOptions = React.ComponentProps<typeof Stack.Screen>["options"];
+
+function ExploreScholarStatus({
+  headerSearchOptions,
+  isError,
+  isFetching,
+  hasItems,
+  emptyMessage,
+  t,
+  refetch,
+}: {
+  headerSearchOptions: StackScreenOptions;
+  isError: boolean;
+  isFetching: boolean;
+  hasItems: boolean;
+  emptyMessage: string;
+  t: ReturnType<typeof useTranslation>["t"];
+  refetch: () => void;
+}) {
+  if (isError && !hasItems) {
+    return (
+      <ScreenView center>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreStatusView
+          message={getErrorStateText("feed", t)}
+          onRetry={refetch}
+          retryLabel={t("feed.retry", "Try Again")}
+        />
+      </ScreenView>
+    );
+  }
+  if (isFetching && !hasItems) {
+    return (
+      <View style={styles.screen}>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreSkeleton />
+      </View>
+    );
+  }
+  if (!hasItems) {
+    return (
+      <ScreenView center>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreStatusView message={emptyMessage} />
+      </ScreenView>
+    );
+  }
+  return null;
+}
+
 function filterScholars(scholars: ScholarListItemDto[], searchQuery: string) {
   const query = searchQuery.trim().toLowerCase();
   if (!query) return scholars;
@@ -65,42 +115,22 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     },
   };
 
-  if (isError && allScholars.length === 0) {
-    return (
-      <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
-        <ExploreStatusView
-          message={getErrorStateText("feed", t)}
-          onRetry={() => refetch()}
-          retryLabel={t("feed.retry", "Try Again")}
-        />
-      </ScreenView>
-    );
-  }
-
-  if (isFetching && allScholars.length === 0) {
-    return (
-      <View style={styles.screen}>
-        <Stack.Screen options={headerSearchOptions} />
-        <ExploreSkeleton />
-      </View>
-    );
-  }
-
-  if (filteredScholars.length === 0) {
-    return (
-      <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
-        <ExploreStatusView
-          message={
-            searchQuery
-              ? t("scholarContent.searchNoMatch", "No scholars match your search.")
-              : getEmptyStateText("feed", t)
-          }
-        />
-      </ScreenView>
-    );
-  }
+  const statusView = (
+    <ExploreScholarStatus
+      headerSearchOptions={headerSearchOptions}
+      isError={isError}
+      isFetching={isFetching}
+      hasItems={filteredScholars.length > 0}
+      emptyMessage={
+        searchQuery
+          ? t("scholarContent.searchNoMatch", "No scholars match your search.")
+          : getEmptyStateText("feed", t)
+      }
+      t={t}
+      refetch={refetch}
+    />
+  );
+  if (statusView) return statusView;
 
   return (
     <View style={styles.screen}>
