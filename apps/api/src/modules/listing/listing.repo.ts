@@ -170,6 +170,54 @@ function buildListingMediaUpdateData(
   return updateData;
 }
 
+function mapListingTopic(topic: {
+  id: string;
+  slug: string;
+  name: string;
+  translations: Array<{ name: string }>;
+}) {
+  return {
+    id: topic.id,
+    slug: topic.slug,
+    name: topic.translations[0]?.name || topic.name,
+  };
+}
+
+function mapPrimaryAudioAsset(
+  asset: {
+    id: string;
+    url: string;
+    format: string | null;
+    bitrateKbps: number | null;
+    durationSeconds: number | null;
+  } | null,
+) {
+  if (!asset) return null;
+  return {
+    id: asset.id,
+    url: asset.url,
+    format: toOptional(asset.format),
+    bitrateKbps: toOptional(asset.bitrateKbps),
+    durationSeconds: toOptional(asset.durationSeconds),
+  };
+}
+
+function mapOriginalListingTranslation(
+  original:
+    | {
+        title: string;
+        description: string | null;
+      }
+    | null
+    | undefined,
+) {
+  if (!original) return undefined;
+  return {
+    title: original.title,
+    description: toOptional(original.description),
+  };
+}
+
 @Injectable()
 export class ListingRepository {
   constructor(
@@ -289,12 +337,7 @@ export class ListingRepository {
       coverImageUrl: this.toPublicAssetUrl(listing.coverImageUrl),
       language: toOptional(listing.language),
       originalLanguage: resolved.originalLanguage,
-      original: resolved.original
-        ? {
-            title: resolved.original.title,
-            description: toOptional(resolved.original.description),
-          }
-        : undefined,
+      original: mapOriginalListingTranslation(resolved.original),
       durationSeconds: toOptional(listing.durationSeconds),
       publishedLectureCount: toOptional(listing.publishedLectureCount),
       publishedDurationSeconds: toOptional(listing.publishedDurationSeconds),
@@ -306,20 +349,8 @@ export class ListingRepository {
         imageUrl: toOptional(listing.scholar.imageUrl),
         title: toOptional(listing.scholar.title),
       },
-      topics: listing.topics.map((lt) => ({
-        id: lt.topic.id,
-        slug: lt.topic.slug,
-        name: lt.topic.translations?.[0]?.name || lt.topic.name,
-      })),
-      primaryAudioAsset: primaryAudio
-        ? {
-            id: primaryAudio.id,
-            url: primaryAudio.url,
-            format: toOptional(primaryAudio.format),
-            bitrateKbps: toOptional(primaryAudio.bitrateKbps),
-            durationSeconds: toOptional(primaryAudio.durationSeconds),
-          }
-        : null,
+      topics: listing.topics.map((lt) => mapListingTopic(lt.topic)),
+      primaryAudioAsset: mapPrimaryAudioAsset(primaryAudio),
       seriesContext,
       rootListing,
     };
