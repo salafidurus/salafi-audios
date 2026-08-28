@@ -19,7 +19,10 @@ import { resolveCatalogPolicy } from "../policy";
 import { type DepUsage } from "./shared";
 
 export interface CatalogFixOptions {
+  /** Runs the repair calculation without writing catalog or manifest files. */
   dryRun?: boolean;
+  /** Supplies the already-authorized catalog policy instead of reading legacy config. */
+  config?: import("../types").CatalogConfig;
 }
 
 export interface CatalogFixResult {
@@ -36,7 +39,7 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
   const originalNamedCatalogs = Object.fromEntries(
     Object.entries(catalogs.named).map(([name, entries]) => [name, { ...entries }]),
   );
-  const config = loadConfig(rootDir);
+  const config = options.config ?? loadConfig(rootDir);
   const workspaces = getWorkspaces(rootDir);
   const updatedFilesSet = new Set<string>();
   let policyError: string | undefined;

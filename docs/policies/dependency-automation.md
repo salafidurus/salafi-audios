@@ -10,7 +10,7 @@ must have one owning updater.
 | --- | --- | --- |
 | Dependabot | Ordinary dependency and GitHub Actions updates | Update dependencies owned by a compatibility pipeline |
 | `pkg-update` | Compatibility-sensitive edge cases that Dependabot cannot safely resolve | Re-propose ordinary dependencies already owned by Dependabot |
-| Catalog tooling | Workspace version alignment, policy evaluation, repair reporting, and lockfile validation | Act as a competing dependency-version source or updater |
+| Dependabot Helper | Workspace version alignment, policy evaluation, repair reporting, and lockfile validation | Act as a competing dependency-version source or updater |
 
 ## Dependabot
 
@@ -46,18 +46,19 @@ If a future compatibility-sensitive dependency needs `pkg-update` ownership,
 it must be declared in the compatibility configuration with an owner and a
 validation contract. It must also be removed from ordinary Dependabot groups.
 
-## Catalog tooling
+## Dependabot Helper catalog alignment
 
-The catalog is the workspace alignment layer. It synchronizes workspace
-`package.json` references with the root catalog and reports or repairs catalog
-drift. `catalog.config.json` is the source of truth for workspace-scoped group
-and compatibility ownership.
+The Dependabot Helper owns the catalog-alignment capability. It synchronizes
+workspace `package.json` references with the root Bun catalog and reports or
+repairs catalog drift after an update has already been authorized. Its typed
+helper policy is the source of automation ownership and compatibility rules;
+package-manager catalog data remains in `package.json`.
 
-Catalog tooling does not independently decide that a package should be updated
-to the latest version. For Dependabot pull requests, `dependabot-sync` applies
-the catalog repair report, installs to validate the lockfile, checks the output
-file allowlist, and writes back only the generated dependency files. A rejected
-repair fails closed and produces an audit result.
+Catalog alignment does not independently decide that a package should be
+updated to the latest version. For Dependabot pull requests, `dependabot-sync`
+invokes the helper, applies the catalog repair report, installs to validate the
+lockfile, checks the output file allowlist, and writes back only generated
+dependency files. A rejected repair fails closed and produces an audit result.
 
 For compatibility groups, the catalog records the owning pipeline and its
 validation commands. The Expo group is owned by `expo-pipeline` and is executed

@@ -5,7 +5,7 @@ import { resolve } from "path";
 import type { CatalogRepairReport } from "../catalog";
 import type { UpdateCandidate } from "./utils/ui";
 
-import { runCatalogFix } from "../catalog/scanner/fix";
+import { runCatalogAlignment } from "../dependabot-helper/catalog-alignment";
 import { applyUpdate } from "./apply";
 import { checkAll } from "./check";
 import { config } from "./pkg-update.config";
@@ -523,15 +523,18 @@ async function processBatch(
     console.log(`[${batch.groupName}] Running catalog alignment fix...`);
     let repairReport: CatalogRepairReport | undefined;
     try {
-      const fixResult = runCatalogFix(wtDir);
+      const fixResult = runCatalogAlignment({
+        rootDir: wtDir,
+        authorizedDependencies: batch.candidates.map((candidate) => candidate.packageName),
+      });
       repairReport = fixResult.report;
       console.log(`[${batch.groupName}] Catalog repair report: ${JSON.stringify(repairReport)}`);
       if (repairReport.status === "rejected" || repairReport.status === "invalid") {
         throw new Error(repairReport.reason ?? "Catalog repair rejected by policy");
       }
-      if (fixResult.updatedFiles.length > 0) {
+      if (fixResult.report.updatedFiles.length > 0) {
         console.log(
-          `[${batch.groupName}] Catalog fix updated: ${fixResult.updatedFiles.join(", ")}`,
+          `[${batch.groupName}] Catalog fix updated: ${fixResult.report.updatedFiles.join(", ")}`,
         );
       } else {
         console.log(`[${batch.groupName}] Catalog already aligned`);

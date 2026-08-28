@@ -1,6 +1,10 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+import type { CatalogRepairReport } from "../catalog/types";
+
+import { formatDependabotAuditComment, validateDependabotFiles } from "../catalog/dependabot";
+import { runCatalogAlignment } from "./catalog-alignment";
 import { dependabotHelperPolicy, validatePolicy } from "./policy";
 
 /** Reads native Dependabot ignore entries without making YAML a runtime dependency. */
@@ -19,8 +23,48 @@ export function validateRepositoryPolicy(rootDir: string): string[] {
 }
 
 function main(args: string[], rootDir: string): number {
+  if (args[0] === "validate-files") {
+    const files = readFileSync(args[1]!, "utf8").split(/\r?\n/).filter(Boolean);
+    const result = validateDependabotFiles(files);
+    if (!result.allowed) {
+      console.error(`Unexpected Dependabot files: ${result.unexpected.join(", ")}`);
+      return 1;
+    }
+    return 0;
+  }
+
+  if (args[0] === "render") {
+    // SAFETY: The workflow writes this JSON from the typed catalog repair report.
+    const report = JSON.parse(readFileSync(args[1]!, "utf8")) as CatalogRepairReport;
+    writeFileSync(
+      args[2]!,
+      `${formatDependabotAuditComment(report, {
+        // SAFETY: The workflow provides one of the three values declared by this union.
+        validation:
+          (process.env.DEPENDABOT_VALIDATION as "passed" | "failed" | "not-run" | undefined) ??
+          "not-run",
+        commitSha: process.env.DEPENDABOT_COMMIT_SHA,
+        rejectionReason: process.env.DEPENDABOT_REJECTION_REASON,
+      })}\n`,
+    );
+    return 0;
+  }
+
+  if (args[0] === "align") {
+    const report = runCatalogAlignment({
+      rootDir,
+      authorizedDependencies: ["*"],
+      dryRun: args.includes("--dry-run"),
+      validateLockfile: args.includes("--validate-lockfile"),
+    }).report;
+    console.log(JSON.stringify(report));
+    return report.status === "rejected" || report.status === "invalid" ? 1 : 0;
+  }
+
   if (args[0] !== "validate") {
-    console.error("Usage: bun infra/dependabot-helper/cli.ts validate");
+    console.error(
+      "Usage: bun infra/dependabot-helper/cli.ts validate | align [--dry-run] [--validate-lockfile] | validate-files <path> | render <report> <output>",
+    );
     return 1;
   }
 
