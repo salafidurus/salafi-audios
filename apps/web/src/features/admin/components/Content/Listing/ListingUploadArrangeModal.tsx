@@ -138,6 +138,27 @@ function getArrangeTitle(
   return state.existing && isDesktop ? `${title} (${state.existing.title})` : title;
 }
 
+function isArrangeBusy(phase: UploadArrangeState["phase"]): boolean {
+  return phase === "presigning" || phase === "uploading" || phase === "committing";
+}
+
+function getSavingLabel(
+  phase: UploadArrangeState["phase"],
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  return phase === "committing"
+    ? t("admin.contents.listing.saving", "Saving…")
+    : t("admin.contents.listing.uploading", "Uploading…");
+}
+
+function getErrorTabs(
+  conflicts: string[],
+  conflictSlugs: string[],
+  unassignedCount: number,
+): string[] {
+  return conflicts.length > 0 || conflictSlugs.length > 0 || unassignedCount > 0 ? ["arrange"] : [];
+}
+
 export function ListingUploadArrangeModal({
   isOpen,
   onClose,
@@ -171,18 +192,9 @@ export function ListingUploadArrangeModal({
   const conflicts = localSlugConflicts(state);
   const unassignedCount = getUnassignedCount(state);
 
-  const busy =
-    state.phase === "presigning" || state.phase === "uploading" || state.phase === "committing";
-
-  const savingLabel =
-    state.phase === "committing"
-      ? t("admin.contents.listing.saving", "Saving…")
-      : t("admin.contents.listing.uploading", "Uploading…");
-
-  const errorTabs =
-    conflicts.length > 0 || state.conflictSlugs.length > 0 || unassignedCount > 0
-      ? ["arrange"]
-      : [];
+  const busy = isArrangeBusy(state.phase);
+  const savingLabel = getSavingLabel(state.phase, t);
+  const errorTabs = getErrorTabs(conflicts, state.conflictSlugs, unassignedCount);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && !busy && onClose()}>
