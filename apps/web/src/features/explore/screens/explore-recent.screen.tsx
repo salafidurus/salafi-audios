@@ -48,6 +48,16 @@ function formatDuration(durationSeconds?: number | null): string {
   return `${minutes}m`;
 }
 
+function getFeedProgress(
+  progress: { positionSeconds: number; durationSeconds: number } | undefined,
+) {
+  return progress ? getProgressPercent(progress.positionSeconds, progress.durationSeconds) : 0;
+}
+
+function getFeedLessonCount(item: { publishedLectureCount?: number; lectureCount?: number }) {
+  return item.publishedLectureCount ?? item.lectureCount ?? 1;
+}
+
 function FeedGridItemCard({
   item,
   onNavigate,
@@ -89,9 +99,7 @@ function FeedGridItemCard({
   );
 
   const progress = useProgressStore((s) => s.progressMap[item.slug]);
-  const progressPercent = progress
-    ? getProgressPercent(progress.positionSeconds, progress.durationSeconds)
-    : 0;
+  const progressPercent = getFeedProgress(progress);
 
   const handlePlay = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -106,8 +114,7 @@ function FeedGridItemCard({
     await play();
   };
 
-  const totalLessons =
-    item.publishedLectureCount ?? item.lectureCount ?? (item.kind === "single" ? 1 : 1);
+  const totalLessons = getFeedLessonCount(item);
 
   return (
     <LectureCard
