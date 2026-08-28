@@ -297,24 +297,27 @@ function buildStagedItems(state: UploadArrangeState, inputs: StagedItemInput[]):
 
 type EditModuleAction = Extract<UploadArrangeAction, { type: "EDIT_MODULE" }>;
 
+function editModuleTitle(mod: NewModule, action: EditModuleAction, rootSlug: string): NewModule {
+  const title = String(action.value ?? "");
+  return mod.slugEdited
+    ? { ...mod, title }
+    : { ...mod, title, slug: deriveChildSlug(rootSlug, title) };
+}
+
+function editModuleOrder(mod: NewModule, action: EditModuleAction): NewModule {
+  const orderIndex = action.value === null ? null : Number(action.value);
+  return { ...mod, orderIndex };
+}
+
 function editModule(mod: NewModule, action: EditModuleAction, rootSlug: string): NewModule {
   if (action.field === "slug") {
     return { ...mod, slug: String(action.value ?? ""), slugEdited: true };
   }
   if (action.field === "title") {
-    const title = String(action.value ?? "");
-    if (mod.slugEdited) return { ...mod, title };
-    return { ...mod, title, slug: deriveChildSlug(rootSlug, title) };
+    return editModuleTitle(mod, action, rootSlug);
   }
-  return {
-    ...mod,
-    [action.field]:
-      action.field === "orderIndex"
-        ? action.value === null
-          ? null
-          : Number(action.value)
-        : action.value,
-  };
+  if (action.field === "orderIndex") return editModuleOrder(mod, action);
+  return { ...mod, [action.field]: action.value };
 }
 
 function appendStagedItems(
