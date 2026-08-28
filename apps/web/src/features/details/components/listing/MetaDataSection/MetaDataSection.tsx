@@ -131,6 +131,49 @@ function ModuleMetadata({ metadata, t }: MetadataRowsProps) {
   ) : null;
 }
 
+function MetaDataView({
+  listing,
+  layout,
+  title,
+  scholarTitle,
+  scholarName,
+  metadata,
+  t,
+}: {
+  listing: MetaDataSectionProps["listing"];
+  layout: MetaDataSectionProps["layout"];
+  title: string;
+  scholarTitle: string | undefined;
+  scholarName: string;
+  metadata: MetadataViewModel;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <div className={cn(styles.container, layout === "sidebar" && styles.sidebar)}>
+      <div className={styles.artworkContainer}>
+        <div className={styles.bookmarkRibbon} aria-hidden="true" />
+        <AppAvatar
+          listingArtwork={listing.coverImageUrl}
+          name={listing.scholar.name}
+          fill
+          className={styles.artworkAvatar}
+        />
+      </div>
+      <div className={styles.textColumn}>
+        <h1 className={styles.titleText}>{title}</h1>
+        <Link href={`/scholars/${listing.scholar.slug}`} className={styles.scholarLink}>
+          <AppText variant="titleMd" color="primary">
+            {scholarTitle && <span className={styles.scholarTitle}>{scholarTitle} </span>}
+            {scholarName}
+          </AppText>
+        </Link>
+        {listing.description && <p className={styles.description}>{listing.description}</p>}
+        <MetadataRows metadata={metadata} t={t} />
+      </div>
+    </div>
+  );
+}
+
 export function MetaDataSection({ listing, layout = "inline", moduleCount }: MetaDataSectionProps) {
   const { t } = useTranslation();
   const showOriginal = useShowOriginalContent();
@@ -152,33 +195,14 @@ export function MetaDataSection({ listing, layout = "inline", moduleCount }: Met
   };
 
   return (
-    <div className={cn(styles.container, layout === "sidebar" && styles.sidebar)}>
-      <div className={styles.artworkContainer}>
-        <div className={styles.bookmarkRibbon} aria-hidden="true" />
-        <AppAvatar
-          listingArtwork={listing.coverImageUrl}
-          name={listing.scholar.name}
-          fill
-          className={styles.artworkAvatar}
-        />
-      </div>
-
-      <div className={styles.textColumn}>
-        {/* Row 1: Title in Fraunces display font */}
-        <h1 className={styles.titleText}>{title}</h1>
-
-        {/* Row 2: Scholar Name Link (Primary strong color Title Md) */}
-        <Link href={`/scholars/${listing.scholar.slug}`} className={styles.scholarLink}>
-          <AppText variant="titleMd" color="primary">
-            {scholarTitle && <span className={styles.scholarTitle}>{scholarTitle} </span>}
-            {formatScholarName(listing.scholar.name)}
-          </AppText>
-        </Link>
-
-        {listing.description && <p className={styles.description}>{listing.description}</p>}
-
-        <MetadataRows metadata={metadata} t={t} />
-      </div>
-    </div>
+    <MetaDataView
+      listing={listing}
+      layout={layout}
+      title={title}
+      scholarTitle={scholarTitle}
+      scholarName={formatScholarName(listing.scholar.name)}
+      metadata={metadata}
+      t={t}
+    />
   );
 }
