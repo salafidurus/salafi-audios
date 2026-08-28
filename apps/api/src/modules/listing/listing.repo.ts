@@ -222,6 +222,26 @@ function mapOriginalListingTitle(original: { title: string } | null | undefined)
   return original ? { title: original.title } : undefined;
 }
 
+function getAdminListingOptionalFields(listing: {
+  description: string | null;
+  language: Locale | null;
+  orderIndex: number | null;
+  durationSeconds: number | null;
+  parentId: string | null;
+  coverImageUrl: string | null;
+  updatedAt: Date | null;
+}) {
+  return {
+    description: toOptional(listing.description),
+    language: toOptional(listing.language),
+    orderIndex: toOptional(listing.orderIndex),
+    durationSeconds: toOptional(listing.durationSeconds),
+    parentId: toOptional(listing.parentId),
+    coverImageUrl: toOptional(listing.coverImageUrl),
+    updatedAt: listing.updatedAt?.toISOString(),
+  };
+}
+
 @Injectable()
 export class ListingRepository {
   constructor(
@@ -1108,21 +1128,15 @@ export class ListingRepository {
       id: listing.id,
       slug: listing.slug,
       title: listing.title,
-      description: listing.description ?? undefined,
+      ...getAdminListingOptionalFields(listing),
       format: listing.format,
-      language: listing.language ?? undefined,
       status: listing.status,
-      orderIndex: listing.orderIndex ?? undefined,
-      durationSeconds: listing.durationSeconds ?? undefined,
       scholarId: listing.scholarId,
       scholarSlug: listing.scholar.slug,
       scholarName: listing.scholar.name,
-      parentId: listing.parentId ?? undefined,
       topics: listing.topics.map((t) => t.topic.id),
       audioUrl: listing.audioAssets[0]?.url,
-      coverImageUrl: listing.coverImageUrl ?? undefined,
       createdAt: listing.createdAt.toISOString(),
-      updatedAt: listing.updatedAt?.toISOString(),
     };
   }
 
