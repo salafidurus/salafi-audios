@@ -109,6 +109,61 @@ function ProfileUpdateStatus({
   );
 }
 
+function getProfileLoadErrorMessage(
+  errorMessage: string | undefined,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  return errorMessage ? errorMessage : t("account.profile.loadError", "Failed to load profile");
+}
+
+type ProfileData = NonNullable<ReturnType<typeof useAccountProfile>["data"]>;
+
+function ProfileIdentity({ profile }: { profile: ProfileData }) {
+  return (
+    <div className={styles.avatarRow}>
+      <UserAvatar
+        image={profile.avatarUrl ?? null}
+        name={profile.displayName || profile.email}
+        size={72}
+      />
+      <div>
+        <p className={styles.profileName}>{profile.displayName}</p>
+        <p className={styles.profileEmail}>{profile.email}</p>
+      </div>
+    </div>
+  );
+}
+
+function ProfileActionRow({
+  isDeletingAccount,
+  onSignOut,
+  onDelete,
+  t,
+}: {
+  isDeletingAccount: boolean;
+  onSignOut: () => void;
+  onDelete: () => void;
+  t: ProfileEditActionsProps["t"];
+}) {
+  return (
+    <div className={styles.actionRow}>
+      <Button variant="outline" data-testid="sign-out-trigger" onClick={onSignOut}>
+        {t("account.signOut", "Sign Out")}
+      </Button>
+      <Button
+        variant="destructive"
+        data-testid="delete-account-trigger"
+        onClick={onDelete}
+        disabled={isDeletingAccount}
+      >
+        {isDeletingAccount
+          ? t("account.profile.deleting", "Deleting…")
+          : t("account.profile.deleteAccount", "Delete Account")}
+      </Button>
+    </div>
+  );
+}
+
 function ProfileContent() {
   const { t } = useTranslation();
   const {
@@ -167,11 +222,12 @@ function ProfileContent() {
   }
 
   if (isProfileLoadError) {
-    const errorMessage =
-      profileLoadError instanceof Error
-        ? profileLoadError.message
-        : t("account.profile.loadError", "Failed to load profile");
-    return <EmptyState variant="error" message={errorMessage} />;
+    return (
+      <EmptyState
+        variant="error"
+        message={getProfileLoadErrorMessage(profileLoadError?.message, t)}
+      />
+    );
   }
 
   if (!profile) {
@@ -184,17 +240,7 @@ function ProfileContent() {
 
   return (
     <>
-      <div className={styles.avatarRow}>
-        <UserAvatar
-          image={profile.avatarUrl ?? null}
-          name={profile.displayName || profile.email}
-          size={72}
-        />
-        <div>
-          <p className={styles.profileName}>{profile.displayName}</p>
-          <p className={styles.profileEmail}>{profile.email}</p>
-        </div>
-      </div>
+      <ProfileIdentity profile={profile} />
 
       <SettingsSection title={t("account.title", "Account")}>
         <SettingsRow
@@ -232,25 +278,12 @@ function ProfileContent() {
 
       <ProfileAccountStatus profile={profile} roles={nonListenerRoles} t={t} />
 
-      <div className={styles.actionRow}>
-        <Button
-          variant="outline"
-          data-testid="sign-out-trigger"
-          onClick={() => setShowSignOutModal(true)}
-        >
-          {t("account.signOut", "Sign Out")}
-        </Button>
-        <Button
-          variant="destructive"
-          data-testid="delete-account-trigger"
-          onClick={() => setShowDeleteAccountModal(true)}
-          disabled={isDeletingAccount}
-        >
-          {isDeletingAccount
-            ? t("account.profile.deleting", "Deleting…")
-            : t("account.profile.deleteAccount", "Delete Account")}
-        </Button>
-      </div>
+      <ProfileActionRow
+        isDeletingAccount={isDeletingAccount}
+        onSignOut={() => setShowSignOutModal(true)}
+        onDelete={() => setShowDeleteAccountModal(true)}
+        t={t}
+      />
 
       <ConfirmationDialog
         open={showSignOutModal}
