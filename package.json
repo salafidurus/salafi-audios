@@ -58,6 +58,7 @@
     "typecheck:affected": "turbo run typecheck --affected",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
+    "test:e2e:bun": "turbo run test:e2e:bun --filter=web",
     "test:prepush": "turbo run test:prepush",
     "test:dead-code-audit": "bun test scripts/dead-code-audit/*.spec.mjs",
     "verify:build-configs": "bun ./scripts/verify-build-configs.mjs",
