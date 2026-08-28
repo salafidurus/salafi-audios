@@ -149,14 +149,32 @@ async function throwForResponseError(
   throw new HttpError(response.status, response.statusText, text);
 }
 
+/**
+ * Installs the process-wide configuration used by subsequent API requests.
+ * Calling this function replaces the previous configuration; it does not make
+ * a request or validate that the configured base URL is reachable.
+ */
 export function configureApiClient(next: HttpClientConfig) {
   config = next;
 }
 
+/**
+ * Returns the configured API base URL, or an empty string before configuration.
+ * The empty result is intentional so callers can inspect startup state without
+ * triggering a request or throwing an error.
+ */
 export function getApiBaseUrl(): string {
   return config?.baseUrl ?? "";
 }
 
+/**
+ * Sends an authenticated API request using the configured client.
+ * Query parameters, JSON payload headers, locale, and session credentials are
+ * derived from the supplied options and client configuration. The promise
+ * rejects when the client is unconfigured, the network request fails, or the
+ * server returns a non-2xx response; non-JSON successful responses are returned
+ * as text and JSON responses are parsed before being returned as `T`.
+ */
 export async function httpClient<T>(options: {
   url: string;
   method: string;
