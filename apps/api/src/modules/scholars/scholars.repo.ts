@@ -46,6 +46,10 @@ function buildScholarUpdateData(dto: UpdateScholarDto): Prisma.ScholarUpdateInpu
   return data;
 }
 
+function hasScholarTranslationChange(dto: UpdateScholarDto): boolean {
+  return dto.name !== undefined || dto.bio !== undefined || dto.mainLanguage !== undefined;
+}
+
 type ScholarFormRecord = {
   id: string;
   name: string;
@@ -263,7 +267,7 @@ export class ScholarsRepository {
         }),
       ]);
 
-    return {
+    const buildDetail = () => ({
       id: record.id,
       slug: record.slug,
       name: resolved.fields.name,
@@ -293,7 +297,9 @@ export class ScholarsRepository {
       totalContentDurationSeconds:
         (singleDuration._sum.durationSeconds ?? 0) +
         (aggregateDuration._sum.publishedDurationSeconds ?? 0),
-    };
+    });
+
+    return buildDetail();
   }
 
   async getContent(slug: string): Promise<ScholarContentUnifiedDto | null> {
@@ -653,16 +659,6 @@ export class ScholarsRepository {
 
   async update(id: string, dto: UpdateScholarDto) {
     return this.prisma.$transaction(async (tx) => {
-      const hasTranslatableChange =
-        dto.name !== undefined || dto.bio !== undefined || dto.mainLanguage !== undefined;
-      const original = hasTranslatableChange
-        ? await tx.scholar.findUnique({
-            where: { id },
-            select: { mainLanguage: true, name: true, bio: true },
-          })
-        : null;
-
-      // Update scholar fields if provided
       const updateData = buildScholarUpdateData(dto);
 
       const scholar = await tx.scholar.update({
@@ -670,20 +666,34 @@ export class ScholarsRepository {
         data: updateData,
       });
 
-      if (hasTranslatableChange && original) {
-        await syncMainLanguageTranslation({
-          upsert: (locale, fields) => this.upsertMainScholarTranslation(tx, id, locale, fields),
-          oldLocale: original.mainLanguage,
-          oldFields: { name: original.name, bio: original.bio },
-          newLocale: dto.mainLanguage ?? original.mainLanguage,
-          newFields: {
-            name: dto.name ?? original.name,
-            bio: dto.bio !== undefined ? dto.bio : original.bio,
-          },
-        });
-      }
+      await this.syncUpdatedScholarTranslation(tx, id, dto);
 
       return scholar;
+    });
+  }
+
+  private async syncUpdatedScholarTranslation(
+    tx: Prisma.TransactionClient,
+    id: string,
+    dto: UpdateScholarDto,
+  ) {
+    if (!hasScholarTranslationChange(dto)) return;
+
+    const original = await tx.scholar.findUnique({
+      where: { id },
+      select: { mainLanguage: true, name: true, bio: true },
+    });
+    if (!original) return;
+
+    await syncMainLanguageTranslation({
+      upsert: (locale, fields) => this.upsertMainScholarTranslation(tx, id, locale, fields),
+      oldLocale: original.mainLanguage,
+      oldFields: { name: original.name, bio: original.bio },
+      newLocale: dto.mainLanguage ?? original.mainLanguage,
+      newFields: {
+        name: dto.name ?? original.name,
+        bio: dto.bio !== undefined ? dto.bio : original.bio,
+      },
     });
   }
 

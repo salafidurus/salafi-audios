@@ -88,6 +88,109 @@ function UsersTableHeader({
   );
 }
 
+function AdminUsersHeader({
+  searchQuery,
+  setSearchQuery,
+  role,
+  setRole,
+  roleOptions,
+}: {
+  searchQuery: string;
+  setSearchQuery: (value: string) => void;
+  role: string;
+  setRole: (value: string) => void;
+  roleOptions: Array<{ id: string; label: string }>;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <StickyHeaderLayout.Header>
+      <PageHeader title={t("admin.users.title", "Manage Users")} />
+      <div className={styles.filterToolbar}>
+        <div className={styles.searchRow}>
+          <Search.Bar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder={t("admin.users.searchPlaceholder", "Search users by name or email...")}
+          />
+        </div>
+        <div className={styles.filterGroup}>
+          <ToggleGroup
+            type="single"
+            value={role}
+            onValueChange={setRole}
+            aria-label={t("admin.users.roleLabel", "Role")}
+            className={styles.filterChips}
+          >
+            <ToggleGroupItem value="" variant="outline" size="sm">
+              {t("search.filterAll", "All")}
+            </ToggleGroupItem>
+            {roleOptions.map((option) => (
+              <ToggleGroupItem key={option.id} value={option.id} variant="outline" size="sm">
+                {option.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
+      </div>
+    </StickyHeaderLayout.Header>
+  );
+}
+
+function AdminUsersContent({
+  visibleItems,
+  listState,
+  fetchNextPage,
+  isDesktop,
+  sort,
+  onSort,
+  debouncedQuery,
+  role,
+  onManageAccess,
+}: {
+  visibleItems: AdminUserListItemDto[];
+  listState: {
+    isLoading: boolean;
+    hasNextPage: boolean | undefined;
+    isFetchingNextPage: boolean;
+  };
+  fetchNextPage: () => void;
+  isDesktop: boolean;
+  sort: UserSort;
+  onSort: (key: UserSortKey) => void;
+  debouncedQuery: string;
+  role: string;
+  onManageAccess: (user: AdminUserListItemDto) => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <StickyHeaderLayout.Content>
+      <InfiniteScrollList
+        data={visibleItems}
+        isLoading={listState.isLoading}
+        hasMore={listState.hasNextPage ?? false}
+        onLoadMore={fetchNextPage}
+        isFetchingNextPage={listState.isFetchingNextPage}
+        layout={isDesktop ? "table" : "list"}
+        tableHeader={isDesktop ? <UsersTableHeader sort={sort} onSort={onSort} /> : undefined}
+        renderItem={(user) => (
+          <UserItem
+            user={user}
+            layout={isDesktop ? "table" : "list"}
+            onManageAccess={() => onManageAccess(user)}
+          />
+        )}
+        emptyMessage={
+          debouncedQuery || role
+            ? t("admin.users.searchNoMatch", "No users match your search.")
+            : t("admin.users.noUsersFound", "No users found.")
+        }
+      />
+    </StickyHeaderLayout.Content>
+  );
+}
+
 export function AdminUsersScreen(): ReactNode {
   const queryClient = useQueryClient();
   const isDesktop = useIsDesktop();
@@ -154,66 +257,25 @@ export function AdminUsersScreen(): ReactNode {
     <ScreenView contentStyle={{ flex: 1 }}>
       <div className={styles.content}>
         <StickyHeaderLayout>
-          <StickyHeaderLayout.Header>
-            <PageHeader title={t("admin.users.title", "Manage Users")} />
+          <AdminUsersHeader
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            role={role}
+            setRole={setRole}
+            roleOptions={roleOptions}
+          />
 
-            <div className={styles.filterToolbar}>
-              <div className={styles.searchRow}>
-                <Search.Bar
-                  value={searchQuery}
-                  onChange={setSearchQuery}
-                  placeholder={t(
-                    "admin.users.searchPlaceholder",
-                    "Search users by name or email...",
-                  )}
-                />
-              </div>
-              <div className={styles.filterGroup}>
-                <ToggleGroup
-                  type="single"
-                  value={role}
-                  onValueChange={setRole}
-                  aria-label={t("admin.users.roleLabel", "Role")}
-                  className={styles.filterChips}
-                >
-                  <ToggleGroupItem value="" variant="outline" size="sm">
-                    {t("search.filterAll", "All")}
-                  </ToggleGroupItem>
-                  {roleOptions.map((option) => (
-                    <ToggleGroupItem key={option.id} value={option.id} variant="outline" size="sm">
-                      {option.label}
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-              </div>
-            </div>
-          </StickyHeaderLayout.Header>
-
-          <StickyHeaderLayout.Content>
-            <InfiniteScrollList
-              data={visibleItems}
-              isLoading={isLoading}
-              hasMore={hasNextPage ?? false}
-              onLoadMore={() => fetchNextPage()}
-              isFetchingNextPage={isFetchingNextPage}
-              layout={isDesktop ? "table" : "list"}
-              tableHeader={
-                isDesktop ? <UsersTableHeader sort={sort} onSort={toggleSort} /> : undefined
-              }
-              renderItem={(user) => (
-                <UserItem
-                  user={user}
-                  layout={isDesktop ? "table" : "list"}
-                  onManageAccess={() => setAccessUser({ id: user.id, name: user.name })}
-                />
-              )}
-              emptyMessage={
-                debouncedQuery || role
-                  ? t("admin.users.searchNoMatch", "No users match your search.")
-                  : t("admin.users.noUsersFound", "No users found.")
-              }
-            />
-          </StickyHeaderLayout.Content>
+          <AdminUsersContent
+            visibleItems={visibleItems}
+            listState={{ isLoading, hasNextPage, isFetchingNextPage }}
+            fetchNextPage={fetchNextPage}
+            isDesktop={isDesktop}
+            sort={sort}
+            onSort={toggleSort}
+            debouncedQuery={debouncedQuery}
+            role={role}
+            onManageAccess={(user) => setAccessUser({ id: user.id, name: user.name })}
+          />
         </StickyHeaderLayout>
       </div>
 

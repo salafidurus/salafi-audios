@@ -23,6 +23,82 @@ export type SearchProcessingScreenProps = {
   topicSlug?: string;
 };
 
+function PopularSearches({
+  searches,
+  onSelect,
+  t,
+}: {
+  searches: string[];
+  onSelect: (search: string) => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <div className={styles.popularSearches}>
+      <p className={styles.popularLabel}>{t("search.popularSearches", "POPULAR SEARCHES")}</p>
+      <div className={styles.popularChips}>
+        {searches.map((term) => (
+          <button
+            key={term}
+            type="button"
+            className={styles.popularChip}
+            onClick={() => onSelect(term)}
+          >
+            {term}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SearchResults({
+  items,
+  isLoading,
+  hasMore,
+  fetchNextPage,
+  isFetchingNextPage,
+  renderItem,
+  emptyMessage,
+}: {
+  items: ReturnType<typeof useInfiniteSearch>["data"] extends infer Data
+    ? Data extends { pages: Array<{ items: infer Items }> }
+      ? Items extends Array<infer Item>
+        ? Item[]
+        : never
+      : never
+    : never;
+  isLoading: boolean;
+  hasMore: boolean;
+  fetchNextPage: () => void;
+  isFetchingNextPage: boolean;
+  renderItem: (item: (typeof items)[number]) => React.ReactNode;
+  emptyMessage: string;
+}) {
+  return (
+    <InfiniteScrollList
+      data={items}
+      isLoading={isLoading}
+      hasMore={hasMore}
+      onLoadMore={fetchNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      renderItem={renderItem}
+      emptyMessage={emptyMessage}
+    />
+  );
+}
+
+function toggleSingleFilter(selected: string[], chipId: string) {
+  return selected.includes(chipId) ? [] : [chipId];
+}
+
+function getTopicSlugs(filter: string[]) {
+  return filter.length ? filter : undefined;
+}
+
+function getSearchItems(data: ReturnType<typeof useInfiniteSearch>["data"]) {
+  return data?.pages.flatMap((page) => page.items) ?? [];
+}
+
 export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessingScreenProps) {
   const showOriginal = useShowOriginalContent();
   const { i18n, t } = useTranslation();
@@ -56,10 +132,10 @@ export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessin
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteSearch({
     query: debouncedQuery,
     showOriginal,
-    topicSlugs: filter.length ? filter : undefined,
+    topicSlugs: getTopicSlugs(filter),
   });
 
-  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
+  const allItems = getSearchItems(data);
 
   const handleItemPress = (slug: string) => {
     navigateToListing(slug);
@@ -92,43 +168,25 @@ export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessin
             chips={filterChips}
             selected={filter}
             onChipChange={(chipId: string) => {
-              setFilter(filter.includes(chipId) ? [] : [chipId]);
+              setFilter(toggleSingleFilter(filter, chipId));
             }}
           />
         </StickyHeaderLayout.Header>
 
         <StickyHeaderLayout.Content>
           {!debouncedQuery.trim() ? (
-            <div className={styles.popularSearches}>
-              <p className={styles.popularLabel}>
-                {t("search.popularSearches", "POPULAR SEARCHES")}
-              </p>
-              <div className={styles.popularChips}>
-                {popularSearches.map((term) => (
-                  <button
-                    key={term}
-                    type="button"
-                    className={styles.popularChip}
-                    onClick={() => setQuery(term)}
-                  >
-                    {term}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <PopularSearches searches={popularSearches} onSelect={setQuery} t={t} />
           ) : (
-            <InfiniteScrollList
-              data={allItems}
+            <SearchResults
+              items={allItems}
               isLoading={isLoading}
               hasMore={hasNextPage ?? false}
-              onLoadMore={() => fetchNextPage()}
+              fetchNextPage={() => {
+                void fetchNextPage();
+              }}
               isFetchingNextPage={isFetchingNextPage}
               renderItem={renderItem}
-              emptyMessage={
-                debouncedQuery.trim()
-                  ? t("search.noResults", "No results found for your search")
-                  : t("search.enterQuery", "Enter a search query to begin")
-              }
+              emptyMessage={t("search.noResults", "No results found for your search")}
             />
           )}
         </StickyHeaderLayout.Content>

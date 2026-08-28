@@ -23,6 +23,78 @@ export type RecentlyAddedSectionContentProps = {
   isLoading?: boolean;
 };
 
+function RecentlyAddedPopulated({
+  featured,
+  rest,
+  t,
+  navigateToListing,
+  playFeatured,
+}: {
+  featured: FeedContentItemDto | undefined;
+  rest: FeedContentItemDto[];
+  t: ReturnType<typeof useTranslation>["t"];
+  navigateToListing: (slug: string) => void;
+  playFeatured: () => Promise<void>;
+}) {
+  return (
+    <section className={styles.section} aria-label={t("home.recent.label", "Recently added")}>
+      <div className={styles.sectionHeader}>
+        <div>
+          <p className={styles.sectionEyebrow}>{t("home.recent.eyebrow", "KEEP EXPLORING")}</p>
+          <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
+        </div>
+        <Link href={routes.explore.index} className={styles.seeAllLink}>
+          {t("common.seeAll", "See all")}
+        </Link>
+      </div>
+      <div className={styles.list}>
+        {featured && (
+          <FeaturedLectureCard
+            title={featured.title}
+            category={featured.kind}
+            scholarName={featured.scholarName}
+            scholarSlug={featured.scholarSlug}
+            scholarTitle={featured.scholarTitle}
+            duration={
+              featured.durationSeconds ? `${Math.round(featured.durationSeconds / 60)} min` : ""
+            }
+            progress={0}
+            totalLessons={1}
+            eyebrow={t("home.recent.featured", "Recently added")}
+            onClick={() => navigateToListing(featured.slug)}
+            onPlay={() => void playFeatured()}
+          />
+        )}
+        {rest.length > 0 && (
+          <div
+            className={styles.restRail}
+            aria-label={t("home.recent.more", "More recently added")}
+          >
+            {rest.map((item) => (
+              <LectureRow
+                key={item.id}
+                title={item.title}
+                category={item.kind}
+                scholarName={item.scholarName}
+                scholarSlug={item.scholarSlug}
+                scholarTitle={item.scholarTitle}
+                scholarImageUrl={item.scholarImageUrl}
+                listingArtwork={item.thumbnailUrl}
+                duration={
+                  item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""
+                }
+                progress={0}
+                totalLessons={1}
+                onClick={() => navigateToListing(item.slug)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function RecentlyAddedSectionContent({
   items,
   isLoading = false,
@@ -92,61 +164,13 @@ function RecentlyAddedSectionContent({
   }
 
   return (
-    <section className={styles.section} aria-label={t("home.recent.label", "Recently added")}>
-      <div className={styles.sectionHeader}>
-        <div>
-          <p className={styles.sectionEyebrow}>{t("home.recent.eyebrow", "KEEP EXPLORING")}</p>
-          <h2 className={styles.sectionTitle}>{t("home.recent.title", "Recently Added")}</h2>
-        </div>
-        <Link href={routes.explore.index} className={styles.seeAllLink}>
-          {t("common.seeAll", "See all")}
-        </Link>
-      </div>
-      <div className={styles.list}>
-        {featured && (
-          <FeaturedLectureCard
-            title={featured.title}
-            category={featured.kind}
-            scholarName={featured.scholarName}
-            scholarSlug={featured.scholarSlug}
-            scholarTitle={featured.scholarTitle}
-            duration={
-              featured.durationSeconds ? `${Math.round(featured.durationSeconds / 60)} min` : ""
-            }
-            progress={0}
-            totalLessons={1}
-            eyebrow={t("home.recent.featured", "Recently added")}
-            onClick={() => navigateToListing(featured.slug)}
-            onPlay={() => void playFeatured()}
-          />
-        )}
-        {rest.length > 0 && (
-          <div
-            className={styles.restRail}
-            aria-label={t("home.recent.more", "More recently added")}
-          >
-            {rest.map((item) => (
-              <LectureRow
-                key={item.id}
-                title={item.title}
-                category={item.kind}
-                scholarName={item.scholarName}
-                scholarSlug={item.scholarSlug}
-                scholarTitle={item.scholarTitle}
-                scholarImageUrl={item.scholarImageUrl}
-                listingArtwork={item.thumbnailUrl}
-                duration={
-                  item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""
-                }
-                progress={0}
-                totalLessons={1}
-                onClick={() => navigateToListing(item.slug)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
+    <RecentlyAddedPopulated
+      featured={featured}
+      rest={rest}
+      t={t}
+      navigateToListing={navigateToListing}
+      playFeatured={playFeatured}
+    />
   );
 }
 

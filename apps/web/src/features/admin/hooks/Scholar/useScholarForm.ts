@@ -86,13 +86,8 @@ function getInitialFormState(): FormState {
 
 function buildEditFormState(data: ScholarFormDataDto): FormState {
   const { scholar } = data;
-  const name = scholar.name || "";
-  const bio = scholar.bio || "";
-  const imageUrl = scholar.imageUrl || "";
-  const isActive = scholar.isActive !== undefined ? scholar.isActive : true;
-  // SAFETY: scholar form data is hydrated from the same locale union used by the editor.
-  const mainLanguage = (scholar.mainLanguage as Locale) || "ar";
-  const orderIndex = scholar.orderIndex || 999;
+  const { name, bio, imageUrl, isActive, mainLanguage, orderIndex } =
+    normalizeScholarEditValues(scholar);
 
   return {
     id: scholar.id,
@@ -128,6 +123,18 @@ function buildEditFormState(data: ScholarFormDataDto): FormState {
     isEditing: true,
     stagedImageFile: null,
     stagedImagePreview: null,
+  };
+}
+
+function normalizeScholarEditValues(scholar: ScholarFormDataDto["scholar"]) {
+  // SAFETY: scholar form data is hydrated from the same locale union used by the editor.
+  return {
+    name: scholar.name || "",
+    bio: scholar.bio || "",
+    imageUrl: scholar.imageUrl || "",
+    isActive: scholar.isActive !== undefined ? scholar.isActive : true,
+    mainLanguage: (scholar.mainLanguage as Locale) || "ar",
+    orderIndex: scholar.orderIndex || 999,
   };
 }
 

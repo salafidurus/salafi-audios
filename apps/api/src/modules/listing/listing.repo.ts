@@ -50,6 +50,13 @@ type AdminListingFilterParams = {
   accessibleScholarIds?: string[];
 };
 
+type CounterChild = {
+  format: string;
+  durationSeconds: number | null;
+  publishedLectureCount: number | null;
+  publishedDurationSeconds: number | null;
+};
+
 function buildAdminListingWhere(params: AdminListingFilterParams): Prisma.ListingWhereInput {
   const scholarId = params.accessibleScholarIds
     ? params.scholarId && !params.accessibleScholarIds.includes(params.scholarId)
@@ -76,6 +83,25 @@ function buildAdminListingWhere(params: AdminListingFilterParams): Prisma.Listin
     ];
   }
   return where;
+}
+
+function sumListingCounters(children: CounterChild[]): {
+  totalCount: number;
+  totalDuration: number;
+} {
+  return children.reduce(
+    (totals, child) =>
+      child.format === 'single'
+        ? {
+            totalCount: totals.totalCount + 1,
+            totalDuration: totals.totalDuration + (child.durationSeconds ?? 0),
+          }
+        : {
+            totalCount: totals.totalCount + (child.publishedLectureCount ?? 0),
+            totalDuration: totals.totalDuration + (child.publishedDurationSeconds ?? 0),
+          },
+    { totalCount: 0, totalDuration: 0 },
+  );
 }
 
 function hasTranslatableListingChange(dto: UpdateListingDetailsDto): boolean {
@@ -129,6 +155,138 @@ async function replaceListingTopics(
   if (topics === undefined) return;
   await tx.listingTopic.deleteMany({ where: { listingId } });
   await createListingTopics(tx, listingId, topics);
+}
+
+function buildListingMediaUpdateData(
+  dto: UpdateListingMediaDto,
+  updatedBy?: string,
+): Prisma.ListingUpdateInput {
+  const updateData: Prisma.ListingUpdateInput = {
+    updatedAt: new Date(),
+    updatedBy,
+  };
+  if (dto.durationSeconds !== undefined) updateData.durationSeconds = dto.durationSeconds;
+  if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
+  return updateData;
+}
+
+function mapListingTopic(topic: {
+  id: string;
+  slug: string;
+  name: string;
+  translations: Array<{ name: string }>;
+}) {
+  return {
+    id: topic.id,
+    slug: topic.slug,
+    name: topic.translations[0]?.name || topic.name,
+  };
+}
+
+function mapPrimaryAudioAsset(
+  asset: {
+    id: string;
+    url: string;
+    format: string | null;
+    bitrateKbps: number | null;
+    durationSeconds: number | null;
+  } | null,
+) {
+  if (!asset) return null;
+  return {
+    id: asset.id,
+    url: asset.url,
+    format: toOptional(asset.format),
+    bitrateKbps: toOptional(asset.bitrateKbps),
+    durationSeconds: toOptional(asset.durationSeconds),
+  };
+}
+
+function mapOriginalListingTranslation(
+  original:
+    | {
+        title: string;
+        description: string | null;
+      }
+    | null
+    | undefined,
+) {
+  if (!original) return undefined;
+  return {
+    title: original.title,
+    description: toOptional(original.description),
+  };
+}
+
+function mapOriginalListingTitle(original: { title: string } | null | undefined) {
+  return original ? { title: original.title } : undefined;
+}
+
+function getAdminListingOptionalFields(listing: {
+  description: string | null;
+  language: Locale | null;
+  orderIndex: number | null;
+  durationSeconds: number | null;
+  parentId: string | null;
+  coverImageUrl: string | null;
+  updatedAt: Date | null;
+}) {
+  return {
+    description: toOptional(listing.description),
+    language: toOptional(listing.language),
+    orderIndex: toOptional(listing.orderIndex),
+    durationSeconds: toOptional(listing.durationSeconds),
+    parentId: toOptional(listing.parentId),
+    coverImageUrl: toOptional(listing.coverImageUrl),
+    updatedAt: listing.updatedAt?.toISOString(),
+  };
+}
+
+function nullableValue<T>(value: T | null | undefined): T | null {
+  return value ?? null;
+}
+
+function buildCreateListingData(
+  dto: CreateListingDto & { publicUrl?: string },
+  slug: string,
+  createdBy?: string,
+): Prisma.ListingUncheckedCreateInput {
+  return {
+    title: dto.title,
+    slug,
+    format: dto.format,
+    status: dto.status ?? Status.draft,
+    language: dto.language ?? 'ar',
+    durationSeconds: dto.durationSeconds ?? undefined,
+    scholarId: dto.scholarId,
+    parentId: dto.parentId ?? undefined,
+    coverImageUrl: dto.coverImageUrl ?? undefined,
+    coverImageKey: dto.coverImageKey ?? undefined,
+    createdBy,
+  };
+}
+
+function buildArrangeLessonUpdateData(
+  op: Extract<ArrangeLessonOp, { op: 'update' }>,
+  existingStatus: Status | null | undefined,
+  userId?: string,
+): Prisma.ListingUpdateInput {
+  const data: Prisma.ListingUpdateInput = { updatedAt: new Date(), updatedBy: userId };
+  if (op.title !== undefined) data.title = op.title;
+  if (op.description !== undefined) data.description = op.description;
+  if (op.status !== undefined) {
+    data.status = op.status;
+    if (isNewlyPublished(op.status, existingStatus)) {
+      data.publishedAt = new Date();
+    }
+  }
+  if (op.orderIndex !== undefined) data.orderIndex = op.orderIndex;
+  if (op.audio) data.durationSeconds = op.audio.durationSeconds;
+  return data;
+}
+
+function isNewlyPublished(status: Status, existingStatus: Status | null | undefined): boolean {
+  return status === Status.published && existingStatus !== Status.published;
 }
 
 @Injectable()
@@ -250,12 +408,7 @@ export class ListingRepository {
       coverImageUrl: this.toPublicAssetUrl(listing.coverImageUrl),
       language: toOptional(listing.language),
       originalLanguage: resolved.originalLanguage,
-      original: resolved.original
-        ? {
-            title: resolved.original.title,
-            description: toOptional(resolved.original.description),
-          }
-        : undefined,
+      original: mapOriginalListingTranslation(resolved.original),
       durationSeconds: toOptional(listing.durationSeconds),
       publishedLectureCount: toOptional(listing.publishedLectureCount),
       publishedDurationSeconds: toOptional(listing.publishedDurationSeconds),
@@ -267,20 +420,8 @@ export class ListingRepository {
         imageUrl: toOptional(listing.scholar.imageUrl),
         title: toOptional(listing.scholar.title),
       },
-      topics: listing.topics.map((lt) => ({
-        id: lt.topic.id,
-        slug: lt.topic.slug,
-        name: lt.topic.translations?.[0]?.name || lt.topic.name,
-      })),
-      primaryAudioAsset: primaryAudio
-        ? {
-            id: primaryAudio.id,
-            url: primaryAudio.url,
-            format: toOptional(primaryAudio.format),
-            bitrateKbps: toOptional(primaryAudio.bitrateKbps),
-            durationSeconds: toOptional(primaryAudio.durationSeconds),
-          }
-        : null,
+      topics: listing.topics.map((lt) => mapListingTopic(lt.topic)),
+      primaryAudioAsset: mapPrimaryAudioAsset(primaryAudio),
       seriesContext,
       rootListing,
     };
@@ -660,49 +801,52 @@ export class ListingRepository {
     format: ListingProgressSummaryDto['format'],
     userId: string,
   ): Promise<ListingProgressSummaryDto> {
-    if (format === 'single') {
-      const progress = await this.prisma.userListingProgress.findUnique({
-        where: { userId_listingId: { userId, listingId: actualId } },
-        select: { isCompleted: true },
-      });
-      return this.toProgressSummary(
-        actualId,
-        listingSlug,
-        format,
-        1,
-        progress?.isCompleted ? 1 : 0,
-      );
-    }
+    const counts =
+      format === 'single'
+        ? await this.getSingleProgressCounts(actualId, userId)
+        : await this.getNestedProgressCounts(actualId, userId, format);
 
+    return this.toProgressSummary(actualId, listingSlug, format, counts.total, counts.completed);
+  }
+
+  private async getSingleProgressCounts(
+    listingId: string,
+    userId: string,
+  ): Promise<{ total: number; completed: number }> {
+    const progress = await this.prisma.userListingProgress.findUnique({
+      where: { userId_listingId: { userId, listingId } },
+      select: { isCompleted: true },
+    });
+    return { total: 1, completed: progress?.isCompleted ? 1 : 0 };
+  }
+
+  private async getNestedProgressCounts(
+    listingId: string,
+    userId: string,
+    format: ListingProgressSummaryDto['format'],
+  ): Promise<{ total: number; completed: number }> {
     const [row] =
       format === 'series'
         ? await this.prisma.$queryRaw<{ total: number; completed: number }[]>`
-            SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
-            FROM "Listing" l
-            LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
-            WHERE l."parentId" = ${actualId}::uuid
-              AND l."deletedAt" IS NULL
-              AND l."status" = 'published'
-          `
+          SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
+          FROM "Listing" l
+          LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
+          WHERE l."parentId" = ${listingId}::uuid
+            AND l."deletedAt" IS NULL
+            AND l."status" = 'published'
+        `
         : await this.prisma.$queryRaw<{ total: number; completed: number }[]>`
-            SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
-            FROM "Listing" l
-            JOIN "Listing" m ON l."parentId" = m.id
-            LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
-            WHERE m."parentId" = ${actualId}::uuid
-              AND l."deletedAt" IS NULL
-              AND l."status" = 'published'
-              AND m."deletedAt" IS NULL
-              AND m."status" = 'published'
-          `;
-
-    return this.toProgressSummary(
-      actualId,
-      listingSlug,
-      format,
-      row?.total ?? 0,
-      row?.completed ?? 0,
-    );
+          SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
+          FROM "Listing" l
+          JOIN "Listing" m ON l."parentId" = m.id
+          LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
+          WHERE m."parentId" = ${listingId}::uuid
+            AND l."deletedAt" IS NULL
+            AND l."status" = 'published'
+            AND m."deletedAt" IS NULL
+            AND m."status" = 'published'
+        `;
+    return { total: row?.total ?? 0, completed: row?.completed ?? 0 };
   }
 
   private toProgressSummary(
@@ -855,23 +999,15 @@ export class ListingRepository {
         slug: r.slug,
         title: resolved.fields.title,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original ? { title: resolved.original.title } : undefined,
-        durationSeconds: r.durationSeconds ?? undefined,
+        original: mapOriginalListingTitle(resolved.original),
+        durationSeconds: toOptional(r.durationSeconds),
         scholar: {
           id: r.scholar.id,
           slug: r.scholar.slug,
           name: scholarName,
-          imageUrl: r.scholar.imageUrl ?? undefined,
+          imageUrl: toOptional(r.scholar.imageUrl),
         },
-        primaryAudioAsset: r.audioAssets[0]
-          ? {
-              id: r.audioAssets[0].id,
-              url: r.audioAssets[0].url,
-              format: r.audioAssets[0].format ?? undefined,
-              bitrateKbps: r.audioAssets[0].bitrateKbps ?? undefined,
-              durationSeconds: r.audioAssets[0].durationSeconds ?? undefined,
-            }
-          : null,
+        primaryAudioAsset: mapPrimaryAudioAsset(r.audioAssets[0] ?? null),
       };
     });
   }
@@ -883,32 +1019,8 @@ export class ListingRepository {
     tx: Prisma.TransactionClient,
     options?: { recurse?: boolean },
   ): Promise<void> {
-    const children = await tx.listing.findMany({
-      where: {
-        parentId: listingId,
-        status: Status.published,
-        deletedAt: null,
-      },
-      select: {
-        format: true,
-        durationSeconds: true,
-        publishedLectureCount: true,
-        publishedDurationSeconds: true,
-      },
-    });
-
-    let totalCount = 0;
-    let totalDuration = 0;
-
-    for (const child of children) {
-      if (child.format === 'single') {
-        totalCount += 1;
-        totalDuration += child.durationSeconds ?? 0;
-      } else {
-        totalCount += child.publishedLectureCount ?? 0;
-        totalDuration += child.publishedDurationSeconds ?? 0;
-      }
-    }
+    const children = await this.findPublishedChildren(tx, listingId);
+    const { totalCount, totalDuration } = sumListingCounters(children);
 
     await tx.listing.update({
       where: { id: listingId },
@@ -928,6 +1040,21 @@ export class ListingRepository {
     if (listing?.parentId) {
       await this.syncListingCounters(listing.parentId, tx);
     }
+  }
+
+  private async findPublishedChildren(
+    tx: Prisma.TransactionClient,
+    listingId: string,
+  ): Promise<CounterChild[]> {
+    return tx.listing.findMany({
+      where: { parentId: listingId, status: Status.published, deletedAt: null },
+      select: {
+        format: true,
+        durationSeconds: true,
+        publishedLectureCount: true,
+        publishedDurationSeconds: true,
+      },
+    });
   }
 
   // ─── Admin Listing Methods ────────────────────────────────────────────────
@@ -1048,21 +1175,15 @@ export class ListingRepository {
       id: listing.id,
       slug: listing.slug,
       title: listing.title,
-      description: listing.description ?? undefined,
+      ...getAdminListingOptionalFields(listing),
       format: listing.format,
-      language: listing.language ?? undefined,
       status: listing.status,
-      orderIndex: listing.orderIndex ?? undefined,
-      durationSeconds: listing.durationSeconds ?? undefined,
       scholarId: listing.scholarId,
       scholarSlug: listing.scholar.slug,
       scholarName: listing.scholar.name,
-      parentId: listing.parentId ?? undefined,
       topics: listing.topics.map((t) => t.topic.id),
       audioUrl: listing.audioAssets[0]?.url,
-      coverImageUrl: listing.coverImageUrl ?? undefined,
       createdAt: listing.createdAt.toISOString(),
-      updatedAt: listing.updatedAt?.toISOString(),
     };
   }
 
@@ -1120,28 +1241,22 @@ export class ListingRepository {
         id: listing.id,
         slug: listing.slug,
         title: listing.title,
-        description: listing.description ?? undefined,
+        ...getAdminListingOptionalFields(listing),
         format: listing.format,
-        language: listing.language ?? undefined,
         status: listing.status,
-        orderIndex: listing.orderIndex ?? undefined,
-        durationSeconds: listing.durationSeconds ?? undefined,
         scholarId: listing.scholarId,
         scholarSlug: listing.scholar.slug,
         scholarName: listing.scholar.name,
-        parentId: listing.parentId ?? undefined,
         topics: listing.topics.map((t) => t.topic.id),
         audioUrl: listing.audioAssets[0]?.url,
-        coverImageUrl: listing.coverImageUrl ?? undefined,
         createdAt: listing.createdAt.toISOString(),
-        updatedAt: listing.updatedAt?.toISOString(),
       },
       translations: listing.translations.map((t) => ({
         locale: t.locale,
         status: t.status,
         fields: {
           title: t.title,
-          description: t.description ?? null,
+          description: nullableValue(t.description),
         },
         createdAt: t.createdAt.toISOString(),
         updatedAt: t.updatedAt.toISOString(),
@@ -1157,19 +1272,7 @@ export class ListingRepository {
 
     return this.prisma.$transaction(async (tx) => {
       const listing = await tx.listing.create({
-        data: {
-          title: dto.title,
-          slug,
-          format: dto.format,
-          status: dto.status ?? Status.draft,
-          language: dto.language ?? 'ar',
-          durationSeconds: dto.durationSeconds ?? undefined,
-          scholarId: dto.scholarId,
-          parentId: dto.parentId ?? undefined,
-          coverImageUrl: dto.coverImageUrl ?? undefined,
-          coverImageKey: dto.coverImageKey ?? undefined,
-          createdBy,
-        },
+        data: buildCreateListingData(dto, slug, createdBy),
         select: { id: true, title: true, parentId: true },
       });
 
@@ -1293,17 +1396,7 @@ export class ListingRepository {
       where: { id: op.id },
       select: { status: true },
     });
-    const data: Prisma.ListingUpdateInput = { updatedAt: new Date(), updatedBy: userId };
-    if (op.title !== undefined) data.title = op.title;
-    if (op.description !== undefined) data.description = op.description;
-    if (op.status !== undefined) {
-      data.status = op.status;
-      if (op.status === Status.published && existing?.status !== Status.published) {
-        data.publishedAt = new Date();
-      }
-    }
-    if (op.orderIndex !== undefined) data.orderIndex = op.orderIndex;
-    if (op.audio) data.durationSeconds = op.audio.durationSeconds;
+    const data = buildArrangeLessonUpdateData(op, existing?.status, userId);
     await tx.listing.update({ where: { id: op.id }, data });
     if (op.audio) await this.syncArrangeLessonAudio(tx, op.id, op.audio);
   }
@@ -1383,13 +1476,7 @@ export class ListingRepository {
 
         if (!listing) throw new Error('Not found');
 
-        // Update listing fields (audioKey → handled via audioAsset, durationSeconds, orderIndex)
-        const updateData: Prisma.ListingUpdateInput = {
-          updatedAt: new Date(),
-          updatedBy,
-        };
-        if (dto.durationSeconds !== undefined) updateData.durationSeconds = dto.durationSeconds;
-        if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
+        const updateData = buildListingMediaUpdateData(dto, updatedBy);
 
         await tx.listing.update({
           where: { id },
@@ -1620,6 +1707,17 @@ export class ListingRepository {
     rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
     existingModuleSlugById: Map<string, string>,
   ): { slug: string; expectedPrefix: string }[] {
+    return [
+      ...this.buildArrangeModulePrefixChecks(rootSlug, moduleOps, existingModuleSlugById),
+      ...this.buildArrangeRootLessonPrefixChecks(rootSlug, rootLessonOps),
+    ];
+  }
+
+  private buildArrangeModulePrefixChecks(
+    rootSlug: string,
+    moduleOps: NonNullable<ArrangeCommitDto['modules']>,
+    existingModuleSlugById: Map<string, string>,
+  ): { slug: string; expectedPrefix: string }[] {
     const checks: { slug: string; expectedPrefix: string }[] = [];
     for (const moduleOp of moduleOps) {
       const parentSlug =
@@ -1635,6 +1733,14 @@ export class ListingRepository {
         }
       }
     }
+    return checks;
+  }
+
+  private buildArrangeRootLessonPrefixChecks(
+    rootSlug: string,
+    rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
+  ): { slug: string; expectedPrefix: string }[] {
+    const checks: { slug: string; expectedPrefix: string }[] = [];
     for (const lessonOp of rootLessonOps) {
       if (lessonOp.op === 'create') {
         checks.push({ slug: lessonOp.slug, expectedPrefix: rootSlug });
@@ -1691,10 +1797,27 @@ export class ListingRepository {
     rootLessonOps: ArrangeCommitDto['lessons'],
     rootId: string,
   ): Array<{ id: string; parentId: string }> {
+    return [
+      ...this.collectRootLessonUpdateTargets(rootLessonOps, rootId),
+      ...this.collectModuleLessonUpdateTargets(moduleOps),
+    ];
+  }
+
+  private collectRootLessonUpdateTargets(
+    rootLessonOps: ArrangeCommitDto['lessons'],
+    rootId: string,
+  ): Array<{ id: string; parentId: string }> {
     const targets: Array<{ id: string; parentId: string }> = [];
     for (const lessonOp of rootLessonOps ?? []) {
       if (lessonOp.op === 'update') targets.push({ id: lessonOp.id, parentId: rootId });
     }
+    return targets;
+  }
+
+  private collectModuleLessonUpdateTargets(
+    moduleOps: ArrangeCommitDto['modules'],
+  ): Array<{ id: string; parentId: string }> {
+    const targets: Array<{ id: string; parentId: string }> = [];
     for (const moduleOp of moduleOps ?? []) {
       if (moduleOp.op !== 'update') continue;
       for (const lessonOp of moduleOp.lessons) {
@@ -1738,6 +1861,48 @@ export class ListingRepository {
     this.assertArrangeLessonTargets(lessonUpdateTargets, found);
   }
 
+  private async applyArrangeModule(
+    tx: Prisma.TransactionClient,
+    moduleOp: NonNullable<ArrangeCommitDto['modules']>[number],
+    rootId: string,
+    scholarId: string,
+    userId: string | undefined,
+    result: ArrangeCommitResultDto,
+    touchedParents: Set<string>,
+  ): Promise<string> {
+    if (moduleOp.op === 'create') {
+      const status = moduleOp.status ?? Status.draft;
+      const created = await tx.listing.create({
+        data: {
+          slug: moduleOp.slug,
+          title: moduleOp.title,
+          description: moduleOp.description ?? undefined,
+          format: 'series',
+          status,
+          publishedAt: status === Status.published ? new Date() : undefined,
+          orderIndex: moduleOp.orderIndex ?? undefined,
+          scholarId,
+          parentId: rootId,
+          createdBy: userId,
+        },
+        select: { id: true },
+      });
+      result.createdModules += 1;
+      touchedParents.add(rootId);
+      return created.id;
+    }
+
+    if (moduleOp.orderIndex !== undefined) {
+      await tx.listing.update({
+        where: { id: moduleOp.id },
+        data: { orderIndex: moduleOp.orderIndex, updatedAt: new Date(), updatedBy: userId },
+      });
+      touchedParents.add(rootId);
+    }
+    result.updatedModules += 1;
+    return moduleOp.id;
+  }
+
   async arrangeCommit(
     rootId: string,
     dto: ArrangeCommitDto,
@@ -1770,38 +1935,15 @@ export class ListingRepository {
       await Promise.all(rootLessonOps.map((lessonOp) => applyLessonOp(lessonOp, rootId)));
 
       for (const moduleOp of moduleOps) {
-        let moduleId: string;
-        if (moduleOp.op === 'create') {
-          const status = moduleOp.status ?? Status.draft;
-          const created = await tx.listing.create({
-            data: {
-              slug: moduleOp.slug,
-              title: moduleOp.title,
-              description: moduleOp.description ?? undefined,
-              format: 'series',
-              status,
-              publishedAt: status === Status.published ? new Date() : undefined,
-              orderIndex: moduleOp.orderIndex ?? undefined,
-              scholarId: root.scholarId,
-              parentId: rootId,
-              createdBy: userId,
-            },
-            select: { id: true },
-          });
-          moduleId = created.id;
-          result.createdModules += 1;
-          touchedParents.add(rootId);
-        } else {
-          moduleId = moduleOp.id;
-          if (moduleOp.orderIndex !== undefined) {
-            await tx.listing.update({
-              where: { id: moduleId },
-              data: { orderIndex: moduleOp.orderIndex, updatedAt: new Date(), updatedBy: userId },
-            });
-            touchedParents.add(rootId);
-          }
-          result.updatedModules += 1;
-        }
+        const moduleId = await this.applyArrangeModule(
+          tx,
+          moduleOp,
+          rootId,
+          root.scholarId,
+          userId,
+          result,
+          touchedParents,
+        );
         affectedIds.push(moduleId);
         await Promise.all(moduleOp.lessons.map((lessonOp) => applyLessonOp(lessonOp, moduleId)));
       }
@@ -2121,8 +2263,8 @@ export class ListingRepository {
         slug: l.slug,
         scholarName,
         scholarSlug: l.scholar!.slug,
-        scholarTitle: l.scholar!.title ?? undefined,
-        scholarImageUrl: l.scholar!.imageUrl ?? undefined,
+        scholarTitle: toOptional(l.scholar!.title),
+        scholarImageUrl: toOptional(l.scholar!.imageUrl),
         thumbnailUrl: thumbnailUrl ?? null,
         durationSeconds: durationSeconds ?? 0,
         publishedLectureCount,

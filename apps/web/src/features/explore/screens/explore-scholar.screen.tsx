@@ -38,13 +38,7 @@ function ScholarResults({
   onNavigateToScholar,
 }: ScholarResultsProps) {
   const { t } = useTranslation();
-  const filteredScholars = debouncedSearch.trim()
-    ? scholars.filter(
-        (scholar) =>
-          scholar.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          scholar.slug.toLowerCase().includes(debouncedSearch.toLowerCase()),
-      )
-    : scholars;
+  const filteredScholars = filterScholars(scholars, debouncedSearch);
 
   if (isError && scholars.length === 0) {
     return (
@@ -86,6 +80,16 @@ function ScholarResults({
         ? t("scholarContent.searchNoMatch", "No scholars match your search.")
         : t("explore.noScholars", "No scholars available.")}
     </div>
+  );
+}
+
+function filterScholars(scholars: ScholarListItemDto[], search: string): ScholarListItemDto[] {
+  const normalizedSearch = search.trim().toLowerCase();
+  if (!normalizedSearch) return scholars;
+  return scholars.filter(
+    (scholar) =>
+      scholar.name.toLowerCase().includes(normalizedSearch) ||
+      scholar.slug.toLowerCase().includes(normalizedSearch),
   );
 }
 

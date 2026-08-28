@@ -39,7 +39,7 @@
     "import/no-cycle": "error",
     "no-unused-vars": "error",
     "unicorn/no-empty-file": "error",
-    "eslint/complexity": ["error", { "max": 15, "variant": "modified" }]
+    "eslint/complexity": ["error", { "max": 7, "variant": "modified" }]
   },
   "overrides": [
     {
@@ -70,7 +70,7 @@
         "**/*.test.{js,jsx,ts,tsx}",
         "**/__tests__/**/*.{js,jsx,ts,tsx}",
         "**/e2e/**/*.{js,jsx,ts,tsx}",
-        "scripts/**/*.{js,jsx,ts,tsx}",
+        "scripts/**/*.{js,jsx,ts,tsx,mjs,cjs}",
         "**/*.config.{js,jsx,ts,tsx,mjs,cjs}",
         "**/next.config.*",
         "**/vite.config.*",

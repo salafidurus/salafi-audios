@@ -26,11 +26,18 @@ async function uploadStagedImage(
 }
 
 function getScholarSaveErrorTabs(state: FormState): string[] {
-  const tabs: string[] = [];
-  if (!state.mainLanguage) tabs.push("general");
-  if (!state.isEditing && !state.name?.trim()) tabs.push("main");
-  if (!state.isEditing && !state.slug?.trim()) tabs.push("general");
-  return tabs;
+  return collectMissingTabs([
+    ["general", !state.mainLanguage],
+    ["main", !state.isEditing && !state.name?.trim()],
+    ["general", !state.isEditing && !state.slug?.trim()],
+  ]);
+}
+
+function collectMissingTabs(checks: readonly (readonly [string, unknown])[]): string[] {
+  return checks.reduce<string[]>((tabs, [tab, missing]) => {
+    if (missing) tabs.push(tab);
+    return tabs;
+  }, []);
 }
 
 async function persistScholar(state: FormState): Promise<void> {

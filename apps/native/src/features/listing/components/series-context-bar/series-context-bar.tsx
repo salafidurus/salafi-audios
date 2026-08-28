@@ -1,4 +1,5 @@
 import type { SeriesContextDto } from "@sd/core-contracts";
+import type { Track } from "@sd/domain-audio";
 
 import { useQueue } from "@sd/domain-audio";
 import { Pressable, View } from "react-native";
@@ -13,14 +14,32 @@ export type SeriesContextBarProps = {
   listingSlug: string;
 };
 
+function getPreviousTrack(
+  queue: Track[],
+  currentIndex: number,
+  isActiveQueue: boolean,
+  hasPrevious: boolean,
+) {
+  return isActiveQueue && hasPrevious ? (queue[currentIndex - 1] ?? null) : null;
+}
+
+function getNextTrack(
+  queue: Track[],
+  currentIndex: number,
+  isActiveQueue: boolean,
+  hasNext: boolean,
+) {
+  return isActiveQueue && hasNext ? (queue[currentIndex + 1] ?? null) : null;
+}
+
 export function SeriesContextBar({ seriesContext, listingSlug }: SeriesContextBarProps) {
   const { queue, currentIndex, currentTrack, hasNext, hasPrevious } = useQueue();
 
   // Prev/Next only make sense relative to the queue that's actually playing this lesson —
   // otherwise they'd show sibling info from an unrelated queue.
   const isActiveQueue = currentTrack?.slug === listingSlug;
-  const prevTrack = isActiveQueue && hasPrevious ? (queue[currentIndex - 1] ?? null) : null;
-  const nextTrack = isActiveQueue && hasNext ? (queue[currentIndex + 1] ?? null) : null;
+  const prevTrack = getPreviousTrack(queue, currentIndex, isActiveQueue, hasPrevious);
+  const nextTrack = getNextTrack(queue, currentIndex, isActiveQueue, hasNext);
 
   return (
     <View style={styles.container}>

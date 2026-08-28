@@ -109,6 +109,24 @@ function ScholarItemActions({
   );
 }
 
+function ScholarCountry({
+  country,
+  countryName,
+  isMobile,
+}: {
+  country?: string | null;
+  countryName: string | null;
+  isMobile: boolean;
+}) {
+  if (!countryName) return null;
+  return (
+    <>
+      <span className={styles.sep}>&bull;</span>
+      <span className={styles.country}>{isMobile ? country : countryName}</span>
+    </>
+  );
+}
+
 export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
@@ -129,12 +147,11 @@ export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) 
           />
           <div className={styles.metaRow}>
             <span className={styles.slug}>{scholar.slug}</span>
-            {countryName && (
-              <>
-                <span className={styles.sep}>&bull;</span>
-                <span className={styles.country}>{isMobile ? scholar.country : countryName}</span>
-              </>
-            )}
+            <ScholarCountry
+              country={scholar.country}
+              countryName={countryName}
+              isMobile={isMobile}
+            />
           </div>
           {scholar.translations.length > 0 && (
             <div className={styles.translationRow}>

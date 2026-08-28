@@ -22,12 +22,7 @@ export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
   const formatScholarName = useFormatScholarName();
   const formattedName = formatScholarName(scholar);
 
-  const metaText = [
-    scholar.mainLanguage ? scholar.mainLanguage.toUpperCase() : null,
-    scholar.lectureCount ? `${scholar.lectureCount} lectures` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const metaText = getScholarMetaText(scholar);
 
   return (
     <List.Item interactive onClick={onPress ? () => onPress(scholar.slug) : undefined}>
@@ -50,17 +45,27 @@ export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
         </div>
       </div>
 
-      {onPress && (
-        <List.Item.Actions>
-          <div className={styles.chevronWrapper}>
-            {isRtl ? (
-              <ChevronLeft className={styles.chevron} size={20} />
-            ) : (
-              <ChevronRight className={styles.chevron} size={20} />
-            )}
-          </div>
-        </List.Item.Actions>
-      )}
+      {onPress && <ScholarRowActions isRtl={isRtl} />}
     </List.Item>
+  );
+}
+
+function getScholarMetaText(scholar: ScholarListItemDto): string {
+  return [
+    scholar.mainLanguage ? scholar.mainLanguage.toUpperCase() : null,
+    scholar.lectureCount ? `${scholar.lectureCount} lectures` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+function ScholarRowActions({ isRtl }: { isRtl: boolean }) {
+  const Chevron = isRtl ? ChevronLeft : ChevronRight;
+  return (
+    <List.Item.Actions>
+      <div className={styles.chevronWrapper}>
+        <Chevron className={styles.chevron} size={20} />
+      </div>
+    </List.Item.Actions>
   );
 }

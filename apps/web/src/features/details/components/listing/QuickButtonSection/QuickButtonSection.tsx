@@ -70,6 +70,22 @@ function buildListingTracks(
   ];
 }
 
+async function toggleCurrentPlayback(isPlaying: boolean) {
+  if (isPlaying) await audioService.pause();
+  else await audioService.resume();
+}
+
+async function playFirstTrack(allTracks: Track[]) {
+  const firstTrack = allTracks[0];
+  if (firstTrack) await audioService.playListing(firstTrack, allTracks);
+}
+
+async function playResumeTrack(allTracks: Track[], resumeId: string | undefined) {
+  if (allTracks.length === 0) return;
+  const targetTrack = (resumeId && allTracks.find((t) => t.id === resumeId)) || allTracks[0];
+  if (targetTrack) await audioService.playListing(targetTrack, allTracks);
+}
+
 export function QuickButtonSection({ listing, contents }: QuickButtonSectionProps) {
   const formatScholarName = useFormatScholarName();
   const { isAuthenticated } = useAuth();
@@ -97,48 +113,23 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
 
   const handlePlayPauseToggle = async () => {
     if (isCurrentActive) {
-      if (isPlaying) {
-        await audioService.pause();
-      } else {
-        await audioService.resume();
-      }
+      await toggleCurrentPlayback(isPlaying);
       return;
     }
-
-    const allTracks = getAllTracks();
-    const firstTrack = allTracks[0];
-    if (!firstTrack) return;
-
-    // Start playing from first track
-    await audioService.playListing(firstTrack, allTracks);
+    await playFirstTrack(getAllTracks());
   };
 
   const handleContinuePlaying = async () => {
     if (isCurrentActive) {
-      if (isPlaying) {
-        await audioService.pause();
-      } else {
-        await audioService.resume();
-      }
+      await toggleCurrentPlayback(isPlaying);
       return;
     }
-
-    // Find the track to resume, and build the queue starting eager URL
-    // resolution there instead of always at the first track.
     const resumeId = isSingle ? listing.slug : lastPlayed?.listingSlug;
-    const allTracks = getAllTracks(resumeId);
-    if (allTracks.length === 0) return;
-
-    const targetTrack = (resumeId && allTracks.find((t) => t.id === resumeId)) || allTracks[0];
-    if (!targetTrack) return;
-    await audioService.playListing(targetTrack, allTracks);
+    await playResumeTrack(getAllTracks(resumeId), resumeId);
   };
 
   const handlePlayFromStart = async () => {
-    const allTracks = getAllTracks();
-    const firstTrack = allTracks[0];
-    if (!firstTrack) return;
-    await audioService.playListing(firstTrack, allTracks);
+    await playFirstTrack(getAllTracks());
   };
 
   // Main button label logic

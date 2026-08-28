@@ -41,6 +41,14 @@ function getContentCountLabel(
 ) {
   const isCollection = format === "collection";
   const count = isCollection ? moduleCount : itemCount;
+  return getCountTranslation(isCollection, count, t);
+}
+
+function getCountTranslation(
+  isCollection: boolean,
+  count: number,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
   const singular = count === 1;
   return t(
     isCollection
@@ -98,18 +106,51 @@ function filterContentModules(contents: ListingContents | undefined, query: stri
   });
 }
 
-function ListingContentSection({ model, t }: ListingContentSectionProps) {
+function ListingContentBody({ model }: { model: ListingContentModel }) {
   const {
     contents,
-    contentCount,
-    contentCountLabel,
-    contentHeading,
     filteredSingleOrSeriesItems,
     filteredModules,
     formatScholarName,
     highlightItemId,
     listing,
   } = model;
+  if (contents.format === "single") {
+    return (
+      <ContentList
+        items={filteredSingleOrSeriesItems}
+        format="single"
+        scholarName={formatScholarName(listing.scholar)}
+        scholarSlug={listing.scholar.slug}
+      />
+    );
+  }
+  if (contents.format === "series") {
+    return (
+      <ContentList
+        items={filteredSingleOrSeriesItems}
+        format="series"
+        scholarName={formatScholarName(listing.scholar)}
+        scholarSlug={listing.scholar.slug}
+        seriesId={listing.id}
+        seriesTitle={listing.title}
+        highlightItemId={highlightItemId}
+      />
+    );
+  }
+  return (
+    <CollectionContentLayout
+      modules={filteredModules}
+      scholarName={formatScholarName(listing.scholar)}
+      scholarSlug={listing.scholar.slug}
+      collectionId={listing.id}
+      highlightItemId={highlightItemId}
+    />
+  );
+}
+
+function ListingContentSection({ model, t }: ListingContentSectionProps) {
+  const { contents, contentCount, contentCountLabel, contentHeading } = model;
   return (
     <section
       aria-label={contentHeading ? undefined : t("listing.collectionContent", "Collection content")}
@@ -134,36 +175,7 @@ function ListingContentSection({ model, t }: ListingContentSectionProps) {
         </>
       )}
 
-      {contents.format === "single" && (
-        <ContentList
-          items={filteredSingleOrSeriesItems}
-          format="single"
-          scholarName={formatScholarName(listing.scholar)}
-          scholarSlug={listing.scholar.slug}
-        />
-      )}
-
-      {contents.format === "series" && (
-        <ContentList
-          items={filteredSingleOrSeriesItems}
-          format="series"
-          scholarName={formatScholarName(listing.scholar)}
-          scholarSlug={listing.scholar.slug}
-          seriesId={listing.id}
-          seriesTitle={listing.title}
-          highlightItemId={highlightItemId}
-        />
-      )}
-
-      {contents.format === "collection" && (
-        <CollectionContentLayout
-          modules={filteredModules}
-          scholarName={formatScholarName(listing.scholar)}
-          scholarSlug={listing.scholar.slug}
-          collectionId={listing.id}
-          highlightItemId={highlightItemId}
-        />
-      )}
+      <ListingContentBody model={model} />
     </section>
   );
 }
@@ -178,6 +190,27 @@ type LoadedListingView = {
   router: ReturnType<typeof useRouter>;
   t: Translation["t"];
 };
+
+function ListingSearch({
+  visible,
+  search,
+  t,
+}: {
+  visible: boolean;
+  search: { value: string; onChange: (value: string) => void };
+  t: Translation["t"];
+}) {
+  if (!visible) return null;
+  return (
+    <div className={styles.searchWrapper}>
+      <Search.Bar
+        value={search.value}
+        onChange={search.onChange}
+        placeholder={t("listing.searchPlaceholder", "Search lessons…")}
+      />
+    </div>
+  );
+}
 
 function LoadedListing({ view }: { view: LoadedListingView }) {
   const { listing, contents, isFetchingContents, isMultiItem, content, search, router, t } = view;
@@ -202,15 +235,7 @@ function LoadedListing({ view }: { view: LoadedListingView }) {
             moduleCount={contents?.format === "collection" ? contents.modules.length : undefined}
           />
           <QuickButtonSection listing={listing} contents={contents} />
-          {isMultiItem ? (
-            <div className={styles.searchWrapper}>
-              <Search.Bar
-                value={search.value}
-                onChange={search.onChange}
-                placeholder={t("listing.searchPlaceholder", "Search lessons…")}
-              />
-            </div>
-          ) : null}
+          <ListingSearch visible={isMultiItem} search={search} t={t} />
         </aside>
         <main className={styles.contentColumn}>
           <StickyHeaderLayout>
@@ -382,22 +407,54 @@ function useListingContentModel({
     t,
   );
   const contentHeading = getContentHeading(listing?.format, t);
-  const content =
-    contents && listing
-      ? {
-          contents,
-          listing,
-          contentCount,
-          contentCountLabel,
-          contentHeading,
-          filteredSingleOrSeriesItems,
-          filteredModules,
-          formatScholarName,
-          highlightItemId,
-        }
-      : undefined;
+  const content = buildListingContentModel({
+    contents,
+    listing,
+    contentCount,
+    contentCountLabel,
+    contentHeading,
+    filteredSingleOrSeriesItems,
+    filteredModules,
+    formatScholarName,
+    highlightItemId,
+  });
 
   return { isMultiItem, content };
+}
+
+function buildListingContentModel({
+  contents,
+  listing,
+  contentCount,
+  contentCountLabel,
+  contentHeading,
+  filteredSingleOrSeriesItems,
+  filteredModules,
+  formatScholarName,
+  highlightItemId,
+}: {
+  contents: ListingContents | undefined;
+  listing: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined;
+  contentCount: number;
+  contentCountLabel: string;
+  contentHeading: string | null;
+  filteredSingleOrSeriesItems: React.ComponentProps<typeof ContentList>["items"];
+  filteredModules: React.ComponentProps<typeof CollectionContentLayout>["modules"];
+  formatScholarName: FormatScholarName;
+  highlightItemId: string | undefined;
+}): ListingContentModel | undefined {
+  if (!contents || !listing) return undefined;
+  return {
+    contents,
+    listing,
+    contentCount,
+    contentCountLabel,
+    contentHeading,
+    filteredSingleOrSeriesItems,
+    filteredModules,
+    formatScholarName,
+    highlightItemId,
+  };
 }
 
 export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {

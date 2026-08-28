@@ -13,21 +13,19 @@ export function useMyLibrarySavedScreen(isAuthenticated = false) {
     [entities],
   );
 
-  if (!isAuthenticated) {
-    return {
-      items: localItems,
-      hasMore: false,
-      nextCursor: undefined,
-      isFetching: false,
-      error: null,
-    };
-  }
-
-  return {
+  const remoteState = () => ({
     items: data?.items ?? [],
     hasMore: data?.hasMore ?? false,
     nextCursor: data?.nextCursor,
     isFetching,
     error,
-  };
+  });
+  const localState = () => ({
+    items: localItems,
+    hasMore: false,
+    nextCursor: undefined,
+    isFetching: false,
+    error: null,
+  });
+  return isAuthenticated ? remoteState() : localState();
 }

@@ -13,19 +13,19 @@ export function parseArchiveOrgIdentifier(input: string): string | null {
 
   try {
     const url = new URL(trimmed);
-    const host = url.hostname.toLowerCase();
-    if (host !== "archive.org" && !host.endsWith(".archive.org")) return null;
-
-    const segments = url.pathname.split("/").filter(Boolean);
-    const kind = segments[0];
-    if ((kind === "details" || kind === "download" || kind === "compress") && segments[1]) {
-      return segments[1];
-    }
-    return null;
+    return parseArchiveUrl(url);
   } catch {
     // Not a URL — treat as a bare identifier if it looks like one.
     return IDENTIFIER_PATTERN.test(trimmed) ? trimmed : null;
   }
+}
+
+function parseArchiveUrl(url: URL): string | null {
+  const host = url.hostname.toLowerCase();
+  if (host !== "archive.org" && !host.endsWith(".archive.org")) return null;
+  const [kind, identifier] = url.pathname.split("/").filter(Boolean);
+  const supportedKind = kind === "details" || kind === "download" || kind === "compress";
+  return supportedKind ? (identifier ?? null) : null;
 }
 
 function extensionOf(filename: string): string {

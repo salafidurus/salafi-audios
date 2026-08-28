@@ -87,6 +87,55 @@ function ItemRow({ item, state }: { item: UploadItem; state: UploadArrangeState 
   );
 }
 
+type ReviewGroup = { title: string; isNewModule: boolean; items: UploadItem[] };
+
+function buildReviewGroups(
+  state: UploadArrangeState,
+  t: ReturnType<typeof useTranslation>["t"],
+): ReviewGroup[] {
+  const { existing } = state;
+  if (!existing) return [];
+  if (existing.format !== "collection") {
+    return [{ title: existing.title, isNewModule: false, items: state.items }];
+  }
+
+  const groups: ReviewGroup[] = [];
+  for (const mod of state.newModules) {
+    groups.push({
+      title: mod.title,
+      isNewModule: true,
+      items: state.items.filter(
+        (item) =>
+          item.assignment.kind === "new-lesson" &&
+          item.assignment.moduleKey === `new:${mod.tempId}`,
+      ),
+    });
+  }
+  for (const mod of existing.modules) {
+    const items = state.items.filter((item) => {
+      const assignment = item.assignment;
+      if (assignment.kind === "new-lesson") return assignment.moduleKey === mod.id;
+      if (assignment.kind === "replace-audio") {
+        return mod.lessons.some((l) => l.id === assignment.lessonId);
+      }
+      return false;
+    });
+    if (items.length > 0) groups.push({ title: mod.title, isNewModule: false, items });
+  }
+  const unassigned = state.items.filter(
+    (item) =>
+      item.assignment.kind === "new-lesson" && item.assignment.moduleKey === ROOT_MODULE_KEY,
+  );
+  if (unassigned.length > 0) {
+    groups.push({
+      title: t("admin.contents.listing.unassigned", "Unassigned"),
+      isNewModule: false,
+      items: unassigned,
+    });
+  }
+  return groups;
+}
+
 export function UploadArrangeReviewTab({ state }: UploadArrangeReviewTabProps) {
   const { t } = useTranslation();
   const { existing } = state;
@@ -99,45 +148,7 @@ export function UploadArrangeReviewTab({ state }: UploadArrangeReviewTabProps) {
     );
   }
 
-  const groups: { title: string; isNewModule: boolean; items: UploadItem[] }[] = [];
-
-  if (existing.format === "collection") {
-    for (const mod of state.newModules) {
-      groups.push({
-        title: mod.title,
-        isNewModule: true,
-        items: state.items.filter(
-          (item) =>
-            item.assignment.kind === "new-lesson" &&
-            item.assignment.moduleKey === `new:${mod.tempId}`,
-        ),
-      });
-    }
-    for (const mod of existing.modules) {
-      const items = state.items.filter((item) => {
-        const assignment = item.assignment;
-        if (assignment.kind === "new-lesson") return assignment.moduleKey === mod.id;
-        if (assignment.kind === "replace-audio") {
-          return mod.lessons.some((l) => l.id === assignment.lessonId);
-        }
-        return false;
-      });
-      if (items.length > 0) groups.push({ title: mod.title, isNewModule: false, items });
-    }
-    const unassigned = state.items.filter(
-      (item) =>
-        item.assignment.kind === "new-lesson" && item.assignment.moduleKey === ROOT_MODULE_KEY,
-    );
-    if (unassigned.length > 0) {
-      groups.push({
-        title: t("admin.contents.listing.unassigned", "Unassigned"),
-        isNewModule: false,
-        items: unassigned,
-      });
-    }
-  } else {
-    groups.push({ title: existing.title, isNewModule: false, items: state.items });
-  }
+  const groups = buildReviewGroups(state, t);
 
   return (
     <div className={styles.arrangeStack}>

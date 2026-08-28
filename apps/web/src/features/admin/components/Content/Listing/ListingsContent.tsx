@@ -1,6 +1,6 @@
 "use client";
 
-import { queryKeys } from "@sd/core-contracts";
+import { queryKeys, type AdminListingListItemDto } from "@sd/core-contracts";
 import { useAbility } from "@sd/domain-account";
 import { useInfiniteAdminListings } from "@sd/domain-content";
 import { useQueryClient } from "@tanstack/react-query";
@@ -43,6 +43,133 @@ function SortIcon({ active, direction }: { active: boolean; direction: SortDirec
     <ArrowUp aria-hidden="true" size={14} />
   ) : (
     <ArrowDown aria-hidden="true" size={14} />
+  );
+}
+
+function DesktopListingsTable({
+  listings,
+  ability,
+  sort,
+  hasNextPage,
+  isFetchingNextPage,
+  onSort,
+  onEdit,
+  onUpload,
+  onTranslate,
+  onLoadMore,
+  t,
+}: {
+  listings: AdminListingListItemDto[];
+  ability: ReturnType<typeof useAbility>["ability"];
+  sort: { key: ListingSortKey; direction: SortDirection };
+  hasNextPage: boolean | undefined;
+  isFetchingNextPage: boolean;
+  onSort: (key: ListingSortKey) => void;
+  onEdit: (listingId: string) => void;
+  onUpload: (listingId: string) => void;
+  onTranslate: (listingId: string) => void;
+  onLoadMore: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  const renderSortHead = (key: ListingSortKey, label: string) => {
+    const active = sort.key === key;
+    return (
+      <TableHead
+        aria-sort={active ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}
+      >
+        <Button
+          variant="ghost"
+          size="sm"
+          className={styles.tableSortButton}
+          onClick={() => onSort(key)}
+          aria-label={t("admin.contents.sortBy", "Sort by {{label}}", { label })}
+        >
+          {label}
+          <SortIcon active={active} direction={sort.direction} />
+        </Button>
+      </TableHead>
+    );
+  };
+
+  return (
+    <div className={styles.desktopContentTable}>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {renderSortHead("title", t("admin.contents.listingColumn", "Listing"))}
+            {renderSortHead("scholarName", t("admin.contents.scholarColumn", "Scholar"))}
+            {renderSortHead("status", t("admin.contents.statusColumn", "Status"))}
+            <TableHead className={styles.tableActionsColumn}>
+              {t("admin.contents.actionsColumn", "Actions")}
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {listings.map((listing) => (
+            <TableRow key={listing.id}>
+              <TableCell className={styles.tablePrimaryCell}>
+                <div className={styles.tableListingCell}>
+                  <AppAvatar
+                    listingArtwork={listing.coverImageUrl}
+                    name={listing.title}
+                    size={24}
+                    className={styles.tableAvatar}
+                  />
+                  <span>{listing.title}</span>
+                </div>
+              </TableCell>
+              <TableCell className={styles.tableMutedCell}>{listing.scholarName}</TableCell>
+              <TableCell className={styles.tableMutedCell}>
+                {t(`admin.contents.listing.${listing.status}`, listing.status)}
+              </TableCell>
+              <TableCell className={styles.tableActionsColumn}>
+                <div className={styles.tableActions}>
+                  {ability.can("update", "Listing") && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEdit(listing.id)}
+                      aria-label={`${t("common.edit", "Edit")} ${listing.title}`}
+                    >
+                      <Pencil size={16} />
+                    </Button>
+                  )}
+                  {ability.can("read", "Translation") && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onTranslate(listing.id)}
+                      aria-label={`${t("admin.translations.button", "Translations")} ${listing.title}`}
+                    >
+                      <Languages size={16} />
+                    </Button>
+                  )}
+                  {ability.can("upload", "Media") && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onUpload(listing.id)}
+                      aria-label={`${t("common.upload", "Upload")} ${listing.title}`}
+                    >
+                      <Upload size={16} />
+                    </Button>
+                  )}
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {hasNextPage && (
+        <div className={styles.tableLoadMore}>
+          <Button variant="outline" size="sm" onClick={onLoadMore} disabled={isFetchingNextPage}>
+            {isFetchingNextPage
+              ? t("common.loading", "Loading...")
+              : t("common.loadMore", "Load more")}
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -94,114 +221,6 @@ export function ListingsContent({
     }));
   };
 
-  const renderSortHead = (key: ListingSortKey, label: string) => {
-    const active = sort.key === key;
-    return (
-      <TableHead
-        aria-sort={active ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}
-      >
-        <Button
-          variant="ghost"
-          size="sm"
-          className={styles.tableSortButton}
-          onClick={() => handleSort(key)}
-          aria-label={t("admin.contents.sortBy", "Sort by {{label}}", { label })}
-        >
-          {label}
-          <SortIcon active={active} direction={sort.direction} />
-        </Button>
-      </TableHead>
-    );
-  };
-
-  const desktopTable = allListings.length > 0 && (
-    <div className={styles.desktopContentTable}>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {renderSortHead("title", t("admin.contents.listingColumn", "Listing"))}
-            {renderSortHead("scholarName", t("admin.contents.scholarColumn", "Scholar"))}
-            {renderSortHead("status", t("admin.contents.statusColumn", "Status"))}
-            <TableHead className={styles.tableActionsColumn}>
-              {t("admin.contents.actionsColumn", "Actions")}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedListings.map((listing) => (
-            <TableRow key={listing.id}>
-              <TableCell className={styles.tablePrimaryCell}>
-                <div className={styles.tableListingCell}>
-                  <AppAvatar
-                    listingArtwork={listing.coverImageUrl}
-                    name={listing.title}
-                    size={24}
-                    className={styles.tableAvatar}
-                  />
-                  <span>{listing.title}</span>
-                </div>
-              </TableCell>
-              <TableCell className={styles.tableMutedCell}>{listing.scholarName}</TableCell>
-              <TableCell className={styles.tableMutedCell}>
-                {t(`admin.contents.listing.${listing.status}`, listing.status)}
-              </TableCell>
-              <TableCell className={styles.tableActionsColumn}>
-                <div className={styles.tableActions}>
-                  {ability.can("update", "Listing") && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEditListing(listing.id)}
-                      aria-label={`${t("common.edit", "Edit")} ${listing.title}`}
-                    >
-                      <Pencil size={16} />
-                    </Button>
-                  )}
-                  {ability.can("read", "Translation") && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() =>
-                        setTranslationTarget({ entity: "listing", listingId: listing.id })
-                      }
-                      aria-label={`${t("admin.translations.button", "Translations")} ${listing.title}`}
-                    >
-                      <Languages size={16} />
-                    </Button>
-                  )}
-                  {ability.can("upload", "Media") && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleUploadListing(listing.id)}
-                      aria-label={`${t("common.upload", "Upload")} ${listing.title}`}
-                    >
-                      <Upload size={16} />
-                    </Button>
-                  )}
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      {hasNextPage && (
-        <div className={styles.tableLoadMore}>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => void fetchNextPage()}
-            disabled={isFetchingNextPage}
-          >
-            {isFetchingNextPage
-              ? t("common.loading", "Loading...")
-              : t("common.loadMore", "Load more")}
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-
   const handleEditListing = (listingId: string) => {
     setSelectedListingId(listingId);
     setIsListingModalOpen(true);
@@ -227,7 +246,21 @@ export function ListingsContent({
 
   return (
     <>
-      {desktopTable}
+      {allListings.length > 0 && (
+        <DesktopListingsTable
+          listings={sortedListings}
+          ability={ability}
+          sort={sort}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          onSort={handleSort}
+          onEdit={handleEditListing}
+          onUpload={handleUploadListing}
+          onTranslate={(id) => setTranslationTarget({ entity: "listing", listingId: id })}
+          onLoadMore={() => void fetchNextPage()}
+          t={t}
+        />
+      )}
       <div className={styles.mobileContentList}>
         <InfiniteScrollList
           data={allListings}

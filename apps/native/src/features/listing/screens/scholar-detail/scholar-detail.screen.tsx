@@ -59,6 +59,31 @@ function TopicItem({ title, subtitle }: TopicItemProps) {
   );
 }
 
+function TopicSections({
+  topics,
+}: {
+  topics:
+    | { topicId: string; topicName: string; items: { id: string; title: string; type: string }[] }[]
+    | undefined;
+}) {
+  if (!topics || topics.length === 0) return null;
+  return (
+    <View style={styles.topicsContainer}>
+      {topics.map((topic) => (
+        <TopicSection key={topic.topicId} topicName={topic.topicName}>
+          {topic.items.map((item) => (
+            <TopicItem
+              key={item.id}
+              title={item.title}
+              subtitle={item.type === "single" ? undefined : item.type}
+            />
+          ))}
+        </TopicSection>
+      ))}
+    </View>
+  );
+}
+
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { data: scholar, isFetching: isScholarFetching } = useScholarDetail(slug);
   const { data: content, isFetching: isContentFetching } = useScholarContent(slug);
@@ -88,21 +113,7 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
         <View style={{ marginTop: 24 }}>
           <ScholarContentList items={content?.items ?? []} />
         </View>
-        {topicsData?.topics && topicsData.topics.length > 0 ? (
-          <View style={styles.topicsContainer}>
-            {topicsData.topics.map((topic) => (
-              <TopicSection key={topic.topicId} topicName={topic.topicName}>
-                {topic.items.map((item) => (
-                  <TopicItem
-                    key={item.id}
-                    title={item.title}
-                    subtitle={item.type === "single" ? undefined : item.type}
-                  />
-                ))}
-              </TopicSection>
-            ))}
-          </View>
-        ) : null}
+        <TopicSections topics={topicsData?.topics} />
       </ScrollView>
     </ScreenView>
   );

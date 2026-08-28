@@ -16,17 +16,13 @@ export interface SettingsRowProps {
   hideBorder?: boolean;
 }
 
-export function SettingsRow({
+function SettingsRowContent({
   label,
   sublabel,
   children,
-  fullWidth = false,
-  stacked = false,
-  onPress,
-  hideBorder = false,
-}: SettingsRowProps) {
-  const isClickable = Boolean(onPress);
-
+  fullWidth,
+  stacked,
+}: Pick<SettingsRowProps, "label" | "sublabel" | "children" | "fullWidth" | "stacked">) {
   const labelGroup = (
     <View style={styles.labelGroup}>
       {label && (
@@ -42,19 +38,33 @@ export function SettingsRow({
     </View>
   );
 
-  const content = fullWidth ? (
-    <View style={styles.fullWidthContent}>{children}</View>
-  ) : stacked ? (
-    <View style={styles.stackedContent} testID="settings-row-stacked-content">
-      {labelGroup}
-      {children && <View style={styles.stackedControl}>{children}</View>}
-    </View>
-  ) : (
+  if (fullWidth) return <View style={styles.fullWidthContent}>{children}</View>;
+  if (stacked) {
+    return (
+      <View style={styles.stackedContent} testID="settings-row-stacked-content">
+        {labelGroup}
+        {children && <View style={styles.stackedControl}>{children}</View>}
+      </View>
+    );
+  }
+  return (
     <>
       {labelGroup}
       {children && <View style={styles.control}>{children}</View>}
     </>
   );
+}
+
+export function SettingsRow({
+  label,
+  sublabel,
+  children,
+  fullWidth = false,
+  stacked = false,
+  onPress,
+  hideBorder = false,
+}: SettingsRowProps) {
+  const isClickable = Boolean(onPress);
 
   return (
     <Pressable
@@ -66,7 +76,9 @@ export function SettingsRow({
         pressed && isClickable && styles.pressed,
       ]}
     >
-      {content}
+      <SettingsRowContent label={label} sublabel={sublabel} fullWidth={fullWidth} stacked={stacked}>
+        {children}
+      </SettingsRowContent>
     </Pressable>
   );
 }

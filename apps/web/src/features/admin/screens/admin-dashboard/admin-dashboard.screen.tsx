@@ -31,6 +31,88 @@ type AdminSection = {
   icon: LucideIcon;
 };
 
+type DashboardMetrics = {
+  scholars?: number;
+  listings?: number;
+  topics?: number;
+  users?: number;
+};
+
+function getDashboardMetric(section: AdminSection, metrics: DashboardMetrics) {
+  if (section.subjects.includes("Scholar")) return metrics.scholars;
+  if (section.subjects.includes("Listing")) return metrics.listings ?? metrics.topics;
+  if (section.subjects.includes("Topic")) return metrics.topics;
+  return metrics.users;
+}
+
+function DashboardSectionCard({
+  section,
+  metric,
+  isMobile,
+}: {
+  section: AdminSection;
+  metric: number | undefined;
+  isMobile: boolean;
+}) {
+  const SectionIcon = section.icon;
+
+  return (
+    <a href={section.href} className={styles.sectionCard}>
+      <Card size="sm">
+        <CardHeader>
+          <CardTitle>{section.title}</CardTitle>
+          <CardDescription>
+            {isMobile ? section.descriptionMobile : section.description}
+          </CardDescription>
+          <CardAction>
+            <span className={styles.cardIcon} aria-hidden="true">
+              <SectionIcon />
+            </span>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <div className={styles.metricRow}>
+            <span className={styles.metric}>{metric ?? "—"}</span>
+            <span className={styles.cardLink} aria-hidden="true">
+              <ArrowUpRight />
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+    </a>
+  );
+}
+
+function DashboardContent({
+  sections,
+  metrics,
+  isMobile,
+  noAccessMessage,
+  emptyMessage,
+}: {
+  sections: AdminSection[];
+  metrics: DashboardMetrics | undefined;
+  isMobile: boolean;
+  noAccessMessage: string;
+  emptyMessage: string;
+}) {
+  if (sections.length === 0) return <EmptyState message={noAccessMessage} />;
+  if (!metrics) return <EmptyState message={emptyMessage} />;
+
+  return (
+    <div className={styles.metricsGrid}>
+      {sections.map((section) => (
+        <DashboardSectionCard
+          key={section.href}
+          section={section}
+          metric={getDashboardMetric(section, metrics)}
+          isMobile={isMobile}
+        />
+      ))}
+    </div>
+  );
+}
+
 function canOpenAdminSection(
   ability: ReturnType<typeof useAbility>["ability"],
   section: AdminSection,
@@ -49,13 +131,21 @@ function getDashboardTitle(isMobile: boolean, t: ReturnType<typeof useTranslatio
     : t("admin.dashboard.title", "Admin Dashboard");
 }
 
+function canLoadDashboard(
+  isAuthenticated: boolean,
+  isAccessLoading: boolean,
+  ability: ReturnType<typeof useAbility>["ability"],
+) {
+  return isAuthenticated && !isAccessLoading && hasAnyAdminAccess(ability);
+}
+
 export function AdminDashboardScreen() {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();
   const { isAuthenticated } = useAuth();
   const { ability, isLoading: isAccessLoading } = useAbility({ isAuthenticated });
   const dashboardQuery = useApiQuery(queryKeys.admin.dashboard(), fetchAdminDashboard, {
-    enabled: isAuthenticated && !isAccessLoading && hasAnyAdminAccess(ability),
+    enabled: canLoadDashboard(isAuthenticated, isAccessLoading, ability),
   });
 
   const adminSections: AdminSection[] = [
@@ -126,57 +216,17 @@ export function AdminDashboardScreen() {
           "A focused view of the work and resources available to your role.",
         )}
       />
-      {visibleSections.length === 0 ? (
-        <EmptyState
-          message={
-            !isMobile
-              ? t("admin.dashboard.noAccess", "You don't have any admin access.")
-              : t("admin.dashboard.noAccessMobile", "No admin access.")
-          }
-        />
-      ) : dashboardQuery.data ? (
-        <>
-          <div className={styles.metricsGrid}>
-            {visibleSections.map((section) => {
-              const SectionIcon = section.icon;
-              const metric = section.subjects.includes("Scholar")
-                ? dashboardQuery.data.metrics.scholars
-                : section.subjects.includes("Listing")
-                  ? (dashboardQuery.data.metrics.listings ?? dashboardQuery.data.metrics.topics)
-                  : section.subjects.includes("Topic")
-                    ? dashboardQuery.data.metrics.topics
-                    : dashboardQuery.data.metrics.users;
-              return (
-                <a key={section.href} href={section.href} className={styles.sectionCard}>
-                  <Card size="sm">
-                    <CardHeader>
-                      <CardTitle>{section.title}</CardTitle>
-                      <CardDescription>
-                        {!isMobile ? section.description : section.descriptionMobile}
-                      </CardDescription>
-                      <CardAction>
-                        <span className={styles.cardIcon} aria-hidden="true">
-                          <SectionIcon />
-                        </span>
-                      </CardAction>
-                    </CardHeader>
-                    <CardContent>
-                      <div className={styles.metricRow}>
-                        <span className={styles.metric}>{metric ?? "—"}</span>
-                        <span className={styles.cardLink} aria-hidden="true">
-                          <ArrowUpRight />
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </a>
-              );
-            })}
-          </div>
-        </>
-      ) : (
-        <EmptyState message={t("admin.dashboard.empty", "No dashboard data is available.")} />
-      )}
+      <DashboardContent
+        sections={visibleSections}
+        metrics={dashboardQuery.data?.metrics}
+        isMobile={isMobile}
+        noAccessMessage={
+          isMobile
+            ? t("admin.dashboard.noAccessMobile", "No admin access.")
+            : t("admin.dashboard.noAccess", "You don't have any admin access.")
+        }
+        emptyMessage={t("admin.dashboard.empty", "No dashboard data is available.")}
+      />
     </ScreenView>
   );
 }

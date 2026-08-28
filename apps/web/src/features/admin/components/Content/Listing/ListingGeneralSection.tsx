@@ -41,6 +41,65 @@ type ListingFieldProps = Pick<ListingGeneralSectionProps, "state" | "dispatch"> 
   isEditing: boolean;
 };
 
+function ListingSlugControl({
+  isEditing,
+  slug,
+  slugSuffix,
+  scholarSlug,
+  scholarId,
+  suffixIsEmpty,
+  dispatch,
+  t,
+}: {
+  isEditing: boolean;
+  slug: string;
+  slugSuffix: string;
+  scholarSlug: string;
+  scholarId?: string;
+  suffixIsEmpty: boolean;
+  dispatch: React.Dispatch<FormAction>;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  if (isEditing) {
+    return <InputField id="lecture-slug" type="text" value={slug} onChange={() => {}} disabled />;
+  }
+
+  return (
+    <>
+      <div className={styles.slugPrefixGroup}>
+        {scholarSlug && <span className={styles.slugPrefixBadge}>{scholarSlug}-</span>}
+        <InputField
+          id="lecture-slug"
+          type="text"
+          value={slugSuffix}
+          onChange={(value) => {
+            dispatch({ type: "UPDATE_FIELD", field: "slugSuffix", value });
+            dispatch({
+              type: "UPDATE_FIELD",
+              field: "slug",
+              value: scholarSlug ? deriveChildSlug(scholarSlug, value) : value,
+            });
+          }}
+          placeholder={
+            scholarSlug
+              ? t("admin.contents.listing.slugSuffixPlaceholder", "bayquniyyah")
+              : t("admin.contents.listing.slugSelectScholarFirst", "Select a scholar first")
+          }
+          disabled={!scholarId}
+        />
+      </div>
+      {suffixIsEmpty && (
+        <span className={styles.fieldError}>
+          {t(
+            "admin.contents.listing.slugSuffixRequired",
+            "Enter a slug beyond the scholar prefix.",
+          )}
+        </span>
+      )}
+    </>
+  );
+}
+
 function ListingSlugField({ state, dispatch, scholars, isEditing }: ListingFieldProps) {
   const { t } = useTranslation();
   const { scholarId, slug, slugSuffix } = state;
@@ -52,42 +111,16 @@ function ListingSlugField({ state, dispatch, scholars, isEditing }: ListingField
       <label htmlFor="lecture-slug" className={styles.label}>
         {t("admin.contents.listing.slugLabel", "Slug")} *
       </label>
-      {isEditing ? (
-        <InputField id="lecture-slug" type="text" value={slug} onChange={() => {}} disabled />
-      ) : (
-        <>
-          <div className={styles.slugPrefixGroup}>
-            {scholarSlug && <span className={styles.slugPrefixBadge}>{scholarSlug}-</span>}
-            <InputField
-              id="lecture-slug"
-              type="text"
-              value={slugSuffix}
-              onChange={(value) => {
-                dispatch({ type: "UPDATE_FIELD", field: "slugSuffix", value });
-                dispatch({
-                  type: "UPDATE_FIELD",
-                  field: "slug",
-                  value: scholarSlug ? deriveChildSlug(scholarSlug, value) : value,
-                });
-              }}
-              placeholder={
-                scholarSlug
-                  ? t("admin.contents.listing.slugSuffixPlaceholder", "bayquniyyah")
-                  : t("admin.contents.listing.slugSelectScholarFirst", "Select a scholar first")
-              }
-              disabled={!scholarId}
-            />
-          </div>
-          {suffixIsEmpty && (
-            <span className={styles.fieldError}>
-              {t(
-                "admin.contents.listing.slugSuffixRequired",
-                "Enter a slug beyond the scholar prefix.",
-              )}
-            </span>
-          )}
-        </>
-      )}
+      <ListingSlugControl
+        isEditing={isEditing}
+        slug={slug}
+        slugSuffix={slugSuffix}
+        scholarSlug={scholarSlug}
+        scholarId={scholarId}
+        suffixIsEmpty={suffixIsEmpty}
+        dispatch={dispatch}
+        t={t}
+      />
     </div>
   );
 }

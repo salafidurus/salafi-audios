@@ -18,18 +18,25 @@ type RedisSetOptions = {
 
 function setWithExpiration(client: Redis, key: string, value: string, options: RedisSetOptions) {
   if (!options.mode || options.duration === undefined) return undefined;
-  if (options.mode === 'EX') {
-    return options.condition === 'NX'
-      ? client.set(key, value, 'EX', options.duration, 'NX')
-      : options.condition === 'XX'
-        ? client.set(key, value, 'EX', options.duration, 'XX')
-        : client.set(key, value, 'EX', options.duration);
+  return setWithMode(client, key, value, options.mode, options.duration, options.condition);
+}
+
+function setWithMode(
+  client: Redis,
+  key: string,
+  value: string,
+  mode: 'EX' | 'PX',
+  duration: number,
+  condition?: 'NX' | 'XX',
+) {
+  if (mode === 'EX') {
+    if (condition === 'NX') return client.set(key, value, 'EX', duration, 'NX');
+    if (condition === 'XX') return client.set(key, value, 'EX', duration, 'XX');
+    return client.set(key, value, 'EX', duration);
   }
-  return options.condition === 'NX'
-    ? client.set(key, value, 'PX', options.duration, 'NX')
-    : options.condition === 'XX'
-      ? client.set(key, value, 'PX', options.duration, 'XX')
-      : client.set(key, value, 'PX', options.duration);
+  if (condition === 'NX') return client.set(key, value, 'PX', duration, 'NX');
+  if (condition === 'XX') return client.set(key, value, 'PX', duration, 'XX');
+  return client.set(key, value, 'PX', duration);
 }
 
 function setWithCondition(client: Redis, key: string, value: string, condition?: 'NX' | 'XX') {

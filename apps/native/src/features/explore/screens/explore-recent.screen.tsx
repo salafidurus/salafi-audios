@@ -35,6 +35,54 @@ type GroupedFeedItem =
       items: FeedContentItemDto[];
     };
 
+type StackScreenOptions = React.ComponentProps<typeof Stack.Screen>["options"];
+
+function ExploreRecentStatus({
+  headerSearchOptions,
+  isError,
+  isFetching,
+  hasItems,
+  t,
+  refetch,
+}: {
+  headerSearchOptions: StackScreenOptions;
+  isError: boolean;
+  isFetching: boolean;
+  hasItems: boolean;
+  t: ReturnType<typeof useTranslation>["t"];
+  refetch: () => void;
+}) {
+  if (isError && !hasItems) {
+    return (
+      <ScreenView center>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreStatusView
+          message={getErrorStateText("feed", t)}
+          onRetry={() => refetch()}
+          retryLabel={t("feed.retry", "Try Again")}
+        />
+      </ScreenView>
+    );
+  }
+  if (isFetching && !hasItems) {
+    return (
+      <View style={styles.screen}>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreSkeleton />
+      </View>
+    );
+  }
+  if (!hasItems) {
+    return (
+      <ScreenView center>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreStatusView message={getEmptyStateText("feed", t)} />
+      </ScreenView>
+    );
+  }
+  return null;
+}
+
 function filterFeedItems(items: FeedItemDto[], searchQuery: string): FeedItemDto[] {
   const query = searchQuery.trim().toLowerCase();
   if (!query) return items;
@@ -146,36 +194,17 @@ export function ExploreRecentScreen({
     },
   };
 
-  if (isError && items.length === 0) {
-    return (
-      <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
-        <ExploreStatusView
-          message={getErrorStateText("feed", t)}
-          onRetry={() => refetch()}
-          retryLabel={t("feed.retry", "Try Again")}
-        />
-      </ScreenView>
-    );
-  }
-
-  if (isFetching && items.length === 0) {
-    return (
-      <View style={styles.screen}>
-        <Stack.Screen options={headerSearchOptions} />
-        <ExploreSkeleton />
-      </View>
-    );
-  }
-
-  if (items.length === 0) {
-    return (
-      <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
-        <ExploreStatusView message={getEmptyStateText("feed", t)} />
-      </ScreenView>
-    );
-  }
+  const statusView = (
+    <ExploreRecentStatus
+      headerSearchOptions={headerSearchOptions}
+      isError={isError}
+      isFetching={isFetching}
+      hasItems={items.length > 0}
+      t={t}
+      refetch={refetch}
+    />
+  );
+  if (statusView) return statusView;
 
   return (
     <View style={styles.screen}>

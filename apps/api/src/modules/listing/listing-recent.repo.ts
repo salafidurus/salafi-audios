@@ -7,6 +7,7 @@ import type {
   FeedPageDto,
   ListingFormat,
   ScholarChipDto,
+  ScholarTitle,
   Locale,
 } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
@@ -21,18 +22,98 @@ type RecentListingRecord = {
   publishedLectureCount: number | null;
 };
 
+type RecentFeedListing = RecentListingRecord & {
+  id: string;
+  slug: string;
+  title: string;
+  language: Locale | null;
+  publishedAt: Date | null;
+  createdAt: Date;
+  translations: Array<{ title: string }>;
+  scholar: {
+    name: string;
+    slug: string;
+    title: ScholarTitle | null;
+    imageUrl: string | null;
+    mainLanguage: Locale;
+    translations: Array<{ name: string }>;
+  };
+};
+
 function recentListingPresentation(
   record: RecentListingRecord,
   toPublicUrl: (value: string) => string | undefined,
 ) {
-  const isSingle = record.format === 'single';
   return {
-    durationSeconds: isSingle
-      ? (record.durationSeconds ?? 0)
-      : (record.publishedDurationSeconds ?? 0),
-    thumbnailUrl: isSingle ? null : toPublicUrl(record.coverImageUrl ?? ''),
-    publishedLectureCount: isSingle ? 1 : (record.publishedLectureCount ?? 1),
+    durationSeconds: listingDuration(record),
+    thumbnailUrl: listingThumbnail(record, toPublicUrl),
+    publishedLectureCount: listingLectureCount(record),
   };
+}
+
+function listingDuration(record: RecentListingRecord): number {
+  return record.format === 'single'
+    ? (record.durationSeconds ?? 0)
+    : (record.publishedDurationSeconds ?? 0);
+}
+
+function listingThumbnail(
+  record: RecentListingRecord,
+  toPublicUrl: (value: string) => string | undefined,
+): string | null | undefined {
+  return record.format === 'single' ? null : toPublicUrl(record.coverImageUrl ?? '');
+}
+
+function listingLectureCount(record: RecentListingRecord): number {
+  return record.format === 'single' ? 1 : (record.publishedLectureCount ?? 1);
+}
+
+function buildRecentContentItem(
+  record: RecentFeedListing,
+  resolved: {
+    fields: { title: string };
+    originalLanguage?: Locale;
+    original?: { title: string | null } | null;
+  },
+  scholarName: string,
+  presentation: ReturnType<typeof recentListingPresentation>,
+): FeedContentItemDto {
+  return {
+    kind: record.format,
+    id: record.id,
+    title: resolved.fields.title,
+    slug: record.slug,
+    scholarName,
+    scholarSlug: record.scholar.slug,
+    scholarTitle: record.scholar.title ?? undefined,
+    scholarImageUrl: record.scholar.imageUrl ?? undefined,
+    thumbnailUrl: presentation.thumbnailUrl ?? null,
+    durationSeconds: presentation.durationSeconds,
+    publishedLectureCount: presentation.publishedLectureCount,
+    publishedAt: (record.publishedAt ?? record.createdAt).toISOString(),
+    originalLanguage: resolved.originalLanguage,
+    original: resolved.original ? { title: resolved.original.title ?? undefined } : undefined,
+  };
+}
+
+function paginateRecentListings<T>(items: T[], limit: number) {
+  const hasMore = items.length > limit;
+  return { hasMore, page: hasMore ? items.slice(0, limit) : items };
+}
+
+function getRecentNextCursor<T extends { createdAt: Date }>(
+  page: T[],
+  hasMore: boolean,
+  pageNumber: number,
+  encodeCursor: (date: Date, page: number) => string,
+): string | undefined {
+  const lastItem = page[page.length - 1];
+  return hasMore && lastItem ? encodeCursor(lastItem.createdAt, pageNumber + 1) : undefined;
+}
+
+function getRecentContentLimit(pageNumber: number, limit: number): number {
+  const moduleCount = pageNumber % 2 === 0 ? 2 : 0;
+  return Math.max(1, limit - moduleCount);
 }
 
 function applyRecentFilters(
@@ -66,8 +147,7 @@ export class RecentListingsRepo {
     };
     applyRecentFilters(where, topicSlug, cursorDate);
 
-    const moduleCount = pageNumber % 2 === 0 ? 2 : 0;
-    const contentLimit = Math.max(1, limit - moduleCount);
+    const contentLimit = getRecentContentLimit(pageNumber, limit);
     const queryArgs = {
       where,
       include: {
@@ -96,54 +176,36 @@ export class RecentListingsRepo {
     } satisfies Prisma.ListingFindManyArgs;
     const listings = await this.prisma.listing.findMany(queryArgs);
 
-    const hasMore = listings.length > contentLimit;
-    const page = hasMore ? listings.slice(0, contentLimit) : listings;
+    const { hasMore, page } = paginateRecentListings(listings, contentLimit);
 
-    const contentItems: FeedContentItemDto[] = page.map((r) => {
-      const resolved = resolveContentTranslation({
-        base: { title: r.title },
-        originalLanguage: r.language,
-        targetLocale: locale,
-        publishedTranslation: r.translations[0] ?? null,
-      });
-      const scholarName = resolveContentTranslation({
-        base: { name: r.scholar!.name },
-        originalLanguage: r.scholar!.mainLanguage,
-        targetLocale: locale,
-        publishedTranslation: r.scholar!.translations[0] ?? null,
-      }).fields.name;
-
-      const presentation = recentListingPresentation(r, (value) => this.toOptionalPublicUrl(value));
-      const kind: ListingFormat = r.format;
-
-      return {
-        kind,
-        id: r.id,
-        title: resolved.fields.title,
-        slug: r.slug,
-        scholarName,
-        scholarSlug: r.scholar!.slug,
-        scholarTitle: r.scholar!.title ?? undefined,
-        scholarImageUrl: r.scholar!.imageUrl ?? undefined,
-        thumbnailUrl: presentation.thumbnailUrl ?? null,
-        durationSeconds: presentation.durationSeconds,
-        publishedLectureCount: presentation.publishedLectureCount,
-        publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
-        originalLanguage: resolved.originalLanguage,
-        original: resolved.original ? { title: resolved.original.title } : undefined,
-      };
-    });
-
+    const contentItems: FeedContentItemDto[] = page.map((r) => this.toRecentContentItem(r, locale));
     const items: FeedPageDto['items'] = [...contentItems];
     await this.appendDiscoveryRows(items, page, contentItems, pageNumber, topicSlug, locale);
 
-    const lastItem = page[page.length - 1];
-    const nextCursor =
-      hasMore && lastItem ? this.encodeCursor(lastItem.createdAt, pageNumber + 1) : undefined;
+    const nextCursor = getRecentNextCursor(page, hasMore, pageNumber, (date, page) =>
+      this.encodeCursor(date, page),
+    );
 
     return { items, nextCursor, exhausted: !nextCursor };
   }
 
+  private toRecentContentItem(r: RecentFeedListing, locale: Locale): FeedContentItemDto {
+    const resolved = resolveContentTranslation({
+      base: { title: r.title },
+      originalLanguage: r.language,
+      targetLocale: locale,
+      publishedTranslation: r.translations[0] ?? null,
+    });
+    const scholarName = resolveContentTranslation({
+      base: { name: r.scholar!.name },
+      originalLanguage: r.scholar!.mainLanguage,
+      targetLocale: locale,
+      publishedTranslation: r.scholar!.translations[0] ?? null,
+    }).fields.name;
+
+    const presentation = recentListingPresentation(r, (value) => this.toOptionalPublicUrl(value));
+    return buildRecentContentItem(r, resolved, scholarName, presentation);
+  }
   private async appendDiscoveryRows(
     items: FeedPageDto['items'],
     page: Parameters<RecentListingsRepo['buildScholarRow']>[0],

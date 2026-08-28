@@ -120,6 +120,73 @@ function QueueItem({ item }: QueueItemProps) {
   );
 }
 
+async function uploadSingleItem(
+  item: UploadItem,
+  index: number,
+  scholarId: string,
+  setItemState: (index: number, update: Partial<UploadItem>) => void,
+): Promise<boolean> {
+  try {
+    setItemState(index, { progress: 0, status: "uploading" });
+    // react-doctor-disable-next-line react/async-await-in-loop, react/async-parallel
+    const [{ uploadUrl, objectKey }, durationSeconds] = await Promise.all([
+      getPresignedUrl({ filename: item.name, contentType: item.mimeType, purpose: "audio" }),
+      getNativeAudioDuration(item.uri),
+    ]);
+    await uploadToR2(uploadUrl, item.uri, item.mimeType, (progress) =>
+      setItemState(index, { progress, status: "uploading" }),
+    );
+    await createListing({
+      title: item.name.replace(/\.[^.]+$/, ""),
+      audioKey: objectKey,
+      scholarId,
+      format: "single",
+      durationSeconds: durationSeconds ?? undefined,
+    });
+    setItemState(index, { progress: 1, status: "done" });
+    return true;
+  } catch (error) {
+    setItemState(index, { status: "error", error: getErrorMessage(error) });
+    return false;
+  }
+}
+
+async function uploadAllItems(
+  queue: UploadItem[],
+  scholarId: string,
+  setItemState: (index: number, update: Partial<UploadItem>) => void,
+): Promise<boolean> {
+  let anySuccess = false;
+  for (let i = 0; i < queue.length; i++) {
+    const item = queue[i]!;
+    if (item.status === "done") continue;
+    // react-doctor-disable-next-line react/async-await-in-loop, react-doctor/async-await-in-loop
+    anySuccess = (await uploadSingleItem(item, i, scholarId, setItemState)) || anySuccess;
+  }
+  return anySuccess;
+}
+
+async function pickAudioFiles(setQueue: (items: UploadItem[]) => void): Promise<void> {
+  const result = await DocumentPicker.getDocumentAsync({
+    type: ["audio/mpeg", "audio/mp4", "audio/x-m4a"],
+    multiple: true,
+  });
+  if (result.canceled) return;
+  setQueue(
+    result.assets.map((asset) => ({
+      name: asset.name,
+      uri: asset.uri,
+      mimeType: asset.mimeType ?? "audio/mpeg",
+      progress: 0,
+      status: "pending" as const,
+    })),
+  );
+}
+
+function isUploadDisabled(queueLength: number, isUploading: boolean, scholarId: string | null) {
+  return queueLength === 0 || isUploading || !scholarId;
+}
+
 export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioUploaderSheetProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
@@ -138,64 +205,21 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
   }, []);
 
   const handlePick = useCallback(async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: ["audio/mpeg", "audio/mp4", "audio/x-m4a"],
-      multiple: true,
-    });
-    if (result.canceled) return;
-    setQueue(
-      result.assets.map((a) => ({
-        name: a.name,
-        uri: a.uri,
-        mimeType: a.mimeType ?? "audio/mpeg",
-        progress: 0,
-        status: "pending" as const,
-      })),
-    );
+    await pickAudioFiles(setQueue);
   }, []);
 
   const handleUploadAll = useCallback(async () => {
     if (!selectedScholarId) return;
     setIsUploading(true);
-    let anySuccess = false;
     try {
-      for (let i = 0; i < queue.length; i++) {
-        const item = queue[i]!;
-        if (item.status === "done") continue;
-        try {
-          setItemState(i, { progress: 0, status: "uploading" });
-          // react-doctor-disable-next-line react-doctor/async-await-in-loop, react-doctor/async-parallel
-          const [{ uploadUrl, objectKey }, durationSeconds] = await Promise.all([
-            getPresignedUrl({
-              filename: item.name,
-              contentType: item.mimeType,
-              purpose: "audio",
-            }),
-            getNativeAudioDuration(item.uri),
-          ]);
-          await uploadToR2(uploadUrl, item.uri, item.mimeType, (p) =>
-            setItemState(i, { progress: p, status: "uploading" }),
-          );
-          await createListing({
-            title: item.name.replace(/\.[^.]+$/, ""),
-            audioKey: objectKey,
-            scholarId: selectedScholarId,
-            format: "single",
-            durationSeconds: durationSeconds ?? undefined,
-          });
-          setItemState(i, { progress: 1, status: "done" });
-          anySuccess = true;
-        } catch (err) {
-          setItemState(i, { status: "error", error: getErrorMessage(err) });
-        }
-      }
+      const anySuccess = await uploadAllItems(queue, selectedScholarId, setItemState);
+      if (anySuccess) onUploadComplete();
     } finally {
       setIsUploading(false);
-      if (anySuccess) onUploadComplete();
     }
   }, [selectedScholarId, queue, setItemState, onUploadComplete]);
 
-  const isUploadDisabled = queue.length === 0 || isUploading || !selectedScholarId;
+  const uploadDisabled = isUploadDisabled(queue.length, isUploading, selectedScholarId);
 
   const renderScholarItem = useCallback(
     ({ item: scholar }: { item: ScholarListItemDto }) => (
@@ -247,8 +271,8 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
       <View style={styles.buttonRow}>
         <Pressable
           onPress={handleUploadAll}
-          disabled={isUploadDisabled}
-          style={[styles.uploadBtn, isUploadDisabled && styles.uploadBtnDisabled]}
+          disabled={uploadDisabled}
+          style={[styles.uploadBtn, uploadDisabled && styles.uploadBtnDisabled]}
         >
           {isUploading ? (
             <ActivityIndicator color={theme.colors.content.onPrimary} />

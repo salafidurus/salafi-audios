@@ -46,11 +46,20 @@ function appendQueryParams(endpoint: URL, params?: QueryParams): void {
   if (!params) return;
 
   for (const [key, raw] of Object.entries(params)) {
-    const values = Array.isArray(raw) ? raw : [raw];
-    for (const item of values) {
-      if (item !== undefined && item !== null) {
-        endpoint.searchParams[Array.isArray(raw) ? "append" : "set"](key, String(item));
-      }
+    appendQueryValue(endpoint, key, raw, Array.isArray(raw));
+  }
+}
+
+function appendQueryValue(
+  endpoint: URL,
+  key: string,
+  raw: QueryParamValue | QueryParamValue[],
+  append: boolean,
+): void {
+  const values = Array.isArray(raw) ? raw : [raw];
+  for (const value of values) {
+    if (value !== undefined && value !== null) {
+      endpoint.searchParams[append ? "append" : "set"](key, String(value));
     }
   }
 }
@@ -60,14 +69,23 @@ function buildHeaders(
   auth: { token?: string; cookie?: string; locale?: string },
 ) {
   const headers = { ...options.headers };
-  const payload = options.body ?? options.data;
+  addContentTypeHeader(headers, options.body != null || options.data != null);
+  addAuthHeaders(headers, auth);
 
-  if (payload !== undefined && payload !== null) headers["Content-Type"] = "application/json";
+  return headers;
+}
+
+function addContentTypeHeader(headers: Record<string, string>, hasPayload: boolean): void {
+  if (hasPayload) headers["Content-Type"] = "application/json";
+}
+
+function addAuthHeaders(
+  headers: Record<string, string>,
+  auth: { token?: string; cookie?: string; locale?: string },
+): void {
   if (auth.token) headers["Authorization"] ??= `Bearer ${auth.token}`;
   if (auth.cookie) headers["Cookie"] ??= auth.cookie;
   if (auth.locale) headers["Accept-Language"] ??= auth.locale;
-
-  return headers;
 }
 
 async function parseResponse<T>(response: Response): Promise<T> {

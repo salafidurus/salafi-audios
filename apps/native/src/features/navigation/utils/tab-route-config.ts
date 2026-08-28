@@ -11,43 +11,31 @@ export function isSection(value: RootTab): value is Section {
 }
 
 export function getRootTabFromPathname(pathname: string): RootTab {
-  if (pathname.startsWith("/search")) {
-    return "search";
-  }
+  if (pathname.startsWith("/search")) return "search";
+  return getSectionFromPathname(pathname);
+}
 
-  if (
-    pathname === "/" ||
-    pathname.startsWith("/scholar") ||
-    pathname.startsWith("/curation") ||
-    pathname.startsWith("/recent")
-  ) {
-    return "explore";
-  }
-
-  if (pathname.startsWith(nativeRoutes.myLibrary.index)) {
-    return "myLibrary";
-  }
-
-  if (pathname.startsWith(routes.settings.index)) {
-    return "settings";
-  }
-
+function getSectionFromPathname(pathname: string): Section {
+  if (isExplorePath(pathname)) return "explore";
+  if (pathname.startsWith(nativeRoutes.myLibrary.index)) return "myLibrary";
+  if (pathname.startsWith(routes.settings.index)) return "settings";
   return "explore";
 }
 
-export function isTabRoute(pathname: string): boolean {
-  if (
+function isExplorePath(pathname: string): boolean {
+  return (
     pathname === "/" ||
-    pathname === "/recent" ||
-    pathname === "/scholar" ||
-    pathname === "/curation" ||
-    pathname.startsWith("/search") ||
-    pathname.startsWith("/my-library") ||
-    pathname.startsWith("/settings")
-  ) {
-    return true;
-  }
-  return false;
+    ["/scholar", "/curation", "/recent"].some((prefix) => pathname.startsWith(prefix))
+  );
+}
+
+export function isTabRoute(pathname: string): boolean {
+  return (
+    pathname === "/" ||
+    ["/recent", "/scholar", "/curation", "/search", "/my-library", "/settings"].some((prefix) =>
+      pathname.startsWith(prefix),
+    )
+  );
 }
 
 export function getActiveSubsection(pathname: string, section: Section): string {
@@ -55,13 +43,7 @@ export function getActiveSubsection(pathname: string, section: Section): string 
     pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
   const parts = normalizedPath.split("/").filter(Boolean);
 
-  if (section === "explore") {
-    const candidate = parts[0] || "recent";
-    if (candidate === "scholar" || candidate === "curation" || candidate === "recent") {
-      return candidate;
-    }
-    return "recent";
-  }
+  if (section === "explore") return getExploreSubsection(parts[0]);
 
   const candidate = parts[1];
   return SECTION_TABS[section].some((tab) => tab.id === candidate)
@@ -69,27 +51,27 @@ export function getActiveSubsection(pathname: string, section: Section): string 
     : DEFAULT_TABS[section];
 }
 
+function getExploreSubsection(candidate: string | undefined): string {
+  return candidate === "scholar" || candidate === "curation" || candidate === "recent"
+    ? candidate
+    : "recent";
+}
+
 export function buildSectionPath(section: Section, tabId?: string): string {
-  const activeTab =
-    tabId && SECTION_TABS[section].some((tab) => tab.id === tabId) ? tabId : DEFAULT_TABS[section];
+  const activeTab = getActiveTab(section, tabId);
+  if (section === "explore") return activeTab === "recent" ? "/" : `/${activeTab}`;
+  if (section === "myLibrary") return buildLibraryPath(activeTab);
+  return activeTab === DEFAULT_TABS[section] ? `/${section}` : `/${section}/${activeTab}`;
+}
 
-  if (section === "explore") {
-    if (activeTab === "recent") {
-      return "/";
-    }
-    return `/${activeTab}`;
-  }
+function getActiveTab(section: Section, tabId?: string): string {
+  return tabId && SECTION_TABS[section].some((tab) => tab.id === tabId)
+    ? tabId
+    : DEFAULT_TABS[section];
+}
 
-  if (section === "myLibrary") {
-    if (activeTab === DEFAULT_TABS[section]) {
-      return nativeRoutes.myLibrary.index;
-    }
-    return `/my-library/${activeTab}`;
-  }
-
-  if (activeTab === DEFAULT_TABS[section]) {
-    return `/${section}`;
-  }
-
-  return `/${section}/${activeTab}`;
+function buildLibraryPath(activeTab: string): string {
+  return activeTab === DEFAULT_TABS.myLibrary
+    ? nativeRoutes.myLibrary.index
+    : `/my-library/${activeTab}`;
 }

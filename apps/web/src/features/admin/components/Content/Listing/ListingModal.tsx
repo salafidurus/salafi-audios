@@ -223,6 +223,30 @@ function ListingModalTabs({
   );
 }
 
+function ListingModalLoading({
+  isOpen,
+  onClose,
+  fetchError,
+  t,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  fetchError: string | null;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t("admin.contents.listing.editTitle", "Edit Listing Details")}
+      size="xl"
+    >
+      <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
+      {fetchError && <div className={styles.error}>{fetchError}</div>}
+    </Modal>
+  );
+}
+
 export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingModalProps) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
@@ -275,15 +299,7 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
 
   if (!state.isEditing && loading) {
     return (
-      <Modal
-        isOpen={isOpen}
-        onClose={handleClose}
-        title={t("admin.contents.listing.editTitle", "Edit Listing Details")}
-        size="xl"
-      >
-        {loading && <div className={styles.loading}>{t("common.loading", "Loading...")}</div>}
-        {fetchError && <div className={styles.error}>{fetchError}</div>}
-      </Modal>
+      <ListingModalLoading isOpen={isOpen} onClose={handleClose} fetchError={fetchError} t={t} />
     );
   }
 

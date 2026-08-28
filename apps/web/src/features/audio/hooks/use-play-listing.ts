@@ -27,6 +27,22 @@ export type UsePlayListingOptions = {
   onError?: (message: string) => void;
 };
 
+async function playFirstTrack(
+  queue: ReturnType<typeof buildTrackQueue>,
+  onError: ((message: string) => void) | undefined,
+  setError: (message: string) => void,
+) {
+  const [firstTrack] = queue;
+  if (!firstTrack) {
+    const errorMsg = "No audio available for this lecture.";
+    setError(errorMsg);
+    onError?.(errorMsg);
+    return;
+  }
+
+  await audioService.playListing(firstTrack, queue);
+}
+
 /**
  * Hook to play a listing by ref (id/slug/format).
  *
@@ -64,15 +80,7 @@ export function usePlayListing(ref: PlayListingRef | null, options?: UsePlayList
         contents,
       );
 
-      const [firstTrack] = queue;
-      if (!firstTrack) {
-        const errorMsg = "No audio available for this lecture.";
-        setError(errorMsg);
-        options?.onError?.(errorMsg);
-        return;
-      }
-
-      await audioService.playListing(firstTrack, queue);
+      await playFirstTrack(queue, options?.onError, setError);
     } catch (err) {
       const sanitized = sanitizeError(err);
       setError(sanitized);

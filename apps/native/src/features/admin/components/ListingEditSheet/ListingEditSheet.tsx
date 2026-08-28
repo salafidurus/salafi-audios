@@ -39,6 +39,38 @@ function getErrorMessage(cause: unknown): string {
   return cause instanceof Error ? cause.message : "Unable to save listing";
 }
 
+async function saveListingChanges(
+  listing: AdminListingDetailDto,
+  title: string,
+  description: string,
+  language: string,
+  dispatch: (patch: Partial<FormState>) => void,
+  onSaved: () => void,
+): Promise<void> {
+  dispatch({ isSaving: true, error: null });
+  try {
+    const update = {
+      title,
+      description: description || undefined,
+      language: parseLocaleInput(language),
+    } satisfies { title: string; description?: string; language?: Locale };
+    await updateListing(listing.id, update);
+    onSaved();
+  } catch (cause) {
+    dispatch({ error: getErrorMessage(cause) });
+  } finally {
+    dispatch({ isSaving: false });
+  }
+}
+
+function canSaveListing(
+  listing: AdminListingDetailDto | null,
+  ability: ReturnType<typeof useAbility>["ability"],
+): boolean {
+  if (!listing) return false;
+  return ability.can("update", subject("Listing", { scholarSlug: listing.scholarSlug }));
+}
+
 export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditSheetProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
@@ -72,31 +104,11 @@ export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditShe
   if (!listingId) return null;
 
   const { listing, title, description, language, isSaving, error } = state;
-  const canSave = listing
-    ? ability.can("update", subject("Listing", { scholarSlug: listing.scholarSlug }))
-    : false;
+  const canSave = canSaveListing(listing, ability);
 
   const handleSave = async () => {
     if (!listing) return;
-    dispatch({ isSaving: true, error: null });
-    try {
-      const update = {
-        title,
-        description: description || undefined,
-        language: parseLocaleInput(language),
-      } satisfies {
-        title: string;
-        description?: string;
-        language?: Locale;
-      };
-
-      await updateListing(listing.id, update);
-      onSaved();
-    } catch (cause) {
-      dispatch({ error: getErrorMessage(cause) });
-    } finally {
-      dispatch({ isSaving: false });
-    }
+    await saveListingChanges(listing, title, description, language, dispatch, onSaved);
   };
 
   return (

@@ -159,24 +159,49 @@ function LoadedState<TData>({
   );
 }
 
-// react-doctor-disable-next-line react-doctor/no-many-boolean-props
-export function InfiniteScrollList<TData>({
+function renderEmptyState<TData>({
   data,
-  renderItem,
-  isLoading,
   isError,
+  errorMessage,
   onRetry,
+  isLoading,
+  emptyMessage,
   hasMore,
-  onLoadMore,
   isFetchingNextPage,
-  emptyMessage = "No items found",
-  errorMessage = "Failed to load content. Please try again.",
-  layout = "list",
-  tableHeader,
-}: InfiniteScrollListProps<TData>): ReactNode {
+  observerTarget,
+}: {
+  data: TData[];
+  isError?: boolean;
+  errorMessage: string;
+  onRetry?: () => void;
+  isLoading?: boolean;
+  emptyMessage: string;
+  hasMore: boolean;
+  isFetchingNextPage?: boolean;
+  observerTarget: React.RefObject<HTMLDivElement | null>;
+}): ReactNode | null {
+  if (isError && data.length === 0) return <ErrorState message={errorMessage} onRetry={onRetry} />;
+  if (isLoading && data.length === 0) return <LoadingState />;
+  if (data.length === 0) {
+    return (
+      <EmptyState
+        message={emptyMessage}
+        hasMore={hasMore}
+        isFetchingNextPage={isFetchingNextPage}
+        observerTarget={observerTarget}
+      />
+    );
+  }
+  return null;
+}
+
+function useInfiniteScrollObserver(
+  hasMore: boolean,
+  onLoadMore: () => void,
+  isFetchingNextPage: boolean,
+) {
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  // Setup intersection observer for infinite scroll
   useEffect(() => {
     if (!observerTarget.current) return;
 
@@ -193,24 +218,51 @@ export function InfiniteScrollList<TData>({
     return () => observer.disconnect();
   }, [hasMore, onLoadMore, isFetchingNextPage]);
 
-  if (isError && data.length === 0) {
-    return <ErrorState message={errorMessage} onRetry={onRetry} />;
-  }
+  return observerTarget;
+}
 
-  if (isLoading && data.length === 0) {
-    return <LoadingState />;
-  }
+function normalizeListFlags(
+  isLoading: boolean | undefined,
+  isError: boolean | undefined,
+  isFetchingNextPage: boolean | undefined,
+) {
+  return {
+    isLoading: isLoading ?? false,
+    isError: isError ?? false,
+    isFetchingNextPage: isFetchingNextPage ?? false,
+  };
+}
 
-  if (data.length === 0) {
-    return (
-      <EmptyState
-        message={emptyMessage}
-        hasMore={hasMore}
-        isFetchingNextPage={isFetchingNextPage}
-        observerTarget={observerTarget}
-      />
-    );
-  }
+// react-doctor-disable-next-line react-doctor/no-many-boolean-props
+export function InfiniteScrollList<TData>({
+  data,
+  renderItem,
+  isLoading,
+  isError,
+  onRetry,
+  hasMore,
+  onLoadMore,
+  isFetchingNextPage,
+  emptyMessage = "No items found",
+  errorMessage = "Failed to load content. Please try again.",
+  layout = "list",
+  tableHeader,
+}: InfiniteScrollListProps<TData>): ReactNode {
+  const flags = normalizeListFlags(isLoading, isError, isFetchingNextPage);
+  const observerTarget = useInfiniteScrollObserver(hasMore, onLoadMore, flags.isFetchingNextPage);
+
+  const emptyState = renderEmptyState({
+    data,
+    isError: flags.isError,
+    errorMessage,
+    onRetry,
+    isLoading: flags.isLoading,
+    emptyMessage,
+    hasMore,
+    isFetchingNextPage: flags.isFetchingNextPage,
+    observerTarget,
+  });
+  if (emptyState) return emptyState;
 
   return (
     <LoadedState
@@ -219,7 +271,7 @@ export function InfiniteScrollList<TData>({
       layout={layout}
       tableHeader={tableHeader}
       observerTarget={observerTarget}
-      isFetchingNextPage={isFetchingNextPage}
+      isFetchingNextPage={flags.isFetchingNextPage}
     />
   );
 }

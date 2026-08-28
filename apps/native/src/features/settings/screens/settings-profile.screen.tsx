@@ -132,6 +132,81 @@ function ProfileUpdateStatus({
   );
 }
 
+type ProfileData = NonNullable<ReturnType<typeof useAccountProfile>["data"]>;
+
+function isProfileInputDisabled(isEditing: boolean) {
+  return !isEditing;
+}
+
+function getProfileInputStyles(isEditing: boolean) {
+  return isProfileInputDisabled(isEditing) ? [styles.input, styles.inputDisabled] : [styles.input];
+}
+
+function shouldHideEmailBorder(roles: string[]) {
+  return roles.length === 0;
+}
+
+function syncProfileDisplayName(
+  displayName: string | null | undefined,
+  isEditing: boolean,
+  setDisplayName: (value: string) => void,
+) {
+  if (!isEditing) setDisplayName(displayName ?? "");
+}
+
+function notifySignOut(onSignOut: (() => void) | undefined) {
+  onSignOut?.();
+}
+
+function ProfileIdentity({ profile }: { profile: ProfileData }) {
+  return (
+    <View style={styles.avatarRow}>
+      <UserAvatar name={profile.displayName || profile.email} size={56} />
+      <View>
+        <AppText variant="bodyLg" style={styles.profileName}>
+          {profile.displayName}
+        </AppText>
+        <AppText variant="bodySm" style={styles.profileEmail}>
+          {profile.email}
+        </AppText>
+      </View>
+    </View>
+  );
+}
+
+function ProfileActions({
+  isDeletingAccount,
+  onSignOut,
+  onDelete,
+  t,
+}: {
+  isDeletingAccount: boolean;
+  onSignOut: () => void;
+  onDelete: () => void;
+  t: ProfileEditControlsProps["t"];
+}) {
+  return (
+    <View style={styles.actionRow}>
+      <Pressable onPress={onSignOut} style={styles.actionButton}>
+        <AppText variant="bodyMd" style={styles.signOutText}>
+          {t("account.signOut", "Sign Out")}
+        </AppText>
+      </Pressable>
+      <Pressable
+        onPress={onDelete}
+        disabled={isDeletingAccount}
+        style={[styles.actionButton, styles.dangerButton]}
+      >
+        <AppText variant="bodyMd" style={styles.deleteText}>
+          {isDeletingAccount
+            ? t("account.profile.deleting", "Deleting…")
+            : t("account.profile.deleteAccount", "Delete Account")}
+        </AppText>
+      </Pressable>
+    </View>
+  );
+}
+
 function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
@@ -144,7 +219,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   const [isDeleteAccountDialogVisible, setIsDeleteAccountDialogVisible] = useState(false);
 
   useEffect(() => {
-    if (!isEditing) setDisplayName(profile?.displayName ?? "");
+    syncProfileDisplayName(profile?.displayName, isEditing, setDisplayName);
   }, [profile?.displayName, isEditing]);
 
   if (isFetching) {
@@ -189,18 +264,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      {/* Avatar row */}
-      <View style={styles.avatarRow}>
-        <UserAvatar name={profile.displayName || profile.email} size={56} />
-        <View>
-          <AppText variant="bodyLg" style={styles.profileName}>
-            {profile.displayName}
-          </AppText>
-          <AppText variant="bodySm" style={styles.profileEmail}>
-            {profile.email}
-          </AppText>
-        </View>
-      </View>
+      <ProfileIdentity profile={profile} />
 
       {/* Account section — display name + email */}
       <SettingsSection title={t("account.title", "Account")}>
@@ -216,7 +280,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
               placeholder={t("account.profile.displayNamePlaceholder", "Your display name")}
               placeholderTextColor={theme.colors.content.muted}
               editable={isEditing}
-              style={[styles.input, !isEditing && styles.inputDisabled]}
+              style={getProfileInputStyles(isEditing)}
             />
             <ProfileEditControls
               isEditing={isEditing}
@@ -231,7 +295,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
         </SettingsRow>
         <SettingsRow
           label={t("account.profile.email", "Email")}
-          hideBorder={nonListenerRoles.length === 0}
+          hideBorder={shouldHideEmailBorder(nonListenerRoles)}
         >
           <AppText variant="bodySm" style={styles.readOnly}>
             {profile.email}
@@ -242,32 +306,19 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
 
       <ProfileUpdateStatus isSuccess={isSuccess} isError={isError} theme={theme} t={t} />
 
-      {/* Actions */}
-      <View style={styles.actionRow}>
-        <Pressable onPress={handleSignOut} style={styles.actionButton}>
-          <AppText variant="bodyMd" style={styles.signOutText}>
-            {t("account.signOut", "Sign Out")}
-          </AppText>
-        </Pressable>
-        <Pressable
-          onPress={handleDeleteAccount}
-          disabled={isDeletingAccount}
-          style={[styles.actionButton, styles.dangerButton]}
-        >
-          <AppText variant="bodyMd" style={styles.deleteText}>
-            {isDeletingAccount
-              ? t("account.profile.deleting", "Deleting…")
-              : t("account.profile.deleteAccount", "Delete Account")}
-          </AppText>
-        </Pressable>
-      </View>
+      <ProfileActions
+        isDeletingAccount={isDeletingAccount}
+        onSignOut={handleSignOut}
+        onDelete={handleDeleteAccount}
+        t={t}
+      />
 
       <ConfirmDialog
         visible={isSignOutDialogVisible}
         onDismiss={() => setIsSignOutDialogVisible(false)}
         onConfirm={() => {
           setIsSignOutDialogVisible(false);
-          onSignOut?.();
+          notifySignOut(onSignOut);
         }}
         title={t("account.profile.signOutTitle", "Sign Out?")}
         message={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
@@ -281,7 +332,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
         onDismiss={() => setIsDeleteAccountDialogVisible(false)}
         onConfirm={() => {
           setIsDeleteAccountDialogVisible(false);
-          deleteAccount(undefined, { onSuccess: () => onSignOut?.() });
+          deleteAccount(undefined, { onSuccess: () => notifySignOut(onSignOut) });
         }}
         title={t("account.profile.deleteAccount", "Delete Account")}
         message={t(

@@ -297,24 +297,51 @@ function buildStagedItems(state: UploadArrangeState, inputs: StagedItemInput[]):
 
 type EditModuleAction = Extract<UploadArrangeAction, { type: "EDIT_MODULE" }>;
 
+function editModuleTitle(mod: NewModule, action: EditModuleAction, rootSlug: string): NewModule {
+  const title = String(action.value ?? "");
+  return mod.slugEdited
+    ? { ...mod, title }
+    : { ...mod, title, slug: deriveChildSlug(rootSlug, title) };
+}
+
+function editModuleOrder(mod: NewModule, action: EditModuleAction): NewModule {
+  const orderIndex = action.value === null ? null : Number(action.value);
+  return { ...mod, orderIndex };
+}
+
 function editModule(mod: NewModule, action: EditModuleAction, rootSlug: string): NewModule {
   if (action.field === "slug") {
     return { ...mod, slug: String(action.value ?? ""), slugEdited: true };
   }
   if (action.field === "title") {
-    const title = String(action.value ?? "");
-    if (mod.slugEdited) return { ...mod, title };
-    return { ...mod, title, slug: deriveChildSlug(rootSlug, title) };
+    return editModuleTitle(mod, action, rootSlug);
   }
-  return {
-    ...mod,
-    [action.field]:
-      action.field === "orderIndex"
-        ? action.value === null
-          ? null
-          : Number(action.value)
-        : action.value,
-  };
+  if (action.field === "orderIndex") return editModuleOrder(mod, action);
+  return { ...mod, [action.field]: action.value };
+}
+
+type SetLessonFieldAction = Extract<UploadArrangeAction, { type: "SET_LESSON_FIELD" }>;
+
+function normalizeOrderIndex(value: SetLessonFieldAction["value"]): number | null {
+  return value === null ? null : Number(value);
+}
+
+function updateLessonField(item: UploadItem, action: SetLessonFieldAction): UploadItem {
+  if (item.assignment.kind !== "new-lesson") return item;
+  const assignment = { ...item.assignment };
+  if (action.field === "slug") {
+    assignment.slug = String(action.value ?? "");
+    assignment.slugEdited = true;
+  } else if (action.field === "description") {
+    assignment.description = String(action.value ?? "");
+  } else if (action.field === "status") {
+    // SAFETY: the status editor dispatches only domain `StatusValue` options for the
+    // `"status"` field branch of this reducer action.
+    assignment.status = action.value as StatusValue;
+  } else {
+    assignment.orderIndex = normalizeOrderIndex(action.value);
+  }
+  return { ...item, assignment };
 }
 
 function appendStagedItems(
@@ -412,23 +439,7 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
       });
 
     case "SET_LESSON_FIELD": {
-      const updated = updateItem(state, action.itemId, (item) => {
-        if (item.assignment.kind !== "new-lesson") return item;
-        const assignment = { ...item.assignment };
-        if (action.field === "slug") {
-          assignment.slug = String(action.value ?? "");
-          assignment.slugEdited = true;
-        } else if (action.field === "description") {
-          assignment.description = String(action.value ?? "");
-        } else if (action.field === "status") {
-          // SAFETY: the status editor dispatches only domain `StatusValue` options for the
-          // `"status"` field branch of this reducer action.
-          assignment.status = action.value as StatusValue;
-        } else {
-          assignment.orderIndex = action.value === null ? null : Number(action.value);
-        }
-        return { ...item, assignment };
-      });
+      const updated = updateItem(state, action.itemId, (item) => updateLessonField(item, action));
       // Re-sort within each module group when the orderIndex field changes.
       if (action.field === "orderIndex") {
         return { ...updated, items: sortItemsByOrderIndex(updated.items) };
@@ -648,40 +659,57 @@ export function itemTargetSlug(state: UploadArrangeState, item: UploadItem): str
   return state.existing?.slug ?? "";
 }
 
-export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
-  const { existing } = state;
-  if (!existing) return { lessons: [] };
-
-  const lessonOpsFor = (moduleKey: ModuleKey): ArrangeLessonOp[] => {
-    const ops: ArrangeLessonOp[] = [];
-    for (const item of state.items) {
-      const assignment = item.assignment;
-      if (assignment.kind === "new-lesson" && assignment.moduleKey === moduleKey) {
-        ops.push({
-          op: "create",
-          slug: assignment.slug,
-          title: item.title,
-          description: assignment.description || undefined,
-          status: assignment.status,
-          orderIndex: assignment.orderIndex ?? undefined,
-          audio: itemAudioRef(item),
-        });
-      } else if (assignment.kind === "replace-audio") {
-        const parentKey =
-          existing.modules.find((m) => m.lessons.some((l) => l.id === assignment.lessonId))?.id ??
-          ROOT_MODULE_KEY;
-        if (parentKey === moduleKey) {
-          ops.push({ op: "update", id: assignment.lessonId, audio: itemAudioRef(item) });
-        }
-      }
-    }
-    return ops;
+function createLessonOp(
+  item: UploadItem,
+  assignment: Extract<UploadItem["assignment"], { kind: "new-lesson" }>,
+): ArrangeLessonOp {
+  return {
+    op: "create",
+    slug: assignment.slug,
+    title: item.title,
+    description: assignment.description || undefined,
+    status: assignment.status,
+    orderIndex: assignment.orderIndex ?? undefined,
+    audio: itemAudioRef(item),
   };
+}
 
-  if (existing.format === "series") {
-    return { lessons: lessonOpsFor(ROOT_MODULE_KEY) };
+function getReplaceLessonOp(
+  item: UploadItem,
+  assignment: Extract<UploadItem["assignment"], { kind: "replace-audio" }>,
+  existing: NonNullable<UploadArrangeState["existing"]>,
+  moduleKey: ModuleKey,
+): ArrangeLessonOp | null {
+  const parentKey =
+    existing.modules.find((m) => m.lessons.some((l) => l.id === assignment.lessonId))?.id ??
+    ROOT_MODULE_KEY;
+  return parentKey === moduleKey
+    ? { op: "update", id: assignment.lessonId, audio: itemAudioRef(item) }
+    : null;
+}
+
+function buildLessonOps(
+  state: UploadArrangeState,
+  existing: NonNullable<UploadArrangeState["existing"]>,
+  moduleKey: ModuleKey,
+): ArrangeLessonOp[] {
+  const ops: ArrangeLessonOp[] = [];
+  for (const item of state.items) {
+    const assignment = item.assignment;
+    if (assignment.kind === "new-lesson" && assignment.moduleKey === moduleKey) {
+      ops.push(createLessonOp(item, assignment));
+    } else if (assignment.kind === "replace-audio") {
+      const operation = getReplaceLessonOp(item, assignment, existing, moduleKey);
+      if (operation) ops.push(operation);
+    }
   }
+  return ops;
+}
 
+function buildCollectionCommitDto(
+  state: UploadArrangeState,
+  existing: NonNullable<UploadArrangeState["existing"]>,
+): ArrangeCommitDto {
   const modules: ArrangeModuleOp[] = [];
   for (const mod of state.newModules) {
     modules.push({
@@ -691,24 +719,36 @@ export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
       description: mod.description || undefined,
       status: mod.status,
       orderIndex: mod.orderIndex ?? undefined,
-      lessons: lessonOpsFor(`new:${mod.tempId}`),
+      lessons: buildLessonOps(state, existing, `new:${mod.tempId}`),
     });
   }
   for (const mod of existing.modules) {
-    const lessons = lessonOpsFor(mod.id);
-    if (lessons.length > 0) {
-      modules.push({ op: "update", id: mod.id, lessons });
-    }
+    const lessons = buildLessonOps(state, existing, mod.id);
+    if (lessons.length > 0) modules.push({ op: "update", id: mod.id, lessons });
   }
   return { modules };
 }
 
+export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
+  const { existing } = state;
+  if (!existing) return { lessons: [] };
+
+  if (existing.format === "series") {
+    return { lessons: buildLessonOps(state, existing, ROOT_MODULE_KEY) };
+  }
+
+  return buildCollectionCommitDto(state, existing);
+}
+
 /** Slugs staged more than once, or colliding with existing children. */
-export function localSlugConflicts(state: UploadArrangeState): string[] {
-  const existingSlugs = new Set([
+function getExistingSlugs(state: UploadArrangeState): Set<string> {
+  return new Set([
     ...allExistingLessons(state.existing).map((l) => l.slug),
     ...(state.existing?.modules.map((m) => m.slug) ?? []),
   ]);
+}
+
+function getStagedSlugs(state: UploadArrangeState): string[] {
   const staged: string[] = [];
   for (const item of state.items) {
     if (item.assignment.kind === "new-lesson") staged.push(item.assignment.slug);
@@ -716,6 +756,10 @@ export function localSlugConflicts(state: UploadArrangeState): string[] {
   for (const mod of state.newModules) {
     staged.push(mod.slug);
   }
+  return staged;
+}
+
+function findSlugConflicts(staged: string[], existingSlugs: Set<string>): string[] {
   const seen = new Set<string>();
   const conflicts = new Set<string>();
   for (const slug of staged) {
@@ -724,6 +768,10 @@ export function localSlugConflicts(state: UploadArrangeState): string[] {
     seen.add(slug);
   }
   return [...conflicts];
+}
+
+export function localSlugConflicts(state: UploadArrangeState): string[] {
+  return findSlugConflicts(getStagedSlugs(state), getExistingSlugs(state));
 }
 
 export function useUploadArrangeState() {

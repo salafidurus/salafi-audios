@@ -29,6 +29,43 @@ export type ExplorePodcastRowProps = {
   hideBorder?: boolean;
 };
 
+async function toggleActiveTrack(isCurrentTrack: boolean, isPlaying: boolean) {
+  if (!isCurrentTrack) return false;
+  if (isPlaying) await audioService.pause();
+  else await audioService.resume();
+  return true;
+}
+
+async function tryPlayExploreQueue(
+  item: FeedContentItemDto,
+  title: string,
+  scholarName: string,
+): Promise<boolean> {
+  try {
+    const contents = await httpClient<ListingContentsDto>({
+      url: endpoints.listings.contents(item.slug),
+      method: "GET",
+    });
+    const queue = buildTrackQueue(
+      {
+        id: item.id,
+        title,
+        format: item.kind,
+        scholarName,
+        scholarSlug: item.scholarSlug,
+        artworkUrl: item.thumbnailUrl ?? undefined,
+      },
+      contents,
+    );
+    const firstTrack = queue[0];
+    if (!firstTrack) return false;
+    await audioService.playListing(firstTrack, queue);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function playExploreItem(
   item: FeedContentItemDto,
   title: string,
@@ -36,37 +73,10 @@ async function playExploreItem(
   isCurrentTrack: boolean,
   isPlaying: boolean,
 ) {
-  if (isCurrentTrack) {
-    if (isPlaying) await audioService.pause();
-    else await audioService.resume();
-    return;
-  }
+  if (await toggleActiveTrack(isCurrentTrack, isPlaying)) return;
 
   if (item.kind !== "single") {
-    try {
-      const contents = await httpClient<ListingContentsDto>({
-        url: endpoints.listings.contents(item.slug),
-        method: "GET",
-      });
-      const queue = buildTrackQueue(
-        {
-          id: item.id,
-          title,
-          format: item.kind,
-          scholarName,
-          scholarSlug: item.scholarSlug,
-          artworkUrl: item.thumbnailUrl ?? undefined,
-        },
-        contents,
-      );
-      const firstTrack = queue[0];
-      if (firstTrack) {
-        await audioService.playListing(firstTrack, queue);
-        return;
-      }
-    } catch {
-      // Fall through to the single-track fallback below.
-    }
+    if (await tryPlayExploreQueue(item, title, scholarName)) return;
   }
 
   const track: Track = {
@@ -120,6 +130,19 @@ function renderProgressBar(progressPercent: number) {
   );
 }
 
+function getIsCurrentTrack(item: FeedContentItemDto, currentTrack: Track | null) {
+  if (!isListingFormat(item.kind)) return false;
+  return isTrackActiveForListing({ id: item.id, slug: item.slug, format: item.kind }, currentTrack);
+}
+
+function getDurationText(seconds?: number | null) {
+  return seconds ? `${Math.round(seconds / 60)} min` : "";
+}
+
+function getPublishedDateText(publishedAt?: string | null) {
+  return publishedAt ? new Date(publishedAt).toLocaleDateString() : "";
+}
+
 export function ExplorePodcastRow({
   item,
   onPress,
@@ -133,16 +156,14 @@ export function ExplorePodcastRow({
   const { progressPercent } = useListingProgress(item.slug);
 
   const { isPlaying, currentTrack } = useAudio();
-  const isCurrentTrack =
-    isListingFormat(item.kind) &&
-    isTrackActiveForListing({ id: item.id, slug: item.slug, format: item.kind }, currentTrack);
+  const isCurrentTrack = getIsCurrentTrack(item, currentTrack);
 
   const isSaved = useIsSaved(item.id);
 
   const handlePlay = () => playExploreItem(item, title, scholarName, isCurrentTrack, isPlaying);
 
-  const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";
-  const publishedDateText = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : "";
+  const durationText = getDurationText(item.durationSeconds);
+  const publishedDateText = getPublishedDateText(item.publishedAt);
 
   const actions: MenuAction[] = [
     { id: "details", title: "Details" },

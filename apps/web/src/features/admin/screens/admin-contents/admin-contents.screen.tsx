@@ -44,9 +44,21 @@ type ContentActionsProps = {
   t: Translate;
 };
 
+function getCreateActionCopy(isMobile: boolean, isTopic: boolean) {
+  if (isTopic) {
+    return isMobile
+      ? { key: "admin.contents.addTopicMobile", fallback: "Topic" }
+      : { key: "admin.contents.addTopic", fallback: "Add Topic" };
+  }
+  return isMobile
+    ? { key: "admin.contents.addListingMobile", fallback: "Listing" }
+    : { key: "admin.contents.addListing", fallback: "Add Listing" };
+}
+
 function ContentActions({ isMobile, activeTab, canCreate, onClick, t }: ContentActionsProps) {
   if (!canCreate || activeTab === "promotions") return null;
   const isTopic = activeTab === "topics";
+  const copy = getCreateActionCopy(isMobile, isTopic);
   return (
     <Button
       variant="primary"
@@ -54,15 +66,7 @@ function ContentActions({ isMobile, activeTab, canCreate, onClick, t }: ContentA
       icon={<Plus size={isMobile ? 16 : 18} />}
       onClick={onClick}
     >
-      {isTopic
-        ? t(
-            isMobile ? "admin.contents.addTopicMobile" : "admin.contents.addTopic",
-            isMobile ? "Topic" : "Add Topic",
-          )
-        : t(
-            isMobile ? "admin.contents.addListingMobile" : "admin.contents.addListing",
-            isMobile ? "Listing" : "Add Listing",
-          )}
+      {t(copy.key, copy.fallback)}
     </Button>
   );
 }

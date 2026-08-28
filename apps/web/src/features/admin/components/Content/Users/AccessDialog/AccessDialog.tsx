@@ -57,29 +57,58 @@ const capabilitiesList = (target: AccessTarget): AccessCapability[] =>
       ? ["manage"]
       : ["write", "publish", "delete"];
 
-function getPreviewRoles(uiState: UiState, isSuperadmin: boolean): string[] {
-  const roles = new Set<string>();
+function getTargetRoles(target: AccessTarget, item: TargetState): string[] {
+  if (!item.enabled) return [];
 
-  if (isSuperadmin) {
-    roles.add("Superadmin");
+  const roleChecks: Array<[boolean | undefined, string]> = [
+    [item.capabilities.write, "Editor"],
+    [item.capabilities.translate, "Translator"],
+    [item.capabilities.publish, "Publisher"],
+    [item.capabilities.delete, "Deleter"],
+    [target === "user" && item.capabilities.manage, "User manager"],
+  ];
+
+  const roles: string[] = [];
+  for (const [enabled, role] of roleChecks) {
+    if (enabled) roles.push(role);
   }
+  return roles;
+}
 
-  Object.keys(uiState).forEach((key) => {
+function getPreviewRoles(uiState: UiState, isSuperadmin: boolean): string[] {
+  const roles = new Set(isSuperadmin ? ["Superadmin"] : []);
+  Object.entries(uiState).forEach(([target, item]) => {
     // SAFETY: `uiState` is a full `UiState` record keyed only by `AccessTarget`.
-    const target = key as AccessTarget;
-    const item = uiState[target];
-    if (item.enabled) {
-      if (item.capabilities.write) roles.add("Editor");
-      if (item.capabilities.translate) roles.add("Translator");
-      if (item.capabilities.publish) roles.add("Publisher");
-      if (item.capabilities.delete) roles.add("Deleter");
-      if (target === "user" && item.capabilities.manage) {
-        roles.add("User manager");
-      }
-    }
+    getTargetRoles(target as AccessTarget, item).forEach((role) => roles.add(role));
   });
-
   return Array.from(roles).sort();
+}
+
+function buildAccessGrants(uiState: UiState): AccessGrantRequest[] {
+  const grants: AccessGrantRequest[] = [];
+  targetRowConfigs.forEach(({ target }) => {
+    const item = uiState[target];
+    if (!item.enabled) return;
+
+    // SAFETY: `item.capabilities` is only mutated through AccessCapability-driven UI
+    // toggles above, so its enumerable keys are the same AccessCapability domain.
+    const enabledCaps = Object.keys(item.capabilities).filter(
+      // SAFETY: see note above — each enumerable key originated from an AccessCapability toggle.
+      (c) => item.capabilities[c as AccessCapability],
+      // SAFETY: see note above — after filtering, the remaining keys are still AccessCapability values.
+    ) as AccessCapability[];
+
+    enabledCaps.forEach((capability) => {
+      grants.push({
+        target,
+        capability,
+        scholarSlugs: item.scholarSlugs,
+        // SAFETY: locale selections come only from SUPPORTED_LOCALES-backed UI chips.
+        locales: item.locales as ("en" | "ar")[],
+      });
+    });
+  });
+  return grants;
 }
 
 interface TargetRowConfig {
@@ -143,6 +172,45 @@ interface AccessDialogBodyProps {
   onToggleSuperadmin: (enabled: boolean) => void;
 }
 
+function SuperadminAccessSection({
+  visible,
+  enabled,
+  saving,
+  onToggle,
+}: {
+  visible?: boolean;
+  enabled: boolean;
+  saving: boolean;
+  onToggle: (enabled: boolean) => void;
+}) {
+  if (!visible) return null;
+
+  return (
+    <>
+      <div className={styles.row}>
+        <div className={styles.rowHeader}>
+          <div className={styles.rowMeta}>
+            <div className={styles.rowLabelSection}>
+              <span className={styles.rowTitle}>Super Admin (Full Access)</span>
+              <span className={styles.rowDesc}>
+                Grants unrestricted administrative access to the entire platform. Superadmins can
+                modify other administrators and manage global system settings.
+              </span>
+            </div>
+          </div>
+          <Toggle
+            checked={enabled}
+            onChange={onToggle}
+            disabled={saving}
+            aria-label="Toggle super admin access"
+          />
+        </div>
+      </div>
+      <Separator />
+    </>
+  );
+}
+
 function AccessDialogBody({
   snapshot,
   error,
@@ -175,29 +243,12 @@ function AccessDialogBody({
         <div className={styles.container}>
           <RolesBanner roles={getPreviewRoles(uiState, targetIsSuperadmin)} />
 
-          {currentUserIsSuperadmin && (
-            <div className={styles.row}>
-              <div className={styles.rowHeader}>
-                <div className={styles.rowMeta}>
-                  <div className={styles.rowLabelSection}>
-                    <span className={styles.rowTitle}>Super Admin (Full Access)</span>
-                    <span className={styles.rowDesc}>
-                      Grants unrestricted administrative access to the entire platform. Superadmins
-                      can modify other administrators and manage global system settings.
-                    </span>
-                  </div>
-                </div>
-                <Toggle
-                  checked={targetIsSuperadmin}
-                  onChange={onToggleSuperadmin}
-                  disabled={saving}
-                  aria-label="Toggle super admin access"
-                />
-              </div>
-            </div>
-          )}
-
-          {currentUserIsSuperadmin && <Separator />}
+          <SuperadminAccessSection
+            visible={currentUserIsSuperadmin}
+            enabled={targetIsSuperadmin}
+            saving={saving}
+            onToggle={onToggleSuperadmin}
+          />
 
           {targetRowConfigs.map((config, index) => {
             const targetState = uiState[config.target];
@@ -345,29 +396,7 @@ export function AccessDialog({
     setSaving(true);
     setError(undefined);
 
-    const grants: AccessGrantRequest[] = [];
-    targetRowConfigs.forEach(({ target }) => {
-      const item = uiState[target];
-      if (item.enabled) {
-        // SAFETY: `item.capabilities` is only mutated through AccessCapability-driven UI
-        // toggles above, so its enumerable keys are the same AccessCapability domain.
-        const enabledCaps = Object.keys(item.capabilities).filter(
-          // SAFETY: see note above — each enumerable key originated from an AccessCapability toggle.
-          (c) => item.capabilities[c as AccessCapability],
-          // SAFETY: see note above — after filtering, the remaining keys are still AccessCapability values.
-        ) as AccessCapability[];
-
-        enabledCaps.forEach((capability) => {
-          grants.push({
-            target,
-            capability,
-            scholarSlugs: item.scholarSlugs,
-            // SAFETY: locale selections come only from SUPPORTED_LOCALES-backed UI chips.
-            locales: item.locales as ("en" | "ar")[],
-          });
-        });
-      }
-    });
+    const grants = buildAccessGrants(uiState);
 
     try {
       await replaceUserAccess(userId, {

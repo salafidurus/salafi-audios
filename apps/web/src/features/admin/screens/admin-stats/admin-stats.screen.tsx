@@ -39,6 +39,17 @@ function hasAccess(isLoading: boolean, check: () => boolean): boolean {
   return !isLoading && check();
 }
 
+type AuthorizedQuery = { isLoading?: boolean; isError?: boolean };
+
+function selectAuthorized(
+  entries: Array<{ enabled: boolean; query: AuthorizedQuery }>,
+): AuthorizedQuery[] {
+  return entries.reduce<AuthorizedQuery[]>((selected, entry) => {
+    if (entry.enabled) selected.push(entry.query);
+    return selected;
+  }, []);
+}
+
 type StatsCardsProps = {
   canReadScholars: boolean;
   canReadListings: boolean;
@@ -259,14 +270,14 @@ export function AdminStatsScreen() {
     },
   ];
 
-  const authorizedQueries = [
-    canReadListings ? listingsQuery : null,
-    canReadScholars ? scholarsQuery : null,
-    canManageUsers ? usersQuery : null,
-  ].filter(Boolean);
+  const authorizedQueries = selectAuthorized([
+    { enabled: canReadListings, query: listingsQuery },
+    { enabled: canReadScholars, query: scholarsQuery },
+    { enabled: canManageUsers, query: usersQuery },
+  ]);
   const isLoading = isAccessLoading || authorizedQueries.some((query) => query?.isLoading);
   const isError = authorizedQueries.some((query) => query?.isError);
-  const hasAuthorizedData = canReadListings || canReadScholars || canManageUsers;
+  const hasAuthorizedData = [canReadListings, canReadScholars, canManageUsers].some(Boolean);
 
   const handleSort = (key: string) => {
     // SAFETY: AdaptiveDataView receives columns whose keys are restricted to SortKey.

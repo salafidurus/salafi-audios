@@ -45,6 +45,49 @@ function getScholarScreenCopy(
   };
 }
 
+function AdminScholarsHeader({
+  copy,
+  isDesktop,
+  canCreate,
+  searchQuery,
+  onSearchChange,
+  onAdd,
+}: {
+  copy: ReturnType<typeof getScholarScreenCopy>;
+  isDesktop: boolean;
+  canCreate: boolean;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  onAdd: () => void;
+}) {
+  return (
+    <>
+      <PageHeader
+        title={copy.title}
+        actions={
+          canCreate && (
+            <Button
+              variant="primary"
+              size={isDesktop ? "md" : "sm"}
+              icon={<Plus size={isDesktop ? 18 : 16} />}
+              onClick={onAdd}
+            >
+              {copy.addLabel}
+            </Button>
+          )
+        }
+      />
+      <div className={styles.toolbar}>
+        <Search.Bar
+          value={searchQuery}
+          onChange={onSearchChange}
+          placeholder={copy.searchPlaceholder}
+        />
+      </div>
+    </>
+  );
+}
+
 export function AdminScholarsScreen() {
   const isDesktop = useIsDesktop();
   const { ability } = useAbility();
@@ -88,29 +131,14 @@ export function AdminScholarsScreen() {
       <div className={styles.container}>
         <StickyHeaderLayout>
           <StickyHeaderLayout.Header>
-            <PageHeader
-              title={copy.title}
-              actions={
-                ability.can("create", "Scholar") && (
-                  <Button
-                    variant="primary"
-                    size={isDesktop ? "md" : "sm"}
-                    icon={<Plus size={isDesktop ? 18 : 16} />}
-                    onClick={handleOpenAdd}
-                  >
-                    {copy.addLabel}
-                  </Button>
-                )
-              }
+            <AdminScholarsHeader
+              copy={copy}
+              isDesktop={isDesktop}
+              canCreate={ability.can("create", "Scholar")}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onAdd={handleOpenAdd}
             />
-
-            <div className={styles.toolbar}>
-              <Search.Bar
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder={copy.searchPlaceholder}
-              />
-            </div>
           </StickyHeaderLayout.Header>
 
           <StickyHeaderLayout.Content>

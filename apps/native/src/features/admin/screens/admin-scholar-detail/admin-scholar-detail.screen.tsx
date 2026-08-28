@@ -35,6 +35,29 @@ function reduce(state: ScreenState, patch: Partial<ScreenState>): ScreenState {
   return { ...state, ...patch };
 }
 
+async function persistOrder(
+  data: AdminListingListItemDto[],
+  to: number,
+  previous: AdminListingListItemDto[],
+  setState: (patch: Partial<ScreenState>) => void,
+  update: (id: string, patch: { orderIndex: number }) => Promise<void>,
+  stateKey: "seriesOrder" | "collectionOrder",
+) {
+  setState({ [stateKey]: data });
+  try {
+    await update(data[to]!.id, { orderIndex: to });
+  } catch {
+    setState({ [stateKey]: previous });
+  }
+}
+
+function getDisplayList(
+  ordered: AdminListingListItemDto[] | null,
+  fetched: AdminListingListItemDto[] | undefined,
+) {
+  return ordered ?? fetched ?? [];
+}
+
 function SeriesItem({
   item,
   drag,
@@ -240,7 +263,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     httpClient<ScholarDetailDto>({ url: endpoints.scholars.detail(scholarSlug), method: "GET" }),
   );
 
-  const scholarId = scholar?.id ?? "";
+  const scholarId = scholar ? scholar.id : "";
   const canAdd = ability.can("create", subject("Listing", { scholarSlug }));
 
   const { data: seriesList, refetch: refetchSeries } = useAdminSeries(scholarId);
@@ -264,8 +287,8 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     collectionOrder,
   } = state;
 
-  const displaySeries = seriesOrder ?? seriesList ?? [];
-  const displayCollections = collectionOrder ?? collectionList ?? [];
+  const displaySeries = getDisplayList(seriesOrder, seriesList);
+  const displayCollections = getDisplayList(collectionOrder, collectionList);
 
   const handleSeriesDragEnd = async ({
     data,
@@ -275,13 +298,17 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     from: number;
     to: number;
   }) => {
-    const prevOrder = seriesOrder ?? seriesList ?? [];
-    dispatch({ seriesOrder: data });
-    try {
-      await updateSeries(data[to]!.id, { orderIndex: to });
-    } catch {
-      dispatch({ seriesOrder: prevOrder });
-    }
+    const prevOrder = getDisplayList(seriesOrder, seriesList);
+    await persistOrder(
+      data,
+      to,
+      prevOrder,
+      dispatch,
+      async (id, patch) => {
+        await updateSeries(id, patch);
+      },
+      "seriesOrder",
+    );
   };
 
   const handleCollectionDragEnd = async ({
@@ -292,13 +319,17 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     from: number;
     to: number;
   }) => {
-    const prevOrder = collectionOrder ?? collectionList ?? [];
-    dispatch({ collectionOrder: data });
-    try {
-      await updateCollection(data[to]!.id, { orderIndex: to });
-    } catch {
-      dispatch({ collectionOrder: prevOrder });
-    }
+    const prevOrder = getDisplayList(collectionOrder, collectionList);
+    await persistOrder(
+      data,
+      to,
+      prevOrder,
+      dispatch,
+      async (id, patch) => {
+        await updateCollection(id, patch);
+      },
+      "collectionOrder",
+    );
   };
 
   if (!scholar) {

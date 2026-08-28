@@ -89,6 +89,14 @@ function MainTabContent({
   );
 }
 
+function shouldShowSublistings(
+  activeTab: string,
+  showSublistingsTab: boolean,
+  listingId?: string,
+): listingId is string {
+  return activeTab === "sublistings" && showSublistingsTab && Boolean(listingId);
+}
+
 export function ListingModalTabContent({
   state,
   dispatch,
@@ -134,7 +142,7 @@ export function ListingModalTabContent({
     );
   }
 
-  if (activeTab === "sublistings" && showSublistingsTab && state.id) {
+  if (shouldShowSublistings(activeTab, showSublistingsTab, state.id)) {
     return <ListingSublistingsTab rootListingId={state.id} />;
   }
 

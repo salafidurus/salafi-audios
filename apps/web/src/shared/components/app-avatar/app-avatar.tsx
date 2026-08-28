@@ -39,23 +39,66 @@ function AvatarContent({
   fallbackText?: string | null;
   onError: ImageProps["onError"];
 }) {
-  if (source) {
+  if (source)
     return (
-      <Image
-        src={source}
-        alt=""
+      <AvatarImage
+        source={source}
         fill={fill}
         sizes={sizes}
-        width={fill ? undefined : size}
-        height={fill ? undefined : size}
-        className={`${styles.avatar} ${className ?? ""}`}
-        unoptimized
+        size={size}
+        className={className}
         onError={onError}
       />
     );
-  }
+  const initial = getAvatarInitial(fallbackText);
+  return <AvatarFallback initial={initial} fill={fill} size={size} className={className} />;
+}
 
-  const initial = fallbackText?.trim().charAt(0).toUpperCase() || "?";
+function AvatarImage({
+  source,
+  fill,
+  sizes,
+  size,
+  className,
+  onError,
+}: Pick<
+  Parameters<typeof AvatarContent>[0],
+  "source" | "fill" | "sizes" | "size" | "className" | "onError"
+>) {
+  return (
+    <Image
+      src={source!}
+      alt=""
+      fill={fill}
+      sizes={sizes}
+      width={getImageDimension(fill, size)}
+      height={getImageDimension(fill, size)}
+      className={`${styles.avatar} ${className ?? ""}`}
+      unoptimized
+      onError={onError}
+    />
+  );
+}
+
+function getImageDimension(fill: boolean, size: number): number | undefined {
+  return fill ? undefined : size;
+}
+
+function getAvatarInitial(fallbackText?: string | null): string {
+  return fallbackText?.trim().charAt(0).toUpperCase() || "?";
+}
+
+function AvatarFallback({
+  initial,
+  fill,
+  size,
+  className,
+}: {
+  initial: string;
+  fill: boolean;
+  size: number;
+  className?: string;
+}) {
   return (
     <div
       className={`${fill ? styles.fallbackFill : styles.fallback} ${className ?? ""}`}

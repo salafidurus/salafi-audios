@@ -90,6 +90,19 @@ function startHeroPlayback(
   void playHero();
 }
 
+function getHeroPlaybackInput(heroItem: HeroItem | null) {
+  if (!heroItem) return null;
+  return {
+    id: heroItem.id,
+    slug: heroItem.slug,
+    title: heroItem.title,
+    format: heroItem.format,
+    scholarName: heroItem.scholarName,
+    scholarSlug: heroItem.scholarSlug,
+    artworkUrl: heroItem.artworkUrl,
+  };
+}
+
 function getHeroEyebrow(hasHistory: boolean, headline: string | null | undefined) {
   if (hasHistory) return "AS-SALAMU 'ALAYKUM · CONTINUE YOUR DURUS";
   if (headline) return headline.toUpperCase();
@@ -118,6 +131,56 @@ function renderFeaturedExtras(hasHistory: boolean) {
   );
 }
 
+function HeroLoadingState() {
+  return (
+    <section className={styles.hero} data-testid="home-hero-skeleton">
+      <div className={styles.marginalia} aria-hidden="true">
+        <span className={styles.arabicText}>دروس</span>
+      </div>
+      <div className={styles.bookmark} aria-hidden="true" />
+      <div className={styles.content}>
+        <div className={`${styles.skeletonLine} ${styles.skeletonEyebrow}`} />
+        <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
+        <div className={`${styles.skeletonLine} ${styles.skeletonSubtitle}`} />
+        <div className={`${styles.skeletonLine} ${styles.skeletonCta}`} />
+      </div>
+      <div className={styles.visualRegion} aria-hidden="true">
+        <div className={styles.visualFrame}>
+          <div className={`${styles.skeletonLine} ${styles.skeletonArtwork}`} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HeroEmptyState({ t }: { t: ReturnType<typeof useTranslation>["t"] }) {
+  return (
+    <section className={styles.hero} data-testid="home-empty-state">
+      <div className={styles.marginalia} aria-hidden="true">
+        <span className={styles.arabicText}>دروس</span>
+      </div>
+      <div className={styles.bookmark} aria-hidden="true" />
+      <div className={styles.content}>
+        <p className={styles.eyebrow}>{t("home.empty.eyebrow", "A library for steady study")}</p>
+        <h1 className={styles.title} data-testid="home-hero-title">
+          {t("home.empty.title", "Find your next lesson")}
+        </h1>
+        <p className={styles.subtitle}>
+          {t(
+            "home.empty.description",
+            "Browse lessons, scholars, and topics to begin building your listening path.",
+          )}
+        </p>
+        <div className={styles.ctaRow}>
+          <Button asChild variant="primary" size="lg" className={styles.startBtn}>
+            <Link href={routes.explore.index}>{t("home.empty.action", "Explore lessons")}</Link>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function HeroSection({
   recentProgress,
   featuredContent,
@@ -136,74 +199,44 @@ export function HeroSection({
     heroItem?.scholarSlug,
   );
 
-  const { play: playHero } = usePlayListing(
-    heroItem
-      ? {
-          id: heroItem.id,
-          slug: heroItem.slug,
-          title: heroItem.title,
-          format: heroItem.format,
-          scholarName: heroItem.scholarName,
-          scholarSlug: heroItem.scholarSlug,
-          artworkUrl: heroItem.artworkUrl,
-        }
-      : null,
-  );
+  const { play: playHero } = usePlayListing(getHeroPlaybackInput(heroItem));
 
   const handleStart = () => startHeroPlayback(hasHistory, recentProgress, onResume, playHero);
 
-  if (isLoading) {
-    return (
-      <section className={styles.hero} data-testid="home-hero-skeleton">
-        <div className={styles.marginalia} aria-hidden="true">
-          <span className={styles.arabicText}>دروس</span>
-        </div>
-        <div className={styles.bookmark} aria-hidden="true" />
-        <div className={styles.content}>
-          <div className={`${styles.skeletonLine} ${styles.skeletonEyebrow}`} />
-          <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
-          <div className={`${styles.skeletonLine} ${styles.skeletonSubtitle}`} />
-          <div className={`${styles.skeletonLine} ${styles.skeletonCta}`} />
-        </div>
-        <div className={styles.visualRegion} aria-hidden="true">
-          <div className={styles.visualFrame}>
-            <div className={`${styles.skeletonLine} ${styles.skeletonArtwork}`} />
-          </div>
-        </div>
-      </section>
-    );
-  }
+  if (isLoading) return <HeroLoadingState />;
 
-  if (!heroItem) {
-    return (
-      <section className={styles.hero} data-testid="home-empty-state">
-        <div className={styles.marginalia} aria-hidden="true">
-          <span className={styles.arabicText}>دروس</span>
-        </div>
-        <div className={styles.bookmark} aria-hidden="true" />
-        <div className={styles.content}>
-          <p className={styles.eyebrow}>{t("home.empty.eyebrow", "A library for steady study")}</p>
-          <h1 className={styles.title} data-testid="home-hero-title">
-            {t("home.empty.title", "Find your next lesson")}
-          </h1>
-          <p className={styles.subtitle}>
-            {t(
-              "home.empty.description",
-              "Browse lessons, scholars, and topics to begin building your listening path.",
-            )}
-          </p>
-          <div className={styles.ctaRow}>
-            <Button asChild variant="primary" size="lg" className={styles.startBtn}>
-              <Link href={routes.explore.index}>{t("home.empty.action", "Explore lessons")}</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  if (!heroItem) return <HeroEmptyState t={t} />;
 
-  const title = heroItem.title;
   const scholarName = getHeroScholarName(heroItem, formatScholarName, formattedScholarFallback);
+
+  return (
+    <HeroContent
+      heroItem={heroItem}
+      scholarName={scholarName}
+      hasHistory={hasHistory}
+      headline={headline}
+      t={t}
+      onStart={handleStart}
+    />
+  );
+}
+
+function HeroContent({
+  heroItem,
+  scholarName,
+  hasHistory,
+  headline,
+  t,
+  onStart,
+}: {
+  heroItem: HeroItem;
+  scholarName: string;
+  hasHistory: boolean;
+  headline?: string | null;
+  t: ReturnType<typeof useTranslation>["t"];
+  onStart: () => void;
+}) {
+  const title = heroItem.title;
 
   return (
     <section className={styles.hero}>
@@ -230,7 +263,7 @@ export function HeroSection({
           <Button
             type="button"
             className={styles.startBtn}
-            onClick={handleStart}
+            onClick={onStart}
             data-testid={hasHistory ? "home-hero-resume" : "home-hero-start"}
             variant="primary"
             size="lg"

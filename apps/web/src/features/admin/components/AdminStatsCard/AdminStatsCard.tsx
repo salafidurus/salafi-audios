@@ -59,14 +59,7 @@ export function AdminStatsCard({
           <p className="text-2xl font-semibold tracking-tight" data-testid="admin-stat-value">
             {value}
           </p>
-          {trend && (
-            <Badge
-              variant={trend.direction === "down" ? "outline" : "secondary"}
-              className={trend.direction === "down" ? "text-destructive" : undefined}
-            >
-              {trend.label}
-            </Badge>
-          )}
+          {trend && <TrendBadge trend={trend} />}
         </div>
       </CardContent>
     </Card>
@@ -94,4 +87,16 @@ export function AdminStatsCard({
   }
 
   return content;
+}
+
+function TrendBadge({ trend }: { trend: NonNullable<AdminStatsCardProps["trend"]> }) {
+  const isDown = trend.direction === "down";
+  return (
+    <Badge
+      variant={isDown ? "outline" : "secondary"}
+      className={isDown ? "text-destructive" : undefined}
+    >
+      {trend.label}
+    </Badge>
+  );
 }

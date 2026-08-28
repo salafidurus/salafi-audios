@@ -23,6 +23,50 @@ type AccountProfileFormProps = {
   updateProfile: ReturnType<typeof useUpdateProfile>["mutate"];
 };
 
+type AccountProfileActionsProps = Pick<
+  AccountProfileFormProps,
+  "isPending" | "isSuccess" | "isError" | "updateProfile"
+> & {
+  displayName: string;
+  unchanged: boolean;
+};
+
+function AccountProfileActions({
+  isPending,
+  isSuccess,
+  isError,
+  updateProfile,
+  displayName,
+  unchanged,
+}: AccountProfileActionsProps) {
+  const { t } = useTranslation();
+  const { theme } = useUnistyles();
+
+  return (
+    <View style={styles.actions}>
+      {isError && (
+        <AppText variant="caption" style={{ color: theme.colors.state.dangerContent }}>
+          {t("account.profile.displayNameSaveFailed", "Failed to save. Please try again.")}
+        </AppText>
+      )}
+      {isSuccess && (
+        <AppText variant="caption" style={{ color: theme.colors.state.successContent }}>
+          {t("account.saved", "Saved.")}
+        </AppText>
+      )}
+      <Pressable
+        onPress={() => updateProfile({ displayName })}
+        disabled={isPending || unchanged}
+        style={[styles.saveButton, (isPending || unchanged) && styles.saveButtonDisabled]}
+      >
+        <AppText variant="bodyMd" style={{ color: theme.colors.content.onPrimary }}>
+          {isPending ? t("account.profile.saving", "Saving…") : t("account.profile.save", "Save")}
+        </AppText>
+      </Pressable>
+    </View>
+  );
+}
+
 function AccountProfileForm({
   profile,
   isPending,
@@ -60,27 +104,14 @@ function AccountProfileForm({
         </SettingsRow>
       </SettingsSection>
 
-      <View style={styles.actions}>
-        {isError && (
-          <AppText variant="caption" style={{ color: theme.colors.state.dangerContent }}>
-            {t("account.profile.displayNameSaveFailed", "Failed to save. Please try again.")}
-          </AppText>
-        )}
-        {isSuccess && (
-          <AppText variant="caption" style={{ color: theme.colors.state.successContent }}>
-            {t("account.saved", "Saved.")}
-          </AppText>
-        )}
-        <Pressable
-          onPress={() => updateProfile({ displayName })}
-          disabled={isPending || unchanged}
-          style={[styles.saveButton, (isPending || unchanged) && styles.saveButtonDisabled]}
-        >
-          <AppText variant="bodyMd" style={{ color: theme.colors.content.onPrimary }}>
-            {isPending ? t("account.profile.saving", "Saving…") : t("account.profile.save", "Save")}
-          </AppText>
-        </Pressable>
-      </View>
+      <AccountProfileActions
+        isPending={isPending}
+        isSuccess={isSuccess}
+        isError={isError}
+        updateProfile={updateProfile}
+        displayName={displayName}
+        unchanged={unchanged}
+      />
     </ScrollView>
   );
 }

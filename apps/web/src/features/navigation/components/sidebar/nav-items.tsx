@@ -214,26 +214,46 @@ function AnonymousCard({ onItemClick, t }: Pick<AuthFooterProps, "onItemClick" |
   );
 }
 
+function AuthFooterContent({
+  isAuthenticated,
+  isLoading,
+  user,
+  onItemClick,
+  onSignOut,
+  t,
+}: AuthFooterProps & { onSignOut: () => void }) {
+  if (isLoading) return null;
+  if (isAuthenticated && user) {
+    return (
+      <AuthenticatedCard
+        user={user}
+        userInitial={(user.name || user.email || "?").charAt(0).toUpperCase()}
+        onSignOut={onSignOut}
+        t={t}
+      />
+    );
+  }
+  if (!isAuthenticated) return <AnonymousCard onItemClick={onItemClick} t={t} />;
+  return null;
+}
+
 function AuthFooter({ isAuthenticated, isLoading, user, onItemClick, t }: AuthFooterProps) {
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
   const { signOut, error: signOutError } = useSignOut();
-  const userInitial = (user?.name || user?.email || "?").charAt(0).toUpperCase();
 
   return (
     <>
-      {!isLoading && isAuthenticated && user ? (
-        <AuthenticatedCard
-          user={user}
-          userInitial={userInitial}
-          onSignOut={() => {
-            onItemClick();
-            setIsSignOutDialogOpen(true);
-          }}
-          t={t}
-        />
-      ) : !isLoading && !isAuthenticated ? (
-        <AnonymousCard onItemClick={onItemClick} t={t} />
-      ) : null}
+      <AuthFooterContent
+        isAuthenticated={isAuthenticated}
+        isLoading={isLoading}
+        user={user}
+        onItemClick={onItemClick}
+        onSignOut={() => {
+          onItemClick();
+          setIsSignOutDialogOpen(true);
+        }}
+        t={t}
+      />
       <ConfirmationDialog
         open={isSignOutDialogOpen}
         onOpenChange={setIsSignOutDialogOpen}
