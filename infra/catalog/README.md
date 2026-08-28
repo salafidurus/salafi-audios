@@ -43,7 +43,48 @@ Does not modify workspace `package.json` files — only updates root catalogs an
 
 ```bash
 bun run catalog fix
+
+# Preview the same repair plan without writing files
+bun run catalog fix --dry-run
 ```
+
+The default fixer never rewrites an explicit workspace dependency merely
+because a catalog entry with the same name exists. Such a rewrite requires a
+matching policy with `mode: "managed"`. `mode: "explicit"` and `mode:
+"ignored"` preserve the workspace version. Ambiguous policy matches fail
+closed.
+
+`--dry-run` reports planned files, before/after dependency values, policy
+reasons, and whether `bun install` is required. The tool does not claim
+lockfile validation until installation has occurred.
+
+### Policy matrix
+
+`catalog.config.json` may contain legacy catalog groups and policy rules:
+
+```json
+{
+  "groups": [],
+  "policies": [
+    {
+      "name": "native-react",
+      "packages": ["react", "react-native"],
+      "workspaces": ["apps/native"],
+      "mode": "explicit",
+      "updateCeiling": "minor",
+      "owner": "expo-pipeline",
+      "compatibilityGroup": "expo-sdk",
+      "sections": ["dependencies"],
+      "reason": "Native compatibility is managed by the Expo pipeline"
+    }
+  ]
+}
+```
+
+Policy rules can define `rangePrefix`, `fixedVersion`, and update ceilings of
+`patch`, `minor`, `major`, or `fixed`. Exact dependency/workspace matches are
+more specific than wildcard matches. Equal-specificity conflicts are reported
+as ambiguity rather than resolved silently.
 
 ### `fix --force`
 

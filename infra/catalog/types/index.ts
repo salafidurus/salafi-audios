@@ -25,7 +25,7 @@ export interface Catalogs {
 }
 
 export interface CatalogIssue {
-  type: "missing" | "mismatch" | "hardcoded" | "orphan";
+  type: "missing" | "mismatch" | "hardcoded" | "orphan" | "policy";
   pkgName: string;
   depName: string;
   expectedVersion?: string;
@@ -45,8 +45,61 @@ export interface CatalogConfigGroup {
   workspaces: string | string[];
 }
 
+export type CatalogPolicyMode = "managed" | "explicit" | "ignored";
+
+export type CatalogUpdateCeiling = "patch" | "minor" | "major" | "fixed";
+
+export type DependencySection = "dependencies" | "devDependencies" | "peerDependencies";
+
+export interface CatalogPolicyRule {
+  name: string;
+  packages: string | string[];
+  workspaces: string | string[];
+  mode?: CatalogPolicyMode;
+  rangePrefix?: "" | "^" | "~";
+  updateCeiling?: CatalogUpdateCeiling;
+  fixedVersion?: string;
+  owner?: string;
+  compatibilityGroup?: string;
+  sections?: DependencySection[];
+  reason: string;
+}
+
 export interface CatalogConfig {
   groups: CatalogConfigGroup[];
+  policies: CatalogPolicyRule[];
+}
+
+export interface CatalogPolicyMatch {
+  status: "matched" | "default" | "ambiguous";
+  rule?: CatalogPolicyRule;
+  candidates?: CatalogPolicyRule[];
+  reason: string;
+}
+
+export interface CatalogUpdateDecision {
+  status: "allowed" | "rejected";
+  reason: string;
+}
+
+export interface CatalogRepairMutation {
+  filePath: string;
+  workspace: string;
+  dependency: string;
+  section: DependencySection;
+  before: string;
+  after: string;
+  rule?: string;
+  reason: string;
+}
+
+export interface CatalogRepairReport {
+  status: "applied" | "planned" | "no-op" | "rejected" | "invalid";
+  mutations: CatalogRepairMutation[];
+  updatedFiles: string[];
+  issues: CatalogIssue[];
+  reason?: string;
+  lockfile: "unchanged" | "requires-install" | "validated";
 }
 
 export interface CatalogStats {

@@ -2,7 +2,7 @@ import { Glob } from "bun";
 import fs from "node:fs";
 import path from "node:path";
 
-import type { PackageJson, Workspace, Catalogs, CatalogConfig } from "../types";
+import type { PackageJson, Workspace, Catalogs, CatalogConfig, CatalogPolicyRule } from "../types";
 
 export function parseCatalogs(rootJson: PackageJson): Catalogs {
   const workspaces = rootJson.workspaces;
@@ -45,12 +45,35 @@ export function loadConfig(rootDir: string): CatalogConfig {
   if (fs.existsSync(configPath)) {
     try {
       const parsed = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-      return { groups: parsed.groups ?? [] };
-    } catch {
-      return { groups: [] };
+      const groups = parsed.groups ?? [];
+      const policies = parsed.policies ?? [];
+      if (!Array.isArray(groups) || !Array.isArray(policies)) {
+        throw new Error("catalog.config.json groups and policies must be arrays");
+      }
+      const errors = policies.flatMap(validateCatalogPolicyRule);
+      if (errors.length > 0) throw new Error(`Invalid catalog policy: ${errors.join("; ")}`);
+      return { groups, policies };
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith("Invalid catalog policy:"))
+        throw error;
+      throw new Error(`Unable to load catalog.config.json: ${error}`);
     }
   }
-  return { groups: [] };
+  return { groups: [], policies: [] };
+}
+
+function validateCatalogPolicyRule(rule: CatalogPolicyRule): string[] {
+  const errors: string[] = [];
+  if (!rule) return ["policy entries must be objects"];
+  if (!rule.name?.trim()) errors.push("policy name must not be empty");
+  if (!rule.reason?.trim()) errors.push(`policy '${rule.name}' must include a reason`);
+  if (rule.updateCeiling === "fixed" && !rule.fixedVersion) {
+    errors.push(`policy '${rule.name}' requires fixedVersion for a fixed update ceiling`);
+  }
+  if (rule.fixedVersion && rule.updateCeiling !== "fixed") {
+    errors.push(`policy '${rule.name}' cannot define fixedVersion unless updateCeiling is fixed`);
+  }
+  return errors;
 }
 
 export function matchPattern(value: string, pattern: string | string[]): boolean {
