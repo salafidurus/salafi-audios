@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { Host } from "@expo/ui";
 import {
   Button as FilledButton,
@@ -140,7 +142,7 @@ export function Button({
   };
 
   return (
-    <Host matchContents={!fullWidth} style={[fullWidth ? base.stretch : null, style]}>
+    <ButtonHost fullWidth={fullWidth} style={style}>
       <ButtonComponent
         onClick={isDisabled ? undefined : onPress}
         enabled={!isDisabled}
@@ -159,6 +161,22 @@ export function Button({
           t.labelStyle,
         )}
       </ButtonComponent>
+    </ButtonHost>
+  );
+}
+
+function ButtonHost({
+  fullWidth,
+  style,
+  children,
+}: {
+  fullWidth: boolean;
+  style: StyleProp<ViewStyle>;
+  children: ReactNode;
+}) {
+  return (
+    <Host matchContents={!fullWidth} style={[fullWidth ? base.stretch : null, style]}>
+      {children}
     </Host>
   );
 }
