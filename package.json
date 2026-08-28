@@ -69,7 +69,7 @@
     "lint:staged": "lint-staged --relative --concurrent false",
     "docs:quality": "markdownlint-cli2 README.md **/README.md docs/**/*.md AGENT.md .github/copilot-instructions.md '!.serena/**/*.md'",
     "security:secrets": "secretlint \"**/*\"",
-    "ci:local": "bun run catalog && bun run verify:build-configs && bun run lint && bun run typecheck && bun run test:prepush && bun run build:affected && bun run --elide-lines=0 --filter web build && bun run docs:quality",
+    "ci:local": "bun run dependabot-helper align && bun run verify:build-configs && bun run lint && bun run typecheck && bun run test:prepush && bun run build:affected && bun run --elide-lines=0 --filter web build && bun run docs:quality",
     "doctor": "bun run react-doctor --verbose",
     "native:expo:fix": "bun run --elide-lines=0 --filter native expo:fix",
     "native:expo:check": "bun run --elide-lines=0 --filter native expo:check"

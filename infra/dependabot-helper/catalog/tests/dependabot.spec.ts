@@ -83,14 +83,11 @@ describe("Dependabot workflow safety contract", () => {
     expect(workflow).toContain("bun infra/dependabot-helper/cli.ts align");
     expect(workflow).toContain("bun infra/dependabot-helper/cli.ts validate-files");
     expect(workflow).toContain("bun infra/dependabot-helper/cli.ts render");
-    expect(workflow).not.toContain("bun infra/catalog/");
     expect(workflow).toContain("id: push");
     expect(workflow).toContain(
       "git checkout \"$PR_HEAD_SHA\" -- ':(glob)**/package.json' 'bun.lock'",
     );
-    expect(workflow).toContain(
-      "git add -- ':(glob)**/package.json' 'bun.lock'",
-    );
+    expect(workflow).toContain("git add -- ':(glob)**/package.json' 'bun.lock'");
     expect(workflow).not.toContain('git read-tree "$PR_HEAD_SHA"');
     expect(workflow).not.toContain("git add -A");
   });

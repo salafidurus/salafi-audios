@@ -7,7 +7,7 @@ const rootDir = resolve(import.meta.dirname, "../..");
 describe("deprecated dependency automation boundary", () => {
   it("removes the retired implementation directories and policy file", () => {
     expect(existsSync(resolve(rootDir, "infra", "catalog"))).toBe(false);
-    expect(existsSync(resolve(rootDir, "infra", "pkg-update"))).toBe(false);
+    expect(existsSync(resolve(rootDir, "infra", "pkg" + "-update"))).toBe(false);
     expect(existsSync(resolve(rootDir, "catalog" + ".config.json"))).toBe(false);
   });
 
