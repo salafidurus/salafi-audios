@@ -1,3 +1,5 @@
+import { dependabotHelperPolicy } from "../dependabot-helper/policy";
+
 export interface PkupdateConfig {
   groups: Record<string, { patterns: string[]; updateTypes?: ("major" | "minor" | "patch")[] }>;
   skip: string[];
@@ -7,6 +9,16 @@ export interface PkupdateConfig {
   expo: { enabled: boolean };
 }
 
+const versionLocked = dependabotHelperPolicy.families.reduce<string[]>((locked, family) => {
+  if (family.mode === "helper-check" && family.versionLocked) locked.push(family.name);
+  return locked;
+}, []);
+
+const expoOwned = dependabotHelperPolicy.families.some(
+  (family) => family.mode === "helper-update" && family.pipeline === "expo-sdk",
+);
+
+/** Transitional runtime adapter; dependency ownership comes from Helper policy. */
 export const config: PkupdateConfig = {
   groups: {
     // Ordinary dependency updates belong to Dependabot. The Expo and Bun
@@ -14,7 +26,7 @@ export const config: PkupdateConfig = {
   },
   skip: [],
   never: ["typescript"],
-  versionLocked: ["better-auth", "prisma"],
+  versionLocked,
   bun: { enabled: true },
-  expo: { enabled: true },
+  expo: { enabled: expoOwned },
 };

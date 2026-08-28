@@ -131,6 +131,26 @@ function familyIncludes(family: DependencyFamily, packageName: string): boolean 
   );
 }
 
+/** Returns whether a dependency belongs to a family after that family's exclusions. */
+export function matchesDependencyFamily(family: DependencyFamily, packageName: string): boolean {
+  return familyIncludes(family, packageName);
+}
+
+/** Finds the policy family that owns or checks a dependency in a workspace. */
+export function resolveDependencyFamily(
+  policy: DependencyAutomationPolicy,
+  packageName: string,
+  workspacePath: string,
+): DependencyFamily | null {
+  return (
+    policy.families.find(
+      (family) =>
+        familyIncludes(family, packageName) &&
+        asPatterns(family.workspaces ?? ["*"]).some((pattern) => matches(workspacePath, pattern)),
+    ) ?? null
+  );
+}
+
 function patternCoveredByIgnore(pattern: string, ignoredPatterns: string[]): boolean {
   return ignoredPatterns.some((ignored) => {
     if (ignored === "*") return true;
