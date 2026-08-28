@@ -72,6 +72,16 @@ async function saveCollection(
   }
 }
 
+function getInitialFormState(collection: AdminListingDetailDto | undefined): FormState {
+  return {
+    title: collection?.title ?? "",
+    description: collection?.description ?? "",
+    language: collection?.language ?? "",
+    isSaving: false,
+    error: null,
+  };
+}
+
 function CollectionSheetForm({
   state,
   collection,
@@ -154,13 +164,7 @@ export function CollectionSheet({
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
-  const [state, dispatch] = useReducer(reduce, {
-    title: collection?.title ?? "",
-    description: collection?.description ?? "",
-    language: collection?.language ?? "",
-    isSaving: false,
-    error: null,
-  });
+  const [state, dispatch] = useReducer(reduce, collection, getInitialFormState);
 
   if (!isOpen) return null;
 
