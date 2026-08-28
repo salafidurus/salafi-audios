@@ -72,6 +72,16 @@ async function saveSeries(
   }
 }
 
+function getInitialFormState(series: AdminListingDetailDto | undefined): FormState {
+  return {
+    title: series?.title ?? "",
+    description: series?.description ?? "",
+    language: series?.language ?? "",
+    isSaving: false,
+    error: null,
+  };
+}
+
 function SeriesSheetForm({
   state,
   series,
@@ -152,13 +162,7 @@ export function SeriesSheet({
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
-  const [state, dispatch] = useReducer(reduce, {
-    title: series?.title ?? "",
-    description: series?.description ?? "",
-    language: series?.language ?? "",
-    isSaving: false,
-    error: null,
-  });
+  const [state, dispatch] = useReducer(reduce, series, getInitialFormState);
 
   if (!isOpen) return null;
 
