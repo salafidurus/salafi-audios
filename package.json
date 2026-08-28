@@ -68,7 +68,7 @@
     "pkg-update": "bun run infra/pkg-update/index.ts",
     "pkg-update:ci": "bun run infra/pkg-update/ci.ts",
     "prepare": "husky",
-    "lint:staged": "lint-staged",
+    "lint:staged": "lint-staged --relative --concurrent false",
     "docs:quality": "markdownlint-cli2 README.md **/README.md docs/**/*.md AGENT.md .github/copilot-instructions.md '!.serena/**/*.md'",
     "tsdoc:baseline": "bun scripts/tsdoc-baseline.ts",
     "security:secrets": "secretlint \"**/*\"",
