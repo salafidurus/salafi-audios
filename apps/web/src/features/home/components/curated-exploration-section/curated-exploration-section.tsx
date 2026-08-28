@@ -16,68 +16,68 @@ type CuratedExplorationSectionProps = {
   isLoading?: boolean;
 };
 
-export function CuratedExplorationSection({
-  items,
-  isLoading = false,
-}: CuratedExplorationSectionProps) {
-  const { t } = useTranslation();
-  const { navigateToListing } = useListingNavigation();
-  const [featured, ...rest] = items;
-  const { play } = usePlayListing(
-    featured
-      ? {
-          id: featured.id,
-          slug: featured.slug,
-          title: featured.title,
-          format: featured.kind,
-          scholarName: featured.scholarName,
-          scholarSlug: featured.scholarSlug,
-          artworkUrl: featured.thumbnailUrl ?? undefined,
-        }
-      : null,
-  );
-
-  if (isLoading && items.length === 0) {
-    return (
-      <section className={styles.section} data-testid="home-curated-loading">
-        <div className={styles.header}>
-          <p className={styles.eyebrow}>{t("home.curated.eyebrow", "CURATED FOR STUDY")}</p>
-          <h2>{t("home.curated.title", "A considered place to begin")}</h2>
-        </div>
-        <div className={styles.skeleton} />
-      </section>
-    );
-  }
-
-  if (items.length === 0) {
-    return (
-      <section className={styles.section} data-testid="home-curated-empty">
-        <div className={styles.header}>
-          <p className={styles.eyebrow}>{t("home.curated.eyebrow", "CURATED FOR STUDY")}</p>
-          <h2>{t("home.curated.title", "A considered place to begin")}</h2>
-        </div>
-        <p className={styles.emptyState}>
-          {t(
-            "home.curated.empty",
-            "Explore the library to find a lesson that suits your study today.",
-          )}
-        </p>
-        <Link href={routes.explore.index} className={styles.link}>
-          {t("home.curated.browse", "Browse the library")}
-        </Link>
-      </section>
-    );
-  }
-
+function SectionHeader({
+  t,
+  description = true,
+}: {
+  t: ReturnType<typeof useTranslation>["t"];
+  description?: boolean;
+}) {
   return (
-    <section className={styles.section}>
-      <div className={styles.header}>
-        <p className={styles.eyebrow}>{t("home.curated.eyebrow", "CURATED FOR STUDY")}</p>
-        <h2>{t("home.curated.title", "A considered place to begin")}</h2>
+    <div className={styles.header}>
+      <p className={styles.eyebrow}>{t("home.curated.eyebrow", "CURATED FOR STUDY")}</p>
+      <h2>{t("home.curated.title", "A considered place to begin")}</h2>
+      {description && (
         <p className={styles.description}>
           {t("home.curated.description", "Hand-picked lessons for a steady listening path.")}
         </p>
-      </div>
+      )}
+    </div>
+  );
+}
+
+function EmptySection({ t }: { t: ReturnType<typeof useTranslation>["t"] }) {
+  return (
+    <section className={styles.section} data-testid="home-curated-empty">
+      <SectionHeader t={t} description={false} />
+      <p className={styles.emptyState}>
+        {t(
+          "home.curated.empty",
+          "Explore the library to find a lesson that suits your study today.",
+        )}
+      </p>
+      <Link href={routes.explore.index} className={styles.link}>
+        {t("home.curated.browse", "Browse the library")}
+      </Link>
+    </section>
+  );
+}
+
+function LoadingSection({ t }: { t: ReturnType<typeof useTranslation>["t"] }) {
+  return (
+    <section className={styles.section} data-testid="home-curated-loading">
+      <SectionHeader t={t} description={false} />
+      <div className={styles.skeleton} />
+    </section>
+  );
+}
+
+function PopulatedSection({
+  featured,
+  rest,
+  t,
+  navigateToListing,
+  play,
+}: {
+  featured: FeedContentItemDto | undefined;
+  rest: FeedContentItemDto[];
+  t: ReturnType<typeof useTranslation>["t"];
+  navigateToListing: (slug: string) => void;
+  play: () => Promise<void>;
+}) {
+  return (
+    <section className={styles.section}>
+      <SectionHeader t={t} />
       <div className={styles.list}>
         {featured && (
           <FeaturedLectureCard
@@ -112,5 +112,45 @@ export function CuratedExplorationSection({
         ))}
       </div>
     </section>
+  );
+}
+
+export function CuratedExplorationSection({
+  items,
+  isLoading = false,
+}: CuratedExplorationSectionProps) {
+  const { t } = useTranslation();
+  const { navigateToListing } = useListingNavigation();
+  const [featured, ...rest] = items;
+  const { play } = usePlayListing(
+    featured
+      ? {
+          id: featured.id,
+          slug: featured.slug,
+          title: featured.title,
+          format: featured.kind,
+          scholarName: featured.scholarName,
+          scholarSlug: featured.scholarSlug,
+          artworkUrl: featured.thumbnailUrl ?? undefined,
+        }
+      : null,
+  );
+
+  if (isLoading && items.length === 0) {
+    return <LoadingSection t={t} />;
+  }
+
+  if (items.length === 0) {
+    return <EmptySection t={t} />;
+  }
+
+  return (
+    <PopulatedSection
+      featured={featured}
+      rest={rest}
+      t={t}
+      navigateToListing={navigateToListing}
+      play={play}
+    />
   );
 }

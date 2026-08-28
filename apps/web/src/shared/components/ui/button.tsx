@@ -52,18 +52,7 @@ function resolveButtonDisabled(loading: boolean, disabled: boolean | undefined) 
   return loading || disabled;
 }
 
-function Button({
-  className,
-  variant = "default",
-  size = "default",
-  asChild = false,
-  label,
-  loading = false,
-  icon,
-  iconPosition = "left",
-  fullWidth = false,
-  ...props
-}: React.ComponentProps<"button"> &
+type ButtonProps = React.ComponentProps<"button"> &
   Omit<ButtonVariantProps, "variant" | "size"> & {
     variant?: ButtonVariantProps["variant"] | "primary" | "surface" | "danger";
     size?: ButtonVariantProps["size"] | "md";
@@ -73,7 +62,23 @@ function Button({
     icon?: React.ReactNode;
     iconPosition?: "left" | "right";
     fullWidth?: boolean;
-  }) {
+  };
+
+function renderButton({
+  className,
+  variant,
+  size,
+  asChild,
+  label,
+  loading,
+  icon,
+  iconPosition,
+  fullWidth,
+  ...props
+}: Required<
+  Pick<ButtonProps, "variant" | "size" | "asChild" | "loading" | "iconPosition" | "fullWidth">
+> &
+  Omit<ButtonProps, "variant" | "size" | "asChild" | "loading" | "iconPosition" | "fullWidth">) {
   const Comp = resolveButtonComponent(asChild);
   const normalizedVariant = normalizeButtonVariant(variant);
   const normalizedSize: ButtonVariantProps["size"] = resolveButtonSize(size);
@@ -95,6 +100,18 @@ function Button({
       {renderButtonContent(asChild, loading, props.children, icon, iconPosition, content)}
     </Comp>
   );
+}
+
+function Button(props: ButtonProps) {
+  return renderButton({
+    ...props,
+    variant: props.variant ?? "default",
+    size: props.size ?? "default",
+    asChild: props.asChild ?? false,
+    loading: props.loading ?? false,
+    iconPosition: props.iconPosition ?? "left",
+    fullWidth: props.fullWidth ?? false,
+  });
 }
 
 export { Button };
