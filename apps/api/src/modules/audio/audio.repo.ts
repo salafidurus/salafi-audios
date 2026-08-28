@@ -234,38 +234,49 @@ export class AudioRepository {
     slug: string,
   ): Promise<{ id: string; durationSeconds: number | null } | null> {
     const key = this.progressListingKey(slug);
-    if (this.redis.enabled) {
-      try {
-        const cachedId = await this.redis.get(key);
-        if (cachedId) {
-          const cached = await this.prisma.listing.findUnique({
-            where: { id: cachedId },
-            select: { id: true, durationSeconds: true },
-          });
-          if (cached) return cached;
-          await this.redis.del(key);
-        }
-      } catch (error) {
-        this.logger.warn(
-          `Redis listing cache lookup failed for ${slug}; using PostgreSQL: ${error instanceof Error ? error.message : String(error)}`,
-        );
-      }
-    }
+    const cached = await this.findCachedProgressListing(key, slug);
+    if (cached) return cached;
 
     const listing = await this.prisma.listing.findFirst({
       where: { slug },
       select: { id: true, durationSeconds: true },
     });
-    if (listing && this.redis.enabled) {
-      try {
-        await this.redis.set(key, listing.id, 'EX', 300);
-      } catch (error) {
-        this.logger.warn(
-          `Redis listing cache write failed for ${slug}: ${error instanceof Error ? error.message : String(error)}`,
-        );
-      }
-    }
+    await this.cacheProgressListing(slug, key, listing);
     return listing;
+  }
+
+  private async findCachedProgressListing(key: string, slug: string) {
+    if (!this.redis.enabled) return null;
+    try {
+      const cachedId = await this.redis.get(key);
+      if (!cachedId) return null;
+      const cached = await this.prisma.listing.findUnique({
+        where: { id: cachedId },
+        select: { id: true, durationSeconds: true },
+      });
+      if (cached) return cached;
+      await this.redis.del(key);
+    } catch (error) {
+      this.logger.warn(
+        `Redis listing cache lookup failed for ${slug}; using PostgreSQL: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+    return null;
+  }
+
+  private async cacheProgressListing(
+    slug: string,
+    key: string,
+    listing: { id: string; durationSeconds: number | null } | null,
+  ) {
+    if (!listing || !this.redis.enabled) return;
+    try {
+      await this.redis.set(key, listing.id, 'EX', 300);
+    } catch (error) {
+      this.logger.warn(
+        `Redis listing cache write failed for ${slug}: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
   }
 
   private async persistProgressImmediately(input: ProgressWrite): Promise<void> {
