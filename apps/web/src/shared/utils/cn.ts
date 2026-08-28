@@ -1,7 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-/** Shared class boundary used by shadcn primitives and app-owned components. */
+/** Defines the shared class-name composition boundary for the web UI. */
+/** Combines conditional class values and resolves conflicting Tailwind utilities. */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

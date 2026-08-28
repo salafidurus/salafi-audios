@@ -1,3 +1,4 @@
+/** Exposes administrative screens, editors, upload controls, and access-aware hooks. */
 // Screens
 export { AdminDashboardScreen } from "./screens/admin-dashboard/admin-dashboard.screen";
 export { AdminListingsScreen } from "./screens/admin-listings/admin-listings.screen";
