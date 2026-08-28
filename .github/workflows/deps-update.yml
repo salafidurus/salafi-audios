@@ -19,6 +19,8 @@ permissions:
 
 jobs:
   update:
+    # Ownership and compatibility boundaries are documented in
+    # ../docs/policies/dependency-automation.md.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

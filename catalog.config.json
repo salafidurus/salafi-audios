@@ -8,6 +8,7 @@
         "expo",
         "expo-*",
         "@expo/*",
+        "jest-expo",
         "react-native",
         "react-native-*",
         "@react-native/*",

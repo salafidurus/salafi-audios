@@ -182,7 +182,7 @@ describe("loadConfig", () => {
       compatibilityGroups: [
         {
           name: "expo-sdk",
-          packages: ["expo", "expo-*"],
+          packages: ["expo", "expo-*", "jest-expo"],
           workspaces: ["apps/native"],
           owner: "expo-pipeline",
           target: { resolver: "explicit", value: "57.0.17" },
@@ -193,6 +193,9 @@ describe("loadConfig", () => {
 
     const config = loadConfig(TEMP_DIR);
     expect(resolveCompatibilityGroup("expo-router", "apps/native", config)?.owner).toBe(
+      "expo-pipeline",
+    );
+    expect(resolveCompatibilityGroup("jest-expo", "apps/native", config)?.owner).toBe(
       "expo-pipeline",
     );
     expect(resolveCompatibilityGroup("expo-router", "apps/web", config)).toBeNull();
