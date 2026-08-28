@@ -10,10 +10,13 @@ import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
+/** Projects native library state into saved, completed, and in-progress content views. */
+/** Describes the inputs, callbacks, and optional state accepted by My Library Completed Screen. */
 export type MyLibraryCompletedScreenProps = {
   onNavigateToListing?: (slug: string) => void;
 };
 
+/** Renders the native my library completed screen surface and coordinates its user-facing state. */
 export function MyLibraryCompletedScreen({ onNavigateToListing }: MyLibraryCompletedScreenProps) {
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useMyLibraryCompletedScreen(isAuthenticated);

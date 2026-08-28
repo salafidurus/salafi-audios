@@ -12,9 +12,11 @@ import { TextInput } from "@/shared/components/TextInput/TextInput";
 
 import { createCollection, updateCollection } from "../../api/admin-scholars.api";
 
+/** Provides authenticated native administration workflows and their data boundaries. */
 type CollectionSheetProps = {
   isOpen: boolean;
   scholarId: string;
+  /** Carries the canonical scholar identity used to scope content and admin requests. */
   scholarSlug: string;
   collection?: AdminListingDetailDto;
   onClose: () => void;
@@ -24,8 +26,10 @@ type CollectionSheetProps = {
 type FormState = {
   title: string;
   description: string;
+  /** Stores the selected content locale used for validation, display, and persistence. */
   language: string;
   isSaving: boolean;
+  /** Stores the user-facing or diagnostic failure associated with the current operation. */
   error: string | null;
 };
 
@@ -92,6 +96,7 @@ function CollectionSheetForm({
   onClose,
   dispatch,
 }: {
+  /** Holds the current state-machine value that controls the surrounding workflow. */
   state: FormState;
   collection: AdminListingDetailDto | undefined;
   canSave: boolean;
@@ -152,6 +157,7 @@ function CollectionSheetForm({
   );
 }
 
+/** Renders the native collection sheet surface and coordinates its user-facing state. */
 export function CollectionSheet({
   isOpen,
   scholarId,

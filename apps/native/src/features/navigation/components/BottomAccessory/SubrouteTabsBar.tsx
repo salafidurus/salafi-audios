@@ -15,6 +15,8 @@ import {
   isSection,
 } from "@/features/navigation/utils/tab-route-config";
 
+/** Renders the native subroute tabs bar surface and coordinates its user-facing state. */
+/** Renders the native subroute tabs bar surface and coordinates its user-facing state. */
 export function SubrouteTabsBar() {
   const pathname = usePathname();
   const router = useRouter();

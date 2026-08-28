@@ -27,6 +27,7 @@ import { useUnistyles } from "react-native-unistyles";
 
 import { getButtonTokens, type ButtonSize, type ButtonVariant } from "./button.tokens";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
 type TextFontWeight =
   | "normal"
   | "bold"
@@ -42,6 +43,7 @@ type TextFontWeight =
 
 const FULL_WIDTH: DimensionValue = "100%";
 
+/** Describes the inputs, callbacks, and optional state accepted by Button. */
 export type ButtonProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;

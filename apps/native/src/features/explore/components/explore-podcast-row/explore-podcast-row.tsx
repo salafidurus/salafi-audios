@@ -22,6 +22,8 @@ import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
+/** Describes the inputs and callbacks accepted by Explore Podcast Row. */
+/** Describes the inputs, callbacks, and optional state accepted by Explore Podcast Row. */
 export type ExplorePodcastRowProps = {
   item: FeedContentItemDto;
   onPress?: () => void;
@@ -143,6 +145,7 @@ function getPublishedDateText(publishedAt?: string | null) {
   return publishedAt ? new Date(publishedAt).toLocaleDateString() : "";
 }
 
+/** Renders the native explore podcast row surface and coordinates its user-facing state. */
 export function ExplorePodcastRow({
   item,
   onPress,

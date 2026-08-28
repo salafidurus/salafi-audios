@@ -2,6 +2,8 @@ import { Stack } from "expo-router";
 
 import { PlaceholderRouteScreen } from "../shared/components/placeholder-route-screen";
 
+/** Defines the Expo Router entrypoint for the native +not-found route and delegates behavior to the feature layer. */
+/** Renders the native not found screen surface and coordinates its user-facing state. */
 export default function NotFoundScreen() {
   return (
     <>

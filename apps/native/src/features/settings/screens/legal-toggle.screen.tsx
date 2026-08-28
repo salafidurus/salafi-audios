@@ -3,6 +3,7 @@ import { ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 // Terms of Use content
+/** Provides native account, preference, support, and settings workflows. */
 const TERMS_SECTIONS = [
   {
     heading: "Acceptance of Terms",
@@ -48,6 +49,7 @@ const PRIVACY_SECTIONS = [
 
 type LegalTab = "terms" | "privacy";
 
+/** Renders the native legal toggle screen surface and coordinates its user-facing state. */
 export function LegalToggleScreen() {
   const [activeTab, setActiveTab] = useState<LegalTab>("terms");
   const styles = StyleSheet.create((theme) => ({

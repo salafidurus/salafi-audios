@@ -20,6 +20,7 @@ import { AppState, type AppStateStatus } from "react-native";
 
 import { createSqliteKvAdapter } from "../sync/sqlite-kv-adapter";
 
+/** Coordinates native playback progress and persistence around the audio engine. */
 const STORAGE_KEY_PREFIX = "sd:progress-cache:v1:";
 const DEFAULT_PERSIST_THROTTLE_MS = 5000;
 

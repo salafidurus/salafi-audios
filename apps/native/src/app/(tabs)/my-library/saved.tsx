@@ -7,6 +7,8 @@ import { MyLibrarySavedScreen } from "@/features/my-library/screens/my-library-s
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
+/** Defines the Expo Router entrypoint for the native (tabs)/my-library/saved route and delegates behavior to the feature layer. */
+/** Defines the native my library saved contract used by this module. */
 export default function MyLibrarySaved() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();

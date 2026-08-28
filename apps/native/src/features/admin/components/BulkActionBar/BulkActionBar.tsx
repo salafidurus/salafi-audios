@@ -1,6 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+/** Provides authenticated native administration workflows and their data boundaries. */
 type BulkActionBarProps = {
   selectedCount: number;
   onPublish: () => void;
@@ -10,6 +11,7 @@ type BulkActionBarProps = {
   isLoading?: boolean;
 };
 
+/** Renders the native bulk action bar surface and coordinates its user-facing state. */
 export function BulkActionBar({
   selectedCount,
   onPublish,

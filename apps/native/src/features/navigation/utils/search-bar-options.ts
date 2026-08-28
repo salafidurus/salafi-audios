@@ -1,5 +1,7 @@
 import type { AppThemeNative } from "@/core/styles/theme";
 
+/** Defines native tab, subroute, and accessory navigation behavior. */
+/** Returns the the themed search bar options used by native consumers. */
 export function getThemedSearchBarOptions(theme: AppThemeNative) {
   return {
     textColor: theme.colors.content.default,

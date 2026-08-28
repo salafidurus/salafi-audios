@@ -5,6 +5,8 @@ import { authClient } from "@/core/auth/auth-client";
 import { queryClient } from "@/core/query-client";
 import { SettingsProfileScreen } from "@/features/settings/screens/settings-profile.screen";
 
+/** Defines the Expo Router entrypoint for the native (tabs)/settings/profile route and delegates behavior to the feature layer. */
+/** Renders the native settings profile route surface and coordinates its user-facing state. */
 export default function SettingsProfileRoute() {
   const router = useRouter();
 

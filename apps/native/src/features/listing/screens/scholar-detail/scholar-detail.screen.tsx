@@ -11,7 +11,10 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
+/** Describes the inputs and callbacks accepted by Scholar Detail Screen. */
+/** Describes the inputs, callbacks, and optional state accepted by Scholar Detail Screen. */
 export type ScholarDetailScreenProps = {
+  /** Carries the canonical route identity used to load the selected content. */
   slug: string;
 };
 
@@ -84,6 +87,7 @@ function TopicSections({
   );
 }
 
+/** Renders the native scholar detail screen surface and coordinates its user-facing state. */
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { data: scholar, isFetching: isScholarFetching } = useScholarDetail(slug);
   const { data: content, isFetching: isContentFetching } = useScholarContent(slug);

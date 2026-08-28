@@ -9,6 +9,8 @@ import { createShadowsNative, type ShadowsNativeTheme } from "./shadows";
 import { spacingNative, type SpacingNative } from "./spacing";
 import { typographyNative, type TypographyNative } from "./typography";
 
+/** Configures native themes, breakpoints, and the Unistyles runtime. */
+/** Describes the complete native theme assembled from colors, recipes, metrics, and direction. */
 export type AppThemeNative = {
   colors: AppColors;
   recipes: AccentRecipesNative;
@@ -20,6 +22,7 @@ export type AppThemeNative = {
   direction: "ltr" | "rtl";
 };
 
+/** Builds the native theme theme values from the active platform mode. */
 export const createThemeNative = (mode: "light" | "dark"): AppThemeNative => {
   const colors = createColors(mode);
 
@@ -35,5 +38,7 @@ export const createThemeNative = (mode: "light" | "dark"): AppThemeNative => {
   };
 };
 
+/** Provides the light native theme used by the Unistyles light mode. */
 export const lightNativeTheme = createThemeNative("light");
+/** Provides the dark native theme used by the Unistyles dark mode. */
 export const darkNativeTheme = createThemeNative("dark");

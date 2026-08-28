@@ -15,6 +15,8 @@ import { SearchResultsList } from "@/features/search/components/SearchResultsLis
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
+/** Defines the Expo Router entrypoint for the native (tabs)/(explore) route and delegates behavior to the feature layer. */
+/** Defines the native error boundary contract used by this module. */
 export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
   return (
     <View style={styles.errorBoundary}>
@@ -26,6 +28,7 @@ export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
   );
 }
 
+/** Renders the native explore index route surface and coordinates its user-facing state. */
 export default function ExploreIndexRoute() {
   const router = useRouter();
   const navigation = useNavigation();

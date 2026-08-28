@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+/** Provides the native text input component and its Expo UI style adaptation. */
+/** Describes the inputs, callbacks, and optional state accepted by Text Input. */
 export type TextInputProps = {
   value?: string;
   onChangeText?: (text: string) => void;
@@ -91,7 +93,7 @@ function mapUniversalTextAlign(
 }
 
 /**
- * @expo/ui's TextInput only accepts a constrained style subset (box paint via
+ * The Expo UI TextInput only accepts a constrained style subset (box paint via
  * `style`, text paint via `textStyle`) — neither covers layout props like
  * `margin*`/`minWidth`/`flex`. Anything outside both buckets is routed to the
  * `Host` wrapper instead, which is a full RN View and supports them natively.
@@ -133,6 +135,7 @@ function splitStyle(style: StyleProp<ViewStyle & TextStyle>): SplitTextInputStyl
   return { boxStyle, textStyle };
 }
 
+/** Renders the native text input surface and coordinates its user-facing state. */
 export function TextInput({
   value = "",
   onChangeText,

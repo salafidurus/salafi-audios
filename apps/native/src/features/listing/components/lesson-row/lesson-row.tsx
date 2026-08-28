@@ -12,6 +12,7 @@ import { DownloadButton } from "@/features/downloads/components/download-button/
 import { DownloadProgress } from "@/features/downloads/components/download-progress/download-progress";
 import { AppText } from "@/shared/components/AppText/AppText";
 
+/** Builds native lecture and scholar content surfaces from canonical identities. */
 function formatDuration(seconds?: number): string {
   if (!seconds) return "";
   const h = Math.floor(seconds / 3600);
@@ -56,6 +57,7 @@ function LessonRowContent({
   isCompleted,
 }: {
   item: ListingContentItemDto;
+  /** Stores the media duration used by playback and progress presentation. */
   duration: string;
   progressPercent: number;
   isCompleted: boolean;
@@ -94,6 +96,7 @@ function LessonRowPlayButton({
   );
 }
 
+/** Describes the inputs and callbacks accepted by Lesson Row. */
 export type LessonRowProps = {
   item: ListingContentItemDto;
   queue: Track[];
@@ -103,6 +106,7 @@ export type LessonRowProps = {
   onLayout?: (id: string, y: number) => void;
 };
 
+/** Renders the native lesson row surface and coordinates its user-facing state. */
 export function LessonRow({ item, queue, highlighted = false, onLayout }: LessonRowProps) {
   const { theme } = useUnistyles();
   const { isPlaying, currentTrack } = useAudio();

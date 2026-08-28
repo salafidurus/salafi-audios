@@ -1,6 +1,8 @@
 import { Host } from "@expo/ui";
 import { Alert, Button, Text } from "@expo/ui/swift-ui";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Describes the inputs, callbacks, and optional state accepted by Confirm Dialog. */
 export type ConfirmDialogProps = {
   visible: boolean;
   onDismiss: () => void;
@@ -12,6 +14,7 @@ export type ConfirmDialogProps = {
   destructive?: boolean;
 };
 
+/** Presents the native iOS confirmation dialog and dispatches the selected action. */
 export function ConfirmDialog({
   visible,
   onDismiss,

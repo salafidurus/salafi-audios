@@ -8,6 +8,7 @@ import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 
+/** Provides authenticated native administration workflows and their data boundaries. */
 type AdminDashboardScreenProps = {
   onNavigateToListings?: () => void;
   onNavigateToScholars?: () => void;
@@ -24,6 +25,7 @@ type AdminCard = {
   subject: AppSubjectType;
 };
 
+/** Renders the native admin dashboard screen surface and coordinates its user-facing state. */
 export function AdminDashboardScreen({
   onNavigateToListings,
   onNavigateToScholars,

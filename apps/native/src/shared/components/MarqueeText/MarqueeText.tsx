@@ -15,6 +15,8 @@ import Animated, {
 
 import { AppText, type AppTextProps } from "@/shared/components/AppText/AppText";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Describes the inputs, callbacks, and optional state accepted by Marquee Text. */
 export type MarqueeTextProps = {
   text: string;
   variant?: AppTextProps["variant"];
@@ -23,6 +25,7 @@ export type MarqueeTextProps = {
   delayMs?: number;
 };
 
+/** Defines the native marquee text contract used by this module. */
 export function MarqueeText({
   text,
   variant = "bodyMd",

@@ -3,11 +3,13 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { ScreenView } from "../ScreenView/ScreenView";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
 type ScreenInProgressProps = {
   title?: string;
   description?: string;
 };
 
+/** Defines the native screen in progress contract used by this module. */
 export function ScreenInProgress({
   title = "Coming Soon",
   description = "This feature is under development",

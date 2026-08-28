@@ -2,6 +2,8 @@ import { Host } from "@expo/ui";
 import { AlertDialog, TextButton, Text } from "@expo/ui/jetpack-compose";
 import { useUnistyles } from "react-native-unistyles";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Describes the inputs, callbacks, and optional state accepted by Confirm Dialog. */
 export type ConfirmDialogProps = {
   visible: boolean;
   onDismiss: () => void;
@@ -13,6 +15,7 @@ export type ConfirmDialogProps = {
   destructive?: boolean;
 };
 
+/** Renders the native confirm dialog surface and coordinates its user-facing state. */
 export function ConfirmDialog({
   visible,
   onDismiss,

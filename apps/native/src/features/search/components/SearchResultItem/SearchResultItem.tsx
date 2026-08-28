@@ -5,15 +5,19 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { MarqueeText } from "@/shared/components/MarqueeText";
 
+/** Implements native search input, filtering, results, and empty states. */
+/** Describes the inputs, callbacks, and optional state accepted by Search Result Item. */
 export type SearchResultItemProps = {
   title: string;
   scholarName: string;
   imageUrl?: string;
   lectureCount: number;
+  /** Stores the media duration used by playback and progress presentation. */
   durationSeconds?: number;
   onPress?: () => void;
 };
 
+/** Defines the native search result item contract used by this module. */
 export function SearchResultItem({
   title,
   scholarName,

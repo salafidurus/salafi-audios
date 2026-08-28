@@ -1,24 +1,32 @@
 import * as SQLite from "expo-sqlite";
 
+/** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
 const DB_NAME = "sd-downloads.db";
 const TABLE_NAME = "downloads";
 
+/** Enumerates the lifecycle values used by the native download workflow. */
 export type DownloadStatus = "pending" | "downloading" | "paused" | "complete" | "error";
 
+/** Defines the native download row contract shared by its consumers. */
 export type DownloadRow = {
+  /** Carries the canonical lecture identity used to reconcile local and remote state. */
   listingSlug: string;
   url: string;
   localUri: string | null;
+  /** Records the lifecycle state used to decide which transition or UI state is valid. */
   status: DownloadStatus;
   bytesTotal: number;
   bytesDownloaded: number;
   /** Serialized `DownloadPauseState`, present only while paused. */
   pauseState: string | null;
+  /** Records when the local record was created, preserving ordering and reconciliation metadata. */
   createdAt: number;
+  /** Records the last local update used when reconciling persisted state. */
   updatedAt: number;
 };
 
 type DownloadUpdate = Partial<Omit<DownloadRow, "listingSlug" | "createdAt" | "updatedAt">> & {
+  /** Carries the canonical lecture identity used to reconcile local and remote state. */
   listingSlug: string;
 };
 
@@ -108,6 +116,7 @@ export async function upsertDownload(row: DownloadUpdate): Promise<void> {
   );
 }
 
+/** Loads one persisted download row by its canonical lecture identity. */
 export async function getDownload(listingSlug: string): Promise<DownloadRow | null> {
   const db = await getDb();
   const row = await db.getFirstAsync<DownloadRow>(
@@ -117,11 +126,13 @@ export async function getDownload(listingSlug: string): Promise<DownloadRow | nu
   return row ?? null;
 }
 
+/** Returns every persisted download row for offline-library reconciliation. */
 export async function getAllDownloads(): Promise<DownloadRow[]> {
   const db = await getDb();
   return db.getAllAsync<DownloadRow>(`SELECT * FROM ${TABLE_NAME}`);
 }
 
+/** Deletes the persisted download row for a canonical lecture identity. */
 export async function removeDownload(listingSlug: string): Promise<void> {
   const db = await getDb();
   await db.runAsync(`DELETE FROM ${TABLE_NAME} WHERE listingSlug = ?`, listingSlug);

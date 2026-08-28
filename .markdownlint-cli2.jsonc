@@ -12,6 +12,7 @@
     "**/.opencode/**",
     "**/.claude/**",
     "**/.agents/**",
+    "**/.serena/**",
     "**/SKILL.md",
     "**/CLAUDE.md",
   ],

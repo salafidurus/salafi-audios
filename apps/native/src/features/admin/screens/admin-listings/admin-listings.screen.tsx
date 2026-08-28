@@ -22,6 +22,7 @@ import { ListingEditSheet } from "../../components/ListingEditSheet/ListingEditS
 import { useAdminListings } from "../../hooks/use-admin-listings";
 import { filterListings } from "./filter-listings";
 
+/** Provides authenticated native administration workflows and their data boundaries. */
 type AdminListingRowProps = {
   item: AdminListingListItemDto;
   isSelected: boolean;
@@ -73,6 +74,7 @@ function AdminListingRow({
   );
 }
 
+/** Renders the native admin listings screen surface and coordinates its user-facing state. */
 export function AdminListingsScreen() {
   const { theme } = useUnistyles();
   const { isAuthenticated } = useAuth();

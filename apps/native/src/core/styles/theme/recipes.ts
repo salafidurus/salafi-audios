@@ -1,7 +1,10 @@
 import type { AppColors, AccentRecipesShared } from "@sd/design-tokens";
 
+/** Configures native themes, breakpoints, and the Unistyles runtime. */
+/** Describes the native accent surfaces and focus treatments derived from app colors. */
 export type AccentRecipesNative = AccentRecipesShared;
 
+/** Builds the native accent theme values from the active platform mode. */
 export const createAccentRecipesNative = (
   colors: AppColors,
   focusRingColor: string,

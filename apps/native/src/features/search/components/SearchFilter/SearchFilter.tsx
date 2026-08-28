@@ -4,6 +4,8 @@ import { useMemo } from "react";
 import { Pressable, ScrollView, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+/** Implements native search input, filtering, results, and empty states. */
+/** Defines the native search filter value contract shared by its consumers. */
 export type SearchFilterValue = TopicSlug[];
 
 type FilterOption = {
@@ -11,12 +13,14 @@ type FilterOption = {
   label: string;
 };
 
+/** Describes the inputs, callbacks, and optional state accepted by Search Filter. */
 export type SearchFilterProps = {
   value: SearchFilterValue;
   onChange: (value: SearchFilterValue) => void;
   topics: TopicDetailDto[];
 };
 
+/** Defines the native search filter contract used by this module. */
 export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
   const options = useMemo<FilterOption[]>(() => {
     const sortedTopics = [...topics].sort((a, b) => a.name.ar.localeCompare(b.name.ar));

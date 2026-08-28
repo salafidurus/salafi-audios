@@ -7,6 +7,8 @@ import { useNativeAppleSignIn } from "@/features/auth/hooks/use-native-apple-sig
 import { useNativeGoogleSignIn } from "@/features/auth/hooks/use-native-google-sign-in";
 import { SignInScreen } from "@/features/auth/screens/sign-in/sign-in.screen";
 
+/** Defines the Expo Router entrypoint for the native (auth)/sign-in route and delegates behavior to the feature layer. */
+/** Renders the native sign in route surface and coordinates its user-facing state. */
 export default function SignInRoute() {
   const router = useRouter();
   const { from } = useLocalSearchParams<{ from?: string }>();

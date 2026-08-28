@@ -12,6 +12,8 @@ import { LanguageSwitch } from "../components/language-switch/language-switch";
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 
+/** Provides native account, preference, support, and settings workflows. */
+/** Describes the inputs, callbacks, and optional state accepted by Account Screen. */
 export type AccountScreenProps = {
   onNavigateToProfile?: () => void;
   onNavigateToLegal?: () => void;
@@ -20,6 +22,7 @@ export type AccountScreenProps = {
   onSignOut?: () => void;
 };
 
+/** Renders the native account screen surface and coordinates its user-facing state. */
 export function AccountScreen({
   onNavigateToProfile,
   onNavigateToLegal,

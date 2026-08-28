@@ -7,6 +7,8 @@ import { RouteAccessGuard, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { BottomAccessoryInnerContent } from "@/features/navigation";
 
+/** Defines the Expo Router entrypoint for the native (tabs) route and delegates behavior to the feature layer. */
+/** Renders the native tabs layout surface and coordinates its user-facing state. */
 export default function TabsLayout() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();

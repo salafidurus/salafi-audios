@@ -6,10 +6,12 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { audioService } from "../audio-service";
 
+/** Adapts the platform audio engine to the native playback contract and lifecycle. */
 function handlePrevious() {
   audioService.skipToPrevious();
 }
 
+/** Defines the native playback controls contract used by this module. */
 export function PlaybackControls() {
   const { isPlaying, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
   const { hasNext } = useQueue();

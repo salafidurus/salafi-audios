@@ -8,6 +8,8 @@ import { StyleSheet } from "react-native-unistyles";
 import { audioService } from "@/features/audio";
 import { AppText } from "@/shared/components/AppText/AppText";
 
+/** Describes the inputs and callbacks accepted by Series Context Bar. */
+/** Describes the inputs, callbacks, and optional state accepted by Series Context Bar. */
 export type SeriesContextBarProps = {
   seriesContext: SeriesContextDto;
   /** The lesson this bar is shown for — Previous/Next only act when it's the one currently playing. */
@@ -32,6 +34,7 @@ function getNextTrack(
   return isActiveQueue && hasNext ? (queue[currentIndex + 1] ?? null) : null;
 }
 
+/** Renders the native series context bar surface and coordinates its user-facing state. */
 export function SeriesContextBar({ seriesContext, listingSlug }: SeriesContextBarProps) {
   const { queue, currentIndex, currentTrack, hasNext, hasPrevious } = useQueue();
 

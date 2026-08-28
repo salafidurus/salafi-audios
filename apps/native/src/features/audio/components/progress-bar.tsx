@@ -7,6 +7,8 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { audioService } from "../audio-service";
 
+/** Adapts the platform audio engine to the native playback contract and lifecycle. */
+/** Renders the native progress bar surface and coordinates its user-facing state. */
 export function ProgressBar() {
   const { durationSeconds, progressPercent } = useAudio();
   const progressBarRef = useRef<View>(null);

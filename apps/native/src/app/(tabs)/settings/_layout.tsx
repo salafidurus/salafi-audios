@@ -4,6 +4,8 @@ import { useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { getTabStackScreenOptions } from "@/features/navigation/utils/stack-header-options";
 
+/** Defines the Expo Router entrypoint for the native (tabs)/settings route and delegates behavior to the feature layer. */
+/** Renders the native settings layout surface and coordinates its user-facing state. */
 export default function SettingsLayout() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();

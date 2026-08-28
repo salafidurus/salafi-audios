@@ -14,12 +14,15 @@ import {
 
 import type { Section } from "../types";
 
+/** Defines native tab, subroute, and accessory navigation behavior. */
+/** Defines the native native navigation icon contract shared by its consumers. */
 export type NativeNavigationIcon = ComponentType<{
   color?: string;
   size?: number;
   strokeWidth?: number;
 }>;
 
+/** Defines the native section tab icon key contract shared by its consumers. */
 export type SectionTabIconKey =
   | "explore-recent"
   | "explore-scholar"
@@ -47,6 +50,7 @@ function isSectionTabIconKey(value: string): value is SectionTabIconKey {
   return Object.hasOwn(SECTION_TAB_ICONS, value);
 }
 
+/** Returns the the section tab icon used by native consumers. */
 export function getSectionTabIcon(section: Section, tabId: string): NativeNavigationIcon | null {
   const key = `${section}-${tabId}`;
   if (!isSectionTabIconKey(key)) {

@@ -10,6 +10,7 @@ import {
 
 /** Settings toggle that switches catalogue content (lectures, series,
  * collections) between the selected language and its original language. */
+/** Renders the native content language toggle surface and coordinates its user-facing state. */
 export function ContentLanguageToggle() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();

@@ -18,7 +18,9 @@ import { CollectionSheet } from "../../components/CollectionSheet/CollectionShee
 import { SeriesSheet } from "../../components/SeriesSheet/SeriesSheet";
 import { useAdminSeries, useAdminCollections } from "../../hooks/use-admin-scholars";
 
+/** Provides authenticated native administration workflows and their data boundaries. */
 type AdminScholarDetailScreenProps = {
+  /** Carries the canonical scholar identity used to scope content and admin requests. */
   scholarSlug: string;
 };
 
@@ -137,6 +139,7 @@ function SectionHeader({
 type ScholarDetailContentProps = {
   scholar: ScholarDetailDto;
   scholarId: string;
+  /** Carries the canonical scholar identity used to scope content and admin requests. */
   scholarSlug: string;
   canAdd: boolean;
   seriesExpanded: boolean;
@@ -256,6 +259,7 @@ function ScholarDetailContent({
   );
 }
 
+/** Renders the native admin scholar detail screen surface and coordinates its user-facing state. */
 export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScreenProps) {
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });

@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { Host, Switch } from "@expo/ui";
 import { useUnistyles } from "react-native-unistyles";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Describes the inputs, callbacks, and optional state accepted by Toggle. */
 export interface ToggleProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
@@ -10,6 +12,7 @@ export interface ToggleProps {
   "aria-label"?: string;
 }
 
+/** Renders the native toggle surface and coordinates its user-facing state. */
 export function Toggle({
   checked,
   onChange,

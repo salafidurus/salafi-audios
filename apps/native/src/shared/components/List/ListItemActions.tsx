@@ -1,5 +1,7 @@
 import type { MenuAction } from "@expo/ui/community/menu";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Describes the inputs, callbacks, and optional state accepted by List Item Actions. */
 export type ListItemActionsProps = {
   /** Actions shown in the native menu opened by long-pressing the row. */
   actions: MenuAction[];

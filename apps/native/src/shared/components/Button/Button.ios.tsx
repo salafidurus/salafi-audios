@@ -24,6 +24,8 @@ import { useUnistyles } from "react-native-unistyles";
 
 import { getButtonTokens, type ButtonSize, type ButtonVariant } from "./button.tokens";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Describes the inputs, callbacks, and optional state accepted by Button. */
 export type ButtonProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -90,6 +92,7 @@ function resolveDisabled(disabled: boolean | undefined, loading: boolean) {
   return disabled || loading;
 }
 
+/** Renders the native button surface and coordinates its user-facing state. */
 export function Button({
   variant = "surface",
   size = "md",

@@ -7,10 +7,13 @@ import { StyleSheet } from "react-native-unistyles";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
+/** Describes the inputs and callbacks accepted by Scholar Header. */
+/** Describes the inputs, callbacks, and optional state accepted by Scholar Header. */
 export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {
     lectureCount: number;
     seriesCount: number;
+    /** Renders the native total duration seconds surface and coordinates its user-facing state. */
     totalDurationSeconds: number;
   };
 };
@@ -60,6 +63,7 @@ function renderSocialLinks(scholar: ScholarHeaderProps["scholar"]) {
   );
 }
 
+/** Renders the native scholar header surface and coordinates its user-facing state. */
 export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   const formatScholarName = useFormatScholarName();
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);

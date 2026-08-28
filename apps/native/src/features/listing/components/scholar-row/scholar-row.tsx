@@ -9,12 +9,15 @@ import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
+/** Builds native lecture and scholar content surfaces from canonical identities. */
+/** Describes the inputs, callbacks, and optional state accepted by Scholar Row. */
 export type ScholarRowProps = {
   scholar: ScholarListItemDto;
   onPress?: (slug: string) => void;
   hideBorder?: boolean;
 };
 
+/** Renders the native scholar row surface and coordinates its user-facing state. */
 export function ScholarRow({ scholar, onPress, hideBorder }: ScholarRowProps) {
   const formatScholarName = useFormatScholarName();
 

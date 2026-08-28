@@ -10,6 +10,8 @@ import { AppText } from "@/shared/components/AppText/AppText";
 
 import { LessonRow } from "../lesson-row/lesson-row";
 
+/** Describes the inputs and callbacks accepted by Listing Content View. */
+/** Describes the inputs, callbacks, and optional state accepted by Listing Content View. */
 export type ListingContentViewProps = {
   contents: ListingContentsDto;
   listingRef: QueueListingRef;

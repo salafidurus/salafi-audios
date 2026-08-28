@@ -1,5 +1,6 @@
 import { typographyBase, getWeightKey, type TypographyVariant } from "@sd/design-tokens";
 
+/** Configures native themes, breakpoints, and the Unistyles runtime. */
 type Locale = "en" | "ar";
 
 const fontFamilies = {
@@ -70,6 +71,7 @@ function createVariantConfig(locale: Locale, variant: TypographyVariant): Typogr
   };
 }
 
+/** Builds the native typography theme values from the active platform mode. */
 export const createTypography = (
   locale: Locale = "en",
 ): Record<TypographyVariant, TypographyVariantConfig> => {
@@ -88,6 +90,8 @@ export const createTypography = (
   );
 };
 
+/** Defines the native typography token set consumed by themed components. */
 export const typographyNative = createTypography("en");
 
+/** Defines shared native typography tokens consumed by the application theme. */
 export type TypographyNative = typeof typographyNative;

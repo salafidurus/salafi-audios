@@ -6,10 +6,13 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 
+/** Describes the inputs and callbacks accepted by Subroute Icon Button. */
+/** Describes the inputs, callbacks, and optional state accepted by Subroute Icon Button. */
 export type SubrouteIconButtonProps = {
   onPress: () => void;
 };
 
+/** Renders the native subroute icon button surface and coordinates its user-facing state. */
 export function SubrouteIconButton({ onPress }: SubrouteIconButtonProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();

@@ -2,11 +2,16 @@ import type { TextStyle } from "react-native";
 
 import { useUnistyles } from "react-native-unistyles";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Defines the native button variant contract shared by its consumers. */
 export type ButtonVariant = "primary" | "surface" | "outline" | "ghost" | "danger";
+/** Defines the native button size contract shared by its consumers. */
 export type ButtonSize = "sm" | "md" | "lg";
 
+/** Defines the native theme contract shared by its consumers. */
 export type Theme = ReturnType<typeof useUnistyles>["theme"];
 
+/** Defines the native button tokens contract shared by its consumers. */
 export type ButtonTokens = {
   backgroundColor: string;
   borderColor?: string;
@@ -25,6 +30,7 @@ export type ButtonTokens = {
  * (SwiftUI/Material) inflates the button well past its intended size. */
 const HEIGHT_BY_SIZE = { sm: 32, md: 40, lg: 48 } satisfies Record<ButtonSize, number>;
 
+/** Returns the the button tokens used by native consumers. */
 export function getButtonTokens(variant: ButtonVariant, size: ButtonSize, t: Theme): ButtonTokens {
   const variantColors = getVariantColors(variant, t);
   const labelStyle = getLabelStyle(size, t);

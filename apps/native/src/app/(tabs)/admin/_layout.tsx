@@ -7,6 +7,8 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { getTabStackScreenOptions } from "@/features/navigation/utils/stack-header-options";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 
+/** Defines the Expo Router entrypoint for the native (tabs)/admin route and delegates behavior to the feature layer. */
+/** Renders the native admin layout surface and coordinates its user-facing state. */
 export default function AdminLayout() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();

@@ -29,7 +29,10 @@ import { Button } from "@/shared/components/Button/Button";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
+/** Builds native lecture and scholar content surfaces from canonical identities. */
+/** Describes the inputs, callbacks, and optional state accepted by Lecture Detail Screen. */
 export type LectureDetailScreenProps = {
+  /** Carries the canonical route identity used to load the selected content. */
   slug: string;
 };
 
@@ -315,9 +318,15 @@ function LoadedLectureBody({ view }: { view: LoadedLectureView }) {
   return isContainer ? <ContainerLectureBody view={view} /> : <SingleLectureBody view={view} />;
 }
 
+/** Renders the native lecture detail screen surface and coordinates its user-facing state. */
 export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { theme } = useUnistyles();
-  const { anchor } = useLocalSearchParams<{ slug: string; anchor?: string }>();
+  /** Carries the canonical route identity used to load the selected content. */
+  const { anchor } = useLocalSearchParams<{
+    /** Carries the canonical route identity used to load the selected content. */
+    slug: string;
+    anchor?: string;
+  }>();
   const { data: lecture, isFetching } = useListingDetail(slug);
   const { data: seriesContents } = useListingContents(getSeriesContentsSlug(lecture));
   const { data: ownContents } = useListingContents(getOwnContentsSlug(lecture));

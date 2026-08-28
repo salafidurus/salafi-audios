@@ -7,7 +7,9 @@ import {
   type DownloadRow,
 } from "@/features/downloads/registry/downloads.registry";
 
+/** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
 type UpsertInput = Partial<Omit<DownloadRow, "listingSlug" | "createdAt" | "updatedAt">> & {
+  /** Carries the canonical lecture identity used to reconcile local and remote state. */
   listingSlug: string;
 };
 

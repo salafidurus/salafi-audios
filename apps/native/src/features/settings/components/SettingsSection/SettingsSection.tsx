@@ -5,12 +5,15 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
 
+/** Provides native account, preference, support, and settings workflows. */
+/** Describes the inputs, callbacks, and optional state accepted by Settings Section. */
 export interface SettingsSectionProps {
   title: string;
   description?: string;
   children: ReactNode;
 }
 
+/** Renders the native settings section surface and coordinates its user-facing state. */
 export function SettingsSection({ title, description, children }: SettingsSectionProps) {
   return (
     <View style={styles.section}>

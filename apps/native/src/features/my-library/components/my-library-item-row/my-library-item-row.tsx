@@ -13,6 +13,8 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 
+/** Describes the inputs and callbacks accepted by My Library Item Row. */
+/** Describes the inputs, callbacks, and optional state accepted by My Library Item Row. */
 export type MyLibraryItemRowProps = {
   item: MyLibraryItemDto;
   variant: "progress" | "saved" | "completed";
@@ -105,6 +107,7 @@ function renderActions(
   return <List.Item.Actions actions={actions} onAction={onAction} />;
 }
 
+/** Renders the native my library item row surface and coordinates its user-facing state. */
 export function MyLibraryItemRow({
   item,
   variant,

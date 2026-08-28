@@ -3,11 +3,14 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useDownload } from "@/features/downloads/hooks/use-download";
 
+/** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
 type DownloadButtonProps = {
+  /** Carries the canonical lecture identity used to reconcile local and remote state. */
   listingSlug: string;
   audioUrl: string;
 };
 
+/** Renders the native download button surface and coordinates its user-facing state. */
 export function DownloadButton({ listingSlug, audioUrl }: DownloadButtonProps) {
   const { status, isDownloaded, isDownloading, startDownload, removeDownload } = useDownload(
     listingSlug,

@@ -6,6 +6,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
 type UserAvatarProps = {
   image?: string | null;
   name?: string | null;
@@ -81,6 +82,7 @@ function renderAvatar(
     : renderFallback(name, size, fill, borderRadius, theme, testID);
 }
 
+/** Renders the native user avatar surface and coordinates its user-facing state. */
 export function UserAvatar({
   image,
   name,

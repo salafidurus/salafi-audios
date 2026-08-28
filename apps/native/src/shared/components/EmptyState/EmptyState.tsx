@@ -3,8 +3,11 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
 
+/** Renders the native empty state variant surface and coordinates its user-facing state. */
+/** Defines the native empty state variant contract shared by its consumers. */
 export type EmptyStateVariant = "empty" | "loading" | "error";
 
+/** Describes the inputs and callbacks accepted by Empty State. */
 export type EmptyStateProps = {
   message: string;
   variant?: EmptyStateVariant;
@@ -12,6 +15,7 @@ export type EmptyStateProps = {
   retryLabel?: string;
 };
 
+/** Enumerates the lifecycle values used by the native empty workflow. */
 export function EmptyState({
   message,
   variant = "empty",
