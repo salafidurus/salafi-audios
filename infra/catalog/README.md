@@ -2,8 +2,9 @@
 
 Manages Bun's workspace `catalog:` protocol for this monorepo. Synchronizes dependency versions between workspace `package.json` files and root-level catalog entries.
 
-The ownership boundary between catalog tooling, Dependabot, and `pkg-update` is
-defined in the [dependency automation policy](../../docs/policies/dependency-automation.md).
+Catalog alignment is a supporting repair capability, not an update owner. The
+ownership boundary between Dependabot and Dependabot Helper is defined in the
+[dependency automation policy](../../docs/policies/dependency-automation.md).
 
 ## Usage
 
