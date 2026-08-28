@@ -30,6 +30,54 @@ type ConfirmationDialogProps = {
   modalTestId?: string;
 };
 
+function ConfirmationDialogFooter({
+  cancelLabel,
+  confirmLabel,
+  variant,
+  isLoading,
+  confirmDisabled,
+  cancelTestId,
+  testId,
+  onCancel,
+  onConfirm,
+  t,
+}: {
+  cancelLabel?: string;
+  confirmLabel: string;
+  variant: "default" | "destructive";
+  isLoading: boolean;
+  confirmDisabled: boolean;
+  cancelTestId?: string;
+  testId?: string;
+  onCancel: () => void;
+  onConfirm: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <DialogFooter>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={onCancel}
+        disabled={isLoading}
+        data-testid={cancelTestId}
+      >
+        {cancelLabel ?? t("common.cancel", "Cancel")}
+      </Button>
+      <Button
+        type="button"
+        variant={variant === "destructive" ? "danger" : "primary"}
+        onClick={onConfirm}
+        loading={isLoading}
+        disabled={isLoading || confirmDisabled}
+        data-testid={testId}
+      >
+        {confirmLabel}
+      </Button>
+    </DialogFooter>
+  );
+}
+
 export function ConfirmationDialog({
   open,
   onOpenChange,
@@ -81,27 +129,18 @@ export function ConfirmationDialog({
             {error}
           </p>
         )}
-        <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isLoading}
-            data-testid={cancelTestId}
-          >
-            {cancelLabel ?? t("common.cancel", "Cancel")}
-          </Button>
-          <Button
-            type="button"
-            variant={variant === "destructive" ? "danger" : "primary"}
-            onClick={confirm}
-            loading={isLoading}
-            disabled={isLoading || confirmDisabled}
-            data-testid={testId}
-          >
-            {confirmLabel}
-          </Button>
-        </DialogFooter>
+        <ConfirmationDialogFooter
+          cancelLabel={cancelLabel}
+          confirmLabel={confirmLabel}
+          variant={variant}
+          isLoading={isLoading}
+          confirmDisabled={confirmDisabled}
+          cancelTestId={cancelTestId}
+          testId={testId}
+          onCancel={() => onOpenChange(false)}
+          onConfirm={confirm}
+          t={t}
+        />
       </DialogContent>
     </Dialog>
   );
