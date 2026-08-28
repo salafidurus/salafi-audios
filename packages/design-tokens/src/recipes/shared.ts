@@ -1,9 +1,12 @@
+/** Cross-platform composite recipes for gradients, surfaces, badges, and application chrome. */
+/** Shared linear-gradient geometry and colors for accent surfaces. */
 export type AccentLinearRecipe = {
   colors: [string, string];
   start: { x: number; y: number };
   end: { x: number; y: number };
 };
 
+/** Shared radial-gradient geometry and colors for accent surfaces. */
 export type AccentRadialRecipe = {
   center: { x: number; y: number };
   radius: number;
@@ -11,6 +14,7 @@ export type AccentRadialRecipe = {
   edgeColor: string;
 };
 
+/** Composite recipe for the primary call-to-action treatment. */
 export type AccentPrimaryCtaRecipe = {
   backgroundColor: string;
   borderColor: string;
@@ -22,6 +26,7 @@ export type AccentPrimaryCtaRecipe = {
   radial: AccentRadialRecipe;
 };
 
+/** Composite recipe for an accented surface and its readable content. */
 export type AccentSurfaceRecipe = {
   backgroundColor: string;
   borderColor: string;
@@ -30,12 +35,14 @@ export type AccentSurfaceRecipe = {
   radial: AccentRadialRecipe;
 };
 
+/** Layered accent colors used to wash a screen background. */
 export type ScreenWashRecipe = {
   washPrimary: string;
   washSecondary: string;
   washMixed: string;
 };
 
+/** Shared shell and input chrome colors for application framing. */
 export type ChromeRecipe = {
   surface: string;
   surfaceStrong: string;
@@ -45,17 +52,20 @@ export type ChromeRecipe = {
   inputBorderRest: string;
 };
 
+/** Selected-surface colors that pair background and foreground semantics. */
 export type AccentSelectedSurfaceRecipe = {
   backgroundColor: string;
   contentColor: string;
 };
 
+/** Surface, border, and foreground colors for a semantic badge. */
 export type AccentBadgeRecipe = {
   surfaceColor: string;
   borderColor: string;
   foregroundColor: string;
 };
 
+/** Badge recipes grouped by semantic status variant. */
 export type BadgeVariantRecipes = {
   primary: AccentBadgeRecipe;
   secondary: AccentBadgeRecipe;
@@ -63,6 +73,7 @@ export type BadgeVariantRecipes = {
   danger: AccentBadgeRecipe;
 };
 
+/** Complete cross-platform recipe contract for composed accent treatments. */
 export type AccentRecipesShared = {
   primaryCta: AccentPrimaryCtaRecipe;
   primarySubtleSurface: AccentSurfaceRecipe;

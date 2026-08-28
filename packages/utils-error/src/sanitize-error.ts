@@ -1,3 +1,4 @@
+/** Converts technical failures into consistent user-safe messages at the client boundary. */
 /**
  * Sanitize error messages to show user-friendly messages instead of technical details.
  * Prevents exposing system information, API details, or implementation specifics.

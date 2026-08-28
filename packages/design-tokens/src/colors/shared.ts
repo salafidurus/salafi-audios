@@ -48,6 +48,7 @@
  *   - Hover/active steps updated to match new ramps.
  */
 
+/** Canonical raw color ramps from which semantic application colors are composed. */
 export const sharedColors = {
   primary: {
     50: "#F0FDFB",
@@ -169,6 +170,7 @@ export const sharedColors = {
   },
 } as const;
 
+/** Semantic surfaces shared by web CSS variables and native themes. */
 export type SurfaceTokens = {
   canvas: string;
   default: string;
@@ -182,6 +184,7 @@ export type SurfaceTokens = {
   disabled: string;
 };
 
+/** Semantic foreground colors for readable content and interactive states. */
 export type ContentTokens = {
   strong: string;
   default: string;
@@ -199,6 +202,7 @@ export type ContentTokens = {
   disabled: string;
 };
 
+/** Semantic borders for separation, focus, and state communication. */
 export type BorderTokens = {
   default: string;
   subtle: string;
@@ -213,6 +217,7 @@ export type BorderTokens = {
   disabled: string;
 };
 
+/** Semantic action colors for interactive controls and their states. */
 export type ActionTokens = {
   primary: string;
   primaryHover: string;
@@ -230,6 +235,7 @@ export type ActionTokens = {
   disabledContent: string;
 };
 
+/** Semantic success and danger colors used to communicate state. */
 export type StateTokens = {
   success: string;
   successSurface: string;
@@ -241,14 +247,17 @@ export type StateTokens = {
   dangerContent: string;
 };
 
+/** Complete semantic color contract consumed by application themes. */
 export type AppColors = {
   surface: SurfaceTokens;
   content: ContentTokens;
   border: BorderTokens;
   action: ActionTokens;
+  /** State colors for success and danger feedback. */
   state: StateTokens;
 };
 
+/** Builds the semantic color palette for one supported appearance mode. */
 export const createColors = (mode: "light" | "dark"): AppColors => {
   const c = sharedColors;
   const isLight = mode === "light";
@@ -481,4 +490,5 @@ export const createColors = (mode: "light" | "dark"): AppColors => {
   };
 };
 
+/** Inferred shape of the canonical raw color ramps. */
 export type SharedColors = typeof sharedColors;

@@ -7,6 +7,8 @@
 
 import type { ScholarTitle } from "@sd/core-contracts";
 
+/** Provides statically extractable translation keys and localized fallback helpers. */
+/** Shared translation keys and semantic fallbacks for localized labels. */
 export const SUBNAV_KEYS = {
   explore: {
     recent: "navigation.subnav.explore.recent",
@@ -28,6 +30,7 @@ export const SUBNAV_KEYS = {
   },
 } as const satisfies Record<string, Record<string, string>>;
 
+/** English fallback labels retained for keys unavailable at runtime. */
 export const SUBNAV_FALLBACKS = {
   explore: {
     recent: "Recent",
@@ -49,6 +52,7 @@ export const SUBNAV_FALLBACKS = {
   },
 } as const satisfies Record<string, Record<string, string>>;
 
+/** Minimal translation function shape required by these framework-neutral helpers. */
 export type TranslateFn = (key: any, options?: any) => any;
 
 type SubnavSection = keyof typeof SUBNAV_KEYS;
@@ -78,6 +82,7 @@ export function getSubnavLabel(section: string, tabId: string, t: TranslateFn): 
   return key ? t(key, fallback) : fallback;
 }
 
+/** Maps canonical scholar titles to translation keys without changing title identity. */
 export const SCHOLAR_TITLE_KEYS = {
   allamah: "scholar.title.allamah",
   sheikh: "scholar.title.sheikh",

@@ -1,3 +1,5 @@
+/** Shared typography roles and responsive measurements for web and native consumers. */
+/** Supported numeric font weights used by the typography token map. */
 export const fontWeight = {
   regular: 400,
   medium: 500,
@@ -8,6 +10,7 @@ export const fontWeight = {
 type FontRole = "display" | "body" | "mono";
 type FontWeightKey = keyof typeof fontWeight;
 type TypographyToken = {
+  /** Semantic font role used to select the appropriate family. */
   fontRole: FontRole;
   fontSize: { web: string; mobile: number };
   lineHeight: { web: number; mobile: number };
@@ -15,6 +18,7 @@ type TypographyToken = {
   letterSpacing: { web: string; mobile: number };
 };
 
+/** Supported semantic typography variants exposed by the design system. */
 export type TypographyVariant =
   | "displayLg"
   | "displayMd"
@@ -27,6 +31,7 @@ export type TypographyVariant =
   | "caption"
   | "xs";
 
+/** Base typography measurements mapped by semantic variant. */
 export const typographyBase = {
   displayLg: {
     fontRole: "display",
@@ -100,6 +105,7 @@ export const typographyBase = {
   },
 } satisfies Record<TypographyVariant, TypographyToken>;
 
+/** Maps a numeric font weight to the nearest supported semantic weight key. */
 export const getWeightKey = (weight: number): FontWeightKey => {
   switch (weight) {
     case 400:

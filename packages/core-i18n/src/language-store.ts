@@ -1,6 +1,7 @@
 import { isSupportedLocale, resolveLocale } from "./locale-utils";
 import { DEFAULT_LOCALE, type Locale } from "./supported-locales";
 
+/** Provides locale persistence abstractions shared by web and native adapters. */
 /**
  * Minimal async storage interface that both web (localStorage adapter) and
  * native (AsyncStorage / expo-secure-store adapter) can implement.
@@ -12,6 +13,7 @@ export interface LanguageStorageAdapter {
 
 const STORAGE_KEY = "sd_locale";
 
+/** Persists and retrieves the user's supported locale selection. */
 export interface LanguageStore {
   /** Read the persisted locale, resolving to a supported Locale. */
   getLanguage(): Promise<Locale>;
