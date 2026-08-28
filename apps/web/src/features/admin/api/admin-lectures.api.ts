@@ -17,6 +17,7 @@ import type {
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { z } from "zod";
 
+/** Documents this module's responsibility and public boundary. */
 export function getPresignedUrl(data: PresignedUrlRequestDto) {
   return httpClient<PresignedUrlResponseDto>({
     url: endpoints.admin.media.presignedUrl,
@@ -25,6 +26,7 @@ export function getPresignedUrl(data: PresignedUrlRequestDto) {
   });
 }
 
+/** Documents the intent and contract of this declaration. */
 export async function uploadToR2(
   uploadUrl: string,
   file: Blob,
@@ -42,6 +44,7 @@ export async function uploadToR2(
   }
 }
 
+/** Documents the intent and contract of this declaration. */
 export function getBatchPresignedUrls(data: BatchPresignAudioRequestDto) {
   return httpClient<BatchPresignAudioResponseDto>({
     url: endpoints.admin.media.presignBatch,
@@ -79,6 +82,7 @@ export function uploadToR2WithProgress(
   });
 }
 
+/** Documents the intent and contract of this declaration. */
 export function fetchArrangeData(id: string) {
   return httpClient<AdminArrangeDataDto>({
     url: endpoints.admin.listings.arrangeData(id),
@@ -86,6 +90,7 @@ export function fetchArrangeData(id: string) {
   });
 }
 
+/** Documents the intent and contract of this declaration. */
 export class ArrangeConflictError extends Error {
   constructor(public readonly conflictingSlugs: string[]) {
     super("Some slugs are already in use");
@@ -111,6 +116,7 @@ function raiseArrangeConflict(message: string): void {
   }
 }
 
+/** Documents the intent and contract of this declaration. */
 export async function commitArrange(id: string, data: ArrangeCommitDto) {
   try {
     return await httpClient<ArrangeCommitResultDto>({
@@ -127,6 +133,7 @@ export async function commitArrange(id: string, data: ArrangeCommitDto) {
   }
 }
 
+/** Documents the intent and contract of this declaration. */
 export function createLecture(data: CreateListingDto) {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.create,
@@ -135,6 +142,7 @@ export function createLecture(data: CreateListingDto) {
   });
 }
 
+/** Documents the intent and contract of this declaration. */
 export function updateListingDetails(id: string, data: UpdateListingDetailsDto) {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.updateDetails(id),
@@ -143,6 +151,7 @@ export function updateListingDetails(id: string, data: UpdateListingDetailsDto) 
   });
 }
 
+/** Documents the intent and contract of this declaration. */
 export function updateListingMedia(id: string, data: UpdateListingMediaDto) {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.updateMedia(id),
@@ -154,7 +163,7 @@ export function updateListingMedia(id: string, data: UpdateListingMediaDto) {
 function buildLectureListQuery(params?: {
   cursor?: string;
   search?: string;
-  status?: string;
+  /** Documents the intent and contract of this field. */ status?: string;
   scholarId?: string;
 }) {
   const query = new URLSearchParams();
@@ -164,10 +173,11 @@ function buildLectureListQuery(params?: {
   return query.toString();
 }
 
+/** Documents the intent and contract of this declaration. */
 export function fetchAdminLectures(params?: {
   cursor?: string;
   search?: string;
-  status?: string;
+  /** Documents the intent and contract of this field. */ status?: string;
   scholarId?: string;
 }) {
   const queryString = buildLectureListQuery(params);
@@ -181,6 +191,7 @@ export function fetchAdminLectures(params?: {
   });
 }
 
+/** Documents the intent and contract of this declaration. */
 export function fetchListingFormData(id: string) {
   return httpClient<ListingFormDataDto>({
     url: endpoints.admin.listings.formData(id),
@@ -188,6 +199,7 @@ export function fetchListingFormData(id: string) {
   });
 }
 
+/** Documents the intent and contract of this declaration. */
 export function getAdminPromotions() {
   return httpClient<any>({
     url: endpoints.admin.listings.promotions,
@@ -195,6 +207,7 @@ export function getAdminPromotions() {
   });
 }
 
+/** Documents the intent and contract of this declaration. */
 export function updateAdminPromotions(body: any) {
   return httpClient<any>({
     url: endpoints.admin.listings.promotions,

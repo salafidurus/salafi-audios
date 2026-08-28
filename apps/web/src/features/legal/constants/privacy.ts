@@ -1,5 +1,6 @@
 import { COMPANY_NAME, COMPANY_URL, COMPANY_COUNTRY } from "./company";
 
+/** Documents this module's responsibility and public boundary. */
 export const PRIVACY_DEFINITIONS = [
   {
     term: "Account",

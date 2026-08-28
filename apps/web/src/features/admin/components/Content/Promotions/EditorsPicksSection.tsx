@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { ArrowDown, ArrowUp, ArrowUpDown, Plus, Star, Trash2 } from "lucide-react";

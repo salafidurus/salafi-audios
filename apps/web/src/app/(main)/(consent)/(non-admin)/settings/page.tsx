@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { SettingsGeneralScreen } from "@/features/settings/screens/settings-general.screen";
 
+/** Documents this module's responsibility and public boundary. */
 export const metadata: Metadata = {
   title: "Settings",
   description: "Manage your app language, display theme, and notification preferences.",

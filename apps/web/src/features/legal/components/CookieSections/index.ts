@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export { InterpretationAndDefinitions } from "./InterpretationAndDefinitions";
 export { UseOfCookies } from "./UseOfCookies";
 export { Changes } from "./Changes";

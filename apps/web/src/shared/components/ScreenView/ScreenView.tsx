@@ -2,6 +2,7 @@ import React from "react";
 
 import styles from "./screen-view.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export interface ScreenViewProps {
   children: React.ReactNode;
   style?: React.CSSProperties;

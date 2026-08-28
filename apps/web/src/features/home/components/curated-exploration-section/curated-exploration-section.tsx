@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { routes, type FeedContentItemDto } from "@sd/core-contracts";
@@ -115,6 +116,7 @@ function PopulatedSection({
   );
 }
 
+/** Documents the intent and contract of this declaration. */
 export function CuratedExplorationSection({
   items,
   isLoading = false,

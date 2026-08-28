@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import styles from "./list-container.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export type ListContainerProps = {
   children: ReactNode;
   className?: string;

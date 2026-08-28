@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { ReactNode } from "react";
@@ -20,8 +21,21 @@ export interface DropdownProps {
   className?: string;
 }
 
-export function Dropdown({ value, onValueChange, children, disabled, error, className }: DropdownProps) {
-  return <Select value={value} onValueChange={onValueChange} disabled={disabled}><div className={className} data-invalid={error ? "true" : undefined}>{children}</div></Select>;
+export function Dropdown({
+  value,
+  onValueChange,
+  children,
+  disabled,
+  error,
+  className,
+}: DropdownProps) {
+  return (
+    <Select value={value} onValueChange={onValueChange} disabled={disabled}>
+      <div className={className} data-invalid={error ? "true" : undefined}>
+        {children}
+      </div>
+    </Select>
+  );
 }
 
 export interface DropdownTriggerProps {
@@ -34,14 +48,51 @@ export interface DropdownTriggerProps {
   children?: ReactNode;
 }
 
-export function DropdownTrigger({ placeholder = "Select...", className, disabled, id, testId, ariaLabel, children }: DropdownTriggerProps) {
-  return <SelectTrigger id={id} data-testid={testId} aria-label={ariaLabel} disabled={disabled} className={className}>{children ?? <SelectValue placeholder={placeholder} />}</SelectTrigger>;
+export function DropdownTrigger({
+  placeholder = "Select...",
+  className,
+  disabled,
+  id,
+  testId,
+  ariaLabel,
+  children,
+}: DropdownTriggerProps) {
+  return (
+    <SelectTrigger
+      id={id}
+      data-testid={testId}
+      aria-label={ariaLabel}
+      disabled={disabled}
+      className={className}
+    >
+      {children ?? <SelectValue placeholder={placeholder} />}
+    </SelectTrigger>
+  );
 }
 
-export function DropdownContent({ children, className }: { children: ReactNode; searchable?: boolean; className?: string }) {
+export function DropdownContent({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  searchable?: boolean;
+  className?: string;
+}) {
   return <SelectContent className={className}>{children}</SelectContent>;
 }
 
-export function DropdownItem({ value, children, disabled }: { value: string; children: ReactNode; disabled?: boolean }) {
-  return <SelectItem value={value} disabled={disabled}>{children}</SelectItem>;
+export function DropdownItem({
+  value,
+  children,
+  disabled,
+}: {
+  value: string;
+  children: ReactNode;
+  disabled?: boolean;
+}) {
+  return (
+    <SelectItem value={value} disabled={disabled}>
+      {children}
+    </SelectItem>
+  );
 }

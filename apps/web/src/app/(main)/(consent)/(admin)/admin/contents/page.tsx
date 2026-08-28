@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { AdminContentsScreen } from "@/features/admin/screens/admin-contents/admin-contents.screen";
 
+/** Documents this module's responsibility and public boundary. */
 export const metadata: Metadata = {
   title: "Topics | Admin",
   description: "Manage content topics and categories.",

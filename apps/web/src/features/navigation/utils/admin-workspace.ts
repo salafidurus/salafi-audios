@@ -2,6 +2,7 @@ import { routes } from "@sd/core-contracts";
 
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
+/** Documents this module's responsibility and public boundary. */
 export const ADMIN_RETURN_PATH_KEY = "sd:admin-return-path:v1";
 
 export type StorageLike = Pick<Storage, "getItem" | "setItem">;

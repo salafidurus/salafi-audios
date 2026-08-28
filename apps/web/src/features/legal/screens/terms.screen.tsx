@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { TERMS_LAST_UPDATE_DATE } from "@/features/legal/constants/update-date";

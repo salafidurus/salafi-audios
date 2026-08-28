@@ -1,6 +1,7 @@
 import { resolveRouteAccess } from "@sd/core-contracts";
 import { NextResponse, type NextRequest } from "next/server";
 
+/** Documents this module's responsibility and public boundary. */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie =

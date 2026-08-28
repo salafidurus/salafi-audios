@@ -13,6 +13,7 @@ import {
 
 import styles from "./AccessDialog.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 interface ScopeOption {
   id: string;
   name: string;

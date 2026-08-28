@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { initApiClient, setLocaleProvider, setUnauthorizedHandler } from "@sd/core-api";

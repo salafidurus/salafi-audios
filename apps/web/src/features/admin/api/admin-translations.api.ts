@@ -11,6 +11,7 @@ import { httpClient, endpoints } from "@sd/core-contracts";
 // Thin wrappers over the standalone per-locale translation endpoints
 // (already used by nothing else in the web UI before this modal).
 
+/** Documents this module's responsibility and public boundary. */
 export function saveListingTranslation(id: string, data: SaveListingTranslationDto) {
   return httpClient<TranslationViewDto>({
     url: endpoints.translations.listings.save(id),

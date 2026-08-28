@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { AppAvatar } from "@/shared/components/app-avatar";
 
+/** Documents this module's responsibility and public boundary. */
 type UserAvatarProps = {
   image: string | null;
   name: string | null;

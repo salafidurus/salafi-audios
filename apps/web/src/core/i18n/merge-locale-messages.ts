@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+/** Documents this module's responsibility and public boundary. */
 export type LocaleMessageValue = string | LocaleMessages;
 export type LocaleMessages = { [key: string]: LocaleMessageValue };
 

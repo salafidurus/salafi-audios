@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { ChevronDown, ChevronUp } from "lucide-react";

@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { ListingDetailDto } from "@sd/core-contracts";
@@ -12,6 +13,7 @@ import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./LecturePlayButton.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type LecturePlayButtonProps = {
   lecture: ListingDetailDto;
 };
@@ -88,6 +90,7 @@ async function playLecture(
   await audioService.playListing(track, [track]);
 }
 
+/** Documents the intent and contract of this declaration. */
 export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
   const { isPlaying, currentTrack } = useAudio();
   const formatScholarName = useFormatScholarName();

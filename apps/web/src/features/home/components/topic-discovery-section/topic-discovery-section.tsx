@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { routes, type FeedContentItemDto, type ListingFormat } from "@sd/core-contracts";
@@ -24,6 +25,7 @@ type TopicDiscoverySectionProps = {
   onResume?: (lectureSlug: string) => void;
 };
 
+/** Documents the intent and contract of this declaration. */
 export function TopicDiscoverySection({
   featuredContent,
   isFeaturedLoading = false,
@@ -119,14 +121,14 @@ export function TopicDiscoverySection({
 
 type TopicListingCardProps = {
   id: string;
-  slug: string;
+  /** Documents the intent and contract of this field. */ slug: string;
   title: string;
   scholarName: string;
-  scholarSlug: string;
+  /** Documents the intent and contract of this field. */ scholarSlug: string;
   scholarTitle?: string | null;
   format: ListingFormat;
   lectureCount: number;
-  durationSeconds?: number;
+  /** Documents the intent and contract of this field. */ durationSeconds?: number;
   onNavigate: (slug: string) => void;
 };
 

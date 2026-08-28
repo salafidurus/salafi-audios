@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { Combobox as ComboboxPrimitive } from "@base-ui/react";

@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 
 import styles from "./ListItemActions.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export type ListItemActionsProps = {
   /** Action buttons or any interactive elements */
   children?: ReactNode;

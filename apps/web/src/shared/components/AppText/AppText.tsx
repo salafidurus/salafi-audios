@@ -4,6 +4,7 @@ import React from "react";
 
 import styles from "./app-text.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export type AppTextProps = {
   variant: TypographyVariant;
   children: React.ReactNode;
@@ -19,6 +20,7 @@ const COLOR_CLASS_MAP = {
   inherit: styles.colorInherit,
 } as const;
 
+/** Documents the intent and contract of this declaration. */
 export function AppText({
   variant,
   children,

@@ -1,4 +1,7 @@
-export type GoogleDriveLink = { kind: "file"; fileId: string } | { kind: "unsupported-folder" };
+/** Identifies a supported Drive file link or an unsupported folder link. */
+export type GoogleDriveLink =
+  | { /** Documents the intent and contract of this field. */ kind: "file"; fileId: string }
+  | { /** Documents the intent and contract of this field. */ kind: "unsupported-folder" };
 
 /**
  * Recognizes Google Drive file/folder links. Folders are flagged distinctly (rather than

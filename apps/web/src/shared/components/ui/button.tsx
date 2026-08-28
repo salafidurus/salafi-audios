@@ -5,6 +5,7 @@ import { cn } from "@/shared/utils/index";
 
 import { buttonVariants, type ButtonVariantProps } from "./button-variants";
 
+/** Documents this module's responsibility and public boundary. */
 function normalizeButtonVariant(
   variant: ButtonVariantProps["variant"] | "primary" | "surface" | "danger",
 ) {

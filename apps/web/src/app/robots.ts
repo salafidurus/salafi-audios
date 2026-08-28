@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+/** Documents this module's responsibility and public boundary. */
 const DISALLOW_PATHS = ["/admin", "/settings", "/sign-in", "/my-library", "/auth"] as const;
 
 export default function robots(): MetadataRoute.Robots {

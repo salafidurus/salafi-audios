@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { useAudio, useQueue } from "@sd/domain-audio";
@@ -24,6 +25,7 @@ function handleClose() {
   audioService.stop();
 }
 
+/** Documents the intent and contract of this declaration. */
 export function MiniPlayer() {
   const {
     currentTrack,

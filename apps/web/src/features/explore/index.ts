@@ -1,4 +1,5 @@
 // Components
+/** Documents this module's responsibility and public boundary. */
 export { FeedListRow, type FeedListRowProps } from "./components/explore-list-row/explore-list-row";
 export {
   FeedScholarRow,

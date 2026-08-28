@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { routes, type FeedContentItemDto, type FeedItemDto } from "@sd/core-contracts";
@@ -18,6 +19,7 @@ function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
 
 const MAX_RECENT_ITEMS = 10;
 
+/** Documents the intent and contract of this declaration. */
 export type RecentlyAddedSectionContentProps = {
   items: FeedContentItemDto[];
   isLoading?: boolean;
@@ -176,6 +178,7 @@ function RecentlyAddedSectionContent({
 
 export { RecentlyAddedSectionContent };
 
+/** Documents the intent and contract of this declaration. */
 export function RecentlyAddedSection() {
   const { data, isLoading: isExploreLoading } = useExploreRecentScreen({ limit: MAX_RECENT_ITEMS });
 

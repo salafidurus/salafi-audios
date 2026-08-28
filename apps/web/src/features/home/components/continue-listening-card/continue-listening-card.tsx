@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { RecentProgressDto } from "@sd/core-contracts";
@@ -17,11 +18,13 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 
 import styles from "./continue-listening-card.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type ContinueListeningCardProps = {
   recentProgress?: RecentProgressDto | null;
   onContinueListening?: (listingSlug: string) => void;
 };
 
+/** Documents the intent and contract of this declaration. */
 export function ContinueListeningCard({
   recentProgress,
   onContinueListening,

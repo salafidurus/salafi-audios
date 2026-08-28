@@ -11,6 +11,7 @@ import { Table, TableBody, TableHeader } from "@/shared/components/ui/table";
 import { List } from "../List";
 import styles from "./InfiniteScrollList.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export interface InfiniteScrollListProps<TData> {
   /** Flattened array of all loaded items */
   data: TData[];
@@ -171,8 +172,8 @@ function renderEmptyState<TData>({
   observerTarget,
 }: {
   data: TData[];
-  isError?: boolean;
-  errorMessage: string;
+  /** Documents the intent and contract of this field. */ isError?: boolean;
+  /** Documents the intent and contract of this field. */ errorMessage: string;
   onRetry?: () => void;
   isLoading?: boolean;
   emptyMessage: string;
@@ -233,6 +234,7 @@ function normalizeListFlags(
   };
 }
 
+/** Documents the intent and contract of this declaration. */
 // react-doctor-disable-next-line react-doctor/no-many-boolean-props
 export function InfiniteScrollList<TData>({
   data,

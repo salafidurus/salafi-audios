@@ -1,6 +1,7 @@
 import { ExternalLink } from "../ExternalLink";
 import styles from "../legal-sections.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export function UseOfCookies() {
   return (
     <section className={styles.section}>

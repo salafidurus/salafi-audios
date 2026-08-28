@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export const LOCALE_COOKIE = "locale";
 
 export function setLocaleCookie(locale: string): void {

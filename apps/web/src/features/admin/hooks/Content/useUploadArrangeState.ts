@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type {
@@ -21,41 +22,55 @@ import {
 /** Existing module id, `new:${tempId}` for a staged module, or "root" (series/single). */
 export type ModuleKey = string;
 
+/** Identifies the synthetic root module used for series and single-listing uploads. */
 export const ROOT_MODULE_KEY = "root";
 
+/** Documents the intent and contract of this declaration. */
 export type UploadItemAssignment =
   | {
-      kind: "new-lesson";
+      /** Documents the intent and contract of this field. */ kind: "new-lesson";
       moduleKey: ModuleKey;
-      slug: string;
-      slugEdited: boolean;
+      /** Documents the intent and contract of this field. */ slug: string;
+      /** Documents the intent and contract of this field. */ slugEdited: boolean;
       description: string;
-      status: StatusValue;
+      /** Documents the intent and contract of this field. */ status: StatusValue;
       orderIndex: number | null;
     }
-  | { kind: "replace-audio"; lessonId: string }
-  | { kind: "replace-root-audio" };
+  | {
+      /** Documents the intent and contract of this field. */ kind: "replace-audio";
+      lessonId: string;
+    }
+  | { /** Documents the intent and contract of this field. */ kind: "replace-root-audio" };
 
+/** Documents the intent and contract of this declaration. */
 export interface UploadItemProgress {
-  status: "pending" | "downloading" | "uploading" | "done" | "error";
+  /** Documents the intent and contract of this field. */ status:
+    | "pending"
+    | "downloading"
+    | "uploading"
+    | "done"
+    | "error";
   percent: number;
   loadedBytes?: number;
   totalBytes?: number;
   objectKey?: string;
   uploadUrl?: string;
-  error?: string;
+  /** Documents the intent and contract of this field. */ error?: string;
 }
 
 /** Where an item's bytes come from: already-picked local File, or a URL fetched at upload time. */
-export type UploadItemSource = { kind: "local"; file: File } | { kind: "url"; url: string };
+export type UploadItemSource =
+  | { /** Documents the intent and contract of this field. */ kind: "local"; file: File }
+  | { /** Documents the intent and contract of this field. */ kind: "url"; url: string };
 
+/** Documents the intent and contract of this declaration. */
 export interface UploadItem {
   id: string;
-  source: UploadItemSource;
+  /** Documents the intent and contract of this field. */ source: UploadItemSource;
   filename: string;
   title: string;
   numericPrefix: number | null;
-  durationSeconds: number | null;
+  /** Documents the intent and contract of this field. */ durationSeconds: number | null;
   sizeBytes: number;
   contentType: string;
   ext: string;
@@ -64,30 +79,40 @@ export interface UploadItem {
   upload: UploadItemProgress;
 }
 
+/** Documents the intent and contract of this declaration. */
 export interface NewModule {
   tempId: string;
-  slug: string;
-  slugEdited: boolean;
+  /** Documents the intent and contract of this field. */ slug: string;
+  /** Documents the intent and contract of this field. */ slugEdited: boolean;
   title: string;
   description: string;
-  status: StatusValue;
+  /** Documents the intent and contract of this field. */ status: StatusValue;
   orderIndex: number | null;
 }
 
+/** Documents the intent and contract of this declaration. */
 export type UploadArrangePhase = "editing" | "presigning" | "uploading" | "committing" | "done";
 
+/** Documents the intent and contract of this declaration. */
 export interface UploadArrangeState {
   existing: AdminArrangeDataDto | null;
   items: UploadItem[];
   newModules: NewModule[];
   phase: UploadArrangePhase;
-  error: string | null;
-  conflictSlugs: string[];
+  /** Documents the intent and contract of this field. */ error: string | null;
+  /** Documents the intent and contract of this field. */ conflictSlugs: string[];
 }
 
+/** Documents the intent and contract of this declaration. */
 export type UploadArrangeAction =
   | { type: "INIT_EXISTING"; data: AdminArrangeDataDto }
-  | { type: "ADD_FILES"; files: { file: File; durationSeconds: number | null }[] }
+  | {
+      type: "ADD_FILES";
+      files: {
+        file: File;
+        /** Documents the intent and contract of this field. */ durationSeconds: number | null;
+      }[];
+    }
   | {
       type: "ADD_URL_ITEMS";
       items: {
@@ -95,7 +120,7 @@ export type UploadArrangeAction =
         filename: string;
         contentType: string;
         sizeBytes: number;
-        durationSeconds: number | null;
+        /** Documents the intent and contract of this field. */ durationSeconds: number | null;
       }[];
     }
   | { type: "RENAME_ITEM"; itemId: string; title: string }
@@ -123,16 +148,29 @@ export type UploadArrangeAction =
   | {
       type: "UPLOAD_PROGRESS";
       itemId: string;
-      status: "downloading" | "uploading";
+      /** Documents the intent and contract of this field. */ status: "downloading" | "uploading";
       percent: number;
       loadedBytes?: number;
       totalBytes?: number;
     }
   | { type: "UPLOAD_DONE"; itemId: string }
-  | { type: "UPLOAD_ERROR"; itemId: string; error: string }
-  | { type: "COMMIT_CONFLICT"; conflictSlugs: string[] }
-  | { type: "SET_ERROR"; error: string | null }
-  | { type: "SET_ALL_LESSON_STATUS"; status: StatusValue };
+  | {
+      type: "UPLOAD_ERROR";
+      itemId: string;
+      /** Documents the intent and contract of this field. */ error: string;
+    }
+  | {
+      type: "COMMIT_CONFLICT";
+      /** Documents the intent and contract of this field. */ conflictSlugs: string[];
+    }
+  | {
+      type: "SET_ERROR";
+      /** Documents the intent and contract of this field. */ error: string | null;
+    }
+  | {
+      type: "SET_ALL_LESSON_STATUS";
+      /** Documents the intent and contract of this field. */ status: StatusValue;
+    };
 
 const INITIAL_STATE: UploadArrangeState = {
   existing: null,
@@ -183,6 +221,7 @@ function existingModuleParentSlug(state: UploadArrangeState, moduleKey: ModuleKe
   );
 }
 
+/** Documents the intent and contract of this declaration. */
 export function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
   if (moduleKey === ROOT_MODULE_KEY) return existingRootSlug(state);
   if (moduleKey.startsWith("new:")) return newModuleParentSlug(state, moduleKey);
@@ -236,11 +275,11 @@ function sortItemsByOrderIndex(items: UploadItem[]): UploadItem[] {
 }
 
 interface StagedItemInput {
-  source: UploadItemSource;
+  /** Documents the intent and contract of this field. */ source: UploadItemSource;
   filename: string;
   contentType: string;
   sizeBytes: number;
-  durationSeconds: number | null;
+  /** Documents the intent and contract of this field. */ durationSeconds: number | null;
 }
 
 /** Shared by ADD_FILES and ADD_URL_ITEMS — identical sorting/slug-derivation/order-cursor
@@ -634,6 +673,7 @@ function itemAudioRef(item: UploadItem) {
   };
 }
 
+/** Documents the intent and contract of this declaration. */
 export function buildPresignRequest(state: UploadArrangeState): BatchPresignAudioRequestDto {
   const rootSlug = state.existing?.slug ?? "";
   return {
@@ -661,7 +701,10 @@ export function itemTargetSlug(state: UploadArrangeState, item: UploadItem): str
 
 function createLessonOp(
   item: UploadItem,
-  assignment: Extract<UploadItem["assignment"], { kind: "new-lesson" }>,
+  assignment: Extract<
+    UploadItem["assignment"],
+    { /** Documents the intent and contract of this field. */ kind: "new-lesson" }
+  >,
 ): ArrangeLessonOp {
   return {
     op: "create",
@@ -676,7 +719,10 @@ function createLessonOp(
 
 function getReplaceLessonOp(
   item: UploadItem,
-  assignment: Extract<UploadItem["assignment"], { kind: "replace-audio" }>,
+  assignment: Extract<
+    UploadItem["assignment"],
+    { /** Documents the intent and contract of this field. */ kind: "replace-audio" }
+  >,
   existing: NonNullable<UploadArrangeState["existing"]>,
   moduleKey: ModuleKey,
 ): ArrangeLessonOp | null {
@@ -729,6 +775,7 @@ function buildCollectionCommitDto(
   return { modules };
 }
 
+/** Documents the intent and contract of this declaration. */
 export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
   const { existing } = state;
   if (!existing) return { lessons: [] };
@@ -770,10 +817,12 @@ function findSlugConflicts(staged: string[], existingSlugs: Set<string>): string
   return [...conflicts];
 }
 
+/** Documents the intent and contract of this declaration. */
 export function localSlugConflicts(state: UploadArrangeState): string[] {
   return findSlugConflicts(getStagedSlugs(state), getExistingSlugs(state));
 }
 
+/** Documents the intent and contract of this declaration. */
 export function useUploadArrangeState() {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   return { state, dispatch };

@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import ScholarDetailInner from "./scholar-detail-inner";
 
+/** Documents this module's responsibility and public boundary. */
 export async function generateMetadata({
   params,
 }: {

@@ -1,5 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
+/** Documents this module's responsibility and public boundary. */
 const badgeVariants = cva(
   "inline-flex w-fit shrink-0 items-center justify-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
   {

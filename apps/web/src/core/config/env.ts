@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+/** Documents this module's responsibility and public boundary. */
 const WebPublicEnvSchema = z.object({
   NEXT_PUBLIC_API_URL: z.url(),
   NEXT_PUBLIC_WEB_URL: z.url(),

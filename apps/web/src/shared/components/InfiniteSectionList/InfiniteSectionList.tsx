@@ -3,6 +3,7 @@ import React, { useEffect, useRef, type ReactNode } from "react";
 import { List } from "../List";
 import styles from "./InfiniteSectionList.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export type SectionData<TSection, TItem> = {
   key: string;
   section: TSection;

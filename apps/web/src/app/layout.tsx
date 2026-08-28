@@ -9,6 +9,7 @@ import { getThemeBootstrapScript } from "../core/styles/theme-bootstrap";
 import { ThemeSync } from "../core/styles/ThemeSync";
 import { themeCss } from "./theme-css";
 
+/** Documents this module's responsibility and public boundary. */
 const fraunces = localFont({
   variable: "--font-display-en",
   display: "swap",
@@ -168,6 +169,7 @@ export const metadata: Metadata = {
   },
 };
 
+/** Documents the intent and contract of this declaration. */
 export default function RootLayout({
   children,
 }: Readonly<{

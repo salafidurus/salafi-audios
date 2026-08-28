@@ -13,6 +13,8 @@ import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-na
 
 import styles from "./hero-section.module.css";
 
+/** Provides the data contract and presentation for the home page hero section. */
+/** Defines the optional content and progress data rendered by the hero section. */
 export type HeroSectionProps = {
   recentProgress?: RecentProgressDto | null;
   featuredContent?: FeedContentItemDto | null;
@@ -24,10 +26,10 @@ export type HeroSectionProps = {
 
 type HeroItem = {
   id: string;
-  slug: string;
+  /** Documents the intent and contract of this field. */ slug: string;
   title: string;
   scholarName: string;
-  scholarSlug: string;
+  /** Documents the intent and contract of this field. */ scholarSlug: string;
   scholarTitle?: string;
   format: FeedContentItemDto["kind"] | RecentProgressDto["format"];
   artworkUrl?: string;
@@ -181,6 +183,7 @@ function HeroEmptyState({ t }: { t: ReturnType<typeof useTranslation>["t"] }) {
   );
 }
 
+/** Documents the intent and contract of this declaration. */
 export function HeroSection({
   recentProgress,
   featuredContent,

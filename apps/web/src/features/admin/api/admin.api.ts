@@ -10,6 +10,7 @@ import type {
 
 import { httpClient, endpoints } from "@sd/core-contracts";
 
+/** Documents this module's responsibility and public boundary. */
 export function fetchUserAccess(userId: string) {
   return httpClient<UserAccessSnapshot>({
     url: endpoints.admin.users.access(userId),

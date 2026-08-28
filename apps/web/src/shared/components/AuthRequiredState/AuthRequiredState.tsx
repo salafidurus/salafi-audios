@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import React, { useState } from "react";
@@ -9,12 +10,14 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import { AuthRequiredStateDesktop } from "./AuthRequiredState.desktop";
 import { AuthRequiredStateMobile } from "./AuthRequiredState.mobile";
 
+/** Documents the intent and contract of this declaration. */
 export type AuthRequiredStateProps = {
   title: string;
   description: string;
   actionLabel?: string;
 };
 
+/** Documents the intent and contract of this declaration. */
 export function AuthRequiredState({ title, description, actionLabel }: AuthRequiredStateProps) {
   const isHydrated = useIsHydrated();
   const { isMobile, isTablet } = useResponsive();

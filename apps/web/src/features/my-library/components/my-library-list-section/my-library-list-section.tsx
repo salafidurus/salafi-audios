@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { MyLibraryItemDto } from "@sd/core-contracts";
@@ -17,11 +18,14 @@ type MyLibraryListSectionProps = {
   title: string;
   description: string;
   variant: MyLibraryListRowProps["variant"];
-  authState: "loading" | "authenticated" | "unauthenticated";
+  /** Documents the intent and contract of this field. */ authState:
+    | "loading"
+    | "authenticated"
+    | "unauthenticated";
   query: {
     items: MyLibraryItemDto[];
     isLoading: boolean;
-    isError: boolean;
+    /** Documents the intent and contract of this field. */ isError: boolean;
     onRetry: () => void;
     hasMore: boolean;
     onLoadMore: () => void;
@@ -35,6 +39,7 @@ type MyLibraryListSectionProps = {
   };
 };
 
+/** Documents the intent and contract of this declaration. */
 export function MyLibraryListSection({
   title,
   description,

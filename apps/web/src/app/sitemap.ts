@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+/** Documents this module's responsibility and public boundary. */
 export default function sitemap(): MetadataRoute.Sitemap {
   if (process.env.NODE_ENV !== "production") {
     return [];

@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { ListingDetailDto, ListingContentsDto } from "@sd/core-contracts";
@@ -21,6 +22,7 @@ import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import { LectureSaveButton } from "../lecture-save-button/LectureSaveButton";
 import styles from "./QuickButtonSection.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type QuickButtonSectionProps = {
   listing: ListingDetailDto;
   contents?: ListingContentsDto;
@@ -86,6 +88,7 @@ async function playResumeTrack(allTracks: Track[], resumeId: string | undefined)
   if (targetTrack) await audioService.playListing(targetTrack, allTracks);
 }
 
+/** Documents the intent and contract of this declaration. */
 export function QuickButtonSection({ listing, contents }: QuickButtonSectionProps) {
   const formatScholarName = useFormatScholarName();
   const { isAuthenticated } = useAuth();

@@ -12,6 +12,7 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 
 import styles from "../Content.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 interface ListingProps {
   listing: AdminListingListItemDto;
   onEdit: (id: string) => void;

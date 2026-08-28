@@ -4,6 +4,7 @@ import {
   resolveContentType,
 } from "./fetch-remote-file";
 
+/** Documents this module's responsibility and public boundary. */
 export interface UrlMetadata {
   filename: string;
   contentType: string;

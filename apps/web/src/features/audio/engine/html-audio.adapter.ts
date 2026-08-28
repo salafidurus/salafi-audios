@@ -2,6 +2,7 @@ import type { PlaybackEngine, PlaybackEngineEvents, Track } from "@sd/domain-aud
 
 import { hasMediaMetadataConstructor, hasNavigator, hasWindow } from "@/shared/lib/runtime-guards";
 
+/** Documents this module's responsibility and public boundary. */
 function hasMediaSession(): boolean {
   return hasNavigator() && "mediaSession" in navigator;
 }

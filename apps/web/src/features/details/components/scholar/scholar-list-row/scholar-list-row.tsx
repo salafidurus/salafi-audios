@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { ScholarListItemDto } from "@sd/core-contracts";
@@ -12,11 +13,13 @@ import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./scholar-list-row.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type ScholarListRowProps = {
   scholar: ScholarListItemDto;
   onPress?: (slug: string) => void;
 };
 
+/** Documents the intent and contract of this declaration. */
 export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
   const isRtl = useIsRtl();
   const formatScholarName = useFormatScholarName();

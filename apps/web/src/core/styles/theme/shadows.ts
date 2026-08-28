@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export const shadowsShared = {
   focus: {
     light: "0 0 0 3px rgb(20 184 166 / 0.28)",

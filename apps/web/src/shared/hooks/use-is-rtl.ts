@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+/** Returns whether the document language or direction indicates a right-to-left layout. */
 export function useIsRtl(): boolean {
   const [isRtl, setIsRtl] = useState(false);
 

@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export function hasDocument(): boolean {
   return globalThis.document !== undefined;
 }

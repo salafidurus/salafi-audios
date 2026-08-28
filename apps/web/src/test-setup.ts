@@ -4,6 +4,7 @@ import { afterEach } from "bun:test";
 import { createI18n } from "./core/i18n/i18n";
 import { hasWindow } from "./shared/lib/runtime-guards";
 
+/** Configures the browser-like test environment and shared test globals. */
 // Register happy-dom globals - this MUST run before any test imports
 const { GlobalRegistrator } = require("@happy-dom/global-registrator");
 

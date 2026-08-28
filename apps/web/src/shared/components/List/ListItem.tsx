@@ -4,6 +4,7 @@ import { isHtmlElement } from "@/shared/lib/runtime-guards";
 
 import styles from "./list-item.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export type ListItemProps = {
   children: ReactNode;
   onClick?: () => void;
@@ -77,7 +78,7 @@ function getListItemAttributes({
   className,
 }: Pick<ListItemProps, "id" | "highlighted" | "className"> & {
   isClickable: boolean;
-  showHoverStates: boolean;
+  /** Documents the intent and contract of this field. */ showHoverStates: boolean;
 }) {
   return {
     id,

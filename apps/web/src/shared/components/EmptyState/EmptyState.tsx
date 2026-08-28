@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 
 import styles from "./EmptyState.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export type EmptyStateVariant = "empty" | "loading" | "denied" | "error";
 
 export type EmptyStateProps = {

@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { ListingModuleDto } from "@sd/core-contracts";
@@ -24,6 +25,7 @@ import { cn } from "@/shared/utils";
 
 import styles from "./CollectionToc.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type CollectionTocProps = {
   modules: ListingModuleDto[];
   onSelect: (moduleId: string) => void;
@@ -32,6 +34,7 @@ export type CollectionTocProps = {
   onToggleCollapse?: () => void;
 };
 
+/** Documents the intent and contract of this declaration. */
 export function CollectionToc({
   modules,
   onSelect,

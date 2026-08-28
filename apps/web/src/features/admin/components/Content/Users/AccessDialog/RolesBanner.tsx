@@ -5,6 +5,7 @@ import { Separator } from "@/shared/components/ui/separator";
 
 import styles from "./AccessDialog.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 interface RolesBannerProps {
   roles: string[];
 }

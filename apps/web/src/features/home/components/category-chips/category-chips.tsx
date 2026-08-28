@@ -7,11 +7,13 @@ import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 
 import styles from "./category-chips.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export type CategoryChipsProps = {
   value?: string;
   onValueChange?: (value: string) => void;
 };
 
+/** Documents the intent and contract of this declaration. */
 export function CategoryChips({ value, onValueChange }: CategoryChipsProps = {}) {
   const { i18n, t } = useTranslation();
   const { data: topics = [], isLoading } = useTopicsList();

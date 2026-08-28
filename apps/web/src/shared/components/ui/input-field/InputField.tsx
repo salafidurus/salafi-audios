@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import React from "react";
@@ -5,6 +6,7 @@ import React from "react";
 import { Input } from "@/shared/components/ui/input";
 import { cn } from "@/shared/utils";
 
+/** Documents the intent and contract of this declaration. */
 export interface InputFieldProps {
   value: string;
   onChange: (value: string) => void;
@@ -21,6 +23,7 @@ export interface InputFieldProps {
 
 const NUMERIC_PATTERN = /^\d*$/;
 
+/** Documents the intent and contract of this declaration. */
 export function InputField({
   value,
   onChange,

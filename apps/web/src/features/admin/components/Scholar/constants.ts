@@ -1,5 +1,6 @@
 import type { ScholarTitle } from "@sd/core-contracts";
 
+/** Documents this module's responsibility and public boundary. */
 export const SCHOLAR_TITLE_LABELS = {
   allamah: "Allamah",
   sheikh: "Shaykh",

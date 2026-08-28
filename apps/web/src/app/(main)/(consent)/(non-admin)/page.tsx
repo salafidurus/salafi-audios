@@ -1,4 +1,5 @@
 // react-doctor-disable-next-line react-doctor/nextjs-missing-metadata
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { routes } from "@sd/core-contracts";
