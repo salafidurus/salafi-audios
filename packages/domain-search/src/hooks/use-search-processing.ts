@@ -3,14 +3,18 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchCatalog, useTopicsList } from "../api/search.api";
 import { buildSearchResultRows, type SearchResultRow } from "../utils/build-search-result-rows";
 
+/** Coordinates debounced search input, topic filters, and translated result rows. */
+/** Public topic-slug values selected as discovery filters. */
 export type SearchFilterValue = string[];
 
+/** Initial and presentation options for the search-processing hook. */
 export type UseSearchProcessingOptions = {
   prefill?: string;
   /** Show original-language titles instead of the selected-language ones. */
   showOriginal?: boolean;
 };
 
+/** Provides the state and derived results needed by a search experience. */
 export function useSearchProcessing({
   prefill,
   showOriginal = false,

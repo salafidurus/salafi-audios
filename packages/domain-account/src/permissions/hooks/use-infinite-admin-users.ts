@@ -1,12 +1,16 @@
 import { httpClient, endpoints, queryKeys, type AdminUserListDto } from "@sd/core-contracts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
+/** Provides paginated admin-user discovery for authorized administration surfaces. */
+/** Filters and controls the admin-user listing query. */
 export interface UseInfiniteAdminUsersOptions {
   search?: string;
+  /** Narrows users by their effective role or access category. */
   role?: string;
   enabled?: boolean;
 }
 
+/** Fetches admin users in API-defined pages without granting client authority. */
 export function useInfiniteAdminUsers(options?: UseInfiniteAdminUsersOptions) {
   const initialPageParam: string | undefined = undefined;
 

@@ -13,6 +13,8 @@ import { unpackRules, type PackRule } from "@casl/ability/extra";
 
 import { useAccountProfile } from "../../account.api";
 
+/** Builds convenience-only client abilities from backend-issued account rules. */
+/** Controls whether the profile query used to build an ability is enabled. */
 export interface UseAbilityOptions {
   isAuthenticated?: boolean;
   enabled?: boolean;

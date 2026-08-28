@@ -1,5 +1,6 @@
 import type { MyLibraryItemDto } from "@sd/core-contracts";
 
+/** Calculates display progress for a top-level My Library Listing. */
 /**
  * Percent complete for a myLibrary row. Prefers the lesson-count rollup
  * (`completedLeafCount`/`totalLeafCount`, populated for series/collection

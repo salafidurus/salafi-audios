@@ -1,10 +1,13 @@
 import { httpClient, endpoints, queryKeys, type MyLibraryPageDto } from "@sd/core-contracts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
+/** Adapts saved personal-library data to an infinite-query interface. */
+/** Controls whether saved personal-library data is requested. */
 export interface UseInfiniteMyLibrarySavedOptions {
   enabled?: boolean;
 }
 
+/** Fetches the authenticated user's saved My Library relationships. */
 export function useInfiniteMyLibrarySaved(options?: UseInfiniteMyLibrarySavedOptions) {
   const initialPageParam: string | undefined = undefined;
 

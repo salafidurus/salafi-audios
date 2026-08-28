@@ -8,6 +8,8 @@ import {
   type TopicDetailDto,
 } from "@sd/core-contracts";
 
+/** Query hooks for public catalog search and topic discovery data. */
+/** Searches API-authorized public Listings using the supplied discovery criteria. */
 export function useSearchCatalog(
   params: SearchCatalogParams,
   options?: Parameters<typeof useApiQuery<SearchCatalogResultsDto>>[2],
@@ -24,6 +26,7 @@ export function useSearchCatalog(
   );
 }
 
+/** Reads the public topic vocabulary used to steer or filter discovery. */
 export function useTopicsList(options?: Parameters<typeof useApiQuery<TopicDetailDto[]>>[2]) {
   return useApiQuery(
     queryKeys.topics.all,

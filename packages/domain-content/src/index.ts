@@ -1,3 +1,4 @@
+/** Public Content Catalog package surface for Listings, scholars, topics, and My Library. */
 // Infinite scroll hooks
 export {
   useInfiniteScholarsList,

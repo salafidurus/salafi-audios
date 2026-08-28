@@ -8,6 +8,7 @@ import {
   type LastPlayedLessonDto,
 } from "@sd/core-contracts";
 
+/** Provides public Catalog queries keyed by Listing slugs. */
 /**
  * Catalog reads resolve Listings through their public slug — the only external
  * identity a Listing route accepts. An ID-shaped value resolves as not found.
@@ -24,6 +25,7 @@ export function useListingDetail(slug: string) {
   );
 }
 
+/** Reads the nested content belonging to a public Listing slug. */
 export function useListingContents(slug: string) {
   return useApiQuery(
     queryKeys.listings.contents(slug),
@@ -36,6 +38,7 @@ export function useListingContents(slug: string) {
   );
 }
 
+/** Reads the user's last-played nested lesson without changing catalog state. */
 export function useLastPlayedLesson(slug: string, enabled = true) {
   return useApiQuery(
     queryKeys.listings.lastPlayed(slug),

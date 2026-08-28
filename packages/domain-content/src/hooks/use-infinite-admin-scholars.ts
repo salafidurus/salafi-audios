@@ -1,11 +1,14 @@
 import { httpClient, endpoints, queryKeys, type AdminScholarListDto } from "@sd/core-contracts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
+/** Provides cursor-based admin discovery of catalog scholars. */
+/** Search and lifecycle controls for the admin scholar query. */
 export interface UseInfiniteAdminScholarsOptions {
   search?: string;
   enabled?: boolean;
 }
 
+/** Fetches admin scholar pages without making client-side authorization decisions. */
 export function useInfiniteAdminScholars(options?: UseInfiniteAdminScholarsOptions) {
   const initialPageParam: string | undefined = undefined;
 

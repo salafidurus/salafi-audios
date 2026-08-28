@@ -8,6 +8,8 @@ import {
 } from "@sd/core-contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+/** Client hooks for authenticated account profile reads and mutations. */
+/** Reads the current user's account profile and derived ability rules. */
 export function useAccountProfile(options?: { enabled?: boolean }) {
   return useApiQuery(
     queryKeys.account.profile(),
@@ -20,6 +22,7 @@ export function useAccountProfile(options?: { enabled?: boolean }) {
   );
 }
 
+/** Updates the authenticated user's profile and refreshes the cached profile. */
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -35,6 +38,7 @@ export function useUpdateProfile() {
   });
 }
 
+/** Permanently requests deletion of the authenticated user's account. */
 export function useDeleteAccount() {
   const queryClient = useQueryClient();
   return useMutation({

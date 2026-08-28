@@ -7,8 +7,11 @@ import { useTranslation } from "react-i18next";
 
 import { useScholarsList } from "../scholar.api";
 
+/** Formats scholar names with locale-aware honorifics and stable slug matching. */
+/** Scholar display data accepted by the low-level formatter. */
 export interface ScholarWithNameAndTitle {
   name: string;
+  /** Optional honorific represented using the shared translation vocabulary. */
   title?: ScholarTitle | string | null;
 }
 
@@ -108,7 +111,13 @@ export function useFormattedScholarName(
 function resolveFormattedScholarName(
   scholarName: string | null | undefined,
   scholarSlug: string | null | undefined,
-  scholars: Array<{ slug: string; title?: ScholarTitle | string | null }> | undefined,
+  scholars:
+    | Array<{
+        /** Locale-independent scholar identity used for matching. */
+        slug: string;
+        title?: ScholarTitle | string | null;
+      }>
+    | undefined,
   t: TranslateFn,
 ): string {
   if (!scholarName) return "";

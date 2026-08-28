@@ -1,4 +1,5 @@
 // API hooks
+/** Public Discovery package surface for search, browse, and quick-browse hooks. */
 export { useSearchCatalog, useTopicsList } from "./api/search.api";
 
 // Domain hooks

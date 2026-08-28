@@ -1,3 +1,4 @@
+/** Public hook exports for catalog, scholar, topic, and personal-library data. */
 export { useInfiniteScholarsList } from "./use-infinite-scholars-list";
 export type { UseInfiniteScholarsListOptions } from "./use-infinite-scholars-list";
 
