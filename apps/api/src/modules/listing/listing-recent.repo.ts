@@ -7,6 +7,7 @@ import type {
   FeedPageDto,
   ListingFormat,
   ScholarChipDto,
+  ScholarTitle,
   Locale,
 } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
@@ -19,6 +20,24 @@ type RecentListingRecord = {
   publishedDurationSeconds: number | null;
   coverImageUrl: string | null;
   publishedLectureCount: number | null;
+};
+
+type RecentFeedListing = RecentListingRecord & {
+  id: string;
+  slug: string;
+  title: string;
+  language: Locale | null;
+  publishedAt: Date | null;
+  createdAt: Date;
+  translations: Array<{ title: string }>;
+  scholar: {
+    name: string;
+    slug: string;
+    title: ScholarTitle | null;
+    imageUrl: string | null;
+    mainLanguage: Locale;
+    translations: Array<{ name: string }>;
+  };
 };
 
 function recentListingPresentation(
@@ -113,41 +132,7 @@ export class RecentListingsRepo {
     const hasMore = listings.length > contentLimit;
     const page = hasMore ? listings.slice(0, contentLimit) : listings;
 
-    const contentItems: FeedContentItemDto[] = page.map((r) => {
-      const resolved = resolveContentTranslation({
-        base: { title: r.title },
-        originalLanguage: r.language,
-        targetLocale: locale,
-        publishedTranslation: r.translations[0] ?? null,
-      });
-      const scholarName = resolveContentTranslation({
-        base: { name: r.scholar!.name },
-        originalLanguage: r.scholar!.mainLanguage,
-        targetLocale: locale,
-        publishedTranslation: r.scholar!.translations[0] ?? null,
-      }).fields.name;
-
-      const presentation = recentListingPresentation(r, (value) => this.toOptionalPublicUrl(value));
-      const kind: ListingFormat = r.format;
-
-      return {
-        kind,
-        id: r.id,
-        title: resolved.fields.title,
-        slug: r.slug,
-        scholarName,
-        scholarSlug: r.scholar!.slug,
-        scholarTitle: r.scholar!.title ?? undefined,
-        scholarImageUrl: r.scholar!.imageUrl ?? undefined,
-        thumbnailUrl: presentation.thumbnailUrl ?? null,
-        durationSeconds: presentation.durationSeconds,
-        publishedLectureCount: presentation.publishedLectureCount,
-        publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
-        originalLanguage: resolved.originalLanguage,
-        original: resolved.original ? { title: resolved.original.title } : undefined,
-      };
-    });
-
+    const contentItems: FeedContentItemDto[] = page.map((r) => this.toRecentContentItem(r, locale));
     const items: FeedPageDto['items'] = [...contentItems];
     await this.appendDiscoveryRows(items, page, contentItems, pageNumber, topicSlug, locale);
 
@@ -158,6 +143,40 @@ export class RecentListingsRepo {
     return { items, nextCursor, exhausted: !nextCursor };
   }
 
+  private toRecentContentItem(r: RecentFeedListing, locale: Locale): FeedContentItemDto {
+    const resolved = resolveContentTranslation({
+      base: { title: r.title },
+      originalLanguage: r.language,
+      targetLocale: locale,
+      publishedTranslation: r.translations[0] ?? null,
+    });
+    const scholarName = resolveContentTranslation({
+      base: { name: r.scholar!.name },
+      originalLanguage: r.scholar!.mainLanguage,
+      targetLocale: locale,
+      publishedTranslation: r.scholar!.translations[0] ?? null,
+    }).fields.name;
+
+    const presentation = recentListingPresentation(r, (value) => this.toOptionalPublicUrl(value));
+    const kind: ListingFormat = r.format;
+
+    return {
+      kind,
+      id: r.id,
+      title: resolved.fields.title,
+      slug: r.slug,
+      scholarName,
+      scholarSlug: r.scholar!.slug,
+      scholarTitle: r.scholar!.title ?? undefined,
+      scholarImageUrl: r.scholar!.imageUrl ?? undefined,
+      thumbnailUrl: presentation.thumbnailUrl ?? null,
+      durationSeconds: presentation.durationSeconds,
+      publishedLectureCount: presentation.publishedLectureCount,
+      publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
+      originalLanguage: resolved.originalLanguage,
+      original: resolved.original ? { title: resolved.original.title } : undefined,
+    };
+  }
   private async appendDiscoveryRows(
     items: FeedPageDto['items'],
     page: Parameters<RecentListingsRepo['buildScholarRow']>[0],
