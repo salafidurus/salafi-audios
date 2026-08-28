@@ -157,6 +157,19 @@ async function replaceListingTopics(
   await createListingTopics(tx, listingId, topics);
 }
 
+function buildListingMediaUpdateData(
+  dto: UpdateListingMediaDto,
+  updatedBy?: string,
+): Prisma.ListingUpdateInput {
+  const updateData: Prisma.ListingUpdateInput = {
+    updatedAt: new Date(),
+    updatedBy,
+  };
+  if (dto.durationSeconds !== undefined) updateData.durationSeconds = dto.durationSeconds;
+  if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
+  return updateData;
+}
+
 @Injectable()
 export class ListingRepository {
   constructor(
@@ -1403,13 +1416,7 @@ export class ListingRepository {
 
         if (!listing) throw new Error('Not found');
 
-        // Update listing fields (audioKey → handled via audioAsset, durationSeconds, orderIndex)
-        const updateData: Prisma.ListingUpdateInput = {
-          updatedAt: new Date(),
-          updatedBy,
-        };
-        if (dto.durationSeconds !== undefined) updateData.durationSeconds = dto.durationSeconds;
-        if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
+        const updateData = buildListingMediaUpdateData(dto, updatedBy);
 
         await tx.listing.update({
           where: { id },
