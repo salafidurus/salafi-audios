@@ -193,6 +193,38 @@ function getOwnContentsSlug(
   return isContainerLecture(lecture) ? (lecture?.slug ?? "") : "";
 }
 
+function getSeriesContentsSlug(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+) {
+  return lecture?.seriesContext?.seriesSlug ?? "";
+}
+
+function getLectureId(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+) {
+  return lecture?.id ?? "";
+}
+
+function getLectureDescription(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]>,
+  showOriginal: boolean,
+) {
+  return lecture.description
+    ? pickContentField(lecture.description, lecture.original?.description, showOriginal)
+    : undefined;
+}
+
+function toggleLectureSaved(
+  isSaved: boolean,
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]>,
+) {
+  if (isSaved) {
+    markUnsaved(lecture.id, lecture.slug);
+  } else {
+    markSaved(lecture.id, lecture.slug);
+  }
+}
+
 function isCurrentLectureTrack(
   lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
   currentTrack: Track | null,
@@ -210,55 +242,43 @@ function useLectureRedirect(
   }, [lecture]);
 }
 
-function LoadedLectureBody({ view }: { view: LoadedLectureView }) {
-  const {
-    lecture,
+function ContainerLectureBody({ view }: { view: LoadedLectureView }) {
+  const { lecture, title, description, anchor, ownContents, loadingMessage } = view;
+  const listingRef: ComponentProps<typeof ListingContentView>["listingRef"] = {
+    id: lecture.id,
     title,
-    description,
-    anchor,
-    ownContents,
-    loadingMessage,
-    isSaved,
-    isCurrentTrack,
-    isPlaying,
-    theme,
-    onPlay,
-    onSave,
-  } = view;
-  const isContainer = lecture.format === "series" || lecture.format === "collection";
-  if (isContainer) {
-    const listingRef: ComponentProps<typeof ListingContentView>["listingRef"] = {
-      id: lecture.id,
-      title,
-      format: lecture.format,
-      scholarName: lecture.scholar.name,
-      scholarSlug: lecture.scholar.slug,
-      artworkUrl: lecture.scholar.imageUrl ?? undefined,
-    };
-    return (
-      <ScreenView>
-        <View style={styles.headerSection}>
-          <AppText variant="titleLg">{title}</AppText>
-          <LectureMeta lecture={lecture} />
-          {description ? (
-            <AppText variant="bodyMd" style={styles.descriptionSection}>
-              {description}
-            </AppText>
-          ) : null}
-        </View>
-        {ownContents ? (
-          <ListingContentView
-            contents={ownContents}
-            listingRef={listingRef}
-            highlightItemId={anchor}
-          />
-        ) : (
-          <EmptyState message={loadingMessage} variant="loading" />
-        )}
-      </ScreenView>
-    );
-  }
+    format: lecture.format,
+    scholarName: lecture.scholar.name,
+    scholarSlug: lecture.scholar.slug,
+    artworkUrl: lecture.scholar.imageUrl ?? undefined,
+  };
+  return (
+    <ScreenView>
+      <View style={styles.headerSection}>
+        <AppText variant="titleLg">{title}</AppText>
+        <LectureMeta lecture={lecture} />
+        {description ? (
+          <AppText variant="bodyMd" style={styles.descriptionSection}>
+            {description}
+          </AppText>
+        ) : null}
+      </View>
+      {ownContents ? (
+        <ListingContentView
+          contents={ownContents}
+          listingRef={listingRef}
+          highlightItemId={anchor}
+        />
+      ) : (
+        <EmptyState message={loadingMessage} variant="loading" />
+      )}
+    </ScreenView>
+  );
+}
 
+function SingleLectureBody({ view }: { view: LoadedLectureView }) {
+  const { lecture, title, description, isSaved, isCurrentTrack, isPlaying, theme, onPlay, onSave } =
+    view;
   return (
     <ScreenView>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -290,11 +310,16 @@ function LoadedLectureBody({ view }: { view: LoadedLectureView }) {
   );
 }
 
+function LoadedLectureBody({ view }: { view: LoadedLectureView }) {
+  const isContainer = view.lecture.format === "series" || view.lecture.format === "collection";
+  return isContainer ? <ContainerLectureBody view={view} /> : <SingleLectureBody view={view} />;
+}
+
 export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { theme } = useUnistyles();
   const { anchor } = useLocalSearchParams<{ slug: string; anchor?: string }>();
   const { data: lecture, isFetching } = useListingDetail(slug);
-  const { data: seriesContents } = useListingContents(lecture?.seriesContext?.seriesSlug ?? "");
+  const { data: seriesContents } = useListingContents(getSeriesContentsSlug(lecture));
   const { data: ownContents } = useListingContents(getOwnContentsSlug(lecture));
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
@@ -302,7 +327,7 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const { isPlaying, currentTrack } = useAudio();
   const isCurrentTrack = isCurrentLectureTrack(lecture, currentTrack);
 
-  const isSaved = useIsSaved(lecture?.id ?? "");
+  const isSaved = useIsSaved(getLectureId(lecture));
 
   // Slugs are flat and don't encode nesting, so a Lesson/Module's own slug
   // resolves to itself — redirect to the top-level page it belongs under,
@@ -316,20 +341,14 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
   const loadedLecture = lecture as NonNullable<ReturnType<typeof useListingDetail>["data"]>;
 
   const title = pickContentField(loadedLecture.title, loadedLecture.original?.title, showOriginal);
-  const description = loadedLecture.description
-    ? pickContentField(loadedLecture.description, loadedLecture.original?.description, showOriginal)
-    : undefined;
+  const description = getLectureDescription(loadedLecture, showOriginal);
 
   const handlePlay = async () => {
     await playLecture(loadedLecture, title, seriesContents, isCurrentTrack, isPlaying);
   };
 
   const handleSave = () => {
-    if (isSaved) {
-      markUnsaved(loadedLecture.id, loadedLecture.slug);
-    } else {
-      markSaved(loadedLecture.id, loadedLecture.slug);
-    }
+    toggleLectureSaved(isSaved, loadedLecture);
   };
 
   const view: LoadedLectureView = {
