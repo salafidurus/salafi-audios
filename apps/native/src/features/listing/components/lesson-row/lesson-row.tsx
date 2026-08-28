@@ -49,6 +49,51 @@ function renderDownload(item: ListingContentItemDto) {
   return <DownloadButton listingSlug={item.slug} audioUrl={item.primaryAudioAsset.url} />;
 }
 
+function LessonRowContent({
+  item,
+  duration,
+  progressPercent,
+  isCompleted,
+}: {
+  item: ListingContentItemDto;
+  duration: string;
+  progressPercent: number;
+  isCompleted: boolean;
+}) {
+  return (
+    <View style={styles.content}>
+      <AppText variant="bodyLg" numberOfLines={2}>
+        {item.title}
+      </AppText>
+      {duration ? (
+        <AppText variant="bodySm" style={styles.meta}>
+          {duration}
+        </AppText>
+      ) : null}
+      {renderProgress(progressPercent, isCompleted)}
+      <DownloadProgress listingSlug={item.slug} />
+    </View>
+  );
+}
+
+function LessonRowPlayButton({
+  isCurrentlyPlaying,
+  theme,
+}: {
+  isCurrentlyPlaying: boolean;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+}) {
+  return (
+    <View style={styles.playButton}>
+      {isCurrentlyPlaying ? (
+        <Pause size={18} color={theme.colors.content.strong} />
+      ) : (
+        <Play size={18} color={theme.colors.content.strong} />
+      )}
+    </View>
+  );
+}
+
 export type LessonRowProps = {
   item: ListingContentItemDto;
   queue: Track[];
@@ -82,26 +127,14 @@ export function LessonRow({ item, queue, highlighted = false, onLayout }: Lesson
         transition={{ type: "timing", duration: 2000 }}
       >
         <Pressable onPress={handlePress} style={styles.row}>
-          <View style={styles.content}>
-            <AppText variant="bodyLg" numberOfLines={2}>
-              {item.title}
-            </AppText>
-            {durationStr ? (
-              <AppText variant="bodySm" style={styles.meta}>
-                {durationStr}
-              </AppText>
-            ) : null}
-            {renderProgress(progressPercent, isCompleted)}
-            <DownloadProgress listingSlug={item.slug} />
-          </View>
+          <LessonRowContent
+            item={item}
+            duration={durationStr}
+            progressPercent={progressPercent}
+            isCompleted={isCompleted}
+          />
           {renderDownload(item)}
-          <View style={styles.playButton}>
-            {isCurrentlyPlaying ? (
-              <Pause size={18} color={theme.colors.content.strong} />
-            ) : (
-              <Play size={18} color={theme.colors.content.strong} />
-            )}
-          </View>
+          <LessonRowPlayButton isCurrentlyPlaying={isCurrentlyPlaying} theme={theme} />
         </Pressable>
       </EaseView>
     </View>

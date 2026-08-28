@@ -16,6 +16,57 @@ type UserAvatarProps = {
 
 type AvatarTheme = ReturnType<typeof useUnistyles>["theme"];
 
+function renderImage(
+  size: number,
+  fill: boolean,
+  borderRadius: number,
+  image: string,
+  testID?: string,
+): ReactNode {
+  return (
+    <Image
+      source={{ uri: image }}
+      style={
+        fill ? [styles.fillImage, { borderRadius }] : { width: size, height: size, borderRadius }
+      }
+      contentFit="cover"
+      testID={testID}
+    />
+  );
+}
+
+function renderFallback(
+  name: string | null | undefined,
+  size: number,
+  fill: boolean,
+  borderRadius: number,
+  theme: AvatarTheme,
+  testID?: string,
+): ReactNode {
+  const fallbackStyle = fill
+    ? [styles.fillFallback, { backgroundColor: theme.colors.surface.subtle, borderRadius }]
+    : [
+        styles.fallback,
+        {
+          width: size,
+          height: size,
+          borderRadius,
+          backgroundColor: theme.colors.surface.subtle,
+        },
+      ];
+  const textStyle = fill
+    ? { color: theme.colors.content.muted }
+    : { color: theme.colors.content.muted, fontSize: size * 0.4 };
+
+  return (
+    <View testID={testID} style={fallbackStyle}>
+      <AppText variant={fill ? "titleMd" : "bodyLg"} style={textStyle}>
+        {name?.charAt(0)?.toUpperCase() ?? "?"}
+      </AppText>
+    </View>
+  );
+}
+
 function renderAvatar(
   image: string | null | undefined,
   name: string | null | undefined,
@@ -25,45 +76,9 @@ function renderAvatar(
   theme: AvatarTheme,
   testID?: string,
 ): ReactNode {
-  if (image) {
-    return (
-      <Image
-        source={{ uri: image }}
-        style={
-          fill ? [styles.fillImage, { borderRadius }] : { width: size, height: size, borderRadius }
-        }
-        contentFit="cover"
-        testID={testID}
-      />
-    );
-  }
-  return (
-    <View
-      testID={testID}
-      style={[
-        fill ? styles.fillFallback : styles.fallback,
-        fill
-          ? { backgroundColor: theme.colors.surface.subtle, borderRadius }
-          : {
-              width: size,
-              height: size,
-              borderRadius,
-              backgroundColor: theme.colors.surface.subtle,
-            },
-      ]}
-    >
-      <AppText
-        variant={fill ? "titleMd" : "bodyLg"}
-        style={
-          fill
-            ? { color: theme.colors.content.muted }
-            : { color: theme.colors.content.muted, fontSize: size * 0.4 }
-        }
-      >
-        {name?.charAt(0)?.toUpperCase() ?? "?"}
-      </AppText>
-    </View>
-  );
+  return image
+    ? renderImage(size, fill, borderRadius, image, testID)
+    : renderFallback(name, size, fill, borderRadius, theme, testID);
 }
 
 export function UserAvatar({
