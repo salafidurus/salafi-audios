@@ -36,6 +36,7 @@
   "scripts": {
     "agents:update": "bun scripts/sync-agents.mjs",
     "catalog": "bun ./infra/catalog/cli.ts",
+    "dependabot-helper": "bun ./infra/dependabot-helper/cli.ts",
     "dead-code-audit": "bun scripts/dead-code-audit/cli.mjs",
     "dev": "turbo watch dev --filter=api --filter=web --filter=native",
     "dev:api": "turbo watch dev --filter=api",
