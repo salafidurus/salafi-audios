@@ -13,6 +13,57 @@ const AppleNativeSessionResponseSchema = z.object({
   }),
 });
 
+async function checkAppleAvailability(): Promise<string | null> {
+  try {
+    if (await AppleAuthentication.isAvailableAsync()) return null;
+    return "Apple Sign-In is not available on this device";
+  } catch {
+    return "Failed to check Apple Sign-In availability";
+  }
+}
+
+async function completeAppleSignIn() {
+  const credential = await AppleAuthentication.signInAsync({
+    requestedScopes: [
+      AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+      AppleAuthentication.AppleAuthenticationScope.EMAIL,
+    ],
+  });
+
+  if (!credential.identityToken) {
+    throw new Error("No identity token returned from Apple");
+  }
+
+  const response = await fetch(`${getApiBaseUrl()}/api/auth/apple/native`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      identityToken: credential.identityToken,
+      user: {
+        id: credential.user,
+        email: credential.email,
+        firstName: credential.fullName?.givenName,
+        lastName: credential.fullName?.familyName,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Server returned ${response.status}: ${body}`);
+  }
+
+  const { session } = AppleNativeSessionResponseSchema.parse(await response.json());
+  const cookieData = JSON.stringify({
+    "better-auth.session_token": {
+      value: session.id,
+      expires: session.expiresAt ?? null,
+    },
+  });
+  await SecureStore.setItemAsync("better-auth_cookie", cookieData);
+  await refreshSession();
+}
+
 export function useNativeAppleSignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,66 +71,16 @@ export function useNativeAppleSignIn() {
   const signIn = useCallback(async () => {
     setError(null);
 
-    try {
-      const isAvailable = await AppleAuthentication.isAvailableAsync();
-      if (!isAvailable) {
-        setError("Apple Sign-In is not available on this device");
-        return;
-      }
-    } catch {
-      setError("Failed to check Apple Sign-In availability");
+    const availabilityError = await checkAppleAvailability();
+    if (availabilityError) {
+      setError(availabilityError);
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
-        ],
-      });
-
-      if (!credential.identityToken) {
-        throw new Error("No identity token returned from Apple");
-      }
-
-      const response = await fetch(`${getApiBaseUrl()}/api/auth/apple/native`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          identityToken: credential.identityToken,
-          user: {
-            id: credential.user,
-            email: credential.email,
-            firstName: credential.fullName?.givenName,
-            lastName: credential.fullName?.familyName,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        const body = await response.text();
-        throw new Error(`Server returned ${response.status}: ${body}`);
-      }
-
-      const parsedResponse = AppleNativeSessionResponseSchema.parse(await response.json());
-      const { session } = parsedResponse;
-
-      // Persist session token using better-auth expo client cookie structure
-      const cookieData = JSON.stringify({
-        "better-auth.session_token": {
-          value: session.id,
-          expires: session.expiresAt ?? null,
-        },
-      });
-      await SecureStore.setItemAsync("better-auth_cookie", cookieData);
-
-      // Force useSession() to pick up the session we just wrote directly to
-      // SecureStore - this custom endpoint doesn't go through better-auth's
-      // normal Set-Cookie flow, so nothing else would trigger a refetch.
-      await refreshSession();
+      await completeAppleSignIn();
 
       setIsLoading(false);
       // Router navigation handled by parent component watching auth state via useAuth()
