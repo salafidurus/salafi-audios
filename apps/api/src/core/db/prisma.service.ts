@@ -14,19 +14,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     config: ConfigService,
     private readonly logger: PinoLogger,
   ) {
-    const connectionString =
-      config?.DATABASE_URL ?? process.env['DATABASE_URL'] ?? process.env['DIRECT_DB_URL'];
-
-    if (!connectionString) {
-      throw new Error('DATABASE_URL is required and no DB fallback is allowed.');
-    }
-
+    const connectionString = requireDatabaseConnection(config);
     const adapter = new PrismaPg({ connectionString });
     super({
       adapter,
-      log: getPrismaLogLevels(
-        config?.PRISMA_LOG_QUERIES ?? process.env['PRISMA_LOG_QUERIES'] === 'true',
-      ),
+      log: getPrismaLogLevels(getPrismaLogQueries(config)),
     });
     this.logger?.setContext(PrismaService.name);
   }
@@ -55,4 +47,17 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       throw err;
     }
   }
+}
+
+function requireDatabaseConnection(config: ConfigService): string {
+  const connectionString =
+    config?.DATABASE_URL ?? process.env['DATABASE_URL'] ?? process.env['DIRECT_DB_URL'];
+  if (!connectionString) {
+    throw new Error('DATABASE_URL is required and no DB fallback is allowed.');
+  }
+  return connectionString;
+}
+
+function getPrismaLogQueries(config: ConfigService): boolean {
+  return config?.PRISMA_LOG_QUERIES ?? process.env['PRISMA_LOG_QUERIES'] === 'true';
 }
