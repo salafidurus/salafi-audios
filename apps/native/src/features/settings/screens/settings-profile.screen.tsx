@@ -138,6 +138,10 @@ function isProfileInputDisabled(isEditing: boolean) {
   return !isEditing;
 }
 
+function getProfileInputStyles(isEditing: boolean) {
+  return isProfileInputDisabled(isEditing) ? [styles.input, styles.inputDisabled] : [styles.input];
+}
+
 function shouldHideEmailBorder(roles: string[]) {
   return roles.length === 0;
 }
@@ -276,7 +280,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
               placeholder={t("account.profile.displayNamePlaceholder", "Your display name")}
               placeholderTextColor={theme.colors.content.muted}
               editable={isEditing}
-              style={[styles.input, isProfileInputDisabled(isEditing) && styles.inputDisabled]}
+              style={getProfileInputStyles(isEditing)}
             />
             <ProfileEditControls
               isEditing={isEditing}
