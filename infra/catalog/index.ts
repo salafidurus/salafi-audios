@@ -42,3 +42,15 @@ export { getUnusedCatalogEntries, runCatalogPrune } from "./scanner/prune";
 export { runCatalogStats } from "./scanner/stats";
 
 export { evaluateCatalogUpdate, resolveCatalogPolicy } from "./policy";
+
+export {
+  DEPENDABOT_AUDIT_MARKER,
+  formatDependabotAuditComment,
+  hasMatchingAuditComment,
+  validateDependabotFiles,
+} from "./dependabot";
+export type {
+  DependabotAuditContext,
+  DependabotFileValidation,
+  DependabotValidation,
+} from "./dependabot";

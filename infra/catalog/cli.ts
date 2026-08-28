@@ -57,9 +57,18 @@ function main() {
     case "fix": {
       const force = process.argv.includes("--force") || process.argv.includes("-f");
       const dryRun = process.argv.includes("--dry-run") || process.argv.includes("--report-only");
+      const json = process.argv.includes("--json");
       if (force && dryRun) throw new Error("--dry-run cannot be combined with --force");
       const result = force ? undefined : runCatalogFix(rootDir, { dryRun });
       const updatedFiles = force ? runCatalogFixForce(rootDir).updatedFiles : result!.updatedFiles;
+      if (json) {
+        if (force) throw new Error("--json cannot be combined with --force");
+        console.log(JSON.stringify(result!.report));
+        if (result!.report.status === "rejected" || result!.report.status === "invalid") {
+          process.exitCode = 1;
+        }
+        break;
+      }
       if (updatedFiles.length > 0) {
         console.log(
           `\x1b[32m${dryRun ? "Planned" : "Successfully aligned"} catalog changes in: ${updatedFiles.join(", ")}\x1b[0m`,
