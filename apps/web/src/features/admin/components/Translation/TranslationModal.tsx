@@ -41,6 +41,20 @@ export interface TranslationModalProps {
   target: ClientTranslationTarget | null;
 }
 
+function getPublishAction(
+  config: TranslationEntityConfig | null,
+  state: TranslationFormState,
+  locale: Locale,
+) {
+  if (!config || !config.supportsPublish || !state.entityId) return null;
+  const currentlyPublished = state.translationStatus[locale] === "published";
+  return {
+    action: currentlyPublished ? config.unpublish : config.publish,
+    currentlyPublished,
+    entityId: state.entityId,
+  };
+}
+
 function TranslationStatusNotices({
   status,
   entityId,
@@ -304,17 +318,15 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
   };
 
   async function handlePublishToggle(locale: Locale) {
-    // Closures defined after the early return above don't retain TypeScript's
-    // null-narrowing of `config`, so it's re-checked here.
-    if (!config || !config.supportsPublish || !state.entityId) return;
-    const currentlyPublished = state.translationStatus[locale] === "published";
-    const action = currentlyPublished ? config.unpublish : config.publish;
+    const request = getPublishAction(config, state, locale);
+    if (!request) return;
+    const { action, currentlyPublished, entityId } = request;
     if (!action) return;
 
     dispatch({ type: "SET_SAVING", saving: true });
     dispatch({ type: "SET_ERROR", error: null });
     try {
-      const result = await action(state.entityId, locale);
+      const result = await action(entityId, locale);
       dispatch({
         type: "SET_STATUS",
         locale,
