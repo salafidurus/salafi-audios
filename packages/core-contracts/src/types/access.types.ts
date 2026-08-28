@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { LocaleSchema } from "./localization.types";
 
+/** Schemas for scoped capabilities, access grants, and backend-provided access snapshots. */
 export const AccessTargetEnum = z.enum([
   "scholar",
   "listing",

@@ -8,6 +8,7 @@ import {
 } from "./localization.types";
 import { ScholarTitleSchema } from "./scholar.types";
 
+/** Home-surface promotion, suggestion, and recent-progress response contracts. */
 export const ScholarChipDtoSchema = z.object({
   id: z.string(),
   name: z.string(),

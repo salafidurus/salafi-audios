@@ -6,10 +6,14 @@
  */
 import { routes } from "./routes";
 
+/** Canonical navigation metadata shared by web and native clients. */
+/** Identifies a top-level navigation section with shared tab metadata. */
 export type Section = "explore" | "myLibrary" | "settings" | "adminContents";
 
+/** Platform-neutral metadata required to render one navigation tab. */
 export type TabConfig = { id: string; label: string; labelKey: string; icon: string };
 
+/** Complete tab definitions for every supported navigation section. */
 export const SECTION_TABS = {
   explore: [
     { id: "recent", label: "Recent", labelKey: "navigation.subnav.explore.recent", icon: "clock" },
@@ -76,6 +80,7 @@ export const SECTION_TABS = {
   ],
 } satisfies Record<Section, TabConfig[]>;
 
+/** Default tab selected when a section has no persisted navigation state. */
 export const DEFAULT_TABS = {
   explore: "recent",
   myLibrary: "started",
@@ -83,6 +88,7 @@ export const DEFAULT_TABS = {
   adminContents: "topics",
 } satisfies Record<Section, string>;
 
+/** English fallback labels for top-level navigation sections. */
 export const SECTION_LABELS = {
   explore: "Explore",
   myLibrary: "My Library",
@@ -90,6 +96,7 @@ export const SECTION_LABELS = {
   adminContents: "Content",
 } satisfies Record<Section, string>;
 
+/** Canonical route associated with each top-level navigation section. */
 export const SECTION_ROUTES = {
   explore: routes.explore.index,
   myLibrary: routes.myLibrary.index,

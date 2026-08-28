@@ -1,3 +1,4 @@
+/** Public barrel exposing the shared HTTP, navigation, route, query, and DTO contracts. */
 // Export HTTP client
 export { httpClient, getApiBaseUrl } from "./http";
 export type { HttpClientConfig } from "./http";

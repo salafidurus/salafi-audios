@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+/** Media upload, presigned-URL, and audio-file request and response contracts. */
 export const PresignedUrlPurposeSchema = z.enum(["audio", "image"]);
 export type PresignedUrlPurpose = z.infer<typeof PresignedUrlPurposeSchema>;
 

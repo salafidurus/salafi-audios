@@ -7,6 +7,7 @@ import {
   type HomePromotionListingDto,
 } from "./home.types";
 
+/** Discovery-feed item, branch, and pagination contracts returned by the public catalog API. */
 export const FeedContentItemDtoSchema = HomePromotionListingDtoSchema;
 export type FeedContentItemDto = HomePromotionListingDto;
 

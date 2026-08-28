@@ -1,3 +1,4 @@
+/** Re-exports the complete shared DTO and schema vocabulary for package consumers. */
 export {
   AccessTargetEnum,
   type AccessTarget,

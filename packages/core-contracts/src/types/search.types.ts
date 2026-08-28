@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
 import { ScholarTitleSchema } from "./scholar.types";
 
+/** Search and quick-browse request and response contracts for public catalog discovery. */
 export const SearchCatalogParamsSchema = z.object({
   q: z.string().optional(),
   limit: z.number().optional(),

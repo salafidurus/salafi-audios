@@ -8,9 +8,13 @@ import {
 } from "./localization.types";
 import { TranslationViewDtoSchema } from "./translation.types";
 
+/** Scholar identity, profile, catalog-summary, and statistics contracts. */
+/** Allowed honorifics used when presenting a scholar's name. */
 export const ScholarTitleSchema = z.enum(["allamah", "sheikh", "ustadh", "akh"]);
+/** Scholar honorific union inferred from {@link ScholarTitleSchema}. */
 export type ScholarTitle = z.infer<typeof ScholarTitleSchema>;
 
+/** Scholar-associated catalog item shown in content listings. */
 export const ScholarContentItemDtoSchema = z.object({
   id: z.string(),
   slug: z.string(),
@@ -24,13 +28,17 @@ export const ScholarContentItemDtoSchema = z.object({
   originalLanguage: LocaleSchema.optional(),
   original: ContentOriginalFieldsSchema.optional(),
 });
+/** Validated scholar content-list item. */
 export type ScholarContentItemDto = z.infer<typeof ScholarContentItemDtoSchema>;
 
+/** Unified collection of catalog items associated with a scholar. */
 export const ScholarContentUnifiedDtoSchema = z.object({
   items: z.array(ScholarContentItemDtoSchema),
 });
+/** Validated unified scholar-content response. */
 export type ScholarContentUnifiedDto = z.infer<typeof ScholarContentUnifiedDtoSchema>;
 
+/** Compact public scholar projection for catalog cards and lists. */
 export const ScholarViewDtoSchema = z.object({
   id: z.string(),
   slug: z.string(),
@@ -39,8 +47,10 @@ export const ScholarViewDtoSchema = z.object({
   isActive: z.boolean(),
   title: ScholarTitleSchema.optional(),
 });
+/** Validated compact public scholar response. */
 export type ScholarViewDto = z.infer<typeof ScholarViewDtoSchema>;
 
+/** Full public scholar profile, including localization and social metadata. */
 export const ScholarDetailDtoSchema = z.object({
   id: z.string(),
   slug: z.string(),
@@ -62,8 +72,10 @@ export const ScholarDetailDtoSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string().optional(),
 });
+/** Validated full scholar-detail response. */
 export type ScholarDetailDto = z.infer<typeof ScholarDetailDtoSchema>;
 
+/** Content-count and duration aggregates for a scholar detail view. */
 export const ScholarDetailStatsSchema = z.object({
   lectureCount: z.number(),
   seriesCount: z.number(),
@@ -71,8 +83,10 @@ export const ScholarDetailStatsSchema = z.object({
   totalDurationSeconds: z.number(),
   totalContentDurationSeconds: z.number(),
 });
+/** Validated scholar detail statistics. */
 export type ScholarDetailStats = z.infer<typeof ScholarDetailStatsSchema>;
 
+/** Broader scholar statistics used by administrative and discovery surfaces. */
 export const ScholarStatsDtoSchema = z.object({
   seriesCount: z.number(),
   lecturesCount: z.number(),
@@ -81,8 +95,10 @@ export const ScholarStatsDtoSchema = z.object({
   seriesListingCount: z.number(),
   singlesCount: z.number(),
 });
+/** Validated scholar statistics response. */
 export type ScholarStatsDto = z.infer<typeof ScholarStatsDtoSchema>;
 
+/** Compact scholar row used in paginated public lists. */
 export const ScholarListItemDtoSchema = z.object({
   id: z.string(),
   slug: z.string(),
@@ -94,8 +110,10 @@ export const ScholarListItemDtoSchema = z.object({
   title: ScholarTitleSchema.optional(),
   lectureCount: z.number(),
 });
+/** Validated scholar-list item response. */
 export type ScholarListItemDto = z.infer<typeof ScholarListItemDtoSchema>;
 
+/** Compact collection summary associated with a scholar. */
 export const CollectionSummaryDtoSchema = z.object({
   id: z.string(),
   slug: z.string(),
@@ -107,8 +125,10 @@ export const CollectionSummaryDtoSchema = z.object({
   originalLanguage: LocaleSchema.optional(),
   original: ContentOriginalFieldsSchema.optional(),
 });
+/** Validated collection summary response. */
 export type CollectionSummaryDto = z.infer<typeof CollectionSummaryDtoSchema>;
 
+/** Compact series summary associated with a scholar. */
 export const SeriesSummaryDtoSchema = z.object({
   id: z.string(),
   slug: z.string(),
@@ -120,6 +140,7 @@ export const SeriesSummaryDtoSchema = z.object({
   originalLanguage: LocaleSchema.optional(),
   original: ContentOriginalFieldsSchema.optional(),
 });
+/** Validated series summary response. */
 export type SeriesSummaryDto = z.infer<typeof SeriesSummaryDtoSchema>;
 
 /** Summary of a Single (a standalone Lecture), as shown in a scholar's Catalog. */
@@ -132,8 +153,10 @@ export const SingleSummaryDtoSchema = z.object({
   originalLanguage: LocaleSchema.optional(),
   original: ContentOriginalFieldsSchema.optional(),
 });
+/** Validated standalone-listing summary response. */
 export type SingleSummaryDto = z.infer<typeof SingleSummaryDtoSchema>;
 
+/** Topic-grouped content associated with a scholar. */
 export const ScholarTopicsDtoSchema = z.object({
   topics: z.array(
     z.object({
@@ -143,8 +166,10 @@ export const ScholarTopicsDtoSchema = z.object({
     }),
   ),
 });
+/** Validated scholar-topic response. */
 export type ScholarTopicsDto = z.infer<typeof ScholarTopicsDtoSchema>;
 
+/** Administrative request for creating a scholar and its initial profile metadata. */
 export const CreateScholarDtoSchema = z.object({
   name: z.string().min(1, "Name must not be empty"),
   slug: z.string().min(1, "Slug must not be empty"),
@@ -161,8 +186,10 @@ export const CreateScholarDtoSchema = z.object({
   socialYoutube: z.url().optional().or(z.literal("")),
   socialWebsite: z.url().optional().or(z.literal("")),
 });
+/** Validated scholar-creation request. */
 export type CreateScholarDto = z.infer<typeof CreateScholarDtoSchema>;
 
+/** Administrative request for partially updating scholar profile metadata. */
 export const UpdateScholarDtoSchema = z.object({
   name: z.string().min(1, "Name must not be empty").optional(),
   bio: z.string().optional(),
@@ -178,21 +205,27 @@ export const UpdateScholarDtoSchema = z.object({
   socialYoutube: z.url().optional().or(z.literal("")),
   socialWebsite: z.url().optional().or(z.literal("")),
 });
+/** Validated scholar-update request. */
 export type UpdateScholarDto = z.infer<typeof UpdateScholarDtoSchema>;
 
+/** Administrative request for creating a scholar translation. */
 export const SaveScholarTranslationDtoSchema = z.object({
   locale: LocaleSchema,
   name: z.string().min(1, "Name must not be empty"),
   bio: z.string().nullable().optional(),
 });
+/** Validated scholar-translation creation request. */
 export type SaveScholarTranslationDto = z.infer<typeof SaveScholarTranslationDtoSchema>;
 
+/** Administrative request for updating an existing scholar translation. */
 export const UpdateScholarTranslationDtoSchema = z.object({
   name: z.string().optional(),
   bio: z.string().nullable().optional(),
 });
+/** Validated scholar-translation update request. */
 export type UpdateScholarTranslationDto = z.infer<typeof UpdateScholarTranslationDtoSchema>;
 
+/** Scholar editing payload combining the base record with available translations. */
 export const ScholarFormDataDtoSchema = z.object({
   scholar: z.object({
     id: z.string(),
@@ -214,6 +247,7 @@ export const ScholarFormDataDtoSchema = z.object({
   }),
   translations: z.array(TranslationViewDtoSchema),
 });
+/** Validated scholar form-data response. */
 export type ScholarFormDataDto = z.infer<typeof ScholarFormDataDtoSchema>;
 
 const AdminScholarTranslationSchema = z.object({
@@ -222,6 +256,7 @@ const AdminScholarTranslationSchema = z.object({
   status: z.enum(["draft", "published"]),
 });
 
+/** Administrative scholar row with editorial and translation metadata. */
 export const AdminScholarListItemDtoSchema = z.object({
   id: z.string(),
   slug: z.string(),
@@ -241,18 +276,23 @@ export const AdminScholarListItemDtoSchema = z.object({
   updatedAt: z.string().optional(),
   translations: z.array(AdminScholarTranslationSchema),
 });
+/** Validated administrative scholar-list item. */
 export type AdminScholarListItemDto = z.infer<typeof AdminScholarListItemDtoSchema>;
 
+/** Cursor-paginated administrative scholar list. */
 export const AdminScholarListDtoSchema = z.object({
   items: z.array(AdminScholarListItemDtoSchema),
   nextCursor: z.string().optional(),
   hasMore: z.boolean(),
 });
+/** Validated administrative scholar-list response. */
 export type AdminScholarListDto = z.infer<typeof AdminScholarListDtoSchema>;
 
+/** Cursor-paginated public scholar list. */
 export const ScholarListDtoSchema = z.object({
   scholars: z.array(ScholarListItemDtoSchema),
   nextCursor: z.string().optional(),
   hasMore: z.boolean(),
 });
+/** Validated public scholar-list response. */
 export type ScholarListDto = z.infer<typeof ScholarListDtoSchema>;

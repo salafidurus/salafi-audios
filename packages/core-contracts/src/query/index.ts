@@ -4,6 +4,7 @@ import type { SearchCatalogParams } from "../types";
 
 import { HttpError } from "../http";
 
+/** Shared React Query configuration and stable cache-key vocabulary for API data. */
 // Centralized query client configuration
 export const createQueryClient = () =>
   new QueryClient({

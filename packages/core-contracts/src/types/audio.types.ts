@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+/** Stream and listening-progress contracts exchanged by audio clients and the API. */
 export const StreamResponseDtoSchema = z.object({
   url: z.string(),
   durationSeconds: z.number(),

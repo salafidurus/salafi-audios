@@ -1,3 +1,4 @@
+/** Canonical API endpoint paths shared by web, native, and backend-facing clients. */
 export const endpoints = {
   search: {
     general: "/search",

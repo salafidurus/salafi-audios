@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+/** Primitive status, pagination, and error-response contracts reused across API DTOs. */
 export const STATUS_VALUES = ["draft", "review", "published", "archived"] as const;
 export const StatusValueSchema = z.enum(STATUS_VALUES);
 export type StatusValue = z.infer<typeof StatusValueSchema>;

@@ -4,6 +4,7 @@ import { StatusValueSchema } from "./common.types";
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
 import { TranslationViewDtoSchema } from "./translation.types";
 
+/** Public and administrative topic DTOs, translations, and nested lecture contracts. */
 export const TopicSlugSchema = z.string();
 export type TopicSlug = z.infer<typeof TopicSlugSchema>;
 
