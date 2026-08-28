@@ -49,6 +49,10 @@ function getReviewChanges(state: FormState): ReviewChanges {
     : getCreateReviewChanges(title, language, coverImageUrl, selectedTopics);
 }
 
+function hasReviewChanges(changes: ReviewChanges): boolean {
+  return Object.values(changes).some(Boolean);
+}
+
 function getCreateReviewChanges(
   title: string,
   language: Locale,
@@ -219,20 +223,7 @@ export function ListingReviewSection({ state, mainLocale, topics }: ListingRevie
   // topics, and coverImage ARE part of the create payload, so those are
   // shown whenever they've been set, mirroring how the title is handled.
   const changes = getReviewChanges(state);
-  const {
-    titleChanged,
-    descriptionChanged,
-    statusChanged,
-    orderIndexChanged,
-    languageChanged,
-    coverImageChanged,
-    topicsChanged,
-  } = changes;
-
-  const hasMainChanges = titleChanged || descriptionChanged;
-  const hasDetailChanges =
-    statusChanged || orderIndexChanged || languageChanged || coverImageChanged || topicsChanged;
-  const hasAnyChanges = hasMainChanges || hasDetailChanges;
+  const hasAnyChanges = hasReviewChanges(changes);
 
   if (!hasAnyChanges) {
     return (
