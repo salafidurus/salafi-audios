@@ -21,7 +21,7 @@ without updating this index.
 Key policies:
 
 - [`Dependency automation`](policies/dependency-automation.md): ownership
-  boundaries for Dependabot, `pkg-update`, and catalog tooling
+  boundaries for Dependabot, Dependabot Helper, and catalog alignment
 
 ## Reading order
 
