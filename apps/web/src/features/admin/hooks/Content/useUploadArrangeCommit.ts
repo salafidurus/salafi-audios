@@ -135,6 +135,30 @@ async function commitUploadedItems(
   await commitArrange(existing.id, buildCommitDto(stateWithKeys));
 }
 
+async function prepareItemsToUpload(
+  state: UploadArrangeState,
+  dispatch: React.Dispatch<UploadArrangeAction>,
+): Promise<UploadItem[]> {
+  const pending = state.items.filter((item) => item.upload.status !== "done");
+  return pending.length > 0 ? presignPendingItems(state, pending, dispatch) : pending;
+}
+
+async function uploadPendingItems(
+  items: UploadItem[],
+  dispatch: React.Dispatch<UploadArrangeAction>,
+): Promise<boolean> {
+  if (items.length === 0) return true;
+  dispatch({ type: "SET_PHASE", phase: "uploading" });
+  const ok = await uploadWithConcurrency(items, dispatch);
+  if (!ok) {
+    dispatch({
+      type: "SET_ERROR",
+      error: "Some files failed to upload. Fix the errors and try again.",
+    });
+  }
+  return ok;
+}
+
 /**
  * The Upload-button flow: batch presign → parallel R2 PUTs with progress →
  * one transactional commit. Retries reuse already-uploaded objectKeys.
@@ -150,24 +174,10 @@ export function useUploadArrangeCommit(
 
     try {
       // 1. Presign any item that doesn't already hold an objectKey (retry-safe).
-      const needsPresign = state.items.filter((item) => item.upload.status !== "done");
-      let itemsToUpload = needsPresign;
-      if (needsPresign.length > 0) {
-        itemsToUpload = await presignPendingItems(state, needsPresign, dispatch);
-      }
+      const itemsToUpload = await prepareItemsToUpload(state, dispatch);
 
       // 2. Upload in parallel with per-item progress.
-      if (itemsToUpload.length > 0) {
-        dispatch({ type: "SET_PHASE", phase: "uploading" });
-        const ok = await uploadWithConcurrency(itemsToUpload, dispatch);
-        if (!ok) {
-          dispatch({
-            type: "SET_ERROR",
-            error: "Some files failed to upload. Fix the errors and try again.",
-          });
-          return;
-        }
-      }
+      if (!(await uploadPendingItems(itemsToUpload, dispatch))) return;
 
       // 3. Commit — one transactional call (or the media endpoint for singles).
       dispatch({ type: "SET_PHASE", phase: "committing" });
