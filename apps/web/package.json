@@ -53,7 +53,7 @@
   "devDependencies": {
     "@playwright/test": "^1.62.0",
     "@tailwindcss/postcss": "^4",
-    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
