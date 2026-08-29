@@ -133,3 +133,21 @@ roles) map to the emitted design-token variables in `src/app/globals.css`.
 `ThemeSync` keeps the document `data-theme` attribute and `.dark` class
 synchronized so Tailwind `dark:` utilities follow the same state as the
 CSS-variable themes.
+
+## 9. Browser E2E boundary
+
+Web browser journeys run through the production-built application using native
+`Bun.WebView` and `bun:test`, as recorded in [ADR 0007](../adr/0007-bun-webview-browser-e2e.md).
+The browser boundary is Chromium-only. `Bun.WebView` is experimental and on
+Linux requires an installed Chrome-family executable.
+
+The repository-owned harness creates an isolated browser profile for each
+journey, waits for explicit application conditions, and removes the browser
+profile and server after success or failure. A failed journey records its test
+identity, URL, screenshot, DOM snapshot, console output, and error.
+
+Use **browser journey** for a user-visible flow at the running web application
+boundary. Use **web unit test** for component or DOM-environment behavior, and
+use **API E2E** for HTTP behavior at the backend boundary. These terms are not
+interchangeable, and browser journeys must not reach into React component
+internals or backend persistence.

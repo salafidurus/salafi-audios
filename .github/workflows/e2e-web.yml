@@ -49,6 +49,13 @@ jobs:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
         run: bun run turbo run build --filter=web...
 
+      - name: Verify Bun.WebView Chrome prerequisite
+        run: |
+          chrome_bin="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          [ -n "$chrome_bin" ] || { echo "No Chrome-family executable is available for Bun.WebView"; exit 1; }
+          echo "Using Chrome-family executable: $chrome_bin"
+          "$chrome_bin" --version
+
       - name: Run Bun.WebView journeys
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:4000' }}
