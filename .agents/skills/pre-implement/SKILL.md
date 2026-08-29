@@ -18,9 +18,9 @@ relevant ticket/dependency graph first, then plan only the selected ticket.
 ## Investigation
 
 When planning isolated work, recommend a worktree under the repository-root
-`.worktree/`, based on `origin/main`. Choose a concise slug of two or three
-short words and use the same slug in the worktree path and branch name. Apply
-the appropriate prefix:
+`.worktree/`, based on `origin/main`. Choose a concise slug: prefer one word
+and never use more than two words. Use the same slug in the worktree path and
+branch name. Apply the appropriate prefix:
 
 - Chore or CI: `.worktree/c-<slug>`, branch `c/<slug>`
 - Feature: `.worktree/f-<slug>`, branch `f/<slug>`
@@ -28,6 +28,13 @@ the appropriate prefix:
 
 For example, use the slug `audio-improve` to recommend
 `.worktree/c-audio-improve` with branch `c/audio-improve`.
+
+For a specification ticket, resolve the parent specification and its recorded
+`spec/<slug>` integration branch. The plan must identify that parent and carry
+the current spec branch as the ticket's branch context. For standalone bug,
+research, maintenance, or other non-specification work, explicitly record
+that no parent specification or spec branch applies and retain the existing
+`origin/main` base.
 
 Read and cross-reference:
 

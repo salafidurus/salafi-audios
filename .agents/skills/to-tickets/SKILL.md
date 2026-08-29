@@ -15,7 +15,7 @@ repository's GitHub workflow and label vocabulary.
 
 ### 1. Gather context
 
-Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
+Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments. For a specification ticket, resolve the parent specification and its recorded `spec/<slug>` branch before drafting the ticket. A standalone ticket has no parent specification and no spec-branch context.
 
 ### 2. Explore the codebase (optional)
 
@@ -129,8 +129,10 @@ differences:
 - **GitHub:** when the ticket belongs to a specification, the first line must
   be `Part of #<spec-number>`. Use a concise Conventional Commit-style title,
   and apply the `ticket` and `ready-for-agent` labels unless the workflow says
-  otherwise. Represent blockers in both the body and GitHub's native dependency
-  graph when available.
+  otherwise. Preserve the parent specification and spec branch in the ticket's
+  lifecycle context; specification ticket branches use the recorded spec
+  branch as their integration context. Represent blockers in both the body and
+  GitHub's native dependency graph when available.
 - **Local files:** number files from `01` in dependency order under the
   feature's issue directory. Keep the ticket title, contracts, acceptance
   criteria, out-of-scope boundary, and blocker wording from the canonical

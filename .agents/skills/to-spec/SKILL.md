@@ -17,7 +17,17 @@ repository's GitHub workflow and label vocabulary.
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below, then publish it to the project issue tracker. Apply both `ready-for-agent` and the `spec` artifact label - no need for additional triage. If the tracker does not have `spec` yet, create it before publishing.
+3. Choose a concise slug for the specification: prefer one word and never use
+   more than two words. Create `spec/<slug>` from `main` (the local equivalent
+   is `origin/main`) before publishing the specification issue. The branch is
+   disposable integration context and belongs to exactly one specification.
+
+4. Write the spec using the template below, then publish it to the project
+   issue tracker. Apply both `ready-for-agent` and the `spec` artifact label -
+   no need for additional triage. If the tracker does not have `spec` yet,
+   create it before publishing. After publication, record the specification
+   issue number and `spec/<slug>` branch together on the specification issue so
+   `to-tickets` and later lifecycle stages can resolve the same context.
 
 After the approved specification is published, recommend proceeding to `to-tickets`.
 

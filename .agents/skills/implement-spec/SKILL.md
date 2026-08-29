@@ -11,6 +11,11 @@ The tickets form a task graph with blocking relationships. Maintain the
 frontier of unblocked tickets and process tickets in dependency order. This
 skill does not implement the specification as one undifferentiated task.
 
+Each specification has one disposable `spec/<slug>` integration context,
+created from `main` and associated with exactly one parent specification.
+Carry that context while selecting and handing off its tickets; tickets with
+no parent specification remain standalone and use the existing lifecycle.
+
 Before editing, read the root and nearest workspace `AGENT.md` files and the
 `tdd` skill. Every ticket cycle follows the `pre-implement`, `implement`, and
 `post-implement` lifecycle skills for checkout, setup, verification, and
