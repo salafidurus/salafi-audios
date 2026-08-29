@@ -119,3 +119,31 @@ resolution.
 - Prefer extending contracts over replacing them.
 - Deprecate intentionally rather than letting clients drift.
 - If API behavior changes materially, update docs and `@sd/core-contracts` together.
+
+## 9. Runtime Stack and Version Floor
+
+### Version Constraints
+
+- **Runtime Environment**: Node.js `>= 22.12.0` (required by NestJS 12 for native ESM/CJS compatibility features).
+- **Nest CLI Environment**: `@nestjs/cli` `>= 22.22.3`.
+- **Package Manager & Test Runner**: Bun `>= 1.4.0` (direct TypeScript execution via SWC transpiler retains raw `.ts` source execution with zero intermediate build output).
+
+### ESM Module Resolution Gating under Bun
+
+NestJS 12 packages are pure ESM modules (`"type": "module"`). To prevent runtime `TypeError: require() async module ... is unsupported` errors when CommonJS companion dependencies (such as `nestjs-pino`, `@nestjs/throttler`, and `@nestjs/terminus`) synchronously call `require('@nestjs/common')` during execution, the application entrypoints must explicitly import the core ES modules first:
+
+```typescript
+import "@nestjs/common";
+import "@nestjs/core";
+```
+
+This forces Bun to evaluate the NestJS core ESM graph synchronously at start, allowing subsequent CJS `require` lookups to succeed instantly.
+
+### Companion Migration Tracking
+
+The companion packages are kept in their isolated state temporarily, with complete decoupling or rewrite migration scheduled in subsequent tickets:
+
+- **Validation Schema Migration**: NestJS 12 Standard Schema (Ticket #752).
+- **Health Verification**: Transitioning to application-owned health checks and removing `@nestjs/terminus` (Ticket #753).
+- **Throttling Policies**: Redesigning around Fastify-native rate limiting and removing `@nestjs/throttler` (Ticket #754).
+- **Logging Integration**: Decoupling `nestjs-pino` and correcting health log noise (Ticket #755).

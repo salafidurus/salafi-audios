@@ -1,3 +1,5 @@
+import '@nestjs/common';
+import '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CDNHealthIndicator } from '../../src/core/health/cdn-health.indicator';
 import { AppModule } from '../../src/app.module';

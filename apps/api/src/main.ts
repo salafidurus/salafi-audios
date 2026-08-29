@@ -1,7 +1,8 @@
 import './shared/utils/env.bootstrap';
+import '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { ConfigService } from './core/config/config.service';
 import { AllExceptionsFilter } from './shared/errors/http-exception.filter';
-import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
