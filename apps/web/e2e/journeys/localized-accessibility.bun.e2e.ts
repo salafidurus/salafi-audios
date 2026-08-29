@@ -70,7 +70,7 @@ describe("localized accessibility Bun.WebView journeys", () => {
           view,
           "My Library tabs are hydrated",
           `document.querySelectorAll('[role="tab"]').length === 3`,
-          { timeoutMs: 10_000 },
+          { timeoutMs: config.readyTimeoutMs },
         );
         const library = await view.evaluate<{ tablist: boolean; completed: boolean }>(`({
           tablist: Boolean(document.querySelector('[role="tablist"][aria-label="My Library sections"]')),
@@ -91,7 +91,7 @@ describe("localized accessibility Bun.WebView journeys", () => {
           view,
           "Settings tabs are hydrated",
           `Boolean(document.querySelector('[role="tablist"][aria-label="Settings sections"]'))`,
-          { timeoutMs: 10_000 },
+          { timeoutMs: config.readyTimeoutMs },
         );
         const settings = await view.evaluate<{ tablist: boolean; profile: boolean }>(`({
           tablist: Boolean(document.querySelector('[role="tablist"][aria-label="Settings sections"]')),
