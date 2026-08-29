@@ -8,9 +8,13 @@ type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string
 export type AuthFixtureOptions = {
   /** API origin used by the built browser client, normally localhost:4000. */
   apiOrigin?: string;
+  /** Capability profile returned by the account and session endpoints. */
   role?: AuthRole;
+  /** Delay applied to session verification to exercise the loading/timeout UI. */
   sessionDelayMs?: number;
+  /** HTTP status returned by the session endpoint. */
   sessionStatus?: 200 | 500;
+  /** HTTP status returned by the sign-out endpoint. */
   signOutStatus?: 200 | 500;
 };
 

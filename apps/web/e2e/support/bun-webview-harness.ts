@@ -4,27 +4,39 @@ import { request as httpRequest } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
+/** Default public port for the Bun.WebView proxy when no isolated port is set. */
 export const DEFAULT_E2E_PORT = 3008;
 const DEFAULT_READY_TIMEOUT_MS = 120_000;
 const DEFAULT_READY_INTERVAL_MS = 100;
 const ARTIFACT_ROOT = resolve(process.cwd(), "test-results", "bun-webview");
 
+/** A serialized console call captured from the Chromium page. */
 export type BrowserConsoleEntry = {
   type: string;
   args: unknown[];
 };
 
+/** Resolved ports, origins, and startup options for one web E2E process. */
 export type E2EConfig = {
+  /** Public proxy port exposed to the browser. */
   port: number;
+  /** Browser-facing origin for the isolated journey. */
   origin: string;
+  /** Backend origin used when the production app makes API requests. */
   apiOrigin: string;
+  /** Maximum time allowed for the proxy to become ready. */
   readyTimeoutMs: number;
+  /** Whether the caller has already built the production app. */
   skipBuild: boolean;
 };
 
+/** Browser state and diagnostics owned by one isolated test journey. */
 export type BrowserJourney = {
+  /** Chromium view used to navigate and evaluate the application. */
   view: Bun.WebView;
+  /** Origin served by the journey's public proxy. */
   origin: string;
+  /** Console calls captured until the view is closed. */
   console: BrowserConsoleEntry[];
   /** Temporary browser profile removed after the journey closes. */
   profileDirectory: string;
@@ -32,19 +44,27 @@ export type BrowserJourney = {
 
 /** Defines the CSS viewport used by an isolated browser journey. */
 export type BrowserViewport = {
+  /** Viewport width in CSS pixels. */
   width: number;
+  /** Viewport height in CSS pixels. */
   height: number;
 };
 
 /** Configures the viewport used by one isolated browser journey. */
 export type BrowserJourneyOptions = {
+  /** Optional viewport width; defaults to 1280 pixels. */
   width?: number;
+  /** Optional viewport height; defaults to 800 pixels. */
   height?: number;
 };
 
+/** Running Next.js process and public proxy owned by one E2E file. */
 export type WebServer = {
+  /** Child process serving the production Next.js build. */
   process: Bun.Subprocess;
+  /** Public proxy origin used by browser journeys. */
   origin: string;
+  /** Stops both the proxy and the child process. */
   stop: () => Promise<void>;
 };
 
@@ -110,6 +130,12 @@ export function getDiagnosticDirectory(testName: string): string {
   return resolve(ARTIFACT_ROOT, slug || "unnamed-test");
 }
 
+/**
+ * Resolves browser and API origins from environment variables.
+ * `BUN_E2E_PORT` controls the isolated browser-facing proxy, while
+ * `BUN_E2E_API_ORIGIN` controls the backend origin used by the built app.
+ * Invalid numeric values fall back to deterministic defaults.
+ */
 export function getE2EConfig(env: Record<string, string | undefined> = process.env): E2EConfig {
   const port = getE2EPort(env);
   const origin = `http://127.0.0.1:${port}`;
@@ -231,7 +257,11 @@ function serializeConsoleArgs(args: unknown[]): unknown[] {
   });
 }
 
-/** Creates an isolated Chromium view and records page console calls. */
+/**
+ * Creates an isolated Chromium view and records page console calls.
+ * The temporary profile keeps cookies and local storage isolated from other
+ * journeys; `withBrowserJourney` removes it after the callback completes.
+ */
 export function createBrowserJourney(
   origin: string,
   options: BrowserJourneyOptions = {},
