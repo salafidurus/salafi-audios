@@ -7,6 +7,7 @@ import {
   getDiagnosticDirectory,
   waitForBrowserCondition,
 } from "./bun-webview-harness";
+import { waitForSelector } from "./bun-webview-waits";
 
 describe("Bun.WebView E2E configuration", () => {
   it("uses the dedicated default port", () => {
@@ -51,5 +52,22 @@ describe("Bun.WebView application conditions", () => {
     } as unknown as Bun.WebView;
 
     await waitForBrowserCondition(view, "test condition", "true", { timeoutMs: 10 });
+  });
+
+  it("keeps dynamic wait literals inside the evaluated expression", async () => {
+    const evaluatedConditions: string[] = [];
+    const view = {
+      evaluate: async (condition: string) => {
+        evaluatedConditions.push(condition);
+        return true;
+      },
+    } as unknown as Bun.WebView;
+
+    const hostileSelector = `</script>${String.fromCharCode(0x2028)}'); alert('escaped`;
+    await waitForSelector(view, hostileSelector, { timeoutMs: 10 });
+
+    expect(evaluatedConditions[0]).toContain("\\u003C\\u002Fscript\\u003E");
+    expect(evaluatedConditions[0]).toContain("\\u2028");
+    expect(evaluatedConditions[0]).not.toContain("</script>");
   });
 });

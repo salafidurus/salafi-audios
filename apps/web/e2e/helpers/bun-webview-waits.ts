@@ -5,6 +5,27 @@ type WaitOptions = {
   intervalMs?: number;
 };
 
+const unsafeJsCharMap = {
+  "<": "\\u003C",
+  ">": "\\u003E",
+  "/": "\\u002F",
+  "\u2028": "\\u2028",
+  "\u2029": "\\u2029",
+} satisfies Record<string, string>;
+
+function escapeUnsafeChars(value: string): string {
+  return value.replace(
+    /[<>/\u2028\u2029]/g,
+    // SAFETY: the replacement regex above contains every key accepted here.
+    (character) => unsafeJsCharMap[character as keyof typeof unsafeJsCharMap] ?? character,
+  );
+}
+
+/** Encodes caller-controlled text as a safe JavaScript string literal. */
+function toSafeJsStringLiteral(value: string): string {
+  return escapeUnsafeChars(JSON.stringify(value));
+}
+
 /** Waits until a selector is present in the hydrated document. */
 export async function waitForSelector(
   view: Bun.WebView,
@@ -14,7 +35,7 @@ export async function waitForSelector(
   await waitForBrowserCondition(
     view,
     `selector: ${selector}`,
-    `document.querySelector(${JSON.stringify(selector)}) !== null`,
+    `document.querySelector(${toSafeJsStringLiteral(selector)}) !== null`,
     options,
   );
 }
@@ -28,7 +49,7 @@ export async function waitForText(
   await waitForBrowserCondition(
     view,
     `visible text: ${text}`,
-    `document.body.textContent?.includes(${JSON.stringify(text)}) === true`,
+    `document.body.textContent?.includes(${toSafeJsStringLiteral(text)}) === true`,
     options,
   );
 }
@@ -42,7 +63,7 @@ export async function waitForPath(
   await waitForBrowserCondition(
     view,
     `path: ${path}`,
-    `location.pathname + location.search === ${JSON.stringify(path)}`,
+    `location.pathname + location.search === ${toSafeJsStringLiteral(path)}`,
     options,
   );
 }
@@ -56,7 +77,7 @@ export async function waitForUrl(
   await waitForBrowserCondition(
     view,
     `URL: ${url}`,
-    `location.href === ${JSON.stringify(url)}`,
+    `location.href === ${toSafeJsStringLiteral(url)}`,
     options,
   );
 }
@@ -70,7 +91,7 @@ export async function waitForHeading(
   await waitForBrowserCondition(
     view,
     `heading: ${text}`,
-    `[...document.querySelectorAll('h1, h2')].some((heading) => heading.textContent?.includes(${JSON.stringify(text)}))`,
+    `[...document.querySelectorAll('h1, h2')].some((heading) => heading.textContent?.includes(${toSafeJsStringLiteral(text)}))`,
     options,
   );
 }
