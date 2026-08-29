@@ -53,12 +53,12 @@ export class AppLoggerService implements NestLoggerService {
 
   /** Emits an informational message with optional structured fields. */
   info(fieldsOrMessage: LogFields | string, message?: string, ...extra: LogArgument[]): void {
-    this.write(this.activeLogger.info, fieldsOrMessage, message, extra);
+    this.write(this.activeLogger.info.bind(this.activeLogger), fieldsOrMessage, message, extra);
   }
 
   /** Emits a warning with optional structured fields. */
   warn(fieldsOrMessage: LogFields | string, message?: string, ...extra: LogArgument[]): void {
-    this.write(this.activeLogger.warn, fieldsOrMessage, message, extra);
+    this.write(this.activeLogger.warn.bind(this.activeLogger), fieldsOrMessage, message, extra);
   }
 
   /** Emits an error while preserving either an Error value or structured fields. */
