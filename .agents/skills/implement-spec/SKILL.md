@@ -56,9 +56,8 @@ required check fails. Its pull request targets `main` and identifies both the
 parent specification and final validation ticket. Close the parent as
 completed only after that pull request is merged and its evidence is recorded.
 
-Closing all child tickets is not finalization. The `close-completed-specs`
-workflow removes completed-ticket triage metadata but does not close the
-parent specification.
+Closing all child tickets is not finalization. The `triage` skill reconciles
+completed-ticket triage metadata but does not close the parent specification.
 
 Abandonment is a separate, auditable terminal path. Record the reason and
 outcome on the parent and child issues according to triage policy, distinguish
