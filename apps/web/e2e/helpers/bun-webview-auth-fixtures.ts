@@ -90,8 +90,9 @@ export async function installAuthFixtures(
   const signOutStatus = options.signOutStatus ?? 200;
   const session = role ? sessionFor(role) : { session: null, user: null };
   const webOrigin = journey.origin;
+  const pendingPausedRequests = new Set<Promise<void>>();
 
-  const onPaused = async (event: Event) => {
+  const handlePaused = async (event: Event) => {
     // SAFETY: Bun.WebView's Fetch.requestPaused event always exposes the CDP payload as `data`.
     const { requestId, request } = (event as Event & { data: PausedRequest }).data;
     const url = new URL(request.url);
@@ -140,6 +141,15 @@ export async function installAuthFixtures(
     }
   };
 
+  const onPaused = (event: Event) => {
+    const pending = handlePaused(event);
+    pendingPausedRequests.add(pending);
+    void pending.then(
+      () => pendingPausedRequests.delete(pending),
+      () => pendingPausedRequests.delete(pending),
+    );
+  };
+
   journey.view.addEventListener("Fetch.requestPaused", onPaused);
   await journey.view.cdp("Fetch.enable", {
     patterns: [
@@ -158,6 +168,7 @@ export async function installAuthFixtures(
 
   return async () => {
     journey.view.removeEventListener("Fetch.requestPaused", onPaused);
+    await Promise.allSettled(pendingPausedRequests);
     await journey.view.cdp("Fetch.disable").catch(() => undefined);
   };
 }
