@@ -3,11 +3,15 @@
 
 import { ExploreFilterField } from "../explore-filter-field/explore-filter-field";
 
+/** One option exposed by the explore filter control. */
 export interface FilterOption {
+  /** Stable option identifier passed back through `onChange`. */
   id: string;
+  /** Localized label rendered in the option list. */
   label: string;
 }
 
+/** Controlled configuration for the explore filter field. */
 export interface FilterSelectProps {
   /** Stable DOM id for the field */
   id?: string;
@@ -25,6 +29,7 @@ export interface FilterSelectProps {
   allLabel?: string;
 }
 
+/** Renders the explore filter as a select or searchable combobox. */
 export function FilterSelect({
   id = "explore-filter",
   label,

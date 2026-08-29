@@ -2,19 +2,18 @@
 
 Issue #716 establishes the Bun.WebView harness and migrates the public home
 smoke journey. Issue #719 migrates the localized, accessibility, responsive,
-and fallback intents listed below; remaining Playwright intents stay active
-until their assigned migration tickets complete.
+and fallback intents listed below. The Bun.WebView journeys are now the
+authoritative web browser E2E path.
 
-| Existing file                   | Intent coverage                                                                                                                         | Follow-up owner                                     |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| `auth-callback.e2e.ts`          | loading, timeout, authentication error, and validated redirect recovery                                                                 | #717 (`auth-callback.bun.e2e.ts`)                   |
-| `auth.e2e.ts`                   | sign-in rendering, social providers, anonymous account/profile/admin/legal routes                                                       | #717 (`auth.bun.e2e.ts`)                            |
-| `fallback.e2e.ts`               | branded 404, Arabic/RTL, theme persistence, and public-shell recovery                                                                   | #719 (Bun migrated)                                 |
-| `home.e2e.ts`                   | public study landing title/header/topic navigation and removal of the legacy search control                                             | #716 (Bun.WebView equivalent)                       |
-| `localized-account-flow.e2e.ts` | canonical navigation, anonymous routes, sign-out success/failure, cookie consent, Arabic/RTL, and mobile settings/library controls      | #717 account/sign-out; #719 localization/responsive |
-| `my-library.e2e.ts`             | canonical/query tabs, history updates, invalid-tab fallback, anonymous state, Arabic/RTL, and narrow-screen usability                   | #718 / #719 (localized subset migrated)             |
-| `navigation.e2e.ts`             | public navigation, search palette, brand/scholars/library links, titles, settings tabs/query fallback/removed alias, and mobile loading | #718                                                |
-| `workspace.e2e.ts`              | signed-out search, listener/admin capability boundaries, mobile keyboard/RTL behavior, and theme preference                             | #717 authorization; #718 / #719 remaining           |
+| Bun journey                          | Intent coverage                                                                                     | Follow-up owner |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------- | --------------- |
+| `auth-callback.bun.e2e.ts`           | loading, timeout, authentication error, and validated redirect recovery                             | #717            |
+| `auth.bun.e2e.ts`                    | sign-in rendering, social providers, anonymous account/profile/admin/legal routes                   | #717            |
+| `localized-accessibility.bun.e2e.ts` | branded 404, Arabic/RTL, theme persistence, public-shell recovery, and responsive accessibility     | #719            |
+| `home.bun.e2e.ts`                    | public study landing title/header/topic navigation and removal of the legacy search control         | #716            |
+| `account.bun.e2e.ts`                 | canonical navigation and sign-out success/failure                                                   | #717            |
+| `navigation-library.bun.e2e.ts`      | canonical/query tabs, history updates, invalid-tab fallback, anonymous state, and public navigation | #718            |
+| `authorization.bun.e2e.ts`           | listener, scoped-admin, and superadmin capability boundaries                                        | #717            |
 
 The new `home.bun.e2e.ts` preserves the meaningful home assertions through
 `Bun.WebView`: non-empty document title, study header presence, exactly one
@@ -35,7 +34,5 @@ assigned to issue 719; authentication and capability assertions remain assigned
 to issue 717.
 
 Issue #717 preserves the authentication, callback, account/sign-out, and
-authorization intents through `auth.bun.e2e.ts`, `auth-callback.bun.e2e.ts`,
-`account.bun.e2e.ts`, and `authorization.bun.e2e.ts`. The original Playwright
-files remain active until the complete migration removes the compatibility
-suite.
+authorization intents through the corresponding journeys under
+`e2e/journeys/`.

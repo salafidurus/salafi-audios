@@ -6,9 +6,15 @@ type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string
 
 /** Selects the deterministic session and mutation outcomes for one journey. */
 export type AuthFixtureOptions = {
+  /** API origin used by the built browser client, normally localhost:4000. */
+  apiOrigin?: string;
+  /** Capability profile returned by the account and session endpoints. */
   role?: AuthRole;
+  /** Delay applied to session verification to exercise the loading/timeout UI. */
   sessionDelayMs?: number;
+  /** HTTP status returned by the session endpoint. */
   sessionStatus?: 200 | 500;
+  /** HTTP status returned by the sign-out endpoint. */
   signOutStatus?: 200 | 500;
 };
 
@@ -39,6 +45,8 @@ function jsonResponse(body: JsonValue, status: number, origin: string) {
       { name: "content-type", value: "application/json" },
       { name: "access-control-allow-origin", value: origin },
       { name: "access-control-allow-credentials", value: "true" },
+      { name: "access-control-allow-methods", value: "GET, POST, PATCH, OPTIONS" },
+      { name: "access-control-allow-headers", value: "content-type" },
     ],
     body: Buffer.from(JSON.stringify(body)).toString("base64"),
   };
@@ -73,23 +81,18 @@ export async function installAuthFixtures(
   journey: BrowserJourney,
   options: AuthFixtureOptions = {},
 ): Promise<() => Promise<void>> {
-  const apiOrigin = new URL(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000").origin;
+  const apiOrigin = new URL(
+    options.apiOrigin ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000",
+  ).origin;
   const role = options.role;
   const sessionDelayMs = options.sessionDelayMs ?? 0;
   const sessionStatus = options.sessionStatus ?? 200;
   const signOutStatus = options.signOutStatus ?? 200;
   const session = role ? sessionFor(role) : { session: null, user: null };
   const webOrigin = journey.origin;
+  const pendingPausedRequests = new Set<Promise<void>>();
 
-  await journey.view.cdp("Fetch.enable", {
-    patterns: [
-      { urlPattern: `${apiOrigin}/api/auth/*` },
-      { urlPattern: `${apiOrigin}/account/profile` },
-      { urlPattern: `${apiOrigin}/admin/users*` },
-    ],
-  });
-
-  const onPaused = async (event: Event) => {
+  const handlePaused = async (event: Event) => {
     // SAFETY: Bun.WebView's Fetch.requestPaused event always exposes the CDP payload as `data`.
     const { requestId, request } = (event as Event & { data: PausedRequest }).data;
     const url = new URL(request.url);
@@ -103,7 +106,11 @@ export async function installAuthFixtures(
         webOrigin,
       );
     } else if (url.pathname === "/api/auth/sign-out") {
-      response = jsonResponse({}, signOutStatus, webOrigin);
+      response = jsonResponse(
+        signOutStatus === 200 ? { success: true } : { error: { message: "Provider failed" } },
+        signOutStatus,
+        webOrigin,
+      );
     } else if (url.pathname === "/account/profile" && role) {
       const user = users[role];
       response = jsonResponse(
@@ -126,13 +133,57 @@ export async function installAuthFixtures(
       response = jsonResponse({}, 404, webOrigin);
     }
 
-    await journey.view.cdp("Fetch.fulfillRequest", { requestId, ...response });
+    try {
+      await journey.view.cdp("Fetch.fulfillRequest", { requestId, ...response });
+    } catch {
+      // The delayed-session timeout journey intentionally closes before its
+      // delayed interception callback resolves.
+    }
+  };
+
+  const onPaused = (event: Event) => {
+    const pending = handlePaused(event);
+    pendingPausedRequests.add(pending);
+    void pending.then(
+      () => pendingPausedRequests.delete(pending),
+      () => pendingPausedRequests.delete(pending),
+    );
   };
 
   journey.view.addEventListener("Fetch.requestPaused", onPaused);
+  await journey.view.cdp("Fetch.enable", {
+    patterns: [
+      { urlPattern: `${apiOrigin}/api/auth/*` },
+      { urlPattern: `${apiOrigin}/account/profile` },
+      { urlPattern: `${apiOrigin}/admin/users*` },
+    ],
+  });
+
+  if (role) {
+    await journey.view.navigate(webOrigin);
+    await journey.view.evaluate(
+      `document.cookie = "better-auth.session_token=fixture-session; Path=/"`,
+    );
+  }
 
   return async () => {
     journey.view.removeEventListener("Fetch.requestPaused", onPaused);
+    await Promise.allSettled(pendingPausedRequests);
     await journey.view.cdp("Fetch.disable").catch(() => undefined);
   };
+}
+
+/** Runs a journey with auth interception and always disables its CDP fixture. */
+export async function withAuthFixtures<T>(
+  journey: BrowserJourney,
+  options: AuthFixtureOptions,
+  callback: () => Promise<T>,
+): Promise<T> {
+  await journey.view.navigate("about:blank");
+  const cleanup = await installAuthFixtures(journey, options);
+  try {
+    return await callback();
+  } finally {
+    await cleanup();
+  }
 }

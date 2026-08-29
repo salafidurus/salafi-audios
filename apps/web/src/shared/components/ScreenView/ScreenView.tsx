@@ -2,15 +2,22 @@ import React from "react";
 
 import styles from "./screen-view.module.css";
 
-/** Documents this module's responsibility and public boundary. */
+/** Provides a shared page-sized surface for web screens. */
+/** Layout options for a page-sized content surface. */
 export interface ScreenViewProps {
+  /** Content rendered inside the responsive page surface. */
   children: React.ReactNode;
+  /** Inline styles applied to the outer surface. */
   style?: React.CSSProperties;
+  /** Inline styles applied to the inner content container. */
   contentStyle?: React.CSSProperties;
+  /** Centers the inner content vertically and horizontally. */
   center?: boolean;
+  /** Design-token background treatment applied to the outer surface. */
   backgroundVariant?: "canvas" | "primaryWash" | "secondaryWash" | "mixedWash";
 }
 
+/** Provides the shared page background and content sizing boundary. */
 export function ScreenView({
   children,
   style,

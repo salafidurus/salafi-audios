@@ -13,21 +13,31 @@ import {
 
 import styles from "./AccessDialog.module.css";
 
-/** Documents this module's responsibility and public boundary. */
+/** One selectable resource scope in the access-management dialog. */
 interface ScopeOption {
+  /** Stable resource identifier submitted with the access grant. */
   id: string;
+  /** Human-readable resource name shown in the selector and chips. */
   name: string;
 }
 
+/** Controlled selection state for a resource-scope combobox. */
 interface ScopeSelectorProps {
+  /** Section heading and accessible label for the selector. */
   title: string;
+  /** Empty-input guidance shown by the combobox. */
   placeholder: string;
+  /** Resource scopes that may be selected. */
   options: ScopeOption[];
+  /** Currently selected resource identifiers. */
   selectedIds: string[];
+  /** Replaces the selected resource identifiers after add/remove actions. */
   onChange: (selectedIds: string[]) => void;
+  /** Prevents adding or removing scopes while the parent operation is busy. */
   disabled?: boolean;
 }
 
+/** Renders addable resource scopes and removable selected-scope chips. */
 export function ScopeSelector({
   title,
   placeholder,

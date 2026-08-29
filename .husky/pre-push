@@ -49,9 +49,9 @@ API_CHANGED=false
 WEB_CHANGED=false
 
 # Give each worktree its own deterministic E2E port so concurrent pushes do
-# not reuse another worktree's Next server. An explicit PW_PORT still wins.
-if [ -n "${PW_PORT:-}" ]; then
-  E2E_PORT="$PW_PORT"
+# not reuse another worktree's Next server. An explicit BUN_E2E_PORT still wins.
+if [ -n "${BUN_E2E_PORT:-}" ]; then
+E2E_PORT="$BUN_E2E_PORT"
 else
   WORKTREE_ROOT=$(git rev-parse --show-toplevel)
   WORKTREE_PORT_HASH=$(printf "%s" "$WORKTREE_ROOT" | cksum | awk '{print $1}')
@@ -88,16 +88,16 @@ fi
 # Branch on change scope
 if [ "$SHARED_CHANGED" = true ]; then
   printf "pre-push: running full e2e (shared packages changed)\n"
-  PW_PORT="$E2E_PORT" bun run turbo test:e2e
+  BUN_E2E_PORT="$E2E_PORT" bun run turbo test:e2e
 elif [ "$API_CHANGED" = true ] && [ "$WEB_CHANGED" = true ]; then
   printf "pre-push: running full e2e (both api and web changed)\n"
-  PW_PORT="$E2E_PORT" bun run turbo test:e2e
+  BUN_E2E_PORT="$E2E_PORT" bun run turbo test:e2e
 elif [ "$API_CHANGED" = true ]; then
   printf "pre-push: running api e2e\n"
   bun run --filter api test:e2e
 elif [ "$WEB_CHANGED" = true ]; then
   printf "pre-push: running web e2e\n"
-  PW_PORT="$E2E_PORT" bun run --filter web test:e2e
+  BUN_E2E_PORT="$E2E_PORT" bun run --filter web test:e2e
 else
   printf "pre-push: skipping e2e (no e2e-affecting changes)\n"
 fi

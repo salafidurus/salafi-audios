@@ -40,6 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Playwright
+# Bun.WebView E2E diagnostics
 test-results/
 .swc/

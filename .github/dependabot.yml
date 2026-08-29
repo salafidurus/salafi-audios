@@ -183,12 +183,10 @@ updates:
           - minor
           - patch
 
-      # E2E test tooling (Playwright + HTTP assertions).
+      # E2E test tooling (HTTP assertions; web journeys use Bun.WebView).
       test-e2e:
         applies-to: version-updates
         patterns:
-          - "playwright"
-          - "@playwright/*"
           - "supertest"
           - "@types/supertest"
         update-types:

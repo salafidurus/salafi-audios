@@ -1,28 +1,16 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
 import {
-  getE2EConfig,
-  startWebServer,
+  createWebE2EServer,
   waitForBrowserCondition,
-  waitForWebReady,
   withBrowserJourney,
-  type E2EConfig,
-  type WebServer,
-} from "./bun-webview-harness";
+} from "../helpers/bun-webview-harness";
 
 describe("localized accessibility Bun.WebView journeys", () => {
-  let config: E2EConfig;
-  let server: WebServer | undefined;
-
-  beforeAll(async () => {
-    config = getE2EConfig();
-    server = await startWebServer(config);
-    await waitForWebReady(config.origin);
-  });
-
-  afterAll(async () => {
-    await server?.stop();
-  });
+  const webServer = createWebE2EServer();
+  const { config } = webServer;
+  beforeAll(webServer.start);
+  afterAll(webServer.stop);
 
   it("renders the Arabic Settings profile journey with RTL semantics", async () => {
     await withBrowserJourney("Arabic Settings profile journey", config.origin, async ({ view }) => {
@@ -82,7 +70,7 @@ describe("localized accessibility Bun.WebView journeys", () => {
           view,
           "My Library tabs are hydrated",
           `document.querySelectorAll('[role="tab"]').length === 3`,
-          { timeoutMs: 10_000 },
+          { timeoutMs: config.readyTimeoutMs },
         );
         const library = await view.evaluate<{ tablist: boolean; completed: boolean }>(`({
           tablist: Boolean(document.querySelector('[role="tablist"][aria-label="My Library sections"]')),
@@ -103,7 +91,7 @@ describe("localized accessibility Bun.WebView journeys", () => {
           view,
           "Settings tabs are hydrated",
           `Boolean(document.querySelector('[role="tablist"][aria-label="Settings sections"]'))`,
-          { timeoutMs: 10_000 },
+          { timeoutMs: config.readyTimeoutMs },
         );
         const settings = await view.evaluate<{ tablist: boolean; profile: boolean }>(`({
           tablist: Boolean(document.querySelector('[role="tablist"][aria-label="Settings sections"]')),
