@@ -2,11 +2,6 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { request as httpRequest } from "node:http";
 import { resolve } from "node:path";
 
-if (process.env.BUN_WEBVIEW_E2E === "1") {
-  const { GlobalRegistrator } = require("@happy-dom/global-registrator");
-  GlobalRegistrator.unregister();
-}
-
 export const DEFAULT_E2E_PORT = 3008;
 const DEFAULT_READY_TIMEOUT_MS = 120_000;
 const DEFAULT_READY_INTERVAL_MS = 100;
@@ -29,6 +24,12 @@ export type BrowserJourney = {
   view: Bun.WebView;
   origin: string;
   console: BrowserConsoleEntry[];
+};
+
+/** Configures the viewport used by one isolated browser journey. */
+export type BrowserJourneyOptions = {
+  width?: number;
+  height?: number;
 };
 
 export type WebServer = {
@@ -123,7 +124,7 @@ export async function startWebServer(config: E2EConfig = getE2EConfig()): Promis
       FALLBACK_TEST_MODE: "1",
     },
     stdout: "inherit",
-    stderr: "ignore",
+    stderr: "inherit",
   });
   let adapter: ReturnType<typeof Bun.serve>;
   try {
@@ -202,13 +203,16 @@ function serializeConsoleArgs(args: unknown[]): unknown[] {
 }
 
 /** Creates an isolated Chromium view and records page console calls. */
-export function createBrowserJourney(origin: string): BrowserJourney {
+export function createBrowserJourney(
+  origin: string,
+  options: BrowserJourneyOptions = {},
+): BrowserJourney {
   const consoleEntries: BrowserConsoleEntry[] = [];
   const view = new Bun.WebView({
     backend: { type: "chrome", url: false },
     dataStore: "ephemeral",
-    width: 1280,
-    height: 800,
+    width: options.width ?? 1280,
+    height: options.height ?? 800,
     console: (type, ...args) => {
       consoleEntries.push({ type, args: serializeConsoleArgs(args) });
     },
@@ -248,8 +252,9 @@ export async function withBrowserJourney<T>(
   testName: string,
   origin: string,
   callback: (journey: BrowserJourney) => Promise<T>,
+  options?: BrowserJourneyOptions,
 ): Promise<T> {
-  const journey = createBrowserJourney(origin);
+  const journey = createBrowserJourney(origin, options);
   try {
     return await callback(journey);
   } catch (error) {
