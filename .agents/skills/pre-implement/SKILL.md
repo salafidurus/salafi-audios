@@ -17,6 +17,16 @@ relevant ticket/dependency graph first, then plan only the selected ticket.
 
 ## Investigation
 
+### Triage precondition
+
+Before planning, verify the implementation issue has exactly one category role
+and one state role, and that its state is `ready-for-agent`. This verification
+is read-only: do not change labels, close issues, or otherwise invoke a
+mutating triage transition from this planning-only skill. If the issue is
+untriaged, has conflicting state labels, or is not ready for an agent, stop
+planning and hand the issue back to `triage` for resolution. If no issue is
+available, record that the triage precondition was not applicable.
+
 When planning isolated work, recommend a worktree under the repository-root
 `.worktree/`, based on `origin/main`. Choose a concise slug: prefer one word
 and never use more than two words. Use the same slug in the worktree path and
