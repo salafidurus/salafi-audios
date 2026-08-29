@@ -52,13 +52,28 @@ describe('Infrastructure & Basic API Features (e2e)', () => {
     expect(res.body).toHaveProperty('message');
   });
 
-  it('Throttler - sequential requests return 429 after the limit', async () => {
+  it('rate limit - sequential authenticated requests return 429 after the test limit', async () => {
     const auth = await authFactory.createUser();
     const responses = [];
     for (let index = 0; index < 3; index += 1) {
       responses.push(await request(app.getHttpServer()).get('/account/profile').set(auth.headers));
     }
     const has429 = responses.some((res) => res.status === 429);
+    const limited = responses.find((res) => res.status === 429);
     expect(has429).toBe(true);
+    expect(limited?.headers['x-ratelimit-limit']).toBe('2');
+    expect(limited?.headers['retry-after']).toBeDefined();
+  });
+
+  it('rate limit - health probes use their own test budget', async () => {
+    await Bun.sleep(1_100);
+    const responses = [];
+    for (let index = 0; index < 3; index += 1) {
+      responses.push(await request(app.getHttpServer()).get('/health/healthz'));
+    }
+
+    expect(responses[0].status).toBe(200);
+    expect(responses[1].status).toBe(200);
+    expect(responses[2].status).toBe(429);
   });
 });

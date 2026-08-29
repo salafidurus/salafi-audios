@@ -117,6 +117,11 @@ export class ConfigService {
     return this.env.REDIS_URL;
   }
 
+  /** Number of trusted reverse-proxy hops used when resolving anonymous IP identity. */
+  get TRUST_PROXY_HOPS(): number {
+    return this.env.TRUST_PROXY_HOPS;
+  }
+
   get REDIS_PROGRESS_BUFFER_DELAY_MS(): number {
     return 120_000;
   }

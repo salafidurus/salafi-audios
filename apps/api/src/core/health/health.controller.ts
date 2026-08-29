@@ -4,14 +4,14 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
 import type { HealthCheckResult } from '@nestjs/terminus';
-import { SkipThrottle } from '@nestjs/throttler';
+import { RateLimitPolicy } from '../security/rate-limit.decorator';
 import { CDNHealthIndicator } from './cdn-health.indicator';
 import { DbHealthIndicator } from './db-health.indicator';
 import { RedisHealthIndicator } from './redis-health.indicator';
 import { RedisService } from '../redis/redis.service';
 
 /** NestJS health controller service or controller coordinating the API boundary for this responsibility. */
-@SkipThrottle()
+@RateLimitPolicy('health-probe')
 @ApiTags('Health')
 @ApiCommonErrors()
 @Public()
