@@ -1,12 +1,15 @@
+/** Provides the shared bordered surface used to group related list items. */
 import type { ReactNode } from "react";
 
 import styles from "./list-container.module.css";
 
-/** Documents this module's responsibility and public boundary. */
-export type ListContainerProps = {
+/** Defines the content and optional styling override for the shared list surface. */
+type ListContainerProps = {
   children: ReactNode;
   className?: string;
 };
+
+export type { ListContainerProps };
 
 /**
  * Container for list items following the /explore screen pattern.

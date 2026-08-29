@@ -39,11 +39,12 @@ Targeted testing examples:
 - Playwright file: `bun run --filter web test:e2e -- e2e/catalog.spec.ts`
 - Playwright grep: `bun run --filter web test:e2e -- --grep "catalog list"`
 
-The Bun.WebView journey requires a locally installed Google Chrome. It runs the
-production-built Next.js app through an isolated ephemeral browser store; the
-The current Playwright suite remains the compatibility suite while the
-follow-up navigation/library and localized/accessibility tickets migrate their
-intents.
+The Bun.WebView journeys require a locally installed Google Chrome. They run the
+production-built Next.js app through an isolated browser profile per journey,
+use explicit application-condition waits, and write failure diagnostics before
+closing the browser. The current Playwright suite remains the compatibility suite
+while the authentication/account, navigation/library, and remaining localized
+accessibility intents migrate through their assigned tickets.
 
 ## Guardrails
 

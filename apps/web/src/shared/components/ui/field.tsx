@@ -80,14 +80,12 @@ function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
   );
 }
 
-function FieldError({
-  className,
-  children,
-  errors,
-  ...props
-}: React.ComponentProps<"div"> & {
+type FieldErrorProps = React.ComponentProps<"div"> & {
+  /** Validation errors used to derive an alert when explicit children are absent. */
   errors?: Array<{ message?: string } | undefined>;
-}) {
+};
+
+function FieldError({ className, children, errors, ...props }: FieldErrorProps) {
   const content = useMemo(() => {
     if (children) {
       return children;

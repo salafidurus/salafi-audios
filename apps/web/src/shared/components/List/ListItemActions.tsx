@@ -1,22 +1,25 @@
+/** Provides responsive action placement for the shared list-item composition. */
 import type { CSSProperties, ReactNode } from "react";
 
 import styles from "./ListItemActions.module.css";
 
-/** Documents this module's responsibility and public boundary. */
-export type ListItemActionsProps = {
-  /** Action buttons or any interactive elements */
+/** Defines responsive placement and styling for actions rendered beside a list item. */
+type ListItemActionsProps = {
+  /** Action buttons or other interactive elements rendered in the action region. */
   children?: ReactNode;
-  /** Optional custom className to merge with default styles */
+  /** Optional class name merged with the component's responsive action styles. */
   className?: string;
-  /** Controls action stacking on desktop/tablet: 'horizontal' (default) for row layout, 'vertical' for column */
+  /** Desktop/tablet action arrangement; horizontal is the default row layout. */
   orientation?: "horizontal" | "vertical";
-  /** Controls action stacking on mobile: 'vertical' (default) for column layout */
+  /** Mobile action arrangement; vertical is the default column layout. */
   mobileOrientation?: "horizontal" | "vertical";
-  /** Fixed width percentage for actions on desktop/tablet (e.g. '10%', '20%'). Default: 'auto'. Mobile is 100% */
+  /** Desktop/tablet action width, expressed as a CSS percentage or `auto`. */
   widthPercentDesktop?: string;
-  /** Optional click handler for actions container */
+  /** Optional click handler attached to the actions container. */
   onClick?: (e: React.MouseEvent) => void;
 };
+
+export type { ListItemActionsProps };
 
 type ActionsStyleVars = CSSProperties & {
   "--actions-width-desktop": string;

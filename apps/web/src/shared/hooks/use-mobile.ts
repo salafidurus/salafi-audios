@@ -4,6 +4,7 @@ import * as React from "react";
 /** Documents this module's responsibility and public boundary. */
 const MOBILE_BREAKPOINT = 641;
 
+/** Tracks whether the viewport is narrower than the app's documented mobile breakpoint. */
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
 
