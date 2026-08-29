@@ -55,6 +55,13 @@ Break the work into **tracer bullet** tickets.
 
 </vertical-slice-rules>
 
+<conflict-and-gate-audit-rules>
+
+- **Conflict Audit**: Conduct an explicit conflict audit across all non-blocking (sibling) tickets to guarantee zero parallel file or context collisions. If two tickets touch overlapping files, shared symbols, or component modules, sequence them explicitly or separate their boundaries so no merge collisions occur.
+- **Feasibility & Green Gate Guarantee**: Verify and ensure that every ticket can be implemented and tested successfully with green verification gates (`test`, `typecheck`, `lint`) without breaking existing app functionality or introducing runtime regressions.
+
+</conflict-and-gate-audit-rules>
+
 Give each ticket its **blocking edges**: the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
 
 **Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change (rename a column, retype a shared symbol) whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket; green is promised only there.
@@ -67,10 +74,16 @@ Present the proposed breakdown as a numbered list. For each ticket, show:
 - **Blocked by**: which other tickets (if any) must complete first
 - **What it delivers**: the end-to-end behaviour this ticket makes work
 
+Before presenting to the user, verify and include in the presentation:
+1. **Conflict Audit**: Explicitly review non-blocking tickets and confirm there are no conflicts or file collisions between them.
+2. **Green-Gate Feasibility & App Stability**: Explicitly confirm that each ticket can be implemented and tested successfully with green gates without breaking existing setup or app functionality.
+
 Ask the user:
 
 - Does the granularity feel right? (too coarse / too fine)
 - Are the blocking edges correct: does each ticket only depend on tickets that genuinely gate it?
+- Are there any potential file or context conflicts between non-blocking tickets?
+- Is the green-gate & app stability guarantee clear and sound?
 - Should any tickets be merged or split further?
 
 Before asking for approval, write down the complete dependency matrix, including
