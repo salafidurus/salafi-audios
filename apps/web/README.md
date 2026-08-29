@@ -29,7 +29,6 @@ Run from repo root:
 - Typecheck: `bun run --filter web typecheck`
 - Unit/integration tests: `bun run --filter web test`
 - Web E2E journeys (Bun.WebView): `bun run --filter web test:e2e`
-- Focused Bun.WebView journeys: `bun run test:e2e:bun` (Turbo builds `web` first)
 - Bun.WebView configuration: `BUN_E2E_PORT`, `BUN_E2E_API_ORIGIN`, and `BUN_E2E_READY_TIMEOUT_MS`
 - Bun.WebView failure artifacts: `apps/web/test-results/bun-webview/<test-name>/`
 

@@ -12,8 +12,7 @@
     "test:watch": "bun test --watch --path-ignore-patterns 'e2e/'",
     "test:cov": "bun test --isolate --coverage --path-ignore-patterns 'e2e/'",
     "test:prepush": "bun test --isolate --path-ignore-patterns 'e2e/'",
-    "test:e2e": "bun run test:e2e:bun",
-    "test:e2e:bun": "BUN_WEBVIEW_E2E=1 bun test --config ./bunfig.e2e.toml --timeout 120000 ./e2e/journeys/*.bun.e2e.ts",
+    "test:e2e": "BUN_WEBVIEW_E2E=1 bun test --config ./bunfig.e2e.toml --timeout 120000 ./e2e/journeys/*.bun.e2e.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

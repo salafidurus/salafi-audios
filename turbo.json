@@ -68,12 +68,6 @@
       "cache": true,
       "env": ["CI", "BUN_E2E_PORT", "BUN_E2E_API_ORIGIN", "BUN_E2E_READY_TIMEOUT_MS"]
     },
-    "test:e2e:bun": {
-      "dependsOn": ["build"],
-      "inputs": ["$TURBO_DEFAULT$", "e2e/**/*.ts"],
-      "outputs": ["test-results/bun-webview/**"],
-      "env": ["BUN_E2E_PORT", "BUN_E2E_API_ORIGIN", "BUN_E2E_READY_TIMEOUT_MS"]
-    },
     "test:prepush": {
       "dependsOn": ["^build", "^test:prepush"],
       "cache": true
