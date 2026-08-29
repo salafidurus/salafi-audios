@@ -3,8 +3,8 @@ import type { IncomingMessage } from 'node:http';
 import type { Http2ServerRequest } from 'node:http2';
 // ESM Module Resolution Gating under Bun:
 // NestJS 12 packages are pure ESM modules. To prevent runtime `TypeError: require() async module ... is unsupported`
-// errors when CommonJS companion dependencies synchronously call `require('@nestjs/common')`
-// during execution, we must explicitly import the core ES modules first.
+// errors when CommonJS companion dependencies
+// synchronously call `require('@nestjs/common')` during execution, we must explicitly import the core ES modules first.
 // This forces Bun to evaluate the NestJS core ESM graph synchronously at startup so subsequent CJS requires succeed.
 import { StandardSchemaValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
