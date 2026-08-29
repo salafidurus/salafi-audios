@@ -1,18 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { HealthCheckError, HealthIndicator } from '@nestjs/terminus';
-import type { HealthIndicatorResult } from '@nestjs/terminus';
 import { S3Client } from 'bun';
 import { ConfigService } from '../config/config.service';
+import {
+  createHealthIndicatorResult,
+  HealthCheckError,
+  type HealthIndicatorResult,
+} from './health.service';
 
 /** NestJS cdnhealth indicator service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
 /** Core API cdn health.indicator module providing shared backend infrastructure and authority-boundary services. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
-export class CDNHealthIndicator extends HealthIndicator {
+export class CDNHealthIndicator {
   private readonly s3: S3Client;
 
   constructor(config: ConfigService) {
-    super();
     this.s3 = new S3Client({
       accessKeyId: config.R2_ACCESS_KEY_ID,
       secretAccessKey: config.R2_SECRET_ACCESS_KEY,
@@ -32,9 +34,9 @@ export class CDNHealthIndicator extends HealthIndicator {
     try {
       await Promise.race([this.s3.list({ maxKeys: 1 }), timeoutPromise]);
 
-      return this.getStatus(key, true);
+      return createHealthIndicatorResult(key, 'up');
     } catch (error) {
-      const result = this.getStatus(key, false, {
+      const result = createHealthIndicatorResult(key, 'down', {
         message: error instanceof Error ? error.message : 'Unknown error',
       });
 
