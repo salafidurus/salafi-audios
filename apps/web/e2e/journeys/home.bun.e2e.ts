@@ -1,27 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
-import {
-  getE2EConfig,
-  startWebServer,
-  waitForWebReady,
-  withBrowserJourney,
-  type E2EConfig,
-  type WebServer,
-} from "../support/bun-webview-harness";
+import { createWebE2EServer, withBrowserJourney } from "../helpers/bun-webview-harness";
 
 describe("public home Bun.WebView journey", () => {
-  let config: E2EConfig;
-  let server: WebServer | undefined;
-
-  beforeAll(async () => {
-    config = getE2EConfig();
-    server = await startWebServer(config);
-    await waitForWebReady(config.origin);
-  });
-
-  afterAll(async () => {
-    await server?.stop();
-  });
+  const webServer = createWebE2EServer();
+  const { config } = webServer;
+  beforeAll(webServer.start);
+  afterAll(webServer.stop);
 
   it("loads the study landing through the production web app", async () => {
     await withBrowserJourney("public home loads study landing", config.origin, async ({ view }) => {

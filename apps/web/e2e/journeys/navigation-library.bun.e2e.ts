@@ -1,14 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
-import { installAuthFixtures } from "../support/bun-webview-auth-fixtures";
+import { withAuthFixtures } from "../helpers/bun-webview-auth-fixtures";
 import {
-  getE2EConfig,
-  startWebServer,
-  waitForWebReady,
+  createWebE2EServer,
+  waitForBrowserCondition,
   withBrowserJourney,
-  type E2EConfig,
-  type WebServer,
-} from "../support/bun-webview-harness";
+} from "../helpers/bun-webview-harness";
+import { waitForText, waitForUrl } from "../helpers/bun-webview-waits";
 
 type PageState = {
   url: string;
@@ -30,38 +28,11 @@ async function readPageState(view: Bun.WebView): Promise<PageState> {
   }))()`);
 }
 
-async function waitForUrl(view: Bun.WebView, expected: string): Promise<void> {
-  const deadline = Date.now() + 10_000;
-  while (Date.now() < deadline) {
-    if ((await readPageState(view)).url === expected) return;
-    await Bun.sleep(50);
-  }
-  throw new Error(`Expected ${expected}, received ${(await readPageState(view)).url}`);
-}
-
-async function waitForText(view: Bun.WebView, expected: string): Promise<void> {
-  const deadline = Date.now() + 10_000;
-  while (Date.now() < deadline) {
-    const state = await readPageState(view);
-    if (state.visibleText.includes(expected)) return;
-    await Bun.sleep(50);
-  }
-  throw new Error(`Expected visible text: ${expected}`);
-}
-
 describe("navigation and My Library Bun.WebView journeys", () => {
-  let config: E2EConfig;
-  let server: WebServer | undefined;
-
-  beforeAll(async () => {
-    config = getE2EConfig();
-    server = await startWebServer(config);
-    await waitForWebReady(config.origin, { timeoutMs: config.readyTimeoutMs });
-  });
-
-  afterAll(async () => {
-    await server?.stop();
-  });
+  const webServer = createWebE2EServer();
+  const { config } = webServer;
+  beforeAll(webServer.start);
+  afterAll(webServer.stop);
 
   describe("public navigation", () => {
     it("shows public destinations and the catalog search affordance", async () => {
@@ -106,7 +77,11 @@ describe("navigation and My Library Bun.WebView journeys", () => {
     it("preserves settings tab query state and the removed profile alias", async () => {
       await withBrowserJourney("settings query navigation", config.origin, async ({ view }) => {
         await view.navigate(`${config.origin}/settings?tab=profile`);
-        await waitForText(view, "Profile");
+        await waitForBrowserCondition(
+          view,
+          "selected Profile settings tab",
+          `document.querySelector('[role="tab"][aria-selected="true"]')?.textContent?.trim() === "Profile"`,
+        );
         expect((await readPageState(view)).url).toBe(`${config.origin}/settings?tab=profile`);
         expect(
           await view.evaluate(
@@ -115,7 +90,11 @@ describe("navigation and My Library Bun.WebView journeys", () => {
         ).toBe("Profile");
 
         await view.navigate(`${config.origin}/settings`);
-        await waitForText(view, "General");
+        await waitForBrowserCondition(
+          view,
+          "selected General settings tab",
+          `document.querySelector('[role="tab"][aria-selected="true"]')?.textContent?.trim() === "General"`,
+        );
         expect(
           await view.evaluate(
             `document.querySelector('[role="tab"][aria-selected="true"]')?.textContent?.trim() ?? ""`,
@@ -123,7 +102,11 @@ describe("navigation and My Library Bun.WebView journeys", () => {
         ).toBe("General");
 
         await view.navigate(`${config.origin}/settings?tab=unknown`);
-        await waitForText(view, "General");
+        await waitForBrowserCondition(
+          view,
+          "selected General settings tab for unknown query",
+          `document.querySelector('[role="tab"][aria-selected="true"]')?.textContent?.trim() === "General"`,
+        );
         expect(
           await view.evaluate(
             `document.querySelector('[role="tab"][aria-selected="true"]')?.textContent?.trim() ?? ""`,
@@ -193,9 +176,7 @@ describe("navigation and My Library Bun.WebView journeys", () => {
         "My Library anonymous and invalid tabs",
         config.origin,
         async (journey) => {
-          await journey.view.navigate("about:blank");
-          const cleanup = await installAuthFixtures(journey, { apiOrigin: config.apiOrigin });
-          try {
+          await withAuthFixtures(journey, { apiOrigin: config.apiOrigin }, async () => {
             await journey.view.navigate(`${config.origin}/my-library?tab=unknown`);
             await waitForText(journey.view, "Continue listening");
             expect((await readPageState(journey.view)).visibleText).toContain("Continue listening");
@@ -206,9 +187,7 @@ describe("navigation and My Library Bun.WebView journeys", () => {
             expect((await readPageState(journey.view)).url).toBe(
               `${config.origin}/my-library?tab=saved`,
             );
-          } finally {
-            await cleanup();
-          }
+          });
         },
       );
     });

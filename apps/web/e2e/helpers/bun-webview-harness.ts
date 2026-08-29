@@ -68,6 +68,12 @@ export type WebServer = {
   stop: () => Promise<void>;
 };
 
+/** Configuration for the shared server lifecycle used by one journey file. */
+export type WebServerOptions = {
+  /** Default public proxy port when `BUN_E2E_PORT` is not set. */
+  defaultPort?: number;
+};
+
 function positiveInteger(value: string | undefined): number | undefined {
   if (!value || !/^\d+$/.test(value)) return undefined;
   const parsed = Number(value);
@@ -199,6 +205,27 @@ export async function startWebServer(config: E2EConfig = getE2EConfig()): Promis
       await adapter.stop(true);
       child.kill("SIGINT");
       await child.exited;
+    },
+  };
+}
+
+/** Creates a lazily started server lifecycle for a Bun test file. */
+export function createWebE2EServer(options: WebServerOptions = {}) {
+  const env = { ...process.env };
+  if (options.defaultPort !== undefined) {
+    env.BUN_E2E_PORT = process.env.BUN_E2E_PORT ?? String(options.defaultPort);
+  }
+  const config = getE2EConfig(env);
+  let server: WebServer | undefined;
+
+  return {
+    config,
+    start: async () => {
+      server = await startWebServer(config);
+      await waitForWebReady(config.origin, { timeoutMs: config.readyTimeoutMs });
+    },
+    stop: async () => {
+      await server?.stop();
     },
   };
 }

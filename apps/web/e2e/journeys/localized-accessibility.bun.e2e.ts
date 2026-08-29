@@ -1,28 +1,16 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
 import {
-  getE2EConfig,
-  startWebServer,
+  createWebE2EServer,
   waitForBrowserCondition,
-  waitForWebReady,
   withBrowserJourney,
-  type E2EConfig,
-  type WebServer,
-} from "../support/bun-webview-harness";
+} from "../helpers/bun-webview-harness";
 
 describe("localized accessibility Bun.WebView journeys", () => {
-  let config: E2EConfig;
-  let server: WebServer | undefined;
-
-  beforeAll(async () => {
-    config = getE2EConfig();
-    server = await startWebServer(config);
-    await waitForWebReady(config.origin);
-  });
-
-  afterAll(async () => {
-    await server?.stop();
-  });
+  const webServer = createWebE2EServer();
+  const { config } = webServer;
+  beforeAll(webServer.start);
+  afterAll(webServer.stop);
 
   it("renders the Arabic Settings profile journey with RTL semantics", async () => {
     await withBrowserJourney("Arabic Settings profile journey", config.origin, async ({ view }) => {

@@ -161,3 +161,18 @@ export async function installAuthFixtures(
     await journey.view.cdp("Fetch.disable").catch(() => undefined);
   };
 }
+
+/** Runs a journey with auth interception and always disables its CDP fixture. */
+export async function withAuthFixtures<T>(
+  journey: BrowserJourney,
+  options: AuthFixtureOptions,
+  callback: () => Promise<T>,
+): Promise<T> {
+  await journey.view.navigate("about:blank");
+  const cleanup = await installAuthFixtures(journey, options);
+  try {
+    return await callback();
+  } finally {
+    await cleanup();
+  }
+}

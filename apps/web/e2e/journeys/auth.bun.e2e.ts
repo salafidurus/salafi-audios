@@ -1,44 +1,18 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
-import { installAuthFixtures } from "../support/bun-webview-auth-fixtures";
-import {
-  getE2EConfig,
-  startWebServer,
-  waitForBrowserCondition,
-  waitForWebReady,
-  withBrowserJourney,
-  type E2EConfig,
-  type WebServer,
-} from "../support/bun-webview-harness";
-
-async function waitForSelector(view: Bun.WebView, selector: string): Promise<void> {
-  await waitForBrowserCondition(
-    view,
-    `selector: ${selector}`,
-    `document.querySelector(${JSON.stringify(selector)}) !== null`,
-    { timeoutMs: 20_000 },
-  );
-}
+import { withAuthFixtures } from "../helpers/bun-webview-auth-fixtures";
+import { createWebE2EServer, withBrowserJourney } from "../helpers/bun-webview-harness";
+import { waitForSelector } from "../helpers/bun-webview-waits";
 
 describe("authentication Bun.WebView journeys", () => {
-  let config: E2EConfig;
-  let server: WebServer | undefined;
-
-  beforeAll(async () => {
-    config = getE2EConfig({ ...process.env, BUN_E2E_PORT: process.env.BUN_E2E_PORT ?? "3028" });
-    server = await startWebServer(config);
-    await waitForWebReady(config.origin);
-  });
-
-  afterAll(async () => {
-    await server?.stop();
-  });
+  const webServer = createWebE2EServer({ defaultPort: 3028 });
+  const { config } = webServer;
+  beforeAll(webServer.start);
+  afterAll(webServer.stop);
 
   it("renders the sign-in controls through the production web app", async () => {
     await withBrowserJourney("authentication sign-in controls", config.origin, async (journey) => {
-      await journey.view.navigate("about:blank");
-      const cleanup = await installAuthFixtures(journey);
-      try {
+      await withAuthFixtures(journey, {}, async () => {
         await journey.view.navigate(`${config.origin}/sign-in`);
         await waitForSelector(journey.view, "h1");
         const page = await journey.view.evaluate<{
@@ -59,37 +33,27 @@ describe("authentication Bun.WebView journeys", () => {
         expect(page.heading).toContain("Salafi Durus");
         expect(page.apple).toBe(1);
         expect(page.google).toBe(1);
-      } finally {
-        await cleanup();
-      }
+      });
     });
   });
 
   it("keeps anonymous account and legal routes out of sign-in", async () => {
     await withBrowserJourney("anonymous account routes", config.origin, async (journey) => {
-      await journey.view.navigate("about:blank");
-      const cleanup = await installAuthFixtures(journey);
-      try {
+      await withAuthFixtures(journey, {}, async () => {
         for (const path of ["/account/profile", "/account", "/account/legal"]) {
           await journey.view.navigate(`${config.origin}${path}`);
           expect(journey.view.url, path).not.toContain("/sign-in");
         }
-      } finally {
-        await cleanup();
-      }
+      });
     });
   });
 
   it("redirects anonymous admin access to sign-in", async () => {
     await withBrowserJourney("anonymous admin boundary", config.origin, async (journey) => {
-      await journey.view.navigate("about:blank");
-      const cleanup = await installAuthFixtures(journey);
-      try {
+      await withAuthFixtures(journey, {}, async () => {
         await journey.view.navigate(`${config.origin}/admin`);
         expect(journey.view.url).toContain("/sign-in");
-      } finally {
-        await cleanup();
-      }
+      });
     });
   });
 });
