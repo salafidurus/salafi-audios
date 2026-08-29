@@ -18,6 +18,12 @@
       "cache": false,
       "persistent": false
     },
+    // core-db's dev task regenerates Prisma and dist as part of its build. Those
+    // build-owned files must not retrigger the watcher that produced them.
+    "@sd/core-db#dev": {
+      "dependsOn": ["^dev"],
+      "inputs": ["$TURBO_DEFAULT$", "!src/generated/**", "!.generated-prisma.lock", "!dist/**"]
+    },
     "build": {
       // Topological: packages build before apps that depend on them
       "dependsOn": ["^build"],

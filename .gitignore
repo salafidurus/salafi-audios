@@ -56,6 +56,7 @@ infra/envs/*.env
 
 # generated DB artifacts (derived, never committed)
 packages/db/src/generated/
+/packages/core-db/.generated-prisma.lock
 
 # Python cache files
 __pycache__/
