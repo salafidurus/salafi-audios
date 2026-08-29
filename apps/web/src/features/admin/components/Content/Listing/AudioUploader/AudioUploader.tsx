@@ -13,6 +13,7 @@ import { InputField } from "@/shared/components/ui/input-field";
 
 import styles from "./audio-uploader.module.css";
 
+/** Provides localized single-audio import, extraction, and upload states. */
 type UploadState = "idle" | "importing" | "extracting" | "uploading" | "success" | "error";
 type UploadMode = "file" | "link";
 
@@ -24,12 +25,19 @@ function getErrorMessage(error: Error | null, fallback: string): string {
   return error?.message ?? fallback;
 }
 
+/** Completion callback for the single-audio upload workflow. */
 interface AudioUploaderProps {
+  /** Called only after duration extraction and object upload both succeed. */
   onUploadComplete: (result: {
+    /** Storage object key returned by the API. */
     audioKey: string;
+    /** Rounded duration extracted from the uploaded audio. */
     durationSeconds: number;
+    /** Original file size in bytes. */
     sizeBytes: number;
+    /** Browser-provided media type. */
     format: string;
+    /** Original file name shown in the completion state. */
     filename: string;
   }) => void;
 }
@@ -103,6 +111,7 @@ function ErrorContent({
   onBrowse,
   onReset,
 }: {
+  /** Failure text shown above the retry action, when available. */
   error: string | null;
   mode: UploadMode;
   onBrowse: () => void;
@@ -149,8 +158,10 @@ function UploadStateContent({
   onReset,
   t,
 }: {
+  /** Current stage rendered by the upload state machine. */
   uploadState: UploadState;
   fileName: string | null;
+  /** Failure text shown when the current operation cannot continue. */
   error: string | null;
   downloadProgress: { loaded: number; total: number | null } | null;
   mode: UploadMode;
@@ -206,6 +217,7 @@ function UploadStateContent({
   );
 }
 
+/** Provides file and URL-based audio upload with progress and recovery states. */
 export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
   const { t } = useTranslation();
   const [dragActive, setDragActive] = useState(false);

@@ -528,6 +528,7 @@ function DesktopNavigationActions({
   );
 }
 
+/** Renders public navigation and capability-scoped admin workspace controls. */
 export function PublicNavigation() {
   const { t, i18n } = useTranslation();
   const { isMobile } = useResponsive();

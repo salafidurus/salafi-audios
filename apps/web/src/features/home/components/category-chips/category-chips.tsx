@@ -7,13 +7,16 @@ import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 
 import styles from "./category-chips.module.css";
 
-/** Documents this module's responsibility and public boundary. */
+/** Provides localized topic navigation for the public home screen. */
+/** Optional controlled topic selection for the home-page category tabs. */
 export type CategoryChipsProps = {
+  /** Currently selected topic slug; omission leaves the tabs uncontrolled. */
   value?: string;
+  /** Receives the selected topic slug when a tab changes. */
   onValueChange?: (value: string) => void;
 };
 
-/** Documents the intent and contract of this declaration. */
+/** Renders localized topic tabs, including loading placeholders while topics load. */
 export function CategoryChips({ value, onValueChange }: CategoryChipsProps = {}) {
   const { i18n, t } = useTranslation();
   const { data: topics = [], isLoading } = useTopicsList();

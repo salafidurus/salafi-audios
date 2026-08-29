@@ -7,6 +7,7 @@ import { useRef, useEffect } from "react";
 import styles from "./Search.module.css";
 import { SearchGlyph } from "./SearchGlyph";
 
+/** Controlled input and presentation options for `Search.Bar`. */
 export interface SearchBarProps {
   /** Current search value (controlled input) */
   value: string;

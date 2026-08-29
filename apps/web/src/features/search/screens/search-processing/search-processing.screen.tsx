@@ -19,8 +19,11 @@ import { formatDuration } from "@/shared/utils/format";
 
 import styles from "./search-processing.screen.module.css";
 
+/** Inputs for the client-side search screen and its initial topic filter. */
 export type SearchProcessingScreenProps = {
+  /** Initial free-text query, typically restored from the URL. */
   searchKey?: string;
+  /** Optional topic slug used to constrain the initial result set. */
   topicSlug?: string;
 };
 
@@ -100,6 +103,11 @@ function getSearchItems(data: ReturnType<typeof useInfiniteSearch>["data"]) {
   return data?.pages.flatMap((page) => page.items) ?? [];
 }
 
+/**
+ * Renders debounced lecture search with localized topic filters and paginated
+ * results. The URL-provided values seed local state; subsequent input remains
+ * controlled by the screen until navigation changes the page.
+ */
 export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessingScreenProps) {
   const showOriginal = useShowOriginalContent();
   const { i18n, t } = useTranslation();

@@ -18,6 +18,8 @@ const scrollToTop = () => {
   }
 };
 
+/** Shows a localized smooth-scroll control after the app content passes the threshold. */
+/** Shows a localized smooth-scroll control after the app content passes the threshold. */
 export function ScrollToTopButton() {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);

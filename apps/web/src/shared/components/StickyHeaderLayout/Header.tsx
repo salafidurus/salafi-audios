@@ -2,11 +2,12 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/shared/utils";
 
-/** Documents this module's responsibility and public boundary. */
+/** Content accepted by the sticky header region. */
 interface HeaderProps {
   children: ReactNode;
 }
 
+/** Renders the sticky, responsive header region of the compound layout. */
 export function Header({ children }: HeaderProps) {
   return (
     <div
