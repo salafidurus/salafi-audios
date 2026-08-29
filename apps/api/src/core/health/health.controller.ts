@@ -2,12 +2,11 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import { Public } from '../auth/decorators';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
-import type { HealthCheckResult } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CDNHealthIndicator } from './cdn-health.indicator';
 import { DbHealthIndicator } from './db-health.indicator';
 import { RedisHealthIndicator } from './redis-health.indicator';
+import { HealthService, type HealthCheckResult } from './health.service';
 import { RedisService } from '../redis/redis.service';
 
 /** NestJS health controller service or controller coordinating the API boundary for this responsibility. */
@@ -20,7 +19,7 @@ import { RedisService } from '../redis/redis.service';
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class HealthController {
   constructor(
-    private readonly health: HealthCheckService,
+    private readonly health: HealthService,
     private readonly dbHealth: DbHealthIndicator,
     private readonly cdnHealth: CDNHealthIndicator,
     private readonly redis: RedisService,
@@ -30,7 +29,6 @@ export class HealthController {
   @Get()
   @ApiOperation({ summary: 'Full system health (database + CDN)' })
   @ApiOkResponse({ description: 'Health check result' })
-  @HealthCheck()
   getHealth(): Promise<HealthCheckResult> {
     const checks = [
       () => this.dbHealth.pingCheck('database', { timeout: 5000 }),
@@ -43,7 +41,6 @@ export class HealthController {
   @Get('healthz')
   @ApiOperation({ summary: 'Liveness probe – is the service running?' })
   @ApiOkResponse({ description: 'Always ok if the process is alive' })
-  @HealthCheck()
   getLiveness(): Promise<HealthCheckResult> {
     return this.health.check([]);
   }
@@ -51,7 +48,6 @@ export class HealthController {
   @Get('readyz')
   @ApiOperation({ summary: 'Readiness probe – can the service accept traffic?' })
   @ApiOkResponse({ description: 'Ok when core dependencies (database) are available' })
-  @HealthCheck()
   getReadiness(): Promise<HealthCheckResult> {
     return this.health.check([() => this.dbHealth.pingCheck('database', { timeout: 5000 })]);
   }

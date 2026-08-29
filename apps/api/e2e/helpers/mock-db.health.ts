@@ -1,8 +1,10 @@
-import { HealthIndicator } from '@nestjs/terminus';
-import type { HealthIndicatorResult } from '@nestjs/terminus';
+import {
+  createHealthIndicatorResult,
+  type HealthIndicatorResult,
+} from '../../src/core/health/health.service';
 
-export class MockDbHealthIndicator extends HealthIndicator {
+export class MockDbHealthIndicator {
   async pingCheck(key: string): Promise<HealthIndicatorResult> {
-    return this.getStatus(key, true, { currentState: 'idle' });
+    return createHealthIndicatorResult(key, 'up', { currentState: 'idle' });
   }
 }

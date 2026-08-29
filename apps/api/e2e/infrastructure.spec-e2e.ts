@@ -38,6 +38,34 @@ describe('Infrastructure & Basic API Features (e2e)', () => {
     expect(res.body.status).toBe('ok');
   });
 
+  it('GET /health/readyz - returns 200 when the database is healthy', async () => {
+    const res = await request(app.getHttpServer()).get('/health/readyz').expect(200);
+
+    expect(res.body).toMatchObject({
+      status: 'ok',
+      info: { database: { status: 'up' } },
+      error: {},
+      details: { database: { status: 'up' } },
+    });
+  });
+
+  it('GET /health - returns 503 with dependency diagnostics when a probe fails', async () => {
+    const failedApp = await createE2eApp({ disableThrottler: true, healthFailure: 'cdn' });
+
+    try {
+      const res = await request(failedApp.app.getHttpServer()).get('/health').expect(503);
+
+      expect(res.body).toMatchObject({
+        statusCode: 503,
+        message: expect.any(String),
+        error: { cdn: { status: 'down' } },
+        details: { cdn: { status: 'down' } },
+      });
+    } finally {
+      await failedApp.app.close();
+    }
+  });
+
   it('GET /docs - returns 200 HTML (Swagger)', async () => {
     const res = await request(app.getHttpServer()).get('/docs/').expect(200);
 

@@ -11,7 +11,7 @@ const httpExceptionBodySchema = z
   .object({
     message: z.union([z.string(), z.array(z.string())]).optional(),
     statusCode: z.number().optional(),
-    error: z.string().optional(),
+    error: z.union([z.string(), z.record(z.string(), z.unknown())]).optional(),
   })
   .catchall(z.unknown());
 
@@ -19,6 +19,17 @@ const bodyMessageArraySchema = z.array(z.string());
 const bodyMessageStringSchema = z.string();
 const zodIssueMessagesSchema = z.array(z.object({ message: z.string() }));
 const zodValidationErrorSchema = z.object({ issues: zodIssueMessagesSchema });
+const healthIndicatorValueSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+const healthIndicatorResultSchema = z.record(
+  z.string(),
+  z.record(z.string(), healthIndicatorValueSchema),
+);
+const healthCheckResponseSchema = z.object({
+  status: z.literal('error'),
+  info: healthIndicatorResultSchema.optional(),
+  error: healthIndicatorResultSchema,
+  details: healthIndicatorResultSchema,
+});
 const errorExtraSourceSchema = z.record(z.string(), z.unknown());
 const errorExtraValueSchema = z.union([
   z.string(),
@@ -29,10 +40,16 @@ const errorExtraValueSchema = z.union([
   z.undefined(),
 ]);
 
-type ErrorExtras = Record<string, string | number | boolean | string[] | null | undefined>;
+type ErrorExtras = Record<
+  string,
+  string | number | boolean | string[] | HealthIndicatorResult | null | undefined
+>;
+
+type HealthIndicatorResult = Record<string, Record<string, string | number | boolean | null>>;
 
 type DevDetails =
   | string[]
+  | HealthIndicatorResult
   | {
       /** Documents the kind field's API projection semantics and lifecycle meaning. */
       kind: string;
@@ -128,7 +145,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
         statusCode: exception.getStatus(),
         message: exception.message || fallback.message,
       };
-    const body = parsedResponse.data;
+    return this.resolveParsedHttpException(exception, fallback, parsedResponse.data);
+  }
+
+  private resolveParsedHttpException(
+    exception: HttpException,
+    fallback: ExceptionResolution,
+    body: z.infer<typeof httpExceptionBodySchema>,
+  ): ExceptionResolution {
+    const healthResponse = healthCheckResponseSchema.safeParse(body);
+    if (healthResponse.success)
+      return this.resolveHealthException(exception, fallback, healthResponse.data);
     const messageList = bodyMessageArraySchema.safeParse(body.message);
     if (messageList.success)
       return {
@@ -146,6 +173,23 @@ export class AllExceptionsFilter implements ExceptionFilter {
       statusCode: exception.getStatus(),
       message: exception.message || fallback.message,
       extras: parsedExtraSource.success ? toErrorExtras(parsedExtraSource.data) : {},
+    };
+  }
+
+  private resolveHealthException(
+    exception: HttpException,
+    fallback: ExceptionResolution,
+    healthResponse: z.infer<typeof healthCheckResponseSchema>,
+  ): ExceptionResolution {
+    return {
+      ...fallback,
+      statusCode: exception.getStatus(),
+      message: 'Health check failed',
+      details: healthResponse.details,
+      extras: {
+        info: healthResponse.info ?? {},
+        error: healthResponse.error,
+      },
     };
   }
 
