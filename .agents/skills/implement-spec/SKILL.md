@@ -13,8 +13,12 @@ skill does not implement the specification as one undifferentiated task.
 
 Each specification has one disposable `spec/<slug>` integration context,
 created from `main` and associated with exactly one parent specification.
-Carry that context while selecting and handing off its tickets; tickets with
-no parent specification remain standalone and use the existing lifecycle.
+Carry the parent issue, resolved spec branch, branch base, and pull-request
+target while selecting and handing off its tickets. If the parent has no
+recorded spec branch, carry the missing-context warning and use the provisional
+`origin/main` base defined by `pre-implement`; do not claim spec-branch
+isolation or invent a pull-request target. Tickets with no parent specification
+remain standalone and use the existing `origin/main` to `main` lifecycle.
 
 Before editing, read the root and nearest workspace `AGENT.md` files and the
 `tdd` skill. Every ticket cycle follows the `pre-implement`, `implement`, and
