@@ -14,6 +14,36 @@ import {
   type RateLimitPolicyName,
 } from './rate-limit.policy';
 
+/** Enforces named Fastify-backed rate-limit policies at the NestJS request boundary. */
+type RateLimitResult =
+  | { isAllowed: true; key: string }
+  | {
+      isAllowed: false;
+      key: string;
+      max: number;
+      timeWindow: number;
+      remaining: number;
+      ttl: number;
+      ttlInSeconds: number;
+      isExceeded: boolean;
+      isBanned: boolean;
+    };
+
+type RateLimiter = (
+  request: FastifyRequest,
+  callOptions?: { increment?: boolean },
+) => Promise<RateLimitResult>;
+
+type FastifyRateLimitFactory = {
+  createRateLimit: (options: {
+    max: number;
+    timeWindow: number;
+    /** Keeps an unavailable rate-limit store fail-open, preserving API availability. */
+    skipOnError: boolean;
+    keyGenerator: (request: FastifyRequest) => string;
+  }) => RateLimiter;
+};
+
 /** Core API rate-limit guard module enforcing named policies at the request boundary. */
 @Injectable()
 /**
@@ -22,10 +52,7 @@ import {
  * route classification and the stable rejection response.
  */
 export class RateLimitGuard implements CanActivate {
-  private readonly limiters = new Map<
-    RateLimitPolicyName,
-    ReturnType<FastifyInstance['createRateLimit']>
-  >();
+  private readonly limiters = new Map<RateLimitPolicyName, RateLimiter>();
 
   constructor(
     private readonly reflector: Reflector,
@@ -82,7 +109,8 @@ export class RateLimitGuard implements CanActivate {
 
     // SAFETY: The API is created with FastifyAdapter, so this adapter instance
     // exposes the rate-limit plugin registered during application bootstrap.
-    const fastify = this.adapterHost.httpAdapter.getInstance() as FastifyInstance;
+    const fastify = this.adapterHost.httpAdapter.getInstance() as FastifyInstance &
+      FastifyRateLimitFactory;
     const limiter = fastify.createRateLimit({
       max: policy.limit,
       timeWindow: policy.timeWindowMs,
