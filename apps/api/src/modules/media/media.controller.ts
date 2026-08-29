@@ -9,6 +9,7 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { BatchPresignAudioRequestDto } from './dto/batch-presign.dto';
 import { MediaService } from './media.service';
+import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
 // Presign requests aren't correlated to a specific scholar/listing at this
 // step, so this stays an unconditioned check — anyone with ANY upload
@@ -24,6 +25,7 @@ export class MediaController {
   constructor(private readonly service: MediaService) {}
 
   @Post('presigned-url')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Media')
   @ApiOperation({ summary: 'Get a presigned R2 upload URL' })
   getPresignedUrl(@Body() dto: PresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
@@ -31,6 +33,7 @@ export class MediaController {
   }
 
   @Post('presign-batch')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Media')
   @ApiOperation({ summary: 'Get presigned R2 upload URLs for a batch of audio files' })
   presignBatch(@Body() dto: BatchPresignAudioRequestDto): Promise<BatchPresignAudioResponseDto> {

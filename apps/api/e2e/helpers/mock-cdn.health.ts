@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { HealthIndicator } from '@nestjs/terminus';
-import type { HealthIndicatorResult } from '@nestjs/terminus';
+import {
+  createHealthIndicatorResult,
+  type HealthIndicatorResult,
+} from '../../src/core/health/health.service';
 
 @Injectable()
-export class MockCDNHealthIndicator extends HealthIndicator {
+export class MockCDNHealthIndicator {
   async pingCheck(key: string): Promise<HealthIndicatorResult> {
-    return this.getStatus(key, true);
+    return createHealthIndicatorResult(key, 'up');
   }
 }
