@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { LoggerService as NestLoggerService } from '@nestjs/common';
+import { API_LOGGER } from './logger.factory';
 
 /** API-owned bridge between Nest logging and structured application logging. */
 type LogFieldValue = string | number | boolean | Error | null | undefined;
@@ -41,7 +42,7 @@ export type ApplicationLogger = {
 export class AppLoggerService implements NestLoggerService {
   private activeLogger: ApplicationLogger;
 
-  constructor(private readonly rootLogger: ApplicationLogger) {
+  constructor(@Inject(API_LOGGER) private readonly rootLogger: ApplicationLogger) {
     this.activeLogger = rootLogger;
   }
 
