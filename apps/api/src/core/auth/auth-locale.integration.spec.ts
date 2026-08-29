@@ -7,7 +7,7 @@ import request from 'supertest';
 import { AuthGuard } from './auth.guard';
 import { AuthLocaleController } from './auth-locale.controller';
 import { PrismaService } from '../db/prisma.service';
-import { ZodValidationPipe } from 'nestjs-zod';
+import { StandardSchemaValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from '../../shared/errors/http-exception.filter';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
@@ -48,7 +48,7 @@ describe('AuthLocaleController — auth boundaries', () => {
     }).compile();
 
     app = module.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
-    app.useGlobalPipes(new ZodValidationPipe());
+    app.useGlobalPipes(new StandardSchemaValidationPipe());
     app.useGlobalFilters(new AllExceptionsFilter(mockConfigService as any));
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
