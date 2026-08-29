@@ -81,7 +81,7 @@ describe('AuthLocaleController — auth boundaries', () => {
         .patch('/auth/me/locale')
         .send({ preferredLanguage: 'fr' });
       expect(res.status).toBe(400);
-      // AllExceptionsFilter maps ZodValidationException issues to a string[].
+      // AllExceptionsFilter preserves native Standard Schema issues as details.
       expect(Array.isArray(res.body.details)).toBe(true);
       expect(res.body.details[0]).toContain('expected one of');
     });

@@ -3,7 +3,6 @@ import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
 import { Prisma } from '@sd/core-db';
 import { ConfigService } from '../../core/config/config.service';
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { ZodValidationException } from 'nestjs-zod';
 import { z } from 'zod';
 
 /** Shared API http exception.filter utilities and boundary definitions used by backend modules. */
@@ -17,8 +16,6 @@ const httpExceptionBodySchema = z
 
 const bodyMessageArraySchema = z.array(z.string());
 const bodyMessageStringSchema = z.string();
-const zodIssueMessagesSchema = z.array(z.object({ message: z.string() }));
-const zodValidationErrorSchema = z.object({ issues: zodIssueMessagesSchema });
 const errorExtraSourceSchema = z.record(z.string(), z.unknown());
 const errorExtraValueSchema = z.union([
   z.string(),
@@ -61,7 +58,7 @@ type ExceptionResolution = {
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly config: ConfigService) {}
 
-  catch(exception: Error | HttpException | ZodValidationException | unknown, host: ArgumentsHost) {
+  catch(exception: Error | HttpException | unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const req = ctx.getRequest<FastifyRequest>();
     const res = ctx.getResponse<FastifyReply>();
@@ -85,9 +82,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     });
   }
 
-  private resolveException(
-    exception: Error | HttpException | ZodValidationException | unknown,
-  ): ExceptionResolution {
+  private resolveException(exception: Error | HttpException | unknown): ExceptionResolution {
     const fallback = {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       message: 'Internal Server Error',
@@ -98,17 +93,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return {
         ...fallback,
         message: 'Database connection refused. Ensure PostgreSQL is running and reachable.',
-      };
-    }
-    if (exception instanceof ZodValidationException) {
-      const parsed = zodValidationErrorSchema.safeParse(exception.getZodError());
-      return {
-        ...fallback,
-        statusCode: exception.getStatus(),
-        message: 'Validation failed',
-        details: parsed.success
-          ? parsed.data.issues.map((issue) => issue.message)
-          : ['Validation failed'],
       };
     }
     if (exception instanceof HttpException) return this.resolveHttpException(exception, fallback);
@@ -150,7 +134,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   }
 
   private buildDevDetails(
-    exception: Error | HttpException | ZodValidationException | unknown,
+    exception: Error | HttpException | unknown,
     existingDetails: DevDetails | undefined,
   ): DevDetails | undefined {
     if (existingDetails !== undefined) {
@@ -162,9 +146,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     return prismaDetails ?? getGenericDevDetails(exception);
   }
 
-  private isPrismaConnectionRefused(
-    exception: Error | HttpException | ZodValidationException | unknown,
-  ): boolean {
+  private isPrismaConnectionRefused(exception: Error | HttpException | unknown): boolean {
     return (
       exception instanceof Prisma.PrismaClientKnownRequestError && exception.code === 'ECONNREFUSED'
     );

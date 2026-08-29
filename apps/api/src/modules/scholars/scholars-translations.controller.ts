@@ -5,8 +5,14 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { resolveScholarTranslation } from '../../core/auth/policy-resolvers';
 import { ScholarsService } from './scholars.service';
-import { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
-import { UpdateScholarTranslationDto } from './dto/update-scholar-translation.dto';
+import {
+  SaveScholarTranslationDtoSchema,
+  type SaveScholarTranslationDto,
+} from './dto/save-scholar-translation.dto';
+import {
+  UpdateScholarTranslationDtoSchema,
+  type UpdateScholarTranslationDto,
+} from './dto/update-scholar-translation.dto';
 
 /** NestJS scholars translations controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Scholar Translations')
@@ -26,7 +32,10 @@ export class ScholarsTranslationsController {
   @Post(':slug/translations')
   @CheckPolicy('translate', 'Translation', resolveScholarTranslation())
   @ApiOperation({ summary: 'Upsert a scholar translation' })
-  upsertTranslation(@Param('slug') slug: string, @Body() dto: SaveScholarTranslationDto) {
+  upsertTranslation(
+    @Param('slug') slug: string,
+    @Body({ schema: SaveScholarTranslationDtoSchema }) dto: SaveScholarTranslationDto,
+  ) {
     return this.service.upsertTranslation(slug, dto);
   }
 
@@ -35,8 +44,8 @@ export class ScholarsTranslationsController {
   @ApiOperation({ summary: 'Partially update a scholar translation' })
   updateTranslation(
     @Param('slug') slug: string,
-    @Param('locale') locale: string,
-    @Body() body: UpdateScholarTranslationDto,
+    @Param('locale', { schema: LocaleSchema }) locale: string,
+    @Body({ schema: UpdateScholarTranslationDtoSchema }) body: UpdateScholarTranslationDto,
   ) {
     return this.service.updateTranslation(slug, LocaleSchema.parse(locale), body);
   }
@@ -44,14 +53,20 @@ export class ScholarsTranslationsController {
   @Post(':slug/translations/:locale/publish')
   @CheckPolicy('publish', 'Translation', resolveScholarTranslation())
   @ApiOperation({ summary: 'Publish a scholar translation' })
-  publishTranslation(@Param('slug') slug: string, @Param('locale') locale: string) {
+  publishTranslation(
+    @Param('slug') slug: string,
+    @Param('locale', { schema: LocaleSchema }) locale: string,
+  ) {
     return this.service.publishTranslation(slug, LocaleSchema.parse(locale));
   }
 
   @Post(':slug/translations/:locale/unpublish')
   @CheckPolicy('publish', 'Translation', resolveScholarTranslation())
   @ApiOperation({ summary: 'Unpublish a scholar translation' })
-  unpublishTranslation(@Param('slug') slug: string, @Param('locale') locale: string) {
+  unpublishTranslation(
+    @Param('slug') slug: string,
+    @Param('locale', { schema: LocaleSchema }) locale: string,
+  ) {
     return this.service.unpublishTranslation(slug, LocaleSchema.parse(locale));
   }
 }

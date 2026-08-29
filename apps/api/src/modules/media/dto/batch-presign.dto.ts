@@ -1,6 +1,9 @@
-import { createZodDto } from 'nestjs-zod';
-import { BatchPresignAudioRequestDtoSchema } from '@sd/core-contracts';
+import {
+  BatchPresignAudioRequestDtoSchema,
+  type BatchPresignAudioRequestDto as BatchPresignAudioRequestDtoType,
+} from '@sd/core-contracts';
 
-/** media application module responsible for batch presign.dto behavior at the backend boundary. */
-/** NestJS batch presign audio request dto service or controller coordinating the API boundary for this responsibility. */
-export class BatchPresignAudioRequestDto extends createZodDto(BatchPresignAudioRequestDtoSchema) {}
+/** Defines the validated request contract for issuing batch media URLs. */
+export { BatchPresignAudioRequestDtoSchema };
+/** Audio object keys for which the API should issue a batch of signed URLs. */
+export type BatchPresignAudioRequestDto = BatchPresignAudioRequestDtoType;

@@ -4,7 +4,7 @@ import './shared/utils/env.bootstrap';
 // errors when CommonJS companion dependencies (such as nestjs-pino, @nestjs/throttler, or @nestjs/terminus)
 // synchronously call `require('@nestjs/common')` during execution, we must explicitly import the core ES modules first.
 // This forces Bun to evaluate the NestJS core ESM graph synchronously at startup so subsequent CJS requires succeed.
-import '@nestjs/common';
+import { StandardSchemaValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from './core/config/config.service';
 import { AllExceptionsFilter } from './shared/errors/http-exception.filter';
@@ -19,7 +19,6 @@ import helmet from '@fastify/helmet';
 import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { ZodValidationPipe } from 'nestjs-zod';
 
 /** API bootstrap entrypoint that configures the NestJS server and shared request infrastructure. */
 async function bootstrap() {
@@ -65,7 +64,7 @@ async function bootstrap() {
     maxAge: 86400,
   });
 
-  app.useGlobalPipes(new ZodValidationPipe());
+  app.useGlobalPipes(new StandardSchemaValidationPipe());
   app.useGlobalFilters(new AllExceptionsFilter(app.get(ConfigService)));
 
   // Mount Better Auth as a Fastify route (not raw middleware). Raw middleware

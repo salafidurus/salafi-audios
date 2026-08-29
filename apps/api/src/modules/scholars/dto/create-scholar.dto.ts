@@ -1,6 +1,9 @@
-import { createZodDto } from 'nestjs-zod';
-import { CreateScholarDtoSchema } from '@sd/core-contracts';
+import {
+  CreateScholarDtoSchema,
+  type CreateScholarDto as CreateScholarDtoType,
+} from '@sd/core-contracts';
 
-/** scholars application module responsible for create scholar.dto behavior at the backend boundary. */
-/** NestJS create scholar dto service or controller coordinating the API boundary for this responsibility. */
-export class CreateScholarDto extends createZodDto(CreateScholarDtoSchema) {}
+/** Request contract for creating a scholar and its main-language profile. */
+export { CreateScholarDtoSchema };
+/** Fields accepted by the scholar creation endpoint. */
+export type CreateScholarDto = CreateScholarDtoType;

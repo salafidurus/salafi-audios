@@ -1,7 +1,10 @@
 import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { AppleNativeService } from './apple-native.service';
-import { AppleNativeSignInDto } from './dto/apple-native-sign-in.dto';
+import {
+  AppleNativeSignInDtoSchema,
+  type AppleNativeSignInDto,
+} from './dto/apple-native-sign-in.dto';
 import { Public } from './decorators';
 
 /** NestJS apple native controller service or controller coordinating the API boundary for this responsibility. */
@@ -15,7 +18,7 @@ export class AppleNativeController {
   @Public()
   @Post('native')
   @HttpCode(200)
-  async nativeSignIn(@Body() dto: AppleNativeSignInDto) {
+  async nativeSignIn(@Body({ schema: AppleNativeSignInDtoSchema }) dto: AppleNativeSignInDto) {
     const { identityToken, user: appleUser } = dto;
 
     const payload = await this.appleNativeService.verifyIdentityToken(identityToken);
