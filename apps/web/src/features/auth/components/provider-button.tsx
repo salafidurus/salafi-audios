@@ -10,11 +10,13 @@ import styles from "./provider-button.module.css";
 type ThemeMode = "light" | "dark";
 type ButtonStyleVars = CSSProperties & Record<`--${string}`, string>;
 
+/** Configures the themed Google provider button. */
 export type GoogleButtonProps = {
   onClick?: () => void;
   disabled?: boolean;
 };
 
+/** Configures the themed Apple provider button. */
 export type AppleButtonProps = {
   onClick?: () => void;
   disabled?: boolean;
@@ -83,6 +85,7 @@ function useThemeMode(): ThemeMode {
   return useSyncExternalStore(subscribeToTheme, readThemeMode, () => "light");
 }
 
+/** Renders a Google sign-in button whose visual tokens follow the active theme. */
 export function GoogleButton({ onClick, disabled = false }: GoogleButtonProps) {
   const themeMode = useThemeMode();
   const isDark = themeMode === "dark";
@@ -117,6 +120,7 @@ export function GoogleButton({ onClick, disabled = false }: GoogleButtonProps) {
   );
 }
 
+/** Renders an Apple sign-in button whose visual tokens follow the active theme. */
 export function AppleButton({ onClick, disabled = false }: AppleButtonProps) {
   const themeMode = useThemeMode();
   const isDark = themeMode === "dark";
@@ -148,12 +152,14 @@ export function AppleButton({ onClick, disabled = false }: AppleButtonProps) {
 }
 
 /* Legacy export for backwards compatibility */
+/** Describes the provider selected by the backwards-compatible button wrapper. */
 export type AuthProviderButtonProps = {
   provider: "apple" | "google";
   onClick?: () => void;
   disabled?: boolean;
 };
 
+/** Renders the provider-specific button while preserving the legacy shared API. */
 export function AuthProviderButton({ provider, onClick, disabled }: AuthProviderButtonProps) {
   if (provider === "apple") {
     return <AppleButton onClick={onClick} disabled={disabled} />;

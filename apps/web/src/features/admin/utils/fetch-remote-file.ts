@@ -10,8 +10,10 @@ const AUDIO_EXTENSION_MIME = {
 
 type AudioExtension = keyof typeof AUDIO_EXTENSION_MIME;
 
+/** Lists extensions the remote-file importer treats as supported audio formats. */
 export const AUDIO_EXTENSIONS = Object.keys(AUDIO_EXTENSION_MIME);
 
+/** Extracts an RFC 5987/Content-Disposition filename, or null when the header has none. */
 export function filenameFromContentDisposition(header: string | null): string | null {
   if (!header) return null;
   const utf8Match = header.match(/filename\*=UTF-8''([^;]+)/i);
@@ -20,6 +22,7 @@ export function filenameFromContentDisposition(header: string | null): string | 
   return match?.[1] ?? null;
 }
 
+/** Derives a decoded filename from the URL path, falling back to `download` for invalid or empty URLs. */
 export function filenameFromUrl(url: string): string {
   try {
     const { pathname } = new URL(url);
@@ -84,6 +87,7 @@ async function readBodyWithProgress(
   return new Blob(chunks as BlobPart[]);
 }
 
+/** Downloads a remote file, validates that it is not HTML, and returns it with inferred metadata. */
 export async function fetchFileFromUrl(
   url: string,
   onProgress?: (loaded: number, total: number | null) => void,

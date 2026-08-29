@@ -1,7 +1,17 @@
-/** Identifies a supported Drive file link or an unsupported folder link. */
+/** Parses Google Drive links and builds anonymous download URLs for supported files. */
+
+/** Identifies a supported Drive file link or a recognized unsupported folder link. */
 export type GoogleDriveLink =
-  | { /** Documents the intent and contract of this field. */ kind: "file"; fileId: string }
-  | { /** Documents the intent and contract of this field. */ kind: "unsupported-folder" };
+  | {
+      /** Distinguishes a downloadable Drive file from an unsupported folder. */
+      kind: "file";
+      /** Opaque Drive identifier used to construct the download endpoint. */
+      fileId: string;
+    }
+  | {
+      /** Distinguishes a recognized folder URL that cannot be imported as a file. */
+      kind: "unsupported-folder";
+    };
 
 /**
  * Recognizes Google Drive file/folder links. Folders are flagged distinctly (rather than

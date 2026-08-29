@@ -14,6 +14,7 @@ type SignInScreenProps = {
   redirectTo: string;
 };
 
+/** Renders the responsive sign-in surface and preserves the requested callback destination. */
 export function SignInResponsiveScreen({ redirectTo }: SignInScreenProps) {
   const { t } = useTranslation();
   const signIn = (provider: "apple" | "google") => {
