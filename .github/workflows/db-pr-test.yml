@@ -4,7 +4,8 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, closed]
     branches:
-      - main # Only PRs targeting main branch
+      - main # Default integration and final validation PRs
+      - spec/** # Specification integration PRs require schema feedback
     paths:
       - packages/core-db/prisma/**
       - packages/core-db/prisma.config.ts

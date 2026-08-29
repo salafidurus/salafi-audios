@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - preview
+      - spec/**
     paths:
       - "docker/**"
       - "apps/api/**"
