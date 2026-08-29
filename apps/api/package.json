@@ -50,7 +50,7 @@
     "ioredis": "^6.0.0",
     "jose": "^6.2.10",
     "keyv": "^5.6.0",
-    "nestjs-zod": "^5.5.0",
+    "nestjs-pino": "^4.6.1",
     "pg": "catalog:",
     "pino": "^10.3.1",
     "reflect-metadata": "^0.2.2",

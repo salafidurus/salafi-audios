@@ -1,6 +1,6 @@
-import { ReplaceUserAccessRequestSchema } from '@sd/core-contracts';
-import { createZodDto } from 'nestjs-zod';
+import { ReplaceUserAccessRequestSchema, type ReplaceUserAccessRequest } from '@sd/core-contracts';
 
-/** Core API replace user access.dto module providing shared backend infrastructure and authority-boundary services. */
-/** NestJS replace user access dto service or controller coordinating the API boundary for this responsibility. */
-export class ReplaceUserAccessDto extends createZodDto(ReplaceUserAccessRequestSchema) {}
+/** Defines the validated request contract for replacing aggregate access grants. */
+export { ReplaceUserAccessRequestSchema };
+/** Fields used to replace an administrator's versioned aggregate access grants. */
+export type ReplaceUserAccessDto = ReplaceUserAccessRequest;

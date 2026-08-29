@@ -1,6 +1,9 @@
-import { createZodDto } from 'nestjs-zod';
-import { UpdateScholarTranslationDtoSchema } from '@sd/core-contracts';
+import {
+  UpdateScholarTranslationDtoSchema,
+  type UpdateScholarTranslationDto as UpdateScholarTranslationDtoType,
+} from '@sd/core-contracts';
 
-/** scholars application module responsible for update scholar translation.dto behavior at the backend boundary. */
-/** NestJS update scholar translation dto service or controller coordinating the API boundary for this responsibility. */
-export class UpdateScholarTranslationDto extends createZodDto(UpdateScholarTranslationDtoSchema) {}
+/** Request contract for partially updating a scholar translation in one locale. */
+export { UpdateScholarTranslationDtoSchema };
+/** Optional translation fields accepted by the scholar-translation update endpoint. */
+export type UpdateScholarTranslationDto = UpdateScholarTranslationDtoType;

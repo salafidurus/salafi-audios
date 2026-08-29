@@ -1,6 +1,9 @@
-import { createZodDto } from 'nestjs-zod';
-import { SaveListingTranslationDtoSchema } from '@sd/core-contracts';
+import {
+  SaveListingTranslationDtoSchema,
+  type SaveListingTranslationDto as SaveListingTranslationDtoType,
+} from '@sd/core-contracts';
 
-/** listing application module responsible for save listing translation.dto behavior at the backend boundary. */
-/** NestJS save listing translation dto service or controller coordinating the API boundary for this responsibility. */
-export class SaveListingTranslationDto extends createZodDto(SaveListingTranslationDtoSchema) {}
+/** Request contract for creating or replacing a listing translation in one locale. */
+export { SaveListingTranslationDtoSchema };
+/** Fields accepted by the listing-translation write endpoint. */
+export type SaveListingTranslationDto = SaveListingTranslationDtoType;

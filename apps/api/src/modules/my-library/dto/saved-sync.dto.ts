@@ -1,6 +1,6 @@
-import { createZodDto } from 'nestjs-zod';
-import { SavedSyncDtoSchema } from '@sd/core-contracts';
+import { SavedSyncDtoSchema, type SavedSyncDto as SavedSyncDtoType } from '@sd/core-contracts';
 
-/** my library application module responsible for saved sync.dto behavior at the backend boundary. */
-/** NestJS saved sync dto service or controller coordinating the API boundary for this responsibility. */
-export class SavedSyncDto extends createZodDto(SavedSyncDtoSchema) {}
+/** Defines the validated request contract for synchronizing saved listings. */
+export { SavedSyncDtoSchema };
+/** One client-side saved-listing change in the synchronization batch. */
+export type SavedSyncDto = SavedSyncDtoType;

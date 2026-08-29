@@ -74,6 +74,16 @@ describe('Infrastructure & Basic API Features (e2e)', () => {
     expect(res.text).toContain('swagger');
   });
 
+  it('OpenAPI preserves the native schema for locale updates', async () => {
+    const res = await request(app.getHttpServer()).get('/docs-json').expect(200);
+    const schema =
+      res.body.paths['/auth/me/locale'].patch.requestBody.content['application/json'].schema;
+
+    expect(schema.type).toBe('object');
+    expect(schema.properties.preferredLanguage).toBeDefined();
+    expect(schema.required).toContain('preferredLanguage');
+  });
+
   it('GET /nonexistent - returns 404 with error body', async () => {
     const res = await request(app.getHttpServer()).get('/nonexistent').expect(404);
 

@@ -3,8 +3,8 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { TopicsService } from './topics.service';
-import { CreateTopicDto } from './dto/create-topic.dto';
-import { UpdateTopicDto } from './dto/update-topic.dto';
+import { CreateTopicWithTranslationsDtoSchema, type CreateTopicDto } from './dto/create-topic.dto';
+import { UpdateTopicWithTranslationsDtoSchema, type UpdateTopicDto } from './dto/update-topic.dto';
 import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
 // Topics are never scholar/locale-scoped — unconditioned checks only.
@@ -34,7 +34,7 @@ export class AdminTopicsController {
   @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Topic')
   @ApiOperation({ summary: 'Create a topic with translations' })
-  create(@Body() dto: CreateTopicDto) {
+  create(@Body({ schema: CreateTopicWithTranslationsDtoSchema }) dto: CreateTopicDto) {
     return this.service.createWithTranslations(dto);
   }
 
@@ -42,7 +42,10 @@ export class AdminTopicsController {
   @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Topic')
   @ApiOperation({ summary: 'Update a topic with translations' })
-  update(@Param('slug') slug: string, @Body() dto: UpdateTopicDto) {
+  update(
+    @Param('slug') slug: string,
+    @Body({ schema: UpdateTopicWithTranslationsDtoSchema }) dto: UpdateTopicDto,
+  ) {
     return this.service.updateWithTranslations(slug, dto);
   }
 

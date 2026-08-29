@@ -1,6 +1,9 @@
-import { createZodDto } from 'nestjs-zod';
-import { ArrangeCommitDtoSchema } from '@sd/core-contracts';
+import {
+  ArrangeCommitDtoSchema,
+  type ArrangeCommitDto as ArrangeCommitDtoType,
+} from '@sd/core-contracts';
 
-/** listing application module responsible for arrange commit.dto behavior at the backend boundary. */
-/** NestJS arrange commit dto service or controller coordinating the API boundary for this responsibility. */
-export class ArrangeCommitDto extends createZodDto(ArrangeCommitDtoSchema) {}
+/** Defines the validated request contract for atomic listing tree edits. */
+export { ArrangeCommitDtoSchema };
+/** Atomic tree-edit payload used to arrange a listing's nested content. */
+export type ArrangeCommitDto = ArrangeCommitDtoType;

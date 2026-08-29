@@ -3,7 +3,7 @@
 // errors when CommonJS companion dependencies synchronously call `require('@nestjs/common')`
 // synchronously call `require('@nestjs/common')` during execution, we must explicitly import the core ES modules first.
 // This forces Bun to evaluate the NestJS core ESM graph synchronously at startup so subsequent CJS requires succeed.
-import '@nestjs/common';
+import { StandardSchemaValidationPipe } from '@nestjs/common';
 import '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CDNHealthIndicator } from '../../src/core/health/cdn-health.indicator';
@@ -15,7 +15,6 @@ import { MockDbHealthIndicator } from './mock-db.health';
 import { DbHealthIndicator } from '../../src/core/health/db-health.indicator';
 import { HealthCheckError } from '../../src/core/health/health.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ZodValidationPipe } from 'nestjs-zod';
 import { AllExceptionsFilter } from '../../src/shared/errors/http-exception.filter';
 import { ConfigService } from '../../src/core/config/config.service';
 import { initAuth } from '../../src/core/auth/auth.instance';
@@ -70,7 +69,7 @@ export async function createE2eApp(options?: {
   });
   initAuth(config);
 
-  app.useGlobalPipes(new ZodValidationPipe());
+  app.useGlobalPipes(new StandardSchemaValidationPipe());
   app.useGlobalFilters(new AllExceptionsFilter(config));
 
   const swaggerConfig = new DocumentBuilder()

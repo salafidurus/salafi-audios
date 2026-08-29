@@ -1,7 +1,10 @@
 import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { AppleNativeService } from './apple-native.service';
-import { AppleNativeSignInDto } from './dto/apple-native-sign-in.dto';
+import {
+  AppleNativeSignInDtoSchema,
+  type AppleNativeSignInDto,
+} from './dto/apple-native-sign-in.dto';
 import { Public } from './decorators';
 import { RateLimitPolicy } from '../security/rate-limit.decorator';
 
@@ -17,7 +20,7 @@ export class AppleNativeController {
   @RateLimitPolicy('authentication')
   @Post('native')
   @HttpCode(200)
-  async nativeSignIn(@Body() dto: AppleNativeSignInDto) {
+  async nativeSignIn(@Body({ schema: AppleNativeSignInDtoSchema }) dto: AppleNativeSignInDto) {
     const { identityToken, user: appleUser } = dto;
 
     const payload = await this.appleNativeService.verifyIdentityToken(identityToken);

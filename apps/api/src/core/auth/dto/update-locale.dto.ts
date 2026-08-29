@@ -1,6 +1,10 @@
-import { createZodDto } from 'nestjs-zod';
-import { UpdateLocaleDtoSchema } from '@sd/core-contracts';
+import {
+  UpdateLocaleDtoSchema,
+  type UpdateLocaleDto as UpdateLocaleDtoType,
+} from '@sd/core-contracts';
 
-/** Core API update locale.dto module providing shared backend infrastructure and authority-boundary services. */
-/** NestJS update locale dto service or controller coordinating the API boundary for this responsibility. */
-export class UpdateLocaleDto extends createZodDto(UpdateLocaleDtoSchema) {}
+/** Shared schema used to validate and document the preferred-language update body. */
+export { UpdateLocaleDtoSchema };
+
+/** Type of the validated preferred-language update body. */
+export type UpdateLocaleDto = UpdateLocaleDtoType;

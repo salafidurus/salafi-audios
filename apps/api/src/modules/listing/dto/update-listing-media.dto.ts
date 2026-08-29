@@ -1,6 +1,9 @@
-import { createZodDto } from 'nestjs-zod';
-import { UpdateListingMediaDtoSchema } from '@sd/core-contracts';
+import {
+  UpdateListingMediaDtoSchema,
+  type UpdateListingMediaDto as UpdateListingMediaDtoType,
+} from '@sd/core-contracts';
 
-/** listing application module responsible for update listing media.dto behavior at the backend boundary. */
-/** NestJS update listing media dto service or controller coordinating the API boundary for this responsibility. */
-export class UpdateListingMediaDto extends createZodDto(UpdateListingMediaDtoSchema) {}
+/** Request contract for replacing the playable media attached to a listing. */
+export { UpdateListingMediaDtoSchema };
+/** Fields accepted by the listing-media update endpoint. */
+export type UpdateListingMediaDto = UpdateListingMediaDtoType;
