@@ -13,7 +13,6 @@
     "test:cov": "bun test --isolate --coverage --path-ignore-patterns 'e2e/'",
     "test:prepush": "bun test --isolate --path-ignore-patterns 'e2e/'",
     "test:e2e": "playwright test",
-    "test:e2e:bun": "BUN_WEBVIEW_E2E=1 bun --no-orphans test --timeout 120000 ./e2e/*.bun.e2e.ts",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "playwright:version": "playwright --version",
@@ -54,7 +53,7 @@
   "devDependencies": {
     "@playwright/test": "^1.62.0",
     "@tailwindcss/postcss": "^4",
-    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
