@@ -1,0 +1,10 @@
+{
+  "name": "ci-contracts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "oxlint .",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  }
+}

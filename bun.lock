@@ -225,6 +225,9 @@
         "tailwindcss": "^4",
       },
     },
+    "infra/ci": {
+      "name": "ci-contracts",
+    },
     "infra/dependabot-helper": {
       "name": "dependabot-helper",
       "dependencies": {
@@ -2195,6 +2198,8 @@
     "chrome-trace-event": ["chrome-trace-event@1.0.4", "", {}, "sha512-rNjApaLzuwaOTjCiT8lSDdGN1APCiqkChLMJxJPWLunPAt5fy8xgU9/jNOchV84wfIxrA0lRQB7oCT8jrn/wrQ=="],
 
     "chromium-edge-launcher": ["chromium-edge-launcher@0.3.0", "", { "dependencies": { "@types/node": "*", "escape-string-regexp": "^4.0.0", "is-wsl": "^2.2.0", "lighthouse-logger": "^1.0.0", "mkdirp": "^1.0.4" } }, "sha512-p03azHlGjtyRvFEee3cyvtsRYdniSkwjkzmM/KmVnqT5d7QkkwpJBhis/zCLMYdQMVJ5tt140TBNqqrZPaWeFA=="],
+
+    "ci-contracts": ["ci-contracts@workspace:infra/ci"],
 
     "ci-info": ["ci-info@3.9.0", "", {}, "sha512-NIxF55hv4nSqQswkAeiOi1r83xy8JldOFDTWiug55KBu9Jnblncd2U6ViHmYgHf01TPZS77NJBhBMKdWj9HQMQ=="],
 
