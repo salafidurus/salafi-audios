@@ -2,11 +2,6 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { request as httpRequest } from "node:http";
 import { resolve } from "node:path";
 
-if (process.env.BUN_WEBVIEW_E2E === "1") {
-  const { GlobalRegistrator } = require("@happy-dom/global-registrator");
-  GlobalRegistrator.unregister();
-}
-
 export const DEFAULT_E2E_PORT = 3008;
 const DEFAULT_READY_TIMEOUT_MS = 120_000;
 const DEFAULT_READY_INTERVAL_MS = 100;
@@ -129,7 +124,7 @@ export async function startWebServer(config: E2EConfig = getE2EConfig()): Promis
       FALLBACK_TEST_MODE: "1",
     },
     stdout: "inherit",
-    stderr: "ignore",
+    stderr: "inherit",
   });
   let adapter: ReturnType<typeof Bun.serve>;
   try {
