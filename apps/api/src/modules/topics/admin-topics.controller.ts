@@ -5,6 +5,7 @@ import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { TopicsService } from './topics.service';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { UpdateTopicDto } from './dto/update-topic.dto';
+import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
 // Topics are never scholar/locale-scoped — unconditioned checks only.
 /** NestJS admin topics controller service or controller coordinating the API boundary for this responsibility. */
@@ -30,6 +31,7 @@ export class AdminTopicsController {
   }
 
   @Post()
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Topic')
   @ApiOperation({ summary: 'Create a topic with translations' })
   create(@Body() dto: CreateTopicDto) {
@@ -37,6 +39,7 @@ export class AdminTopicsController {
   }
 
   @Put(':slug')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Topic')
   @ApiOperation({ summary: 'Update a topic with translations' })
   update(@Param('slug') slug: string, @Body() dto: UpdateTopicDto) {
@@ -44,6 +47,7 @@ export class AdminTopicsController {
   }
 
   @Delete(':slug')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('delete', 'Topic')
   @ApiOperation({ summary: 'Delete a topic' })
   remove(@Param('slug') slug: string) {

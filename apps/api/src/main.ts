@@ -1,7 +1,7 @@
 import './shared/utils/env.bootstrap';
 // ESM Module Resolution Gating under Bun:
 // NestJS 12 packages are pure ESM modules. To prevent runtime `TypeError: require() async module ... is unsupported`
-// errors when CommonJS companion dependencies (such as nestjs-pino or @nestjs/throttler)
+// errors when CommonJS companion dependencies synchronously call `require('@nestjs/common')`
 // synchronously call `require('@nestjs/common')` during execution, we must explicitly import the core ES modules first.
 // This forces Bun to evaluate the NestJS core ESM graph synchronously at startup so subsequent CJS requires succeed.
 import '@nestjs/common';
@@ -20,15 +20,38 @@ import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { ZodValidationPipe } from 'nestjs-zod';
+import rateLimit from '@fastify/rate-limit';
+import { RedisService } from './core/redis/redis.service';
+import { getApiEnv } from './core/config/env';
+import { getRateLimitPolicy } from './core/security/rate-limit.policy';
 
 /** API bootstrap entrypoint that configures the NestJS server and shared request infrastructure. */
 async function bootstrap() {
+  const env = getApiEnv(process.env);
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({ logger: false }), // Disable Fastify's logger, use Pino instead
+    new FastifyAdapter({
+      logger: false,
+      trustProxy: (_address, hop) => hop < env.TRUST_PROXY_HOPS,
+    }), // Disable Fastify's logger, use Pino instead
     { bufferLogs: true },
   );
   const config = app.get(ConfigService);
+  const redis = app.get(RedisService);
+  // SAFETY: NestFactory is configured with FastifyAdapter immediately above.
+  const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
+  await app.register(rateLimit, {
+    global: false,
+    redis: redis.rawClient,
+    nameSpace: `${redis.namespace}rate-limit:`,
+  });
+  const globalSafetyLimiter = fastify.rateLimit({
+    max: getRateLimitPolicy('global-safety', config.NODE_ENV).limit,
+    timeWindow: getRateLimitPolicy('global-safety', config.NODE_ENV).timeWindowMs,
+    skipOnError: getRateLimitPolicy('global-safety', config.NODE_ENV).failureMode === 'open',
+    keyGenerator: (request) => `global-safety:ip:${request.ip}`,
+  });
+  const authenticationPolicy = getRateLimitPolicy('authentication', config.NODE_ENV);
   initAuth(config);
 
   app.useLogger(app.get(Logger));
@@ -75,10 +98,18 @@ async function bootstrap() {
   // https://better-auth.com/docs/integrations/fastify
   // SAFETY: this Nest app is bootstrapped with the Fastify adapter above, so
   // the underlying HTTP adapter instance is a Fastify server here.
-  const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
   fastify.route({
     method: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     url: '/api/auth/*',
+    preHandler: [
+      globalSafetyLimiter,
+      fastify.rateLimit({
+        max: authenticationPolicy.limit,
+        timeWindow: authenticationPolicy.timeWindowMs,
+        skipOnError: authenticationPolicy.failureMode === 'open',
+        keyGenerator: (request) => `authentication:ip:${request.ip}`,
+      }),
+    ],
     async handler(request: FastifyRequest, reply: FastifyReply) {
       const url = new URL(request.url, `http://${request.headers.host}`);
       const headers = fromNodeHeaders(request.headers);

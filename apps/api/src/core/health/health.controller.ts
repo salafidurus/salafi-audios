@@ -2,7 +2,7 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import { Public } from '../auth/decorators';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SkipThrottle } from '@nestjs/throttler';
+import { RateLimitPolicy } from '../security/rate-limit.decorator';
 import { CDNHealthIndicator } from './cdn-health.indicator';
 import { DbHealthIndicator } from './db-health.indicator';
 import { RedisHealthIndicator } from './redis-health.indicator';
@@ -10,7 +10,7 @@ import { HealthService, type HealthCheckResult } from './health.service';
 import { RedisService } from '../redis/redis.service';
 
 /** NestJS health controller service or controller coordinating the API boundary for this responsibility. */
-@SkipThrottle()
+@RateLimitPolicy('health-probe')
 @ApiTags('Health')
 @ApiCommonErrors()
 @Public()

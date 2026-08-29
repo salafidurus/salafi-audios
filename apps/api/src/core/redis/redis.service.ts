@@ -1,4 +1,3 @@
-import type { ThrottlerStorage } from '@nestjs/throttler';
 import type { KeyvStoreAdapter } from 'keyv';
 
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
@@ -180,23 +179,6 @@ export class RedisService implements OnModuleDestroy {
         );
       },
     };
-  }
-
-  createThrottlerStorage(): ThrottlerStorage {
-    return {
-      increment: async (key, ttl) => {
-        const redisKey = `${this.namespace}throttle:${key}`;
-        const totalHits = await this.incr(redisKey);
-        if (totalHits === 1) await this.pexpire(redisKey, ttl);
-        const remaining = await this.pttl(redisKey);
-        return {
-          totalHits,
-          timeToExpire: Math.max(remaining, 0),
-          isBlocked: false,
-          timeToBlockExpire: 0,
-        };
-      },
-    } satisfies ThrottlerStorage;
   }
 
   async quit(): Promise<void> {
