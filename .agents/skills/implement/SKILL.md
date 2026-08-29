@@ -15,6 +15,18 @@ those sources as mandatory workflow rules.
 Read `.agents/skills/implement/tsdoc-policy.md` before editing code or
 agent-facing implementation guidance.
 
+## Triage handoff
+
+Before creating or modifying the implementation checkout, invoke the `triage`
+skill for the approved implementation issue and request the implementation-start
+transition. Triage must verify the issue context and move its state from
+`ready-for-agent` (or an explicitly approved `ready-for-human` handoff) to
+`in-progress`, preserving the category and artifact labels. Independently
+verify the resulting state before editing. If the issue is untriaged, has
+conflicting state labels, or the transition cannot be verified, stop without
+editing. If no implementation issue exists, record that the triage handoff was
+not applicable.
+
 ## Checkout selection
 
 Determine whether the approved scope includes committed files under

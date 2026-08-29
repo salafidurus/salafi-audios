@@ -10,8 +10,8 @@ Issues and specs for this repository live as GitHub issues. Use the `gh` CLI for
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
 - **Apply or remove labels**: `gh issue edit <number> --add-label "..."` or `--remove-label "..."`.
 - **Close an issue**: `gh issue close <number> --comment "..."`
-- **Complete an implementation issue**: remove the active `ready-for-agent`
-  label, close the issue, and verify both state and labels with
+- **Complete an implementation issue**: remove active triage-state labels,
+  close the issue, and verify both state and labels with
   `gh issue view <number> --json state,labels`.
 
 ## Specification completion and abandonment
@@ -24,9 +24,10 @@ current `main`, run the complete acceptance matrix, and produce a merged PR
 targeting `main` before the parent spec can be closed as completed.
 If a required acceptance check fails, finalization fails closed.
 
-When a ticket closes, the `close-completed-specs` workflow removes its
-`ready-for-agent` label. It does not close or relabel the parent spec: child
-ticket completion cannot prove final-merge or acceptance-matrix evidence.
+The `triage` skill owns completed-ticket state reconciliation after the merged
+PR is confirmed. It does not close or relabel the parent spec merely because a
+child ticket closes: child-ticket completion cannot prove final-merge or
+acceptance-matrix evidence.
 
 For successful finalization, record the merged validation PR, acceptance
 results, and the completed parent state. Remove active triage-state labels,
