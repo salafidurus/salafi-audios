@@ -5,16 +5,16 @@ smoke journey. Issue #719 migrates the localized, accessibility, responsive,
 and fallback intents listed below; remaining Playwright intents stay active
 until their assigned migration tickets complete.
 
-| Existing file                   | Intent coverage                                                                                                                         | Follow-up owner                                   |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `auth-callback.e2e.ts`          | loading, timeout, authentication error, and validated redirect recovery                                                                 | #717                                              |
-| `auth.e2e.ts`                   | sign-in rendering, social providers, anonymous account/profile/admin/legal routes                                                       | #717                                              |
-| `fallback.e2e.ts`               | branded 404, Arabic/RTL, theme persistence, and public-shell recovery                                                                   | #719 (Bun migrated)                               |
-| `home.e2e.ts`                   | public study landing title/header/topic navigation and removal of the legacy search control                                             | #716 (Bun.WebView equivalent)                     |
-| `localized-account-flow.e2e.ts` | canonical navigation, anonymous routes, sign-out success/failure, cookie consent, Arabic/RTL, and mobile settings/library controls      | #719 (localized subset migrated)                  |
-| `my-library.e2e.ts`             | canonical/query tabs, history updates, invalid-tab fallback, anonymous state, Arabic/RTL, and narrow-screen usability                   | #718 / #719 (localized subset migrated)           |
-| `navigation.e2e.ts`             | public navigation, search palette, brand/scholars/library links, titles, settings tabs/query fallback/removed alias, and mobile loading | #718                                              |
-| `workspace.e2e.ts`              | signed-out search, listener/admin capability boundaries, mobile keyboard/RTL behavior, and theme preference                             | #717 / #718 / #719 (mobile/theme subset migrated) |
+| Existing file                   | Intent coverage                                                                                                                         | Follow-up owner                                     |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `auth-callback.e2e.ts`          | loading, timeout, authentication error, and validated redirect recovery                                                                 | #717 (`auth-callback.bun.e2e.ts`)                   |
+| `auth.e2e.ts`                   | sign-in rendering, social providers, anonymous account/profile/admin/legal routes                                                       | #717 (`auth.bun.e2e.ts`)                            |
+| `fallback.e2e.ts`               | branded 404, Arabic/RTL, theme persistence, and public-shell recovery                                                                   | #719 (Bun migrated)                                 |
+| `home.e2e.ts`                   | public study landing title/header/topic navigation and removal of the legacy search control                                             | #716 (Bun.WebView equivalent)                       |
+| `localized-account-flow.e2e.ts` | canonical navigation, anonymous routes, sign-out success/failure, cookie consent, Arabic/RTL, and mobile settings/library controls      | #717 account/sign-out; #719 localization/responsive |
+| `my-library.e2e.ts`             | canonical/query tabs, history updates, invalid-tab fallback, anonymous state, Arabic/RTL, and narrow-screen usability                   | #718 / #719 (localized subset migrated)             |
+| `navigation.e2e.ts`             | public navigation, search palette, brand/scholars/library links, titles, settings tabs/query fallback/removed alias, and mobile loading | #718                                                |
+| `workspace.e2e.ts`              | signed-out search, listener/admin capability boundaries, mobile keyboard/RTL behavior, and theme preference                             | #717 authorization; #718 / #719 remaining           |
 
 The new `home.bun.e2e.ts` preserves the meaningful home assertions through
 `Bun.WebView`: non-empty document title, study header presence, exactly one
@@ -25,3 +25,9 @@ The new `localized-accessibility.bun.e2e.ts` preserves the #719 slice through
 focusability, narrow-screen Settings/My Library controls, branded 404 recovery,
 shell-unavailable recovery, and stored fallback theme behavior. Assertions that
 remain owned by #717 or #718 are intentionally not duplicated here.
+
+Issue #717 preserves the authentication, callback, account/sign-out, and
+authorization intents through `auth.bun.e2e.ts`, `auth-callback.bun.e2e.ts`,
+`account.bun.e2e.ts`, and `authorization.bun.e2e.ts`. The original Playwright
+files remain active until the complete migration removes the compatibility
+suite.

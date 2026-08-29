@@ -42,8 +42,9 @@ Targeted testing examples:
 The Bun.WebView journeys require a locally installed Google Chrome. They run the
 production-built Next.js app through an isolated browser profile per journey,
 use explicit application-condition waits, and write failure diagnostics before
-closing the browser. Authentication/account and navigation/library intents remain
-with their follow-up migration tickets until those tickets are complete.
+closing the browser. The current Playwright suite remains the compatibility suite
+while the authentication/account, navigation/library, and remaining localized
+accessibility intents migrate through their assigned tickets.
 
 ## Guardrails
 
