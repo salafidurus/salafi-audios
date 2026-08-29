@@ -128,17 +128,6 @@ resolution.
 - **Nest CLI Environment**: `@nestjs/cli` `>= 22.22.3`.
 - **Package Manager & Test Runner**: Bun `>= 1.4.0` (direct TypeScript execution via SWC transpiler retains raw `.ts` source execution with zero intermediate build output).
 
-### ESM Module Resolution Gating under Bun
-
-NestJS 12 packages are pure ESM modules (`"type": "module"`). To prevent runtime `TypeError: require() async module ... is unsupported` errors when CommonJS companion dependencies (such as `nestjs-pino`, `@nestjs/throttler`, and `@nestjs/terminus`) synchronously call `require('@nestjs/common')` during execution, the application entrypoints must explicitly import the core ES modules first:
-
-```typescript
-import "@nestjs/common";
-import "@nestjs/core";
-```
-
-This forces Bun to evaluate the NestJS core ESM graph synchronously at start, allowing subsequent CJS `require` lookups to succeed instantly.
-
 ### Companion Migration Tracking
 
 The companion packages are kept in their isolated state temporarily, with complete decoupling or rewrite migration scheduled in subsequent tickets:
