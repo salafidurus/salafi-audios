@@ -31,10 +31,14 @@ For example, use the slug `audio-improve` to recommend
 
 For a specification ticket, resolve the parent specification and its recorded
 `spec/<slug>` integration branch. The plan must identify that parent and carry
-the current spec branch as the ticket's branch context. For standalone bug,
-research, maintenance, or other non-specification work, explicitly record
-that no parent specification or spec branch applies and retain the existing
-`origin/main` base.
+the current spec branch as the ticket's branch context. If the parent
+specification does not define a `spec/<slug>` branch, use `origin/main` as the
+provisional base, continue planning, and explicitly report that the
+specification integration context is missing; do not claim spec-branch
+isolation or invent a spec-branch PR target. For standalone bug, research,
+maintenance, or other non-specification work, explicitly record that no parent
+specification or spec branch applies and retain the existing `origin/main`
+base.
 
 Read and cross-reference:
 
