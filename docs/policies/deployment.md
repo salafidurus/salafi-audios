@@ -25,6 +25,15 @@ Changes enter protected branches through pull requests. Preview and production
 backend deployments are promoted from approved immutable container artifacts;
 promotion does not rebuild the application.
 
+## Specification pull-request validation
+
+Pull requests targeting a disposable `spec/<slug>` integration branch receive
+the repository checks needed to validate the feature candidate, including
+build, test, lint, database compatibility, Docker, and applicable feature
+validation. A specification branch is a validation target only: deployment,
+release promotion, Dependabot synchronization, and other privileged workflows
+remain restricted to their existing main or release branches.
+
 ## Configuration and security
 
 - Environment variables and secrets are isolated per environment.

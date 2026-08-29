@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - spec/**
     paths:
       - "scripts/deploy/**"
       - "scripts/utils/**"
