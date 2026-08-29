@@ -12,6 +12,7 @@ on:
       - ".github/workflows/e2e-api.yml"
     branches:
       - main
+      - spec/**
 
 concurrency:
   group: e2e-api-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

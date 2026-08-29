@@ -17,6 +17,19 @@ relevant ticket/dependency graph first, then plan only the selected ticket.
 
 ## Investigation
 
+Read [READINESS.md](READINESS.md) before evaluating the ticket lifecycle
+precondition.
+
+### Triage precondition
+
+Before planning, verify the implementation issue has exactly one category role
+and one state role, and that its state is `ready-for-agent`. This verification
+is read-only: do not change labels, close issues, or otherwise invoke a
+mutating triage transition from this planning-only skill. If the issue is
+untriaged, has conflicting state labels, or is not ready for an agent, stop
+planning and hand the issue back to `triage` for resolution. If no issue is
+available, record that the triage precondition was not applicable.
+
 When planning isolated work, recommend a worktree under the repository-root
 `.worktree/`, based on `origin/main`. Choose a concise slug: prefer one word
 and never use more than two words. Use the same slug in the worktree path and
@@ -31,22 +44,34 @@ For example, use the slug `audio-improve` to recommend
 
 For a specification ticket, resolve the parent specification and its recorded
 `spec/<slug>` integration branch. The plan must identify that parent and carry
-the current spec branch as the ticket's branch context. For standalone bug,
-research, maintenance, or other non-specification work, explicitly record
-that no parent specification or spec branch applies and retain the existing
-`origin/main` base.
+the current spec branch as the ticket's branch context. If the parent
+specification does not define a `spec/<slug>` branch, use `origin/main` as the
+provisional base, continue planning, and explicitly report that the
+specification integration context is missing; do not claim spec-branch
+isolation or invent a spec-branch PR target. For standalone bug, research,
+maintenance, or other non-specification work, explicitly record that no parent
+specification or spec branch applies and retain the existing `origin/main`
+base with `main` as the pull-request target.
+
+Every plan records this routing context:
+
+| Ticket context                               | Branch base                 | Pull-request target            |
+| -------------------------------------------- | --------------------------- | ------------------------------ |
+| Specification ticket with a verified branch  | `spec/<slug>`               | `spec/<slug>`                  |
+| Specification ticket without branch metadata | `origin/main` provisionally | unresolved; report the warning |
+| Standalone ticket                            | `origin/main`               | `main`                         |
 
 Read and cross-reference:
 
 1. The ticket, comments, labels, dependencies, and acceptance criteria.
 2. The parent specification, when one exists.
-3. Root and nearest workspace `AGENT.md` files.
+3. Root and nearest workspace [AGENT.md](../../../AGENT.md) files.
 4. Relevant `CONTEXT.md`, architecture documents, and ADRs.
 5. The current implementation, tests, public seams, package boundaries, and
    affected scripts.
 6. Platform-specific constraints, including whether the change touches
    `apps/native`.
-7. `.agents/skills/pre-implement/tsdoc-policy.md` when the ticket changes code,
+7. [tsdoc-policy.md](tsdoc-policy.md) when the ticket changes code,
    contracts, or agent-facing implementation guidance.
 
 Resolve facts by inspecting the repository and issue tracker. Surface only
@@ -58,7 +83,7 @@ For every affected public seam, read the implementation and tests and record
 the documentation contract in the plan. Identify routes, API clients, hooks,
 components, types, adapters, state machines, and meaningful semantic fields.
 Explain the behavior, invariant, side effect, and failure mode that callers
-need to preserve. Use `.agents/skills/pre-implement/tsdoc-policy.md` for
+need to preserve. Use [tsdoc-policy.md](tsdoc-policy.md) for
 planning examples; do not plan generic comments or documentation for trivial
 locals.
 

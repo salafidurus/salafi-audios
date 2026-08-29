@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { PinoLogger } from 'nestjs-pino';
+import { AppLoggerService } from '../../core/logger/app-logger.service';
 import { PrismaService } from '../../core/db/prisma.service';
 import { ConfigService } from '../../core/config/config.service';
 import { RedisService } from '../../core/redis/redis.service';
@@ -81,7 +81,7 @@ export class AudioRepository {
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
     private readonly config: ConfigService,
-    private readonly logger: PinoLogger,
+    private readonly logger: AppLoggerService,
   ) {
     this.logger.setContext(AudioRepository.name);
   }

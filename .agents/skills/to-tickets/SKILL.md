@@ -8,8 +8,27 @@ disable-model-invocation: true
 
 Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it.
 
-Use `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md` for the
-repository's GitHub workflow and label vocabulary.
+Use [issue-tracker.md](../../../docs/agents/issue-tracker.md) and
+[triage-labels.md](../../../docs/agents/triage-labels.md) for the repository's
+GitHub workflow and label vocabulary.
+
+When an existing specification or ticket set is named, read
+[REPAIR.md](REPAIR.md) and reconcile the existing graph instead of publishing
+duplicates. When research, grilling, or implementation planning reveals that
+an existing ticket is not execution-ready, also read [REVISE.md](REVISE.md).
+
+## Operating modes
+
+- **New ticket set:** draft and publish tickets for a specification that has no
+  published implementation ticket set.
+- **Existing ticket set:** repair the named specification's tickets in place;
+  preserve issue numbers, closed states, historical comments, and valid
+  dependency evidence.
+- **Research-driven revision:** update one existing ticket after a documented
+  research, grilling, or scope clarification pass; preserve its issue number
+  and history, then return it through triage before implementation resumes.
+
+Never treat a repair or revision as a fresh ticket publication.
 
 ## Process
 
@@ -63,10 +82,10 @@ the numbered breakdown and get approval for them.
 
 Iterate until the user approves the breakdown.
 
-### 5. Publish the tickets to the configured tracker
+### 5. Publish or repair the tickets in the configured tracker
 
 Publish the approved tickets using the GitHub workflow documented in
-`docs/agents/issue-tracker.md`; the tickets are the same, with native GitHub
+[issue-tracker.md](../../../docs/agents/issue-tracker.md); the tickets are the same, with native GitHub
 blocking edges where supported:
 
 - **Local files** → write one file per ticket under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below: one ticket per file, never a single combined file.
@@ -88,7 +107,10 @@ Before finishing publication, perform a dependency audit:
   extra edges. If an edge cannot be represented, stop and report the exact
   missing relationship instead of silently publishing an incomplete graph.
 
-Do NOT close or modify any parent issue.
+Do NOT close or modify any parent issue during new ticket publication. For
+existing-specification repair, modify the parent only when the approved repair
+explicitly includes correcting its branch or lifecycle metadata; never close
+it as part of ticket reconciliation.
 
 After the approved ticket set and dependency graph are published, recommend proceeding to `pre-implement` for the first unblocked ticket. The lifecycle then continues through `implement` and `post-implement`.
 
