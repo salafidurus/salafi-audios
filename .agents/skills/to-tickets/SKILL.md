@@ -13,7 +13,8 @@ repository's GitHub workflow and label vocabulary.
 
 When an existing specification or ticket set is named, read
 [REPAIR.md](REPAIR.md) and reconcile the existing graph instead of publishing
-duplicates.
+duplicates. When research, grilling, or implementation planning reveals that
+an existing ticket is not execution-ready, also read [REVISE.md](REVISE.md).
 
 ## Operating modes
 
@@ -22,8 +23,11 @@ duplicates.
 - **Existing ticket set:** repair the named specification's tickets in place;
   preserve issue numbers, closed states, historical comments, and valid
   dependency evidence.
+- **Research-driven revision:** update one existing ticket after a documented
+  research, grilling, or scope clarification pass; preserve its issue number
+  and history, then return it through triage before implementation resumes.
 
-Never treat a repair as a fresh ticket publication.
+Never treat a repair or revision as a fresh ticket publication.
 
 ## Process
 

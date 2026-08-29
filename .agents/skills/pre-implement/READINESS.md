@@ -11,6 +11,11 @@ This is the read-only lifecycle gate before planning one implementation ticket.
   target.
 - Conflicting labels, missing parent context, or an incomplete ticket stops
   planning and returns the issue to `triage`.
+- If planning reveals an unresolved material decision, missing contract,
+  inadequate acceptance criterion, or scope mismatch, stop without editing the
+  ticket. Return it to `triage`, run the necessary research, grilling, or
+  domain-modeling work, then use `to-tickets/REVISE.md` to update the existing
+  ticket before running this readiness check again.
 
 Do not add or remove labels, close issues, post comments, create branches, or
 modify files during this check.
