@@ -51,6 +51,7 @@ infra/envs/.env.*
 infra/envs/*.env
 
 # temp files
+.research/
 .deploy_tmp/
 .local-expo-mcp/
 
