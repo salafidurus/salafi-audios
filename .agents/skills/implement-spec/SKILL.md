@@ -43,8 +43,29 @@ delivery.
 
 5. Recompute the frontier after the ticket completes, preserving context
    pointers to its PR, commits, decisions, and follow-up work.
-6. Repeat until all required tickets are complete, then verify the
-   specification's acceptance criteria and final issue state.
+6. Repeat until all required tickets are complete, then choose exactly one
+   terminal path: finalization or abandonment.
+
+## Finalization and abandonment
+
+Finalization is the only path that can bring a specification into `main`. The
+final validation ticket starts from the latest spec branch and current `main`,
+resolves drift and conflicts at that boundary, runs the complete specification
+acceptance matrix plus applicable repository checks, and fails closed when any
+required check fails. Its pull request targets `main` and identifies both the
+parent specification and final validation ticket. Close the parent as
+completed only after that pull request is merged and its evidence is recorded.
+
+Closing all child tickets is not finalization. The `close-completed-specs`
+workflow removes completed-ticket triage metadata but does not close the
+parent specification.
+
+Abandonment is a separate, auditable terminal path. Record the reason and
+outcome on the parent and child issues according to triage policy, distinguish
+it from completion, verify the spec branch and each ticket resource before
+deleting it, and preserve unrelated branches, worktrees, dirty state, and
+active specifications. If any identity or state check is uncertain, stop
+without deleting that resource.
 
 Communication to and from subagents should be sparse. Use context pointers to
 the specification, tickets, research, and previous commits instead of

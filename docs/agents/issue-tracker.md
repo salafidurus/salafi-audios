@@ -14,19 +14,30 @@ Issues and specs for this repository live as GitHub issues. Use the `gh` CLI for
   label, close the issue, and verify both state and labels with
   `gh issue view <number> --json state,labels`.
 
-## Completed specs
+## Specification completion and abandonment
 
 Specs are umbrella issues labelled `spec`; implementation issues are labelled
-`ticket` and begin their body with `Part of #<spec-number>`. The
-`close-completed-specs` workflow closes an open spec automatically after it has
-at least one linked ticket and every linked ticket is closed.
+`ticket` and begin their body with `Part of #<spec-number>`. Closing every
+ticket is necessary evidence, but it does not complete the specification.
+The final validation ticket must reconcile the latest spec candidate with
+current `main`, run the complete acceptance matrix, and produce a merged PR
+targeting `main` before the parent spec can be closed as completed.
+If a required acceptance check fails, finalization fails closed.
 
 When a ticket closes, the `close-completed-specs` workflow removes its
-`ready-for-agent` label before evaluating the parent spec. When all linked
-tickets are closed, it removes active triage-state labels from the completed
-spec, preserves the `spec` label, and posts a completion comment. It does not
-apply `wontfix`: completion is distinct from rejection. A completed spec may
-therefore be closed without a state-role label.
+`ready-for-agent` label. It does not close or relabel the parent spec: child
+ticket completion cannot prove final-merge or acceptance-matrix evidence.
+
+For successful finalization, record the merged validation PR, acceptance
+results, and the completed parent state. Remove active triage-state labels,
+preserve `spec`, and do not apply `wontfix`.
+
+For abandonment, record the decision and reason on the parent and child
+issues, apply `wontfix` according to triage policy, and keep the outcome
+distinct from successful completion. Verify the spec branch and each ticket
+branch/worktree belong to this specification before deleting them. Delete no
+resource when identity or state is uncertain, and preserve unrelated dirty
+checkout state, worktrees, branches, and active specifications.
 
 Infer the repository from `git remote -v`; `gh` does this automatically inside the clone.
 
