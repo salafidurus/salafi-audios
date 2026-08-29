@@ -116,7 +116,7 @@ export function getE2EConfig(env: Record<string, string | undefined> = process.e
   return {
     port,
     origin,
-    apiOrigin: env.BUN_E2E_API_ORIGIN ?? origin,
+    apiOrigin: env.BUN_E2E_API_ORIGIN ?? env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000",
     readyTimeoutMs: positiveInteger(env.BUN_E2E_READY_TIMEOUT_MS) ?? DEFAULT_READY_TIMEOUT_MS,
     skipBuild: env.BUN_E2E_SKIP_BUILD === "1",
   };

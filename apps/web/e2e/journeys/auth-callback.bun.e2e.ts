@@ -1,14 +1,15 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
-import { installAuthFixtures } from "./bun-webview-auth-fixtures";
+import { installAuthFixtures } from "../support/bun-webview-auth-fixtures";
 import {
   getE2EConfig,
   startWebServer,
+  waitForBrowserCondition,
   waitForWebReady,
   withBrowserJourney,
   type E2EConfig,
   type WebServer,
-} from "./bun-webview-harness";
+} from "../support/bun-webview-harness";
 
 async function waitForHeading(view: Bun.WebView, text: string) {
   await view.evaluate(`new Promise((resolve, reject) => {
@@ -24,6 +25,24 @@ async function waitForHeading(view: Bun.WebView, text: string) {
     };
     check();
   })`);
+}
+
+async function waitForText(view: Bun.WebView, text: string) {
+  await waitForBrowserCondition(
+    view,
+    `visible text: ${text}`,
+    `document.body.textContent?.includes(${JSON.stringify(text)}) === true`,
+    { timeoutMs: 20_000 },
+  );
+}
+
+async function waitForPath(view: Bun.WebView, path: string) {
+  await waitForBrowserCondition(
+    view,
+    `path: ${path}`,
+    `location.pathname + location.search === ${JSON.stringify(path)}`,
+    { timeoutMs: 20_000 },
+  );
 }
 
 describe("authentication callback Bun.WebView journeys", () => {
@@ -46,6 +65,7 @@ describe("authentication callback Bun.WebView journeys", () => {
       const cleanup = await installAuthFixtures(journey, { sessionDelayMs: 500 });
       try {
         await journey.view.navigate(`${config.origin}/auth/callback?redirect=/explore`);
+        await waitForText(journey.view, "Completing sign-in...");
         const state = await journey.view.evaluate<{ main: number; text: string }>(
           `({ main: document.querySelectorAll('main').length, text: document.body.textContent ?? '' })`,
         );
@@ -93,6 +113,7 @@ describe("authentication callback Bun.WebView journeys", () => {
       const cleanup = await installAuthFixtures(journey, { role: "listener" });
       try {
         await journey.view.navigate(`${config.origin}/auth/callback?redirect=/explore`);
+        await waitForPath(journey.view, "/explore");
         expect(journey.view.url).toMatch(/\/explore$/);
       } finally {
         await cleanup();
@@ -108,8 +129,10 @@ describe("authentication callback Bun.WebView journeys", () => {
         await journey.view.navigate(
           `${config.origin}/auth/callback?redirect=${encodeURIComponent("https://evil.example")}`,
         );
-        expect(journey.view.url).toMatch(/\/$/);
-        expect(journey.view.url).not.toContain("evil.example");
+        await waitForPath(journey.view, "/");
+        const currentUrl = await journey.view.evaluate<string>("location.href");
+        expect(currentUrl).toMatch(/\/$/);
+        expect(currentUrl).not.toContain("evil.example");
       } finally {
         await cleanup();
       }

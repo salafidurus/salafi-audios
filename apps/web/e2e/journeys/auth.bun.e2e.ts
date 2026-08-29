@@ -1,14 +1,24 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
-import { installAuthFixtures } from "./bun-webview-auth-fixtures";
+import { installAuthFixtures } from "../support/bun-webview-auth-fixtures";
 import {
   getE2EConfig,
   startWebServer,
+  waitForBrowserCondition,
   waitForWebReady,
   withBrowserJourney,
   type E2EConfig,
   type WebServer,
-} from "./bun-webview-harness";
+} from "../support/bun-webview-harness";
+
+async function waitForSelector(view: Bun.WebView, selector: string): Promise<void> {
+  await waitForBrowserCondition(
+    view,
+    `selector: ${selector}`,
+    `document.querySelector(${JSON.stringify(selector)}) !== null`,
+    { timeoutMs: 20_000 },
+  );
+}
 
 describe("authentication Bun.WebView journeys", () => {
   let config: E2EConfig;
@@ -30,6 +40,7 @@ describe("authentication Bun.WebView journeys", () => {
       const cleanup = await installAuthFixtures(journey);
       try {
         await journey.view.navigate(`${config.origin}/sign-in`);
+        await waitForSelector(journey.view, "h1");
         const page = await journey.view.evaluate<{
           title: string;
           heading: string;

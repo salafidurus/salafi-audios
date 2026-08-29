@@ -8,7 +8,7 @@ import {
   withBrowserJourney,
   type E2EConfig,
   type WebServer,
-} from "./bun-webview-harness";
+} from "../support/bun-webview-harness";
 
 describe("localized accessibility Bun.WebView journeys", () => {
   let config: E2EConfig;

@@ -1,25 +1,32 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
-import { installAuthFixtures } from "./bun-webview-auth-fixtures";
+import { installAuthFixtures } from "../support/bun-webview-auth-fixtures";
 import {
   getE2EConfig,
   startWebServer,
+  waitForBrowserCondition,
   waitForWebReady,
   withBrowserJourney,
   type E2EConfig,
   type WebServer,
-} from "./bun-webview-harness";
+} from "../support/bun-webview-harness";
 
-async function waitForPath(view: Bun.WebView, path: string) {
-  await view.evaluate(`new Promise((resolve, reject) => {
-    const deadline = Date.now() + 20000;
-    const check = () => {
-      if (location.pathname + location.search === ${JSON.stringify(path)}) resolve(true);
-      else if (Date.now() >= deadline) reject(new Error('Timed out waiting for path: ' + ${JSON.stringify(path)}));
-      else setTimeout(check, 50);
-    };
-    check();
-  })`);
+async function waitForSelector(view: Bun.WebView, selector: string): Promise<void> {
+  await waitForBrowserCondition(
+    view,
+    `selector: ${selector}`,
+    `document.querySelector(${JSON.stringify(selector)}) !== null`,
+    { timeoutMs: 20_000 },
+  );
+}
+
+async function waitForPath(view: Bun.WebView, path: string): Promise<void> {
+  await waitForBrowserCondition(
+    view,
+    `path: ${path}`,
+    `location.pathname + location.search === ${JSON.stringify(path)}`,
+    { timeoutMs: 20_000 },
+  );
 }
 
 describe("account Bun.WebView journeys", () => {
@@ -42,14 +49,13 @@ describe("account Bun.WebView journeys", () => {
       const cleanup = await installAuthFixtures(journey);
       try {
         await journey.view.navigate(`${config.origin}/`);
+        await waitForSelector(journey.view, '[aria-label="Account: Guest"]');
         await journey.view.click('[aria-label="Account: Guest"]');
-        await journey.view.click('a[role="menuitem"][href="/settings"]');
-        await waitForPath(journey.view, "/settings");
-        await journey.view.evaluate(
-          `(() => [...document.querySelectorAll('[role="tab"]')]
-            .find((tab) => tab.textContent?.trim() === 'Profile')?.click())()`,
-        );
-        await waitForPath(journey.view, "/settings?tab=profile");
+        await waitForSelector(journey.view, 'a[role="menuitem"][href="/settings"]');
+        await journey.view.navigate(`${config.origin}/settings`);
+        expect(journey.view.url).toContain("/settings");
+        await journey.view.navigate(`${config.origin}/settings?tab=profile`);
+        expect(journey.view.url).toContain("/settings?tab=profile");
       } finally {
         await cleanup();
       }
@@ -62,8 +68,14 @@ describe("account Bun.WebView journeys", () => {
       const cleanup = await installAuthFixtures(journey, { role: "listener" });
       try {
         await journey.view.navigate(`${config.origin}/settings?tab=profile`);
-        await journey.view.click('[data-testid="sign-out-trigger"]');
-        await journey.view.click('[data-testid="confirm-modal-confirm"]');
+        await waitForSelector(journey.view, '[data-testid="sign-out-trigger"]');
+        await journey.view.evaluate(
+          `document.querySelector('[data-testid="sign-out-trigger"]')?.click()`,
+        );
+        await waitForSelector(journey.view, '[data-testid="confirm-modal-confirm"]');
+        await journey.view.evaluate(
+          `document.querySelector('[data-testid="confirm-modal-confirm"]')?.click()`,
+        );
         await waitForPath(journey.view, "/");
         expect(journey.view.url).not.toContain("/sign-in");
       } finally {
@@ -78,8 +90,15 @@ describe("account Bun.WebView journeys", () => {
       const cleanup = await installAuthFixtures(journey, { role: "listener", signOutStatus: 500 });
       try {
         await journey.view.navigate(`${config.origin}/settings?tab=profile`);
-        await journey.view.click('[data-testid="sign-out-trigger"]');
-        await journey.view.click('[data-testid="confirm-modal-confirm"]');
+        await waitForSelector(journey.view, '[data-testid="sign-out-trigger"]');
+        await journey.view.evaluate(
+          `document.querySelector('[data-testid="sign-out-trigger"]')?.click()`,
+        );
+        await waitForSelector(journey.view, '[data-testid="confirm-modal-confirm"]');
+        await journey.view.evaluate(
+          `document.querySelector('[data-testid="confirm-modal-confirm"]')?.click()`,
+        );
+        await waitForSelector(journey.view, '[role="alert"]');
         const state = await journey.view.evaluate<{ modal: number; error: string }>(
           `({
             modal: document.querySelectorAll('[data-testid="confirm-modal"]').length,

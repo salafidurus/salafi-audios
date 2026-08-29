@@ -7,7 +7,7 @@ import {
   withBrowserJourney,
   type E2EConfig,
   type WebServer,
-} from "./bun-webview-harness";
+} from "../support/bun-webview-harness";
 
 describe("public home Bun.WebView journey", () => {
   let config: E2EConfig;

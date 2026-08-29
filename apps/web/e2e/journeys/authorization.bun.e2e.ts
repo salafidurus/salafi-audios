@@ -1,14 +1,24 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
-import { installAuthFixtures } from "./bun-webview-auth-fixtures";
+import { installAuthFixtures } from "../support/bun-webview-auth-fixtures";
 import {
   getE2EConfig,
   startWebServer,
+  waitForBrowserCondition,
   waitForWebReady,
   withBrowserJourney,
   type E2EConfig,
   type WebServer,
-} from "./bun-webview-harness";
+} from "../support/bun-webview-harness";
+
+async function waitForText(view: Bun.WebView, expected: string): Promise<void> {
+  await waitForBrowserCondition(
+    view,
+    `visible text: ${expected}`,
+    `document.body.textContent?.includes(${JSON.stringify(expected)}) === true`,
+    { timeoutMs: 20_000 },
+  );
+}
 
 describe("authorization Bun.WebView journeys", () => {
   let config: E2EConfig;
@@ -27,9 +37,13 @@ describe("authorization Bun.WebView journeys", () => {
   it("does not expose admin navigation to a listener", async () => {
     await withBrowserJourney("listener authorization boundary", config.origin, async (journey) => {
       await journey.view.navigate("about:blank");
-      const cleanup = await installAuthFixtures(journey, { role: "listener" });
+      const cleanup = await installAuthFixtures(journey, {
+        apiOrigin: config.apiOrigin,
+        role: "listener",
+      });
       try {
         await journey.view.navigate(`${config.origin}/settings`);
+        await waitForText(journey.view, "Listener");
         const state = await journey.view.evaluate<{ account: string; adminLinks: number }>(
           `({
             account: document.body.textContent ?? '',
@@ -50,9 +64,13 @@ describe("authorization Bun.WebView journeys", () => {
       config.origin,
       async (journey) => {
         await journey.view.navigate("about:blank");
-        const cleanup = await installAuthFixtures(journey, { role: "scoped-admin" });
+        const cleanup = await installAuthFixtures(journey, {
+          apiOrigin: config.apiOrigin,
+          role: "scoped-admin",
+        });
         try {
           await journey.view.navigate(`${config.origin}/admin`);
+          await waitForText(journey.view, "Contents");
           const links = await journey.view.evaluate<string[]>(
             `[...document.querySelectorAll('nav a')].map((link) => link.textContent?.trim() ?? '')`,
           );
@@ -72,9 +90,13 @@ describe("authorization Bun.WebView journeys", () => {
       config.origin,
       async (journey) => {
         await journey.view.navigate("about:blank");
-        const cleanup = await installAuthFixtures(journey, { role: "superadmin" });
+        const cleanup = await installAuthFixtures(journey, {
+          apiOrigin: config.apiOrigin,
+          role: "superadmin",
+        });
         try {
           await journey.view.navigate(`${config.origin}/admin/users`);
+          await waitForText(journey.view, "Manage Users");
           const page = await journey.view.evaluate<{ usersLink: number; heading: string }>(
             `({
             usersLink: [...document.querySelectorAll('nav a')].filter((link) => link.textContent?.includes('Users')).length,

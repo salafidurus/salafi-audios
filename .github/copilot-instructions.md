@@ -29,7 +29,7 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 - Run single app: `bun run dev:api`, `bun run dev:web`, `bun run dev:native`
 - Build / Test / Lint / Typecheck: `bun run build`, `bun run test`, `bun run lint`, `bun run typecheck` (use Turbo filters to scope)
 - API-only tests: `bun run --filter api test`
-- E2E (Playwright): `bun run test:e2e`
+- Web E2E (Bun.WebView): `bun run test:e2e`
 - Shared contract updates: edit `packages/core-contracts` manually when backend response shapes change, then build/typecheck the package.
 
 ## Codegen & generated artifacts ⚠️
@@ -58,7 +58,7 @@ Bug fixes start with a failing test that reproduces the bug.
 | Domain store actions (Zustand)     | Unit — reset store state each test | `packages/domain-*/src/**/*.spec.ts`               |
 | Pure utilities / helpers           | Unit                               | Co-located `.spec.ts` next to source file          |
 | Route constant smoke tests         | Unit                               | `packages/core-contracts/src/routes.spec.ts`       |
-| Critical user flows                | E2E (Playwright)                   | `apps/web/e2e/`                                    |
+| Critical user flows                | E2E (Bun.WebView)                  | `apps/web/e2e/journeys/`                           |
 
 ### What NOT to test
 
@@ -85,7 +85,7 @@ Bug fixes start with a failing test that reproduces the bug.
 - Only test exported utility functions and hooks that contain real logic.
 - Do not test components purely for rendering; test behavior (e.g., a hook that computes a derived value).
 
-**Web E2E (Playwright):**
+**Web E2E (Bun.WebView):**
 
 - Cover: public pages load without errors, auth redirect fires for protected routes, sidebar navigates correctly.
 - Do not cover: visual layout, font rendering, or UI polish.
@@ -97,7 +97,7 @@ bun run test                                                  # all
 bun run --filter api test                                     # API only
 bun run --filter api test -- src/modules/scholars/scholars.service.spec.ts
 bun run --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts
-bun run test:e2e                                              # Playwright
+bun run test:e2e                                              # Bun.WebView
 bun run test:prepush                                          # CI gate (changed files only)
 ```
 

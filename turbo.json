@@ -64,9 +64,9 @@
     "test:e2e": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", "e2e/**/*.ts"],
-      "outputs": ["playwright-report/**", "test-results/**"],
+      "outputs": ["test-results/bun-webview/**"],
       "cache": true,
-      "env": ["CI", "PW_SKIP_WEB_BUILD"]
+      "env": ["CI", "BUN_E2E_PORT", "BUN_E2E_API_ORIGIN", "BUN_E2E_READY_TIMEOUT_MS"]
     },
     "test:e2e:bun": {
       "dependsOn": ["build"],

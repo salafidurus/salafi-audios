@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
+import { installAuthFixtures } from "../support/bun-webview-auth-fixtures";
 import {
   getE2EConfig,
   startWebServer,
@@ -7,7 +8,7 @@ import {
   withBrowserJourney,
   type E2EConfig,
   type WebServer,
-} from "./bun-webview-harness";
+} from "../support/bun-webview-harness";
 
 type PageState = {
   url: string;
@@ -191,15 +192,23 @@ describe("navigation and My Library Bun.WebView journeys", () => {
       await withBrowserJourney(
         "My Library anonymous and invalid tabs",
         config.origin,
-        async ({ view }) => {
-          await view.navigate(`${config.origin}/my-library?tab=unknown`);
-          await waitForText(view, "Continue listening");
-          expect((await readPageState(view)).visibleText).toContain("Continue listening");
-          expect((await readPageState(view)).visibleText).not.toContain("Page not found");
+        async (journey) => {
+          await journey.view.navigate("about:blank");
+          const cleanup = await installAuthFixtures(journey, { apiOrigin: config.apiOrigin });
+          try {
+            await journey.view.navigate(`${config.origin}/my-library?tab=unknown`);
+            await waitForText(journey.view, "Continue listening");
+            expect((await readPageState(journey.view)).visibleText).toContain("Continue listening");
+            expect((await readPageState(journey.view)).visibleText).not.toContain("Page not found");
 
-          await view.navigate(`${config.origin}/my-library?tab=saved`);
-          await waitForText(view, "Sign in to view your saved lessons");
-          expect((await readPageState(view)).url).toBe(`${config.origin}/my-library?tab=saved`);
+            await journey.view.navigate(`${config.origin}/my-library?tab=saved`);
+            await waitForText(journey.view, "Sign in to view saved lectures");
+            expect((await readPageState(journey.view)).url).toBe(
+              `${config.origin}/my-library?tab=saved`,
+            );
+          } finally {
+            await cleanup();
+          }
         },
       );
     });

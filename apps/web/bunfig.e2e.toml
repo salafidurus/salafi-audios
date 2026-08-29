@@ -1,0 +1,5 @@
+[test]
+timeout = 120000
+bail = false
+include = ["e2e/journeys/**/*.bun.e2e.ts"]
+root = "."

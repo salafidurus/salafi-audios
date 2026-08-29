@@ -6,6 +6,8 @@ type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string
 
 /** Selects the deterministic session and mutation outcomes for one journey. */
 export type AuthFixtureOptions = {
+  /** API origin used by the built browser client, normally localhost:4000. */
+  apiOrigin?: string;
   role?: AuthRole;
   sessionDelayMs?: number;
   sessionStatus?: 200 | 500;
@@ -39,6 +41,8 @@ function jsonResponse(body: JsonValue, status: number, origin: string) {
       { name: "content-type", value: "application/json" },
       { name: "access-control-allow-origin", value: origin },
       { name: "access-control-allow-credentials", value: "true" },
+      { name: "access-control-allow-methods", value: "GET, POST, PATCH, OPTIONS" },
+      { name: "access-control-allow-headers", value: "content-type" },
     ],
     body: Buffer.from(JSON.stringify(body)).toString("base64"),
   };
@@ -73,21 +77,15 @@ export async function installAuthFixtures(
   journey: BrowserJourney,
   options: AuthFixtureOptions = {},
 ): Promise<() => Promise<void>> {
-  const apiOrigin = new URL(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000").origin;
+  const apiOrigin = new URL(
+    options.apiOrigin ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000",
+  ).origin;
   const role = options.role;
   const sessionDelayMs = options.sessionDelayMs ?? 0;
   const sessionStatus = options.sessionStatus ?? 200;
   const signOutStatus = options.signOutStatus ?? 200;
   const session = role ? sessionFor(role) : { session: null, user: null };
   const webOrigin = journey.origin;
-
-  await journey.view.cdp("Fetch.enable", {
-    patterns: [
-      { urlPattern: `${apiOrigin}/api/auth/*` },
-      { urlPattern: `${apiOrigin}/account/profile` },
-      { urlPattern: `${apiOrigin}/admin/users*` },
-    ],
-  });
 
   const onPaused = async (event: Event) => {
     // SAFETY: Bun.WebView's Fetch.requestPaused event always exposes the CDP payload as `data`.
@@ -103,7 +101,11 @@ export async function installAuthFixtures(
         webOrigin,
       );
     } else if (url.pathname === "/api/auth/sign-out") {
-      response = jsonResponse({}, signOutStatus, webOrigin);
+      response = jsonResponse(
+        signOutStatus === 200 ? { success: true } : { error: { message: "Provider failed" } },
+        signOutStatus,
+        webOrigin,
+      );
     } else if (url.pathname === "/account/profile" && role) {
       const user = users[role];
       response = jsonResponse(
@@ -126,10 +128,29 @@ export async function installAuthFixtures(
       response = jsonResponse({}, 404, webOrigin);
     }
 
-    await journey.view.cdp("Fetch.fulfillRequest", { requestId, ...response });
+    try {
+      await journey.view.cdp("Fetch.fulfillRequest", { requestId, ...response });
+    } catch {
+      // The delayed-session timeout journey intentionally closes before its
+      // delayed interception callback resolves.
+    }
   };
 
   journey.view.addEventListener("Fetch.requestPaused", onPaused);
+  await journey.view.cdp("Fetch.enable", {
+    patterns: [
+      { urlPattern: `${apiOrigin}/api/auth/*` },
+      { urlPattern: `${apiOrigin}/account/profile` },
+      { urlPattern: `${apiOrigin}/admin/users*` },
+    ],
+  });
+
+  if (role) {
+    await journey.view.navigate(webOrigin);
+    await journey.view.evaluate(
+      `document.cookie = "better-auth.session_token=fixture-session; Path=/"`,
+    );
+  }
 
   return async () => {
     journey.view.removeEventListener("Fetch.requestPaused", onPaused);

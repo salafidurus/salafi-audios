@@ -14,5 +14,5 @@ Prefer CSS Modules and semantic design tokens from `@sd/design-tokens`; use
 Preserve localization, RTL, theme, keyboard, and screen-reader behavior.
 
 Keep route files thin and feature components testable. Web tests use the web
-package scripts and Playwright for E2E; do not run the root test runner in place
+package scripts and Bun.WebView for E2E; do not run the root test runner in place
 of the package setup.
