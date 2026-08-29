@@ -30,6 +30,13 @@ therefore be closed without a state-role label.
 
 Infer the repository from `git remote -v`; `gh` does this automatically inside the clone.
 
+Specification ticket delivery is merge-gated against the parent
+`spec/<slug>` branch. Verify the PR target, merged state, and closed ticket
+state independently before removing the ticket branch or worktree. Cleanup
+must preserve the active specification branch, sibling ticket branches and
+worktrees, unrelated worktrees, and unrelated dirty checkout state. Standalone
+tickets continue to target and clean up through `main`.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** Set this to `yes` if external pull requests should enter the triage queue.
