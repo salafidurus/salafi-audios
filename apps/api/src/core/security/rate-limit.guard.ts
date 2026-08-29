@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
+import '@fastify/rate-limit';
 import { HttpAdapterHost, Reflector } from '@nestjs/core';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
@@ -21,6 +22,7 @@ import {
  * principal to the request. Fastify owns counter mechanics; this guard owns
  * route classification and the stable rejection response.
  */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class RateLimitGuard implements CanActivate {
   private readonly limiters = new Map<
     RateLimitPolicyName,

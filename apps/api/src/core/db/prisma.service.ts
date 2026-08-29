@@ -3,7 +3,7 @@ import type { OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@sd/core-db';
 import { ConfigService } from '../config/config.service';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PinoLogger } from 'nestjs-pino';
+import { AppLoggerService } from '../logger/app-logger.service';
 import { getPrismaLogLevels } from './prisma-log-levels';
 
 /** NestJS prisma service service or controller coordinating the API boundary for this responsibility. */
@@ -15,7 +15,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
   constructor(
     config: ConfigService,
-    private readonly logger: PinoLogger,
+    private readonly logger: AppLoggerService,
   ) {
     const connectionString = requireDatabaseConnection(config);
     const adapter = new PrismaPg({ connectionString });
@@ -46,7 +46,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       this.isConnected = true;
       this.logger?.warn({ db: true }, 'Prisma reconnected');
     } catch (err) {
-      this.logger?.error({ err, db: true }, 'Prisma reconnect failed');
+      const error = err instanceof Error ? err : new Error(String(err));
+      this.logger?.error({ err: error, db: true }, 'Prisma reconnect failed');
       throw err;
     }
   }

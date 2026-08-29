@@ -2,7 +2,7 @@ import type { KeyvStoreAdapter } from 'keyv';
 
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
-import { PinoLogger } from 'nestjs-pino';
+import { AppLoggerService } from '../logger/app-logger.service';
 import { z } from 'zod';
 
 import { ConfigService } from '../config/config.service';
@@ -53,7 +53,7 @@ export class RedisService implements OnModuleDestroy {
 
   constructor(
     private readonly config: ConfigService,
-    private readonly logger: PinoLogger,
+    private readonly logger: AppLoggerService,
   ) {
     this.logger.setContext(RedisService.name);
     if (!config.REDIS_URL) {

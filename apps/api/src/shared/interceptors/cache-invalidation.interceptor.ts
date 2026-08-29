@@ -7,7 +7,7 @@ import {
   type ExecutionContext,
   type NestInterceptor,
 } from '@nestjs/common';
-import { PinoLogger } from 'nestjs-pino';
+import { AppLoggerService } from '../../core/logger/app-logger.service';
 import { from, of, type Observable } from 'rxjs';
 import { catchError, concatMap, map } from 'rxjs/operators';
 
@@ -17,7 +17,7 @@ import { catchError, concatMap, map } from 'rxjs/operators';
 export class CacheInvalidationInterceptor implements NestInterceptor {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cache: Cache,
-    private readonly logger: PinoLogger,
+    private readonly logger: AppLoggerService,
   ) {
     this.logger.setContext(CacheInvalidationInterceptor.name);
   }
