@@ -4,8 +4,12 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { resolveScholarIdParam } from '../../core/auth/policy-resolvers';
 import { ScholarsService } from './scholars.service';
-import { CreateScholarDto } from './dto/create-scholar.dto';
-import { UpdateScholarDto } from './dto/update-scholar.dto';
+import {
+  CreateScholarDtoSchema,
+  UpdateScholarDtoSchema,
+  type CreateScholarDto,
+  type UpdateScholarDto,
+} from '@sd/core-contracts';
 import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
 /** NestJS admin scholars controller service or controller coordinating the API boundary for this responsibility. */
@@ -34,7 +38,7 @@ export class AdminScholarsController {
   @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Scholar')
   @ApiOperation({ summary: 'Create a scholar' })
-  create(@Body() dto: CreateScholarDto) {
+  create(@Body({ schema: CreateScholarDtoSchema }) dto: CreateScholarDto) {
     return this.service.create(dto);
   }
 
@@ -42,7 +46,7 @@ export class AdminScholarsController {
   @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Scholar', resolveScholarIdParam())
   @ApiOperation({ summary: 'Update a scholar' })
-  update(@Param('id') id: string, @Body() dto: UpdateScholarDto) {
+  update(@Param('id') id: string, @Body({ schema: UpdateScholarDtoSchema }) dto: UpdateScholarDto) {
     return this.service.update(id, dto);
   }
 }

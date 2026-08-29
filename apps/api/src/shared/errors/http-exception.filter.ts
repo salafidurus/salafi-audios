@@ -3,7 +3,6 @@ import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
 import { Prisma } from '@sd/core-db';
 import { ConfigService } from '../../core/config/config.service';
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { ZodValidationException } from 'nestjs-zod';
 import { z } from 'zod';
 
 /** Shared API http exception.filter utilities and boundary definitions used by backend modules. */
@@ -17,8 +16,6 @@ const httpExceptionBodySchema = z
 
 const bodyMessageArraySchema = z.array(z.string());
 const bodyMessageStringSchema = z.string();
-const zodIssueMessagesSchema = z.array(z.object({ message: z.string() }));
-const zodValidationErrorSchema = z.object({ issues: zodIssueMessagesSchema });
 const healthIndicatorValueSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
 const healthIndicatorResultSchema = z.record(
   z.string(),
@@ -78,7 +75,7 @@ type ExceptionResolution = {
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly config: ConfigService) {}
 
-  catch(exception: Error | HttpException | ZodValidationException | unknown, host: ArgumentsHost) {
+  catch(exception: Error | HttpException | unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const req = ctx.getRequest<FastifyRequest>();
     const res = ctx.getResponse<FastifyReply>();
@@ -86,7 +83,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const requestId = req.id ?? res.getHeader('x-request-id') ?? '';
     const timestamp = new Date().toISOString();
 
-    const { statusCode, message, details, extras } = this.resolveException(exception);
+    const { statusCode, message, details, extras } = this.resolveException(
+      exception instanceof Error ? exception : undefined,
+    );
 
     const isProd = this.config.NODE_ENV === 'production';
     const devDetails = isProd ? undefined : this.buildDevDetails(exception, details);
@@ -102,30 +101,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
     });
   }
 
-  private resolveException(
-    exception: Error | HttpException | ZodValidationException | unknown,
-  ): ExceptionResolution {
+  private resolveException(exception: Error | undefined): ExceptionResolution {
     const fallback = {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       message: 'Internal Server Error',
       details: undefined,
       extras: {},
     } satisfies ExceptionResolution;
+    if (exception === undefined) return fallback;
     if (this.isPrismaConnectionRefused(exception)) {
       return {
         ...fallback,
         message: 'Database connection refused. Ensure PostgreSQL is running and reachable.',
-      };
-    }
-    if (exception instanceof ZodValidationException) {
-      const parsed = zodValidationErrorSchema.safeParse(exception.getZodError());
-      return {
-        ...fallback,
-        statusCode: exception.getStatus(),
-        message: 'Validation failed',
-        details: parsed.success
-          ? parsed.data.issues.map((issue) => issue.message)
-          : ['Validation failed'],
       };
     }
     if (exception instanceof HttpException) return this.resolveHttpException(exception, fallback);
@@ -194,7 +181,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   }
 
   private buildDevDetails(
-    exception: Error | HttpException | ZodValidationException | unknown,
+    exception: Error | HttpException | unknown,
     existingDetails: DevDetails | undefined,
   ): DevDetails | undefined {
     if (existingDetails !== undefined) {
@@ -206,47 +193,69 @@ export class AllExceptionsFilter implements ExceptionFilter {
     return prismaDetails ?? getGenericDevDetails(exception);
   }
 
-  private isPrismaConnectionRefused(
-    exception: Error | HttpException | ZodValidationException | unknown,
-  ): boolean {
-    return (
-      exception instanceof Prisma.PrismaClientKnownRequestError && exception.code === 'ECONNREFUSED'
-    );
+  private isPrismaConnectionRefused(exception: Error | HttpException): boolean {
+    if (!(exception instanceof Prisma.PrismaClientKnownRequestError)) return false;
+    // SAFETY: Prisma's known-request instance carries its documented error code.
+    return (exception as { code?: string }).code === 'ECONNREFUSED';
   }
 }
 
 function getPrismaDevDetails(exception: Error): DevDetails | undefined {
   if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+    // SAFETY: Prisma's known-request instance carries these documented fields.
+    const prismaError = exception as Error & {
+      code: string;
+      /** Preserves the Prisma client version in development diagnostics. */
+      clientVersion: string;
+      meta: unknown;
+    };
     return {
       kind: 'prisma-known-request-error',
-      code: exception.code,
-      clientVersion: exception.clientVersion,
+      code: prismaError.code,
+      clientVersion: prismaError.clientVersion,
       message: exception.message,
-      meta: exception.meta,
+      meta: prismaError.meta,
     };
   }
 
   if (exception instanceof Prisma.PrismaClientValidationError) {
+    // SAFETY: Prisma's validation-error instance carries its documented client version.
+    const prismaError = exception as Error & {
+      /** Preserves the Prisma client version in development diagnostics. */
+      clientVersion: string;
+    };
     return {
       kind: 'prisma-validation-error',
-      clientVersion: exception.clientVersion,
+      clientVersion: prismaError.clientVersion,
       message: exception.message,
     };
   }
 
   if (exception instanceof Prisma.PrismaClientUnknownRequestError) {
+    // SAFETY: Prisma's unknown-request instance carries its documented client version.
+    const prismaError = exception as Error & {
+      /** Preserves the Prisma client version in development diagnostics. */
+      clientVersion: string;
+    };
     return {
       kind: 'prisma-unknown-request-error',
-      clientVersion: exception.clientVersion,
+      clientVersion: prismaError.clientVersion,
       message: exception.message,
     };
   }
 
   if (exception instanceof Prisma.PrismaClientInitializationError) {
+    // SAFETY: Prisma's initialization-error instance carries these documented fields.
+    const prismaError = exception as Error & {
+      /** Preserves Prisma's provider error code in development diagnostics. */
+      errorCode: string;
+      /** Preserves the Prisma client version in development diagnostics. */
+      clientVersion: string;
+    };
     return {
       kind: 'prisma-initialization-error',
-      errorCode: exception.errorCode,
-      clientVersion: exception.clientVersion,
+      errorCode: prismaError.errorCode,
+      clientVersion: prismaError.clientVersion,
       message: exception.message,
     };
   }

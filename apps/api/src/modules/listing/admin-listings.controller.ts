@@ -1,4 +1,25 @@
 import {
+  ArrangeCommitDtoSchema,
+  BulkActionDtoSchema,
+  CreateListingDtoSchema,
+  UpdateListingDetailsDtoSchema,
+  UpdateListingMediaDtoSchema,
+  type ArrangeCommitDto,
+  type BulkActionDto,
+  type CreateListingDto,
+  type UpdateListingDetailsDto,
+  type UpdateListingMediaDto,
+  type AdminListingActionDto,
+  type AdminListingListDto,
+  type AdminListingDetailDto,
+  type AdminListingMediaDetailDto,
+  type AdminArrangeDataDto,
+  type ArrangeCommitResultDto,
+  type BulkActionResultDto,
+  type ListingRefDto,
+  type HomePromotionsDto,
+} from '@sd/core-contracts';
+import {
   BadRequestException,
   Body,
   Controller,
@@ -12,17 +33,6 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import type {
-  AdminListingActionDto,
-  AdminListingListDto,
-  AdminListingDetailDto,
-  AdminListingMediaDetailDto,
-  AdminArrangeDataDto,
-  ArrangeCommitResultDto,
-  BulkActionResultDto,
-  ListingRefDto,
-  HomePromotionsDto,
-} from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { CurrentUser } from '../../core/auth/decorators';
@@ -36,11 +46,6 @@ import { subject } from '@casl/ability';
 import { PrismaService } from '../../core/db/prisma.service';
 import { ListingService } from './listing.service';
 import { ListingEditorialService } from './listing-editorial.service';
-import { CreateListingDto } from './dto/create-listing.dto';
-import { UpdateListingDetailsDto } from './dto/update-listing-details.dto';
-import { UpdateListingMediaDto } from './dto/update-listing-media.dto';
-import { ArrangeCommitDto } from './dto/arrange-commit.dto';
-import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
 /** NestJS admin listings controller service or controller coordinating the API boundary for this responsibility. */
@@ -132,7 +137,7 @@ export class AdminListingsController {
   @ApiOperation({ summary: 'Transactionally create/update modules and lessons with audio' })
   arrangeCommit(
     @Param('id') id: string,
-    @Body() dto: ArrangeCommitDto,
+    @Body({ schema: ArrangeCommitDtoSchema }) dto: ArrangeCommitDto,
     @Req() req: { user?: { id: string } },
   ): Promise<ArrangeCommitResultDto> {
     return this.editorial.arrange(id, dto, req.user?.id);
@@ -143,7 +148,7 @@ export class AdminListingsController {
   @CheckPolicy('write', 'Listing', resolveScholarIdFromBody())
   @ApiOperation({ summary: 'Create a listing after R2 upload' })
   createListing(
-    @Body() dto: CreateListingDto,
+    @Body({ schema: CreateListingDtoSchema }) dto: CreateListingDto,
     @Req() req: { user?: { id: string } },
   ): Promise<{ id: string; title: string }> {
     const publicUrl = dto.audioKey
@@ -157,7 +162,7 @@ export class AdminListingsController {
   @CheckPolicy('publish', 'Listing')
   @ApiOperation({ summary: 'Bulk publish or archive listings' })
   async bulkAction(
-    @Body() dto: BulkActionDto,
+    @Body({ schema: BulkActionDtoSchema }) dto: BulkActionDto,
     @CurrentUser() user: AbilityInput,
     @Req() req: { user?: { id: string } },
   ): Promise<BulkActionResultDto> {
@@ -191,7 +196,7 @@ export class AdminListingsController {
   @ApiOkResponse({ description: 'Listing details updated successfully' })
   async updateListingDetails(
     @Param('id') id: string,
-    @Body() updateDto: UpdateListingDetailsDto,
+    @Body({ schema: UpdateListingDetailsDtoSchema }) updateDto: UpdateListingDetailsDto,
     @Req() req: { user?: { id: string } },
   ): Promise<AdminListingActionDto> {
     const res = await this.service.updateListingDetails(id, updateDto, req.user?.id);
@@ -205,7 +210,7 @@ export class AdminListingsController {
   @ApiOkResponse({ description: 'Listing media updated successfully' })
   async updateListingMedia(
     @Param('id') id: string,
-    @Body() updateDto: UpdateListingMediaDto,
+    @Body({ schema: UpdateListingMediaDtoSchema }) updateDto: UpdateListingMediaDto,
     @Req() req: { user?: { id: string } },
   ): Promise<AdminListingActionDto> {
     const res = await this.editorial.replace(id, updateDto, req.user?.id);

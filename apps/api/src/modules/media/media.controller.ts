@@ -1,13 +1,15 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import type {
-  BatchPresignAudioResponseDto,
-  PresignedUrlRequestDto,
-  PresignedUrlResponseDto,
+import {
+  BatchPresignAudioRequestDtoSchema,
+  PresignedUrlRequestDtoSchema,
+  type BatchPresignAudioRequestDto,
+  type BatchPresignAudioResponseDto,
+  type PresignedUrlRequestDto,
+  type PresignedUrlResponseDto,
 } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
-import { BatchPresignAudioRequestDto } from './dto/batch-presign.dto';
 import { MediaService } from './media.service';
 import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
@@ -28,7 +30,9 @@ export class MediaController {
   @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Media')
   @ApiOperation({ summary: 'Get a presigned R2 upload URL' })
-  getPresignedUrl(@Body() dto: PresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
+  getPresignedUrl(
+    @Body({ schema: PresignedUrlRequestDtoSchema }) dto: PresignedUrlRequestDto,
+  ): Promise<PresignedUrlResponseDto> {
     return this.service.getPresignedUploadUrl(dto);
   }
 
@@ -36,7 +40,9 @@ export class MediaController {
   @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Media')
   @ApiOperation({ summary: 'Get presigned R2 upload URLs for a batch of audio files' })
-  presignBatch(@Body() dto: BatchPresignAudioRequestDto): Promise<BatchPresignAudioResponseDto> {
+  presignBatch(
+    @Body({ schema: BatchPresignAudioRequestDtoSchema }) dto: BatchPresignAudioRequestDto,
+  ): Promise<BatchPresignAudioResponseDto> {
     return this.service.getBatchAudioPresignedUrls(dto);
   }
 }
