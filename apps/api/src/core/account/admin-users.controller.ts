@@ -7,6 +7,7 @@ import type { AdminUserListDto, UserAccessSnapshot } from '@sd/core-contracts';
 import { CurrentUser } from '../auth/decorators';
 import { AccessService } from './access.service';
 import { ReplaceUserAccessDto } from './dto/replace-user-access.dto';
+import { RateLimitPolicy } from '../security/rate-limit.decorator';
 
 /**
  * AdminUsersController
@@ -47,6 +48,7 @@ export class AdminUsersController {
   }
 
   @Put(':userId/access')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('manage', 'UserAccess')
   @ApiOperation({ summary: 'Replace a user access snapshot atomically' })
   replaceAccess(

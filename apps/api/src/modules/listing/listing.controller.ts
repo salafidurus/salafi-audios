@@ -12,13 +12,13 @@ import type {
   FeedPageDto,
   HomePromotionsDto,
 } from '@sd/core-contracts';
-import { SkipThrottle } from '@nestjs/throttler';
+import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 import { CacheTTL } from '@nestjs/cache-manager';
 import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
 import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
 
 /** NestJS listing controller service or controller coordinating the API boundary for this responsibility. */
-@SkipThrottle()
+@RateLimitPolicy('public-read')
 @ApiTags('Listings')
 @ApiCommonErrors()
 @Public()

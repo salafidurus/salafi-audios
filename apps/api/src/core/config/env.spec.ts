@@ -51,4 +51,13 @@ describe('getApiEnv — Neon control-plane credentials', () => {
 
     expect(getApiEnv(complete).NEON_ENDPOINT_ID).toBe('ep-neon-endpoint');
   });
+
+  it('defaults proxy trust to zero hops', () => {
+    expect(getApiEnv(baseDevEnv).TRUST_PROXY_HOPS).toBe(0);
+  });
+
+  it('bounds proxy trust to the configured hop range', () => {
+    expect(getApiEnv({ ...baseDevEnv, TRUST_PROXY_HOPS: '2' }).TRUST_PROXY_HOPS).toBe(2);
+    expect(() => getApiEnv({ ...baseDevEnv, TRUST_PROXY_HOPS: '11' })).toThrow();
+  });
 });
