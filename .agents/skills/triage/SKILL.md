@@ -41,11 +41,19 @@ For a PR, the same states read against the attached code: `ready-for-agent` mean
 
 Every triaged issue should carry exactly one category role and one state role. If state roles conflict, flag it and ask the maintainer before doing anything else.
 
+Completed implementation tickets are reconciled by this skill after their
+merged PR is independently confirmed. Remove active triage-state labels,
+preserve the `ticket` artifact label, close the implementation issue if it is
+still open, and verify the final state and labels. Completion is not a
+rejection, so do not apply `wontfix`. If the issue is already closed, still
+verify and repair its active triage labels before reporting completion.
+
 Completed specification exception: a `spec` issue is an umbrella record for
 linked `ticket` issues. When it has at least one linked ticket and all linked
 tickets are closed, it may be closed as completed. Remove active state labels
 and preserve `spec`; do not apply `wontfix`, because completion is not a
-rejection. The `close-completed-specs` workflow performs this transition.
+rejection. The `triage` skill owns this transition; closing child tickets does
+not by itself complete the parent specification.
 
 These are canonical role names. Use `docs/agents/triage-labels.md` for the
 actual GitHub label strings.
@@ -92,6 +100,17 @@ Show counts and a one-line summary per item. Let the maintainer pick.
      - **Rejected (bug)**: give a polite explanation, then close.
      - **Rejected (enhancement)**: write to `.out-of-scope/`, link to it from a comment, then close ([OUT-OF-SCOPE.md](OUT-OF-SCOPE.md)).
    - `needs-triage`: apply the role. Optional comment if there's partial progress.
+
+## Reconcile a merged implementation ticket
+
+When `post-implement` invokes this skill after independently confirming that a
+PR merged, treat the linked implementation issue as completed work. Read the
+issue and merged PR, remove active triage-state labels while preserving the
+`ticket` artifact label, close the issue if GitHub left it open, and verify the
+final issue state and labels. Any comment posted during this reconciliation
+must begin with the required AI-triage disclaimer. Do not delete branches or
+worktrees here; `post-implement` performs those actions only after its own
+independent verification succeeds.
 
 ## Quick state override
 
