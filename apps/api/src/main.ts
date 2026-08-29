@@ -1,7 +1,9 @@
 import './shared/utils/env.bootstrap';
+import type { IncomingMessage } from 'node:http';
+import type { Http2ServerRequest } from 'node:http2';
 // ESM Module Resolution Gating under Bun:
 // NestJS 12 packages are pure ESM modules. To prevent runtime `TypeError: require() async module ... is unsupported`
-// errors when CommonJS companion dependencies (such as nestjs-pino, @nestjs/throttler, or @nestjs/terminus)
+// errors when CommonJS companion dependencies (such as @nestjs/throttler or @nestjs/terminus)
 // synchronously call `require('@nestjs/common')` during execution, we must explicitly import the core ES modules first.
 // This forces Bun to evaluate the NestJS core ESM graph synchronously at startup so subsequent CJS requires succeed.
 import '@nestjs/common';
@@ -11,8 +13,14 @@ import { AllExceptionsFilter } from './shared/errors/http-exception.filter';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
+import { ApiLogController } from './core/logger/api-log.controller';
+import { AppLoggerService } from './core/logger/app-logger.service';
+import {
+  generateRequestId,
+  getSharedApiLogger,
+  REQUEST_ID_HEADER,
+} from './core/logger/logger.factory';
 import { initAuth, getAuth } from './core/auth/auth.instance';
 import { fromNodeHeaders } from 'better-auth/node';
 import helmet from '@fastify/helmet';
@@ -23,15 +31,30 @@ import { ZodValidationPipe } from 'nestjs-zod';
 
 /** API bootstrap entrypoint that configures the NestJS server and shared request infrastructure. */
 async function bootstrap() {
+  const bootstrapConfig = new ConfigService();
+  const sharedLogger = getSharedApiLogger(bootstrapConfig.NODE_ENV);
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({ logger: false }), // Disable Fastify's logger, use Pino instead
+    new FastifyAdapter({
+      loggerInstance: sharedLogger,
+      genReqId: (request: IncomingMessage | Http2ServerRequest) =>
+        generateRequestId(request.headers),
+      logController: new ApiLogController(),
+    }),
     { bufferLogs: true },
   );
   const config = app.get(ConfigService);
   initAuth(config);
 
-  app.useLogger(app.get(Logger));
+  app.useLogger(app.get(AppLoggerService));
+
+  // SAFETY: NestFastifyApplication is constructed with FastifyAdapter above, so
+  // its HTTP adapter instance is the Fastify instance used for these hooks.
+  const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
+  fastify.addHook('onRequest', (request, reply, done) => {
+    reply.header(REQUEST_ID_HEADER, request.id);
+    done();
+  });
 
   // Security: Helmet with proper CSP configuration
   await app.register(helmet, {
@@ -75,7 +98,6 @@ async function bootstrap() {
   // https://better-auth.com/docs/integrations/fastify
   // SAFETY: this Nest app is bootstrapped with the Fastify adapter above, so
   // the underlying HTTP adapter instance is a Fastify server here.
-  const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
   fastify.route({
     method: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     url: '/api/auth/*',
