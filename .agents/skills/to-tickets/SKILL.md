@@ -8,8 +8,9 @@ disable-model-invocation: true
 
 Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it.
 
-Use `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md` for the
-repository's GitHub workflow and label vocabulary.
+Use [issue-tracker.md](../../../docs/agents/issue-tracker.md) and
+[triage-labels.md](../../../docs/agents/triage-labels.md) for the repository's
+GitHub workflow and label vocabulary.
 
 When an existing specification or ticket set is named, read
 [REPAIR.md](REPAIR.md) and reconcile the existing graph instead of publishing
@@ -84,7 +85,7 @@ Iterate until the user approves the breakdown.
 ### 5. Publish or repair the tickets in the configured tracker
 
 Publish the approved tickets using the GitHub workflow documented in
-`docs/agents/issue-tracker.md`; the tickets are the same, with native GitHub
+[issue-tracker.md](../../../docs/agents/issue-tracker.md); the tickets are the same, with native GitHub
 blocking edges where supported:
 
 - **Local files** → write one file per ticket under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below: one ticket per file, never a single combined file.

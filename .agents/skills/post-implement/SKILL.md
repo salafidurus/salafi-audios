@@ -9,7 +9,7 @@ disable-model-invocation: true
 Complete the delivery lifecycle for one implemented ticket after implementation.
 This skill has two explicit phases: PR preparation and merge-gated cleanup.
 
-Read `.agents/skills/post-implement/tsdoc-policy.md` before preparing the PR.
+Read [tsdoc-policy.md](tsdoc-policy.md) before preparing the PR.
 
 Read [COMPLETION.md](COMPLETION.md) before applying any merge-gated completion,
 specification finalization, abandonment, or cleanup path.
@@ -48,7 +48,7 @@ against the pre-work baseline before pushing.
 ## Documentation verification
 
 Review every changed public declaration against
-`.agents/skills/post-implement/tsdoc-policy.md`. Confirm that TSDoc describes
+[tsdoc-policy.md](tsdoc-policy.md). Confirm that TSDoc describes
 actual behavior, invariants, side effects, and failure modes rather than names
 or types. Search the changed scope for generic,
 placeholder, stale, duplicated, or mechanically generated prose. Run final-mode

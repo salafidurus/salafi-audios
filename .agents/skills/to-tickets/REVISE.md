@@ -14,7 +14,7 @@ shortcut.
    assumption into acceptance criteria.
 3. If the decision changes the specification's problem, solution, scope, or
    durable architectural boundary, stop and route the parent through
-   `to-spec/REPAIR.md` first.
+   [to-spec/REPAIR.md](../to-spec/REPAIR.md) first.
 4. Present the proposed ticket revision and dependency changes for approval
    before tracker writes.
 
@@ -45,5 +45,6 @@ contracts, acceptance criteria, and blockers are complete. Then report the
 ticket to `pre-implement`; do not invoke `implement` directly.
 
 If the revision exposes a broader scope change, unresolved decision, or parent
-specification contradiction, stop and route back through `to-spec/REPAIR.md`
-instead of forcing the ticket to ready.
+specification contradiction, stop and route back through
+[to-spec/REPAIR.md](../to-spec/REPAIR.md) instead of forcing the ticket to
+ready.

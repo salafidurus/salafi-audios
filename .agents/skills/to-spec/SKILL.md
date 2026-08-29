@@ -6,8 +6,9 @@ disable-model-invocation: true
 
 This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user; just synthesize what you already know.
 
-Use `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md` for the
-repository's GitHub workflow and label vocabulary.
+Use [issue-tracker.md](../../../docs/agents/issue-tracker.md) and
+[triage-labels.md](../../../docs/agents/triage-labels.md) for the repository's
+GitHub workflow and label vocabulary.
 
 When an existing specification is named, read [REPAIR.md](REPAIR.md) and use
 its reconciliation procedure instead of publishing a second specification.
