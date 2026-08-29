@@ -26,6 +26,14 @@ focusability, narrow-screen Settings/My Library controls, branded 404 recovery,
 shell-unavailable recovery, and stored fallback theme behavior. Assertions that
 remain owned by #717 or #718 are intentionally not duplicated here.
 
+The #718 Bun.WebView journey in `navigation-library.bun.e2e.ts` preserves the
+navigation and My Library intents. Its coverage includes public destinations,
+search affordance, settings URL state, canonical library tabs, anonymous
+library state, invalid-tab fallback, and both browser-history directions.
+Arabic/RTL, accessibility, and narrow-screen interaction assertions remain
+assigned to issue 719; authentication and capability assertions remain assigned
+to issue 717.
+
 Issue #717 preserves the authentication, callback, account/sign-out, and
 authorization intents through `auth.bun.e2e.ts`, `auth-callback.bun.e2e.ts`,
 `account.bun.e2e.ts`, and `authorization.bun.e2e.ts`. The original Playwright

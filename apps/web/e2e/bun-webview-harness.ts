@@ -4,11 +4,6 @@ import { request as httpRequest } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-if (process.env.BUN_WEBVIEW_E2E === "1") {
-  const { GlobalRegistrator } = require("@happy-dom/global-registrator");
-  GlobalRegistrator.unregister();
-}
-
 export const DEFAULT_E2E_PORT = 3008;
 const DEFAULT_READY_TIMEOUT_MS = 120_000;
 const DEFAULT_READY_INTERVAL_MS = 100;
@@ -39,6 +34,12 @@ export type BrowserJourney = {
 export type BrowserViewport = {
   width: number;
   height: number;
+};
+
+/** Configures the viewport used by one isolated browser journey. */
+export type BrowserJourneyOptions = {
+  width?: number;
+  height?: number;
 };
 
 export type WebServer = {
@@ -133,7 +134,7 @@ export async function startWebServer(config: E2EConfig = getE2EConfig()): Promis
       FALLBACK_TEST_MODE: "1",
     },
     stdout: "inherit",
-    stderr: "ignore",
+    stderr: "inherit",
   });
   let adapter: ReturnType<typeof Bun.serve>;
   try {
@@ -233,15 +234,15 @@ function serializeConsoleArgs(args: unknown[]): unknown[] {
 /** Creates an isolated Chromium view and records page console calls. */
 export function createBrowserJourney(
   origin: string,
-  viewport: BrowserViewport = { width: 1280, height: 800 },
+  options: BrowserJourneyOptions = {},
 ): BrowserJourney {
   const consoleEntries: BrowserConsoleEntry[] = [];
   const profileDirectory = mkdtempSync(join(tmpdir(), "salafi-durus-bun-webview-"));
   const view = new Bun.WebView({
     backend: { type: "chrome", url: false },
     dataStore: { directory: profileDirectory },
-    width: viewport.width,
-    height: viewport.height,
+    width: options.width ?? 1280,
+    height: options.height ?? 800,
     console: (type, ...args) => {
       consoleEntries.push({ type, args: serializeConsoleArgs(args) });
     },
@@ -281,9 +282,9 @@ export async function withBrowserJourney<T>(
   testName: string,
   origin: string,
   callback: (journey: BrowserJourney) => Promise<T>,
-  viewport?: BrowserViewport,
+  options?: BrowserJourneyOptions,
 ): Promise<T> {
-  const journey = createBrowserJourney(origin, viewport);
+  const journey = createBrowserJourney(origin, options);
   try {
     return await callback(journey);
   } catch (error) {
