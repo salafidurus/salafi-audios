@@ -6,6 +6,7 @@ import { resolveScholarIdParam } from '../../core/auth/policy-resolvers';
 import { ScholarsService } from './scholars.service';
 import { CreateScholarDtoSchema, type CreateScholarDto } from './dto/create-scholar.dto';
 import { UpdateScholarDtoSchema, type UpdateScholarDto } from './dto/update-scholar.dto';
+import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
 /** NestJS admin scholars controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Scholars')
@@ -30,6 +31,7 @@ export class AdminScholarsController {
   }
 
   @Post()
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Scholar')
   @ApiOperation({ summary: 'Create a scholar' })
   create(@Body({ schema: CreateScholarDtoSchema }) dto: CreateScholarDto) {
@@ -37,6 +39,7 @@ export class AdminScholarsController {
   }
 
   @Patch(':id')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Scholar', resolveScholarIdParam())
   @ApiOperation({ summary: 'Update a scholar' })
   update(@Param('id') id: string, @Body({ schema: UpdateScholarDtoSchema }) dto: UpdateScholarDto) {

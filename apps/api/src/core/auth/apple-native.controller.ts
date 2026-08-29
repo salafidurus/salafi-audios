@@ -6,6 +6,7 @@ import {
   type AppleNativeSignInDto,
 } from './dto/apple-native-sign-in.dto';
 import { Public } from './decorators';
+import { RateLimitPolicy } from '../security/rate-limit.decorator';
 
 /** NestJS apple native controller service or controller coordinating the API boundary for this responsibility. */
 @ApiExcludeController()
@@ -16,6 +17,7 @@ export class AppleNativeController {
   constructor(private readonly appleNativeService: AppleNativeService) {}
 
   @Public()
+  @RateLimitPolicy('authentication')
   @Post('native')
   @HttpCode(200)
   async nativeSignIn(@Body({ schema: AppleNativeSignInDtoSchema }) dto: AppleNativeSignInDto) {

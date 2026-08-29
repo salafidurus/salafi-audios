@@ -114,6 +114,26 @@ resolution.
 - Swagger/OpenAPI may be exposed in development at `/api/docs` when enabled.
 - Public client base URLs are configured via `NEXT_PUBLIC_API_URL` for web and `EXPO_PUBLIC_API_URL` for mobile.
 
+### API rate-limit policies
+
+The API uses Fastify-native `@fastify/rate-limit` with an application-owned named policy boundary. Routes may select a policy explicitly; unannotated public and protected routes fall back to `public-read` and `authenticated` respectively.
+
+| Policy             | Production budget         | Global safety ceiling |
+| ------------------ | ------------------------- | --------------------- |
+| `global-safety`    | 600 requests / 60 seconds | No                    |
+| `public-read`      | 120 / 60 seconds          | Yes                   |
+| `authenticated`    | 60 / 60 seconds           | Yes                   |
+| `authentication`   | 10 / 60 seconds           | Yes                   |
+| `admin-write`      | 30 / 60 seconds           | Yes                   |
+| `expensive-search` | 20 / 60 seconds           | Yes                   |
+| `health-probe`     | 30 / 10 seconds           | No                    |
+
+Health endpoints intentionally bypass the ordinary global ceiling so monitoring cannot consume application traffic capacity, but they retain their own short-window budget. Test mode uses two requests per second for deterministic rejection tests. `DISABLE_THROTTLER=true` disables enforcement for local/test setups that need unrestricted traffic.
+
+Authenticated buckets use the trusted backend session user ID. Anonymous buckets use Fastify's resolved `request.ip`; forwarded addresses only affect that value when `TRUST_PROXY_HOPS` is explicitly configured (zero by default). Redis-backed counters are enabled when `REDIS_URL` is present and use the existing environment namespace. All policies fail open on rate-limit storage errors to preserve API availability; this is intentional and is separate from authentication or authorization failures.
+
+Rejected requests return HTTP 429 with `x-ratelimit-limit`, `x-ratelimit-remaining`, `x-ratelimit-reset`, and `retry-after` headers.
+
 ## 8. Evolution Rules
 
 - Prefer extending contracts over replacing them.

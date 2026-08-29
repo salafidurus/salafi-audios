@@ -1,6 +1,6 @@
 import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SkipThrottle } from '@nestjs/throttler';
+import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 import { Public } from '../../core/auth/decorators';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import {
@@ -15,7 +15,7 @@ import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.i
 import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
 
 /** NestJS search controller service or controller coordinating the API boundary for this responsibility. */
-@SkipThrottle()
+@RateLimitPolicy('expensive-search')
 @ApiTags('Search')
 @ApiCommonErrors()
 @Public()

@@ -48,6 +48,7 @@ import type { UpdateListingDetailsDto } from './dto/update-listing-details.dto';
 import type { UpdateListingMediaDto } from './dto/update-listing-media.dto';
 import type { ArrangeCommitDto } from './dto/arrange-commit.dto';
 import type { BulkActionDto } from '../../shared/dto/bulk-action.dto';
+import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
 /** NestJS admin listings controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Listings')
@@ -71,6 +72,7 @@ export class AdminListingsController {
   }
 
   @Post('promotions')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Listing')
   @ApiOperation({ summary: 'Update home promotions' })
   @ApiOkResponse({ description: 'Success status' })
@@ -132,6 +134,7 @@ export class AdminListingsController {
   }
 
   @Post(':id/arrange-commit')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Transactionally create/update modules and lessons with audio' })
   arrangeCommit(
@@ -143,6 +146,7 @@ export class AdminListingsController {
   }
 
   @Post()
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Listing', resolveScholarIdFromBody())
   @ApiOperation({ summary: 'Create a listing after R2 upload' })
   createListing(
@@ -156,6 +160,7 @@ export class AdminListingsController {
   }
 
   @Post('bulk')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('publish', 'Listing')
   @ApiOperation({ summary: 'Bulk publish or archive listings' })
   async bulkAction(
@@ -187,6 +192,7 @@ export class AdminListingsController {
   }
 
   @Put(':id/details')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Update listing details (title, description, status, topics, etc.)' })
   @ApiOkResponse({ description: 'Listing details updated successfully' })
@@ -200,6 +206,7 @@ export class AdminListingsController {
   }
 
   @Put(':id/media')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Update listing media (audio file, duration, etc.)' })
   @ApiOkResponse({ description: 'Listing media updated successfully' })
@@ -213,6 +220,7 @@ export class AdminListingsController {
   }
 
   @Post(':id/publish')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('publish', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Publish a listing' })
   @ApiOkResponse({ description: 'Listing published successfully' })
@@ -225,6 +233,7 @@ export class AdminListingsController {
   }
 
   @Post(':id/archive')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('delete', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Archive a listing' })
   @ApiOkResponse({ description: 'Listing archived successfully' })
@@ -237,6 +246,7 @@ export class AdminListingsController {
   }
 
   @Delete(':id')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('delete', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Delete a listing' })
   @ApiOkResponse({ description: 'Listing deleted successfully' })
