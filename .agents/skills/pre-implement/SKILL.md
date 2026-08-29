@@ -38,7 +38,15 @@ specification integration context is missing; do not claim spec-branch
 isolation or invent a spec-branch PR target. For standalone bug, research,
 maintenance, or other non-specification work, explicitly record that no parent
 specification or spec branch applies and retain the existing `origin/main`
-base.
+base with `main` as the pull-request target.
+
+Every plan records this routing context:
+
+| Ticket context                               | Branch base                 | Pull-request target            |
+| -------------------------------------------- | --------------------------- | ------------------------------ |
+| Specification ticket with a verified branch  | `spec/<slug>`               | `spec/<slug>`                  |
+| Specification ticket without branch metadata | `origin/main` provisionally | unresolved; report the warning |
+| Standalone ticket                            | `origin/main`               | `main`                         |
 
 Read and cross-reference:
 
