@@ -29,7 +29,7 @@ Run from repo root:
 - Typecheck: `bun run --filter web typecheck`
 - Unit/integration tests: `bun run --filter web test`
 - E2E tests (Playwright): `bun run --filter web test:e2e`
-- Bun.WebView smoke journey: `bun run test:e2e:bun` (Turbo builds `web` first)
+- Bun.WebView journeys: `bun run test:e2e:bun` (Turbo builds `web` first)
 - Bun.WebView configuration: `BUN_E2E_PORT`, `BUN_E2E_API_ORIGIN`, and `BUN_E2E_READY_TIMEOUT_MS`
 - Bun.WebView failure artifacts: `apps/web/test-results/bun-webview/<test-name>/`
 
@@ -41,8 +41,8 @@ Targeted testing examples:
 
 The Bun.WebView journey requires a locally installed Google Chrome. It runs the
 production-built Next.js app through an isolated ephemeral browser store; the
-current Playwright suite remains the compatibility suite until the follow-up
-auth, navigation/library, and localized/accessibility tickets migrate their
+The current Playwright suite remains the compatibility suite while the
+follow-up navigation/library and localized/accessibility tickets migrate their
 intents.
 
 ## Guardrails

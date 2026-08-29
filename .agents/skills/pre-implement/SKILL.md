@@ -39,8 +39,8 @@ Read and cross-reference:
    affected scripts.
 6. Platform-specific constraints, including whether the change touches
    `apps/native`.
-7. `./tsdoc-policy.md` when the ticket changes code, contracts, or
-   agent-facing implementation guidance.
+7. `.agents/skills/pre-implement/tsdoc-policy.md` when the ticket changes code,
+   contracts, or agent-facing implementation guidance.
 
 Resolve facts by inspecting the repository and issue tracker. Surface only
 decisions, assumptions, risks, and ambiguities that require human judgment.
@@ -51,8 +51,9 @@ For every affected public seam, read the implementation and tests and record
 the documentation contract in the plan. Identify routes, API clients, hooks,
 components, types, adapters, state machines, and meaningful semantic fields.
 Explain the behavior, invariant, side effect, and failure mode that callers
-need to preserve. Use `./tsdoc-policy.md` for planning examples; do not plan
-generic comments or documentation for trivial locals.
+need to preserve. Use `.agents/skills/pre-implement/tsdoc-policy.md` for
+planning examples; do not plan generic comments or documentation for trivial
+locals.
 
 ## Output
 

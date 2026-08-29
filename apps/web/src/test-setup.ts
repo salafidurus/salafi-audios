@@ -1,4 +1,3 @@
-import "@testing-library/jest-dom";
 import { afterEach } from "bun:test";
 
 import { createI18n } from "./core/i18n/i18n";
@@ -13,6 +12,10 @@ if (process.env.BUN_WEBVIEW_E2E === "1") {
   const { GlobalRegistrator } = require("@happy-dom/global-registrator");
 
   GlobalRegistrator.register();
+
+  // jest-dom v7 imports Testing Library's DOM helpers at module load time, so
+  // register the browser globals before loading it.
+  require("@testing-library/jest-dom");
 
   // Initialize i18n for tests
   const testI18n = createI18n("en");
