@@ -12,8 +12,8 @@ Before editing, read the repository instructions in `AGENT.md`, the nearest
 app/package `AGENT.md`, the `tdd` skill, and the approved ticket plan. Treat
 those sources as mandatory workflow rules.
 
-Read `./tsdoc-policy.md` before editing code or agent-facing implementation
-guidance.
+Read `.agents/skills/implement/tsdoc-policy.md` before editing code or
+agent-facing implementation guidance.
 
 ## Checkout selection
 
@@ -77,8 +77,8 @@ Update TSDoc in the same vertical slice and commit as the implementation. Write
 it from the source and tests, documenting caller-visible behavior, invariants,
 side effects, and failure modes. Cover changed exported production
 declarations, meaningful semantic fields, and non-obvious helpers. Do not use
-generic or generated prose; consult `./tsdoc-policy.md` for good and bad
-examples.
+generic or generated prose; consult `.agents/skills/implement/tsdoc-policy.md`
+for good and bad examples.
 
 Before committing, run final-mode TSDoc lint and inspect the diff for stale,
 duplicated, or mechanically generated comments. Missing documentation on a
