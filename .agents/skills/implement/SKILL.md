@@ -22,9 +22,25 @@ Determine whether the approved scope includes committed files under
 
 - Native scope uses the current checkout because native changes may require the
   current development environment.
-- Non-native scope uses the approved isolated worktree under `.worktrees`,
-  branched from `origin/main`.
+- Non-native scope uses the approved isolated worktree under `.worktree/`.
+  For a specification ticket, branch it from the resolved `spec/<slug>`
+  integration branch. If `pre-implement` reported missing specification
+  branch metadata, use `origin/main` provisionally and preserve that warning;
+  do not describe the work as spec-branch-isolated or invent a spec-branch PR
+  target. Standalone tickets are branched from `origin/main`.
 - Mixed scope follows the native/current-checkout path.
+
+The approved plan carries the routing context explicitly:
+
+| Ticket context                                          | Branch base                 | Pull-request target                    |
+| ------------------------------------------------------- | --------------------------- | -------------------------------------- |
+| Specification ticket with a verified integration branch | `spec/<slug>`               | `spec/<slug>`                          |
+| Specification ticket with missing branch metadata       | `origin/main` provisionally | unresolved; report the missing context |
+| Standalone ticket                                       | `origin/main`               | `main`                                 |
+
+Resolve the branch base and pull-request target before creating the worktree or
+preparing delivery. Branch topology does not change native/current-checkout
+selection.
 
 For non-native work, create the approved worktree if it does not exist. Use a
 short name with the matching prefix: `c-` and `c/` for chore or CI work, `f-`
@@ -33,15 +49,15 @@ existing worktree, verify its path, branch, base, and clean starting state.
 
 After selecting or creating a non-native worktree, copy every gitignored
 `.env` file from the main checkout into the matching path in the worktree,
-excluding `node_modules`, `.git`, and `.worktrees`, then run `bun install` from
+excluding `node_modules`, `.git`, and `.worktree`, then run `bun install` from
 the worktree:
 
 ```bash
-WORKTREE=".worktrees/<worktree-name>"
+WORKTREE=".worktree/<worktree-name>"
 find . -maxdepth 4 -name '.env' \
   -not -path '*/node_modules/*' \
   -not -path '*/.git/*' \
-  -not -path '*.worktrees/*' \
+  -not -path '*.worktree/*' \
   -exec sh -c 'mkdir -p "$(dirname "$2/$1")" && cp "$1" "$2/$1"' _ {} "$WORKTREE" \;
 bun install
 ```
