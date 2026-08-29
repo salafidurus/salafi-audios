@@ -1,7 +1,13 @@
 import './shared/utils/env.bootstrap';
+// ESM Module Resolution Gating under Bun:
+// NestJS 12 packages are pure ESM modules. To prevent runtime `TypeError: require() async module ... is unsupported`
+// errors when CommonJS companion dependencies (such as nestjs-pino, @nestjs/throttler, or @nestjs/terminus)
+// synchronously call `require('@nestjs/common')` during execution, we must explicitly import the core ES modules first.
+// This forces Bun to evaluate the NestJS core ESM graph synchronously at startup so subsequent CJS requires succeed.
+import '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { ConfigService } from './core/config/config.service';
 import { AllExceptionsFilter } from './shared/errors/http-exception.filter';
-import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
