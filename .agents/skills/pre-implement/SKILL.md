@@ -17,6 +17,9 @@ relevant ticket/dependency graph first, then plan only the selected ticket.
 
 ## Investigation
 
+Read [READINESS.md](READINESS.md) before evaluating the ticket lifecycle
+precondition.
+
 ### Triage precondition
 
 Before planning, verify the implementation issue has exactly one category role

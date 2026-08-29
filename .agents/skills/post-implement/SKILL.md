@@ -11,6 +11,9 @@ This skill has two explicit phases: PR preparation and merge-gated cleanup.
 
 Read `.agents/skills/post-implement/tsdoc-policy.md` before preparing the PR.
 
+Read [COMPLETION.md](COMPLETION.md) before applying any merge-gated completion,
+specification finalization, abandonment, or cleanup path.
+
 ## PR preparation
 
 Run the applicable post-work checks before publishing. The repository baseline

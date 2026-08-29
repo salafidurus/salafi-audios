@@ -15,6 +15,9 @@ those sources as mandatory workflow rules.
 Read `.agents/skills/implement/tsdoc-policy.md` before editing code or
 agent-facing implementation guidance.
 
+Read [START.md](START.md) before performing the implementation-start triage
+handoff or selecting the implementation checkout.
+
 ## Triage handoff
 
 Before creating or modifying the implementation checkout, invoke the `triage`

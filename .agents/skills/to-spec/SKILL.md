@@ -9,27 +9,44 @@ This skill takes the current conversation context and codebase understanding and
 Use `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md` for the
 repository's GitHub workflow and label vocabulary.
 
+When an existing specification is named, read [REPAIR.md](REPAIR.md) and use
+its reconciliation procedure instead of publishing a second specification.
+
+## Operating modes
+
+- **New specification:** synthesize and publish one new specification issue.
+- **Existing specification:** reconcile the named specification in place;
+  preserve its issue number, history, linked tickets, and valid decisions.
+
+Do not mix these modes. A repair must never silently become a new publication.
+
 ## Process
 
 1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
 
 2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
-Check with the user that these seams match their expectations.
+Present the proposed seams and any material scope decisions for approval before
+publishing or repairing the tracker. This is a decision checkpoint, not a new
+discovery interview.
 
-3. Choose a concise slug for the specification: prefer one word and never use
-   more than two words. Create `spec/<slug>` from `main` (the local equivalent
-   is `origin/main`) before publishing the specification issue. The branch is
-   disposable integration context and belongs to exactly one specification.
+3. For a new specification, choose a concise slug and create `spec/<slug>`
+   from `main` (the local equivalent is `origin/main`) before publishing. For
+   an existing specification, resolve its recorded branch and repair it only
+   through [REPAIR.md](REPAIR.md). A spec branch is disposable integration
+   context and belongs to exactly one specification.
 
-4. Write the spec using the template below, then publish it to the project
-   issue tracker. Apply both `ready-for-agent` and the `spec` artifact label -
-   no need for additional triage. If the tracker does not have `spec` yet,
-   create it before publishing. After publication, record the specification
-   issue number and `spec/<slug>` branch together on the specification issue so
-   `to-tickets` and later lifecycle stages can resolve the same context.
+4. Write or reconcile the spec using the template below, then publish the
+   approved new or changed body to the project issue tracker. Apply both
+   `ready-for-agent` and the `spec` artifact label to an open specification;
+   no additional triage transition is needed for publication. If the tracker
+   does not have `spec` yet, create it before publishing. Record the
+   specification issue number and `spec/<slug>` branch together on the
+   specification issue so `to-tickets` and later lifecycle stages resolve the
+   same context. Existing issue comments remain historical evidence.
 
-After the approved specification is published, recommend proceeding to `to-tickets`.
+5. End with the lifecycle handoff: recommend `to-tickets` for a new or
+   reconciled specification, and do not start implementation from this skill.
 
 <spec-template>
 

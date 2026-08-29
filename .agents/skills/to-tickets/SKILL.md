@@ -11,6 +11,20 @@ Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet ver
 Use `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md` for the
 repository's GitHub workflow and label vocabulary.
 
+When an existing specification or ticket set is named, read
+[REPAIR.md](REPAIR.md) and reconcile the existing graph instead of publishing
+duplicates.
+
+## Operating modes
+
+- **New ticket set:** draft and publish tickets for a specification that has no
+  published implementation ticket set.
+- **Existing ticket set:** repair the named specification's tickets in place;
+  preserve issue numbers, closed states, historical comments, and valid
+  dependency evidence.
+
+Never treat a repair as a fresh ticket publication.
+
 ## Process
 
 ### 1. Gather context
@@ -63,7 +77,7 @@ the numbered breakdown and get approval for them.
 
 Iterate until the user approves the breakdown.
 
-### 5. Publish the tickets to the configured tracker
+### 5. Publish or repair the tickets in the configured tracker
 
 Publish the approved tickets using the GitHub workflow documented in
 `docs/agents/issue-tracker.md`; the tickets are the same, with native GitHub
@@ -88,7 +102,10 @@ Before finishing publication, perform a dependency audit:
   extra edges. If an edge cannot be represented, stop and report the exact
   missing relationship instead of silently publishing an incomplete graph.
 
-Do NOT close or modify any parent issue.
+Do NOT close or modify any parent issue during new ticket publication. For
+existing-specification repair, modify the parent only when the approved repair
+explicitly includes correcting its branch or lifecycle metadata; never close
+it as part of ticket reconciliation.
 
 After the approved ticket set and dependency graph are published, recommend proceeding to `pre-implement` for the first unblocked ticket. The lifecycle then continues through `implement` and `post-implement`.
 
