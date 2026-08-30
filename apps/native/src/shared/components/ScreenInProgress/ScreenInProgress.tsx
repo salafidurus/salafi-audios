@@ -1,6 +1,7 @@
-import { Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Column, Text as ExpoText } from "@expo/ui";
+import { useUnistyles } from "react-native-unistyles";
 
+import { toUniversalTextStyle } from "../../../core/styles/expo-ui";
 import { ScreenView } from "../ScreenView/ScreenView";
 
 /** Provides a reusable native UI primitive with a focused rendering contract. */
@@ -14,30 +15,28 @@ export function ScreenInProgress({
   title = "Coming Soon",
   description = "This feature is under development",
 }: ScreenInProgressProps) {
+  const { theme } = useUnistyles();
+
   return (
     <ScreenView center>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{description}</Text>
+      <Column spacing={theme.spacing.component.gapSm}>
+        <ExpoText
+          textStyle={{
+            ...toUniversalTextStyle(theme, "titleLg", theme.colors.content.primary),
+            textAlign: "center",
+          }}
+        >
+          {title}
+        </ExpoText>
+        <ExpoText
+          textStyle={{
+            ...toUniversalTextStyle(theme, "bodySm", theme.colors.content.default),
+            textAlign: "center",
+          }}
+        >
+          {description}
+        </ExpoText>
+      </Column>
     </ScreenView>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  title: {
-    fontFamily: theme.typography.titleLg.fontFamily,
-    fontSize: theme.typography.titleLg.fontSize,
-    lineHeight: theme.typography.titleLg.lineHeight,
-    letterSpacing: theme.typography.titleLg.letterSpacing,
-    color: theme.colors.content.primary,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontFamily: theme.typography.bodySm.fontFamily,
-    fontSize: theme.typography.bodySm.fontSize,
-    lineHeight: theme.typography.bodySm.lineHeight,
-    letterSpacing: theme.typography.bodySm.letterSpacing,
-    color: theme.colors.content.default,
-    textAlign: "center",
-    marginTop: theme.spacing.component.gapSm,
-  },
-}));

@@ -1,7 +1,8 @@
 import type { ReactElement, ReactNode } from "react";
 
+import { ListItem as ExpoListItem } from "@expo/ui";
 import { MenuView, type NativeActionEvent } from "@expo/ui/community/menu";
-import { Children, isValidElement } from "react";
+import { Children, isValidElement, useState } from "react";
 import { Pressable, type ViewStyle, type StyleProp } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -33,6 +34,7 @@ export function ListItem({
 }: ListItemProps) {
   const isClickable = Boolean(onPress);
   const isInteractive = isClickable || interactive;
+  const [pressed, setPressed] = useState(false);
 
   const elements = Children.toArray(children);
   const actionsElement = elements.find(isActionsElement);
@@ -40,17 +42,19 @@ export function ListItem({
 
   const row = (
     <Pressable
-      onPress={onPress}
-      disabled={!isClickable}
+      onPressIn={isInteractive ? () => setPressed(true) : undefined}
+      onPressOut={isInteractive ? () => setPressed(false) : undefined}
       testID={testID}
-      style={({ pressed }) => [
+      style={() => [
         styles.item,
         hideBorder && styles.noBorder,
         pressed && isInteractive && styles.pressed,
         style,
       ]}
     >
-      {content}
+      <ExpoListItem onPress={onPress} testID="native-list-item">
+        {content}
+      </ExpoListItem>
     </Pressable>
   );
 

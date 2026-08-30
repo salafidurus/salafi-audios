@@ -5,6 +5,17 @@ import { ListItem } from "./ListItem";
 import { ListItemActions } from "./ListItemActions";
 
 describe("ListItem", () => {
+  it("uses the supported Expo UI ListItem row surface", async () => {
+    await render(
+      <ListItem testID="lecture-row">
+        <Text>Row content</Text>
+      </ListItem>,
+    );
+
+    expect(screen.getByTestId("lecture-row")).toBeTruthy();
+    expect(screen.getByTestId("native-list-item")).toBeTruthy();
+  });
+
   it("calls onPress when tapped and renders no menu wiring without List.Item.Actions", async () => {
     const onPress = jest.fn();
     await render(
@@ -17,6 +28,21 @@ describe("ListItem", () => {
 
     expect(onPress).toHaveBeenCalled();
     expect(screen.queryByTestId(/-action-/)).toBeNull();
+  });
+
+  it("keeps the pressed styling active while the universal row is pressed", async () => {
+    await render(
+      <ListItem onPress={() => undefined} testID="lecture-row">
+        <Text>Row content</Text>
+      </ListItem>,
+    );
+
+    const row = screen.getByTestId("lecture-row");
+    await fireEvent(row, "pressIn");
+
+    expect(JSON.stringify(row.props.style)).toContain("backgroundColor");
+
+    await fireEvent(row, "pressOut");
   });
 
   it("opens a long-press menu with the given List.Item.Actions and reports the pressed action", async () => {

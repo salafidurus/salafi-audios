@@ -1,6 +1,7 @@
-import { Text, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Column, Text as ExpoText } from "@expo/ui";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { toUniversalTextStyle } from "../../../core/styles/expo-ui";
 import { Button } from "../Button/Button";
 import { ScreenView } from "../ScreenView/ScreenView";
 
@@ -20,15 +21,31 @@ export function AuthRequiredState({
   actionLabel = "Sign In",
   onPress,
 }: AuthRequiredStateProps) {
+  const { theme } = useUnistyles();
+
   return (
     <ScreenView center contentStyle={styles.content}>
-      <View style={styles.group}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{description}</Text>
-      </View>
-      <View style={styles.group}>
+      <Column spacing={theme.spacing.component.gapSm}>
+        <ExpoText
+          textStyle={{
+            ...toUniversalTextStyle(theme, "titleLg", theme.colors.content.strong),
+            textAlign: "center",
+          }}
+        >
+          {title}
+        </ExpoText>
+        <ExpoText
+          textStyle={{
+            ...toUniversalTextStyle(theme, "bodyMd", theme.colors.content.muted),
+            textAlign: "center",
+          }}
+        >
+          {description}
+        </ExpoText>
+      </Column>
+      <Column>
         <Button variant="primary" size="md" label={actionLabel} onPress={onPress} />
-      </View>
+      </Column>
     </ScreenView>
   );
 }
@@ -36,19 +53,5 @@ export function AuthRequiredState({
 const styles = StyleSheet.create((theme) => ({
   content: {
     gap: theme.spacing.component.gapXl,
-  },
-  group: {
-    alignItems: "center",
-    gap: theme.spacing.component.gapSm,
-  },
-  title: {
-    ...theme.typography.titleLg,
-    color: theme.colors.content.strong,
-    textAlign: "center",
-  },
-  subtitle: {
-    ...theme.typography.bodyMd,
-    color: theme.colors.content.muted,
-    textAlign: "center",
   },
 }));

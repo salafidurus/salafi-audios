@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { List as ExpoList } from "@expo/ui";
 import { View, type ViewStyle, type StyleProp } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -12,7 +13,11 @@ export type ListContainerProps = {
 
 /** Defines the native list container contract used by this module. */
 export function ListContainer({ children, style }: ListContainerProps) {
-  return <View style={[styles.container, style]}>{children}</View>;
+  return (
+    <View style={[styles.container, style]}>
+      <ExpoList>{children}</ExpoList>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create((theme) => ({
