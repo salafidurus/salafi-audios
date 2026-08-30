@@ -14,15 +14,14 @@ import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 export type ScholarRowProps = {
   scholar: ScholarListItemDto;
   onPress?: (slug: string) => void;
-  hideBorder?: boolean;
 };
 
 /** Renders the native scholar row surface and coordinates its user-facing state. */
-export function ScholarRow({ scholar, onPress, hideBorder }: ScholarRowProps) {
+export function ScholarRow({ scholar, onPress }: ScholarRowProps) {
   const formatScholarName = useFormatScholarName();
 
   return (
-    <List.Item onPress={() => onPress?.(scholar.slug)} hideBorder={hideBorder}>
+    <List.Item onPress={() => onPress?.(scholar.slug)}>
       <View style={styles.rowContent} testID="scholar-row">
         <UserAvatar
           image={scholar.imageUrl}

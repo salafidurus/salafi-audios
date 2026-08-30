@@ -151,12 +151,11 @@ function renderFeedItem(
   if (item.kind === "grouped_podcasts") {
     return (
       <List>
-        {item.items.map((subItem, index) => (
+        {item.items.map((subItem) => (
           <ExplorePodcastRow
             key={subItem.id}
             item={subItem}
             onNavigateToListing={onNavigateToListing}
-            hideBorder={index === item.items.length - 1}
           />
         ))}
       </List>

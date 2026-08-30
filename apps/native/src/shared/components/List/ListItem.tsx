@@ -1,20 +1,16 @@
 import type { ReactElement, ReactNode } from "react";
 
+import { ListItem as ExpoListItem } from "@expo/ui";
 import { MenuView, type NativeActionEvent } from "@expo/ui/community/menu";
 import { Children, isValidElement } from "react";
-import { Pressable, type ViewStyle, type StyleProp } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
 
 import { ListItemActions, type ListItemActionsProps } from "./ListItemActions";
 
-/** Describes the inputs and callbacks accepted by List Item. */
-/** Describes the inputs, callbacks, and optional state accepted by List Item. */
+/** Defines the content and interaction contract for an Expo UI list row. */
+/** Row layout, separators, pressed feedback, and platform-specific styling remain native-owned. */
 export type ListItemProps = {
   children: ReactNode;
   onPress?: () => void;
-  interactive?: boolean;
-  hideBorder?: boolean;
-  style?: StyleProp<ViewStyle>;
   testID?: string;
 };
 
@@ -23,35 +19,15 @@ function isActionsElement(child: ReactNode): child is ReactElement<ListItemActio
 }
 
 /** Renders the native list item surface and coordinates its user-facing state. */
-export function ListItem({
-  children,
-  onPress,
-  interactive = false,
-  hideBorder = false,
-  style,
-  testID,
-}: ListItemProps) {
-  const isClickable = Boolean(onPress);
-  const isInteractive = isClickable || interactive;
-
+export function ListItem({ children, onPress, testID }: ListItemProps) {
   const elements = Children.toArray(children);
   const actionsElement = elements.find(isActionsElement);
   const content = elements.filter((child) => child !== actionsElement);
 
   const row = (
-    <Pressable
-      onPress={onPress}
-      disabled={!isClickable}
-      testID={testID}
-      style={({ pressed }) => [
-        styles.item,
-        hideBorder && styles.noBorder,
-        pressed && isInteractive && styles.pressed,
-        style,
-      ]}
-    >
+    <ExpoListItem onPress={onPress} testID={testID}>
       {content}
-    </Pressable>
+    </ExpoListItem>
   );
 
   if (!actionsElement) return row;
@@ -69,20 +45,3 @@ export function ListItem({
     </MenuView>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  item: {
-    backgroundColor: "transparent",
-    paddingVertical: theme.spacing.scale.md,
-    paddingHorizontal: theme.spacing.scale.lg,
-    borderBottomWidth: theme.border.width.default,
-    borderBottomColor: theme.colors.border.subtle,
-    flexDirection: "column",
-  },
-  noBorder: {
-    borderBottomWidth: 0,
-  },
-  pressed: {
-    backgroundColor: theme.colors.surface.hover,
-  },
-}));
