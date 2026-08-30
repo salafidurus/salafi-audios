@@ -35,7 +35,6 @@ export function AccentGradientFill({
       style={[StyleSheet.absoluteFill, styles.container, { borderRadius }]}
     >
       <Svg width="100%" height="100%">
-        {/* @ts-expect-error react-native-svg accepts children for Defs at runtime */}
         <Defs>
           <LinearGradient
             id={linearId}
