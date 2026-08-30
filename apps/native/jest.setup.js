@@ -85,18 +85,28 @@ jest.mock("@expo/ui", () => {
     return React.createElement(View, { style, ...rest }, children);
   }
 
-  function Button({ children, label, onPress, disabled, testID }) {
+  function Button({ children, label, onPress, disabled, testID, variant, style }) {
     return React.createElement(
       Pressable,
       {
         onPress,
         disabled,
         testID,
+        style,
+        variant,
         accessibilityRole: "button",
         accessibilityState: { disabled },
       },
       children ?? React.createElement(Text, null, label),
     );
+  }
+
+  function Row({ children, spacing, ...rest }) {
+    return React.createElement(View, { ...rest, spacing }, children);
+  }
+
+  function ExpoText({ children, textStyle, ...rest }) {
+    return React.createElement(Text, { ...rest, style: textStyle }, children);
   }
 
   function Switch({ value, onValueChange, disabled, testID }) {
@@ -165,7 +175,7 @@ jest.mock("@expo/ui", () => {
     });
   }
 
-  return { Host, Button, Switch, TextInput, useNativeState };
+  return { Host, Button, Row, Text: ExpoText, Switch, TextInput, useNativeState };
 });
 
 jest.mock("@expo/ui/community/segmented-control", () => {
