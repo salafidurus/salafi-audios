@@ -117,14 +117,22 @@ Standalone tickets retain the existing `main`-based cleanup. Specification
 tickets use the parent spec branch as their integration target and preserve
 that branch until final specification validation or abandonment.
 
-## Final specification validation or abandonment
+## Finalization or abandonment
 
-The final validation ticket is a lifecycle exception. It must use the latest
-spec candidate and current `main` as integration inputs, resolve conflicts at
-that boundary, run the complete specification acceptance matrix, and refuse
-completion when required checks fail. Its PR targets `main` and references the
-parent specification and validation ticket. Verify the merged PR and recorded
-acceptance evidence before closing the parent as completed.
+Finalization is the terminal post-implement path for a specification. It is
+executed only for the published finalization ticket, after every
+implementation ticket has completed. Open or update the direct
+`spec/<slug>` → `main` PR, wait for all required CI including Docker, and merge
+it only after the complete specification acceptance matrix and applicable
+repository checks pass. Verify the merged PR, final head, and recorded
+acceptance evidence; then close the parent specification.
+
+Only after merge verification may you delete the disposable `spec/<slug>`
+branch and any remaining specification resources, including the finalization
+ticket resources. Verify Git registration, local and remote refs, and physical
+worktree paths before each deletion. Preserve unrelated dirty state,
+worktrees, branches, and active specifications. If the direct PR needs no
+boundary changes, do not create an intermediate branch.
 
 If the specification is abandoned, record the reason and distinct abandoned
 outcome on the parent and child issues according to tracker policy. Verify the
