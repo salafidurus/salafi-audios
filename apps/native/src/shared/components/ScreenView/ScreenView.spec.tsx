@@ -61,4 +61,17 @@ describe("ScreenView", () => {
     );
     expect(screen.getByTestId("child")).toBeTruthy();
   });
+
+  it("wraps its existing layout in a flex Host without adding another safe area", async () => {
+    const result = await render(
+      <ScreenView>
+        <View testID="child" />
+      </ScreenView>,
+    );
+
+    const host = result.toJSON() as { props: Record<string, unknown> };
+    expect(host.props.style).toEqual(expect.objectContaining({ flex: 1 }));
+    expect(host.props.ignoreSafeArea).toBe("all");
+    expect(host.props.layoutDirection).toBe("leftToRight");
+  });
 });
