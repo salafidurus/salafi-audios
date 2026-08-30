@@ -1,8 +1,8 @@
 import { Body, Controller, Patch } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UpdateLocaleDtoSchema, type UpdateLocaleDto } from '@sd/core-contracts';
 import { PrismaService } from '../db/prisma.service';
 import { CurrentUser } from './decorators';
-import { UpdateLocaleDtoSchema, type UpdateLocaleDto } from './dto/update-locale.dto';
 
 /** NestJS auth locale controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Auth')

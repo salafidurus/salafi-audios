@@ -5,12 +5,12 @@ import { CheckPolicy } from '../auth/decorators/check-policy.decorator';
 import { UserDirectoryService } from './user-directory.service';
 import {
   ReplaceUserAccessRequestSchema,
+  type ReplaceUserAccessRequest as ReplaceUserAccessDto,
   type AdminUserListDto,
   type UserAccessSnapshot,
 } from '@sd/core-contracts';
 import { CurrentUser } from '../auth/decorators';
 import { AccessService } from './access.service';
-import type { ReplaceUserAccessDto } from './dto/replace-user-access.dto';
 import { RateLimitPolicy } from '../security/rate-limit.decorator';
 
 /**

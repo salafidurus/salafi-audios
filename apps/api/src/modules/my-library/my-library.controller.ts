@@ -4,9 +4,14 @@ import { Controller, Delete, Get, Param, Post, Query, Body } from '@nestjs/commo
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CurrentUser } from '../../core/auth/decorators';
-import type { MyLibraryPageDto, RecentProgressDto, SavedDeltaItemDto } from '@sd/core-contracts';
+import {
+  SavedSyncDtoSchema,
+  type MyLibraryPageDto,
+  type RecentProgressDto,
+  type SavedDeltaItemDto,
+  type SavedSyncDto,
+} from '@sd/core-contracts';
 import { MyLibraryService } from './my-library.service';
-import { SavedSyncDtoSchema, type SavedSyncDto } from './dto/saved-sync.dto';
 
 /** NestJS my library controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('My Library')

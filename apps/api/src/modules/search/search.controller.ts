@@ -6,9 +6,9 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import {
   SearchQueryDtoSchema,
   type SearchCatalogResultsDto as CatalogSearchResultsContractDto,
+  type SearchQueryDto,
 } from '@sd/core-contracts';
 import { SearchService } from './search.service';
-import type { SearchQueryDto } from './dto/search-query.dto';
 import { SearchResultsDto } from './dto/search-results.dto';
 import { CacheTTL } from '@nestjs/cache-manager';
 import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';

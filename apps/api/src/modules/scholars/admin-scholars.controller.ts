@@ -4,8 +4,12 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { resolveScholarIdParam } from '../../core/auth/policy-resolvers';
 import { ScholarsService } from './scholars.service';
-import { CreateScholarDtoSchema, type CreateScholarDto } from './dto/create-scholar.dto';
-import { UpdateScholarDtoSchema, type UpdateScholarDto } from './dto/update-scholar.dto';
+import {
+  CreateScholarDtoSchema,
+  UpdateScholarDtoSchema,
+  type CreateScholarDto,
+  type UpdateScholarDto,
+} from '@sd/core-contracts';
 import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
 /** NestJS admin scholars controller service or controller coordinating the API boundary for this responsibility. */

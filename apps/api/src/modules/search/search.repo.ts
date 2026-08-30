@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
-import type { Locale, SearchCatalogItemDto } from '@sd/core-contracts';
+import type { Locale, SearchCatalogItemDto, SearchQueryDto } from '@sd/core-contracts';
 import { ConfigService } from '../../core/config/config.service';
 import { PrismaService } from '../../core/db/prisma.service';
-import type { SearchQueryDto } from './dto/search-query.dto';
 import { isTrigramSearchFailure } from './search-error.utils';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';

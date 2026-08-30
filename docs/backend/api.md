@@ -150,9 +150,9 @@ Rejected requests return HTTP 429 with `x-ratelimit-limit`, `x-ratelimit-remaini
 
 ### Companion Migration Tracking
 
-The companion packages are kept in their isolated state temporarily, with complete decoupling or rewrite migration scheduled in subsequent tickets:
+The NestJS 12 companion migrations are integrated in the API runtime. The application now owns these boundaries and no longer depends on the unsupported NestJS 11 companion packages:
 
-- **Validation Schema Migration**: NestJS 12 Standard Schema (Ticket #752).
-- **Health Verification**: Transitioning to application-owned health checks and removing `@nestjs/terminus` (Ticket #753).
-- **Throttling Policies**: Redesigning around Fastify-native rate limiting and removing `@nestjs/throttler` (Ticket #754).
-- **Logging Integration**: Decoupling `nestjs-pino` and correcting health log noise (Ticket #755).
+- **Validation**: NestJS Standard Schema validation with contract schemas (Ticket #752).
+- **Health**: Application-owned health checks (Ticket #753).
+- **Throttling**: Fastify-native rate-limit policies (Ticket #754).
+- **Logging**: Application-owned request logging without `nestjs-pino` (Ticket #755).

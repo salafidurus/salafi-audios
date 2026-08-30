@@ -1,14 +1,15 @@
 import { Controller, Get, Post, Patch, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { LocaleSchema, UpdateTopicTranslationDtoSchema } from '@sd/core-contracts';
+import {
+  LocaleSchema,
+  SaveTopicTranslationDtoSchema,
+  UpdateTopicTranslationDtoSchema,
+  type SaveTopicTranslationDto,
+} from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { resolveUnscoped } from '../../core/auth/policy-resolvers';
 import { TopicsService } from './topics.service';
-import {
-  SaveTopicTranslationDtoSchema,
-  type SaveTopicTranslationDto,
-} from './dto/save-topic-translation.dto';
 
 // Topics are never scholar/locale-scoped resources — unconditioned checks only.
 /** NestJS topics translations controller service or controller coordinating the API boundary for this responsibility. */

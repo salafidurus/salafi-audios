@@ -1,10 +1,13 @@
 import { Controller, Get, Patch, Body, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { UpdateProfileDtoSchema, type UserProfileDto } from '@sd/core-contracts';
+import {
+  UpdateProfileDtoSchema,
+  type UpdateProfileDto,
+  type UserProfileDto,
+} from '@sd/core-contracts';
 import { AccountService } from './account.service';
 import { CurrentUser } from '../auth/decorators';
-import type { UpdateProfileDto } from './dto/update-profile.dto';
 import type { AccessGrantAttribute } from '../auth/ability/ability.types';
 
 /** NestJS account controller service or controller coordinating the API boundary for this responsibility. */

@@ -1,18 +1,16 @@
 import { Controller, Get, Post, Patch, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { LocaleSchema } from '@sd/core-contracts';
+import {
+  LocaleSchema,
+  SaveScholarTranslationDtoSchema,
+  UpdateScholarTranslationDtoSchema,
+  type SaveScholarTranslationDto,
+  type UpdateScholarTranslationDto,
+} from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { resolveScholarTranslation } from '../../core/auth/policy-resolvers';
 import { ScholarsService } from './scholars.service';
-import {
-  SaveScholarTranslationDtoSchema,
-  type SaveScholarTranslationDto,
-} from './dto/save-scholar-translation.dto';
-import {
-  UpdateScholarTranslationDtoSchema,
-  type UpdateScholarTranslationDto,
-} from './dto/update-scholar-translation.dto';
 
 /** NestJS scholars translations controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Scholar Translations')

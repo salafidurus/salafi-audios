@@ -1,4 +1,25 @@
 import {
+  ArrangeCommitDtoSchema,
+  BulkActionDtoSchema,
+  CreateListingDtoSchema,
+  UpdateListingDetailsDtoSchema,
+  UpdateListingMediaDtoSchema,
+  type ArrangeCommitDto,
+  type BulkActionDto,
+  type CreateListingDto,
+  type UpdateListingDetailsDto,
+  type UpdateListingMediaDto,
+  type AdminListingActionDto,
+  type AdminListingListDto,
+  type AdminListingDetailDto,
+  type AdminListingMediaDetailDto,
+  type AdminArrangeDataDto,
+  type ArrangeCommitResultDto,
+  type BulkActionResultDto,
+  type ListingRefDto,
+  type HomePromotionsDto,
+} from '@sd/core-contracts';
+import {
   BadRequestException,
   Body,
   Controller,
@@ -12,24 +33,6 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import {
-  ArrangeCommitDtoSchema,
-  BulkActionDtoSchema,
-  CreateListingDtoSchema,
-  UpdateListingDetailsDtoSchema,
-  UpdateListingMediaDtoSchema,
-} from '@sd/core-contracts';
-import type {
-  AdminListingActionDto,
-  AdminListingListDto,
-  AdminListingDetailDto,
-  AdminListingMediaDetailDto,
-  AdminArrangeDataDto,
-  ArrangeCommitResultDto,
-  BulkActionResultDto,
-  ListingRefDto,
-  HomePromotionsDto,
-} from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { CurrentUser } from '../../core/auth/decorators';
@@ -43,11 +46,6 @@ import { subject } from '@casl/ability';
 import { PrismaService } from '../../core/db/prisma.service';
 import { ListingService } from './listing.service';
 import { ListingEditorialService } from './listing-editorial.service';
-import type { CreateListingDto } from './dto/create-listing.dto';
-import type { UpdateListingDetailsDto } from './dto/update-listing-details.dto';
-import type { UpdateListingMediaDto } from './dto/update-listing-media.dto';
-import type { ArrangeCommitDto } from './dto/arrange-commit.dto';
-import type { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
 /** NestJS admin listings controller service or controller coordinating the API boundary for this responsibility. */

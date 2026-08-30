@@ -83,7 +83,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const requestId = req.id ?? res.getHeader('x-request-id') ?? '';
     const timestamp = new Date().toISOString();
 
-    const { statusCode, message, details, extras } = this.resolveException(exception);
+    const { statusCode, message, details, extras } = this.resolveException(
+      exception instanceof Error ? exception : undefined,
+    );
 
     const isProd = this.config.NODE_ENV === 'production';
     const devDetails = isProd ? undefined : this.buildDevDetails(exception, details);
@@ -99,13 +101,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
     });
   }
 
-  private resolveException(exception: Error | HttpException | unknown): ExceptionResolution {
+  private resolveException(exception: Error | undefined): ExceptionResolution {
     const fallback = {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       message: 'Internal Server Error',
       details: undefined,
       extras: {},
     } satisfies ExceptionResolution;
+    if (exception === undefined) return fallback;
     if (this.isPrismaConnectionRefused(exception)) {
       return {
         ...fallback,
@@ -190,45 +193,69 @@ export class AllExceptionsFilter implements ExceptionFilter {
     return prismaDetails ?? getGenericDevDetails(exception);
   }
 
-  private isPrismaConnectionRefused(exception: Error | HttpException | unknown): boolean {
-    return (
-      exception instanceof Prisma.PrismaClientKnownRequestError && exception.code === 'ECONNREFUSED'
-    );
+  private isPrismaConnectionRefused(exception: Error | HttpException): boolean {
+    if (!(exception instanceof Prisma.PrismaClientKnownRequestError)) return false;
+    // SAFETY: Prisma's known-request instance carries its documented error code.
+    return (exception as { code?: string }).code === 'ECONNREFUSED';
   }
 }
 
 function getPrismaDevDetails(exception: Error): DevDetails | undefined {
   if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+    // SAFETY: Prisma's known-request instance carries these documented fields.
+    const prismaError = exception as Error & {
+      code: string;
+      /** Preserves the Prisma client version in development diagnostics. */
+      clientVersion: string;
+      meta: unknown;
+    };
     return {
       kind: 'prisma-known-request-error',
-      code: exception.code,
-      clientVersion: exception.clientVersion,
+      code: prismaError.code,
+      clientVersion: prismaError.clientVersion,
       message: exception.message,
-      meta: exception.meta,
+      meta: prismaError.meta,
     };
   }
 
   if (exception instanceof Prisma.PrismaClientValidationError) {
+    // SAFETY: Prisma's validation-error instance carries its documented client version.
+    const prismaError = exception as Error & {
+      /** Preserves the Prisma client version in development diagnostics. */
+      clientVersion: string;
+    };
     return {
       kind: 'prisma-validation-error',
-      clientVersion: exception.clientVersion,
+      clientVersion: prismaError.clientVersion,
       message: exception.message,
     };
   }
 
   if (exception instanceof Prisma.PrismaClientUnknownRequestError) {
+    // SAFETY: Prisma's unknown-request instance carries its documented client version.
+    const prismaError = exception as Error & {
+      /** Preserves the Prisma client version in development diagnostics. */
+      clientVersion: string;
+    };
     return {
       kind: 'prisma-unknown-request-error',
-      clientVersion: exception.clientVersion,
+      clientVersion: prismaError.clientVersion,
       message: exception.message,
     };
   }
 
   if (exception instanceof Prisma.PrismaClientInitializationError) {
+    // SAFETY: Prisma's initialization-error instance carries these documented fields.
+    const prismaError = exception as Error & {
+      /** Preserves Prisma's provider error code in development diagnostics. */
+      errorCode: string;
+      /** Preserves the Prisma client version in development diagnostics. */
+      clientVersion: string;
+    };
     return {
       kind: 'prisma-initialization-error',
-      errorCode: exception.errorCode,
-      clientVersion: exception.clientVersion,
+      errorCode: prismaError.errorCode,
+      clientVersion: prismaError.clientVersion,
       message: exception.message,
     };
   }

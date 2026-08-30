@@ -1,17 +1,15 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { PresignedUrlRequestDtoSchema } from '@sd/core-contracts';
-import type {
-  BatchPresignAudioResponseDto,
-  PresignedUrlRequestDto,
-  PresignedUrlResponseDto,
+import {
+  BatchPresignAudioRequestDtoSchema,
+  PresignedUrlRequestDtoSchema,
+  type BatchPresignAudioRequestDto,
+  type BatchPresignAudioResponseDto,
+  type PresignedUrlRequestDto,
+  type PresignedUrlResponseDto,
 } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
-import {
-  BatchPresignAudioRequestDtoSchema,
-  type BatchPresignAudioRequestDto,
-} from './dto/batch-presign.dto';
 import { MediaService } from './media.service';
 import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
