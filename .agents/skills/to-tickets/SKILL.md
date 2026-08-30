@@ -57,6 +57,24 @@ Break the work into **tracer bullet** tickets.
 
 Give each ticket its **blocking edges**: the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
 
+### Finalization ticket
+
+Every specification ticket set must end with one final spec-finalization
+ticket. Publish it after the implementation tickets have been drafted, and set
+its blockers to **every implementation ticket in the specification**. It is
+the terminal node of the existing graph, not a new lifecycle stage. Its
+acceptance criteria must require:
+
+- Merge `spec/<slug>` into `main` and resolve any conflicts.
+- Run the complete specification acceptance matrix.
+- Open the final pull request with `spec/<slug>` as head and `main` as base.
+- Preserve the `spec/<slug>` branch until that pull request is merged.
+
+The finalization ticket must identify the parent specification and recorded
+`spec/<slug>` branch. Do not publish it for a standalone ticket set. If the
+specification has no implementation tickets, its blocker set must explicitly
+say `None (can start immediately)`.
+
 **Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change (rename a column, retype a shared symbol) whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket; green is promised only there.
 
 ### 4. Quiz the user
@@ -112,7 +130,7 @@ existing-specification repair, modify the parent only when the approved repair
 explicitly includes correcting its branch or lifecycle metadata; never close
 it as part of ticket reconciliation.
 
-After the approved ticket set and dependency graph are published, recommend proceeding to `pre-implement` for the first unblocked ticket. The lifecycle then continues through `implement` and `post-implement`.
+After the approved ticket set and dependency graph are published, recommend proceeding to `pre-implement` for the first unblocked ticket. The lifecycle then continues through `implement` and `post-implement`; once every implementation ticket is complete, the finalization ticket is the only remaining frontier node.
 
 <ticket-template>
 
@@ -140,6 +158,10 @@ change. This section is mandatory, even when it contains only one boundary.
 
 **Blocked by:** only tickets that genuinely prevent this ticket from starting.
 Use "None (can start immediately)" when no such ticket exists.
+
+For the final spec-finalization ticket, **Blocked by** must list every
+implementation ticket in the specification, never only the last ticket in an
+implementation order.
 
 </ticket-template>
 
