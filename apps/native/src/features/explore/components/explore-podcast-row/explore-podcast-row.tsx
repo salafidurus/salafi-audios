@@ -2,6 +2,7 @@ import type { MenuAction } from "@expo/ui/community/menu";
 import type { FeedContentItemDto, ListingContentsDto } from "@sd/core-contracts";
 import type { Track } from "@sd/domain-audio";
 
+import { Column, Row } from "@expo/ui";
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import {
@@ -173,19 +174,23 @@ export function ExplorePodcastRow({ item, onPress, onNavigateToListing }: Explor
   return (
     <List.Item onPress={handlePlay} testID="podcast-row-item">
       <View style={styles.rowContent} testID="podcast-row">
-        <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
-        <View style={styles.content}>
-          <MarqueeText text={title} variant="titleMd" />
-          <MarqueeText text={displayScholarName} variant="bodySm" />
-          <View style={styles.details}>
-            <AppText variant="xs" style={styles.metaText}>
-              {durationText}
-              {durationText && publishedDateText && " · "}
-              {publishedDateText}
-            </AppText>
+        <Row alignment="center">
+          <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
+          <View style={styles.content}>
+            <Column>
+              <MarqueeText text={title} variant="titleMd" />
+              <MarqueeText text={displayScholarName} variant="bodySm" />
+              <View style={styles.details}>
+                <AppText variant="xs" style={styles.metaText}>
+                  {durationText}
+                  {durationText && publishedDateText && " · "}
+                  {publishedDateText}
+                </AppText>
+              </View>
+              {renderProgressBar(progressPercent)}
+            </Column>
           </View>
-          {renderProgressBar(progressPercent)}
-        </View>
+        </Row>
       </View>
 
       <List.Item.Actions actions={actions} onAction={handleAction} />

@@ -1,11 +1,12 @@
 import { MenuView, type MenuAction, type NativeActionEvent } from "@expo/ui/community/menu";
 import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
 import { useQueryClient } from "@tanstack/react-query";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { changeLocale } from "@/core/i18n/i18n";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText } from "@/shared/components/AppText/AppText";
 
 /** Provides native account, preference, support, and settings workflows. */
 const LOCALE_LABELS = {
@@ -53,8 +54,12 @@ export function LanguageSwitch() {
           own the tap gesture on this trigger. A Pressable — even without onPress —
           claims RN's touch responder and blocks the native tap from ever firing. */}
       <View style={styles.trigger}>
-        <Text style={styles.triggerLabel}>{LOCALE_LABELS[activeLocale]}</Text>
-        <Text style={styles.chevron}>▾</Text>
+        <AppText variant="labelMd" style={styles.triggerLabel}>
+          {LOCALE_LABELS[activeLocale]}
+        </AppText>
+        <AppText variant="labelMd" style={styles.chevron}>
+          ▾
+        </AppText>
       </View>
     </MenuView>
   );

@@ -36,6 +36,8 @@ export type ButtonProps = {
   fullWidth?: boolean;
   disabled?: boolean;
   onPress?: () => void;
+  /** Announces the action label while the Expo button remains the native action target. */
+  accessibilityLabel?: string;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 };
@@ -125,6 +127,8 @@ function renderButtonContent(
 ) {
   if (loading) return <ActivityIndicator size="small" color={indicatorColor} />;
 
+  if (!icon) return <ExpoText textStyle={textStyle}>{label}</ExpoText>;
+
   return (
     <Row alignment="center" spacing={gap}>
       {icon && iconPosition === "left" ? icon : null}
@@ -152,6 +156,7 @@ export function Button({
   fullWidth = false,
   disabled,
   onPress,
+  accessibilityLabel,
   style,
   testID,
 }: ButtonProps) {
@@ -160,7 +165,11 @@ export function Button({
   const tokens = getButtonTokens(variant, size, theme);
 
   return (
-    <View style={getContainerStyle(fullWidth, style)}>
+    <View
+      accessible={Boolean(accessibilityLabel)}
+      accessibilityLabel={accessibilityLabel}
+      style={getContainerStyle(fullWidth, style)}
+    >
       <Host matchContents={!fullWidth}>
         <ExpoButton
           disabled={isDisabled}

@@ -1,8 +1,10 @@
+import { Button as ExpoButton, Column, Host, Row } from "@expo/ui";
 import { Image } from "expo-image";
 import { Clock3, Headphones } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { AppText } from "@/shared/components/AppText/AppText";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 
 /** Implements native search input, filtering, results, and empty states. */
@@ -30,32 +32,58 @@ export function SearchResultItem({
   const durationLabel = formatDuration(durationSeconds);
 
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
-      <View style={styles.media}>
-        {imageUrl ? (
-          <Image source={{ uri: imageUrl }} style={styles.cover} contentFit="cover" />
-        ) : (
-          <View style={styles.coverFallback}>
-            <Headphones size={20} color={theme.colors.content.subtle} />
-          </View>
-        )}
-      </View>
-      <View style={styles.body}>
-        <MarqueeText text={title} variant="titleMd" style={styles.title} />
-        <MarqueeText text={scholarName} variant="bodySm" style={styles.scholarName} />
-        <View style={styles.metaRow}>
-          <Headphones size={11} color={theme.colors.content.muted} />
-          <Text style={styles.metaText}>{formatLectureCount(lectureCount)}</Text>
-          {durationLabel ? (
-            <>
-              <Text style={styles.metaText}> · </Text>
-              <Clock3 size={11} color={theme.colors.content.muted} />
-              <Text style={styles.metaText}>{durationLabel}</Text>
-            </>
-          ) : null}
-        </View>
-      </View>
-    </Pressable>
+    <View style={styles.card}>
+      <Host matchContents={false}>
+        <ExpoButton
+          onPress={onPress}
+          variant="text"
+          style={{
+            backgroundColor: theme.colors.surface.default,
+            borderColor: theme.colors.border.subtle,
+            borderRadius: theme.radius.component.card,
+            borderWidth: 1,
+            padding: theme.spacing.component.cardPadding,
+            width: "100%",
+          }}
+        >
+          <Row alignment="center">
+            <View style={styles.media}>
+              {imageUrl ? (
+                <Image source={{ uri: imageUrl }} style={styles.cover} contentFit="cover" />
+              ) : (
+                <View style={styles.coverFallback}>
+                  <Headphones size={20} color={theme.colors.content.subtle} />
+                </View>
+              )}
+            </View>
+            <View style={styles.body}>
+              <Column>
+                <MarqueeText text={title} variant="titleMd" style={styles.title} />
+                <MarqueeText text={scholarName} variant="bodySm" style={styles.scholarName} />
+                <View style={styles.metaRow}>
+                  <Headphones size={11} color={theme.colors.content.muted} />
+                  <AppText variant="caption" style={styles.metaText}>
+                    {formatLectureCount(lectureCount)}
+                  </AppText>
+                  {durationLabel ? (
+                    <>
+                      <AppText variant="caption" style={styles.metaText}>
+                        {" "}
+                        ·{" "}
+                      </AppText>
+                      <Clock3 size={11} color={theme.colors.content.muted} />
+                      <AppText variant="caption" style={styles.metaText}>
+                        {durationLabel}
+                      </AppText>
+                    </>
+                  ) : null}
+                </View>
+              </Column>
+            </View>
+          </Row>
+        </ExpoButton>
+      </Host>
+    </View>
   );
 }
 
@@ -69,9 +97,6 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     gap: theme.spacing.component.gapMd,
     padding: theme.spacing.component.cardPadding,
-  },
-  pressed: {
-    backgroundColor: theme.colors.surface.hover,
   },
   media: {
     width: "20%",

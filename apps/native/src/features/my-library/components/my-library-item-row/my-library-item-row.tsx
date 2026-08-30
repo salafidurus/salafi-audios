@@ -1,6 +1,7 @@
 import type { MenuAction } from "@expo/ui/community/menu";
 import type { MyLibraryItemDto } from "@sd/core-contracts";
 
+import { Column, Row } from "@expo/ui";
 import { pickContentField } from "@sd/core-i18n";
 import { getMyLibraryItemPercent } from "@sd/domain-content";
 import { Bookmark, Clock, CheckCircle } from "lucide-react-native";
@@ -123,25 +124,29 @@ export function MyLibraryItemRow({
   return (
     <List.Item onPress={onPress} testID={testID}>
       <View style={styles.rowContent}>
-        <View style={styles.iconContainer}>
-          <MyLibraryItemIcon variant={variant} />
-        </View>
-        <View style={styles.content}>
-          <AppText variant="bodyMd" numberOfLines={2}>
-            {lectureTitle}
-          </AppText>
-          <MarqueeText
-            text={`${item.scholarName}${item.seriesTitle ? ` · ${item.seriesTitle}` : ""}`}
-            variant="caption"
-            style={styles.subtitle}
-          />
-          <AppText variant="xs" style={styles.meta}>
-            {renderMeta(item, variant, progress, t)}
-          </AppText>
-          {variant === "progress" && progress !== null ? (
-            <ProgressBarFill percent={progress} />
-          ) : null}
-        </View>
+        <Row alignment="center">
+          <View style={styles.iconContainer}>
+            <MyLibraryItemIcon variant={variant} />
+          </View>
+          <View style={styles.content}>
+            <Column>
+              <AppText variant="bodyMd" numberOfLines={2}>
+                {lectureTitle}
+              </AppText>
+              <MarqueeText
+                text={`${item.scholarName}${item.seriesTitle ? ` · ${item.seriesTitle}` : ""}`}
+                variant="caption"
+                style={styles.subtitle}
+              />
+              <AppText variant="xs" style={styles.meta}>
+                {renderMeta(item, variant, progress, t)}
+              </AppText>
+              {variant === "progress" && progress !== null ? (
+                <ProgressBarFill percent={progress} />
+              ) : null}
+            </Column>
+          </View>
+        </Row>
       </View>
       {renderActions(actions, onAction)}
     </List.Item>

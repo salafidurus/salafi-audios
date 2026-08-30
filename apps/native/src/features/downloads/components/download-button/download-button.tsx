@@ -1,7 +1,9 @@
-import { View, Pressable, Text, ActivityIndicator } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useDownload } from "@/features/downloads/hooks/use-download";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { Button } from "@/shared/components/Button/Button";
 
 /** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
 type DownloadButtonProps = {
@@ -20,13 +22,14 @@ export function DownloadButton({ listingSlug, audioUrl }: DownloadButtonProps) {
 
   if (isDownloaded) {
     return (
-      <Pressable
+      <Button
+        label="✓ Downloaded"
+        variant="surface"
         onPress={removeDownload}
-        style={[styles.pill, styles.downloadedPill]}
         accessibilityLabel="Remove download"
-      >
-        <Text style={styles.downloadedLabel}>✓ Downloaded</Text>
-      </Pressable>
+        style={[styles.pill, styles.downloadedPill]}
+        testID="remove-download"
+      />
     );
   }
 
@@ -34,19 +37,22 @@ export function DownloadButton({ listingSlug, audioUrl }: DownloadButtonProps) {
     return (
       <View style={[styles.pill, styles.downloadingPill]}>
         <ActivityIndicator size="small" color={theme.colors.action.primary} />
-        <Text style={styles.downloadingLabel}>Downloading</Text>
+        <AppText variant="caption" style={styles.downloadingLabel}>
+          Downloading
+        </AppText>
       </View>
     );
   }
 
   return (
-    <Pressable
+    <Button
+      label={status === "error" ? "⚠ Retry" : "↓ Download"}
+      variant="outline"
       onPress={startDownload}
-      style={[styles.pill, styles.downloadPill]}
       accessibilityLabel="Download lecture"
-    >
-      <Text style={styles.downloadLabel}>{status === "error" ? "⚠ Retry" : "↓ Download"}</Text>
-    </Pressable>
+      style={[styles.pill, styles.downloadPill]}
+      testID="download-lecture"
+    />
   );
 }
 

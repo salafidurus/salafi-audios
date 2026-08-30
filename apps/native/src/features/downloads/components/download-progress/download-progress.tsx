@@ -1,7 +1,8 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useDownload } from "@/features/downloads/hooks/use-download";
+import { AppText } from "@/shared/components/AppText/AppText";
 
 /** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
 type DownloadProgressProps = {
@@ -20,7 +21,9 @@ export function DownloadProgress({ listingSlug }: DownloadProgressProps) {
       <View style={styles.track}>
         <View style={[styles.fill, { width: `${progress}%` }]} />
       </View>
-      <Text style={styles.label}>{Math.round(progress)}%</Text>
+      <AppText variant="caption" style={styles.label}>
+        {Math.round(progress)}%
+      </AppText>
     </View>
   );
 }
