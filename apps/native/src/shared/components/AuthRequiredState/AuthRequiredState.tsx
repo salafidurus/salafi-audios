@@ -1,4 +1,4 @@
-import { Column, Text as ExpoText } from "@expo/ui";
+import { Column, Host, Text as ExpoText } from "@expo/ui";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { toUniversalTextStyle } from "../../../core/styles/expo-ui";
@@ -25,27 +25,31 @@ export function AuthRequiredState({
 
   return (
     <ScreenView center contentStyle={styles.content}>
-      <Column spacing={theme.spacing.component.gapSm}>
-        <ExpoText
-          textStyle={{
-            ...toUniversalTextStyle(theme, "titleLg", theme.colors.content.strong),
-            textAlign: "center",
-          }}
-        >
-          {title}
-        </ExpoText>
-        <ExpoText
-          textStyle={{
-            ...toUniversalTextStyle(theme, "bodyMd", theme.colors.content.muted),
-            textAlign: "center",
-          }}
-        >
-          {description}
-        </ExpoText>
-      </Column>
-      <Column>
-        <Button variant="primary" size="md" label={actionLabel} onPress={onPress} />
-      </Column>
+      <Host matchContents>
+        <Column spacing={theme.spacing.component.gapSm}>
+          <ExpoText
+            textStyle={{
+              ...toUniversalTextStyle(theme, "titleLg", theme.colors.content.strong),
+              textAlign: "center",
+            }}
+          >
+            {title}
+          </ExpoText>
+          <ExpoText
+            textStyle={{
+              ...toUniversalTextStyle(theme, "bodyMd", theme.colors.content.muted),
+              textAlign: "center",
+            }}
+          >
+            {description}
+          </ExpoText>
+        </Column>
+      </Host>
+      <Host matchContents>
+        <Column>
+          <Button variant="primary" size="md" label={actionLabel} onPress={onPress} />
+        </Column>
+      </Host>
     </ScreenView>
   );
 }
