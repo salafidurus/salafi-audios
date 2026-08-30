@@ -59,14 +59,13 @@ export function MyLibrarySavedScreen({ onNavigateToListing }: MyLibrarySavedScre
     <ScreenView>
       <ScrollView contentContainerStyle={styles.listContent}>
         <List>
-          {items.map((item, index) => (
+          {items.map((item) => (
             <MyLibraryItemRow
               key={item.id}
               item={item}
               variant="saved"
               testID={`my-library-saved-row-${item.id}`}
               onPress={() => handleItemPress(item.listingSlug)}
-              hideBorder={index === items.length - 1}
               actions={[
                 {
                   id: "remove",

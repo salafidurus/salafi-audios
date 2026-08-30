@@ -100,14 +100,10 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
   const filteredScholars = filterScholars(allScholars, searchQuery);
 
   const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<ScholarListItemDto>) => (
-      <ScholarRow
-        scholar={item}
-        onPress={onNavigateToScholar}
-        hideBorder={index === filteredScholars.length - 1}
-      />
+    ({ item }: ListRenderItemInfo<ScholarListItemDto>) => (
+      <ScholarRow scholar={item} onPress={onNavigateToScholar} />
     ),
-    [onNavigateToScholar, filteredScholars.length],
+    [onNavigateToScholar],
   );
 
   const headerSearchOptions = {
@@ -139,16 +135,18 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
   return (
     <View style={styles.screen}>
       <Stack.Screen options={headerSearchOptions} />
-      <List style={styles.listCard}>
-        <FlatList
-          data={filteredScholars}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          onEndReached={() => hasNextPage && fetchNextPage()}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
-        />
-      </List>
+      <View style={styles.listCard}>
+        <List>
+          <FlatList
+            data={filteredScholars}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            onEndReached={() => hasNextPage && fetchNextPage()}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
+          />
+        </List>
+      </View>
     </View>
   );
 }

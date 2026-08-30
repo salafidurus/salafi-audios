@@ -19,7 +19,6 @@ export type MyLibraryItemRowProps = {
   item: MyLibraryItemDto;
   variant: "progress" | "saved" | "completed";
   onPress?: () => void;
-  hideBorder?: boolean;
   testID?: string;
   /** Actions shown in a native context menu opened by long-pressing the row. */
   actions?: MenuAction[];
@@ -112,7 +111,6 @@ export function MyLibraryItemRow({
   item,
   variant,
   onPress,
-  hideBorder = false,
   testID,
   actions,
   onAction,
@@ -123,7 +121,7 @@ export function MyLibraryItemRow({
   const progress = getMyLibraryItemPercent(item);
 
   return (
-    <List.Item onPress={onPress} hideBorder={hideBorder} testID={testID}>
+    <List.Item onPress={onPress} testID={testID}>
       <View style={styles.rowContent}>
         <View style={styles.iconContainer}>
           <MyLibraryItemIcon variant={variant} />

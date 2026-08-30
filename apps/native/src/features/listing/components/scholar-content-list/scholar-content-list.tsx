@@ -109,14 +109,10 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
             onChangeText={setFilter}
           />
           <List>
-            {filteredBrowse.map((item, index) => {
+            {filteredBrowse.map((item) => {
               const title = pickContentField(item.title, item.original?.title, showOriginal);
               return (
-                <List.Item
-                  key={item.id}
-                  onPress={() => navigateToListing(item.slug)}
-                  hideBorder={index === filteredBrowse.length - 1}
-                >
+                <List.Item key={item.id} onPress={() => navigateToListing(item.slug)}>
                   <View style={styles.rowContent}>
                     <MarqueeText text={title} variant="titleMd" />
                   </View>

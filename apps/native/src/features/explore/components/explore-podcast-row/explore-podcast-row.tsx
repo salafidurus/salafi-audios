@@ -28,7 +28,6 @@ export type ExplorePodcastRowProps = {
   item: FeedContentItemDto;
   onPress?: () => void;
   onNavigateToListing?: (slug: string) => void;
-  hideBorder?: boolean;
 };
 
 async function toggleActiveTrack(isCurrentTrack: boolean, isPlaying: boolean) {
@@ -146,12 +145,7 @@ function getPublishedDateText(publishedAt?: string | null) {
 }
 
 /** Renders the native explore podcast row surface and coordinates its user-facing state. */
-export function ExplorePodcastRow({
-  item,
-  onPress,
-  onNavigateToListing,
-  hideBorder = false,
-}: ExplorePodcastRowProps) {
+export function ExplorePodcastRow({ item, onPress, onNavigateToListing }: ExplorePodcastRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const scholarName = item.scholarName;
@@ -177,7 +171,7 @@ export function ExplorePodcastRow({
     handleExploreAction(id, item, isSaved, onPress, onNavigateToListing);
 
   return (
-    <List.Item onPress={handlePlay} hideBorder={hideBorder} testID="podcast-row-item">
+    <List.Item onPress={handlePlay} testID="podcast-row-item">
       <View style={styles.rowContent} testID="podcast-row">
         <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
         <View style={styles.content}>
