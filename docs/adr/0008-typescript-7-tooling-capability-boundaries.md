@@ -197,7 +197,24 @@ The implementation checkout could not reproduce the aggregate commands because
 `bun install --frozen-lockfile --ignore-scripts` was blocked by registry DNS
 resolution after the initial temp-directory failure. This is setup evidence,
 not a compatibility classification. The dependent implementation tickets must
-rerun the commands after a complete frozen installation.
+rerun the commands after a complete frozen installation. The final integration
+gate below records that rerun as the certification boundary.
+
+## Final parity gate
+
+The final integration gate is implemented by
+`scripts/verify-typescript-parity.mjs` and runs after the aggregate CI build,
+lint, typecheck, and test job. It verifies the TypeScript 7-owned root command,
+native and Dependabot Helper compiler boundaries, API decorator settings, the
+locked React Doctor and OxLint plugin dependencies, pinned Docker Bun installs,
+package export targets, declaration/source-map outputs, and generated Prisma
+client declarations.
+
+The verifier does not invoke a compatibility compiler or publish a second
+typecheck command. React Doctor remains the existing locked, blocking workflow;
+this gate records its presence and policy without changing its implementation.
+Focused tests cover rejection of a legacy primary compiler, preservation of the
+public typecheck command, and missing post-build artifacts.
 
 ## Consequences
 
