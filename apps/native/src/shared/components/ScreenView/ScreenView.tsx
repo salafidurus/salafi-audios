@@ -1,6 +1,9 @@
+import { Host } from "@expo/ui";
 import { View, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
+import { createUniversalHostProps } from "../../../core/styles/expo-ui";
 
 /** Provides a reusable native UI primitive with a focused rendering contract. */
 /** Describes the inputs, callbacks, and optional state accepted by Screen View. */
@@ -21,19 +24,22 @@ export function ScreenView({
   backgroundVariant = "canvas",
 }: ScreenViewProps) {
   const insets = useSafeAreaInsets();
-  const { theme } = useUnistyles();
+  const { theme, rt } = useUnistyles();
+  const hostProps = createUniversalHostProps(theme, rt.themeName);
 
   return (
-    <View
-      style={[
-        styles.container,
-        getBackgroundVariant(backgroundVariant, theme),
-        { paddingTop: insets.top, paddingBottom: insets.bottom },
-        style,
-      ]}
-    >
-      <View style={[styles.content, center && styles.center, contentStyle]}>{children}</View>
-    </View>
+    <Host style={{ flex: 1 }} {...hostProps}>
+      <View
+        style={[
+          styles.container,
+          getBackgroundVariant(backgroundVariant, theme),
+          { paddingTop: insets.top, paddingBottom: insets.bottom },
+          style,
+        ]}
+      >
+        <View style={[styles.content, center && styles.center, contentStyle]}>{children}</View>
+      </View>
+    </Host>
   );
 }
 

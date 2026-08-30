@@ -44,7 +44,7 @@ jest.mock("react-native-unistyles", () => {
       create: resolve,
       configure: () => undefined,
     },
-    useUnistyles: () => ({ theme: lightNativeTheme, rt: {} }),
+    useUnistyles: () => ({ theme: lightNativeTheme, rt: { themeName: "system" } }),
   };
 });
 
