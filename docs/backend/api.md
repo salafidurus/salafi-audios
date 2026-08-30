@@ -114,8 +114,45 @@ resolution.
 - Swagger/OpenAPI may be exposed in development at `/api/docs` when enabled.
 - Public client base URLs are configured via `NEXT_PUBLIC_API_URL` for web and `EXPO_PUBLIC_API_URL` for mobile.
 
+### API rate-limit policies
+
+The API uses Fastify-native `@fastify/rate-limit` with an application-owned named policy boundary. Routes may select a policy explicitly; unannotated public and protected routes fall back to `public-read` and `authenticated` respectively.
+
+| Policy             | Production budget         | Global safety ceiling |
+| ------------------ | ------------------------- | --------------------- |
+| `global-safety`    | 600 requests / 60 seconds | No                    |
+| `public-read`      | 120 / 60 seconds          | Yes                   |
+| `authenticated`    | 60 / 60 seconds           | Yes                   |
+| `authentication`   | 10 / 60 seconds           | Yes                   |
+| `admin-write`      | 30 / 60 seconds           | Yes                   |
+| `expensive-search` | 20 / 60 seconds           | Yes                   |
+| `health-probe`     | 30 / 10 seconds           | No                    |
+
+Health endpoints intentionally bypass the ordinary global ceiling so monitoring cannot consume application traffic capacity, but they retain their own short-window budget. Test mode uses two requests per second for deterministic rejection tests. `DISABLE_THROTTLER=true` disables enforcement for local/test setups that need unrestricted traffic.
+
+Authenticated buckets use the trusted backend session user ID. Anonymous buckets use Fastify's resolved `request.ip`; forwarded addresses only affect that value when `TRUST_PROXY_HOPS` is explicitly configured (zero by default). Redis-backed counters are enabled when `REDIS_URL` is present and use the existing environment namespace. All policies fail open on rate-limit storage errors to preserve API availability; this is intentional and is separate from authentication or authorization failures.
+
+Rejected requests return HTTP 429 with `x-ratelimit-limit`, `x-ratelimit-remaining`, `x-ratelimit-reset`, and `retry-after` headers.
+
 ## 8. Evolution Rules
 
 - Prefer extending contracts over replacing them.
 - Deprecate intentionally rather than letting clients drift.
 - If API behavior changes materially, update docs and `@sd/core-contracts` together.
+
+## 9. Runtime Stack and Version Floor
+
+### Version Constraints
+
+- **Runtime Environment**: Node.js `>= 22.12.0` (required by NestJS 12 for native ESM/CJS compatibility features).
+- **Nest CLI Environment**: `@nestjs/cli` `>= 22.22.3`.
+- **Package Manager & Test Runner**: Bun `>= 1.4.0` (direct TypeScript execution via SWC transpiler retains raw `.ts` source execution with zero intermediate build output).
+
+### Companion Migration Tracking
+
+The NestJS 12 companion migrations are integrated in the API runtime. The application now owns these boundaries and no longer depends on the unsupported NestJS 11 companion packages:
+
+- **Validation**: NestJS Standard Schema validation with contract schemas (Ticket #752).
+- **Health**: Application-owned health checks (Ticket #753).
+- **Throttling**: Fastify-native rate-limit policies (Ticket #754).
+- **Logging**: Application-owned request logging without `nestjs-pino` (Ticket #755).

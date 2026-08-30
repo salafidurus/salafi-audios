@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { HealthCheckError, HealthIndicator } from '@nestjs/terminus';
-import type { HealthIndicatorResult } from '@nestjs/terminus';
 import { z } from 'zod';
 import { ConfigService } from '../config/config.service';
+import {
+  createHealthIndicatorResult,
+  HealthCheckError,
+  type HealthIndicatorResult,
+} from './health.service';
 
 /** Core API db health.indicator module providing shared backend infrastructure and authority-boundary services. */
 const NEON_API_BASE_URL = 'https://console.neon.tech/api/v2';
@@ -16,10 +19,8 @@ function isNeonConfigured(config: ConfigService): boolean {
 
 @Injectable()
 /** NestJS db health indicator service or controller coordinating the API boundary for this responsibility. */
-export class DbHealthIndicator extends HealthIndicator {
-  constructor(private readonly config: ConfigService) {
-    super();
-  }
+export class DbHealthIndicator {
+  constructor(private readonly config: ConfigService) {}
 
   async pingCheck(key: string, options?: { timeout?: number }): Promise<HealthIndicatorResult> {
     // Local/dev deployments run without Neon control-plane credentials; the
@@ -27,7 +28,10 @@ export class DbHealthIndicator extends HealthIndicator {
     // never masks a misconfigured deployment. Real connectivity is
     // exercised by every Prisma-backed request.
     if (!isNeonConfigured(this.config)) {
-      return this.getStatus(key, true, { currentState: 'unknown', neonConfigured: false });
+      return createHealthIndicatorResult(key, 'up', {
+        currentState: 'unknown',
+        neonConfigured: false,
+      });
     }
 
     const timeout = options?.timeout ?? 1000;
@@ -39,11 +43,11 @@ export class DbHealthIndicator extends HealthIndicator {
 
       const currentState = await readNeonState(response);
 
-      return this.getStatus(key, true, { currentState });
+      return createHealthIndicatorResult(key, 'up', { currentState });
     } catch (error) {
       throw new HealthCheckError(
         'Database check failed',
-        this.getStatus(key, false, {
+        createHealthIndicatorResult(key, 'down', {
           message: error instanceof Error ? error.message : 'Unknown error',
         }),
       );

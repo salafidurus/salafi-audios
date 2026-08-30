@@ -4,9 +4,14 @@ import { Controller, Delete, Get, Param, Post, Query, Body } from '@nestjs/commo
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CurrentUser } from '../../core/auth/decorators';
-import type { MyLibraryPageDto, RecentProgressDto, SavedDeltaItemDto } from '@sd/core-contracts';
+import {
+  SavedSyncDtoSchema,
+  type MyLibraryPageDto,
+  type RecentProgressDto,
+  type SavedDeltaItemDto,
+  type SavedSyncDto,
+} from '@sd/core-contracts';
 import { MyLibraryService } from './my-library.service';
-import { SavedSyncDto } from './dto/saved-sync.dto';
 
 /** NestJS my library controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('My Library')
@@ -69,7 +74,10 @@ export class MyLibraryController {
   @Post('saved/sync')
   @ApiOperation({ summary: 'Bulk sync saved listings' })
   @ApiOkResponse({ description: 'Saved listings synced' })
-  syncSaved(@CurrentUser() user: { id: string }, @Body() body: SavedSyncDto): Promise<void> {
+  syncSaved(
+    @CurrentUser() user: { id: string },
+    @Body({ schema: SavedSyncDtoSchema }) body: SavedSyncDto,
+  ): Promise<void> {
     return this.myLibrary.bulkSyncSaved(user.id, body.items ?? []);
   }
 

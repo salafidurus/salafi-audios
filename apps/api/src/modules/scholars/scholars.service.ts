@@ -2,6 +2,9 @@ import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import type {
+  CreateScholarDto,
+  SaveScholarTranslationDto,
+  UpdateScholarDto,
   ScholarListItemDto,
   ScholarDetailDto,
   ScholarDetailStats,
@@ -13,9 +16,6 @@ import type {
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
-import type { CreateScholarDto } from './dto/create-scholar.dto';
-import type { UpdateScholarDto } from './dto/update-scholar.dto';
-import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 
 /** NestJS scholars service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()

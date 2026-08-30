@@ -8,10 +8,10 @@ import type {
   AdminTopicDetailDto,
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
+  SaveTopicTranslationDto,
   Locale,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
-import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { TopicsRepository } from './topics.repo';
 
 /** NestJS topics service service or controller coordinating the API boundary for this responsibility. */

@@ -61,6 +61,18 @@ Every plan records this routing context:
 | Specification ticket without branch metadata | `origin/main` provisionally | unresolved; report the warning |
 | Standalone ticket                            | `origin/main`               | `main`                         |
 
+For the final spec-finalization ticket, use this classification instead of
+the ordinary specification-ticket row:
+
+| Ticket context      | Branch base                                      | Pull-request target |
+| ------------------- | ------------------------------------------------ | ------------------- |
+| Finalization ticket | current `origin/spec/<slug>` and `origin/main`   | `main`              |
+
+No ordinary feature work is expected for this ticket. The plan must identify
+the parent specification, confirm that every implementation ticket is
+complete, and treat the latest spec candidate and current `main` as the two
+integration inputs.
+
 Read and cross-reference:
 
 1. The ticket, comments, labels, dependencies, and acceptance criteria.

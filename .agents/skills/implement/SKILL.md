@@ -8,6 +8,13 @@ Implement one approved ticket plan. Specification-level work is orchestrated
 by `implement-spec`, which selects tickets and invokes this lifecycle for each
 ticket.
 
+The final spec-finalization ticket is a special terminal ticket. For it,
+verify the spec candidate against current `main`, resolve conflicts if needed,
+and run the complete specification acceptance matrix. A direct pull request
+from `spec/<slug>` to `main` is sufficient when no boundary changes are
+required; do not create an intermediate feature branch or ordinary feature
+worktree for this ticket.
+
 Before editing, read the repository instructions in
 [AGENT.md](../../../AGENT.md), the nearest app/package `AGENT.md`, the `tdd`
 skill, and the approved ticket plan. Treat
@@ -33,7 +40,13 @@ not applicable.
 
 ## Checkout selection
 
-Determine whether the approved scope includes committed files under
+For the finalization ticket, use `origin/spec/<slug>` and `origin/main` as the
+integration inputs and perform the boundary verification in the checkout that
+holds the spec candidate. Do not apply the ordinary native/non-native feature
+classification to this ticket. If conflicts exist, resolve them at the
+spec-to-main boundary and record the resolution before running acceptance.
+
+For an ordinary ticket, determine whether the approved scope includes committed files under
 `apps/native`:
 
 - Native scope uses the current checkout because native changes may require the
@@ -98,10 +111,15 @@ Skip a check only when the approved plan explains why it cannot apply.
 
 ## Execution
 
-Use the `tdd` skill's exact five-step red → green loop for every vertical slice:
+Use the `tdd` skill's exact five-step red → green loop for every ordinary
+vertical slice:
 write red, confirm red, implement minimally, confirm green, and run the
 applicable full suite. Run typechecking and single-test commands regularly.
 Apply the nearest workspace rules and keep shared package boundaries intact.
+
+For the finalization ticket, no new feature slice is expected. Run the
+complete specification acceptance matrix, applicable repository checks, and
+any conflict-resolution verification required by the approved plan.
 
 ## Documentation requirements
 

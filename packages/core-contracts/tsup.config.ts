@@ -8,7 +8,7 @@ export default defineConfig({
     "query/hooks/index": "src/query/hooks/index.ts",
   },
   format: ["cjs", "esm"],
-  dts: true,
+  dts: false,
   splitting: false,
   clean: true,
   tsconfig: "tsconfig.build.json",
