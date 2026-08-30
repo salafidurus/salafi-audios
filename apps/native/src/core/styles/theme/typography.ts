@@ -55,6 +55,7 @@ const getNativeFontFamily = (
 type TypographyVariantConfig = {
   fontFamily: string;
   fontSize: number;
+  fontWeight: "400" | "500" | "600" | "700";
   lineHeight: number;
   letterSpacing: number;
 };
@@ -66,6 +67,9 @@ function createVariantConfig(locale: Locale, variant: TypographyVariant): Typogr
   return {
     fontFamily: getNativeFontFamily(locale, token.fontRole, weightKey),
     fontSize: token.fontSize.mobile,
+    // SAFETY: design tokens restrict native weights to regular, medium,
+    // semibold, and bold, which map to these four UniversalTextStyle values.
+    fontWeight: String(token.fontWeight) as TypographyVariantConfig["fontWeight"],
     lineHeight: token.lineHeight.mobile,
     letterSpacing: token.letterSpacing.mobile,
   };
