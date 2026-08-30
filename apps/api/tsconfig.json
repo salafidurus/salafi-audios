@@ -1,5 +1,5 @@
 {
-  // Editor / typecheck only — does not emit. NestJS CLI uses tsconfig.build.json.
+  // Editor / typecheck only — the API runs directly from TypeScript through Bun.
   // Project reference support for incremental builds.
   "extends": "../../tsconfig.nest.json",
   "compilerOptions": {

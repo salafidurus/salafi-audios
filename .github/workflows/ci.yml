@@ -58,3 +58,9 @@ jobs:
           DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
           DATABASE_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
         run: bun run turbo run build lint typecheck test --continue
+
+      - name: Test TypeScript parity gate
+        run: bun run test:typescript-parity
+
+      - name: Verify TypeScript compiler parity
+        run: bun run verify:typescript-parity
