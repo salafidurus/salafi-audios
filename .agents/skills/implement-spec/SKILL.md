@@ -31,7 +31,9 @@ delivery.
    acceptance criteria, and dependency edges.
 2. Evaluate the affected code, domain contexts, architecture documents, ADRs,
    tests, package boundaries, and platform constraints.
-3. Select one unblocked implementation ticket.
+3. Select one unblocked ticket from the current frontier. Before all child
+   tickets complete, this is an implementation ticket; after they complete,
+   select the finalization ticket as the only remaining frontier node.
 4. Run the complete ticket lifecycle:
 
    `pre-implement → implement → post-implement`
@@ -43,18 +45,26 @@ delivery.
 
 5. Recompute the frontier after the ticket completes, preserving context
    pointers to its PR, commits, decisions, and follow-up work.
-6. Repeat until all required tickets are complete, then choose exactly one
-   terminal path: finalization or abandonment.
+6. Repeat through the finalization ticket. The specification graph is:
+
+   `spec → tickets → child ticket lifecycles → finalization ticket → main`
+
+   After all implementation tickets complete, the finalization ticket must be
+   the only remaining frontier node. Run its `pre-implement → implement →
+   post-implement` lifecycle, then choose exactly one terminal outcome:
+   completed finalization or abandonment.
 
 ## Finalization and abandonment
 
 Finalization is the only path that can bring a specification into `main`. The
-final validation ticket starts from the latest spec branch and current `main`,
-resolves drift and conflicts at that boundary, runs the complete specification
-acceptance matrix plus applicable repository checks, and fails closed when any
-required check fails. Its pull request targets `main` and identifies both the
-parent specification and final validation ticket. Close the parent as
-completed only after that pull request is merged and its evidence is recorded.
+published finalization ticket is the only remaining frontier after every
+implementation ticket completes. It starts from the latest spec branch and
+current `main`, resolves drift and conflicts at that boundary, runs the
+complete specification acceptance matrix plus applicable repository checks,
+and fails closed when any required check fails. Its pull request targets
+`main` and identifies both the parent specification and finalization ticket.
+Close the parent as completed only after that pull request is merged and its
+evidence is recorded.
 
 Closing all child tickets is not finalization. The `triage` skill reconciles
 completed-ticket triage metadata but does not close the parent specification.
@@ -72,7 +82,8 @@ duplicating their contents.
 
 ## Completion
 
-Every required ticket has completed its own pre-implementation, implementation,
-and post-implementation lifecycle, and the specification's acceptance criteria
-have been verified. The specification umbrella is not itself treated
-as an executable ticket unless it explicitly has implementation scope.
+Every implementation ticket and the finalization ticket have completed their
+own pre-implementation, implementation, and post-implementation lifecycle, and
+the specification's acceptance criteria have been verified. The specification
+umbrella is not itself treated as an executable ticket unless it explicitly has
+implementation scope.

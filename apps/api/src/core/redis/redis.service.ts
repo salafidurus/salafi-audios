@@ -1,9 +1,8 @@
-import type { ThrottlerStorage } from '@nestjs/throttler';
 import type { KeyvStoreAdapter } from 'keyv';
 
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
-import { PinoLogger } from 'nestjs-pino';
+import { AppLoggerService } from '../logger/app-logger.service';
 import { z } from 'zod';
 
 import { ConfigService } from '../config/config.service';
@@ -54,7 +53,7 @@ export class RedisService implements OnModuleDestroy {
 
   constructor(
     private readonly config: ConfigService,
-    private readonly logger: PinoLogger,
+    private readonly logger: AppLoggerService,
   ) {
     this.logger.setContext(RedisService.name);
     if (!config.REDIS_URL) {
@@ -180,23 +179,6 @@ export class RedisService implements OnModuleDestroy {
         );
       },
     };
-  }
-
-  createThrottlerStorage(): ThrottlerStorage {
-    return {
-      increment: async (key, ttl) => {
-        const redisKey = `${this.namespace}throttle:${key}`;
-        const totalHits = await this.incr(redisKey);
-        if (totalHits === 1) await this.pexpire(redisKey, ttl);
-        const remaining = await this.pttl(redisKey);
-        return {
-          totalHits,
-          timeToExpire: Math.max(remaining, 0),
-          isBlocked: false,
-          timeToBlockExpire: 0,
-        };
-      },
-    } satisfies ThrottlerStorage;
   }
 
   async quit(): Promise<void> {

@@ -2,7 +2,7 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import { Public } from '../../core/auth/decorators';
 import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SkipThrottle } from '@nestjs/throttler';
+import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 import { CacheTTL } from '@nestjs/cache-manager';
 import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
 import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
@@ -10,7 +10,7 @@ import type { TopicDetailDto, TopicLectureViewDto } from '@sd/core-contracts';
 import { TopicsService } from './topics.service';
 
 /** NestJS topics controller service or controller coordinating the API boundary for this responsibility. */
-@SkipThrottle()
+@RateLimitPolicy('public-read')
 @ApiTags('Topics')
 @ApiCommonErrors()
 @Public()

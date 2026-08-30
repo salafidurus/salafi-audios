@@ -59,7 +59,9 @@
     "test:e2e": "turbo run test:e2e",
     "test:prepush": "turbo run test:prepush",
     "test:dead-code-audit": "bun test scripts/dead-code-audit/*.spec.mjs",
+    "test:typescript-parity": "bun test scripts/verify-typescript-parity.spec.mjs",
     "verify:build-configs": "bun ./scripts/verify-build-configs.mjs",
+    "verify:typescript-parity": "bun ./scripts/verify-typescript-parity.mjs",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "clean": "turbo run clean",
@@ -69,7 +71,7 @@
     "lint:staged": "lint-staged --relative --concurrent false",
     "docs:quality": "markdownlint-cli2 README.md **/README.md docs/**/*.md AGENT.md .github/copilot-instructions.md '!.serena/**/*.md'",
     "security:secrets": "secretlint \"**/*\"",
-    "ci:local": "bun run dependabot-helper align && bun run verify:build-configs && bun run lint && bun run typecheck && bun run test:prepush && bun run build:affected && bun run --elide-lines=0 --filter web build && bun run docs:quality",
+    "ci:local": "bun run dependabot-helper align && bun run verify:build-configs && bun run lint && bun run typecheck && bun run test:prepush && bun run build:affected && bun run --elide-lines=0 --filter web build && bun run test:typescript-parity && bun run verify:typescript-parity && bun run docs:quality",
     "doctor": "bun run react-doctor --verbose",
     "native:expo:fix": "bun run --elide-lines=0 --filter native expo:fix",
     "native:expo:check": "bun run --elide-lines=0 --filter native expo:check"
@@ -101,7 +103,7 @@
     "tsup": "catalog:",
     "tsx": "4.23.12",
     "turbo": "2.10.12",
-    "typescript": "5.9.3",
+    "typescript": "7.0.2",
     "unplugin-swc": "^1.5.11"
   },
   "engines": {

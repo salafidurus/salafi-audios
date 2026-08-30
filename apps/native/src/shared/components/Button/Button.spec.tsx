@@ -2,9 +2,9 @@ import { render, screen, fireEvent } from "@testing-library/react-native";
 import React from "react";
 import { View } from "react-native";
 
-import { Button } from "./Button.android";
+import { Button } from "./Button";
 
-describe("Button (android)", () => {
+describe("Button", () => {
   it("renders label text", async () => {
     await render(<Button label="Submit" />);
     expect(screen.getByText("Submit")).toBeTruthy();
@@ -17,9 +17,12 @@ describe("Button (android)", () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it("shows loading indicator instead of label when loading", async () => {
-    await render(<Button label="Submit" loading />);
+  it("shows loading indicator instead of label and disables interaction", async () => {
+    const onPress = jest.fn();
+    await render(<Button label="Submit" loading onPress={onPress} />);
     expect(screen.queryByText("Submit")).toBeNull();
+    await fireEvent.press(screen.getByRole("button"));
+    expect(onPress).not.toHaveBeenCalled();
   });
 
   it("does not call onPress when disabled", async () => {
@@ -34,8 +37,13 @@ describe("Button (android)", () => {
     expect(screen.getByText("Submit")).toBeTruthy();
   });
 
-  it("renders icon on the left by default", async () => {
-    await render(<Button label="Submit" icon={<View testID="test-icon" />} />);
+  it("maps the outline variant to the universal Expo UI button variant", async () => {
+    await render(<Button label="Submit" variant="outline" testID="submit-button" />);
+    expect(screen.getByTestId("submit-button").props.variant).toBe("outlined");
+  });
+
+  it("renders icons on the requested side", async () => {
+    await render(<Button label="Submit" icon={<View testID="test-icon" />} iconPosition="right" />);
     expect(screen.getByTestId("test-icon")).toBeTruthy();
   });
 });
