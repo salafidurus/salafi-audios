@@ -2,7 +2,12 @@ import { Controller, Get, Post, Put, Param, Query, Body, UseInterceptors } from 
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CurrentUser, Public } from '../../core/auth/decorators';
-import type { AudioProgressDto, ProgressSyncDto, StreamResponseDto } from '@sd/core-contracts';
+import {
+  ProgressSyncDtoSchema,
+  type AudioProgressDto,
+  type ProgressSyncDto,
+  type StreamResponseDto,
+} from '@sd/core-contracts';
 import { AudioService } from './audio.service';
 import { CacheTTL } from '@nestjs/cache-manager';
 import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
@@ -30,7 +35,10 @@ export class AudioController {
   @Post('progress/sync')
   @ApiOperation({ summary: 'Bulk sync progress from client' })
   @ApiOkResponse({ description: 'Progress synced' })
-  syncProgress(@CurrentUser() user: { id: string }, @Body() body: ProgressSyncDto): Promise<void> {
+  syncProgress(
+    @CurrentUser() user: { id: string },
+    @Body({ schema: ProgressSyncDtoSchema }) body: ProgressSyncDto,
+  ): Promise<void> {
     return this.audio.bulkSync(user.id, body.items ?? []);
   }
 

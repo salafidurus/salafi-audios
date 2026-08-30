@@ -29,7 +29,7 @@ import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
 import { LocaleMiddleware } from './shared/i18n/locale.middleware';
 import { CacheInvalidationInterceptor } from './shared/interceptors/cache-invalidation.interceptor';
 
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { RateLimitGuard } from './core/security/rate-limit.guard';
 
 /** Root NestJS module composing the API application and its infrastructure dependencies. */
 @Module({
@@ -61,10 +61,9 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     ListingModule,
   ],
   providers: [
-    ThrottlerGuard,
     { provide: APP_INTERCEPTOR, useClass: CacheInvalidationInterceptor },
-    { provide: APP_GUARD, useExisting: ThrottlerGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_GUARD, useExisting: RateLimitGuard },
     { provide: APP_GUARD, useClass: PolicyGuard },
     { provide: APP_INTERCEPTOR, useClass: LocaleInterceptor },
   ],

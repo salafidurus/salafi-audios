@@ -1,12 +1,12 @@
 import { Controller, Get, Res } from '@nestjs/common';
-import { SkipThrottle } from '@nestjs/throttler';
+import { RateLimitPolicy } from '../security/rate-limit.decorator';
 import { Public } from '../auth/decorators';
 import { ConfigService } from '../config/config.service';
 import { SitemapService } from './sitemap.service';
 import type { Response } from 'express';
 
 /** NestJS sitemap controller service or controller coordinating the API boundary for this responsibility. */
-@SkipThrottle()
+@RateLimitPolicy('public-read')
 @Public()
 @Controller()
 /** Core API sitemap.controller module providing shared backend infrastructure and authority-boundary services. */

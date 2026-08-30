@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'bun:test';
 import { ListingRepository } from './listing.repo';
 import { Status } from '@sd/core-db';
-import type { CreateListingDto } from './dto/create-listing.dto';
+import type { CreateListingDto } from '@sd/core-contracts';
 
 describe('ListingRepository.createWithAudioAsset', () => {
   let repo: ListingRepository;

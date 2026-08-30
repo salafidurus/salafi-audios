@@ -1,7 +1,6 @@
-import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
-/** Core API apple native sign in.dto module providing shared backend infrastructure and authority-boundary services. */
+/** Defines the validated native Apple identity payload for authentication. */
 const AppleUserInfoSchema = z
   .object({
     email: z.string().optional(),
@@ -10,10 +9,11 @@ const AppleUserInfoSchema = z
   })
   .optional();
 
-const AppleNativeSignInDtoSchema = z.object({
+/** Native Apple identity payload accepted by the sign-in endpoint. */
+export const AppleNativeSignInDtoSchema = z.object({
   identityToken: z.string(),
   user: AppleUserInfoSchema,
 });
 
-/** NestJS apple native sign in dto service or controller coordinating the API boundary for this responsibility. */
-export class AppleNativeSignInDto extends createZodDto(AppleNativeSignInDtoSchema) {}
+/** Fields extracted from the native Apple identity payload. */
+export type AppleNativeSignInDto = z.infer<typeof AppleNativeSignInDtoSchema>;
