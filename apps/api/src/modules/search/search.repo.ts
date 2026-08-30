@@ -1,12 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
-import type { Locale, SearchCatalogItemDto } from '@sd/core-contracts';
+import type { Locale, SearchCatalogItemDto, SearchQueryDto } from '@sd/core-contracts';
 import { ConfigService } from '../../core/config/config.service';
 import { PrismaService } from '../../core/db/prisma.service';
-import type { SearchQueryDto } from './dto/search-query.dto';
 import { isTrigramSearchFailure } from './search-error.utils';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
+import { AppLoggerService } from '../../core/logger/app-logger.service';
 
 /** search application module responsible for search.repo behavior at the backend boundary. */
 const SIMILARITY_THRESHOLD = 0.12;
@@ -24,12 +24,13 @@ type SearchQueryRow = SearchRow & { format: string };
 @Injectable()
 /** NestJS search repository service or controller coordinating the API boundary for this responsibility. */
 export class SearchRepository {
-  private readonly logger = new Logger(SearchRepository.name);
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
-  ) {}
+    private readonly logger: AppLoggerService,
+  ) {
+    this.logger.setContext(SearchRepository.name);
+  }
 
   async searchListings(
     query: SearchQueryDto,

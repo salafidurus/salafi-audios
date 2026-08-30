@@ -1,10 +1,10 @@
 import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
 import { CDNHealthIndicator } from './cdn-health.indicator';
 import { DbHealthIndicator } from './db-health.indicator';
 import { RedisHealthIndicator } from './redis-health.indicator';
+import { HealthService } from './health.service';
 import { RedisService } from '../redis/redis.service';
 
 describe('HealthController', () => {
@@ -27,9 +27,9 @@ describe('HealthController', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [TerminusModule],
       controllers: [HealthController],
       providers: [
+        HealthService,
         { provide: DbHealthIndicator, useValue: dbHealth },
         { provide: CDNHealthIndicator, useValue: cdnHealth },
         { provide: RedisHealthIndicator, useValue: redisHealth },

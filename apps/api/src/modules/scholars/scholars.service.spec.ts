@@ -4,12 +4,12 @@ import { NotFoundException } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import type {
+  CreateScholarDto,
+  UpdateScholarDto,
   ScholarDetailDto,
   ScholarContentUnifiedDto,
   ScholarListItemDto,
 } from '@sd/core-contracts';
-import { CreateScholarDto } from './dto/create-scholar.dto';
-import { UpdateScholarDto } from './dto/update-scholar.dto';
 import { ScholarsRepository } from './scholars.repo';
 import { ScholarsService } from './scholars.service';
 

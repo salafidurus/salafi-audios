@@ -13,10 +13,10 @@ import type {
   TranslationViewDto,
   AdminScholarListItemDto,
   Locale,
+  CreateScholarDto,
+  UpdateScholarDto,
+  SaveScholarTranslationDto,
 } from '@sd/core-contracts';
-import type { CreateScholarDto } from './dto/create-scholar.dto';
-import type { UpdateScholarDto } from './dto/update-scholar.dto';
-import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
