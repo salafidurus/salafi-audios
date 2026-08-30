@@ -6,8 +6,8 @@ import type {
   TopicLectureViewDto,
   TranslationViewDto,
   Locale,
+  SaveTopicTranslationDto,
 } from '@sd/core-contracts';
-import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
