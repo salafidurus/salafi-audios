@@ -88,7 +88,7 @@
     "@types/react": "catalog:",
     "bun-types": "catalog:",
     "husky": "9.1.7",
-    "knip": "^6.32.2",
+    "knip": "^6.32.3",
     "lint-staged": "17.3.0",
     "markdownlint-cli2": "0.23.2",
     "oxfmt": "^0.65.0",
