@@ -7,6 +7,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
+import { NativeBridgeHost } from "@/shared/ui";
 
 /** Provides authenticated native administration workflows and their data boundaries. */
 type AdminDashboardScreenProps = {
@@ -56,26 +57,30 @@ export function AdminDashboardScreen({
   ];
 
   if (isLoading) {
-    return <EmptyState variant="loading" message={t("admin.dashboard.loading", "Loading…")} />;
+    return (
+      <NativeBridgeHost testID="admin-dashboard-host" matchContents={false}>
+        <EmptyState variant="loading" message={t("admin.dashboard.loading", "Loading…")} />
+      </NativeBridgeHost>
+    );
   }
 
   const visibleCards = cards.filter((card) => ability.can(card.action, card.subject));
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{t("admin.dashboard.title", "Admin Dashboard")}</Text>
-
-      {visibleCards.length === 0 ? (
-        <EmptyState message={t("admin.dashboard.noAccess", "You don't have any admin access.")} />
-      ) : (
-        visibleCards.map((card) => (
-          <Pressable key={card.key} onPress={card.onPress} style={[styles.card, card.cardStyle]}>
-            <Text style={styles.cardTitle}>{card.title}</Text>
-            <Text style={styles.cardSubtitle}>{card.subtitle}</Text>
-          </Pressable>
-        ))
-      )}
-    </ScrollView>
+    <NativeBridgeHost testID="admin-dashboard-host" matchContents={false}>
+      <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+        {visibleCards.length === 0 ? (
+          <EmptyState message={t("admin.dashboard.noAccess", "You don't have any admin access.")} />
+        ) : (
+          visibleCards.map((card) => (
+            <Pressable key={card.key} onPress={card.onPress} style={[styles.card, card.cardStyle]}>
+              <Text style={styles.cardTitle}>{card.title}</Text>
+              <Text style={styles.cardSubtitle}>{card.subtitle}</Text>
+            </Pressable>
+          ))
+        )}
+      </ScrollView>
+    </NativeBridgeHost>
   );
 }
 
@@ -87,12 +92,6 @@ const styles = StyleSheet.create((theme) => ({
   content: {
     padding: theme.spacing.scale.lg,
     paddingBottom: theme.spacing.scale["4xl"],
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: theme.spacing.scale["2xl"],
-    color: theme.colors.content.strong,
   },
   card: {
     padding: theme.spacing.scale.lg,

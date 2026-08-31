@@ -100,6 +100,7 @@ describe("AdminScholarDetailScreen", () => {
     });
 
     await render(<AdminScholarDetailScreen scholarSlug="scholar-one" />);
+    expect(screen.getByTestId("admin-scholar-detail-host")).toBeTruthy();
     expect(screen.getByText("Scholar One")).toBeTruthy();
     expect(screen.getByText("scholar-one", { exact: false })).toBeTruthy();
     expect(screen.getByText("Series Title")).toBeTruthy();

@@ -30,6 +30,7 @@ jest.mock("@expo/ui", () => {
     ScrollView: Container,
     Switch: Container,
     Text,
+    RNHostView: Container,
   };
 });
 

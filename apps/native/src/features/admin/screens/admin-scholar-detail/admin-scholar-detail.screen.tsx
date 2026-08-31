@@ -12,6 +12,7 @@ import { useAuth } from "@/core/auth/use-auth";
 import { DraggableList, type RenderItemParams } from "@/shared/components/DraggableList";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { NativeBridgeHost } from "@/shared/ui";
 
 import { updateSeries, updateCollection } from "../../api/admin-scholars.api";
 import { CollectionSheet } from "../../components/CollectionSheet/CollectionSheet";
@@ -191,71 +192,81 @@ function ScholarDetailContent({
   onCollectionSaved,
 }: ScholarDetailContentProps) {
   return (
-    <GestureHandlerRootView style={styles.root}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.scholarName}>{scholar.name}</Text>
-        <Text style={styles.scholarSlug}>@{scholar.slug}</Text>
+    <NativeBridgeHost testID="admin-scholar-detail-host" matchContents={false}>
+      <GestureHandlerRootView style={styles.root}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.scholarName}>{scholar.name}</Text>
+          <Text style={styles.scholarSlug}>@{scholar.slug}</Text>
 
-        <SectionHeader
-          title="Series"
-          isExpanded={seriesExpanded}
-          onToggle={onToggleSeries}
-          onAdd={onAddSeries}
-          canAdd={canAdd}
-        />
-        {seriesExpanded &&
-          (displaySeries.length === 0 ? (
-            <EmptyState message="No series added yet." variant="empty" />
-          ) : (
-            <DraggableList
-              data={displaySeries}
-              keyExtractor={(item) => item.id}
-              onDragEnd={onSeriesDragEnd}
-              scrollEnabled={false}
-              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
-                <SeriesItem item={item} drag={drag} isActive={isActive} />
-              )}
-            />
-          ))}
+          <SectionHeader
+            title="Series"
+            isExpanded={seriesExpanded}
+            onToggle={onToggleSeries}
+            onAdd={onAddSeries}
+            canAdd={canAdd}
+          />
+          {seriesExpanded &&
+            (displaySeries.length === 0 ? (
+              <EmptyState message="No series added yet." variant="empty" />
+            ) : (
+              <DraggableList
+                data={displaySeries}
+                keyExtractor={(item) => item.id}
+                onDragEnd={onSeriesDragEnd}
+                scrollEnabled={false}
+                renderItem={({
+                  item,
+                  drag,
+                  isActive,
+                }: RenderItemParams<AdminListingListItemDto>) => (
+                  <SeriesItem item={item} drag={drag} isActive={isActive} />
+                )}
+              />
+            ))}
 
-        <SectionHeader
-          title="Collections"
-          isExpanded={collectionsExpanded}
-          onToggle={onToggleCollections}
-          onAdd={onAddCollection}
-          canAdd={canAdd}
-        />
-        {collectionsExpanded &&
-          (displayCollections.length === 0 ? (
-            <EmptyState message="No collections added yet." variant="empty" />
-          ) : (
-            <DraggableList
-              data={displayCollections}
-              keyExtractor={(item) => item.id}
-              onDragEnd={onCollectionDragEnd}
-              scrollEnabled={false}
-              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
-                <CollectionItem item={item} drag={drag} isActive={isActive} />
-              )}
-            />
-          ))}
+          <SectionHeader
+            title="Collections"
+            isExpanded={collectionsExpanded}
+            onToggle={onToggleCollections}
+            onAdd={onAddCollection}
+            canAdd={canAdd}
+          />
+          {collectionsExpanded &&
+            (displayCollections.length === 0 ? (
+              <EmptyState message="No collections added yet." variant="empty" />
+            ) : (
+              <DraggableList
+                data={displayCollections}
+                keyExtractor={(item) => item.id}
+                onDragEnd={onCollectionDragEnd}
+                scrollEnabled={false}
+                renderItem={({
+                  item,
+                  drag,
+                  isActive,
+                }: RenderItemParams<AdminListingListItemDto>) => (
+                  <CollectionItem item={item} drag={drag} isActive={isActive} />
+                )}
+              />
+            ))}
 
-        <SeriesSheet
-          isOpen={showSeriesSheet}
-          scholarId={scholarId}
-          scholarSlug={scholarSlug}
-          onClose={onCloseSeries}
-          onSaved={onSeriesSaved}
-        />
-        <CollectionSheet
-          isOpen={showCollectionSheet}
-          scholarId={scholarId}
-          scholarSlug={scholarSlug}
-          onClose={onCloseCollection}
-          onSaved={onCollectionSaved}
-        />
-      </ScrollView>
-    </GestureHandlerRootView>
+          <SeriesSheet
+            isOpen={showSeriesSheet}
+            scholarId={scholarId}
+            scholarSlug={scholarSlug}
+            onClose={onCloseSeries}
+            onSaved={onSeriesSaved}
+          />
+          <CollectionSheet
+            isOpen={showCollectionSheet}
+            scholarId={scholarId}
+            scholarSlug={scholarSlug}
+            onClose={onCloseCollection}
+            onSaved={onCollectionSaved}
+          />
+        </ScrollView>
+      </GestureHandlerRootView>
+    </NativeBridgeHost>
   );
 }
 
@@ -338,9 +349,11 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
 
   if (!scholar) {
     return (
-      <View style={styles.loadingContainer}>
-        <EmptyState message="Loading scholar…" variant="loading" />
-      </View>
+      <NativeBridgeHost testID="admin-scholar-detail-host" matchContents={false}>
+        <View style={styles.loadingContainer}>
+          <EmptyState message="Loading scholar…" variant="loading" />
+        </View>
+      </NativeBridgeHost>
     );
   }
 

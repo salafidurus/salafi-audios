@@ -52,6 +52,7 @@ export function NativeBridgeHost({
       {...configuration}
       {...props}
       matchContents={matchContents}
+      useViewportSizeMeasurement
       style={style}
     >
       <RNHostView>{children}</RNHostView>

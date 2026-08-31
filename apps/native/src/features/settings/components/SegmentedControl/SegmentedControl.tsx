@@ -1,4 +1,5 @@
 /** Provides a controlled, direction-aware native segmented control. */
+import { Host } from "@expo/ui";
 import { SegmentedControl as NativeSegmentedControl } from "@expo/ui/community/segmented-control";
 import { I18nManager } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
@@ -35,17 +36,19 @@ export function SegmentedControl<T extends string>({
   const effectiveIndex = effectiveOptions.findIndex((opt) => opt.value === value);
 
   return (
-    <NativeSegmentedControl
-      testID={testID}
-      values={effectiveOptions.map((opt) => opt.label)}
-      selectedIndex={effectiveIndex === -1 ? undefined : effectiveIndex}
-      onChange={(event) => {
-        const opt = effectiveOptions[event.nativeEvent.selectedSegmentIndex];
-        if (opt) onChange(opt.value);
-      }}
-      tintColor={theme.colors.action.primary}
-      appearance={rt.themeName === "dark" ? "dark" : "light"}
-      style={{ alignSelf: "stretch" }}
-    />
+    <Host matchContents={false} style={{ flex: 1 }}>
+      <NativeSegmentedControl
+        testID={testID}
+        values={effectiveOptions.map((opt) => opt.label)}
+        selectedIndex={effectiveIndex === -1 ? undefined : effectiveIndex}
+        onChange={(event) => {
+          const opt = effectiveOptions[event.nativeEvent.selectedSegmentIndex];
+          if (opt) onChange(opt.value);
+        }}
+        tintColor={theme.colors.action.primary}
+        appearance={rt.themeName === "dark" ? "dark" : "light"}
+        style={{ alignSelf: "stretch" }}
+      />
+    </Host>
   );
 }

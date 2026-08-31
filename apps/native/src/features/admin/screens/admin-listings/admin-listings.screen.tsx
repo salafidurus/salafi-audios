@@ -14,6 +14,7 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { NativeBridgeHost } from "@/shared/ui";
 
 import { bulkListingAction } from "../../api/admin-listings.api";
 import { AudioUploaderSheet } from "../../components/AudioUploaderSheet/AudioUploaderSheet";
@@ -138,67 +139,68 @@ export function AdminListingsScreen() {
   };
 
   return (
-    <View style={styles.screen}>
-      <Stack.Screen options={headerSearchOptions} />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <AppText variant="titleLg">Listings</AppText>
-          {canUpload ? (
-            <Pressable onPress={() => setShowUploader(true)} style={styles.uploadBtn}>
-              <AppText variant="labelMd" style={styles.uploadBtnText}>
-                + Upload
-              </AppText>
-            </Pressable>
-          ) : null}
-        </View>
-
-        {isLoading ? (
-          <EmptyState message="Loading…" variant="loading" />
-        ) : listings.length === 0 ? (
-          <EmptyState message="No listings found." variant="empty" />
-        ) : (
-          <View>
-            {listings.map((item) => (
-              <AdminListingRow
-                key={item.id}
-                item={item}
-                isSelected={selectedIds.has(item.id)}
-                actions={rowActions}
-                onPress={() => handleRowPress(item.id)}
-                onAction={(action) => void handleRowAction(item.id, action)}
-              />
-            ))}
+    <NativeBridgeHost testID="admin-listings-host" matchContents={false}>
+      <View style={styles.screen}>
+        <Stack.Screen options={headerSearchOptions} />
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.header}>
+            {canUpload ? (
+              <Pressable onPress={() => setShowUploader(true)} style={styles.uploadBtn}>
+                <AppText variant="labelMd" style={styles.uploadBtnText}>
+                  + Upload
+                </AppText>
+              </Pressable>
+            ) : null}
           </View>
-        )}
-      </ScrollView>
 
-      <BulkActionBar
-        selectedCount={selectedIds.size}
-        onPublish={() => handleBulkAction("publish")}
-        onArchive={() => handleBulkAction("archive")}
-        canPublish={canPublish}
-        canArchive={canArchive}
-        isLoading={isBulkLoading}
-      />
+          {isLoading ? (
+            <EmptyState message="Loading…" variant="loading" />
+          ) : listings.length === 0 ? (
+            <EmptyState message="No listings found." variant="empty" />
+          ) : (
+            <View>
+              {listings.map((item) => (
+                <AdminListingRow
+                  key={item.id}
+                  item={item}
+                  isSelected={selectedIds.has(item.id)}
+                  actions={rowActions}
+                  onPress={() => handleRowPress(item.id)}
+                  onAction={(action) => void handleRowAction(item.id, action)}
+                />
+              ))}
+            </View>
+          )}
+        </ScrollView>
 
-      <AudioUploaderSheet
-        isOpen={showUploader}
-        onClose={() => setShowUploader(false)}
-        onUploadComplete={() => {
-          setShowUploader(false);
-          refetch();
-        }}
-      />
+        <BulkActionBar
+          selectedCount={selectedIds.size}
+          onPublish={() => handleBulkAction("publish")}
+          onArchive={() => handleBulkAction("archive")}
+          canPublish={canPublish}
+          canArchive={canArchive}
+          isLoading={isBulkLoading}
+        />
 
-      <ListingEditSheet
-        listingId={editingListingId}
-        onClose={() => setEditingListingId(null)}
-        onSaved={() => {
-          setEditingListingId(null);
-          refetch();
-        }}
-      />
-    </View>
+        <AudioUploaderSheet
+          isOpen={showUploader}
+          onClose={() => setShowUploader(false)}
+          onUploadComplete={() => {
+            setShowUploader(false);
+            refetch();
+          }}
+        />
+
+        <ListingEditSheet
+          listingId={editingListingId}
+          onClose={() => setEditingListingId(null)}
+          onSaved={() => {
+            setEditingListingId(null);
+            refetch();
+          }}
+        />
+      </View>
+    </NativeBridgeHost>
   );
 }
 
@@ -214,7 +216,7 @@ const styles = StyleSheet.create((theme) => ({
   header: {
     paddingVertical: theme.spacing.scale.md,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
   },
   uploadBtn: {

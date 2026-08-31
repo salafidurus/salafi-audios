@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react-native";
+import { render, screen } from "@testing-library/react-native";
 import React from "react";
 
 import { BottomAccessoryContent } from "./BottomAccessoryContent";
@@ -76,33 +76,20 @@ describe("BottomAccessoryContent", () => {
     expect(screen.toJSON()).toBeNull();
   });
 
-  it("renders subroute tabs only when subroute is available and no track playing", async () => {
+  it("renders null when no track is playing, even on a section route", async () => {
     useAudio.mockReturnValue({ currentTrack: null });
     usePathname.mockReturnValue("/recent");
 
     await render(<BottomAccessoryContent />);
-    expect(screen.getByTestId("subroute-only-container")).toBeTruthy();
+    expect(screen.toJSON()).toBeNull();
   });
 
-  it("renders miniplayer only when track playing and no subroute active", async () => {
-    useAudio.mockReturnValue({ currentTrack: mockTrack });
-    usePathname.mockReturnValue("/search");
-
-    await render(<BottomAccessoryContent />);
-    expect(screen.getByTestId("miniplayer-only-container")).toBeTruthy();
-    expect(screen.getByText("Test Lecture")).toBeTruthy();
-  });
-
-  it("renders dual mode and toggles between views when both are available", async () => {
+  it("renders the miniplayer when a track is playing", async () => {
     useAudio.mockReturnValue({ currentTrack: mockTrack });
     usePathname.mockReturnValue("/recent");
 
     await render(<BottomAccessoryContent />);
-    expect(screen.getByTestId("dual-mode-container")).toBeTruthy();
-    expect(screen.getByTestId("subroute-icon-button")).toBeTruthy();
-
-    // Toggle to expanded subroute tabs
-    await fireEvent.press(screen.getByTestId("subroute-icon-button"));
-    expect(screen.getByTestId("mini-player-icon-button")).toBeTruthy();
+    expect(screen.getByTestId("miniplayer-only-container")).toBeTruthy();
+    expect(screen.getByText("Test Lecture")).toBeTruthy();
   });
 });
