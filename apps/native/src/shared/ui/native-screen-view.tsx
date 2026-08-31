@@ -1,9 +1,9 @@
 import { Host } from "@expo/ui";
 import { View, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet as UnistylesStyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { createUniversalHostProps } from "../../../core/styles/expo-ui";
+import { createUniversalHostProps } from "../../core/styles/expo-ui";
 
 /** Provides a reusable native UI primitive with a focused rendering contract. */
 /** Describes the inputs, callbacks, and optional state accepted by Screen View. */
@@ -43,7 +43,7 @@ export function ScreenView({
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = UnistylesStyleSheet?.create((theme) => ({
   container: {
     flex: 1,
     paddingHorizontal: theme.spacing.layout.pageX,
@@ -56,7 +56,11 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     alignItems: "center",
   },
-}));
+})) ?? {
+  container: {},
+  content: {},
+  center: {},
+};
 
 type Theme = ReturnType<typeof useUnistyles>["theme"];
 

@@ -1,9 +1,9 @@
-import { Button, Row, type ButtonProps } from "@expo/ui";
+import type { ReactNode } from "react";
+
+import { Button, Row, type ButtonProps, type UniversalStyle } from "@expo/ui";
+import { type StyleProp, type ViewStyle } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
-import type { NativeIconName } from "./native-icon-sources";
-
-import { NativeIcon } from "./native-icon";
 import { NativeText } from "./native-text";
 
 /** Adapts semantic button actions and token styles to Expo UI Button. */
@@ -14,19 +14,24 @@ export type NativeButtonVariant = "primary" | "surface" | "outline" | "ghost" | 
 export type NativeButtonSize = "sm" | "md" | "lg";
 
 /** Defines a token-aware semantic button independent of platform modifiers. */
-export type NativeButtonProps = Omit<ButtonProps, "children" | "label" | "variant"> & {
-  label: string;
+export type NativeButtonProps = Omit<ButtonProps, "children" | "label" | "variant" | "style"> & {
+  label: string | number;
   accessibilityLabel?: string;
-  icon?: NativeIconName;
+  icon?: ReactNode;
   variant?: NativeButtonVariant;
   size?: NativeButtonSize;
   loading?: boolean;
+  iconPosition?: "left" | "right";
+  fullWidth?: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 
 /** Renders an accessible native action; loading also disables the action. */
 export function NativeButton({
   label,
   icon,
+  iconPosition = "left",
+  fullWidth = false,
   variant = "primary",
   size = "md",
   loading = false,
@@ -39,21 +44,27 @@ export function NativeButton({
   const isDisabled = isButtonDisabled(disabled, loading);
   const textVariant = getButtonTextVariant(size);
   const nativeVariant = getExpoButtonVariant(variant);
+  const buttonContent = renderButtonContent(
+    icon,
+    iconPosition,
+    label,
+    loading,
+    textVariant,
+    variant,
+    theme.spacing.component.gapSm,
+  );
+  const accessibilityProps = getAccessibilityProps(accessibilityLabel);
 
   return (
     <Button
       {...props}
-      {...(accessibilityLabel ? { accessibilityLabel } : {})}
+      {...accessibilityProps}
       disabled={isDisabled}
       variant={nativeVariant}
-      style={getButtonStyle(size, variant, disabled, theme, style)}
+      // SAFETY: getButtonStyle only returns properties supported by Expo UI Button.
+      style={getButtonStyle(size, variant, disabled, theme, style, fullWidth)}
     >
-      <Row alignment="center" spacing={theme.spacing.component.gapSm}>
-        {icon ? <NativeIcon name={icon} colorRole={getButtonIconRole(variant)} /> : null}
-        <NativeText variant={textVariant} colorRole={getButtonColorRole(variant)}>
-          {getButtonLabel(label, loading)}
-        </NativeText>
-      </Row>
+      {buttonContent}
     </Button>
   );
 }
@@ -62,22 +73,55 @@ function isButtonDisabled(disabled: boolean, loading: boolean) {
   return disabled || loading;
 }
 
+function getAccessibilityProps(accessibilityLabel: string | undefined) {
+  return accessibilityLabel ? { accessibilityLabel } : {};
+}
+
 function getButtonStyle(
   size: NativeButtonSize,
   variant: NativeButtonVariant,
   disabled: boolean,
   theme: NativeTheme,
   style: NativeButtonProps["style"],
-) {
-  return {
+  fullWidth: boolean,
+): ButtonProps["style"] {
+  // SAFETY: callers provide RN layout styles; Expo UI consumes the overlapping
+  // visual subset and ignores layout-only fields at this native boundary.
+  const result: UniversalStyle = {
     height: getButtonHeight(size, theme),
     borderRadius: theme.radius.component.chip,
     backgroundColor: getButtonBackground(variant, theme),
     borderColor: theme.colors.border.default,
     borderWidth: variant === "ghost" ? 0 : theme.border.width.default,
     opacity: disabled ? 0.5 : undefined,
-    ...style,
+    width: fullWidth ? ("100%" as const) : undefined,
   };
+  if (style && !Array.isArray(style)) Object.assign(result, style);
+  return result;
+}
+
+function renderButtonContent(
+  icon: ReactNode,
+  iconPosition: "left" | "right",
+  label: string | number,
+  loading: boolean,
+  textVariant: "bodySm" | "bodyLg" | "labelMd",
+  variant: NativeButtonVariant,
+  gap: number,
+) {
+  const text = (
+    <NativeText variant={textVariant} colorRole={getButtonColorRole(variant)}>
+      {getButtonLabel(label, loading)}
+    </NativeText>
+  );
+  if (loading) return text;
+  return (
+    <Row alignment="center" spacing={gap}>
+      {iconPosition === "left" ? icon : null}
+      {text}
+      {iconPosition === "right" ? icon : null}
+    </Row>
+  );
 }
 
 function getButtonTextVariant(size: NativeButtonSize) {
@@ -98,14 +142,8 @@ function getButtonColorRole(variant: NativeButtonVariant) {
     : ("default" as const);
 }
 
-function getButtonLabel(label: string, loading: boolean) {
-  return loading ? `${label}…` : label;
-}
-
-function getButtonIconRole(variant: NativeButtonVariant) {
-  return variant === "primary" || variant === "danger"
-    ? ("onAction" as const)
-    : ("default" as const);
+function getButtonLabel(label: string | number, loading: boolean) {
+  return loading ? `${label}…` : String(label);
 }
 
 type NativeTheme = ReturnType<typeof useUnistyles>["theme"];

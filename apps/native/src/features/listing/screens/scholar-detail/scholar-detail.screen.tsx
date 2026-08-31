@@ -7,9 +7,8 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { ScholarContentList } from "@/features/listing/components/scholar-content-list/scholar-content-list";
 import { ScholarHeader } from "@/features/listing/components/scholar-header/scholar-header";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText, ScreenView } from "@/shared/ui";
 
 /** Describes the inputs and callbacks accepted by Scholar Detail Screen. */
 /** Describes the inputs, callbacks, and optional state accepted by Scholar Detail Screen. */

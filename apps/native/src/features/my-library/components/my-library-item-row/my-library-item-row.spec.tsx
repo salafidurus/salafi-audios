@@ -41,13 +41,13 @@ jest.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: () => false,
 }));
 
-jest.mock("@/shared/components/AppText/AppText", () => {
+jest.mock("@/shared/ui/native-text", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { Text } = require("react-native");
   return {
-    AppText: ({
+    NativeText: ({
       children,
       style,
       numberOfLines,

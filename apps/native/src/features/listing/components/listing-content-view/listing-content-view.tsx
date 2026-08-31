@@ -6,7 +6,7 @@ import { useMemo, useRef } from "react";
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { AppText } from "@/shared/ui";
 
 import { LessonRow } from "../lesson-row/lesson-row";
 

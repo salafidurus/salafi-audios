@@ -7,7 +7,7 @@ import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { MyLibraryItemRow } from "@/features/my-library/components/my-library-item-row/my-library-item-row";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { ScreenView } from "@/shared/ui";
 
 /** Projects native library state into saved, completed, and in-progress content views. */
 /** Describes the inputs, callbacks, and optional state accepted by My Library Saved Screen. */

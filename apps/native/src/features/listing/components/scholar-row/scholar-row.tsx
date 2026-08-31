@@ -4,9 +4,9 @@ import { useFormatScholarName } from "@sd/domain-content";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { AppText } from "@/shared/ui";
 
 /** Builds native lecture and scholar content surfaces from canonical identities. */
 /** Describes the inputs and callbacks accepted by Scholar Row. */

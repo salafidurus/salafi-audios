@@ -6,7 +6,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { MyLibraryItemRow } from "@/features/my-library/components/my-library-item-row/my-library-item-row";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { ScreenView } from "@/shared/ui";
 
 import { useAuth } from "../../../core/auth/use-auth";
 import { useTranslation } from "../../../core/i18n/use-translation";

@@ -31,7 +31,7 @@ export const APPROVED_NATIVE_BRIDGES: readonly ApprovedNativeBridge[] = [
     validationEvidence: "NativeBridgeHost composition test and Android host validation",
   },
   {
-    file: "src/shared/components/List/ListItem.tsx",
+    file: "src/shared/ui/native-list-item.tsx",
     kind: "bridge",
     reason: "ListItem keeps rich leading, trailing, and action content in explicit RN host slots.",
     owner: "native UI foundation",

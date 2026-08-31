@@ -10,7 +10,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { audioService } from "@/features/audio";
 import { DownloadButton } from "@/features/downloads/components/download-button/download-button";
 import { DownloadProgress } from "@/features/downloads/components/download-progress/download-progress";
-import { AppText } from "@/shared/components/AppText/AppText";
+import { AppText } from "@/shared/ui";
 
 /** Builds native lecture and scholar content surfaces from canonical identities. */
 function formatDuration(seconds?: number): string {

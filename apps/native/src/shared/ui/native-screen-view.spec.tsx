@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react-native";
 import React from "react";
 import { View } from "react-native";
 
-import { ScreenView } from "./ScreenView";
+import { ScreenView } from "./native-screen-view";
 
 jest.mock("react-native-safe-area-context", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports

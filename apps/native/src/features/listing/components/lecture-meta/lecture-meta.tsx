@@ -3,8 +3,8 @@ import type { ListingDetailDto } from "@sd/core-contracts";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { AppText } from "@/shared/ui";
 
 /** Builds native lecture and scholar content surfaces from canonical identities. */
 /** Describes the inputs, callbacks, and optional state accepted by Lecture Meta. */

@@ -5,8 +5,7 @@ import { useState } from "react";
 import { useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { TextInput } from "@/shared/components/TextInput/TextInput";
-import { NativeButton, NativeScreenHost, NativeText } from "@/shared/ui";
+import { NativeButton, NativeScreenHost, NativeText, TextInput } from "@/shared/ui";
 
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";

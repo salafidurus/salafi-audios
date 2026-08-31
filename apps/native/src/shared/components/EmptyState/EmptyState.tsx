@@ -1,7 +1,7 @@
 import { Pressable, View, type TextStyle } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { NativeText as AppText } from "@/shared/ui";
 
 /** Renders the native empty state variant surface and coordinates its user-facing state. */
 /** Defines the native empty state variant contract shared by its consumers. */

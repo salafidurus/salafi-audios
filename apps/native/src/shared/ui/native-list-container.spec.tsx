@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react-native";
 import { Text } from "react-native";
 
-import { ListContainer } from "./ListContainer";
+import { ListContainer } from "./native-list-container";
 
 describe("ListContainer", () => {
   it("hosts rows in the supported Expo UI List surface", async () => {

@@ -31,6 +31,14 @@ const FORBIDDEN_VISUAL_PACKAGES = new Set([
   "react-native-svg",
 ]);
 
+const LEGACY_SEMANTIC_MODULES = new Set([
+  "@/shared/components/AppText/AppText",
+  "@/shared/components/Button/Button",
+  "@/shared/components/TextInput/TextInput",
+  "@/shared/components/ScreenView/ScreenView",
+  "@/shared/components/List",
+]);
+
 type VisualViolation = {
   file: string;
   source: string;
@@ -85,6 +93,18 @@ function detectedBridgeFiles(nativeRoot: string): string[] {
   });
 }
 
+function detectedLegacyFeatureImports(nativeRoot: string): string[] {
+  const featuresRoot = path.join(nativeRoot, "src/features");
+  return nativeSourceFiles(featuresRoot).flatMap((file) => {
+    const source = fs.readFileSync(file, "utf8");
+    const relativeFile = path.relative(nativeRoot, file);
+    return [...source.matchAll(/from\s+["']([^"']+)["']/g)]
+      .map((match) => match[1] ?? "")
+      .filter((moduleName) => LEGACY_SEMANTIC_MODULES.has(moduleName))
+      .map((moduleName) => `${relativeFile}: ${moduleName}`);
+  });
+}
+
 describe("Expo UI visual boundary", () => {
   it("detects visual React Native imports and forbidden visual packages", () => {
     const violations = visualViolations(process.cwd());
@@ -116,6 +136,10 @@ describe("Expo UI visual boundary", () => {
       expect(isNativeBridgeMetadata(bridge)).toBe(true);
       expect(bridge.file.length).toBeGreaterThan(0);
     }
+  });
+
+  it("prevents migrated feature code from importing legacy semantic components", () => {
+    expect(detectedLegacyFeatureImports(process.cwd())).toEqual([]);
   });
 });
 

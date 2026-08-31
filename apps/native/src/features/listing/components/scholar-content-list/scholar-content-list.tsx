@@ -8,11 +8,9 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { List } from "@/shared/components/List";
-import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
+import { AppText, List, TextInput } from "@/shared/ui";
 
 /** Describes the inputs and callbacks accepted by Scholar Content List. */
 /** Describes the inputs, callbacks, and optional state accepted by Scholar Content List. */

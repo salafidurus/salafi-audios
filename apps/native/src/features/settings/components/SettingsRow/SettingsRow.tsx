@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { View, Pressable } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { AppText } from "@/shared/ui";
 
 /** Provides native account, preference, support, and settings workflows. */
 /** Describes the inputs, callbacks, and optional state accepted by Settings Row. */

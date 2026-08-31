@@ -6,7 +6,7 @@ import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { audioService } from "@/features/audio";
-import { AppText } from "@/shared/components/AppText/AppText";
+import { AppText } from "@/shared/ui";
 
 /** Describes the inputs and callbacks accepted by Series Context Bar. */
 /** Describes the inputs, callbacks, and optional state accepted by Series Context Bar. */
