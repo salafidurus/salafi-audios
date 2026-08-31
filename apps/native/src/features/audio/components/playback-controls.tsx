@@ -1,17 +1,20 @@
+import { Button, Column, Row } from "@expo/ui";
 import { useAudio, useQueue } from "@sd/domain-audio";
-import { Play, Pause, RotateCw, RotateCcw, SkipBack, SkipForward } from "lucide-react-native";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
+import { toUniversalStyleFromRN } from "@/core/styles/expo-ui";
+import { NativeIcon, NativeText } from "@/shared/ui";
 
 import { audioService } from "../audio-service";
 
-/** Adapts the platform audio engine to the native playback contract and lifecycle. */
+/** Defines the native playback control contract used by this module. */
+
 function handlePrevious() {
   audioService.skipToPrevious();
 }
 
-/** Defines the native playback controls contract used by this module. */
+/** Renders native playback actions while preserving the audio service contract. */
 export function PlaybackControls() {
   const { isPlaying, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
   const { hasNext } = useQueue();
@@ -47,99 +50,112 @@ export function PlaybackControls() {
     audioService.setSpeed(speeds[nextIndex]!);
   };
 
-  const onPrimary = theme.colors.content.onPrimary;
-  const strong = theme.colors.content.strong;
-  const muted = theme.colors.content.muted;
-  const RotateCcwIcon = <RotateCcw size={28} color={strong} />;
-  const PauseIcon = <Pause size={32} color={onPrimary} fill={onPrimary} />;
-  const PlayIcon = <Play size={32} color={onPrimary} fill={onPrimary} />;
-  const RotateCwIcon = <RotateCw size={28} color={strong} />;
-
   if (!hasTrack) return null;
 
   return (
-    <View style={styles.container}>
-      <View accessible accessibilityLabel="Playback speed">
-        <Pressable onPress={handleCycleSpeed} testID="playback-speed">
-          <Text
-            style={{ fontSize: 12, fontWeight: "bold", color: muted }}
-          >{`${speed.toFixed(2)}x`}</Text>
-        </Pressable>
-      </View>
+    <Column
+      alignment="center"
+      spacing={theme.spacing.scale.md}
+      style={toUniversalStyleFromRN(styles.container)}
+    >
+      <Button
+        onPress={handleCycleSpeed}
+        variant="text"
+        label={`${speed.toFixed(2)}x`}
+        testID="playback-speed"
+        style={toUniversalStyleFromRN(styles.speedButton)}
+      />
 
-      <View style={styles.centerControls}>
-        <View accessible accessibilityLabel="Previous track">
-          <Pressable onPress={handlePrevious} testID="previous-track">
-            <SkipBack size={20} color={strong} fill={strong} />
-          </Pressable>
-        </View>
+      <Row alignment="center" spacing={theme.spacing.scale.sm}>
+        <Button
+          variant="text"
+          onPress={handlePrevious}
+          testID="previous-track"
+          style={toUniversalStyleFromRN(styles.iconButton)}
+        >
+          <NativeIcon name="skipBack" size={20} colorRole="strong" />
+        </Button>
 
-        <View accessible accessibilityLabel="Skip backward 30 seconds">
-          <Pressable onPress={handleSkipBackward} testID="skip-backward" style={styles.skipControl}>
-            {RotateCcwIcon}
-            <Text style={styles.skipText}>30</Text>
-          </Pressable>
-        </View>
+        <Button
+          variant="text"
+          onPress={handleSkipBackward}
+          testID="skip-backward"
+          style={toUniversalStyleFromRN(styles.iconButton)}
+        >
+          <Column alignment="center">
+            <NativeIcon name="replay" size={28} colorRole="strong" />
+            <NativeText variant="caption" colorRole="strong" textStyle={{ fontSize: 9 }}>
+              30
+            </NativeText>
+          </Column>
+        </Button>
 
-        <View accessible accessibilityLabel={isPlaying ? "Pause" : "Play"}>
-          <Pressable onPress={handlePlayPause} style={styles.playButton} testID="play-pause">
-            {isPlaying ? PauseIcon : <View style={{ marginStart: 4 }}>{PlayIcon}</View>}
-          </Pressable>
-        </View>
+        <Button
+          variant="text"
+          onPress={handlePlayPause}
+          testID="play-pause"
+          style={toUniversalStyleFromRN(styles.playButton)}
+        >
+          <NativeIcon name={isPlaying ? "pause" : "play"} size={30} colorRole="onAction" />
+        </Button>
 
-        <View accessible accessibilityLabel="Skip forward 30 seconds">
-          <Pressable onPress={handleSkipForward} testID="skip-forward" style={styles.skipControl}>
-            {RotateCwIcon}
-            <Text style={styles.skipText}>30</Text>
-          </Pressable>
-        </View>
+        <Button
+          variant="text"
+          onPress={handleSkipForward}
+          testID="skip-forward"
+          style={toUniversalStyleFromRN(styles.iconButton)}
+        >
+          <Column alignment="center">
+            <NativeIcon name="forward" size={28} colorRole="strong" />
+            <NativeText variant="caption" colorRole="strong" textStyle={{ fontSize: 9 }}>
+              30
+            </NativeText>
+          </Column>
+        </Button>
 
-        <View accessible accessibilityLabel="Next track">
-          <Pressable onPress={handleNext} disabled={!hasNext} testID="next-track">
-            <SkipForward
-              size={20}
-              color={hasNext ? strong : muted}
-              fill={hasNext ? strong : muted}
-            />
-          </Pressable>
-        </View>
-      </View>
-
-      <View style={styles.placeholder} />
-    </View>
+        <Button
+          variant="text"
+          onPress={handleNext}
+          disabled={!hasNext}
+          testID="next-track"
+          style={toUniversalStyleFromRN(styles.iconButton)}
+        >
+          <NativeIcon
+            name="skipForward"
+            size={20}
+            color={hasNext ? theme.colors.content.strong : theme.colors.content.muted}
+          />
+        </Button>
+      </Row>
+    </Column>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    paddingHorizontal: theme.spacing.scale.xl,
-    marginVertical: theme.spacing.scale.lg,
-  },
-  centerControls: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  skipControl: {
-    flexDirection: "row",
-    alignItems: "center",
+    alignSelf: "stretch",
+    marginVertical: theme.spacing.scale.md,
   },
   playButton: {
     width: 64,
     height: 64,
     borderRadius: theme.radius.scale.full,
     backgroundColor: theme.colors.action.primary,
-    marginHorizontal: theme.spacing.scale["2xl"],
+    justifyContent: "center",
+    alignment: "center",
   },
-  skipText: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: theme.colors.content.strong,
+  iconButton: {
+    width: 44,
+    height: 52,
+    justifyContent: "center",
+    alignment: "center",
   },
-  placeholder: {
-    width: 60,
+  speedButton: {
+    height: 40,
+    borderRadius: theme.radius.scale.lg,
+    backgroundColor: theme.colors.surface.subtle,
+    width: 76,
+    justifyContent: "center",
+    alignment: "center",
   },
 }));
