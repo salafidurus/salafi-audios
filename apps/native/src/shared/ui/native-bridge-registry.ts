@@ -31,6 +31,13 @@ export const APPROVED_NATIVE_BRIDGES: readonly ApprovedNativeBridge[] = [
     validationEvidence: "NativeBridgeHost composition test and Android host validation",
   },
   {
+    file: "src/shared/components/List/ListItem.tsx",
+    kind: "bridge",
+    reason: "ListItem keeps rich leading, trailing, and action content in explicit RN host slots.",
+    owner: "native UI foundation",
+    validationEvidence: "ListItem contract tests and Android list host validation",
+  },
+  {
     file: "src/shared/components/DraggableList.tsx",
     kind: "infrastructure",
     reason: "Reordering requires React Native gesture and animation infrastructure.",
