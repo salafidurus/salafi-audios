@@ -115,22 +115,23 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     },
   };
 
-  const statusView = (
-    <ExploreScholarStatus
-      headerSearchOptions={headerSearchOptions}
-      isError={isError}
-      isFetching={isFetching}
-      hasItems={filteredScholars.length > 0}
-      emptyMessage={
-        searchQuery
-          ? t("scholarContent.searchNoMatch", "No scholars match your search.")
-          : getEmptyStateText("feed", t)
-      }
-      t={t}
-      refetch={refetch}
-    />
-  );
-  if (statusView) return statusView;
+  if (filteredScholars.length === 0) {
+    return (
+      <ExploreScholarStatus
+        headerSearchOptions={headerSearchOptions}
+        isError={isError}
+        isFetching={isFetching}
+        hasItems={filteredScholars.length > 0}
+        emptyMessage={
+          searchQuery
+            ? t("scholarContent.searchNoMatch", "No scholars match your search.")
+            : getEmptyStateText("feed", t)
+        }
+        t={t}
+        refetch={refetch}
+      />
+    );
+  }
 
   return (
     <View style={styles.screen}>

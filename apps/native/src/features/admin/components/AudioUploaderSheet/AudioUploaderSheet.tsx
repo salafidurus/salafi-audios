@@ -5,11 +5,13 @@ import { useAbility } from "@sd/domain-account";
 import { useScholarsList } from "@sd/domain-content";
 import * as DocumentPicker from "expo-document-picker";
 import { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, type ViewStyle, Pressable, Text, View } from "react-native";
+import { FlatList, type ViewStyle, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { Button } from "@/shared/components/Button/Button";
 
 import { getPresignedUrl, uploadToR2, createListing } from "../../api/admin-listings.api";
 
@@ -69,14 +71,13 @@ type ScholarChipProps = {
 
 function ScholarChip({ scholar, isSelected, onPress }: ScholarChipProps) {
   return (
-    <Pressable
+    <Button
+      label={scholar.name}
       onPress={() => onPress(scholar.id)}
-      style={[styles.scholarChip, isSelected && styles.scholarChipSelected]}
-    >
-      <Text style={[styles.scholarChipText, isSelected && styles.scholarChipTextSelected]}>
-        {scholar.name}
-      </Text>
-    </Pressable>
+      variant={isSelected ? "primary" : "outline"}
+      size="sm"
+      style={styles.scholarChip}
+    />
   );
 }
 
@@ -112,13 +113,17 @@ function QueueItem({ item }: QueueItemProps) {
 
   return (
     <View style={styles.queueItem}>
-      <Text numberOfLines={1} style={styles.queueItemName}>
+      <AppText variant="bodySm" numberOfLines={1} style={styles.queueItemName}>
         {item.name}
-      </Text>
+      </AppText>
       <View style={styles.progressTrack}>
         <View style={fillStyle} />
       </View>
-      {item.status === "error" && <Text style={styles.queueItemError}>{item.error}</Text>}
+      {item.status === "error" && (
+        <AppText variant="bodySm" style={styles.queueItemError}>
+          {item.error}
+        </AppText>
+      )}
     </View>
   );
 }
@@ -192,7 +197,6 @@ function isUploadDisabled(queueLength: number, isUploading: boolean, scholarId: 
 
 /** Renders the native audio uploader sheet surface and coordinates its user-facing state. */
 export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioUploaderSheetProps) {
-  const { theme } = useUnistyles();
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
@@ -245,11 +249,13 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t("admin.audioUploader.title", "Upload Audio")}</Text>
+      <AppText variant="titleLg" style={styles.title}>
+        {t("admin.audioUploader.title", "Upload Audio")}
+      </AppText>
 
-      <Text style={styles.label}>
+      <AppText variant="labelMd" style={styles.label}>
         {t("admin.audioUploader.assignScholar", "Assign to Scholar")}
-      </Text>
+      </AppText>
       <FlatList
         data={scholars}
         horizontal
@@ -259,11 +265,12 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
         renderItem={renderScholarItem}
       />
 
-      <Pressable onPress={handlePick} style={styles.pickBtn}>
-        <Text style={styles.pickBtnText}>
-          {t("admin.audioUploader.selectFiles", "Select Audio Files")}
-        </Text>
-      </Pressable>
+      <Button
+        label={t("admin.audioUploader.selectFiles", "Select Audio Files")}
+        onPress={handlePick}
+        variant="outline"
+        style={styles.pickBtn}
+      />
 
       <FlatList
         data={queue}
@@ -273,22 +280,19 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
       />
 
       <View style={styles.buttonRow}>
-        <Pressable
+        <Button
+          label={t("admin.audioUploader.uploadAll", "Upload All")}
           onPress={handleUploadAll}
+          loading={isUploading}
           disabled={uploadDisabled}
-          style={[styles.uploadBtn, uploadDisabled && styles.uploadBtnDisabled]}
-        >
-          {isUploading ? (
-            <ActivityIndicator color={theme.colors.content.onPrimary} />
-          ) : (
-            <Text style={styles.uploadBtnText}>
-              {t("admin.audioUploader.uploadAll", "Upload All")}
-            </Text>
-          )}
-        </Pressable>
-        <Pressable onPress={onClose} style={styles.cancelBtn}>
-          <Text style={styles.cancelBtnText}>{t("common.cancel", "Cancel")}</Text>
-        </Pressable>
+          style={styles.uploadBtn}
+        />
+        <Button
+          label={t("common.cancel", "Cancel")}
+          onPress={onClose}
+          variant="ghost"
+          style={styles.cancelBtn}
+        />
       </View>
     </View>
   );

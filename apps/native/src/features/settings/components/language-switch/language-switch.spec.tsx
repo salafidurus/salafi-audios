@@ -44,6 +44,12 @@ jest.mock("react-native-unistyles", () => ({
         },
       }),
   },
+  useUnistyles: () => ({
+    theme: {
+      colors: { content: { strong: "#111111" } },
+      typography: { labelMd: {} },
+    },
+  }),
 }));
 
 describe("LanguageSwitch", () => {

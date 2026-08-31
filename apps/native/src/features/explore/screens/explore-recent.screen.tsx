@@ -198,17 +198,18 @@ export function ExploreRecentScreen({
     },
   };
 
-  const statusView = (
-    <ExploreRecentStatus
-      headerSearchOptions={headerSearchOptions}
-      isError={isError}
-      isFetching={isFetching}
-      hasItems={items.length > 0}
-      t={t}
-      refetch={refetch}
-    />
-  );
-  if (statusView) return statusView;
+  if (items.length === 0) {
+    return (
+      <ExploreRecentStatus
+        headerSearchOptions={headerSearchOptions}
+        isError={isError}
+        isFetching={isFetching}
+        hasItems={items.length > 0}
+        t={t}
+        refetch={refetch}
+      />
+    );
+  }
 
   return (
     <View style={styles.screen}>

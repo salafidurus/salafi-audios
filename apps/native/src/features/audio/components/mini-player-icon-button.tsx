@@ -18,19 +18,18 @@ export function MiniPlayerIconButton({ onPress }: MiniPlayerIconButtonProps) {
   const { t } = useTranslation();
 
   return (
-    <Pressable
-      onPress={onPress}
+    <View
+      accessible
       accessibilityRole="button"
       accessibilityLabel={t("navigation.show_miniplayer", "Show mini player")}
       style={styles.container}
-      testID="mini-player-icon-button"
     >
       <EaseView animate={{ scale: 1 }} transition={{ type: "spring", damping: 12, stiffness: 150 }}>
-        <View style={styles.button}>
+        <Pressable onPress={onPress} testID="mini-player-icon-button" style={styles.button}>
           <Music size={20} color={theme.colors.action.primary} />
-        </View>
+        </Pressable>
       </EaseView>
-    </Pressable>
+    </View>
   );
 }
 

@@ -83,7 +83,9 @@ function rewriteLoopbackForAndroidEmulator(url: string): string {
 
 /** Returns the the api base url used by native consumers. */
 export function getApiBaseUrl(): string | undefined {
-  const apiUrl = getRuntimeEnv()?.apiUrl;
+  // Expo config extra is unavailable in some development-client startup paths,
+  // while EXPO_PUBLIC_* values are still statically embedded by Expo.
+  const apiUrl = getRuntimeEnv()?.apiUrl ?? process.env.EXPO_PUBLIC_API_URL;
   if (!apiUrl) {
     return apiUrl;
   }

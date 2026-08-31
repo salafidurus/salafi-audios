@@ -173,18 +173,22 @@ export function ExplorePodcastRow({ item, onPress, onNavigateToListing }: Explor
   return (
     <List.Item onPress={handlePlay} testID="podcast-row-item">
       <View style={styles.rowContent} testID="podcast-row">
-        <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
-        <View style={styles.content}>
-          <MarqueeText text={title} variant="titleMd" />
-          <MarqueeText text={displayScholarName} variant="bodySm" />
-          <View style={styles.details}>
-            <AppText variant="xs" style={styles.metaText}>
-              {durationText}
-              {durationText && publishedDateText && " · "}
-              {publishedDateText}
-            </AppText>
+        <View style={styles.rowLayout}>
+          <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
+          <View style={styles.content}>
+            <View style={styles.columnLayout}>
+              <MarqueeText text={title} variant="titleMd" />
+              <MarqueeText text={displayScholarName} variant="bodySm" />
+              <View style={styles.details}>
+                <AppText variant="xs" style={styles.metaText}>
+                  {durationText}
+                  {durationText && publishedDateText && " · "}
+                  {publishedDateText}
+                </AppText>
+              </View>
+              {renderProgressBar(progressPercent)}
+            </View>
           </View>
-          {renderProgressBar(progressPercent)}
         </View>
       </View>
 
@@ -198,6 +202,15 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     gap: theme.spacing.scale.sm,
     flex: 1,
+  },
+  rowLayout: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.sm,
+    flex: 1,
+  },
+  columnLayout: {
+    gap: theme.spacing.scale.xs,
   },
   content: {
     flex: 1,

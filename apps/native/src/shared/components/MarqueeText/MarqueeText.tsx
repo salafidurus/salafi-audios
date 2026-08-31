@@ -72,7 +72,7 @@ export function MarqueeText({
       onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
       style={{ overflow: "hidden", minWidth: 0, width: "100%" }}
     >
-      <View style={{ opacity: textWidth === 0 ? 0 : 1 }}>
+      <View>
         <Animated.View style={animatedStyle}>
           <AppText
             variant={variant}

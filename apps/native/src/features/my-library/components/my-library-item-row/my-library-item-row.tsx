@@ -123,24 +123,28 @@ export function MyLibraryItemRow({
   return (
     <List.Item onPress={onPress} testID={testID}>
       <View style={styles.rowContent}>
-        <View style={styles.iconContainer}>
-          <MyLibraryItemIcon variant={variant} />
-        </View>
-        <View style={styles.content}>
-          <AppText variant="bodyMd" numberOfLines={2}>
-            {lectureTitle}
-          </AppText>
-          <MarqueeText
-            text={`${item.scholarName}${item.seriesTitle ? ` · ${item.seriesTitle}` : ""}`}
-            variant="caption"
-            style={styles.subtitle}
-          />
-          <AppText variant="xs" style={styles.meta}>
-            {renderMeta(item, variant, progress, t)}
-          </AppText>
-          {variant === "progress" && progress !== null ? (
-            <ProgressBarFill percent={progress} />
-          ) : null}
+        <View style={styles.rowLayout}>
+          <View style={styles.iconContainer}>
+            <MyLibraryItemIcon variant={variant} />
+          </View>
+          <View style={styles.content}>
+            <View style={styles.columnLayout}>
+              <AppText variant="bodyMd" numberOfLines={2}>
+                {lectureTitle}
+              </AppText>
+              <MarqueeText
+                text={`${item.scholarName}${item.seriesTitle ? ` · ${item.seriesTitle}` : ""}`}
+                variant="caption"
+                style={styles.subtitle}
+              />
+              <AppText variant="xs" style={styles.meta}>
+                {renderMeta(item, variant, progress, t)}
+              </AppText>
+              {variant === "progress" && progress !== null ? (
+                <ProgressBarFill percent={progress} />
+              ) : null}
+            </View>
+          </View>
         </View>
       </View>
       {renderActions(actions, onAction)}
@@ -153,6 +157,14 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: theme.spacing.scale.md,
+  },
+  rowLayout: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.md,
+  },
+  columnLayout: {
+    gap: theme.spacing.scale.xs,
   },
   iconContainer: {
     paddingTop: theme.spacing.scale.xs,

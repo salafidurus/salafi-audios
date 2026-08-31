@@ -85,7 +85,16 @@ jest.mock("@expo/ui", () => {
     return React.createElement(View, { style, ...rest }, children);
   }
 
-  function Button({ children, label, onPress, disabled, testID, variant, style }) {
+  function Button({
+    children,
+    label,
+    onPress,
+    disabled,
+    testID,
+    variant,
+    style,
+    accessibilityLabel,
+  }) {
     return React.createElement(
       Pressable,
       {
@@ -96,6 +105,7 @@ jest.mock("@expo/ui", () => {
         variant,
         accessibilityRole: "button",
         accessibilityState: { disabled },
+        accessibilityLabel,
       },
       children ?? React.createElement(Text, null, label),
     );

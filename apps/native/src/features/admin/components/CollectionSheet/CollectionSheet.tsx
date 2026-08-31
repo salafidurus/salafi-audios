@@ -3,11 +3,13 @@ import type { AdminListingDetailDto, Locale } from "@sd/core-contracts";
 import { subject } from "@casl/ability";
 import { useAbility } from "@sd/domain-account";
 import { useReducer } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { Button } from "@/shared/components/Button/Button";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 
 import { createCollection, updateCollection } from "../../api/admin-scholars.api";
@@ -109,21 +111,23 @@ function CollectionSheetForm({
   const { title, description, language, isSaving, error } = state;
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
+      <AppText variant="titleLg" style={styles.title}>
         {collection
           ? t("admin.collectionEdit.editTitle", "Edit Collection")
           : t("admin.collectionEdit.newTitle", "New Collection")}
-      </Text>
+      </AppText>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.label}>{t("admin.collectionEdit.titleLabel", "Title *")}</Text>
+        <AppText variant="labelMd" style={styles.label}>
+          {t("admin.collectionEdit.titleLabel", "Title *")}
+        </AppText>
         <TextInput
           value={title}
           onChangeText={(v) => dispatch({ title: v })}
           style={styles.input}
         />
-        <Text style={styles.label}>
+        <AppText variant="labelMd" style={styles.label}>
           {t("admin.collectionEdit.descriptionLabel", "Description")}
-        </Text>
+        </AppText>
         <TextInput
           value={description}
           onChangeText={(v) => dispatch({ description: v })}
@@ -131,7 +135,9 @@ function CollectionSheetForm({
           numberOfLines={3}
           style={styles.input}
         />
-        <Text style={styles.label}>{t("admin.collectionEdit.languageLabel", "Language")}</Text>
+        <AppText variant="labelMd" style={styles.label}>
+          {t("admin.collectionEdit.languageLabel", "Language")}
+        </AppText>
         <TextInput
           value={language}
           onChangeText={(v) => dispatch({ language: v })}
@@ -139,19 +145,26 @@ function CollectionSheetForm({
           placeholderTextColor={theme.colors.content.muted}
           style={styles.input}
         />
-        {error && <Text style={styles.errorText}>{error}</Text>}
+        {error && (
+          <AppText variant="bodySm" style={styles.errorText}>
+            {error}
+          </AppText>
+        )}
       </ScrollView>
       <View style={styles.buttonRow}>
-        <Pressable onPress={onSave} disabled={isSaving || !canSave} style={styles.saveBtn}>
-          {isSaving ? (
-            <ActivityIndicator color={theme.colors.content.onPrimary} />
-          ) : (
-            <Text style={styles.saveBtnText}>{t("common.save", "Save")}</Text>
-          )}
-        </Pressable>
-        <Pressable onPress={onClose} style={styles.cancelBtn}>
-          <Text style={styles.cancelBtnText}>{t("common.cancel", "Cancel")}</Text>
-        </Pressable>
+        <Button
+          label={t("common.save", "Save")}
+          onPress={onSave}
+          loading={isSaving}
+          disabled={!canSave}
+          style={styles.saveBtn}
+        />
+        <Button
+          label={t("common.cancel", "Cancel")}
+          onPress={onClose}
+          variant="ghost"
+          style={styles.cancelBtn}
+        />
       </View>
     </View>
   );
