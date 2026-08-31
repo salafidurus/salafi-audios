@@ -106,7 +106,10 @@ function renderActions(
   return <List.Item.Actions actions={actions} onAction={onAction} />;
 }
 
-/** Renders the native my library item row surface and coordinates its user-facing state. */
+/**
+ * Renders the library row while retaining an RN fallback for progress fill,
+ * marquee metadata, and saved/completed action-menu behavior.
+ */
 export function MyLibraryItemRow({
   item,
   variant,

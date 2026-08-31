@@ -1,5 +1,6 @@
 import type { ScholarContentItemDto } from "@sd/core-contracts";
 
+import { Host } from "@expo/ui";
 import { pickContentField } from "@sd/core-i18n";
 import { useState, useCallback } from "react";
 import { FlatList, Pressable, View } from "react-native";
@@ -10,7 +11,6 @@ import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
-import { MarqueeText } from "@/shared/components/MarqueeText";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
@@ -112,11 +112,15 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
             {filteredBrowse.map((item) => {
               const title = pickContentField(item.title, item.original?.title, showOriginal);
               return (
-                <List.Item key={item.id} onPress={() => navigateToListing(item.slug)}>
-                  <View style={styles.rowContent}>
-                    <MarqueeText text={title} variant="titleMd" />
-                  </View>
-                </List.Item>
+                <Host key={item.id} matchContents>
+                  <List.Item
+                    title={title}
+                    onPress={() => navigateToListing(item.slug)}
+                    testID={`scholar-content-row-${item.slug}`}
+                  >
+                    {null}
+                  </List.Item>
+                </Host>
               );
             })}
           </View>
@@ -166,13 +170,5 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.scale.sm,
     color: theme.colors.content.default,
     marginBottom: theme.spacing.scale.sm,
-  },
-  rowContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.scale.sm,
-  },
-  titleText: {
-    flex: 1,
   },
 }));

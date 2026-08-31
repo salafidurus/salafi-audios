@@ -106,7 +106,10 @@ export type LessonRowProps = {
   onLayout?: (id: string, y: number) => void;
 };
 
-/** Renders the native lesson row surface and coordinates its user-facing state. */
+/**
+ * Renders the lesson row through RN because playback gestures, download state,
+ * progress animation, and the nested action controls need explicit fallbacks.
+ */
 export function LessonRow({ item, queue, highlighted = false, onLayout }: LessonRowProps) {
   const { theme } = useUnistyles();
   const { isPlaying, currentTrack } = useAudio();
