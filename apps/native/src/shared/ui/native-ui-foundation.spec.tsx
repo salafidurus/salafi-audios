@@ -6,7 +6,7 @@ import { NativeIcon } from "./native-icon";
 import { NativeList, NativeListItem } from "./native-list";
 import { NativeStateView } from "./native-state-view";
 import { NativeText } from "./native-text";
-import { NativeScreenHost } from "./native-ui-host";
+import { NativeBridgeHost, NativeScreenHost } from "./native-ui-host";
 
 describe("native UI foundation", () => {
   it("renders token-aware semantic text", async () => {
@@ -110,5 +110,17 @@ describe("native UI foundation", () => {
       layoutDirection: "leftToRight",
       useViewportSizeMeasurement: true,
     });
+  });
+
+  it("uses RNHostView only for an explicitly bridged RN child", async () => {
+    await render(
+      <NativeBridgeHost>
+        <NativeText testID="bridged-content">Bridged content</NativeText>
+      </NativeBridgeHost>,
+    );
+
+    expect(screen.getByTestId("rn-host-view")).toContainElement(
+      screen.getByTestId("bridged-content"),
+    );
   });
 });
