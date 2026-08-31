@@ -1,8 +1,7 @@
-import { Button as ExpoButton, Host, Text as ExpoText } from "@expo/ui";
 import { useAudio, useQueue } from "@sd/domain-audio";
 import { Play, Pause, RotateCw, RotateCcw, SkipBack, SkipForward } from "lucide-react-native";
 import React from "react";
-import { View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { audioService } from "../audio-service";
@@ -61,60 +60,48 @@ export function PlaybackControls() {
   return (
     <View style={styles.container}>
       <View accessible accessibilityLabel="Playback speed">
-        <Host matchContents>
-          <ExpoButton onPress={handleCycleSpeed} variant="text" testID="playback-speed">
-            <ExpoText
-              textStyle={{ fontSize: 12, fontWeight: "bold", color: muted }}
-            >{`${speed.toFixed(2)}x`}</ExpoText>
-          </ExpoButton>
-        </Host>
+        <Pressable onPress={handleCycleSpeed} testID="playback-speed">
+          <Text
+            style={{ fontSize: 12, fontWeight: "bold", color: muted }}
+          >{`${speed.toFixed(2)}x`}</Text>
+        </Pressable>
       </View>
 
       <View style={styles.centerControls}>
         <View accessible accessibilityLabel="Previous track">
-          <Host matchContents>
-            <ExpoButton onPress={handlePrevious} variant="text" testID="previous-track">
-              <SkipBack size={20} color={strong} fill={strong} />
-            </ExpoButton>
-          </Host>
+          <Pressable onPress={handlePrevious} testID="previous-track">
+            <SkipBack size={20} color={strong} fill={strong} />
+          </Pressable>
         </View>
 
         <View accessible accessibilityLabel="Skip backward 30 seconds">
-          <Host matchContents>
-            <ExpoButton onPress={handleSkipBackward} variant="text" testID="skip-backward">
-              {RotateCcwIcon}
-              <ExpoText textStyle={styles.skipText}>30</ExpoText>
-            </ExpoButton>
-          </Host>
+          <Pressable onPress={handleSkipBackward} testID="skip-backward" style={styles.skipControl}>
+            {RotateCcwIcon}
+            <Text style={styles.skipText}>30</Text>
+          </Pressable>
         </View>
 
         <View accessible accessibilityLabel={isPlaying ? "Pause" : "Play"}>
-          <Host matchContents>
-            <ExpoButton onPress={handlePlayPause} style={styles.playButton} testID="play-pause">
-              {isPlaying ? PauseIcon : <View style={{ marginStart: 4 }}>{PlayIcon}</View>}
-            </ExpoButton>
-          </Host>
+          <Pressable onPress={handlePlayPause} style={styles.playButton} testID="play-pause">
+            {isPlaying ? PauseIcon : <View style={{ marginStart: 4 }}>{PlayIcon}</View>}
+          </Pressable>
         </View>
 
         <View accessible accessibilityLabel="Skip forward 30 seconds">
-          <Host matchContents>
-            <ExpoButton onPress={handleSkipForward} variant="text" testID="skip-forward">
-              {RotateCwIcon}
-              <ExpoText textStyle={styles.skipText}>30</ExpoText>
-            </ExpoButton>
-          </Host>
+          <Pressable onPress={handleSkipForward} testID="skip-forward" style={styles.skipControl}>
+            {RotateCwIcon}
+            <Text style={styles.skipText}>30</Text>
+          </Pressable>
         </View>
 
         <View accessible accessibilityLabel="Next track">
-          <Host matchContents>
-            <ExpoButton onPress={handleNext} disabled={!hasNext} variant="text" testID="next-track">
-              <SkipForward
-                size={20}
-                color={hasNext ? strong : muted}
-                fill={hasNext ? strong : muted}
-              />
-            </ExpoButton>
-          </Host>
+          <Pressable onPress={handleNext} disabled={!hasNext} testID="next-track">
+            <SkipForward
+              size={20}
+              color={hasNext ? strong : muted}
+              fill={hasNext ? strong : muted}
+            />
+          </Pressable>
         </View>
       </View>
 
@@ -133,6 +120,10 @@ const styles = StyleSheet.create((theme) => ({
     marginVertical: theme.spacing.scale.lg,
   },
   centerControls: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  skipControl: {
     flexDirection: "row",
     alignItems: "center",
   },

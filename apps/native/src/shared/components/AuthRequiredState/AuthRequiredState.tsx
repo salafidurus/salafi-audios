@@ -25,7 +25,7 @@ export function AuthRequiredState({
 
   return (
     <ScreenView center contentStyle={styles.content}>
-      <Host matchContents>
+      <Host matchContents={{ vertical: true }} style={styles.textContent}>
         <Column spacing={theme.spacing.component.gapSm}>
           <ExpoText
             textStyle={{
@@ -57,5 +57,8 @@ export function AuthRequiredState({
 const styles = StyleSheet.create((theme) => ({
   content: {
     gap: theme.spacing.component.gapXl,
+  },
+  textContent: {
+    width: "100%",
   },
 }));

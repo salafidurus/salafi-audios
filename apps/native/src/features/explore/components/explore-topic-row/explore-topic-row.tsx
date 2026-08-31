@@ -1,11 +1,10 @@
 import type { ContentSuggestionDto } from "@sd/core-contracts";
 import type { ListRenderItemInfo } from "react-native";
 
-import { Button as ExpoButton, Column, Host } from "@expo/ui";
 import { pickContentField } from "@sd/core-i18n";
 import { useFormattedScholarName } from "@sd/domain-content";
 import { useCallback } from "react";
-import { View, FlatList } from "react-native";
+import { FlatList, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -31,26 +30,23 @@ function TopicCard({ item, showOriginal, onItemPress }: TopicCardProps) {
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
   return (
-    <Host matchContents>
-      <ExpoButton
-        variant="text"
-        onPress={() => onItemPress?.(item.slug)}
-        style={styles.card}
-        testID={`topic-card-${item.slug}`}
-      >
-        <Column>
-          <AppText variant="bodySm" style={styles.title} numberOfLines={2}>
-            {title}
+    <Pressable
+      onPress={() => onItemPress?.(item.slug)}
+      style={styles.card}
+      testID={`topic-card-${item.slug}`}
+    >
+      <View style={styles.cardContent}>
+        <AppText variant="bodySm" style={styles.title} numberOfLines={2}>
+          {title}
+        </AppText>
+        <MarqueeText text={scholarName} variant="caption" style={styles.scholar} />
+        {item.durationSeconds ? (
+          <AppText variant="caption" style={styles.duration}>
+            {Math.floor(item.durationSeconds / 60)}m
           </AppText>
-          <MarqueeText text={scholarName} variant="caption" style={styles.scholar} />
-          {item.durationSeconds ? (
-            <AppText variant="caption" style={styles.duration}>
-              {Math.floor(item.durationSeconds / 60)}m
-            </AppText>
-          ) : null}
-        </Column>
-      </ExpoButton>
-    </Host>
+        ) : null}
+      </View>
+    </Pressable>
   );
 }
 
@@ -107,6 +103,9 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.colors.border.default,
     borderRadius: theme.radius.component.panel,
     backgroundColor: theme.colors.surface.default,
+  },
+  cardContent: {
+    gap: theme.spacing.scale.xs,
   },
   title: {
     fontSize: 14,

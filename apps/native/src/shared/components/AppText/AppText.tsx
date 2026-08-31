@@ -2,7 +2,13 @@ import type { UniversalStyle, UniversalTextStyle } from "@expo/ui";
 import type { TypographyVariant } from "@sd/design-tokens";
 
 import { Host, Text as ExpoText } from "@expo/ui";
-import { StyleSheet as RNStyleSheet, type TextProps, type TextStyle } from "react-native";
+import {
+  Platform,
+  StyleSheet as RNStyleSheet,
+  Text as RNText,
+  type TextProps,
+  type TextStyle,
+} from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
 import { toUniversalStyle, toUniversalTextStyle } from "../../../core/styles/expo-ui";
@@ -29,8 +35,25 @@ export function AppText({ variant, children, style, numberOfLines, onLayout }: A
   // SAFETY: Expo UI Text accepts the same text children rendered by this primitive at runtime.
   const textChildren = children as string;
 
+  // Expo UI Text currently loses nested Android text during measurement in
+  // RN list/layout trees. RN Text keeps the same semantic token styles while
+  // restoring wrapping, onLayout, and accessibility on that platform.
+  if (Platform.OS === "android") {
+    return (
+      <RNText style={flattened} numberOfLines={numberOfLines} onLayout={onLayout}>
+        {textChildren}
+      </RNText>
+    );
+  }
+
   return (
-    <Host style={pickLayoutStyle(flattened)} onLayout={onLayout}>
+    <Host
+      // Let React Native own horizontal sizing so labels can wrap in rows;
+      // let the native text surface determine its intrinsic height.
+      matchContents={{ vertical: true }}
+      style={pickLayoutStyle(flattened)}
+      onLayout={onLayout}
+    >
       <ExpoText style={universalStyle} textStyle={textStyle} numberOfLines={numberOfLines}>
         {textChildren}
       </ExpoText>

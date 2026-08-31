@@ -1,7 +1,6 @@
 import type { MenuAction } from "@expo/ui/community/menu";
 import type { MyLibraryItemDto } from "@sd/core-contracts";
 
-import { Column, Row } from "@expo/ui";
 import { pickContentField } from "@sd/core-i18n";
 import { getMyLibraryItemPercent } from "@sd/domain-content";
 import { Bookmark, Clock, CheckCircle } from "lucide-react-native";
@@ -124,12 +123,12 @@ export function MyLibraryItemRow({
   return (
     <List.Item onPress={onPress} testID={testID}>
       <View style={styles.rowContent}>
-        <Row alignment="center">
+        <View style={styles.rowLayout}>
           <View style={styles.iconContainer}>
             <MyLibraryItemIcon variant={variant} />
           </View>
           <View style={styles.content}>
-            <Column>
+            <View style={styles.columnLayout}>
               <AppText variant="bodyMd" numberOfLines={2}>
                 {lectureTitle}
               </AppText>
@@ -144,9 +143,9 @@ export function MyLibraryItemRow({
               {variant === "progress" && progress !== null ? (
                 <ProgressBarFill percent={progress} />
               ) : null}
-            </Column>
+            </View>
           </View>
-        </Row>
+        </View>
       </View>
       {renderActions(actions, onAction)}
     </List.Item>
@@ -158,6 +157,14 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: theme.spacing.scale.md,
+  },
+  rowLayout: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.md,
+  },
+  columnLayout: {
+    gap: theme.spacing.scale.xs,
   },
   iconContainer: {
     paddingTop: theme.spacing.scale.xs,

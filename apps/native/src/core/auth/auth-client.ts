@@ -13,7 +13,7 @@ const scheme = Array.isArray(rawScheme) ? rawScheme[0] : (rawScheme ?? "salafidu
 
 /** Creates the Better Auth client used by native session and sign-in flows. */
 export const authClient = createAuthClient({
-  baseURL: getApiBaseUrl() ?? process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000",
+  baseURL: getApiBaseUrl() ?? "http://localhost:4000",
   plugins: [
     expoClient({
       scheme,

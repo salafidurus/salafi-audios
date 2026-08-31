@@ -1,7 +1,6 @@
-import { Button as ExpoButton, Host } from "@expo/ui";
 import { Music } from "lucide-react-native";
 import React from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { EaseView } from "react-native-ease";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -26,16 +25,9 @@ export function MiniPlayerIconButton({ onPress }: MiniPlayerIconButtonProps) {
       style={styles.container}
     >
       <EaseView animate={{ scale: 1 }} transition={{ type: "spring", damping: 12, stiffness: 150 }}>
-        <Host matchContents>
-          <ExpoButton
-            variant="text"
-            onPress={onPress}
-            testID="mini-player-icon-button"
-            style={styles.button}
-          >
-            <Music size={20} color={theme.colors.action.primary} />
-          </ExpoButton>
-        </Host>
+        <Pressable onPress={onPress} testID="mini-player-icon-button" style={styles.button}>
+          <Music size={20} color={theme.colors.action.primary} />
+        </Pressable>
       </EaseView>
     </View>
   );

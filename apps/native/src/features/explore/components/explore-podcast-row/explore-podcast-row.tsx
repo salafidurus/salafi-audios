@@ -2,7 +2,6 @@ import type { MenuAction } from "@expo/ui/community/menu";
 import type { FeedContentItemDto, ListingContentsDto } from "@sd/core-contracts";
 import type { Track } from "@sd/domain-audio";
 
-import { Column, Row } from "@expo/ui";
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import {
@@ -174,10 +173,10 @@ export function ExplorePodcastRow({ item, onPress, onNavigateToListing }: Explor
   return (
     <List.Item onPress={handlePlay} testID="podcast-row-item">
       <View style={styles.rowContent} testID="podcast-row">
-        <Row alignment="center">
+        <View style={styles.rowLayout}>
           <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
           <View style={styles.content}>
-            <Column>
+            <View style={styles.columnLayout}>
               <MarqueeText text={title} variant="titleMd" />
               <MarqueeText text={displayScholarName} variant="bodySm" />
               <View style={styles.details}>
@@ -188,9 +187,9 @@ export function ExplorePodcastRow({ item, onPress, onNavigateToListing }: Explor
                 </AppText>
               </View>
               {renderProgressBar(progressPercent)}
-            </Column>
+            </View>
           </View>
-        </Row>
+        </View>
       </View>
 
       <List.Item.Actions actions={actions} onAction={handleAction} />
@@ -203,6 +202,15 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     gap: theme.spacing.scale.sm,
     flex: 1,
+  },
+  rowLayout: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.sm,
+    flex: 1,
+  },
+  columnLayout: {
+    gap: theme.spacing.scale.xs,
   },
   content: {
     flex: 1,

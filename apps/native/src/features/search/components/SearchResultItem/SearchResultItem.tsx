@@ -1,7 +1,6 @@
-import { Button as ExpoButton, Column, Host, Row } from "@expo/ui";
 import { Image } from "expo-image";
 import { Clock3, Headphones } from "lucide-react-native";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
@@ -32,58 +31,47 @@ export function SearchResultItem({
   const durationLabel = formatDuration(durationSeconds);
 
   return (
-    <View style={styles.card}>
-      <Host matchContents={false}>
-        <ExpoButton
-          onPress={onPress}
-          variant="text"
-          style={{
-            backgroundColor: theme.colors.surface.default,
-            borderColor: theme.colors.border.subtle,
-            borderRadius: theme.radius.component.card,
-            borderWidth: 1,
-            padding: theme.spacing.component.cardPadding,
-            width: "100%",
-          }}
-        >
-          <Row alignment="center">
-            <View style={styles.media}>
-              {imageUrl ? (
-                <Image source={{ uri: imageUrl }} style={styles.cover} contentFit="cover" />
-              ) : (
-                <View style={styles.coverFallback}>
-                  <Headphones size={20} color={theme.colors.content.subtle} />
-                </View>
-              )}
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+    >
+      <View style={styles.row}>
+        <View style={styles.media}>
+          {imageUrl ? (
+            <Image source={{ uri: imageUrl }} style={styles.cover} contentFit="cover" />
+          ) : (
+            <View style={styles.coverFallback}>
+              <Headphones size={20} color={theme.colors.content.subtle} />
             </View>
-            <View style={styles.body}>
-              <Column>
-                <MarqueeText text={title} variant="titleMd" style={styles.title} />
-                <MarqueeText text={scholarName} variant="bodySm" style={styles.scholarName} />
-                <View style={styles.metaRow}>
-                  <Headphones size={11} color={theme.colors.content.muted} />
+          )}
+        </View>
+        <View style={styles.body}>
+          <View>
+            <MarqueeText text={title} variant="titleMd" style={styles.title} />
+            <MarqueeText text={scholarName} variant="bodySm" style={styles.scholarName} />
+            <View style={styles.metaRow}>
+              <Headphones size={11} color={theme.colors.content.muted} />
+              <AppText variant="caption" style={styles.metaText}>
+                {formatLectureCount(lectureCount)}
+              </AppText>
+              {durationLabel ? (
+                <>
                   <AppText variant="caption" style={styles.metaText}>
-                    {formatLectureCount(lectureCount)}
+                    {" "}
+                    ·{" "}
                   </AppText>
-                  {durationLabel ? (
-                    <>
-                      <AppText variant="caption" style={styles.metaText}>
-                        {" "}
-                        ·{" "}
-                      </AppText>
-                      <Clock3 size={11} color={theme.colors.content.muted} />
-                      <AppText variant="caption" style={styles.metaText}>
-                        {durationLabel}
-                      </AppText>
-                    </>
-                  ) : null}
-                </View>
-              </Column>
+                  <Clock3 size={11} color={theme.colors.content.muted} />
+                  <AppText variant="caption" style={styles.metaText}>
+                    {durationLabel}
+                  </AppText>
+                </>
+              ) : null}
             </View>
-          </Row>
-        </ExpoButton>
-      </Host>
-    </View>
+          </View>
+        </View>
+      </View>
+    </Pressable>
   );
 }
 
@@ -93,10 +81,16 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.colors.border.subtle,
     borderRadius: theme.radius.component.card,
     backgroundColor: theme.colors.surface.default,
+    padding: theme.spacing.component.cardPadding,
+  },
+  cardPressed: {
+    opacity: 0.8,
+  },
+  row: {
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.component.gapMd,
-    padding: theme.spacing.component.cardPadding,
+    width: "100%",
   },
   media: {
     width: "20%",
