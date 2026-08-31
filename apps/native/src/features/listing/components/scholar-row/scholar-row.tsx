@@ -1,73 +1,64 @@
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
 import { useFormatScholarName } from "@sd/domain-content";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
-import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 /** Builds native lecture and scholar content surfaces from canonical identities. */
-/** Describes the inputs, callbacks, and optional state accepted by Scholar Row. */
+/** Describes the inputs and callbacks accepted by Scholar Row. */
 export type ScholarRowProps = {
   scholar: ScholarListItemDto;
   onPress?: (slug: string) => void;
 };
 
-/** Renders the native scholar row surface and coordinates its user-facing state. */
+/**
+ * Renders a scholar row through the RN fallback because its callers use a
+ * virtualized FlatList; native List.Item cannot be nested in that cell safely.
+ */
 export function ScholarRow({ scholar, onPress }: ScholarRowProps) {
   const formatScholarName = useFormatScholarName();
 
   return (
-    <List.Item onPress={() => onPress?.(scholar.slug)}>
-      <View style={styles.rowContent} testID="scholar-row">
-        <UserAvatar
-          image={scholar.imageUrl}
-          name={scholar.name}
-          size={48}
-          testID={scholar.imageUrl ? "scholar-row-avatar" : "scholar-row-avatar-placeholder"}
-        />
-        <View style={styles.content}>
-          <MarqueeText text={formatScholarName(scholar)} variant="titleMd" />
-          <View style={styles.subtitle}>
-            {scholar.mainLanguage ? (
-              <AppText variant="xs" style={styles.metaText}>
-                {scholar.mainLanguage}
-              </AppText>
-            ) : null}
+    <Pressable
+      onPress={() => onPress?.(scholar.slug)}
+      accessibilityRole="button"
+      testID="scholar-row"
+      style={styles.row}
+    >
+      <UserAvatar
+        image={scholar.imageUrl}
+        name={scholar.name}
+        size={48}
+        testID={scholar.imageUrl ? "scholar-row-avatar" : "scholar-row-avatar-placeholder"}
+      />
+      <View style={styles.content}>
+        <MarqueeText text={formatScholarName(scholar)} variant="titleMd" />
+        <View style={styles.subtitle}>
+          {scholar.mainLanguage ? (
             <AppText variant="xs" style={styles.metaText}>
-              {scholar.lectureCount} lectures
+              {scholar.mainLanguage}
             </AppText>
-          </View>
+          ) : null}
+          <AppText variant="xs" style={styles.metaText}>
+            {scholar.lectureCount} lectures
+          </AppText>
         </View>
       </View>
-    </List.Item>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  rowContent: {
+  row: {
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.scale.md,
-  },
-  avatarContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    overflow: "hidden",
-  },
-  avatar: {
-    width: "100%",
-    height: "100%",
-  },
-  avatarPlaceholder: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 24,
-    backgroundColor: theme.colors.surface.subtle,
+    paddingHorizontal: theme.spacing.scale.md,
+    paddingVertical: theme.spacing.scale.sm,
   },
   content: {
     flex: 1,

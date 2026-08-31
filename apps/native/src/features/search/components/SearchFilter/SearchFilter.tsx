@@ -1,8 +1,10 @@
 import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
 
 import { useMemo } from "react";
-import { Pressable, ScrollView, Text } from "react-native";
+import { ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
+import { NativeButton } from "@/shared/ui";
 
 /** Implements native search input, filtering, results, and empty states. */
 /** Defines the native search filter value contract shared by its consumers. */
@@ -20,7 +22,11 @@ export type SearchFilterProps = {
   topics: TopicDetailDto[];
 };
 
-/** Defines the native search filter contract used by this module. */
+/**
+ * Defines the native search filter contract used by this module.
+ * Horizontal scrolling remains an RN infrastructure fallback because Expo UI
+ * 57's universal ScrollView does not expose the required horizontal prop.
+ */
 export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
   const options = useMemo<FilterOption[]>(() => {
     const sortedTopics = [...topics].sort((a, b) => a.name.ar.localeCompare(b.name.ar));
@@ -42,8 +48,12 @@ export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
       {options.map((option) => {
         const isActive = option.id === "all" ? value.length === 0 : selected.has(option.id);
         return (
-          <Pressable
+          <NativeButton
             key={option.id}
+            label={option.label}
+            size="sm"
+            variant={isActive ? "primary" : "outline"}
+            testID={`native-search-filter-${option.id}`}
             onPress={() => {
               if (option.id === "all") {
                 onChange([]);
@@ -55,16 +65,7 @@ export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
               else next.add(option.id);
               onChange(Array.from(next));
             }}
-            style={({ pressed }) => [
-              styles.chip,
-              isActive && styles.chipActive,
-              pressed && styles.chipPressed,
-            ]}
-          >
-            <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
-              {option.label}
-            </Text>
-          </Pressable>
+          />
         );
       })}
     </ScrollView>
@@ -76,27 +77,5 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.component.gapSm,
     paddingTop: theme.spacing.component.gapSm,
     paddingBottom: theme.spacing.component.gapSm,
-  },
-  chip: {
-    borderWidth: 1,
-    borderColor: theme.colors.border.subtle,
-    borderRadius: theme.radius.component.chip,
-    backgroundColor: theme.colors.surface.subtle,
-    paddingHorizontal: theme.spacing.component.chipX,
-    paddingVertical: theme.spacing.component.chipY,
-  },
-  chipActive: {
-    backgroundColor: theme.recipes.primarySubtleSurface.backgroundColor,
-    borderColor: theme.recipes.primarySubtleSurface.borderColor,
-  },
-  chipPressed: {
-    opacity: 0.9,
-  },
-  chipLabel: {
-    color: theme.colors.content.muted,
-    ...theme.typography.labelMd,
-  },
-  chipLabelActive: {
-    color: theme.recipes.primarySubtleSurface.textColor,
   },
 }));
