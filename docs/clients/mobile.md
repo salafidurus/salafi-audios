@@ -20,6 +20,21 @@ The mobile app (`apps/native`) is the listening-first client. It prioritizes con
 - Business rules do not live in route files.
 - Mobile-specific persistence and playback mechanics belong in infrastructure or feature layers, not navigation.
 
+### Native UI foundation
+
+New reusable native visual primitives belong in `apps/native/src/shared/ui/`.
+That layer owns semantic contracts and maps product tokens from the native
+Unistyles theme to Expo UI. Universal `@expo/ui` components are the default;
+SwiftUI and Jetpack Compose are selected only for materially platform-specific
+behavior. React Native visual UI is an explicit fallback for documented
+capability, performance, accessibility, or infrastructure gaps.
+
+Screen or feature roots own `Host` boundaries. `RNHostView` is reserved for
+embedding a React Native child subtree inside Expo UI; it is not a generic
+layout wrapper. React Native continues to own navigation and safe-area shells.
+Existing shared components may delegate to the foundation while feature
+migration proceeds incrementally.
+
 ## 3. Current Implementation State
 
 Mobile has search, auth, catalog browsing, audio playback with progress tracking, My Library, offline audio downloads, local-first sync, and admin surfaces implemented. See §6 for the sync architecture and §7 for playback/downloads specifics.

@@ -83,6 +83,21 @@ disappears when `completedAt` is accepted.
 
 ## Engineering vocabulary
 
+### Native rendering vocabulary
+
+- **Universal UI** means a common component imported from the universal
+  `@expo/ui` API.
+- **Platform UI** means a SwiftUI or Jetpack Compose Expo UI component selected
+  because the required behavior materially differs by platform.
+- **RN fallback UI** means React Native visual UI retained for a documented
+  capability, performance, accessibility, or infrastructure gap.
+- **Bridge** means an explicit boundary between an Expo UI/platform-native
+  subtree and a React Native subtree. `RNHostView` places the React Native
+  child inside Expo UI; it is not a generic layout wrapper.
+- **Native UI primitive** means a reusable semantic component that owns product
+  behavior and design-token mapping while delegating rendering to Universal UI,
+  Platform UI, or an approved RN fallback.
+
 **Complexity budget** is the maximum cyclomatic complexity permitted for an
 in-scope production function. The repository currently sets that budget to 7
 and measures it with Oxlint's `eslint/complexity` rule using the `modified`
