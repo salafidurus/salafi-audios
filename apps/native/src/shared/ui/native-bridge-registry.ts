@@ -54,14 +54,6 @@ export const APPROVED_NATIVE_BRIDGES: readonly ApprovedNativeBridge[] = [
     validationEvidence: "Bottom accessory contract tests and Android host validation",
   },
   {
-    file: "src/features/navigation/components/BottomAccessory/SubrouteIconButton.tsx",
-    kind: "bridge",
-    reason:
-      "The subsection disclosure control retains a React Native host for navigation composition.",
-    owner: "navigation feature owner",
-    validationEvidence: "Subroute navigation contract tests and Android host validation",
-  },
-  {
     file: "src/shared/components/DraggableList.tsx",
     kind: "infrastructure",
     reason: "Reordering requires React Native gesture and animation infrastructure.",
