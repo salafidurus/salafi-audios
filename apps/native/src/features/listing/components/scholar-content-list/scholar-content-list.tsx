@@ -108,7 +108,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
             value={filter}
             onChangeText={setFilter}
           />
-          <List>
+          <View>
             {filteredBrowse.map((item) => {
               const title = pickContentField(item.title, item.original?.title, showOriginal);
               return (
@@ -119,7 +119,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
                 </List.Item>
               );
             })}
-          </List>
+          </View>
         </View>
       )}
     </View>

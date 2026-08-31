@@ -10,7 +10,6 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
@@ -150,7 +149,7 @@ function renderFeedItem(
   }
   if (item.kind === "grouped_podcasts") {
     return (
-      <List>
+      <View>
         {item.items.map((subItem) => (
           <ExplorePodcastRow
             key={subItem.id}
@@ -158,7 +157,7 @@ function renderFeedItem(
             onNavigateToListing={onNavigateToListing}
           />
         ))}
-      </List>
+      </View>
     );
   }
   return null;

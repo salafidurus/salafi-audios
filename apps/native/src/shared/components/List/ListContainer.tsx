@@ -1,18 +1,22 @@
 import type { ReactNode } from "react";
 
-import { View } from "react-native";
+import { Host, List as ExpoList } from "@expo/ui";
 
 /** Defines the content contract for an Expo UI list. */
 /** Container background, spacing, borders, and platform presentation remain native-owned. */
 export type ListContainerProps = {
   children: ReactNode;
+  onRefresh?: () => Promise<void>;
+  testID?: string;
 };
 
 /** Defines the native list container contract used by this module. */
-export function ListContainer({ children }: ListContainerProps) {
+export function ListContainer({ children, onRefresh, testID = "native-list" }: ListContainerProps) {
   return (
-    <View testID="native-list" style={{ width: "100%" }}>
-      {children}
-    </View>
+    <Host style={{ flex: 1 }}>
+      <ExpoList onRefresh={onRefresh} testID={testID}>
+        {children}
+      </ExpoList>
+    </Host>
   );
 }

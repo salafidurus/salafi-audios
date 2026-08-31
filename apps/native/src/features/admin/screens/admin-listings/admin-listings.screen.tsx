@@ -157,7 +157,7 @@ export function AdminListingsScreen() {
         ) : listings.length === 0 ? (
           <EmptyState message="No listings found." variant="empty" />
         ) : (
-          <List>
+          <View>
             {listings.map((item) => (
               <AdminListingRow
                 key={item.id}
@@ -168,7 +168,7 @@ export function AdminListingsScreen() {
                 onAction={(action) => void handleRowAction(item.id, action)}
               />
             ))}
-          </List>
+          </View>
         )}
       </ScrollView>
 
