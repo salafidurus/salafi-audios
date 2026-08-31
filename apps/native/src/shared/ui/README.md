@@ -26,3 +26,7 @@ must not add a second safe-area inset.
 
 Existing shared components remain compatibility consumers during the expand
 phase. Feature migration and compatibility removal are separate tickets.
+
+The bridge registry marks files that import `RNHostView` as `bridge` entries;
+React Native visual infrastructure that does not cross an Expo UI boundary is
+recorded as `infrastructure` metadata instead.

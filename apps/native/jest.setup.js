@@ -85,6 +85,10 @@ jest.mock("@expo/ui", () => {
     return React.createElement(View, { style, ...rest }, children);
   }
 
+  function RNHostView({ children, ...rest }) {
+    return React.createElement(View, { ...rest, testID: rest.testID ?? "rn-host-view" }, children);
+  }
+
   function Button({
     children,
     label,
@@ -210,6 +214,7 @@ jest.mock("@expo/ui", () => {
 
   return {
     Host,
+    RNHostView,
     Button,
     Column,
     List,
