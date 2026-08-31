@@ -1,5 +1,5 @@
 /** Provides locale selection and invalidates localized query data after changes. */
-import { Picker } from "@expo/ui";
+import { Host, Picker } from "@expo/ui";
 import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -37,17 +37,19 @@ export function LanguageSwitch() {
   };
 
   return (
-    <Picker
-      testID="language-switch-menu"
-      selectedValue={activeLocale}
-      // SAFETY: Picker values are populated exclusively from SUPPORTED_LOCALES.
-      onValueChange={(locale) =>
-        void handleSelect(/* SAFETY: values originate from SUPPORTED_LOCALES */ locale as Locale)
-      }
-    >
-      {SUPPORTED_LOCALES.map((locale) => (
-        <Picker.Item key={locale} label={LOCALE_LABELS[locale]} value={locale} />
-      ))}
-    </Picker>
+    <Host matchContents>
+      <Picker
+        testID="language-switch-menu"
+        selectedValue={activeLocale}
+        // SAFETY: Picker values are populated exclusively from SUPPORTED_LOCALES.
+        onValueChange={(locale) =>
+          void handleSelect(/* SAFETY: values originate from SUPPORTED_LOCALES */ locale as Locale)
+        }
+      >
+        {SUPPORTED_LOCALES.map((locale) => (
+          <Picker.Item key={locale} label={LOCALE_LABELS[locale]} value={locale} />
+        ))}
+      </Picker>
+    </Host>
   );
 }
