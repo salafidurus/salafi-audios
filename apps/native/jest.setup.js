@@ -85,6 +85,10 @@ jest.mock("@expo/ui", () => {
     return React.createElement(View, { style, ...rest }, children);
   }
 
+  function RNHostView({ children, ...rest }) {
+    return React.createElement(View, { ...rest, testID: rest.testID ?? "rn-host-view" }, children);
+  }
+
   function Button({
     children,
     label,
@@ -153,9 +157,31 @@ jest.mock("@expo/ui", () => {
   }
   Icon.select = ({ ios }) => ios;
 
-  function Switch({ value, onValueChange, disabled, testID }) {
-    return React.createElement(RNSwitch, { value, onValueChange, disabled, testID });
+  function Switch({ value, onValueChange, disabled, label, testID }) {
+    return React.createElement(RNSwitch, { value, onValueChange, disabled, label, testID });
   }
+
+  function Picker({ children, selectedValue, onValueChange, enabled, testID }) {
+    return React.createElement(
+      View,
+      { testID, selectedValue, enabled },
+      React.Children.map(children, (child) =>
+        child?.props
+          ? React.createElement(
+              Pressable,
+              {
+                accessibilityRole: "button",
+                accessibilityLabel: child.props.label,
+                disabled: enabled === false,
+                onPress: () => onValueChange(child.props.value),
+              },
+              React.createElement(Text, null, child.props.label),
+            )
+          : child,
+      ),
+    );
+  }
+  Picker.Item = () => null;
 
   // Mirrors the real ObservableState contract (a plain object with a mutable
   // `.value`) but backs it with React state, so a caller mutating `.value`
@@ -221,7 +247,7 @@ jest.mock("@expo/ui", () => {
 
   return {
     Host,
-    RNHostView: View,
+    RNHostView,
     Button,
     Column,
     List,
@@ -231,6 +257,8 @@ jest.mock("@expo/ui", () => {
     Icon,
     Switch,
     TextInput,
+    Picker,
+    PickerItem: Picker.Item,
     useNativeState,
   };
 });
@@ -354,6 +382,10 @@ jest.mock("@expo/ui/swift-ui", () => {
     return React.createElement(Text, null, children);
   }
 
+  function ProgressView({ value, testID, modifiers }) {
+    return React.createElement(View, { value, testID, modifiers });
+  }
+
   // isPresented fully controls visibility here (matches the real controlled-
   // component contract); Alert.Trigger is rendered as null since its Button is
   // only a required SwiftUI anchor, never actually pressed by the user.
@@ -369,7 +401,7 @@ jest.mock("@expo/ui/swift-ui", () => {
     return React.createElement(View, null, children);
   };
 
-  return { Button, HStack, Text: SwiftUIText, Alert };
+  return { Button, HStack, Text: SwiftUIText, ProgressView, Alert };
 });
 
 jest.mock("@expo/ui/swift-ui/modifiers", () => ({
@@ -383,6 +415,8 @@ jest.mock("@expo/ui/swift-ui/modifiers", () => ({
   frame: (params) => ({ $type: "frame", ...params }),
   opacity: (value) => ({ $type: "opacity", value }),
   padding: (params) => ({ $type: "padding", ...params }),
+  progressViewStyle: (style) => ({ $type: "progressViewStyle", style }),
+  tint: (color) => ({ $type: "tint", color }),
 }));
 
 jest.mock("@expo/ui/jetpack-compose", () => {

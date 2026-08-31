@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
-import { Host, type UniversalHostProps } from "@expo/ui";
+import { Host, RNHostView, type UniversalHostProps } from "@expo/ui";
 import { useUnistyles } from "react-native-unistyles";
 
 import { getNativeHostConfiguration } from "./native-host-configuration";
@@ -34,7 +34,7 @@ export function NativeScreenHost({ children, style, ...props }: NativeScreenHost
 type NativeBridgeHostProps = Omit<
   UniversalHostProps,
   "children" | "colorScheme" | "layoutDirection" | "seedColor"
-> & { children: ReactNode };
+> & { children: ReactElement };
 
 /** Owns an Expo UI host whose child is an explicitly bridged RN subtree. */
 export function NativeBridgeHost({
@@ -54,7 +54,7 @@ export function NativeBridgeHost({
       matchContents={matchContents}
       style={style}
     >
-      {children}
+      <RNHostView>{children}</RNHostView>
     </Host>
   );
 }

@@ -1,3 +1,5 @@
+import type { StyleProp, ViewStyle } from "react-native";
+
 import { SegmentedControl } from "@expo/ui/community/segmented-control";
 import { useUnistyles } from "react-native-unistyles";
 
@@ -9,6 +11,7 @@ export type NativeSegmentedControlProps = {
   onValueChange: (value: string) => void;
   disabled?: boolean;
   testID?: string;
+  style?: StyleProp<ViewStyle>;
 };
 
 /** Maps controlled values to the platform-native segmented control. */
@@ -18,6 +21,7 @@ export function NativeSegmentedControl({
   onValueChange,
   disabled = false,
   testID,
+  style,
 }: NativeSegmentedControlProps) {
   const { theme, rt } = useUnistyles();
   return (
@@ -29,6 +33,7 @@ export function NativeSegmentedControl({
       tintColor={theme.colors.action.primary}
       appearance={rt.themeName === "system" ? undefined : rt.themeName}
       testID={testID}
+      style={style}
     />
   );
 }

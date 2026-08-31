@@ -1,6 +1,5 @@
-import { Host, Switch } from "@expo/ui";
 import { View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
@@ -8,13 +7,13 @@ import {
   useShowOriginalContent,
 } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { NativeSwitch } from "@/shared/ui/native-switch";
 
 /** Settings toggle that switches catalogue content (lectures, series,
  * collections) between the selected language and its original language. */
 /** Renders the native content language toggle surface and coordinates its user-facing state. */
 export function ContentLanguageToggle() {
   const { t } = useTranslation();
-  const { theme } = useUnistyles();
   const showOriginal = useShowOriginalContent();
 
   return (
@@ -22,13 +21,11 @@ export function ContentLanguageToggle() {
       <AppText variant="bodySm" style={styles.label}>
         {t("account.showOriginalContent", "Show content in its original language")}
       </AppText>
-      <Host matchContents seedColor={theme.colors.action.primary}>
-        <Switch
-          value={showOriginal}
-          onValueChange={setShowOriginalContent}
-          testID="content-language-toggle-switch"
-        />
-      </Host>
+      <NativeSwitch
+        value={showOriginal}
+        onValueChange={setShowOriginalContent}
+        testID="content-language-toggle-switch"
+      />
     </View>
   );
 }

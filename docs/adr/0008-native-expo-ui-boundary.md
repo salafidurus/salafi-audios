@@ -55,6 +55,10 @@ real Expo UI `List`/`ListItem` composition from ordinary vertical layout.
 
 Every permanent visual RN bridge is recorded with its file, reason, owner, and
 validation evidence. Temporary bridges additionally record a removal condition.
+Registry entries that describe RN visual infrastructure without an Expo UI
+crossing are explicitly classified as infrastructure metadata, so parity checks
+can distinguish actual bridge imports from approved bootstrap or capability
+fallbacks.
 The migration guard compares detected visual RN usage with the registry in both
 directions. Android is the current validation target; iOS remains explicitly
 unverified until an iOS target is available.

@@ -1,9 +1,11 @@
-import type { ReactNode } from "react";
+import { NativeSwitch } from "@/shared/ui/native-switch";
 
-import { Host, Switch } from "@expo/ui";
+/** Preserves the legacy toggle entry point while native settings migrate. */
 
-/** Provides a reusable native UI primitive with a focused rendering contract. */
-/** Describes the inputs, callbacks, and optional state accepted by Toggle. */
+/**
+ * Compatibility props for boolean settings that still use the legacy
+ * `checked`/`onChange` vocabulary.
+ */
 export interface ToggleProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
@@ -11,16 +13,20 @@ export interface ToggleProps {
   "aria-label"?: string;
 }
 
-/** Renders the native toggle surface and coordinates its user-facing state. */
+/** Delegates the legacy toggle API to the canonical controlled switch. */
 export function Toggle({
   checked,
   onChange,
   disabled = false,
   "aria-label": ariaLabel,
-}: ToggleProps): ReactNode {
+}: ToggleProps) {
   return (
-    <Host matchContents accessibilityLabel={ariaLabel}>
-      <Switch value={checked} onValueChange={onChange} disabled={disabled} testID="toggle-switch" />
-    </Host>
+    <NativeSwitch
+      value={checked}
+      onValueChange={onChange}
+      disabled={disabled}
+      label={ariaLabel}
+      testID="toggle-switch"
+    />
   );
 }
