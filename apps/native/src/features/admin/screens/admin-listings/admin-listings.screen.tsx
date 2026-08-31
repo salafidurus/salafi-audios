@@ -26,7 +26,6 @@ import { filterListings } from "./filter-listings";
 type AdminListingRowProps = {
   item: AdminListingListItemDto;
   isSelected: boolean;
-  hideBorder: boolean;
   actions: MenuAction[];
   onPress: () => void;
   onAction: (action: string) => void;
@@ -46,24 +45,12 @@ function getVisibleRowActions(ability: AppAbility): MenuAction[] {
   return actions;
 }
 
-function AdminListingRow({
-  item,
-  isSelected,
-  hideBorder,
-  actions,
-  onPress,
-  onAction,
-}: AdminListingRowProps) {
+function AdminListingRow({ item, isSelected, actions, onPress, onAction }: AdminListingRowProps) {
   const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
 
   return (
-    <List.Item
-      testID={`admin-listing-row-${item.id}`}
-      onPress={onPress}
-      hideBorder={hideBorder}
-      style={isSelected ? styles.rowSelected : undefined}
-    >
-      <View style={styles.rowContent}>
+    <List.Item testID={`admin-listing-row-${item.id}`} onPress={onPress}>
+      <View style={[styles.rowContent, isSelected && styles.rowSelected]}>
         <MarqueeText text={item.title} variant="bodyMd" style={styles.rowTitle} />
         <AppText variant="caption" style={styles.rowMeta}>
           {scholarName} · {item.status}
@@ -171,12 +158,11 @@ export function AdminListingsScreen() {
           <EmptyState message="No listings found." variant="empty" />
         ) : (
           <List>
-            {listings.map((item, index) => (
+            {listings.map((item) => (
               <AdminListingRow
                 key={item.id}
                 item={item}
                 isSelected={selectedIds.has(item.id)}
-                hideBorder={index === listings.length - 1}
                 actions={rowActions}
                 onPress={() => handleRowPress(item.id)}
                 onAction={(action) => void handleRowAction(item.id, action)}

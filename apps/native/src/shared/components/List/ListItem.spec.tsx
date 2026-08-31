@@ -5,6 +5,16 @@ import { ListItem } from "./ListItem";
 import { ListItemActions } from "./ListItemActions";
 
 describe("ListItem", () => {
+  it("uses the supported Expo UI ListItem row surface", async () => {
+    await render(
+      <ListItem testID="lecture-row">
+        <Text>Row content</Text>
+      </ListItem>,
+    );
+
+    expect(screen.getByTestId("lecture-row")).toBeTruthy();
+  });
+
   it("calls onPress when tapped and renders no menu wiring without List.Item.Actions", async () => {
     const onPress = jest.fn();
     await render(
@@ -17,6 +27,19 @@ describe("ListItem", () => {
 
     expect(onPress).toHaveBeenCalled();
     expect(screen.queryByTestId(/-action-/)).toBeNull();
+  });
+
+  it("delegates row interaction and appearance to the universal item", async () => {
+    const onPress = jest.fn();
+    await render(
+      <ListItem onPress={onPress} testID="lecture-row">
+        <Text>Row content</Text>
+      </ListItem>,
+    );
+
+    await fireEvent.press(screen.getByTestId("lecture-row"));
+
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 
   it("opens a long-press menu with the given List.Item.Actions and reports the pressed action", async () => {

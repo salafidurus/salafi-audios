@@ -1,14 +1,16 @@
 import type { ContentSuggestionDto } from "@sd/core-contracts";
 import type { ListRenderItemInfo } from "react-native";
 
+import { Button as ExpoButton, Column, Host } from "@expo/ui";
 import { pickContentField } from "@sd/core-i18n";
 import { useFormattedScholarName } from "@sd/domain-content";
 import { useCallback } from "react";
-import { View, Text, FlatList, Pressable } from "react-native";
+import { View, FlatList } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { AppText } from "@/shared/components/AppText/AppText";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 
 /** Describes the inputs and callbacks accepted by Explore Topic Row. */
@@ -29,18 +31,26 @@ function TopicCard({ item, showOriginal, onItemPress }: TopicCardProps) {
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
   return (
-    <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => onItemPress?.(item.slug)}
-    >
-      <Text style={styles.title} numberOfLines={2}>
-        {title}
-      </Text>
-      <MarqueeText text={scholarName} variant="caption" style={styles.scholar} />
-      {item.durationSeconds ? (
-        <Text style={styles.duration}>{Math.floor(item.durationSeconds / 60)}m</Text>
-      ) : null}
-    </Pressable>
+    <Host matchContents>
+      <ExpoButton
+        variant="text"
+        onPress={() => onItemPress?.(item.slug)}
+        style={styles.card}
+        testID={`topic-card-${item.slug}`}
+      >
+        <Column>
+          <AppText variant="bodySm" style={styles.title} numberOfLines={2}>
+            {title}
+          </AppText>
+          <MarqueeText text={scholarName} variant="caption" style={styles.scholar} />
+          {item.durationSeconds ? (
+            <AppText variant="caption" style={styles.duration}>
+              {Math.floor(item.durationSeconds / 60)}m
+            </AppText>
+          ) : null}
+        </Column>
+      </ExpoButton>
+    </Host>
   );
 }
 
@@ -60,9 +70,9 @@ export function ExploreTopicRow({ topicName, items, onItemPress }: ExploreTopicR
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>
+      <AppText variant="titleMd" style={styles.heading}>
         {t("feed.newInTopic", "New in {{topic}}", { topic: topicName })}
-      </Text>
+      </AppText>
       <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -97,9 +107,6 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.colors.border.default,
     borderRadius: theme.radius.component.panel,
     backgroundColor: theme.colors.surface.default,
-  },
-  cardPressed: {
-    backgroundColor: theme.colors.surface.subtle,
   },
   title: {
     fontSize: 14,

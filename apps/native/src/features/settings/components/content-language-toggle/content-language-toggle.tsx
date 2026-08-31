@@ -1,5 +1,5 @@
 import { Host, Switch } from "@expo/ui";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -7,6 +7,7 @@ import {
   setShowOriginalContent,
   useShowOriginalContent,
 } from "@/features/settings/content-preference";
+import { AppText } from "@/shared/components/AppText/AppText";
 
 /** Settings toggle that switches catalogue content (lectures, series,
  * collections) between the selected language and its original language. */
@@ -18,9 +19,9 @@ export function ContentLanguageToggle() {
 
   return (
     <View style={styles.row}>
-      <Text style={styles.label}>
+      <AppText variant="bodySm" style={styles.label}>
         {t("account.showOriginalContent", "Show content in its original language")}
-      </Text>
+      </AppText>
       <Host matchContents seedColor={theme.colors.action.primary}>
         <Switch
           value={showOriginal}

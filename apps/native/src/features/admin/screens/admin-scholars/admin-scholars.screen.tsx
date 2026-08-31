@@ -51,12 +51,8 @@ export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreen
           <EmptyState message="No scholars found." variant="empty" />
         ) : (
           <List>
-            {scholars.map((item, index) => (
-              <List.Item
-                key={item.id}
-                onPress={() => onNavigateToScholar(item.slug)}
-                hideBorder={index === scholars.length - 1}
-              >
+            {scholars.map((item) => (
+              <List.Item key={item.id} onPress={() => onNavigateToScholar(item.slug)}>
                 <View style={styles.rowContent}>
                   <MarqueeText text={item.name} variant="bodyMd" style={styles.rowName} />
                   <AppText variant="caption" style={styles.rowSlug}>

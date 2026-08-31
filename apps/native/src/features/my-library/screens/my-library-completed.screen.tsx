@@ -52,13 +52,12 @@ export function MyLibraryCompletedScreen({ onNavigateToListing }: MyLibraryCompl
     <ScreenView>
       <ScrollView contentContainerStyle={styles.listContent}>
         <List>
-          {items.map((item, index) => (
+          {items.map((item) => (
             <MyLibraryItemRow
               key={item.id}
               item={item}
               variant="completed"
               onPress={() => handleItemPress(item.listingSlug)}
-              hideBorder={index === items.length - 1}
             />
           ))}
         </List>

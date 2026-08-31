@@ -90,4 +90,21 @@ describe("ConfirmDialog (Android)", () => {
       textContentColor: lightNativeTheme.colors.content.default,
     });
   });
+
+  it("styles a destructive confirm action with the danger color", async () => {
+    await render(
+      <ConfirmDialog
+        visible={true}
+        onDismiss={() => {}}
+        onConfirm={() => {}}
+        title="Delete account?"
+        message="This cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        destructive
+      />,
+    );
+
+    expect(screen.getByText("Delete").props.style.color).toBe(lightNativeTheme.colors.state.danger);
+  });
 });

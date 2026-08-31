@@ -44,7 +44,7 @@ jest.mock("react-native-unistyles", () => {
       create: resolve,
       configure: () => undefined,
     },
-    useUnistyles: () => ({ theme: lightNativeTheme, rt: {} }),
+    useUnistyles: () => ({ theme: lightNativeTheme, rt: { themeName: "system" } }),
   };
 });
 
@@ -85,18 +85,54 @@ jest.mock("@expo/ui", () => {
     return React.createElement(View, { style, ...rest }, children);
   }
 
-  function Button({ children, label, onPress, disabled, testID }) {
+  function Button({
+    children,
+    label,
+    onPress,
+    disabled,
+    testID,
+    variant,
+    style,
+    accessibilityLabel,
+  }) {
     return React.createElement(
       Pressable,
       {
         onPress,
         disabled,
         testID,
+        style,
+        variant,
         accessibilityRole: "button",
         accessibilityState: { disabled },
+        accessibilityLabel,
       },
       children ?? React.createElement(Text, null, label),
     );
+  }
+
+  function Row({ children, spacing, ...rest }) {
+    return React.createElement(View, { ...rest, spacing }, children);
+  }
+
+  function Column({ children, spacing, ...rest }) {
+    return React.createElement(View, { ...rest, spacing }, children);
+  }
+
+  function List({ children, testID = "native-list" }) {
+    return React.createElement(View, { testID }, children);
+  }
+
+  function ListItem({ children, onPress, testID = "native-list-item" }) {
+    return React.createElement(
+      Pressable,
+      { onPress, testID, accessibilityRole: "button" },
+      children,
+    );
+  }
+
+  function ExpoText({ children, textStyle, ...rest }) {
+    return React.createElement(Text, { ...rest, style: textStyle, textStyle }, children);
   }
 
   function Switch({ value, onValueChange, disabled, testID }) {
@@ -165,7 +201,18 @@ jest.mock("@expo/ui", () => {
     });
   }
 
-  return { Host, Button, Switch, TextInput, useNativeState };
+  return {
+    Host,
+    Button,
+    Column,
+    List,
+    ListItem,
+    Row,
+    Text: ExpoText,
+    Switch,
+    TextInput,
+    useNativeState,
+  };
 });
 
 jest.mock("@expo/ui/community/segmented-control", () => {
