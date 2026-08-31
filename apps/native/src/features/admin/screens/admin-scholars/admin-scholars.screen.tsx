@@ -10,6 +10,7 @@ import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-ba
 import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
+import { NativeBridgeHost } from "@/shared/ui/native-ui-host";
 
 import { filterScholars } from "./filter-scholars";
 
@@ -38,32 +39,35 @@ export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreen
   };
 
   return (
-    <View style={styles.container}>
+    <>
       <Stack.Screen options={headerSearchOptions} />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <AppText variant="titleLg">Scholars</AppText>
+      <NativeBridgeHost testID="admin-scholars-host" matchContents={false}>
+        <View style={styles.container}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            {isLoading ? (
+              <EmptyState message="Loading…" variant="loading" />
+            ) : scholars.length === 0 ? (
+              <EmptyState message="No scholars found." variant="empty" />
+            ) : (
+              <List>
+                {scholars.map((item) => (
+                  <List.Item key={item.id} onPress={() => onNavigateToScholar(item.slug)}>
+                    <View style={styles.rowContent}>
+                      <AppText variant="bodyLg" style={styles.rowName}>
+                        {item.name}
+                      </AppText>
+                      <AppText variant="caption" style={styles.rowSlug}>
+                        @{item.slug}
+                      </AppText>
+                    </View>
+                  </List.Item>
+                ))}
+              </List>
+            )}
+          </ScrollView>
         </View>
-        {isLoading ? (
-          <EmptyState message="Loading…" variant="loading" />
-        ) : scholars.length === 0 ? (
-          <EmptyState message="No scholars found." variant="empty" />
-        ) : (
-          <List>
-            {scholars.map((item) => (
-              <List.Item
-                key={item.id}
-                title={item.name}
-                supportingText={`@${item.slug}`}
-                onPress={() => onNavigateToScholar(item.slug)}
-              >
-                {null}
-              </List.Item>
-            ))}
-          </List>
-        )}
-      </ScrollView>
-    </View>
+      </NativeBridgeHost>
+    </>
   );
 }
 
@@ -74,9 +78,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   scrollContent: {
     padding: theme.spacing.scale.md,
-  },
-  header: {
-    paddingVertical: theme.spacing.scale.md,
   },
   loadingText: {
     textAlign: "center",

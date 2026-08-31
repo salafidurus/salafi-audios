@@ -46,7 +46,7 @@ describe("AdminScholarsScreen", () => {
     });
 
     await render(<AdminScholarsScreen onNavigateToScholar={() => {}} />);
-    expect(screen.getByText("Scholars")).toBeTruthy();
+    expect(screen.getByTestId("admin-scholars-host")).toBeTruthy();
     expect(screen.getByText("Scholar One")).toBeTruthy();
     expect(screen.getByText("scholar-one", { exact: false })).toBeTruthy();
     expect(screen.getByText("Scholar Two")).toBeTruthy();
