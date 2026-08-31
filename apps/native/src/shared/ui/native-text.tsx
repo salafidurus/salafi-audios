@@ -19,7 +19,8 @@ export type NativeTextColorRole =
 
 /** Defines the narrow semantic text contract used by the native foundation. */
 export type NativeTextProps = Omit<TextProps, "children" | "textStyle"> & {
-  children?: React.ReactNode;
+  /** Supported content is deliberately narrow; rich nested content needs its own adapter. */
+  children?: string | number;
   variant?: TypographyVariant;
   /** Selects the token color while allowing an explicit text-style override. */
   colorRole?: NativeTextColorRole;

@@ -4,7 +4,11 @@ import { NativeButton } from "./native-button";
 import { NativeFormField } from "./native-form-field";
 import { NativeIcon } from "./native-icon";
 import { NativeList, NativeListItem } from "./native-list";
+import { NativePicker } from "./native-picker";
+import { NativeProgress } from "./native-progress";
+import { NativeSegmentedControl } from "./native-segmented-control";
 import { NativeStateView } from "./native-state-view";
+import { NativeSwitch } from "./native-switch";
 import { NativeText } from "./native-text";
 import { NativeBridgeHost, NativeScreenHost } from "./native-ui-host";
 
@@ -122,5 +126,61 @@ describe("native UI foundation", () => {
     expect(screen.getByTestId("rn-host-view")).toContainElement(
       screen.getByTestId("bridged-content"),
     );
+  });
+
+  it("preserves controlled switch state, accessibility label, and disabled behavior", async () => {
+    const onValueChange = jest.fn();
+    await render(
+      <NativeSwitch
+        value={false}
+        onValueChange={onValueChange}
+        label="Enable notifications"
+        disabled
+        testID="notifications-switch"
+      />,
+    );
+
+    const control = screen.getByTestId("notifications-switch");
+    expect(control.props.value).toBe(false);
+    expect(control.props.disabled).toBe(true);
+    expect(control.props.label).toBe("Enable notifications");
+  });
+
+  it("preserves controlled picker selection and reports the selected value", async () => {
+    const onValueChange = jest.fn();
+    await render(
+      <NativePicker
+        selectedValue="system"
+        options={[
+          { label: "Light", value: "light" },
+          { label: "System", value: "system" },
+        ]}
+        onValueChange={onValueChange}
+        testID="theme-picker"
+      />,
+    );
+
+    expect(screen.getByTestId("theme-picker").props.selectedValue).toBe("system");
+    await fireEvent.press(screen.getByRole("button", { name: "Light" }));
+    expect(onValueChange).toHaveBeenCalledWith("light");
+  });
+
+  it("maps progress and segmented-control state to native controls", async () => {
+    const onValueChange = jest.fn();
+    await render(
+      <>
+        <NativeProgress value={0.4} variant="linear" testID="progress" />
+        <NativeSegmentedControl
+          values={["Published", "Drafts"]}
+          value="Published"
+          onValueChange={onValueChange}
+          testID="status-filter"
+        />
+      </>,
+    );
+
+    expect(screen.getByTestId("progress").props.value).toBe(0.4);
+    await fireEvent.press(screen.getByRole("button", { name: "Drafts" }));
+    expect(onValueChange).toHaveBeenCalledWith("Drafts");
   });
 });
