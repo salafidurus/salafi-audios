@@ -123,17 +123,24 @@ jest.mock("@expo/ui", () => {
     return React.createElement(View, { testID }, children);
   }
 
-  function ListItem({ children, onPress, testID = "native-list-item" }) {
+  function ListItem({ children, leading, supportingText, onPress, testID = "native-list-item" }) {
     return React.createElement(
       Pressable,
       { onPress, testID, accessibilityRole: "button" },
+      leading,
       children,
+      supportingText,
     );
   }
 
   function ExpoText({ children, textStyle, ...rest }) {
     return React.createElement(Text, { ...rest, style: textStyle, textStyle }, children);
   }
+
+  function Icon({ testID, ...rest }) {
+    return React.createElement(Text, { testID, ...rest });
+  }
+  Icon.select = ({ ios }) => ios;
 
   function Switch({ value, onValueChange, disabled, testID }) {
     return React.createElement(RNSwitch, { value, onValueChange, disabled, testID });
@@ -209,6 +216,7 @@ jest.mock("@expo/ui", () => {
     ListItem,
     Row,
     Text: ExpoText,
+    Icon,
     Switch,
     TextInput,
     useNativeState,
