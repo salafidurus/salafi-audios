@@ -1,12 +1,11 @@
 import { useProgressStore } from "@sd/domain-audio";
 import { useMyLibraryProgressScreen } from "@sd/domain-content";
 import React, { useCallback } from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { MyLibraryItemRow } from "@/features/my-library/components/my-library-item-row/my-library-item-row";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 import { useAuth } from "../../../core/auth/use-auth";
@@ -59,7 +58,7 @@ export function MyLibraryScreen({ onNavigateToListing }: MyLibraryScreenProps) {
   return (
     <ScreenView>
       <ScrollView contentContainerStyle={styles.listContent}>
-        <List>
+        <View>
           {items.map((item) => (
             <MyLibraryItemRow
               key={item.id}
@@ -73,7 +72,7 @@ export function MyLibraryScreen({ onNavigateToListing }: MyLibraryScreenProps) {
               onAction={() => markCompleted(item.listingId)}
             />
           ))}
-        </List>
+        </View>
       </ScrollView>
     </ScreenView>
   );

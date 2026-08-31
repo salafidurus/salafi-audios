@@ -1,4 +1,4 @@
-import type { ScholarListItemDto } from "@sd/core-contracts";
+import type { ScholarListDto } from "@sd/core-contracts";
 
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 import { Stack } from "expo-router";
@@ -10,7 +10,6 @@ import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-ba
 import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
-import { MarqueeText } from "@/shared/components/MarqueeText";
 
 import { filterScholars } from "./filter-scholars";
 
@@ -22,12 +21,12 @@ type AdminScholarsScreenProps = {
 /** Renders the native admin scholars screen surface and coordinates its user-facing state. */
 export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreenProps) {
   const { theme } = useUnistyles();
-  const { data, isLoading } = useApiQuery<ScholarListItemDto[]>(["scholars", "list"], () =>
-    httpClient<ScholarListItemDto[]>({ url: endpoints.scholars.list, method: "GET" }),
+  const { data, isLoading } = useApiQuery<ScholarListDto>(["scholars", "list"], () =>
+    httpClient<ScholarListDto>({ url: endpoints.scholars.list, method: "GET" }),
   );
   const [searchQuery, setSearchQuery] = useState("");
 
-  const scholars = filterScholars(data ?? [], searchQuery);
+  const scholars = filterScholars(data?.scholars ?? [], searchQuery);
 
   const headerSearchOptions = {
     headerSearchBarOptions: {
@@ -52,13 +51,13 @@ export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreen
         ) : (
           <List>
             {scholars.map((item) => (
-              <List.Item key={item.id} onPress={() => onNavigateToScholar(item.slug)}>
-                <View style={styles.rowContent}>
-                  <MarqueeText text={item.name} variant="bodyMd" style={styles.rowName} />
-                  <AppText variant="caption" style={styles.rowSlug}>
-                    @{item.slug}
-                  </AppText>
-                </View>
+              <List.Item
+                key={item.id}
+                title={item.name}
+                supportingText={`@${item.slug}`}
+                onPress={() => onNavigateToScholar(item.slug)}
+              >
+                {null}
               </List.Item>
             ))}
           </List>

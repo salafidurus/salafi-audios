@@ -36,10 +36,12 @@ describe("AdminScholarsScreen", () => {
 
   it("renders the list of scholars when loaded", async () => {
     mockUseApiQuery.mockReturnValue({
-      data: [
-        { id: "s1", name: "Scholar One", slug: "scholar-one" },
-        { id: "s2", name: "Scholar Two", slug: "scholar-two" },
-      ],
+      data: {
+        scholars: [
+          { id: "s1", name: "Scholar One", slug: "scholar-one" },
+          { id: "s2", name: "Scholar Two", slug: "scholar-two" },
+        ],
+      },
       isLoading: false,
     });
 

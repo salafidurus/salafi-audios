@@ -11,7 +11,6 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
@@ -137,16 +136,14 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     <View style={styles.screen}>
       <Stack.Screen options={headerSearchOptions} />
       <View style={styles.listCard}>
-        <List>
-          <FlatList
-            data={filteredScholars}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-            onEndReached={() => hasNextPage && fetchNextPage()}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
-          />
-        </List>
+        <FlatList
+          data={filteredScholars}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          onEndReached={() => hasNextPage && fetchNextPage()}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
+        />
       </View>
     </View>
   );

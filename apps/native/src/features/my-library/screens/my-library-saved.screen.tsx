@@ -1,13 +1,12 @@
 import { useMyLibrarySavedScreen, markUnsaved } from "@sd/domain-content";
 import { useCallback } from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { MyLibraryItemRow } from "@/features/my-library/components/my-library-item-row/my-library-item-row";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 /** Projects native library state into saved, completed, and in-progress content views. */
@@ -58,7 +57,7 @@ export function MyLibrarySavedScreen({ onNavigateToListing }: MyLibrarySavedScre
   return (
     <ScreenView>
       <ScrollView contentContainerStyle={styles.listContent}>
-        <List>
+        <View>
           {items.map((item) => (
             <MyLibraryItemRow
               key={item.id}
@@ -76,7 +75,7 @@ export function MyLibrarySavedScreen({ onNavigateToListing }: MyLibrarySavedScre
               onAction={() => handleRemove(item.listingId, item.listingSlug)}
             />
           ))}
-        </List>
+        </View>
       </ScrollView>
     </ScreenView>
   );

@@ -123,13 +123,24 @@ jest.mock("@expo/ui", () => {
     return React.createElement(View, { testID }, children);
   }
 
-  function ListItem({ children, leading, supportingText, onPress, testID = "native-list-item" }) {
+  function ListItem({
+    children,
+    title,
+    leading,
+    supportingText,
+    trailing,
+    onPress,
+    testID = "native-list-item",
+  }) {
     return React.createElement(
       Pressable,
       { onPress, testID, accessibilityRole: "button" },
       leading,
-      children,
-      supportingText,
+      title ? React.createElement(Text, null, title) : children,
+      typeof supportingText === "string"
+        ? React.createElement(Text, null, supportingText)
+        : supportingText,
+      trailing,
     );
   }
 
@@ -210,6 +221,7 @@ jest.mock("@expo/ui", () => {
 
   return {
     Host,
+    RNHostView: View,
     Button,
     Column,
     List,
@@ -395,8 +407,13 @@ jest.mock("@expo/ui/jetpack-compose", () => {
     };
   }
 
-  function ComposeText({ children, color, style }) {
-    return React.createElement(Text, { style: { color, ...style } }, children);
+  function ComposeText({ children, color, style, modifiers = [] }) {
+    const testIdMod = modifiers.find((m) => m.$type === "testID");
+    return React.createElement(
+      Text,
+      { style: { color, ...style }, testID: testIdMod?.tag },
+      children,
+    );
   }
 
   function Spacer() {
@@ -441,6 +458,7 @@ jest.mock("@expo/ui/jetpack-compose/modifiers", () => ({
   border: (width, color) => ({ $type: "border", width, color }),
   clip: (shape) => ({ $type: "clip", shape }),
   height: (value) => ({ $type: "height", value }),
+  fillMaxWidth: () => ({ $type: "fillMaxWidth" }),
   padding: (start, top, end, bottom) => ({ $type: "padding", start, top, end, bottom }),
   Shapes: { RoundedCorner: (radius) => ({ type: "roundedCorner", radius }) },
   testID: (tag) => ({ $type: "testID", tag }),
