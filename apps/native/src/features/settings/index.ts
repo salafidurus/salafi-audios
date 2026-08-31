@@ -1,4 +1,4 @@
-/** Exposes account, support, legal, language, and content-preference settings surfaces. */
+/** Exposes native account, support, legal, language, and preference surfaces. */
 // Screens
 export { AccountScreen, type AccountScreenProps } from "./screens/account.screen";
 export {
@@ -13,4 +13,8 @@ export { LanguageSwitch } from "./components/language-switch/language-switch";
 export { ContentLanguageToggle } from "./components/content-language-toggle/content-language-toggle";
 
 // i18n utilities
-export { useShowOriginalContent, setShowOriginalContent } from "./content-preference";
+export {
+  contentPreferenceStore,
+  useShowOriginalContent,
+  setShowOriginalContent,
+} from "./content-preference";

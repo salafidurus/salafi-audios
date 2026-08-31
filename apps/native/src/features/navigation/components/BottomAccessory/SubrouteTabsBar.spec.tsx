@@ -21,7 +21,7 @@ jest.mock(
     new Proxy(
       {},
       {
-        get: () => "Icon",
+        get: () => () => null,
       },
     ),
 );

@@ -1,53 +1,45 @@
+/** Groups related settings content into the native bordered section primitive. */
 import type { ReactNode } from "react";
 
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Column } from "@expo/ui";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { NativeText } from "@/shared/ui/native-text";
 
-/** Provides native account, preference, support, and settings workflows. */
-/** Describes the inputs, callbacks, and optional state accepted by Settings Section. */
+/** Carries the visible heading and row subtree; rows stay grouped under one bordered panel. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- module/declaration comments are both present above.
 export interface SettingsSectionProps {
   title: string;
   description?: string;
   children: ReactNode;
 }
 
-/** Renders the native settings section surface and coordinates its user-facing state. */
+/** Groups related settings rows under a native heading and description. */
 export function SettingsSection({ title, description, children }: SettingsSectionProps) {
+  const { theme } = useUnistyles();
+
   return (
-    <View style={styles.section}>
-      <View style={styles.header}>
-        <AppText variant="labelMd" style={styles.title}>
+    <Column spacing={theme.spacing.scale.md}>
+      <Column spacing={theme.spacing.scale.xs}>
+        <NativeText variant="labelMd" colorRole="muted" textStyle={styles.title}>
           {title}
-        </AppText>
-        {description && (
-          <AppText variant="caption" style={styles.description}>
+        </NativeText>
+        {description ? (
+          <NativeText variant="caption" colorRole="muted">
             {description}
-          </AppText>
-        )}
-      </View>
-      <View style={styles.rows}>{children}</View>
-    </View>
+          </NativeText>
+        ) : null}
+      </Column>
+      <Column style={styles.rows}>{children}</Column>
+    </Column>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  section: {
-    marginBottom: theme.spacing.scale["2xl"],
-  },
-  header: {
-    marginBottom: theme.spacing.scale.md,
-  },
   title: {
-    color: theme.colors.content.muted,
     textTransform: "uppercase",
     fontWeight: "600",
     letterSpacing: 0.8,
-  },
-  description: {
-    color: theme.colors.content.muted,
-    marginTop: theme.spacing.scale.xs,
   },
   rows: {
     borderWidth: theme.border.width.default,

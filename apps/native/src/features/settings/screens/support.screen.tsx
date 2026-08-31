@@ -1,7 +1,11 @@
-import { View, Text, ScrollView } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+/** Native support surface presenting FAQ and contact guidance. */
+/** Renders native FAQ and support contact content. */
+import { Column, ScrollView } from "@expo/ui";
+import { useUnistyles } from "react-native-unistyles";
 
-/** Provides native account, preference, support, and settings workflows. */
+import { NativeScreenHost, NativeText } from "@/shared/ui";
+
+/** Owns the static FAQ and support contact content shown to native users. */
 const SUPPORT_SECTIONS = [
   {
     title: "FAQ",
@@ -12,7 +16,7 @@ const SUPPORT_SECTIONS = [
       },
       {
         q: "How do I save lectures?",
-        a: "Tap the bookmark icon on any lecture to add it to your MyLibrary.",
+        a: "Tap the bookmark icon on any lecture to add it to your Library.",
       },
       {
         q: "Can I listen offline?",
@@ -33,64 +37,52 @@ const SUPPORT_SECTIONS = [
   },
 ];
 
-const styles = StyleSheet.create((theme) => ({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.surface.canvas,
-  },
-  contentContainer: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginBottom: 16,
-    color: theme.colors.content.strong,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    marginBottom: 8,
-    color: theme.colors.content.strong,
-  },
-  itemContainer: {
-    marginBottom: 12,
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: theme.colors.surface.subtle,
-  },
-  itemQuestion: {
-    fontWeight: "600",
-    marginBottom: 2,
-    color: theme.colors.content.strong,
-  },
-  itemAnswer: {
-    color: theme.colors.content.muted,
-    lineHeight: 20,
-  },
-}));
-
-/** Renders the native support screen surface and coordinates its user-facing state. */
+/** Presents static FAQ and contact entries inside the native support surface. */
 export function SupportScreen() {
+  const { theme } = useUnistyles();
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <Text style={styles.title}>Support</Text>
-      {/* react-doctor-disable-next-line react-doctor/rn-no-scrollview-mapped-list */}
-      {SUPPORT_SECTIONS.map((section) => (
-        <View key={section.title} style={styles.section}>
-          <Text style={styles.sectionTitle}>{section.title}</Text>
-          {section.items.map((item) => (
-            <View key={item.q} style={styles.itemContainer}>
-              <Text style={styles.itemQuestion}>{item.q}</Text>
-              <Text style={styles.itemAnswer}>{item.a}</Text>
-            </View>
+    <NativeScreenHost testID="support-screen-host">
+      <ScrollView showsIndicators={false}>
+        <Column
+          spacing={theme.spacing.scale.lg}
+          style={{
+            paddingHorizontal: theme.spacing.layout.pageX,
+            paddingVertical: theme.spacing.layout.pageY,
+          }}
+        >
+          <NativeText variant="titleLg" colorRole="strong">
+            Support
+          </NativeText>
+          {SUPPORT_SECTIONS.map((section) => (
+            <Column key={section.title} spacing={theme.spacing.scale.sm}>
+              <NativeText variant="titleMd" colorRole="strong">
+                {section.title}
+              </NativeText>
+              {section.items.map((item) => (
+                <Column
+                  key={item.q}
+                  spacing={theme.spacing.scale.xs}
+                  style={{
+                    padding: theme.spacing.scale.md,
+                    borderRadius: theme.radius.component.card,
+                    borderWidth: theme.border.width.default,
+                    borderColor: theme.colors.border.subtle,
+                    backgroundColor: theme.colors.surface.default,
+                  }}
+                >
+                  <NativeText variant="bodyMd" colorRole="strong">
+                    {item.q}
+                  </NativeText>
+                  <NativeText variant="bodySm" colorRole="muted">
+                    {item.a}
+                  </NativeText>
+                </Column>
+              ))}
+            </Column>
           ))}
-        </View>
-      ))}
-    </ScrollView>
+        </Column>
+      </ScrollView>
+    </NativeScreenHost>
   );
 }

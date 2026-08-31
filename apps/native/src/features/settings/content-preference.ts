@@ -2,7 +2,7 @@ import { createContentPreferenceStore, type LanguageStorageAdapter } from "@sd/c
 import * as SecureStore from "expo-secure-store";
 import { useSyncExternalStore } from "react";
 
-/** Provides native account, preference, support, and settings workflows. */
+/** Persists the native reader's content-language preference in SecureStore. */
 const secureStoreAdapter: LanguageStorageAdapter = {
   async getItem(key) {
     try {
@@ -23,12 +23,15 @@ const secureStoreAdapter: LanguageStorageAdapter = {
 const store = createContentPreferenceStore(secureStoreAdapter);
 void store.hydrate();
 
+/** Exposes the hydrated preference store for native consumers and tests. */
+export const contentPreferenceStore = store;
+
 /** Reactive access to the "show content in original language" preference. */
 export function useShowOriginalContent(): boolean {
   return useSyncExternalStore(store.subscribe, store.getShowOriginal);
 }
 
-/** Persists the listener’s original-language content preference for native readers. */
+/** Records the reader's original-language preference and notifies subscribers. */
 export function setShowOriginalContent(value: boolean): void {
   store.setShowOriginal(value);
 }
