@@ -8,6 +8,9 @@ import {
 } from "@expo/ui";
 import {
   ActivityIndicator,
+  Platform,
+  Pressable,
+  Text as RNText,
   View,
   type DimensionValue,
   type StyleProp,
@@ -138,6 +141,62 @@ function renderButtonContent(
   );
 }
 
+function AndroidButton({
+  label,
+  icon,
+  iconPosition,
+  fullWidth,
+  disabled,
+  loading,
+  onPress,
+  accessibilityLabel,
+  style,
+  testID,
+  tokens,
+}: ButtonProps & { tokens: ReturnType<typeof getButtonTokens> }) {
+  const isDisabled = resolveDisabled(disabled, loading ?? false);
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      disabled={isDisabled}
+      onPress={getPressHandler(isDisabled, onPress)}
+      testID={testID}
+      style={({ pressed }) => [
+        getContainerStyle(fullWidth ?? false, style),
+        styles.androidButton,
+        // SAFETY: AndroidButton only consumes the same primitive color, spacing,
+        // border, size, and opacity fields that React Native ViewStyle supports.
+        toUniversalButtonStyle(tokens, fullWidth ?? false, isDisabled) as ViewStyle,
+        pressed ? styles.androidPressed : undefined,
+      ]}
+    >
+      {renderAndroidButtonContent({ loading: loading ?? false, icon, iconPosition, label, tokens })}
+    </Pressable>
+  );
+}
+
+function renderAndroidButtonContent({
+  loading,
+  icon,
+  iconPosition,
+  label,
+  tokens,
+}: Pick<ButtonProps, "loading" | "icon" | "iconPosition" | "label"> & {
+  tokens: ReturnType<typeof getButtonTokens>;
+}) {
+  if (loading) return <ActivityIndicator size="small" color={tokens.indicatorColor} />;
+
+  return (
+    <View style={styles.androidContent}>
+      {icon && iconPosition === "left" ? icon : null}
+      <RNText style={[styles.androidLabel, { color: tokens.textColor }]}>{label}</RNText>
+      {icon && iconPosition === "right" ? icon : null}
+    </View>
+  );
+}
+
 /**
  * Renders a universal native button while keeping arbitrary caller layout styles
  * on the React Native container boundary.
@@ -163,6 +222,26 @@ export function Button({
   const { theme } = useUnistyles();
   const isDisabled = resolveDisabled(disabled, loading);
   const tokens = getButtonTokens(variant, size, theme);
+
+  if (Platform.OS === "android") {
+    return (
+      <AndroidButton
+        {...{
+          label,
+          icon,
+          iconPosition,
+          fullWidth,
+          disabled,
+          loading,
+          onPress,
+          accessibilityLabel,
+          style,
+          testID,
+          tokens,
+        }}
+      />
+    );
+  }
 
   return (
     <View
@@ -196,4 +275,24 @@ export function Button({
 const base = {
   intrinsic: { alignSelf: "flex-start" as const },
   stretch: { width: FULL_WIDTH },
+};
+
+const styles = {
+  androidButton: {
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+  },
+  androidContent: {
+    alignItems: "center" as const,
+    flexDirection: "row" as const,
+    gap: 8,
+    justifyContent: "center" as const,
+  },
+  androidLabel: {
+    fontSize: 15,
+    fontWeight: "600" as const,
+  },
+  androidPressed: {
+    opacity: 0.8,
+  },
 };

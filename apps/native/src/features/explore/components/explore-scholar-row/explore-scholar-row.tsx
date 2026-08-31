@@ -1,8 +1,7 @@
 import type { ScholarChipDto } from "@sd/core-contracts";
 import type { ListRenderItemInfo } from "react-native";
 
-import { Button as ExpoButton, Column, Host } from "@expo/ui";
-import { View, FlatList } from "react-native";
+import { FlatList, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
@@ -20,19 +19,16 @@ export type ExploreScholarRowProps = {
 export function ExploreScholarRow({ scholars, onScholarPress }: ExploreScholarRowProps) {
   function renderScholar({ item: scholar }: ListRenderItemInfo<ScholarChipDto>) {
     return (
-      <Host matchContents>
-        <ExpoButton
-          variant="text"
-          onPress={() => onScholarPress?.(scholar.slug)}
-          style={styles.scholar}
-          testID={`scholar-card-${scholar.slug}`}
-        >
-          <Column alignment="center">
-            <UserAvatar image={scholar.imageUrl} name={scholar.name} size={48} />
-            <MarqueeText text={scholar.name} variant="caption" style={styles.name} />
-          </Column>
-        </ExpoButton>
-      </Host>
+      <Pressable
+        onPress={() => onScholarPress?.(scholar.slug)}
+        style={styles.scholar}
+        testID={`scholar-card-${scholar.slug}`}
+      >
+        <View style={styles.scholarContent}>
+          <UserAvatar image={scholar.imageUrl} name={scholar.name} size={48} />
+          <MarqueeText text={scholar.name} variant="caption" style={styles.name} />
+        </View>
+      </Pressable>
     );
   }
 
@@ -71,6 +67,10 @@ const styles = StyleSheet.create((theme) => ({
   scholar: {
     alignItems: "center",
     width: 72,
+  },
+  scholarContent: {
+    alignItems: "center",
+    width: "100%",
   },
   avatar: {
     width: 48,
