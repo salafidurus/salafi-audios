@@ -144,7 +144,10 @@ function getPublishedDateText(publishedAt?: string | null) {
   return publishedAt ? new Date(publishedAt).toLocaleDateString() : "";
 }
 
-/** Renders the native explore podcast row surface and coordinates its user-facing state. */
+/**
+ * Renders the explore podcast row while retaining an RN fallback for its
+ * progress bar, remote artwork, marquee text, and long-press action menu.
+ */
 export function ExplorePodcastRow({ item, onPress, onNavigateToListing }: ExplorePodcastRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
