@@ -16,6 +16,7 @@ export type NativeButtonSize = "sm" | "md" | "lg";
 /** Defines a token-aware semantic button independent of platform modifiers. */
 export type NativeButtonProps = Omit<ButtonProps, "children" | "label" | "variant"> & {
   label: string;
+  accessibilityLabel?: string;
   icon?: NativeIconName;
   variant?: NativeButtonVariant;
   size?: NativeButtonSize;
@@ -30,6 +31,7 @@ export function NativeButton({
   size = "md",
   loading = false,
   disabled = false,
+  accessibilityLabel,
   style,
   ...props
 }: NativeButtonProps) {
@@ -41,6 +43,7 @@ export function NativeButton({
   return (
     <Button
       {...props}
+      {...(accessibilityLabel ? { accessibilityLabel } : {})}
       disabled={isDisabled}
       variant={nativeVariant}
       style={getButtonStyle(size, variant, disabled, theme, style)}

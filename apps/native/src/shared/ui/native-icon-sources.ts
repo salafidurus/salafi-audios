@@ -10,6 +10,10 @@ export const nativeIconSources = {
   }),
   check: Icon.select({ ios: "checkmark", android: import("@expo/material-symbols/check.xml") }),
   close: Icon.select({ ios: "xmark", android: import("@expo/material-symbols/close.xml") }),
+  chevronDown: Icon.select({
+    ios: "chevron.down",
+    android: import("@expo/material-symbols/keyboard_arrow_down.xml"),
+  }),
   delete: Icon.select({ ios: "trash", android: import("@expo/material-symbols/delete.xml") }),
   download: Icon.select({
     ios: "arrow.down.circle",
@@ -21,11 +25,34 @@ export const nativeIconSources = {
     android: import("@expo/material-symbols/error.xml"),
   }),
   more: Icon.select({ ios: "ellipsis", android: import("@expo/material-symbols/more_horiz.xml") }),
+  music: Icon.select({
+    ios: "music.note",
+    android: import("@expo/material-symbols/music_note.xml"),
+  }),
   pause: Icon.select({ ios: "pause.fill", android: import("@expo/material-symbols/pause.xml") }),
-  play: Icon.select({ ios: "play.fill", android: import("@expo/material-symbols/play_arrow.xml") }),
+  play: Icon.select({
+    ios: "play.fill",
+    android: import("@expo/material-symbols/arrow_right.xml"),
+  }),
   search: Icon.select({
     ios: "magnifyingglass",
     android: import("@expo/material-symbols/search.xml"),
+  }),
+  skipBack: Icon.select({
+    ios: "backward.end",
+    android: import("@expo/material-symbols/skip_previous.xml"),
+  }),
+  skipForward: Icon.select({
+    ios: "forward.end",
+    android: import("@expo/material-symbols/skip_next.xml"),
+  }),
+  replay: Icon.select({
+    ios: "gobackward.30",
+    android: import("@expo/material-symbols/replay_30.xml"),
+  }),
+  forward: Icon.select({
+    ios: "goforward.30",
+    android: import("@expo/material-symbols/forward_30.xml"),
   }),
   settings: Icon.select({
     ios: "gearshape",

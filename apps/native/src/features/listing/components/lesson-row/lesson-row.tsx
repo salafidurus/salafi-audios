@@ -130,16 +130,18 @@ export function LessonRow({ item, queue, highlighted = false, onLayout }: Lesson
         animate={{ backgroundColor: "transparent" }}
         transition={{ type: "timing", duration: 2000 }}
       >
-        <Pressable onPress={handlePress} style={styles.row}>
-          <LessonRowContent
-            item={item}
-            duration={durationStr}
-            progressPercent={progressPercent}
-            isCompleted={isCompleted}
-          />
+        <View style={styles.row}>
+          <Pressable onPress={handlePress} style={styles.primaryAction}>
+            <LessonRowContent
+              item={item}
+              duration={durationStr}
+              progressPercent={progressPercent}
+              isCompleted={isCompleted}
+            />
+            <LessonRowPlayButton isCurrentlyPlaying={isCurrentlyPlaying} theme={theme} />
+          </Pressable>
           {renderDownload(item)}
-          <LessonRowPlayButton isCurrentlyPlaying={isCurrentlyPlaying} theme={theme} />
-        </Pressable>
+        </View>
       </EaseView>
     </View>
   );
@@ -155,6 +157,12 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.layout.pageX,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border.subtle,
+  },
+  primaryAction: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.md,
   },
   content: {
     flex: 1,

@@ -123,6 +123,21 @@ jest.mock("@expo/ui", () => {
     return React.createElement(View, { ...rest, spacing }, children);
   }
 
+  function Slider({ value, onValueChange, min, max, disabled, testID }) {
+    return React.createElement("NativeSlider", {
+      value,
+      min,
+      max,
+      disabled,
+      testID,
+      onValueChange,
+    });
+  }
+
+  function BottomSheet({ children, isPresented, onDismiss, testID }) {
+    return isPresented ? React.createElement(View, { testID, onDismiss }, children) : null;
+  }
+
   function List({ children, testID = "native-list" }) {
     return React.createElement(View, { testID }, children);
   }
@@ -253,6 +268,8 @@ jest.mock("@expo/ui", () => {
     List,
     ListItem,
     Row,
+    Slider,
+    BottomSheet,
     Text: ExpoText,
     Icon,
     Switch,
@@ -454,6 +471,10 @@ jest.mock("@expo/ui/jetpack-compose", () => {
     return React.createElement(View, null);
   }
 
+  function ProgressIndicator({ progress, testID }) {
+    return React.createElement(View, { progress, testID });
+  }
+
   // Visibility is controlled by the caller conditionally rendering AlertDialog
   // (matches the real controlled-component contract), so the mock just renders
   // its compound-component children as-is. `colors` is forwarded onto the
@@ -483,6 +504,8 @@ jest.mock("@expo/ui/jetpack-compose", () => {
     Text: ComposeText,
     Spacer,
     AlertDialog,
+    CircularProgressIndicator: ProgressIndicator,
+    LinearProgressIndicator: ProgressIndicator,
   };
 });
 
