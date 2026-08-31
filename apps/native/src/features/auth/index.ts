@@ -1,2 +1,2 @@
-/** Encapsulates a user-facing native feature and its local integration boundaries. */
+/** Exposes authentication screens and native provider integrations. */
 export { SignInScreen, type SignInScreenProps } from "./screens/sign-in/sign-in.screen";

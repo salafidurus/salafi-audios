@@ -38,6 +38,30 @@ export const APPROVED_NATIVE_BRIDGES: readonly ApprovedNativeBridge[] = [
     validationEvidence: "ListItem contract tests and Android list host validation",
   },
   {
+    file: "src/features/auth/screens/sign-in/sign-in.screen.tsx",
+    kind: "bridge",
+    reason:
+      "Apple authentication is an iOS-only native control hosted inside the Expo UI sign-in surface.",
+    owner: "auth feature owner",
+    validationEvidence: "Sign-in screen contract tests and Android host validation",
+  },
+  {
+    file: "src/features/navigation/components/BottomAccessory/BottomAccessory.tsx",
+    kind: "bridge",
+    reason:
+      "The package-owned bottom accessory is mounted through the React Native navigation boundary.",
+    owner: "navigation feature owner",
+    validationEvidence: "Bottom accessory contract tests and Android host validation",
+  },
+  {
+    file: "src/features/navigation/components/BottomAccessory/SubrouteIconButton.tsx",
+    kind: "bridge",
+    reason:
+      "The subsection disclosure control retains a React Native host for navigation composition.",
+    owner: "navigation feature owner",
+    validationEvidence: "Subroute navigation contract tests and Android host validation",
+  },
+  {
     file: "src/shared/components/DraggableList.tsx",
     kind: "infrastructure",
     reason: "Reordering requires React Native gesture and animation infrastructure.",

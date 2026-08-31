@@ -78,6 +78,7 @@ jest.mock("@expo/ui", () => {
     Switch: RNSwitch,
     TextInput: RNTextInput,
     View,
+    ScrollView: RNScrollView,
     Text,
   } = require("react-native");
 
@@ -121,6 +122,10 @@ jest.mock("@expo/ui", () => {
 
   function Column({ children, spacing, ...rest }) {
     return React.createElement(View, { ...rest, spacing }, children);
+  }
+
+  function ScrollView({ children, ...rest }) {
+    return React.createElement(RNScrollView, rest, children);
   }
 
   function Slider({ value, onValueChange, min, max, disabled, testID }) {
@@ -187,6 +192,10 @@ jest.mock("@expo/ui", () => {
               {
                 accessibilityRole: "button",
                 accessibilityLabel: child.props.label,
+                accessibilityState: { checked: child.props.value === selectedValue },
+                testID:
+                  child.props.testID ??
+                  (child.props.value ? `${testID}-option-${child.props.value}` : undefined),
                 disabled: enabled === false,
                 onPress: () => onValueChange(child.props.value),
               },
@@ -265,6 +274,7 @@ jest.mock("@expo/ui", () => {
     RNHostView,
     Button,
     Column,
+    ScrollView,
     List,
     ListItem,
     Row,

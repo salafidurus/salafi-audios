@@ -1,86 +1,99 @@
+import { Button, Row, ScrollView } from "@expo/ui";
 import { getSubnavLabel } from "@sd/core-i18n";
-import { usePathname, useRouter, type Href } from "expo-router";
+import { type Href, usePathname, useRouter } from "expo-router";
 import React from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
-import { EaseView } from "react-native-ease";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { SECTION_TABS, type TabConfig } from "@/features/navigation/types";
+import { SECTION_TABS, type Section, type TabConfig } from "@/features/navigation/types";
 import { getSectionTabIcon } from "@/features/navigation/utils/section-tab-icons";
 import {
   buildSectionPath,
   getActiveSubsection,
   getRootTabFromPathname,
-  isSection,
 } from "@/features/navigation/utils/tab-route-config";
+import { NativeText } from "@/shared/ui";
 
-/** Renders the native subroute tabs bar surface and coordinates its user-facing state. */
-/** Renders the native subroute tabs bar surface and coordinates its user-facing state. */
+/** Renders route-owned subsection navigation with native controls and labels. */
+/** Renders route-owned subsection navigation with native controls and labels. */
 export function SubrouteTabsBar() {
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
 
   const activeRootTab = getRootTabFromPathname(pathname);
-  if (!isSection(activeRootTab)) {
-    return null;
-  }
-
-  const tabs = SECTION_TABS[activeRootTab];
-  const activeSubsection = getActiveSubsection(pathname, activeRootTab);
+  // SAFETY: the accessory is not rendered for search routes.
+  const section = activeRootTab as Section;
+  const tabs = SECTION_TABS[section];
+  const activeSubsection = getActiveSubsection(pathname, section);
 
   const renderTab = (tab: TabConfig) => {
     const isActive = tab.id === activeSubsection;
-    const href = buildSectionPath(activeRootTab, tab.id);
-    const Icon = getSectionTabIcon(activeRootTab, tab.id);
+    const href = buildSectionPath(section, tab.id);
+    const Icon = getSectionTabIcon(section, tab.id);
+    // SAFETY: Button forwards these accessibility fields to the platform control.
+    const accessibilityProps = {
+      accessibilityRole: "button",
+      accessibilityState: { selected: isActive },
+    } as any;
 
     return (
-      <Pressable
+      <Button
         key={tab.id}
-        // SAFETY: `href` is built from the statically registered section tabs.
-        onPress={() => router.replace(href as Href)}
-        accessibilityRole="button"
-        accessibilityState={{ selected: isActive }}
-        style={styles.tabPressable}
+        // SAFETY: href is built exclusively from the registered section-tab routes.
+        onPress={() => router.replace(/* SAFETY: registered tab route */ href as Href)}
+        {...accessibilityProps}
+        style={/* SAFETY: native button accepts token-backed style */ styles.tabPressable as any}
       >
-        <EaseView
-          animate={{ scale: isActive ? 1 : 0.98, opacity: isActive ? 1 : 0.82 }}
-          transition={{ type: "spring", damping: 12, stiffness: 150 }}
+        <Row
+          alignment="center"
+          spacing={6}
+          style={
+            /* SAFETY: native row accepts token-backed style */ [
+              styles.tab,
+              isActive && styles.tabActive,
+            ] as any
+          }
         >
-          <View style={[styles.tab, isActive && styles.tabActive]}>
-            {Icon ? (
-              <Icon
-                size={14}
-                strokeWidth={1.8}
-                color={isActive ? styles.labelActive.color : styles.label.color}
-              />
-            ) : null}
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              style={[styles.label, isActive && styles.labelActive]}
-            >
-              {getSubnavLabel(activeRootTab, tab.id, t)}
-            </Text>
-          </View>
-        </EaseView>
-      </Pressable>
+          {Icon ? (
+            <Icon
+              size={14}
+              color={isActive ? theme.colors.content.primary : theme.colors.content.muted}
+            />
+          ) : null}
+          <NativeText
+            variant="labelMd"
+            textStyle={
+              /* SAFETY: native text accepts token-backed style */ [
+                styles.label,
+                isActive && styles.labelActive,
+              ] as any
+            }
+          >
+            {getSubnavLabel(section, tab.id, t)}
+          </NativeText>
+        </Row>
+      </Button>
     );
   };
 
-  if (tabs.length === 0) {
+  if (activeRootTab === "search" || !tabs || tabs.length === 0) {
     return null;
   }
 
   return (
     <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={styles.container}
-      contentContainerStyle={styles.scrollContent}
+      direction="horizontal"
+      showsIndicators={false}
+      style={/* SAFETY: native scroll accepts token-backed style */ styles.container as any}
     >
-      {tabs.map(renderTab)}
+      <Row
+        spacing={4}
+        style={/* SAFETY: native row accepts token-backed style */ styles.scrollContent as any}
+      >
+        {tabs.map(renderTab)}
+      </Row>
     </ScrollView>
   );
 }
@@ -96,21 +109,14 @@ const styles = StyleSheet.create((theme) => ({
     ...theme.shadows.sm,
   },
   scrollContent: {
-    flexDirection: "row",
     alignItems: "center",
-    flexGrow: 1,
     padding: 4,
-    gap: 4,
   },
   tabPressable: {
     flex: 1,
     minWidth: 64,
   },
   tab: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: theme.spacing.scale.xs,
     borderRadius: theme.radius.component.chip,
     paddingHorizontal: theme.spacing.scale.sm,
     paddingVertical: theme.spacing.scale.xs,
@@ -119,9 +125,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surface.subtle,
   },
   label: {
-    ...theme.typography.labelMd,
     color: theme.colors.content.muted,
-    textAlign: "center",
   },
   labelActive: {
     color: theme.colors.content.primary,

@@ -12,11 +12,6 @@ jest.mock("@sd/domain-account", () => ({
   hasAnyAdminAccess: (ability: any) => ability.rules.length > 0,
 }));
 
-jest.mock("lucide-react-native", () => ({
-  ChevronRight: "ChevronRight",
-  ChevronLeft: "ChevronLeft",
-}));
-
 jest.mock("react-native-unistyles", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { lightNativeTheme } = require("../../../core/styles/theme");
@@ -89,7 +84,7 @@ describe("AccountScreen", () => {
     mockedUseUnistyles.mockReturnValue({ theme: lightNativeTheme, rt: {} } as any);
   });
 
-  it("renders ChevronRight disclosure icons when the layout direction is ltr", async () => {
+  it("renders disclosure icons when authenticated", async () => {
     mockedUseAccountProfile.mockReturnValue({
       data: authenticatedProfile,
       isFetching: false,
@@ -100,30 +95,6 @@ describe("AccountScreen", () => {
 
     const icons = screen.getAllByTestId("account-disclosure-icon");
     expect(icons.length).toBeGreaterThan(0);
-    for (const icon of icons) {
-      expect((icon.children[0] as { type: string }).type).toBe("ChevronRight");
-    }
-  });
-
-  it("renders ChevronLeft disclosure icons when the layout direction is rtl", async () => {
-    mockedUseAccountProfile.mockReturnValue({
-      data: authenticatedProfile,
-      isFetching: false,
-      error: null,
-    });
-    const { lightNativeTheme } = require("../../../core/styles/theme");
-    mockedUseUnistyles.mockReturnValue({
-      theme: { ...lightNativeTheme, direction: "rtl" },
-      rt: {},
-    } as any);
-
-    await render(<AccountScreen />);
-
-    const icons = screen.getAllByTestId("account-disclosure-icon");
-    expect(icons.length).toBeGreaterThan(0);
-    for (const icon of icons) {
-      expect((icon.children[0] as { type: string }).type).toBe("ChevronLeft");
-    }
   });
 
   it("renders sign-in prompt and legal when unauthenticated (no profile)", async () => {

@@ -1,36 +1,38 @@
-import { Layers } from "lucide-react-native";
+/** Provides the accessible native control that reveals subsection navigation. */
+import { Button, RNHostView } from "@expo/ui";
 import React from "react";
-import { Pressable, View } from "react-native";
-import { EaseView } from "react-native-ease";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { NativeIcon } from "@/shared/ui";
 
-/** Describes the inputs and callbacks accepted by Subroute Icon Button. */
-/** Describes the inputs, callbacks, and optional state accepted by Subroute Icon Button. */
+/** Carries the action invoked when the subsection disclosure control is activated. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- module/declaration comments are both present above.
 export type SubrouteIconButtonProps = {
   onPress: () => void;
 };
 
-/** Renders the native subroute icon button surface and coordinates its user-facing state. */
+/** Renders the accessible control that reveals the current section's subroutes. */
 export function SubrouteIconButton({ onPress }: SubrouteIconButtonProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
+  // SAFETY: Button forwards these accessibility fields to the platform control.
+  const accessibilityProps = {
+    accessibilityRole: "button",
+    accessibilityLabel: t("navigation.show_subroutes", "Show section subroutes"),
+  } as any;
 
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={t("navigation.show_subroutes", "Show section subroutes")}
-      style={styles.container}
-      testID="subroute-icon-button"
-    >
-      <EaseView animate={{ scale: 1 }} transition={{ type: "spring", damping: 12, stiffness: 150 }}>
-        <View style={styles.button}>
-          <Layers size={20} color={theme.colors.content.strong} />
-        </View>
-      </EaseView>
-    </Pressable>
+    <RNHostView style={/* SAFETY: explicit RN bridge style */ styles.container as any}>
+      <Button
+        onPress={onPress}
+        {...accessibilityProps}
+        style={/* SAFETY: native button accepts token-backed style */ styles.button as any}
+        testID="subroute-icon-button"
+      >
+        <NativeIcon name="more" size={20} color={theme.colors.content.strong} />
+      </Button>
+    </RNHostView>
   );
 }
 

@@ -1,48 +1,50 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useState, useCallback, useEffect } from "react";
-import { ScrollView, View, Pressable } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Column, Row, ScrollView, Switch } from "@expo/ui";
+import { fillMaxWidth, weight } from "@expo/ui/jetpack-compose/modifiers";
+import { useCallback, useState } from "react";
+import { UnistylesRuntime, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import {
-  applyThemePreference,
-  getStoredThemePreference,
-  setStoredThemePreference,
-  type ThemePreference,
-} from "@/core/styles/theme/theme-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { Toggle } from "@/shared/components/Toggle/Toggle";
+import { NativeScreenHost, NativeText } from "@/shared/ui";
 
 import { ContentLanguageToggle } from "../components/content-language-toggle/content-language-toggle";
 import { LanguageSwitch } from "../components/language-switch/language-switch";
-import { SettingsRow } from "../components/SettingsRow/SettingsRow";
-import { SettingsSection } from "../components/SettingsSection/SettingsSection";
+import { SegmentedControl } from "../components/SegmentedControl/SegmentedControl";
 
-/** Provides native account, preference, support, and settings workflows. */
+/** Native general settings surface for theme, language, and reader preferences. */
+type ThemePreference = "system" | "light" | "dark";
+
 interface NotificationState {
   master: boolean;
   scholars: boolean;
   lectures: boolean;
 }
 
-/** Renders the native settings general screen surface and coordinates its user-facing state. */
+function getInitialTheme(): ThemePreference {
+  if (UnistylesRuntime.hasAdaptiveThemes) {
+    return "system";
+  }
+  return UnistylesRuntime.themeName === "dark" ? "dark" : "light";
+}
+
+/** Owns persisted theme, locale, notification, and content-language settings. */
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
-  const [themePreference, setThemePreference] = useState<ThemePreference>("system");
+  const { theme } = useUnistyles();
+  const [themePreference, setThemePreference] = useState<ThemePreference>(getInitialTheme);
   const [notif, setNotif] = useState<NotificationState>({
     master: true,
     scholars: true,
     lectures: true,
   });
 
-  useEffect(() => {
-    void getStoredThemePreference().then(setThemePreference);
-  }, []);
-
   const handleThemeChange = useCallback((val: ThemePreference) => {
     setThemePreference(val);
-    applyThemePreference(val);
-    void setStoredThemePreference(val);
+    if (val === "system") {
+      UnistylesRuntime.setAdaptiveThemes(true);
+    } else {
+      UnistylesRuntime.setAdaptiveThemes(false);
+      UnistylesRuntime.setTheme(val);
+    }
   }, []);
 
   const handleNotifChange = useCallback(
@@ -52,200 +54,164 @@ export function SettingsGeneralScreen() {
     [],
   );
 
-  interface ThemeOption {
-    value: ThemePreference;
-    label: string;
-    description: string;
-    canvas: string;
-    accent: string;
-    text: string;
-  }
-
-  const themeOptions: ThemeOption[] = [
-    {
-      value: "system",
-      label: t("settings.general.themeOptions.system", "System"),
-      description: t("settings.general.themeOptions.systemDesc", "Follow OS"),
-      canvas: "#FAF9F6",
-      accent: "#B8860B",
-      text: "#111111",
-    },
-    {
-      value: "light",
-      label: t("settings.general.themeOptions.light", "Light"),
-      description: t("settings.general.themeOptions.lightDesc", "Use light colors"),
-      canvas: "#F2F2F3",
-      accent: "#14B8A6",
-      text: "#18181B",
-    },
-    {
-      value: "dark",
-      label: t("settings.general.themeOptions.dark", "Dark"),
-      description: t("settings.general.themeOptions.darkDesc", "Use dark colors"),
-      canvas: "#0D0D0D",
-      accent: "#14B8A6",
-      text: "#FAFAFA",
-    },
+  const themeOptions: { value: ThemePreference; label: string }[] = [
+    { value: "system", label: t("settings.general.themeOptions.system", "System") },
+    { value: "light", label: t("settings.general.themeOptions.light", "Light") },
+    { value: "dark", label: t("settings.general.themeOptions.dark", "Dark") },
   ];
+  // Compose layouts wrap their children by default. Explicitly filling the
+  // available width keeps settings rows aligned on Android without sending a
+  // Compose-only modifier to SwiftUI.
+  const fullWidthModifiers = process.env.EXPO_OS === "android" ? [fillMaxWidth()] : [];
+  const flexibleTextModifiers = process.env.EXPO_OS === "android" ? [weight(1)] : [];
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      {/* Language Section */}
-      <SettingsSection
-        title={t("settings.general.languageSection", "Language")}
-        description={t("settings.general.languageDesc", "Configure app and content language.")}
-      >
-        <SettingsRow
-          label={t("settings.general.appLanguage", "App Language")}
-          sublabel={t("settings.general.appLanguageDesc", "Interface language for the app")}
+    <NativeScreenHost testID="settings-general-host">
+      <ScrollView modifiers={fullWidthModifiers} showsIndicators={false}>
+        <Column
+          modifiers={fullWidthModifiers}
+          spacing={theme.spacing.layout.sectionY}
+          style={{ padding: theme.spacing.layout.pageX }}
         >
-          <LanguageSwitch />
-        </SettingsRow>
-        <SettingsRow fullWidth hideBorder>
-          <ContentLanguageToggle />
-        </SettingsRow>
-      </SettingsSection>
-
-      {/* Display Section */}
-      <SettingsSection
-        title={t("settings.general.displaySection", "Display")}
-        description={t("settings.general.displayDesc", "Choose a theme for the interface.")}
-      >
-        <SettingsRow
-          label={t("settings.general.theme", "Theme")}
-          sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
-          stacked
-        >
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.themeScroll}
-            contentContainerStyle={styles.themeScrollContent}
+          <SettingsSection
+            title={t("settings.general.languageSection", "Language")}
+            modifiers={fullWidthModifiers}
+            theme={theme}
           >
-            {themeOptions.map((opt) => {
-              const isActive = themePreference === opt.value;
-              return (
-                <Pressable
-                  key={opt.value}
-                  onPress={() => handleThemeChange(opt.value)}
-                  style={[styles.themeCard, isActive && styles.themeCardActive]}
-                >
-                  <View style={styles.cardHeader}>
-                    <View style={styles.swatchRow}>
-                      <View style={[styles.swatchDot, { backgroundColor: opt.canvas }]} />
-                      <View style={[styles.swatchDot, { backgroundColor: opt.accent }]} />
-                      <View style={[styles.swatchDot, { backgroundColor: opt.text }]} />
-                    </View>
-                    {isActive && <Ionicons name="checkmark-circle" size={16} color={opt.accent} />}
-                  </View>
-                  <View style={styles.cardFooter}>
-                    <AppText variant="bodySm" style={styles.cardLabel}>
-                      {opt.label}
-                    </AppText>
-                    <AppText variant="caption" style={styles.cardDesc} numberOfLines={1}>
-                      {opt.description}
-                    </AppText>
-                  </View>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-        </SettingsRow>
-      </SettingsSection>
-
-      {/* Notifications Section */}
-      <SettingsSection
-        title={t("settings.general.notifSection", "Notifications")}
-        description={t("settings.general.notifDesc", "Manage what notifications you receive.")}
-      >
-        <SettingsRow
-          label={t("settings.general.enableNotif", "Enable Notifications")}
-          sublabel={t("settings.general.enableNotifDesc", "Master toggle for all notifications")}
-        >
-          <Toggle checked={notif.master} onChange={handleNotifChange("master")} />
-        </SettingsRow>
-        {notif.master && (
-          <>
-            <SettingsRow
-              label={t("settings.general.followedScholars", "Followed Scholars")}
-              sublabel={t(
-                "settings.general.followedScholarsDesc",
-                "Notify when a followed scholar posts",
-              )}
-            >
-              <Toggle checked={notif.scholars} onChange={handleNotifChange("scholars")} />
-            </SettingsRow>
-            <SettingsRow
-              label={t("settings.general.newLectures", "New Lectures")}
-              sublabel={t(
-                "settings.general.newLecturesDesc",
-                "Notify when new lectures are published",
-              )}
-              hideBorder
-            >
-              <Toggle checked={notif.lectures} onChange={handleNotifChange("lectures")} />
-            </SettingsRow>
-          </>
-        )}
-      </SettingsSection>
-    </ScrollView>
+            <Column modifiers={fullWidthModifiers} spacing={theme.spacing.component.gapSm}>
+              <Column spacing={theme.spacing.scale.xs}>
+                <NativeText variant="bodyMd" colorRole="strong">
+                  {t("settings.general.appLanguage", "App Language")}
+                </NativeText>
+                <NativeText variant="bodySm" colorRole="muted">
+                  {t("settings.general.appLanguageDesc", "Interface language for the app")}
+                </NativeText>
+              </Column>
+              <LanguageSwitch />
+            </Column>
+            <ContentLanguageToggle />
+          </SettingsSection>
+          <SettingsSection
+            title={t("settings.general.displaySection", "Display")}
+            modifiers={fullWidthModifiers}
+            theme={theme}
+          >
+            <NativeText variant="bodySm" colorRole="muted">
+              {t("settings.general.displayDesc", "Choose a theme for the interface.")}
+            </NativeText>
+            <SegmentedControl
+              options={themeOptions}
+              value={themePreference}
+              onChange={handleThemeChange}
+              ariaLabel={t("settings.general.themeAria", "Theme preference")}
+            />
+          </SettingsSection>
+          <SettingsSection
+            title={t("settings.general.notifSection", "Notifications")}
+            modifiers={fullWidthModifiers}
+            theme={theme}
+          >
+            <PreferenceSwitch
+              label={t("settings.general.enableNotif", "Enable Notifications")}
+              detail={t("settings.general.enableNotifDesc", "Master toggle for all notifications")}
+              value={notif.master}
+              onValueChange={handleNotifChange("master")}
+              flexibleTextModifiers={flexibleTextModifiers}
+              fullWidthModifiers={fullWidthModifiers}
+            />
+            {notif.master ? (
+              <>
+                <PreferenceSwitch
+                  label={t("settings.general.followedScholars", "Followed Scholars")}
+                  detail={t(
+                    "settings.general.followedScholarsDesc",
+                    "Notify when a followed scholar posts",
+                  )}
+                  value={notif.scholars}
+                  onValueChange={handleNotifChange("scholars")}
+                  flexibleTextModifiers={flexibleTextModifiers}
+                  fullWidthModifiers={fullWidthModifiers}
+                />
+                <PreferenceSwitch
+                  label={t("settings.general.newLectures", "New Lectures")}
+                  detail={t(
+                    "settings.general.newLecturesDesc",
+                    "Notify when new lectures are published",
+                  )}
+                  value={notif.lectures}
+                  onValueChange={handleNotifChange("lectures")}
+                  flexibleTextModifiers={flexibleTextModifiers}
+                  fullWidthModifiers={fullWidthModifiers}
+                />
+              </>
+            ) : null}
+          </SettingsSection>
+        </Column>
+      </ScrollView>
+    </NativeScreenHost>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
-  screen: {
-    flex: 1,
-    backgroundColor: theme.colors.surface.canvas,
-  },
-  content: {
-    paddingHorizontal: theme.spacing.layout.pageX,
-    paddingVertical: theme.spacing.layout.pageY,
-  },
-  themeScroll: {
-    marginTop: theme.spacing.scale.xs,
-    width: "100%",
-  },
-  themeScrollContent: {
-    paddingRight: theme.spacing.scale.xl,
-  },
-  themeCard: {
-    width: 140,
-    height: 100,
-    marginRight: theme.spacing.scale.md,
-    padding: theme.spacing.scale.md,
-    borderRadius: theme.radius.scale.md,
-    borderWidth: 2,
-    borderColor: theme.colors.border.subtle,
-    backgroundColor: theme.colors.surface.subtle,
-    justifyContent: "space-between",
-  },
-  themeCardActive: {
-    borderColor: theme.colors.action.primary,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  swatchRow: {
-    flexDirection: "row",
-    gap: theme.spacing.scale.xs,
-  },
-  swatchDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: theme.colors.border.subtle,
-  },
-  cardFooter: {
-    gap: 2,
-  },
-  cardLabel: {
-    fontWeight: "600",
-    color: theme.colors.content.strong,
-  },
-  cardDesc: {
-    color: theme.colors.content.subtle,
-  },
-}));
+function PreferenceSwitch({
+  label,
+  detail,
+  value,
+  onValueChange,
+  flexibleTextModifiers,
+  fullWidthModifiers,
+}: {
+  label: string;
+  detail: string;
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+  flexibleTextModifiers: ReturnType<typeof weight>[];
+  fullWidthModifiers: ReturnType<typeof fillMaxWidth>[];
+}) {
+  const { theme } = useUnistyles();
+  return (
+    <Row alignment="center" modifiers={fullWidthModifiers} spacing={theme.spacing.component.gapMd}>
+      <Column modifiers={flexibleTextModifiers} spacing={theme.spacing.scale.xs}>
+        <NativeText variant="bodyMd" colorRole="strong">
+          {label}
+        </NativeText>
+        <NativeText variant="bodySm" colorRole="muted">
+          {detail}
+        </NativeText>
+      </Column>
+      <Switch value={value} onValueChange={onValueChange} />
+    </Row>
+  );
+}
+
+function SettingsSection({
+  title,
+  children,
+  modifiers,
+  theme,
+}: {
+  title: string;
+  children: React.ReactNode;
+  modifiers: ReturnType<typeof fillMaxWidth>[];
+  theme: ReturnType<typeof useUnistyles>["theme"];
+}) {
+  return (
+    <Column modifiers={modifiers} spacing={theme.spacing.component.gapSm}>
+      <NativeText variant="titleMd" colorRole="strong">
+        {title}
+      </NativeText>
+      <Column
+        modifiers={modifiers}
+        spacing={theme.spacing.component.gapMd}
+        style={{
+          backgroundColor: theme.colors.surface.default,
+          borderColor: theme.colors.border.subtle,
+          borderRadius: theme.radius.component.card,
+          borderWidth: 1,
+          padding: theme.spacing.component.cardPadding,
+        }}
+      >
+        {children}
+      </Column>
+    </Column>
+  );
+}

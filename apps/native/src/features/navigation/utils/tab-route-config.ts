@@ -1,11 +1,12 @@
+/** Resolves root and subsection route identities for the native navigation shell. */
 import { routes } from "@sd/core-contracts";
 
 import { nativeRoutes } from "@/core/navigation/routes";
 
 import { DEFAULT_TABS, SECTION_TABS, type Section } from "../types";
 
-/** Renders the native root tab surface and coordinates its user-facing state. */
-/** Defines the native root tab contract shared by its consumers. */
+/** Restricts route ownership to content sections plus the search root route. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- module/declaration comments are both present above.
 export type RootTab = Section | "search";
 
 /** Checks whether a root tab represents a content section rather than search. */
