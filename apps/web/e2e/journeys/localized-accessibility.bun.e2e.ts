@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
 import {
   createWebE2EServer,
@@ -10,8 +10,8 @@ import {
 describe("localized accessibility Bun.WebView journeys", () => {
   const webServer = createWebE2EServer();
   const { config } = webServer;
-  beforeEach(webServer.start);
-  afterEach(webServer.stop);
+  beforeAll(webServer.start);
+  afterAll(webServer.stop);
 
   it("renders the Arabic Settings profile journey with RTL semantics", async () => {
     await withBrowserJourney("Arabic Settings profile journey", config.origin, async ({ view }) => {
