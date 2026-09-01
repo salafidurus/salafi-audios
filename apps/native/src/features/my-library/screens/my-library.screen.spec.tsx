@@ -1,6 +1,6 @@
 import type { MyLibraryItemDto } from "@sd/core-contracts";
 
-import { useMyLibraryProgressScreen } from "@sd/domain-content";
+import { useMyLibrarySections } from "@sd/domain-content";
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import React from "react";
 
@@ -26,9 +26,7 @@ jest.mock("react-native-safe-area-context", () => ({
 }));
 
 jest.mock("@sd/domain-content", () => ({
-  useMyLibraryProgressScreen: jest.fn(),
-  useMyLibraryCompletedScreen: jest.fn(),
-  useMyLibrarySavedScreen: jest.fn(),
+  useMyLibrarySections: jest.fn(),
   getMyLibraryItemPercent: (item: MyLibraryItemDto) => {
     if (item.totalLeafCount && item.totalLeafCount > 0) {
       return Math.round(((item.completedLeafCount ?? 0) / item.totalLeafCount) * 100);
@@ -55,7 +53,7 @@ jest.mock("../../../core/i18n/use-translation", () => ({
 }));
 
 const mockedUseAuth = jest.mocked(useAuth);
-const mockedUseMyLibraryProgressScreen = jest.mocked(useMyLibraryProgressScreen);
+const mockedUseMyLibrarySections = jest.mocked(useMyLibrarySections);
 
 function buildMyLibraryState(items: MyLibraryItemDto[] = [], isFetching = false) {
   return {
@@ -64,6 +62,7 @@ function buildMyLibraryState(items: MyLibraryItemDto[] = [], isFetching = false)
     nextCursor: undefined,
     isFetching,
     error: null,
+    refetch: jest.fn(),
   };
 }
 
@@ -74,21 +73,29 @@ describe("MyLibraryScreen", () => {
       isLoading: false,
       user: undefined,
     });
-    mockedUseMyLibraryProgressScreen.mockReturnValue(buildMyLibraryState());
+    mockedUseMyLibrarySections.mockReturnValue({
+      started: buildMyLibraryState(),
+      saved: buildMyLibraryState(),
+      completed: buildMyLibraryState(),
+    });
   });
 
-  it("renders a loading state while In Progress is fetching", async () => {
-    mockedUseMyLibraryProgressScreen.mockReturnValue(buildMyLibraryState([], true));
+  it("renders a loading state while Started is fetching", async () => {
+    mockedUseMyLibrarySections.mockReturnValue({
+      started: buildMyLibraryState([], true),
+      saved: buildMyLibraryState(),
+      completed: buildMyLibraryState(),
+    });
 
     await render(<MyLibraryScreen />);
 
-    expect(screen.getByText("Loading In Progress…")).toBeTruthy();
+    expect(screen.getByText("Loading Started…")).toBeTruthy();
   });
 
   it("renders empty section messages when no items exist", async () => {
     await render(<MyLibraryScreen />);
 
-    expect(screen.getByText("No lectures in progress.")).toBeTruthy();
+    expect(screen.getByText("Nothing here yet.")).toBeTruthy();
   });
 
   it("navigates to a lecture when an item is pressed", async () => {
@@ -99,8 +106,8 @@ describe("MyLibraryScreen", () => {
       isLoading: false,
       user: undefined,
     });
-    mockedUseMyLibraryProgressScreen.mockReturnValue(
-      buildMyLibraryState([
+    mockedUseMyLibrarySections.mockReturnValue({
+      started: buildMyLibraryState([
         {
           id: "item-1",
           listingId: "lecture-1",
@@ -116,7 +123,9 @@ describe("MyLibraryScreen", () => {
           completedAt: undefined,
         },
       ]),
-    );
+      saved: buildMyLibraryState(),
+      completed: buildMyLibraryState(),
+    });
 
     await render(<MyLibraryScreen onNavigateToListing={onNavigateToListing} />);
 
@@ -131,8 +140,8 @@ describe("MyLibraryScreen", () => {
       isLoading: false,
       user: undefined,
     });
-    mockedUseMyLibraryProgressScreen.mockReturnValue(
-      buildMyLibraryState([
+    mockedUseMyLibrarySections.mockReturnValue({
+      started: buildMyLibraryState([
         {
           id: "item-1",
           listingId: "lecture-1",
@@ -148,11 +157,38 @@ describe("MyLibraryScreen", () => {
           completedAt: undefined,
         },
       ]),
-    );
+      saved: buildMyLibraryState(),
+      completed: buildMyLibraryState(),
+    });
 
     await render(<MyLibraryScreen />);
-    await fireEvent.press(screen.getByTestId("my-library-progress-row-item-1-action-complete"));
+    await fireEvent.press(screen.getByTestId("my-library-started-row-item-1-action-complete"));
 
     expect(mockMarkCompleted).toHaveBeenCalledWith("lecture-1");
+  });
+
+  it("switches to Saved and renders the selected section internally", async () => {
+    mockedUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, user: undefined });
+    mockedUseMyLibrarySections.mockReturnValue({
+      started: buildMyLibraryState(),
+      saved: buildMyLibraryState([
+        {
+          id: "saved-1",
+          listingId: "lecture-2",
+          listingTitle: "Saved Lecture",
+          listingSlug: "saved-lecture",
+          scholarId: "scholar-1",
+          scholarSlug: "ibn-baz",
+          scholarName: "Ibn Baz",
+        },
+      ]),
+      completed: buildMyLibraryState(),
+    });
+
+    await render(<MyLibraryScreen />);
+    await fireEvent.press(screen.getByText("Saved"));
+
+    expect(screen.getByText("Saved Lecture")).toBeTruthy();
+    expect(screen.getAllByTestId("my-library-saved-row-saved-1").length).toBeGreaterThan(0);
   });
 });

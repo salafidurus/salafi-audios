@@ -292,6 +292,7 @@
   },
   "myLibrary": {
     "title": "My Library",
+    "started": "Started",
     "inProgress": "In Progress",
     "saved": "Saved",
     "completed": "Completed",

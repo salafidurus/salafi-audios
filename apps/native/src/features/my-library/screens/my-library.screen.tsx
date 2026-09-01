@@ -1,111 +1,167 @@
 import { useProgressStore } from "@sd/domain-audio";
-import { useMyLibraryProgressScreen } from "@sd/domain-content";
-import React, { useCallback } from "react";
+import { markUnsaved, useMyLibrarySections, type MyLibrarySection } from "@sd/domain-content";
+import { useCallback, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { MyLibraryItemRow } from "@/features/my-library/components/my-library-item-row/my-library-item-row";
 import { RootScreenHeader } from "@/features/navigation";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { ScreenView } from "@/shared/ui";
+import { NativeSegmentedControl, ScreenView } from "@/shared/ui";
 
-import { useAuth } from "../../../core/auth/use-auth";
-import { useTranslation } from "../../../core/i18n/use-translation";
-
-/** Projects native library state into saved, completed, and in-progress content views. */
-/** Describes the inputs, callbacks, and optional state accepted by My Library Screen. */
+/**
+ * Supplies optional listing navigation while the root owns section selection
+ * locally; omitting it keeps the screen usable in isolated navigation tests.
+ */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- the public prop contract is documented above.
 export type MyLibraryScreenProps = {
   onNavigateToListing?: (slug: string) => void;
 };
 
-/** Renders the native my library screen surface and coordinates its user-facing state. */
-export function MyLibraryScreen({ onNavigateToListing }: MyLibraryScreenProps) {
-  const { isAuthenticated } = useAuth();
-  const { t } = useTranslation();
-  const { items, isFetching } = useMyLibraryProgressScreen(isAuthenticated);
-  const markCompleted = useProgressStore((s) => s.actions.markCompleted);
+const SECTIONS: MyLibrarySection[] = ["started", "saved", "completed"];
 
+function sectionEmptyKey(section: MyLibrarySection) {
+  return section === "started"
+    ? "myLibrary.emptyProgress"
+    : `myLibrary.empty${section[0]!.toUpperCase()}${section.slice(1)}`;
+}
+
+function sectionFallback(section: MyLibrarySection) {
+  if (section === "started") return "Started";
+  return section[0]!.toUpperCase() + section.slice(1);
+}
+
+function getActions(section: MyLibrarySection, t: ReturnType<typeof useTranslation>["t"]) {
+  if (section === "started") {
+    return [{ id: "complete", title: t("myLibrary.markAsCompleted", "Mark as Completed") }];
+  }
+  if (section === "saved") {
+    return [
+      {
+        id: "remove",
+        title: t("myLibrary.removeFromSaved", "Remove from Saved"),
+        attributes: { destructive: true },
+      },
+    ];
+  }
+  return undefined;
+}
+
+/**
+ * Renders one My Library root with internal Started, Saved, and Completed
+ * selection. Selection is presentation state and never becomes a route.
+ */
+// eslint-disable-next-line complexity -- this root deliberately composes three observable states.
+export function MyLibraryScreen({ onNavigateToListing }: MyLibraryScreenProps) {
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { t } = useTranslation();
+  const [selectedSection, setSelectedSection] = useState<MyLibrarySection>("started");
+  const sections = useMyLibrarySections(isAuthenticated, true);
+  const section = sections[selectedSection];
+  const markCompleted = useProgressStore((state) => state.actions.markCompleted);
+
+  const labels = useMemo(
+    () => SECTIONS.map((value) => t(`myLibrary.${value}`, sectionFallback(value))),
+    [t],
+  );
   const handleItemPress = useCallback(
-    (slug: string) => {
-      onNavigateToListing?.(slug);
-    },
+    (slug: string) => onNavigateToListing?.(slug),
     [onNavigateToListing],
   );
+  const handleAction = useCallback(
+    (action: string, listingId: string, listingSlug: string) => {
+      if (action === "complete") markCompleted(listingId);
+      if (action === "remove") markUnsaved(listingId, listingSlug);
+    },
+    [markCompleted],
+  );
 
-  if (isFetching && items.length === 0) {
+  const sectionLabel = t(`myLibrary.${selectedSection}`, sectionFallback(selectedSection));
+
+  if (isAuthLoading || (section.isFetching && section.items.length === 0)) {
     return (
-      <ScreenView>
-        <RootScreenHeader title={t("myLibrary.inProgress", "In Progress")} />
-        <View style={styles.status}>
-          <EmptyState
-            message={t("myLibrary.loadingSection", "Loading {{section}}…", {
-              section: t("myLibrary.inProgress", "In Progress"),
-            })}
-            variant="loading"
-          />
-        </View>
+      <ScreenView center>
+        <RootScreenHeader title={t("myLibrary.title", "My Library")} />
+        <EmptyState
+          message={t("myLibrary.loadingSection", "Loading {{section}}…", {
+            section: sectionLabel,
+          })}
+          variant="loading"
+        />
       </ScreenView>
     );
   }
 
-  if (items.length === 0) {
+  if (section.error && section.items.length === 0) {
     return (
-      <ScreenView>
-        <RootScreenHeader title={t("myLibrary.inProgress", "In Progress")} />
-        <View style={styles.status}>
-          <EmptyState
-            message={t("myLibrary.emptyProgress", "No lectures in progress.")}
-            variant="empty"
-          />
-        </View>
+      <ScreenView center>
+        <RootScreenHeader title={t("myLibrary.title", "My Library")} />
+        <EmptyState
+          message={t("myLibrary.error", "My Library could not be loaded.")}
+          variant="error"
+          onRetry={() => void section.refetch?.()}
+          retryLabel={t("serverError.retry", "Try Again")}
+        />
       </ScreenView>
     );
   }
 
   return (
     <ScreenView>
-      <RootScreenHeader title={t("myLibrary.inProgress", "In Progress")} />
-      <ScrollView contentContainerStyle={styles.listContent}>
-        <View>
-          {items.map((item) => (
+      <RootScreenHeader title={t("myLibrary.title", "My Library")} />
+      <View
+        style={styles.selector}
+        accessibilityLabel={t("myLibrary.selectorLabel", "My Library sections")}
+      >
+        <NativeSegmentedControl
+          values={labels}
+          value={sectionLabel}
+          onValueChange={(label) => {
+            const index = labels.indexOf(label);
+            if (index >= 0) setSelectedSection(SECTIONS[index]!);
+          }}
+          testID="my-library-section-selector"
+        />
+      </View>
+      {section.items.length === 0 ? (
+        <View style={styles.status}>
+          <EmptyState
+            message={t(sectionEmptyKey(selectedSection), "Nothing here yet.")}
+            variant="empty"
+          />
+        </View>
+      ) : (
+        <ScrollView contentContainerStyle={styles.listContent}>
+          {section.items.map((item) => (
             <MyLibraryItemRow
               key={item.id}
               item={item}
-              variant="progress"
-              testID={`my-library-progress-row-${item.id}`}
+              variant={selectedSection === "started" ? "progress" : selectedSection}
+              testID={`my-library-${selectedSection}-row-${item.id}`}
               onPress={() => handleItemPress(item.listingSlug)}
-              actions={[
-                { id: "complete", title: t("myLibrary.markAsCompleted", "Mark as Completed") },
-              ]}
-              onAction={() => markCompleted(item.listingId)}
+              actions={getActions(selectedSection, t)}
+              onAction={(action) => handleAction(action, item.listingId, item.listingSlug)}
             />
           ))}
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
     </ScreenView>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  loadingText: {
-    color: theme.colors.content.default,
-  },
-  emptyText: {
-    color: theme.colors.content.muted,
-    textAlign: "center",
-  },
-  emptyContainer: {
-    padding: theme.spacing.scale.lg,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  listContent: {
+  selector: {
     paddingHorizontal: theme.spacing.layout.pageX,
-    paddingVertical: theme.spacing.layout.pageY,
-    paddingBottom: theme.spacing.scale["2xl"],
+    paddingBottom: theme.spacing.scale.sm,
   },
   status: {
     flex: 1,
     justifyContent: "center",
+  },
+  listContent: {
+    paddingHorizontal: theme.spacing.layout.pageX,
+    paddingBottom: theme.spacing.scale["2xl"],
   },
 }));

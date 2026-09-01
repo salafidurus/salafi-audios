@@ -23,6 +23,12 @@ export { useMyLibrarySavedScreen } from "./use-my-library-saved";
 export { useMyLibraryCompletedScreen } from "./use-my-library-completed";
 export { useMyLibraryProgressScreen } from "./use-my-library-progress";
 export {
+  useMyLibrarySections,
+  type MyLibrarySection,
+  type MyLibrarySectionResult,
+  type MyLibrarySectionsResult,
+} from "./use-my-library-sections";
+export {
   useSavedStore,
   useIsSaved,
   isSaved,

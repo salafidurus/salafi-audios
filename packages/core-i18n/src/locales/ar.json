@@ -292,6 +292,7 @@
   },
   "myLibrary": {
     "title": "مكتبتي",
+    "started": "قيد البدء",
     "inProgress": "قيد الاستماع",
     "saved": "المحفوظة",
     "completed": "المكتملة",

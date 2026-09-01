@@ -1,28 +1,18 @@
 /** Documents this module's responsibility and public boundary. */
 "use client";
 
-import { useProgressStore, usePlaybackStore } from "@sd/domain-audio";
-import { mergeLiveProgress, useInfiniteMyLibraryProgress } from "@sd/domain-content";
+import { useMyLibrarySections } from "@sd/domain-content";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { MyLibraryListSection } from "@/features/my-library/components/my-library-list-section/my-library-list-section";
 import { MyLibraryShell } from "@/features/my-library/components/my-library-shell/my-library-shell";
 
+/** Renders the route-backed Started view with auth-aware shared library data. */
 export function MyLibraryScreen() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { t } = useTranslation();
-  const { data, isLoading, isError, refetch } = useInfiniteMyLibraryProgress({
-    enabled: isAuthenticated,
-  });
-  const progressMap = useProgressStore((state) => state.progressMap);
-  const currentTrack = usePlaybackStore((state) => state.currentTrack);
-
-  const items = mergeLiveProgress(
-    data?.pages.flatMap((page) => page.items) ?? [],
-    progressMap,
-    currentTrack,
-  );
+  const query = useMyLibrarySections(isAuthenticated, false).started;
 
   return (
     <MyLibraryShell activeTab="started">
@@ -37,10 +27,10 @@ export function MyLibraryScreen() {
           isAuthLoading ? "loading" : isAuthenticated ? "authenticated" : "unauthenticated"
         }
         query={{
-          items,
-          isLoading,
-          isError,
-          onRetry: () => void refetch(),
+          items: query.items,
+          isLoading: query.isFetching,
+          isError: !!query.error,
+          onRetry: () => void query.refetch?.(),
           hasMore: false,
           onLoadMore: () => {},
           emptyMessage: t(

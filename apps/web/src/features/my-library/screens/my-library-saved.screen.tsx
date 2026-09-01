@@ -1,19 +1,18 @@
 /** Documents this module's responsibility and public boundary. */
 "use client";
 
-import { useInfiniteMyLibrarySaved } from "@sd/domain-content";
+import { useMyLibrarySections } from "@sd/domain-content";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { MyLibraryListSection } from "@/features/my-library/components/my-library-list-section/my-library-list-section";
 import { MyLibraryShell } from "@/features/my-library/components/my-library-shell/my-library-shell";
 
+/** Renders the URL-backed Saved view using the shared personal-state projection. */
 export function MyLibrarySavedScreen() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { t } = useTranslation();
-  const { data, isLoading, isError, refetch, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteMyLibrarySaved({ enabled: isAuthenticated });
-  const items = data?.pages.flatMap((page) => page.items) ?? [];
+  const query = useMyLibrarySections(isAuthenticated, false).saved;
 
   return (
     <MyLibraryShell activeTab="saved">
@@ -28,13 +27,13 @@ export function MyLibrarySavedScreen() {
           isAuthLoading ? "loading" : isAuthenticated ? "authenticated" : "unauthenticated"
         }
         query={{
-          items,
-          isLoading,
-          isError,
-          onRetry: () => void refetch(),
-          hasMore: hasNextPage ?? false,
-          onLoadMore: () => void fetchNextPage(),
-          isFetchingNextPage,
+          items: query.items,
+          isLoading: query.isFetching,
+          isError: !!query.error,
+          onRetry: () => void query.refetch?.(),
+          hasMore: query.hasMore,
+          onLoadMore: () => {},
+          isFetchingNextPage: false,
           emptyMessage: t(
             "myLibrary.emptySaved",
             "Your saved lessons will appear here when you bookmark them.",

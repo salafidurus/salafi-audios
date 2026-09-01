@@ -1,19 +1,18 @@
 /** Documents this module's responsibility and public boundary. */
 "use client";
 
-import { useInfiniteMyLibraryCompleted } from "@sd/domain-content";
+import { useMyLibrarySections } from "@sd/domain-content";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { MyLibraryListSection } from "@/features/my-library/components/my-library-list-section/my-library-list-section";
 import { MyLibraryShell } from "@/features/my-library/components/my-library-shell/my-library-shell";
 
+/** Renders the URL-backed Completed view using the shared personal-state projection. */
 export function MyLibraryCompletedScreen() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { t } = useTranslation();
-  const { data, isLoading, isError, refetch, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteMyLibraryCompleted({ enabled: isAuthenticated });
-  const items = data?.pages.flatMap((page) => page.items) ?? [];
+  const query = useMyLibrarySections(isAuthenticated, false).completed;
 
   return (
     <MyLibraryShell activeTab="completed">
@@ -28,13 +27,13 @@ export function MyLibraryCompletedScreen() {
           isAuthLoading ? "loading" : isAuthenticated ? "authenticated" : "unauthenticated"
         }
         query={{
-          items,
-          isLoading,
-          isError,
-          onRetry: () => void refetch(),
-          hasMore: hasNextPage ?? false,
-          onLoadMore: () => void fetchNextPage(),
-          isFetchingNextPage,
+          items: query.items,
+          isLoading: query.isFetching,
+          isError: !!query.error,
+          onRetry: () => void query.refetch?.(),
+          hasMore: query.hasMore,
+          onLoadMore: () => {},
+          isFetchingNextPage: false,
           emptyMessage: t(
             "myLibrary.emptyCompleted",
             "Completed lessons will collect here as you finish your study.",
