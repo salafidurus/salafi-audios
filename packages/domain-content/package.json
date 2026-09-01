@@ -28,7 +28,7 @@
   },
   "peerDependencies": {
     "@tanstack/react-query": "catalog:",
-    "react": "^19.0.0",
+    "react": "19.2.8",
     "react-i18next": "catalog:"
   }
 }
