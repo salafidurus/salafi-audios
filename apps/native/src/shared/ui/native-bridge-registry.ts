@@ -54,6 +54,30 @@ export const APPROVED_NATIVE_BRIDGES: readonly ApprovedNativeBridge[] = [
     validationEvidence: "Bottom accessory contract tests and Android host validation",
   },
   {
+    file: "src/features/navigation/components/SearchPalette/SearchPaletteSheet.android.tsx",
+    kind: "bridge",
+    reason:
+      "The Android Compose bottom sheet hosts the React Native search palette content through RNHostView.",
+    owner: "navigation feature owner",
+    validationEvidence: "Search palette contract tests and Android sheet validation",
+  },
+  {
+    file: "src/features/navigation/components/SearchPalette/SearchPaletteSheet.ios.tsx",
+    kind: "bridge",
+    reason:
+      "The iOS SwiftUI bottom sheet hosts the React Native search palette content through RNHostView.",
+    owner: "navigation feature owner",
+    validationEvidence: "Search palette contract tests and iOS sheet validation",
+  },
+  {
+    file: "src/features/navigation/components/SearchPalette/SearchPaletteSheet.tsx",
+    kind: "bridge",
+    reason:
+      "The universal Expo UI bottom sheet hosts the React Native search palette content through RNHostView.",
+    owner: "navigation feature owner",
+    validationEvidence: "Search palette contract tests and native sheet validation",
+  },
+  {
     file: "src/shared/components/DraggableList.tsx",
     kind: "infrastructure",
     reason: "Reordering requires React Native gesture and animation infrastructure.",
