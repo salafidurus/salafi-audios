@@ -1,6 +1,5 @@
 /** Provides the cross-root native search palette and its catalog result navigation boundary. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- module responsibility is documented above.
-import { getLocalizedName } from "@sd/core-i18n";
 import { useInfiniteScholarsList } from "@sd/domain-content";
 import { useSearchCatalog, useTopicsList } from "@sd/domain-search";
 import { useRouter } from "expo-router";
@@ -19,16 +18,8 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 
+import { buildPaletteResults, type PaletteResult } from "./search-palette-results";
 import { SearchPaletteSheet } from "./SearchPaletteSheet";
-
-type PaletteResult = {
-  id: string;
-  label: string;
-  type: "topic" | "scholar" | "listing";
-  /** Canonical slug used by the result's destination route. */
-  slug: string;
-  metadata?: string;
-};
 
 type SearchPaletteContextValue = { open: () => void };
 const SearchPaletteContext = createContext<SearchPaletteContextValue | null>(null);
@@ -40,56 +31,6 @@ export function useSearchPalette() {
     throw new Error("useSearchPalette must be used inside SearchPaletteProvider");
   }
   return context;
-}
-
-function matches(value: string, query: string) {
-  return value.toLocaleLowerCase().includes(query.toLocaleLowerCase());
-}
-
-/** Builds the bounded, query-matched result list shown by the palette. */
-// oxlint-disable-next-line complexity -- result groups are intentionally combined at one public seam.
-export function buildPaletteResults(
-  query: string,
-  topics: ReturnType<typeof useTopicsList>["data"],
-  scholarPages: ReturnType<typeof useInfiniteScholarsList>["data"],
-  listingData: ReturnType<typeof useSearchCatalog>["data"],
-  language: string,
-): PaletteResult[] {
-  if (!query) return [];
-
-  const topicResults = (topics ?? []).flatMap((topic) => {
-    const label = getLocalizedName(topic.name, language);
-    return matches(label, query)
-      ? [{ id: `topic-${topic.id}`, label, type: "topic" as const, slug: topic.slug }]
-      : [];
-  });
-  const scholarResults = (scholarPages?.pages.flatMap((page) => page.items) ?? []).flatMap(
-    (scholar) =>
-      matches(scholar.name, query)
-        ? [
-            {
-              id: `scholar-${scholar.id}`,
-              label: scholar.name,
-              type: "scholar" as const,
-              slug: scholar.slug,
-            },
-          ]
-        : [],
-  );
-  const listings = [
-    ...(listingData?.collections ?? []),
-    ...(listingData?.series ?? []),
-    ...(listingData?.singles ?? []),
-  ];
-  const listingResults = listings.map((listing) => ({
-    id: `listing-${listing.id}`,
-    label: listing.title,
-    type: "listing" as const,
-    slug: listing.slug,
-    metadata: listing.scholarName,
-  }));
-
-  return [...topicResults, ...scholarResults, ...listingResults].slice(0, 8);
 }
 
 /** Owns modal visibility, lazy catalog queries, and result navigation for root screens. */

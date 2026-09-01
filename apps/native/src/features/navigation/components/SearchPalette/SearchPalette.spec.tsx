@@ -1,6 +1,6 @@
 import type { SearchCatalogResultsDto, ScholarListDto, TopicDetailDto } from "@sd/core-contracts";
 
-import { buildPaletteResults } from "./SearchPalette";
+import { buildPaletteResults } from "./search-palette-results";
 
 jest.mock("@sd/domain-content", () => ({
   useInfiniteScholarsList: jest.fn(),
