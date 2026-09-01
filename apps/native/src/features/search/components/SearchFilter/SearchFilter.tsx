@@ -1,13 +1,12 @@
 import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
 
-import { Host } from "@expo/ui";
 import { getLocalizedName } from "@sd/core-i18n";
 import { useMemo } from "react";
-import { ScrollView } from "react-native";
+import { Pressable, ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { NativeButton } from "@/shared/ui";
+import { AppText } from "@/shared/ui";
 
 /** Implements native search input, filtering, results, and empty states. */
 /** Defines the native search filter value contract shared by its consumers. */
@@ -59,22 +58,25 @@ export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
       {options.map((option) => {
         const isActive = option.id === "all" ? value.length === 0 : selected.has(option.id);
         return (
-          <Host key={option.id}>
-            <NativeButton
-              label={option.label}
-              size="sm"
-              variant={isActive ? "primary" : "outline"}
-              testID={`native-search-filter-${option.id}`}
-              onPress={() => {
-                if (option.id === "all") {
-                  onChange([]);
-                  return;
-                }
+          <Pressable
+            key={option.id}
+            accessibilityRole="button"
+            accessibilityState={{ selected: isActive }}
+            testID={`native-search-filter-${option.id}`}
+            onPress={() => {
+              if (option.id === "all") {
+                onChange([]);
+                return;
+              }
 
-                onChange(selected.has(option.id) ? [] : [option.id]);
-              }}
-            />
-          </Host>
+              onChange(selected.has(option.id) ? [] : [option.id]);
+            }}
+            style={[styles.chip, isActive && styles.activeChip]}
+          >
+            <AppText variant="bodySm" colorRole={isActive ? "onAction" : "default"}>
+              {option.label}
+            </AppText>
+          </Pressable>
         );
       })}
     </ScrollView>
@@ -86,5 +88,19 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.component.gapSm,
     paddingTop: theme.spacing.component.gapSm,
     paddingBottom: theme.spacing.component.gapSm,
+  },
+  chip: {
+    minHeight: theme.spacing.scale["4xl"],
+    paddingHorizontal: theme.spacing.scale.md,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: theme.radius.component.chip,
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.border.default,
+    backgroundColor: theme.colors.surface.default,
+  },
+  activeChip: {
+    borderColor: theme.colors.action.primary,
+    backgroundColor: theme.colors.action.primary,
   },
 }));

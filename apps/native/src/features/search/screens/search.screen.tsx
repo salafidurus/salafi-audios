@@ -1,11 +1,10 @@
-import { Host } from "@expo/ui";
 import { useSearchProcessing } from "@sd/domain-search";
-import { ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText, NativeButton, NativeFormField, ScreenView } from "@/shared/ui";
+import { AppText, NativeFormField, ScreenView } from "@/shared/ui";
 
 import { SearchFilter } from "../components/SearchFilter/SearchFilter";
 import { SearchResultItem } from "../components/SearchResultItem/SearchResultItem";
@@ -46,14 +45,11 @@ function PopularSearches({
         contentContainerStyle={styles.popularList}
       >
         {searches.map((search) => (
-          <Host key={search}>
-            <NativeButton
-              label={search}
-              size="sm"
-              variant="outline"
-              onPress={() => onSelect(search)}
-            />
-          </Host>
+          <Pressable key={search} onPress={() => onSelect(search)} style={styles.popularChip}>
+            <AppText variant="bodySm" colorRole="default">
+              {search}
+            </AppText>
+          </Pressable>
         ))}
       </ScrollView>
     </View>
@@ -87,7 +83,6 @@ export function SearchScreen({ onNavigateToListing }: SearchScreenProps) {
           testID="native-global-search-input"
         />
         <View style={styles.intro}>
-          <AppText variant="titleMd">{t("search.title", "Find something to study")}</AppText>
           <AppText variant="bodySm" colorRole="muted">
             {t("search.description", "Search lectures, scholars, and topics across the catalog.")}
           </AppText>
@@ -139,5 +134,14 @@ const styles = StyleSheet.create((theme) => ({
   popularList: {
     gap: theme.spacing.component.gapSm,
     paddingBottom: theme.spacing.scale.md,
+  },
+  popularChip: {
+    minHeight: theme.spacing.scale["4xl"],
+    paddingHorizontal: theme.spacing.scale.md,
+    justifyContent: "center",
+    borderRadius: theme.radius.component.chip,
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.border.default,
+    backgroundColor: theme.colors.surface.default,
   },
 }));

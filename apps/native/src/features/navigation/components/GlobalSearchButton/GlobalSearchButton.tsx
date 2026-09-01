@@ -1,11 +1,9 @@
-import { Host } from "@expo/ui";
 import { routes } from "@sd/core-contracts";
 import { useRouter } from "expo-router";
-import { Pressable } from "react-native";
+import { Pressable, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { NativeIcon } from "@/shared/ui";
 
 /**
  * Provides the global discovery action used by persistent root headers.
@@ -25,9 +23,7 @@ export function GlobalSearchButton() {
       style={styles.button}
       testID="global-search-button"
     >
-      <Host>
-        <NativeIcon name="search" colorRole="strong" size={22} />
-      </Host>
+      <Text style={styles.icon}>⌕</Text>
     </Pressable>
   );
 }
@@ -42,5 +38,10 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surface.elevated,
     borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
+  },
+  icon: {
+    fontSize: 28,
+    lineHeight: 30,
+    color: theme.colors.content.strong,
   },
 }));
