@@ -1,13 +1,12 @@
-import { routes } from "@sd/core-contracts";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import React from "react";
 
 import { GlobalSearchButton } from "./GlobalSearchButton";
 
-const mockPush = jest.fn();
+const mockOpen = jest.fn();
 
-jest.mock("expo-router", () => ({
-  useRouter: () => ({ push: mockPush }),
+jest.mock("../SearchPalette/SearchPalette", () => ({
+  useSearchPalette: () => ({ open: mockOpen }),
 }));
 
 jest.mock("@/core/i18n/use-translation", () => ({
@@ -22,6 +21,6 @@ describe("GlobalSearchButton", () => {
 
     fireEvent.press(screen.getByRole("button", { name: "Search" }));
 
-    expect(mockPush).toHaveBeenCalledWith(routes.search);
+    expect(mockOpen).toHaveBeenCalled();
   });
 });

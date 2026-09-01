@@ -2,6 +2,7 @@
 // Screens (none currently — navigation uses Expo Router tabs directly)
 
 export { GlobalSearchButton } from "./components/GlobalSearchButton/GlobalSearchButton";
+export { SearchPaletteProvider, useSearchPalette } from "./components/SearchPalette/SearchPalette";
 export {
   RootScreenHeader,
   type RootScreenHeaderProps,

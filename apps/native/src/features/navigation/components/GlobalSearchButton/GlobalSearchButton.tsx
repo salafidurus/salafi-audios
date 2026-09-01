@@ -1,16 +1,16 @@
-import { routes } from "@sd/core-contracts";
-import { useRouter } from "expo-router";
 import { Pressable, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+
+import { useSearchPalette } from "../SearchPalette/SearchPalette";
 
 /**
  * Provides the global discovery action used by persistent root headers.
  */
 /** Renders a labeled action that pushes Search while preserving the caller's root stack. */
 export function GlobalSearchButton() {
-  const router = useRouter();
+  const { open } = useSearchPalette();
   const { t } = useTranslation();
   const label = t("search.open", "Search");
 
@@ -19,7 +19,7 @@ export function GlobalSearchButton() {
       accessibilityRole="button"
       accessibilityLabel={label}
       hitSlop={8}
-      onPress={() => router.push(routes.search)}
+      onPress={open}
       style={styles.button}
       testID="global-search-button"
     >
