@@ -4,7 +4,8 @@ import { render, screen, fireEvent, within } from "@testing-library/react-native
 
 import { useAuth } from "@/core/auth/use-auth";
 
-import { HomeScreen, resolveHomeAvatarImage } from "./home.screen";
+import { resolveHomeAvatarImage } from "../utils/home-artwork";
+import { HomeScreen } from "./home.screen";
 
 jest.mock("@sd/domain-audio", () => ({
   useProgressStore: jest.fn((selector: (state: unknown) => unknown) =>

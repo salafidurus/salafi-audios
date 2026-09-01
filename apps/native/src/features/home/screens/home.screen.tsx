@@ -18,6 +18,8 @@ import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 import { AppText, ScreenView } from "@/shared/ui";
 
+import { resolveHomeAvatarImage } from "../utils/home-artwork";
+
 /** Provides the native Home study surface and its public/personal content sections. */
 /**
  * Describes navigation callbacks supplied by the native Home route.
@@ -27,14 +29,6 @@ export type HomeScreenProps = {
   onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
-
-/** Resolves Home artwork while preserving the product's image fallback order. */
-export function resolveHomeAvatarImage(
-  primary?: string | null,
-  secondary?: string | null,
-): string | undefined {
-  return [primary, secondary].find((image) => Boolean(image?.trim())) ?? undefined;
-}
 
 function ContentCard({ item, onPress }: { item: FeedContentItemDto; onPress?: () => void }) {
   const { t } = useTranslation();
