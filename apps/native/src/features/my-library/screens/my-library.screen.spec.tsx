@@ -61,6 +61,7 @@ function buildMyLibraryState(items: MyLibraryItemDto[] = [], isFetching = false)
     hasMore: false,
     nextCursor: undefined,
     isFetching,
+    isFetchingNextPage: false,
     error: null,
     refetch: jest.fn(),
   };
@@ -96,6 +97,11 @@ describe("MyLibraryScreen", () => {
     await render(<MyLibraryScreen />);
 
     expect(screen.getByText("Nothing here yet.")).toBeTruthy();
+    expect(mockedUseMyLibrarySections).toHaveBeenCalledWith({
+      isAuthenticated: false,
+      localFallback: true,
+      activeSection: "started",
+    });
   });
 
   it("navigates to a lecture when an item is pressed", async () => {
@@ -168,6 +174,7 @@ describe("MyLibraryScreen", () => {
   });
 
   it("switches to Saved and renders the selected section internally", async () => {
+    const onNavigateToListing = jest.fn();
     mockedUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, user: undefined });
     mockedUseMyLibrarySections.mockReturnValue({
       started: buildMyLibraryState(),
@@ -185,10 +192,16 @@ describe("MyLibraryScreen", () => {
       completed: buildMyLibraryState(),
     });
 
-    await render(<MyLibraryScreen />);
+    await render(<MyLibraryScreen onNavigateToListing={onNavigateToListing} />);
     await fireEvent.press(screen.getByText("Saved"));
 
     expect(screen.getByText("Saved Lecture")).toBeTruthy();
     expect(screen.getAllByTestId("my-library-saved-row-saved-1").length).toBeGreaterThan(0);
+    expect(onNavigateToListing).not.toHaveBeenCalled();
+    expect(mockedUseMyLibrarySections).toHaveBeenCalledWith({
+      isAuthenticated: true,
+      localFallback: true,
+      activeSection: "started",
+    });
   });
 });

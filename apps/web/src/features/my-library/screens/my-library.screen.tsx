@@ -12,7 +12,11 @@ import { MyLibraryShell } from "@/features/my-library/components/my-library-shel
 export function MyLibraryScreen() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { t } = useTranslation();
-  const query = useMyLibrarySections(isAuthenticated, false).started;
+  const query = useMyLibrarySections({
+    isAuthenticated,
+    localFallback: false,
+    activeSection: "started",
+  }).started;
 
   return (
     <MyLibraryShell activeTab="started">
@@ -31,8 +35,9 @@ export function MyLibraryScreen() {
           isLoading: query.isFetching,
           isError: !!query.error,
           onRetry: () => void query.refetch?.(),
-          hasMore: false,
-          onLoadMore: () => {},
+          hasMore: query.hasMore,
+          onLoadMore: () => void query.fetchNextPage?.(),
+          isFetchingNextPage: query.isFetchingNextPage,
           emptyMessage: t(
             "myLibrary.emptyProgress",
             "Nothing in progress yet. Start a lesson and your place will appear here.",

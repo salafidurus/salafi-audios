@@ -12,7 +12,11 @@ import { MyLibraryShell } from "@/features/my-library/components/my-library-shel
 export function MyLibrarySavedScreen() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { t } = useTranslation();
-  const query = useMyLibrarySections(isAuthenticated, false).saved;
+  const query = useMyLibrarySections({
+    isAuthenticated,
+    localFallback: false,
+    activeSection: "saved",
+  }).saved;
 
   return (
     <MyLibraryShell activeTab="saved">
@@ -32,8 +36,8 @@ export function MyLibrarySavedScreen() {
           isError: !!query.error,
           onRetry: () => void query.refetch?.(),
           hasMore: query.hasMore,
-          onLoadMore: () => {},
-          isFetchingNextPage: false,
+          onLoadMore: () => void query.fetchNextPage?.(),
+          isFetchingNextPage: query.isFetchingNextPage,
           emptyMessage: t(
             "myLibrary.emptySaved",
             "Your saved lessons will appear here when you bookmark them.",

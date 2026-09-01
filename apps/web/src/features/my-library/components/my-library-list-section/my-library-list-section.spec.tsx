@@ -36,18 +36,29 @@ vi.mock("@/shared/components/InfiniteScrollList", () => ({
     data,
     isLoading,
     isError,
+    hasMore,
+    onLoadMore,
+    isFetchingNextPage,
     emptyMessage,
     renderItem,
   }: {
     data: MyLibraryItemDto[];
     isLoading: boolean;
     isError: boolean;
+    hasMore: boolean;
+    onLoadMore: () => void;
+    isFetchingNextPage?: boolean;
     emptyMessage: string;
     renderItem: (item: MyLibraryItemDto) => React.ReactNode;
   }) => (
     <div data-testid="infinite-scroll-list">
       {isLoading && <p>Loading lessons</p>}
       {isError && <p>Could not load lessons</p>}
+      {hasMore && (
+        <button type="button" data-testid="load-more" onClick={onLoadMore}>
+          {isFetchingNextPage ? "Loading more" : "Load more"}
+        </button>
+      )}
       {!isLoading && !isError && data.length === 0 && <p>{emptyMessage}</p>}
       {!isLoading &&
         !isError &&
@@ -110,5 +121,25 @@ describe("MyLibraryListSection", () => {
 
     rerender(<MyLibraryListSection {...defaultProps} />);
     expect(screen.getByText("A lesson")).toBeInTheDocument();
+  });
+
+  it("delegates cursor pagination state and loading-more action", () => {
+    const onLoadMore = vi.fn();
+
+    render(
+      <MyLibraryListSection
+        {...defaultProps}
+        query={{
+          ...defaultProps.query,
+          hasMore: true,
+          isFetchingNextPage: true,
+          onLoadMore,
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId("load-more")).toHaveTextContent("Loading more");
+    screen.getByTestId("load-more").click();
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
   });
 });

@@ -27,6 +27,7 @@ export {
   type MyLibrarySection,
   type MyLibrarySectionResult,
   type MyLibrarySectionsResult,
+  type UseMyLibrarySectionsOptions,
 } from "./use-my-library-sections";
 export {
   useSavedStore,

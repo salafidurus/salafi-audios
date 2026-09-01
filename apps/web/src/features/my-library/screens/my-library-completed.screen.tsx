@@ -12,7 +12,11 @@ import { MyLibraryShell } from "@/features/my-library/components/my-library-shel
 export function MyLibraryCompletedScreen() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { t } = useTranslation();
-  const query = useMyLibrarySections(isAuthenticated, false).completed;
+  const query = useMyLibrarySections({
+    isAuthenticated,
+    localFallback: false,
+    activeSection: "completed",
+  }).completed;
 
   return (
     <MyLibraryShell activeTab="completed">
@@ -32,8 +36,8 @@ export function MyLibraryCompletedScreen() {
           isError: !!query.error,
           onRetry: () => void query.refetch?.(),
           hasMore: query.hasMore,
-          onLoadMore: () => {},
-          isFetchingNextPage: false,
+          onLoadMore: () => void query.fetchNextPage?.(),
+          isFetchingNextPage: query.isFetchingNextPage,
           emptyMessage: t(
             "myLibrary.emptyCompleted",
             "Completed lessons will collect here as you finish your study.",

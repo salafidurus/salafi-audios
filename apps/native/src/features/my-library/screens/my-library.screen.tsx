@@ -109,7 +109,11 @@ export function MyLibraryScreen({ onNavigateToListing }: MyLibraryScreenProps) {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { t } = useTranslation();
   const [selectedSection, setSelectedSection] = useState<MyLibrarySection>("started");
-  const sections = useMyLibrarySections(isAuthenticated, true);
+  const sections = useMyLibrarySections({
+    isAuthenticated,
+    localFallback: true,
+    activeSection: selectedSection,
+  });
   const section = sections[selectedSection];
   const markCompleted = useProgressStore((state) => state.actions.markCompleted);
 
