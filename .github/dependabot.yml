@@ -35,6 +35,14 @@ updates:
       # jest-expo is updated only through the Expo compatibility pipeline,
       # which runs expo install --fix and expo-doctor.
       - dependency-name: "jest-expo"
+      # Keep the exact Jest runtime/types review unit below its approved
+      # minor/patch ceiling; Dependabot ignore rules suppress only majors.
+      - dependency-name: "jest"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "@types/jest"
+        update-types:
+          - "version-update:semver-major"
       # eslint-config-expo — versioned in lockstep with the Expo SDK. A
       # standalone bump crashes the native flat ESLint config; upgrade it
       # only as part of a coordinated Expo SDK upgrade.
