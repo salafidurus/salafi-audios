@@ -1,9 +1,5 @@
-/** Native tab paths remain Expo Router paths; web/API paths live in core-contracts. */
-/** Renders the native const native routes = { surface and coordinates its user-facing state. */
+/** Defines the native navigation route module. */
+/** Defines the native route paths that remain separate from web/API paths in core-contracts. */
 export const nativeRoutes = {
-  myLibrary: {
-    index: "/my-library",
-    saved: "/my-library/saved",
-    completed: "/my-library/completed",
-  },
+  myLibrary: { index: "/my-library" },
 } as const;

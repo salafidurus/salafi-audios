@@ -53,7 +53,11 @@
   "explore": {
     "searchRecent": "البحث في الصوتيات الأخيرة..."
   },
+  "home": {
+    "description": "ابدأ رحلتك في طلب العلم."
+  },
   "scholarContent": {
+    "description": "استكشف علماءنا.",
     "filterPlaceholder": "تصفية المحتوى…",
     "searchNoMatch": "لا يوجد شيوخ يطابقون بحثك.",
     "searchScholars": "البحث عن الشيوخ..."

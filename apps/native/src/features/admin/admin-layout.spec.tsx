@@ -3,7 +3,7 @@ import { useAbility } from "@sd/domain-account";
 import { render, screen } from "@testing-library/react-native";
 import React from "react";
 
-import AdminLayout from "../../app/(tabs)/admin/_layout";
+import AdminLayout from "../../app/admin/_layout";
 
 jest.mock("@sd/domain-account", () => ({
   useAbility: jest.fn(),
