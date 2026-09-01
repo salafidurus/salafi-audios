@@ -1,7 +1,7 @@
 import { useProgressStore } from "@sd/domain-audio";
 import { markUnsaved, useMyLibrarySections, type MyLibrarySection } from "@sd/domain-content";
 import { useCallback, useMemo, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { FlatList, Pressable, ScrollView, View, type ListRenderItemInfo } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
@@ -47,6 +47,44 @@ function getActions(section: MyLibrarySection, t: ReturnType<typeof useTranslati
     ];
   }
   return undefined;
+}
+
+type MyLibraryListItemProps = {
+  item: Parameters<typeof MyLibraryItemRow>[0]["item"];
+  variant: "progress" | "saved" | "completed";
+  actions: ReturnType<typeof getActions>;
+  onNavigate: (slug: string) => void;
+  onAction: (action: string, listingId: string, listingSlug: string) => void;
+  testID: string;
+};
+
+function MyLibraryListItem({
+  item,
+  variant,
+  actions,
+  onNavigate,
+  onAction,
+  testID,
+}: MyLibraryListItemProps) {
+  const handlePress = useCallback(
+    () => onNavigate(item.listingSlug),
+    [item.listingSlug, onNavigate],
+  );
+  const handleAction = useCallback(
+    (action: string) => onAction(action, item.listingId, item.listingSlug),
+    [item.listingId, item.listingSlug, onAction],
+  );
+
+  return (
+    <MyLibraryItemRow
+      item={item}
+      variant={variant}
+      testID={testID}
+      onPress={handlePress}
+      actions={actions}
+      onAction={handleAction}
+    />
+  );
 }
 
 type MyLibrarySectionTabsProps = {
@@ -132,6 +170,20 @@ export function MyLibraryScreen({ onNavigateToListing }: MyLibraryScreenProps) {
     },
     [markCompleted],
   );
+  const actions = useMemo(() => getActions(selectedSection, t), [selectedSection, t]);
+  const renderItem = useCallback(
+    ({ item }: ListRenderItemInfo<(typeof section.items)[number]>) => (
+      <MyLibraryListItem
+        item={item}
+        variant={selectedSection === "started" ? "progress" : selectedSection}
+        testID={`my-library-${selectedSection}-row-${item.id}`}
+        onNavigate={handleItemPress}
+        actions={actions}
+        onAction={handleAction}
+      />
+    ),
+    [actions, handleAction, handleItemPress, selectedSection],
+  );
 
   const sectionLabel = t(`myLibrary.${selectedSection}`, sectionFallback(selectedSection));
   const isLoading = isAuthLoading || (section.isFetching && section.items.length === 0);
@@ -172,19 +224,12 @@ export function MyLibraryScreen({ onNavigateToListing }: MyLibraryScreenProps) {
           />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.listContent}>
-          {section.items.map((item) => (
-            <MyLibraryItemRow
-              key={item.id}
-              item={item}
-              variant={selectedSection === "started" ? "progress" : selectedSection}
-              testID={`my-library-${selectedSection}-row-${item.id}`}
-              onPress={() => handleItemPress(item.listingSlug)}
-              actions={getActions(selectedSection, t)}
-              onAction={(action) => handleAction(action, item.listingId, item.listingSlug)}
-            />
-          ))}
-        </ScrollView>
+        <FlatList
+          contentContainerStyle={styles.listContent}
+          data={section.items}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+        />
       )}
     </ScreenView>
   );
