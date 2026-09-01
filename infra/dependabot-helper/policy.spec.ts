@@ -60,6 +60,7 @@ describe("Dependabot Helper policy", () => {
         "@react-navigation/*",
         "@sentry/*",
         "@react-native-async-storage/*",
+        "@shopify/flash-list",
       ]),
     ).toEqual([]);
   });

@@ -6,6 +6,8 @@ export interface ScholarData {
   slug: string;
   name: string;
   bio: string;
+  imageUrl?: string;
+  imageKey?: string;
   nameEn?: string;
   bioEn?: string;
   country: string;
@@ -46,6 +48,8 @@ export const SCHOLARS: ScholarData[] = [
     slug: "arafat",
     name: "عرفات بن حسن المحمدي",
     bio: "من أبرز علماء القرن الخامس عشر الهجري، عُرف بجهوده المباركة في تدريس العقيدة، والفقه، وسائر علوم الشريعة الإسلامية. تتلمذ على أيدي الشيخ ربيع بن هادي المدخلي، والشيخ عبيد بن عبد الله الجابري، والشيخ عبد الله بن عبد الرحيم البخاري، وغيرهم من كبار علماء هذا العصر.",
+    imageUrl: "https://preview-cdn.salafidurus.com/images/scholar/arafat.jpg",
+    imageKey: "images/scholar/arafat.jpg",
     nameEn: "Arafat bn Hasan Al-Muhammadi",
     bioEn:
       "A prominent scholar of the 15th hijri century known with keen efforts in teaching Aqeedah, Fiqh and various fields of knowledge. He was a student of Shaykh Rabee Al-Madkhali, Shaykh Ubayd Al-Jaabiri, Shaykh Abdullah Al-Bukhari and other than them from the senior scholars of this era.",
@@ -59,6 +63,8 @@ export const SCHOLARS: ScholarData[] = [
     slug: "mabram",
     name: "مصطفى بن مبرم",
     bio: "من كبار علماء السلفية المعاصرين. تتلمذ على أيدي الشيخ مقبل بن هادي الوادعي، والشيخ عبد الله بن عقيل، والشيخ صالح بن محمد اللحيدان، والشيخ محمد بن صالح العثيمين، وغيرهم من كبار علماء هذا العصر.",
+    imageUrl: "https://preview-cdn.salafidurus.com/images/scholar/mabram.jpg",
+    imageKey: "images/scholar/mabram.jpg",
     nameEn: "Mustafa bn Mabram",
     bioEn:
       "From the contemporary senior scholars of Salafiyyah. He is from the students of Shaykh Muqbil, Shaykh Ibn Aqeel, Shaykh Luhaydan, Shaykh Uthaymin and other senior scholars of this time.",
@@ -72,6 +78,8 @@ export const SCHOLARS: ScholarData[] = [
     slug: "bukhari",
     name: "عبد الله بن عبد الرحيم البخاري",
     bio: "من كبار العلماء والمحدِّثين في القرن الخامس عشر الهجري. شغل منصب أستاذٍ لعلم الحديث في الجامعة الإسلامية بالمدينة المنورة. تتلمذ على أيدي الشيخ محمد أمان الجامي، والشيخ عبد العزيز بن عبد الله بن باز، والشيخ صفي الرحمن المباركفوري، والشيخ أحمد بن يحيى النجمي، وغيرهم من كبار علماء هذا العصر.",
+    imageUrl: "https://preview-cdn.salafidurus.com/images/scholar/bukhari.jpg",
+    imageKey: "images/scholar/bukhari.jpg",
     nameEn: "Abdullah bn AbdirRaheem al-Bukhari",
     bioEn:
       "A senior scholar from the muhaddith of the 15th hijri century. He was a professor of Hadith Science in the Islamic University of Madina. He is from the students of Shaykh Muhammad Amaan Al-Jami, Shaykh Ibn Baaz, Shaykh Safiyyur-Rahman Al-Mubaarakfuri, Shaykh Ahmad An-Najmi, and many more senior scholars of our time.",
@@ -85,6 +93,8 @@ export const SCHOLARS: ScholarData[] = [
     slug: "khalid",
     name: "خالد الظفيري",
     bio: "",
+    imageUrl: "https://preview-cdn.salafidurus.com/images/scholar/khalid.jpg",
+    imageKey: "images/scholar/khalid.jpg",
     nameEn: "Khalid Adh-Dhafiri",
     bioEn: undefined,
     country: "KW",

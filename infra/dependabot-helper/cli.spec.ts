@@ -42,6 +42,7 @@ describe("Dependabot Helper CLI boundary", () => {
         '      - dependency-name: "@react-navigation/*"',
         '      - dependency-name: "@sentry/*"',
         '      - dependency-name: "@react-native-async-storage/*"',
+        '      - dependency-name: "@shopify/flash-list"',
       ].join("\n"),
     );
 
@@ -76,6 +77,7 @@ describe("Dependabot Helper CLI boundary", () => {
         "@react-navigation/*",
         "@sentry/*",
         "@react-native-async-storage/*",
+        "@shopify/flash-list",
       ]
         .map((name) => `      - dependency-name: "${name}"`)
         .join("\n"),
