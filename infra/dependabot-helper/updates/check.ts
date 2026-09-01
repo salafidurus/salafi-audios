@@ -6,7 +6,7 @@ import type { UpdateCandidate } from "./utils/ui";
 import { dependabotHelperPolicy, resolveDependencyFamily } from "../policy";
 import { config, type PkupdateConfig } from "./update.config";
 import { fetchLatestVersion } from "./utils/npm";
-import { categorizeBump, isNewer } from "./utils/semver";
+import { isNewer } from "./utils/semver";
 
 type LatestVersionFetcher = (packageName: string) => Promise<string | null>;
 
@@ -43,67 +43,17 @@ function readJson(path: string): PackageJson {
   return JSON.parse(readFileSync(path, "utf-8")) as PackageJson;
 }
 
-function matchesSkip(name: string, skip: string[]): boolean {
-  if (
-    skip.some((s) => {
-      if (s.endsWith("*")) return name.startsWith(s.slice(0, -1));
-      return name === s;
-    })
-  )
-    return true;
-
-  return false;
-}
-
-function matchesNever(name: string, never: string[]): boolean {
-  return never.some((n) => {
-    if (n.endsWith("*")) return name.startsWith(n.slice(0, -1));
-    return name === n;
-  });
-}
-
+/**
+ * Returns no candidates because ordinary catalog versions belong to Dependabot.
+ * Helper-owned updates must use their dedicated pipeline, while helper checks
+ * validate state without selecting replacement versions.
+ */
 export async function checkCatalog(
-  rootDir: string,
-  cfg: PkupdateConfig,
-  fetcher: LatestVersionFetcher = fetchLatestVersion,
+  _rootDir: string,
+  _cfg: PkupdateConfig,
+  _fetcher: LatestVersionFetcher = fetchLatestVersion,
 ): Promise<UpdateCandidate[]> {
-  const rootPkg = readJson(resolve(rootDir, "package.json")); // nosemgrep
-  const catalog = rootPkg.workspaces?.catalog ?? {};
-
-  const entries = Object.entries(catalog).filter(([pkg]) => !matchesSkip(pkg, cfg.skip));
-
-  const versions = await Promise.all(entries.map(([pkg]) => fetcher(pkg)));
-
-  const updateTypeSets = new Map<string, ReadonlySet<string> | undefined>();
-  for (const [name, g] of Object.entries(cfg.groups)) {
-    updateTypeSets.set(name, g.updateTypes ? new Set(g.updateTypes) : undefined);
-  }
-
-  const results: UpdateCandidate[] = [];
-  for (let i = 0; i < entries.length; i++) {
-    const [pkg, version] = entries[i]!;
-    const latest = versions[i];
-    if (!latest) continue;
-
-    const raw = version.replace(/^[\^~>=<]+\s*/, "");
-    if (latest === raw) continue;
-
-    const group = filterByGroups(pkg, cfg.groups);
-    const allowed = group ? updateTypeSets.get(group) : undefined;
-    if (allowed) {
-      const bump = categorizeBump(raw, latest);
-      if (bump && !allowed.has(bump)) continue;
-    }
-    const isNever = matchesNever(pkg, cfg.never);
-    results.push({
-      type: "catalog",
-      packageName: pkg,
-      currentVersion: version,
-      latestVersion: latest,
-      group: isNever ? pkg : (group ?? undefined),
-    });
-  }
-  return results;
+  return [];
 }
 
 export async function checkBun(

@@ -140,5 +140,11 @@ describe("dependency update ownership contract", () => {
     expect(dependabot.slice(jestStart, familyStart)).toContain("          - minor");
     expect(dependabot.slice(jestStart, familyStart)).toContain("          - patch");
     expect(dependabot.slice(jestStart, familyStart)).not.toContain("          - major");
+
+    const jestIgnore = dependabot.slice(dependabot.indexOf('dependency-name: "jest"'));
+    expect(jestIgnore).toContain('update-types:\n          - "version-update:semver-major"');
+
+    const typesJestIgnore = dependabot.slice(dependabot.indexOf('dependency-name: "@types/jest"'));
+    expect(typesJestIgnore).toContain('update-types:\n          - "version-update:semver-major"');
   });
 });
