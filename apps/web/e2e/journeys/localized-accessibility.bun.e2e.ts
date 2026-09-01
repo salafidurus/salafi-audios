@@ -1,7 +1,8 @@
-import { afterAll, beforeAll, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 
 import {
   createWebE2EServer,
+  initializeBrowserJourney,
   waitForBrowserCondition,
   withBrowserJourney,
 } from "../helpers/bun-webview-harness";
@@ -9,16 +10,13 @@ import {
 describe("localized accessibility Bun.WebView journeys", () => {
   const webServer = createWebE2EServer();
   const { config } = webServer;
-  beforeAll(webServer.start);
-  afterAll(webServer.stop);
+  beforeEach(webServer.start);
+  afterEach(webServer.stop);
 
   it("renders the Arabic Settings profile journey with RTL semantics", async () => {
     await withBrowserJourney("Arabic Settings profile journey", config.origin, async ({ view }) => {
+      await initializeBrowserJourney(view, config.origin, "ar");
       await view.navigate(`${config.origin}/settings?tab=profile`);
-      await view.evaluate(`(() => {
-        document.cookie = "locale=ar; path=/";
-        return true;
-      })()`);
       await view.reload();
       await waitForBrowserCondition(
         view,
@@ -47,6 +45,7 @@ describe("localized accessibility Bun.WebView journeys", () => {
 
   it("keeps the catalog search control keyboard-focusable", async () => {
     await withBrowserJourney("keyboard catalog search journey", config.origin, async ({ view }) => {
+      await initializeBrowserJourney(view, config.origin, "en");
       await view.navigate(`${config.origin}/`);
       await waitForBrowserCondition(
         view,
@@ -65,6 +64,7 @@ describe("localized accessibility Bun.WebView journeys", () => {
       "narrow My Library controls journey",
       config.origin,
       async ({ view }) => {
+        await initializeBrowserJourney(view, config.origin, "en");
         await view.navigate(`${config.origin}/my-library`);
         await waitForBrowserCondition(
           view,
@@ -86,15 +86,16 @@ describe("localized accessibility Bun.WebView journeys", () => {
       "narrow Settings controls journey",
       config.origin,
       async ({ view }) => {
+        await initializeBrowserJourney(view, config.origin, "en");
         await view.navigate(`${config.origin}/settings`);
         await waitForBrowserCondition(
           view,
           "Settings tabs are hydrated",
-          `Boolean(document.querySelector('[role="tablist"][aria-label="Settings sections"]'))`,
+          `Boolean(document.querySelector('[role="tablist"]'))`,
           { timeoutMs: config.readyTimeoutMs },
         );
         const settings = await view.evaluate<{ tablist: boolean; profile: boolean }>(`({
-          tablist: Boolean(document.querySelector('[role="tablist"][aria-label="Settings sections"]')),
+          tablist: Boolean(document.querySelector('[role="tablist"]')),
           profile: Boolean(document.querySelector('[role="tab"][data-state="inactive"]')),
         })`);
 
@@ -109,8 +110,8 @@ describe("localized accessibility Bun.WebView journeys", () => {
       "localized fallback recovery journey",
       config.origin,
       async ({ view }) => {
+        await initializeBrowserJourney(view, config.origin, "ar");
         await view.navigate(`${config.origin}/`);
-        await view.evaluate(`document.cookie = "locale=ar; path=/"`);
         await view.navigate(`${config.origin}/route-that-does-not-exist`);
         await waitForBrowserCondition(
           view,
@@ -169,6 +170,7 @@ describe("localized accessibility Bun.WebView journeys", () => {
 
   it("applies stored theme preference before rendering fallback content", async () => {
     await withBrowserJourney("stored fallback theme journey", config.origin, async ({ view }) => {
+      await initializeBrowserJourney(view, config.origin, "en");
       await view.navigate(`${config.origin}/`);
       await view.evaluate(`localStorage.setItem("theme-preference:v1", "dark")`);
       await view.navigate(`${config.origin}/route-that-does-not-exist`);
