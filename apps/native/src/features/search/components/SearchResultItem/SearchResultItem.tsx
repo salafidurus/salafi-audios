@@ -1,6 +1,7 @@
 import { Host } from "@expo/ui";
 import { StyleSheet } from "react-native-unistyles";
 
+import { useTranslation } from "@/core/i18n/use-translation";
 import { List, NativeIcon, NativeImage } from "@/shared/ui";
 
 /** Implements native search input, filtering, results, and empty states. */
@@ -29,8 +30,9 @@ export function SearchResultItem({
   durationSeconds,
   onPress,
 }: SearchResultItemProps) {
-  const durationLabel = formatDuration(durationSeconds);
-  const supportingText = [scholarName, formatLectureCount(lectureCount), durationLabel]
+  const { t } = useTranslation();
+  const durationLabel = formatDuration(durationSeconds, t);
+  const supportingText = [scholarName, formatLectureCount(lectureCount, t), durationLabel]
     .filter(Boolean)
     .join(" · ");
 
@@ -74,16 +76,22 @@ const styles = StyleSheet.create((theme) => ({
   },
 }));
 
-function formatLectureCount(count: number): string {
-  if (count === 1) return "1 lecture";
-  return `${count} lectures`;
+function formatLectureCount(count: number, t: ReturnType<typeof useTranslation>["t"]): string {
+  return t("search.lectureCount", "{{count}} lectures", { count });
 }
 
-function formatDuration(durationSeconds?: number): string {
+function formatDuration(
+  durationSeconds: number | undefined,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
   if (!durationSeconds || durationSeconds <= 0) return "";
   const hours = Math.floor(durationSeconds / 3600);
   const minutes = Math.floor((durationSeconds % 3600) / 60);
-  if (hours > 0) return `${hours}hr ${String(minutes).padStart(2, "0")}m`;
-  if (minutes <= 0) return "";
-  return `${minutes}m`;
+  if (hours > 0) {
+    return t("search.durationHours", "{{hours}}hr {{minutes}}m", {
+      hours,
+      minutes: String(minutes).padStart(2, "0"),
+    });
+  }
+  return minutes > 0 ? t("search.durationMinutes", "{{minutes}}m", { minutes }) : "";
 }

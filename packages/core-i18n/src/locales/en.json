@@ -284,7 +284,11 @@
     "filterAllAria": "Show all items",
     "filterByAria": "Filter by {{label}}",
     "filterRemoveAria": "Remove {{label}} filter",
-    "enterQuery": "Enter a search query to begin"
+    "enterQuery": "Enter a search query to begin",
+    "title": "Search",
+    "lectureCount": "{{count}} lectures",
+    "durationHours": "{{hours}}hr {{minutes}}m",
+    "durationMinutes": "{{minutes}}m"
   },
   "myLibrary": {
     "title": "My Library",

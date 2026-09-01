@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { useTranslation } from "@/core/i18n/use-translation";
 import { NativeButton } from "@/shared/ui";
 
 /** Implements native search input, filtering, results, and empty states. */
@@ -28,13 +29,14 @@ export type SearchFilterProps = {
  * 57's universal ScrollView does not expose the required horizontal prop.
  */
 export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
+  const { t } = useTranslation();
   const options = useMemo<FilterOption[]>(() => {
     const sortedTopics = [...topics].sort((a, b) => a.name.ar.localeCompare(b.name.ar));
     return [
-      { id: "all", label: "All" },
+      { id: "all", label: t("search.filterAll", "All") },
       ...sortedTopics.map((topic) => ({ id: topic.slug, label: topic.name.ar })),
     ];
-  }, [topics]);
+  }, [t, topics]);
 
   const selected = useMemo(() => new Set(value), [value]);
 

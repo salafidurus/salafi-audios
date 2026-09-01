@@ -8,3 +8,4 @@ export {
   SearchResultsList,
   type SearchResultsListProps,
 } from "./components/SearchResultsList/SearchResultsList";
+export { SearchScreen, type SearchScreenProps } from "./screens/search.screen";

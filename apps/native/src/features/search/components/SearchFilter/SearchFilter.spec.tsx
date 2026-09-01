@@ -4,6 +4,10 @@ import { render, screen, fireEvent } from "@testing-library/react-native";
 
 import { SearchFilter } from "./SearchFilter";
 
+jest.mock("@/core/i18n/use-translation", () => ({
+  useTranslation: () => ({ t: (_key: string, fallback: string) => fallback }),
+}));
+
 const topics = [
   { id: "topic-1", slug: "aqeedah", name: { ar: "Aqeedah", en: "Aqeedah" } },
 ] as TopicDetailDto[];
