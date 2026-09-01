@@ -201,7 +201,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   tab: {
     minHeight: 48,
-    minWidth: 96,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: theme.spacing.scale.md,
