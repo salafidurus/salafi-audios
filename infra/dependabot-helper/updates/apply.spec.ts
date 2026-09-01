@@ -21,8 +21,10 @@ const versionLockedConfig = {
   versionLocked: ["better-auth"],
 };
 
+let spawnStatuses = [0, 0];
+
 mock.module("child_process", () => ({
-  spawnSync: () => ({ status: 0, stdout: "", stderr: "" }),
+  spawnSync: () => ({ status: spawnStatuses.shift() ?? 0, stdout: "", stderr: "" }),
 }));
 
 let tmpDir: string;
@@ -198,6 +200,38 @@ describe("applyExpoUpdate", () => {
       readFileSync(join(tmpDir, "apps", "native", "package.json"), "utf-8"),
     );
     expect(nativePkg.dependencies.expo).toBe("57.0.6");
+  });
+
+  it("keeps the update accepted when expo-doctor reports known Bun linker diagnostics", async () => {
+    const candidate: UpdateCandidate = {
+      type: "expo",
+      packageName: "expo",
+      currentVersion: "~52.0.0",
+      latestVersion: "57.0.6",
+    };
+
+    spawnStatuses = [0, 1];
+    try {
+      await expect(applyExpoUpdate(candidate, tmpDir)).resolves.toBe(true);
+    } finally {
+      spawnStatuses = [0, 0];
+    }
+  });
+
+  it("rejects the update when expo install --fix fails", async () => {
+    const candidate: UpdateCandidate = {
+      type: "expo",
+      packageName: "expo",
+      currentVersion: "~52.0.0",
+      latestVersion: "57.0.6",
+    };
+
+    spawnStatuses = [1];
+    try {
+      await expect(applyExpoUpdate(candidate, tmpDir)).resolves.toBe(false);
+    } finally {
+      spawnStatuses = [0, 0];
+    }
   });
 });
 
