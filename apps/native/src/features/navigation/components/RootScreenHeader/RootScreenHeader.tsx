@@ -1,6 +1,6 @@
 import { Host } from "@expo/ui";
-import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Pressable, StyleSheet, View } from "react-native";
+import { useUnistyles } from "react-native-unistyles";
 
 import { AppText, NativeIcon } from "@/shared/ui";
 
@@ -16,8 +16,20 @@ export type RootScreenHeaderProps = {
 
 /** Renders an accessible in-content header for root and pushed native screens. */
 export function RootScreenHeader({ title, showSearch = true, onBack }: RootScreenHeaderProps) {
+  const { theme } = useUnistyles();
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          gap: theme.spacing.scale.md,
+          paddingTop: theme.spacing.layout.pageY,
+          paddingBottom: theme.spacing.scale.sm,
+          backgroundColor: theme.colors.surface.canvas,
+        },
+      ]}
+    >
       {onBack ? (
         <Pressable
           accessibilityRole="button"
@@ -39,16 +51,12 @@ export function RootScreenHeader({ title, showSearch = true, onBack }: RootScree
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.spacing.scale.md,
-    paddingTop: theme.spacing.layout.pageY,
-    paddingBottom: theme.spacing.scale.sm,
-    backgroundColor: theme.colors.surface.canvas,
   },
   title: {
     flex: 1,
   },
-}));
+});

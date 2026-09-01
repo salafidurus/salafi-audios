@@ -2,7 +2,8 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 import { getWrappedLayout } from "@/core/integrations";
-import { BottomAccessory, SearchPaletteProvider } from "@/features/navigation";
+import { BottomAccessory } from "@/features/navigation/components/BottomAccessory/BottomAccessory";
+import { SearchPaletteProvider } from "@/features/navigation/components/SearchPalette/SearchPalette";
 
 import { Providers } from "../core/providers";
 

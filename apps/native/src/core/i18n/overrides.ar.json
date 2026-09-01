@@ -51,7 +51,10 @@
     }
   },
   "explore": {
-    "searchRecent": "البحث في الصوتيات الأخيرة..."
+    "searchRecent": "البحث في الصوتيات الأخيرة...",
+    "title": "استكشاف",
+    "exploreByTopic": "استكشف حسب الموضوع",
+    "exploreByTopicDescription": "اختر موضوعًا لتشكيل موجز دراستك."
   },
   "home": {
     "description": "ابدأ رحلتك في طلب العلم.",
@@ -74,7 +77,19 @@
     "description": "استكشف علماءنا.",
     "filterPlaceholder": "تصفية المحتوى…",
     "searchNoMatch": "لا يوجد شيوخ يطابقون بحثك.",
-    "searchScholars": "البحث عن الشيوخ..."
+    "searchScholars": "البحث عن الشيوخ...",
+    "searchDescription": "تصفح العلماء واعثر على أحدث دروسهم."
+  },
+  "common": { "loadMore": "تحميل المزيد" },
+  "search": {
+    "label": "بحث",
+    "description": "البحث في الفهرس",
+    "open": "بحث",
+    "popularSearches": "عمليات البحث الشائعة",
+    "popularTafsir": "التفسير",
+    "popularFiqh": "فقه العبادات",
+    "popularAqeedah": "نواقض الإسلام",
+    "popularNahw": "النحو"
   },
   "settings": {
     "support": "الدعم"

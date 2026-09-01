@@ -2,19 +2,6 @@ import type { SearchCatalogResultsDto, ScholarListDto, TopicDetailDto } from "@s
 
 import { buildPaletteResults } from "./search-palette-results";
 
-jest.mock("@sd/domain-content", () => ({
-  useInfiniteScholarsList: jest.fn(),
-}));
-
-jest.mock("@sd/domain-search", () => ({
-  useSearchCatalog: jest.fn(),
-  useTopicsList: jest.fn(),
-}));
-
-jest.mock("expo-router", () => ({
-  useRouter: () => ({ push: jest.fn() }),
-}));
-
 describe("buildPaletteResults", () => {
   it("combines matching topics, scholars, and listings in one palette result set", () => {
     const topics = [

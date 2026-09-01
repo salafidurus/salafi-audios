@@ -9,6 +9,11 @@ jest.mock("../SearchPalette/SearchPalette", () => ({
   useSearchPalette: () => ({ open: mockOpen }),
 }));
 
+jest.mock("../SearchPalette/search-palette.store", () => ({
+  useSearchPaletteStore: (selector: (state: { open: typeof mockOpen }) => unknown) =>
+    selector({ open: mockOpen }),
+}));
+
 jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({ t: (_key: string, fallback: string) => fallback }),
 }));

@@ -3,7 +3,7 @@
 import { useInfiniteScholarsList } from "@sd/domain-content";
 import { useSearchCatalog, useTopicsList } from "@sd/domain-search";
 import { useRouter } from "expo-router";
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -19,24 +19,18 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 
 import { buildPaletteResults, type PaletteResult } from "./search-palette-results";
+import { useSearchPaletteStore } from "./search-palette.store";
 import { SearchPaletteSheet } from "./SearchPaletteSheet";
 
-type SearchPaletteContextValue = { open: () => void };
-const SearchPaletteContext = createContext<SearchPaletteContextValue | null>(null);
-
-/** Returns the navigation action used to open the shared palette. */
-export function useSearchPalette() {
-  const context = useContext(SearchPaletteContext);
-  if (!context) {
-    throw new Error("useSearchPalette must be used inside SearchPaletteProvider");
-  }
-  return context;
-}
-
-/** Owns modal visibility, lazy catalog queries, and result navigation for root screens. */
+/**
+ * Owns lazy catalog queries and result navigation for the app-global palette.
+ * Visibility is held in Zustand so header actions do not depend on this provider's module.
+ */
 // oxlint-disable-next-line complexity -- this is the single orchestration boundary for the palette lifecycle.
+// oxlint-disable-next-line anti-slop/require-tsdoc -- the provider contract is documented above.
 export function SearchPaletteProvider({ children }: { children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const isOpen = useSearchPaletteStore((state) => state.isOpen);
+  const closePalette = useSearchPaletteStore((state) => state.close);
   const [query, setQuery] = useState("");
   const { i18n, t } = useTranslation();
   const router = useRouter();
@@ -58,7 +52,7 @@ export function SearchPaletteProvider({ children }: { children: React.ReactNode 
   );
 
   const close = () => {
-    setIsOpen(false);
+    closePalette();
     setQuery("");
   };
   const select = (result: PaletteResult) => {
@@ -69,10 +63,8 @@ export function SearchPaletteProvider({ children }: { children: React.ReactNode 
   };
   const isLoading =
     normalizedQuery.length > 0 && (isListingsLoading || isTopicsLoading || isScholarsLoading);
-  const contextValue = useMemo(() => ({ open: () => setIsOpen(true) }), []);
-
   return (
-    <SearchPaletteContext.Provider value={contextValue}>
+    <>
       {children}
       <SearchPaletteSheet
         isPresented={isOpen}
@@ -115,51 +107,76 @@ export function SearchPaletteProvider({ children }: { children: React.ReactNode 
             onChangeText={setQuery}
           />
           <ScrollView keyboardShouldPersistTaps="handled" style={styles.results}>
-            {isLoading ? (
-              <ActivityIndicator color={theme.colors.action.primary} />
-            ) : normalizedQuery && results.length === 0 ? (
-              <Text style={[styles.message, { color: theme.colors.content.muted }]}>
-                No catalog results
-              </Text>
-            ) : !normalizedQuery ? (
-              <Text style={[styles.message, { color: theme.colors.content.muted }]}>
-                Type to search public catalog content
-              </Text>
-            ) : (
-              results.map((result) => (
-                <Pressable
-                  accessibilityRole="button"
-                  key={result.id}
-                  onPress={() => select(result)}
-                  style={({ pressed }) => [styles.result, pressed && styles.resultPressed]}
-                >
-                  <View style={styles.resultBody}>
-                    <Text
-                      numberOfLines={1}
-                      style={[styles.resultLabel, { color: theme.colors.content.default }]}
-                    >
-                      {result.label}
-                    </Text>
-                    {result.metadata ? (
-                      <Text
-                        numberOfLines={1}
-                        style={[styles.metadata, { color: theme.colors.content.muted }]}
-                      >
-                        {result.metadata}
-                      </Text>
-                    ) : null}
-                  </View>
-                  <Text style={[styles.type, { color: theme.colors.content.muted }]}>
-                    {result.type}
-                  </Text>
-                </Pressable>
-              ))
-            )}
+            <PaletteResults
+              isLoading={isLoading}
+              normalizedQuery={normalizedQuery}
+              onSelect={select}
+              results={results}
+              theme={theme}
+            />
           </ScrollView>
         </KeyboardAvoidingView>
       </SearchPaletteSheet>
-    </SearchPaletteContext.Provider>
+    </>
   );
+}
+
+function PaletteResults({
+  isLoading,
+  normalizedQuery,
+  onSelect,
+  results,
+  theme,
+}: {
+  isLoading: boolean;
+  normalizedQuery: string;
+  onSelect: (result: PaletteResult) => void;
+  results: PaletteResult[];
+  theme: ReturnType<typeof useUnistyles>["theme"];
+}) {
+  if (isLoading) return <ActivityIndicator color={theme.colors.action.primary} />;
+  if (normalizedQuery && results.length === 0) {
+    return (
+      <Text style={[styles.message, { color: theme.colors.content.muted }]}>
+        No catalog results
+      </Text>
+    );
+  }
+  if (!normalizedQuery) {
+    return (
+      <Text style={[styles.message, { color: theme.colors.content.muted }]}>
+        Type to search public catalog content
+      </Text>
+    );
+  }
+  return results.map((result) => (
+    <Pressable
+      accessibilityRole="button"
+      key={result.id}
+      onPress={() => onSelect(result)}
+      style={({ pressed }) => [styles.result, pressed && styles.resultPressed]}
+    >
+      <View style={styles.resultBody}>
+        <Text
+          numberOfLines={1}
+          style={[styles.resultLabel, { color: theme.colors.content.default }]}
+        >
+          {result.label}
+        </Text>
+        {result.metadata ? (
+          <Text numberOfLines={1} style={[styles.metadata, { color: theme.colors.content.muted }]}>
+            {result.metadata}
+          </Text>
+        ) : null}
+      </View>
+      <Text style={[styles.type, { color: theme.colors.content.muted }]}>{result.type}</Text>
+    </Pressable>
+  ));
+}
+
+/** Returns the app-global search palette action used by navigation controls. */
+export function useSearchPalette() {
+  return { open: useSearchPaletteStore((state) => state.open) };
 }
 
 const styles = StyleSheet.create((theme) => ({

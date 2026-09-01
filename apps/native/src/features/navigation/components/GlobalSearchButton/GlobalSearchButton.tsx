@@ -1,17 +1,18 @@
-import { Pressable, Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Pressable, StyleSheet, Text } from "react-native";
+import { useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 
-import { useSearchPalette } from "../SearchPalette/SearchPalette";
+import { useSearchPaletteStore } from "../SearchPalette/search-palette.store";
 
 /**
  * Provides the global discovery action used by persistent root headers.
  */
 /** Renders a labeled action that pushes Search while preserving the caller's root stack. */
 export function GlobalSearchButton() {
-  const { open } = useSearchPalette();
+  const open = useSearchPaletteStore((state) => state.open);
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
   const label = t("search.open", "Search");
 
   return (
@@ -20,28 +21,31 @@ export function GlobalSearchButton() {
       accessibilityLabel={label}
       hitSlop={8}
       onPress={open}
-      style={styles.button}
+      style={[
+        styles.button,
+        {
+          width: theme.spacing.scale["4xl"],
+          height: theme.spacing.scale["4xl"],
+          borderRadius: theme.radius.scale.full,
+          backgroundColor: theme.colors.surface.elevated,
+          borderColor: theme.colors.border.subtle,
+        },
+      ]}
       testID="global-search-button"
     >
-      <Text style={styles.icon}>⌕</Text>
+      <Text style={[styles.icon, { color: theme.colors.content.strong }]}>⌕</Text>
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create({
   button: {
-    width: theme.spacing.scale["4xl"],
-    height: theme.spacing.scale["4xl"],
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: theme.radius.scale.full,
-    backgroundColor: theme.colors.surface.elevated,
-    borderWidth: theme.border.width.default,
-    borderColor: theme.colors.border.subtle,
+    borderWidth: 1,
   },
   icon: {
     fontSize: 28,
     lineHeight: 30,
-    color: theme.colors.content.strong,
   },
-}));
+});
