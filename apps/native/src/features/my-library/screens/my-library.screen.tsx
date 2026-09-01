@@ -278,7 +278,8 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
   },
   listContent: {
-    paddingHorizontal: theme.spacing.layout.pageX,
+    paddingVertical: theme.spacing.scale.md,
     paddingBottom: theme.spacing.scale["2xl"],
+    gap: theme.spacing.scale.md,
   },
 }));

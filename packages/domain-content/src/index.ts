@@ -66,3 +66,4 @@ export {
 } from "./utils/format-scholar-name";
 export { getMyLibraryItemPercent } from "./utils/my-library-item-progress";
 export { mergeLiveProgress } from "./utils/merge-live-progress";
+export { useEnrichedLocalLibraryItems } from "./my-library.catalog";

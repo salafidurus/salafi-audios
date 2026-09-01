@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useInfiniteMyLibraryCompleted } from "./hooks/use-infinite-my-library-completed";
 import { useInfiniteMyLibraryProgress } from "./hooks/use-infinite-my-library-progress";
 import { useInfiniteMyLibrarySaved } from "./hooks/use-infinite-my-library-saved";
+import { useEnrichedLocalLibraryItems } from "./my-library.catalog";
 import { localCompletedItems, localProgressItems, localSavedItems } from "./my-library.local";
 import { useSavedStore } from "./saved/saved.store";
 import { mergeLiveProgress } from "./utils/merge-live-progress";
@@ -128,6 +129,18 @@ export function useMyLibrarySections({
     [savedEntities],
   );
   const localCompleted = useMemo(() => localCompletedItems(progressMap), [progressMap]);
+  const enrichedLocalProgress = useEnrichedLocalLibraryItems(
+    localProgress,
+    !isAuthenticated && localFallback,
+  );
+  const enrichedLocalSaved = useEnrichedLocalLibraryItems(
+    localSaved,
+    !isAuthenticated && localFallback,
+  );
+  const enrichedLocalCompleted = useEnrichedLocalLibraryItems(
+    localCompleted,
+    !isAuthenticated && localFallback,
+  );
 
   const remoteProgressItems = useMemo(
     () =>
@@ -141,9 +154,9 @@ export function useMyLibrarySections({
 
   if (!isAuthenticated && localFallback) {
     return {
-      started: localState(localProgress),
-      saved: localState(localSaved),
-      completed: localState(localCompleted),
+      started: localState(enrichedLocalProgress),
+      saved: localState(enrichedLocalSaved),
+      completed: localState(enrichedLocalCompleted),
     };
   }
 

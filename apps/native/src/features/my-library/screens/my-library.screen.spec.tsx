@@ -27,6 +27,7 @@ jest.mock("react-native-safe-area-context", () => ({
 
 jest.mock("@sd/domain-content", () => ({
   useMyLibrarySections: jest.fn(),
+  formatScholarName: (name: string) => name,
   getMyLibraryItemPercent: (item: MyLibraryItemDto) => {
     if (item.totalLeafCount && item.totalLeafCount > 0) {
       return Math.round(((item.completedLeafCount ?? 0) / item.totalLeafCount) * 100);
