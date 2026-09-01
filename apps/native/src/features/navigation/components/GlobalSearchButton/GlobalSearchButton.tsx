@@ -1,3 +1,4 @@
+import { Host } from "@expo/ui";
 import { routes } from "@sd/core-contracts";
 import { useRouter } from "expo-router";
 import { Pressable } from "react-native";
@@ -22,7 +23,9 @@ export function GlobalSearchButton() {
       onPress={() => router.push(routes.search)}
       testID="global-search-button"
     >
-      <NativeIcon name="search" colorRole="strong" size={22} />
+      <Host>
+        <NativeIcon name="search" colorRole="strong" size={22} />
+      </Host>
     </Pressable>
   );
 }
