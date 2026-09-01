@@ -80,9 +80,10 @@ describe("Dependabot workflow safety contract", () => {
     );
 
     expect(workflow).toContain("pull-requests: write");
-    expect(workflow).toContain("bun run --filter dependabot-helper align");
-    expect(workflow).toContain("bun run --filter dependabot-helper validate-files");
-    expect(workflow).toContain("bun run --filter dependabot-helper render");
+    expect(workflow).toContain("bun infra/dependabot-helper/cli.ts align");
+    expect(workflow).toContain("bun infra/dependabot-helper/cli.ts validate-files");
+    expect(workflow).toContain("bun infra/dependabot-helper/cli.ts render");
+    expect(workflow).not.toContain("bun run --filter dependabot-helper");
     expect(workflow).toContain("id: push");
     expect(workflow).toContain(
       "git checkout \"$PR_HEAD_SHA\" -- ':(glob)**/package.json' 'bun.lock'",
@@ -98,8 +99,8 @@ describe("Dependabot workflow safety contract", () => {
       "utf8",
     );
 
-    expect(workflow).toContain("run: bun run --filter dependabot-helper validate");
-    expect(workflow).toContain("bun run --filter dependabot-helper align");
+    expect(workflow).toContain("run: bun infra/dependabot-helper/cli.ts validate");
+    expect(workflow).toContain("bun infra/dependabot-helper/cli.ts align");
   });
 
   it("routes scheduled auxiliary work through the Helper entry points", () => {
