@@ -3,7 +3,8 @@ import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { NativeFormField, ScreenView } from "@/shared/ui";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { AppText, NativeButton, NativeFormField, ScreenView } from "@/shared/ui";
 
 import { SearchFilter } from "../components/SearchFilter/SearchFilter";
 import { SearchResultItem } from "../components/SearchResultItem/SearchResultItem";
@@ -21,9 +22,46 @@ export type SearchScreenProps = {
   onNavigateToListing?: (slug: string) => void;
 };
 
+function PopularSearches({
+  onSelect,
+  t,
+}: {
+  onSelect: (query: string) => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  const searches = [
+    t("search.popularTafsir", "Tafsir"),
+    t("search.popularFiqh", "Fiqh of Worship"),
+    t("search.popularAqeedah", "Nullifiers of Islam"),
+    t("search.popularNahw", "Nahw"),
+  ];
+
+  return (
+    <View style={styles.popular}>
+      <AppText variant="titleMd">{t("search.popularSearches", "POPULAR SEARCHES")}</AppText>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.popularList}
+      >
+        {searches.map((search) => (
+          <NativeButton
+            key={search}
+            label={search}
+            size="sm"
+            variant="outline"
+            onPress={() => onSelect(search)}
+          />
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
 /** Renders debounced catalog search, topic filters, and navigable result rows. */
 export function SearchScreen({ onNavigateToListing }: SearchScreenProps) {
   const { t } = useTranslation();
+  const showOriginal = useShowOriginalContent();
   const {
     query,
     setQuery,
@@ -34,7 +72,7 @@ export function SearchScreen({ onNavigateToListing }: SearchScreenProps) {
     isFetching,
     shouldSearch,
     errorMessage,
-  } = useSearchProcessing();
+  } = useSearchProcessing({ showOriginal });
 
   return (
     <ScreenView>
@@ -43,27 +81,31 @@ export function SearchScreen({ onNavigateToListing }: SearchScreenProps) {
           label={t("search.label", "Search")}
           value={query}
           onChangeText={setQuery}
-          placeholder={t("search.placeholder", "Search lectures, series, and scholars")}
+          placeholder={t("search.placeholder", "Search lectures, scholars, or topics")}
           testID="native-global-search-input"
         />
         <SearchFilter value={filter} onChange={setFilter} topics={topics} />
         <View style={styles.results}>
-          <SearchResultsList
-            items={items}
-            isFetching={isFetching}
-            shouldSearch={shouldSearch}
-            errorMessage={errorMessage}
-            renderItem={(item) => (
-              <SearchResultItem
-                title={item.title}
-                scholarName={item.scholarName}
-                imageUrl={item.imageUrl}
-                lectureCount={item.lectureCount}
-                durationSeconds={item.durationSeconds}
-                onPress={() => onNavigateToListing?.(item.slug)}
-              />
-            )}
-          />
+          {shouldSearch ? (
+            <SearchResultsList
+              items={items}
+              isFetching={isFetching}
+              shouldSearch={shouldSearch}
+              errorMessage={errorMessage}
+              renderItem={(item) => (
+                <SearchResultItem
+                  title={item.title}
+                  scholarName={item.scholarName}
+                  imageUrl={item.imageUrl}
+                  lectureCount={item.lectureCount}
+                  durationSeconds={item.durationSeconds}
+                  onPress={() => onNavigateToListing?.(item.slug)}
+                />
+              )}
+            />
+          ) : (
+            <PopularSearches onSelect={setQuery} t={t} />
+          )}
         </View>
       </ScrollView>
     </ScreenView>
@@ -77,5 +119,12 @@ const styles = StyleSheet.create((theme) => ({
   },
   results: {
     flex: 1,
+  },
+  popular: {
+    gap: theme.spacing.scale.sm,
+  },
+  popularList: {
+    gap: theme.spacing.component.gapSm,
+    paddingBottom: theme.spacing.scale.md,
   },
 }));

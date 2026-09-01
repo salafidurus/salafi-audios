@@ -14,6 +14,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { RootScreenHeader } from "@/features/navigation";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 import { AppText, ScreenView } from "@/shared/ui";
@@ -340,6 +341,7 @@ function HomeSurface({
   const { t } = useTranslation();
   return (
     <ScreenView>
+      <RootScreenHeader title={t("navigation.home", "Home")} />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header} testID="home-study-header">
           <AppText variant="caption" colorRole="primary">

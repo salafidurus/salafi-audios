@@ -2,6 +2,10 @@
 // Screens (none currently — navigation uses Expo Router tabs directly)
 
 export { GlobalSearchButton } from "./components/GlobalSearchButton/GlobalSearchButton";
+export {
+  RootScreenHeader,
+  type RootScreenHeaderProps,
+} from "./components/RootScreenHeader/RootScreenHeader";
 
 // Components (used outside this feature)
 export { BottomAccessory } from "./components/BottomAccessory/BottomAccessory";

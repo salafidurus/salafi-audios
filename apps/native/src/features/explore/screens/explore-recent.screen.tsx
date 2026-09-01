@@ -3,12 +3,15 @@ import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
-import { useCallback } from "react";
+import { useTopicsList } from "@sd/domain-search";
+import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { ScreenView } from "@/shared/ui";
+import { RootScreenHeader } from "@/features/navigation";
+import { SearchFilter } from "@/features/search";
+import { AppText, ScreenView } from "@/shared/ui";
 
 import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
 import { ExploreScholarRow } from "../components/explore-scholar-row/explore-scholar-row";
@@ -145,8 +148,11 @@ function getItemKey(item: GroupedFeedItem, index: number): string {
 /** Renders the mixed Explore feed and coordinates its user-facing state. */
 export function ExploreScreen({ onNavigateToListing, onNavigateToScholar }: ExploreScreenProps) {
   const { t } = useTranslation();
-  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
-    useExploreRecentScreen();
+  const [topicSlug, setTopicSlug] = useState<string | undefined>();
+  const { data: topics = [] } = useTopicsList();
+  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useExploreRecentScreen(
+    { topicSlug },
+  );
   const rawItems = data?.pages.flatMap((p) => p.items) ?? [];
   const items = groupFeedItems(rawItems);
 
@@ -156,30 +162,37 @@ export function ExploreScreen({ onNavigateToListing, onNavigateToScholar }: Expl
     [onNavigateToListing, onNavigateToScholar],
   );
 
-  if (items.length === 0) {
-    return (
-      <ExploreRecentStatus
-        isError={isError}
-        isFetching={isFetching}
-        hasItems={items.length > 0}
-        t={t}
-        refetch={refetch}
-      />
-    );
-  }
-
   return (
-    <View style={styles.screen}>
-      <FlatList
-        data={items}
-        keyExtractor={getItemKey}
-        renderItem={renderItem}
-        onEndReached={() => hasNextPage && fetchNextPage()}
-        onEndReachedThreshold={0.5}
-        contentContainerStyle={styles.listContent}
-        ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
+    <ScreenView>
+      <RootScreenHeader title={t("explore.title", "Explore")} />
+      <AppText variant="labelMd">{t("explore.exploreByTopic", "Explore by topic")}</AppText>
+      <SearchFilter
+        value={topicSlug ? [topicSlug] : []}
+        onChange={(value) => setTopicSlug(value[0])}
+        topics={topics}
       />
-    </View>
+      <View style={styles.screen}>
+        {items.length === 0 ? (
+          <ExploreRecentStatus
+            isError={isError}
+            isFetching={isFetching}
+            hasItems={false}
+            t={t}
+            refetch={refetch}
+          />
+        ) : (
+          <FlatList
+            data={items}
+            keyExtractor={getItemKey}
+            renderItem={renderItem}
+            onEndReached={() => hasNextPage && fetchNextPage()}
+            onEndReachedThreshold={0.5}
+            contentContainerStyle={styles.listContent}
+            ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
+          />
+        )}
+      </View>
+    </ScreenView>
   );
 }
 

@@ -1,6 +1,7 @@
-import { Stack } from "expo-router";
+import { useRouter } from "expo-router";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { RootScreenHeader } from "@/features/navigation";
 import { SearchScreen } from "@/features/search";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
@@ -10,11 +11,16 @@ import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 /** Delegates search presentation to the feature layer while retaining shared listing navigation. */
 export default function SearchRoute() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { navigateToListing } = useListingNavigation();
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: true, title: t("search.title", "Search") }} />
+      <RootScreenHeader
+        title={t("search.title", "Search")}
+        showSearch={false}
+        onBack={router.back}
+      />
       <SearchScreen onNavigateToListing={navigateToListing} />
     </>
   );

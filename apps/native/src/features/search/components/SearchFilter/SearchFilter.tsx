@@ -1,5 +1,6 @@
 import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
 
+import { getLocalizedName } from "@sd/core-i18n";
 import { useMemo } from "react";
 import { ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -29,14 +30,21 @@ export type SearchFilterProps = {
  * 57's universal ScrollView does not expose the required horizontal prop.
  */
 export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
   const options = useMemo<FilterOption[]>(() => {
-    const sortedTopics = [...topics].sort((a, b) => a.name.ar.localeCompare(b.name.ar));
+    const sortedTopics = [...topics].sort((a, b) =>
+      getLocalizedName(a.name, i18n.language).localeCompare(
+        getLocalizedName(b.name, i18n.language),
+      ),
+    );
     return [
       { id: "all", label: t("search.filterAll", "All") },
-      ...sortedTopics.map((topic) => ({ id: topic.slug, label: topic.name.ar })),
+      ...sortedTopics.map((topic) => ({
+        id: topic.slug,
+        label: getLocalizedName(topic.name, i18n.language),
+      })),
     ];
-  }, [t, topics]);
+  }, [i18n.language, t, topics]);
 
   const selected = useMemo(() => new Set(value), [value]);
 
@@ -62,10 +70,7 @@ export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
                 return;
               }
 
-              const next = new Set(value);
-              if (next.has(option.id)) next.delete(option.id);
-              else next.add(option.id);
-              onChange(Array.from(next));
+              onChange(selected.has(option.id) ? [] : [option.id]);
             }}
           />
         );

@@ -5,7 +5,10 @@ import { render, screen, fireEvent } from "@testing-library/react-native";
 import { SearchFilter } from "./SearchFilter";
 
 jest.mock("@/core/i18n/use-translation", () => ({
-  useTranslation: () => ({ t: (_key: string, fallback: string) => fallback }),
+  useTranslation: () => ({
+    i18n: { language: "en" },
+    t: (_key: string, fallback: string) => fallback,
+  }),
 }));
 
 const topics = [
