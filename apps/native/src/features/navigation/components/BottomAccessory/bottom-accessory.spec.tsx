@@ -78,7 +78,7 @@ describe("BottomAccessoryContent", () => {
 
   it("renders null when no track is playing, even on a section route", async () => {
     useAudio.mockReturnValue({ currentTrack: null });
-    usePathname.mockReturnValue("/recent");
+    usePathname.mockReturnValue("/explore");
 
     await render(<BottomAccessoryContent />);
     expect(screen.toJSON()).toBeNull();
@@ -86,7 +86,7 @@ describe("BottomAccessoryContent", () => {
 
   it("renders the miniplayer when a track is playing", async () => {
     useAudio.mockReturnValue({ currentTrack: mockTrack });
-    usePathname.mockReturnValue("/recent");
+    usePathname.mockReturnValue("/explore");
 
     await render(<BottomAccessoryContent />);
     expect(screen.getByTestId("miniplayer-only-container")).toBeTruthy();

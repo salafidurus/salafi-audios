@@ -18,18 +18,6 @@ export default function MyLibraryLayout() {
           title: t("myLibrary.inProgress", "In Progress"),
         }}
       />
-      <Stack.Screen
-        name="saved"
-        options={{
-          title: t("myLibrary.saved", "Saved"),
-        }}
-      />
-      <Stack.Screen
-        name="completed"
-        options={{
-          title: t("myLibrary.completed", "Completed"),
-        }}
-      />
     </Stack>
   );
 }

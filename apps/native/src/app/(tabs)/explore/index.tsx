@@ -4,9 +4,9 @@ import { useRouter } from "expo-router";
 import { ExploreRecentScreen } from "@/features/explore/screens/explore-recent.screen";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
-/** Defines the Expo Router entrypoint for the native (tabs)/(explore)/recent route and delegates behavior to the feature layer. */
-/** Defines the native explore recent contract used by this module. */
-export default function ExploreRecent() {
+/** Defines the Explore root entrypoint for the native discovery shell. */
+/** Preserves the existing discovery projection as the Explore root until later parity slices expand it. */
+export default function ExploreRoute() {
   const router = useRouter();
   const { navigateToListing } = useListingNavigation();
 

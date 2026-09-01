@@ -278,16 +278,6 @@ export {
 export { routes, routeDefinitions, resolveRouteAccess } from "./routes";
 export type { RouteAccess, RouteDefinition } from "./routes";
 
-// Export shared navigation metadata
-export {
-  SECTION_TABS,
-  DEFAULT_TABS,
-  SECTION_LABELS,
-  SECTION_ROUTES,
-  type Section,
-  type TabConfig,
-} from "./navigation";
-
 // Export query utilities (client, keys, hooks)
 export { createQueryClient, queryKeys } from "./query";
 export { useApiQuery, initApiClient } from "./query/hooks";

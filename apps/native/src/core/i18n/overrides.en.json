@@ -53,7 +53,11 @@
   "explore": {
     "searchRecent": "Search recent audios..."
   },
+  "home": {
+    "description": "Begin your study journey."
+  },
   "scholarContent": {
+    "description": "Explore our scholars.",
     "filterPlaceholder": "Filter content…",
     "searchNoMatch": "No scholars match your search.",
     "searchScholars": "Search scholars..."
