@@ -51,7 +51,10 @@
     }
   },
   "explore": {
-    "searchRecent": "Search recent audios..."
+    "searchRecent": "Search recent audios...",
+    "title": "Explore",
+    "exploreByTopic": "Explore by topic",
+    "exploreByTopicDescription": "Choose a topic to shape your study feed."
   },
   "home": {
     "description": "Begin your study journey.",
@@ -77,7 +80,19 @@
     "description": "Explore our scholars.",
     "filterPlaceholder": "Filter content…",
     "searchNoMatch": "No scholars match your search.",
-    "searchScholars": "Search scholars..."
+    "searchScholars": "Search scholars...",
+    "searchDescription": "Browse scholars and find their latest lessons."
+  },
+  "common": { "loadMore": "Load more" },
+  "search": {
+    "label": "Search",
+    "description": "Search the catalog",
+    "open": "Search",
+    "popularSearches": "POPULAR SEARCHES",
+    "popularTafsir": "Tafsir",
+    "popularFiqh": "Fiqh of Worship",
+    "popularAqeedah": "Nullifiers of Islam",
+    "popularNahw": "Nahw"
   },
   "settings": {
     "support": "Support"

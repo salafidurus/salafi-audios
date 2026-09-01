@@ -186,7 +186,6 @@ export function ListItem({
 const styles = {
   row: {
     width: "100%" as const,
-    paddingHorizontal: 16,
     paddingVertical: 12,
   },
   content: {

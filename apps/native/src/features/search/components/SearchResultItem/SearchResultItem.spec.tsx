@@ -2,6 +2,10 @@ import { render, screen, fireEvent } from "@testing-library/react-native";
 
 import { SearchResultItem } from "./SearchResultItem";
 
+jest.mock("@/core/i18n/use-translation", () => ({
+  useTranslation: () => ({ t: (_key: string, fallback: string) => fallback }),
+}));
+
 describe("SearchResultItem", () => {
   it("renders as an accessible native list row and preserves activation", async () => {
     const onPress = jest.fn();

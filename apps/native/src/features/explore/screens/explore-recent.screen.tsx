@@ -3,14 +3,15 @@ import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
-import { Stack } from "expo-router";
+import { useTopicsList } from "@sd/domain-search";
 import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { ScreenView } from "@/shared/ui";
+import { RootScreenHeader } from "@/features/navigation";
+import { SearchFilter } from "@/features/search";
+import { AppText, ScreenView } from "@/shared/ui";
 
 import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
 import { ExploreScholarRow } from "../components/explore-scholar-row/explore-scholar-row";
@@ -21,9 +22,9 @@ import {
 } from "../components/explore-status/explore-status";
 import { ExploreTopicRow } from "../components/explore-topic-row/explore-topic-row";
 
-/** Composes native explore and catalog surfaces for browsing available content. */
-/** Describes the inputs, callbacks, and optional state accepted by Explore Recent Screen. */
-export type ExploreRecentScreenProps = {
+/** Composes the mixed native discovery feed without peer subsection navigation. */
+/** Describes navigation callbacks accepted by the Explore root screen. */
+export type ExploreScreenProps = {
   onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
@@ -37,17 +38,13 @@ type GroupedFeedItem =
       items: FeedContentItemDto[];
     };
 
-type StackScreenOptions = React.ComponentProps<typeof Stack.Screen>["options"];
-
 function ExploreRecentStatus({
-  headerSearchOptions,
   isError,
   isFetching,
   hasItems,
   t,
   refetch,
 }: {
-  headerSearchOptions: StackScreenOptions;
   /** Indicates that the associated request or operation failed and should render its error state. */
   isError: boolean;
   isFetching: boolean;
@@ -58,7 +55,6 @@ function ExploreRecentStatus({
   if (isError && !hasItems) {
     return (
       <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView
           message={getErrorStateText("feed", t)}
           onRetry={() => refetch()}
@@ -70,7 +66,6 @@ function ExploreRecentStatus({
   if (isFetching && !hasItems) {
     return (
       <View style={styles.screen}>
-        <Stack.Screen options={headerSearchOptions} />
         <ExploreSkeleton />
       </View>
     );
@@ -78,30 +73,11 @@ function ExploreRecentStatus({
   if (!hasItems) {
     return (
       <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView message={getEmptyStateText("feed", t)} />
       </ScreenView>
     );
   }
   return null;
-}
-
-function filterFeedItems(items: FeedItemDto[], searchQuery: string): FeedItemDto[] {
-  const query = searchQuery.trim().toLowerCase();
-  if (!query) return items;
-
-  return items.filter((item) => {
-    if (item.kind === "scholar_row") {
-      return item.scholars.some((scholar) => scholar.name.toLowerCase().includes(query));
-    }
-    if (item.kind === "topic_row") {
-      return (
-        item.topicName.toLowerCase().includes(query) ||
-        item.items.some((content) => content.title.toLowerCase().includes(query))
-      );
-    }
-    return item.title.toLowerCase().includes(query);
-  });
 }
 
 function groupFeedItems(items: FeedItemDto[]): GroupedFeedItem[] {
@@ -169,18 +145,16 @@ function getItemKey(item: GroupedFeedItem, index: number): string {
   return item.id;
 }
 
-/** Renders the native explore recent screen surface and coordinates its user-facing state. */
-export function ExploreRecentScreen({
-  onNavigateToListing,
-  onNavigateToScholar,
-}: ExploreRecentScreenProps) {
+/** Renders the mixed Explore feed and coordinates its user-facing state. */
+export function ExploreScreen({ onNavigateToListing, onNavigateToScholar }: ExploreScreenProps) {
   const { t } = useTranslation();
-  const { theme } = useUnistyles();
-  const [searchQuery, setSearchQuery] = useState("");
-  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
-    useExploreRecentScreen();
+  const [topicSlug, setTopicSlug] = useState<string | undefined>();
+  const { data: topics = [] } = useTopicsList();
+  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useExploreRecentScreen(
+    { topicSlug },
+  );
   const rawItems = data?.pages.flatMap((p) => p.items) ?? [];
-  const items = groupFeedItems(filterFeedItems(rawItems, searchQuery));
+  const items = groupFeedItems(rawItems);
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<GroupedFeedItem>) =>
@@ -188,41 +162,42 @@ export function ExploreRecentScreen({
     [onNavigateToListing, onNavigateToScholar],
   );
 
-  const headerSearchOptions = {
-    headerSearchBarOptions: {
-      placeholder: t("explore.searchRecent", "Search recent audios..."),
-      onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
-      onCancelButtonPress: () => setSearchQuery(""),
-      ...getThemedSearchBarOptions(theme),
-    },
-  };
-
-  if (items.length === 0) {
-    return (
-      <ExploreRecentStatus
-        headerSearchOptions={headerSearchOptions}
-        isError={isError}
-        isFetching={isFetching}
-        hasItems={items.length > 0}
-        t={t}
-        refetch={refetch}
-      />
-    );
-  }
-
   return (
-    <View style={styles.screen}>
-      <Stack.Screen options={headerSearchOptions} />
-      <FlatList
-        data={items}
-        keyExtractor={getItemKey}
-        renderItem={renderItem}
-        onEndReached={() => hasNextPage && fetchNextPage()}
-        onEndReachedThreshold={0.5}
-        contentContainerStyle={styles.listContent}
-        ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
-      />
-    </View>
+    <ScreenView>
+      <RootScreenHeader title={t("explore.title", "Explore")} />
+      <View style={styles.filterSection}>
+        <AppText variant="titleMd">{t("explore.exploreByTopic", "Explore by topic")}</AppText>
+        <AppText variant="bodySm" colorRole="muted">
+          {t("explore.exploreByTopicDescription", "Choose a topic to shape your study feed.")}
+        </AppText>
+        <SearchFilter
+          value={topicSlug ? [topicSlug] : []}
+          onChange={(value) => setTopicSlug(value[0])}
+          topics={topics}
+        />
+      </View>
+      <View style={styles.screen}>
+        {items.length === 0 ? (
+          <ExploreRecentStatus
+            isError={isError}
+            isFetching={isFetching}
+            hasItems={false}
+            t={t}
+            refetch={refetch}
+          />
+        ) : (
+          <FlatList
+            data={items}
+            keyExtractor={getItemKey}
+            renderItem={renderItem}
+            onEndReached={() => hasNextPage && fetchNextPage()}
+            onEndReachedThreshold={0.5}
+            contentContainerStyle={styles.listContent}
+            ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
+          />
+        )}
+      </View>
+    </ScreenView>
   );
 }
 
@@ -232,7 +207,11 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surface.canvas,
   },
   listContent: {
-    padding: theme.spacing.scale.md,
+    paddingVertical: theme.spacing.scale.md,
     gap: theme.spacing.scale.md,
+  },
+  filterSection: {
+    gap: theme.spacing.scale.xs,
+    paddingBottom: theme.spacing.scale.sm,
   },
 }));

@@ -4,7 +4,7 @@ import { useUnistyles } from "react-native-unistyles";
 
 import { RouteAccessGuard } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { BottomAccessoryInnerContent } from "@/features/navigation";
+import { BottomAccessoryContent } from "@/features/navigation/components/BottomAccessory/BottomAccessoryContent";
 
 /** Defines the Expo Router entrypoint for the native (tabs) route and delegates behavior to the feature layer. */
 /** Renders the native tabs layout surface and coordinates its user-facing state. */
@@ -70,7 +70,7 @@ export default function TabsLayout() {
 
         {Platform.OS === "ios" ? (
           <NativeTabs.BottomAccessory>
-            <BottomAccessoryInnerContent />
+            <BottomAccessoryContent />
           </NativeTabs.BottomAccessory>
         ) : null}
       </NativeTabs>

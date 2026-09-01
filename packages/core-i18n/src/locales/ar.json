@@ -284,7 +284,11 @@
     "filterAllAria": "عرض جميع العناصر",
     "filterByAria": "تصفية حسب {{label}}",
     "filterRemoveAria": "إزالة تصفية {{label}}",
-    "enterQuery": "أدخل كلمة بحث للبدء"
+    "enterQuery": "أدخل كلمة بحث للبدء",
+    "title": "بحث",
+    "lectureCount": "{{count}} محاضرات",
+    "durationHours": "{{hours}}س {{minutes}}د",
+    "durationMinutes": "{{minutes}}د"
   },
   "myLibrary": {
     "title": "مكتبتي",

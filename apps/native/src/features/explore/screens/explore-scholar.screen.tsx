@@ -3,15 +3,14 @@ import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useInfiniteScholarsList } from "@sd/domain-content";
-import { Stack } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FlatList, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
-import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { ScreenView } from "@/shared/ui";
+import { RootScreenHeader } from "@/features/navigation";
+import { AppText, NativeButton, NativeFormField, ScreenView } from "@/shared/ui";
 
 import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
 import {
@@ -25,10 +24,7 @@ export type ExploreScholarScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
-type StackScreenOptions = React.ComponentProps<typeof Stack.Screen>["options"];
-
 function ExploreScholarStatus({
-  headerSearchOptions,
   isError,
   isFetching,
   hasItems,
@@ -36,7 +32,6 @@ function ExploreScholarStatus({
   t,
   refetch,
 }: {
-  headerSearchOptions: StackScreenOptions;
   /** Indicates that the associated request or operation failed and should render its error state. */
   isError: boolean;
   isFetching: boolean;
@@ -47,31 +42,18 @@ function ExploreScholarStatus({
 }) {
   if (isError && !hasItems) {
     return (
-      <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
-        <ExploreStatusView
-          message={getErrorStateText("feed", t)}
-          onRetry={refetch}
-          retryLabel={t("feed.retry", "Try Again")}
-        />
-      </ScreenView>
+      <ExploreStatusView
+        message={getErrorStateText("feed", t)}
+        onRetry={refetch}
+        retryLabel={t("feed.retry", "Try Again")}
+      />
     );
   }
   if (isFetching && !hasItems) {
-    return (
-      <View style={styles.screen}>
-        <Stack.Screen options={headerSearchOptions} />
-        <ExploreSkeleton />
-      </View>
-    );
+    return <ExploreSkeleton />;
   }
   if (!hasItems) {
-    return (
-      <ScreenView center>
-        <Stack.Screen options={headerSearchOptions} />
-        <ExploreStatusView message={emptyMessage} />
-      </ScreenView>
-    );
+    return <ExploreStatusView message={emptyMessage} />;
   }
   return null;
 }
@@ -88,15 +70,17 @@ function filterScholars(scholars: ScholarListItemDto[], searchQuery: string) {
 /** Renders the native explore scholar screen surface and coordinates its user-facing state. */
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
-  const { theme } = useUnistyles();
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
     useInfiniteScholarsList();
 
-  const allScholars = data?.pages.flatMap((p) => p.items) ?? [];
+  const allScholars = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data?.pages]);
 
-  const filteredScholars = filterScholars(allScholars, searchQuery);
+  const filteredScholars = useMemo(
+    () => filterScholars(allScholars, searchQuery),
+    [allScholars, searchQuery],
+  );
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<ScholarListItemDto>) => (
@@ -105,56 +89,71 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     [onNavigateToScholar],
   );
 
-  const headerSearchOptions = {
-    headerSearchBarOptions: {
-      placeholder: t("scholarContent.searchScholars", "Search scholars..."),
-      onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
-      onCancelButtonPress: () => setSearchQuery(""),
-      ...getThemedSearchBarOptions(theme),
-    },
-  };
-
-  if (filteredScholars.length === 0) {
-    return (
-      <ExploreScholarStatus
-        headerSearchOptions={headerSearchOptions}
-        isError={isError}
-        isFetching={isFetching}
-        hasItems={filteredScholars.length > 0}
-        emptyMessage={
-          searchQuery
-            ? t("scholarContent.searchNoMatch", "No scholars match your search.")
-            : getEmptyStateText("feed", t)
-        }
-        t={t}
-        refetch={refetch}
-      />
-    );
-  }
-
   return (
-    <View style={styles.screen}>
-      <Stack.Screen options={headerSearchOptions} />
-      <View style={styles.listCard}>
-        <FlatList
-          data={filteredScholars}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          onEndReached={() => hasNextPage && fetchNextPage()}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
-        />
+    <ScreenView>
+      <RootScreenHeader title={t("explore.scholarsTitle", "Scholars")} />
+      <NativeFormField
+        label={t("scholarContent.searchScholars", "Search scholars...")}
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        placeholder={t("scholarContent.searchScholars", "Search scholars...")}
+        testID="native-scholar-search-input"
+      />
+      <View style={styles.intro}>
+        <AppText variant="bodySm" colorRole="muted">
+          {t("scholarContent.searchDescription", "Browse scholars and find their latest lessons.")}
+        </AppText>
       </View>
-    </View>
+      {filteredScholars.length === 0 ? (
+        <View style={styles.status}>
+          <ExploreScholarStatus
+            isError={isError}
+            isFetching={isFetching}
+            hasItems={false}
+            emptyMessage={
+              searchQuery
+                ? t("scholarContent.searchNoMatch", "No scholars match your search.")
+                : getEmptyStateText("feed", t)
+            }
+            t={t}
+            refetch={refetch}
+          />
+        </View>
+      ) : (
+        <>
+          <View style={styles.listCard}>
+            <FlatList
+              data={filteredScholars}
+              keyExtractor={(item) => item.id}
+              renderItem={renderItem}
+              onEndReached={() => hasNextPage && fetchNextPage()}
+              onEndReachedThreshold={0.5}
+              ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
+            />
+          </View>
+          {hasNextPage ? (
+            <NativeButton
+              label={t("common.loadMore", "Load more")}
+              loading={isFetching}
+              onPress={() => void fetchNextPage()}
+            />
+          ) : null}
+        </>
+      )}
+    </ScreenView>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  screen: {
+  status: {
     flex: 1,
-    backgroundColor: theme.colors.surface.canvas,
+    justifyContent: "center",
+  },
+  intro: {
+    paddingBottom: theme.spacing.scale.sm,
   },
   listCard: {
-    margin: theme.spacing.scale.md,
+    flex: 1,
+    marginVertical: theme.spacing.scale.md,
   },
 }));

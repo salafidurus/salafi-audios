@@ -5,6 +5,7 @@ import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { MyLibraryItemRow } from "@/features/my-library/components/my-library-item-row/my-library-item-row";
+import { RootScreenHeader } from "@/features/navigation";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { ScreenView } from "@/shared/ui";
 
@@ -33,30 +34,37 @@ export function MyLibraryScreen({ onNavigateToListing }: MyLibraryScreenProps) {
 
   if (isFetching && items.length === 0) {
     return (
-      <ScreenView center>
-        <EmptyState
-          message={t("myLibrary.loadingSection", "Loading {{section}}…", {
-            section: t("myLibrary.inProgress", "In Progress"),
-          })}
-          variant="loading"
-        />
+      <ScreenView>
+        <RootScreenHeader title={t("myLibrary.inProgress", "In Progress")} />
+        <View style={styles.status}>
+          <EmptyState
+            message={t("myLibrary.loadingSection", "Loading {{section}}…", {
+              section: t("myLibrary.inProgress", "In Progress"),
+            })}
+            variant="loading"
+          />
+        </View>
       </ScreenView>
     );
   }
 
   if (items.length === 0) {
     return (
-      <ScreenView center>
-        <EmptyState
-          message={t("myLibrary.emptyProgress", "No lectures in progress.")}
-          variant="empty"
-        />
+      <ScreenView>
+        <RootScreenHeader title={t("myLibrary.inProgress", "In Progress")} />
+        <View style={styles.status}>
+          <EmptyState
+            message={t("myLibrary.emptyProgress", "No lectures in progress.")}
+            variant="empty"
+          />
+        </View>
       </ScreenView>
     );
   }
 
   return (
     <ScreenView>
+      <RootScreenHeader title={t("myLibrary.inProgress", "In Progress")} />
       <ScrollView contentContainerStyle={styles.listContent}>
         <View>
           {items.map((item) => (
@@ -95,5 +103,9 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.layout.pageX,
     paddingVertical: theme.spacing.layout.pageY,
     paddingBottom: theme.spacing.scale["2xl"],
+  },
+  status: {
+    flex: 1,
+    justifyContent: "center",
   },
 }));

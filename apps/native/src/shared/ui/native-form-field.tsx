@@ -1,4 +1,4 @@
-import { Column, TextInput, useNativeState, type TextInputProps } from "@expo/ui";
+import { Column, Host, TextInput, useNativeState, type TextInputProps } from "@expo/ui";
 import { useEffect } from "react";
 import { useUnistyles } from "react-native-unistyles";
 
@@ -34,30 +34,32 @@ export function NativeFormField({
   }, [value]);
 
   return (
-    <Column spacing={theme.spacing.scale.sm}>
-      <NativeText variant="labelMd" colorRole="strong">
-        {label}
-      </NativeText>
-      <TextInput
-        {...props}
-        value={nativeValue}
-        style={{
-          paddingHorizontal: theme.spacing.scale.lg,
-          paddingVertical: theme.spacing.scale.md,
-          borderRadius: theme.radius.component.chip,
-          borderWidth: theme.border.width.default,
-          borderColor: error ? theme.colors.state.danger : theme.colors.border.default,
-          backgroundColor: theme.colors.surface.default,
-          ...style,
-        }}
-        textStyle={{
-          ...theme.typography.bodyMd,
-          color: theme.colors.content.default,
-          ...textStyle,
-        }}
-      />
-      {error ? <NativeText colorRole="danger">{error}</NativeText> : null}
-      {!error && helperText ? <NativeText colorRole="muted">{helperText}</NativeText> : null}
-    </Column>
+    <Host>
+      <Column spacing={theme.spacing.scale.sm}>
+        <NativeText variant="labelMd" colorRole="strong">
+          {label}
+        </NativeText>
+        <TextInput
+          {...props}
+          value={nativeValue}
+          style={{
+            paddingHorizontal: theme.spacing.scale.lg,
+            paddingVertical: theme.spacing.scale.md,
+            borderRadius: theme.radius.component.chip,
+            borderWidth: theme.border.width.default,
+            borderColor: error ? theme.colors.state.danger : theme.colors.border.default,
+            backgroundColor: theme.colors.surface.default,
+            ...style,
+          }}
+          textStyle={{
+            ...theme.typography.bodyMd,
+            color: theme.colors.content.default,
+            ...textStyle,
+          }}
+        />
+        {error ? <NativeText colorRole="danger">{error}</NativeText> : null}
+        {!error && helperText ? <NativeText colorRole="muted">{helperText}</NativeText> : null}
+      </Column>
+    </Host>
   );
 }
