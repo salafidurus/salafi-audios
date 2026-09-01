@@ -65,6 +65,10 @@ updates:
       # @react-native-async-storage/async-storage — tied to Expo SDK
       # managed workflow; independent bumps break native builds.
       - dependency-name: "@react-native-async-storage/*"
+      # FlashList follows the Expo SDK compatibility pipeline because Expo
+      # Doctor pins its preferred version, while the native app may carry a
+      # newer compatible minor release.
+      - dependency-name: "@shopify/flash-list"
 
     # ── Groups ───────────────────────────────────
     groups:

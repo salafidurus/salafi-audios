@@ -33,6 +33,7 @@ const expoPackages = [
   "@react-navigation/*",
   "@sentry/*",
   "@react-native-async-storage/*",
+  "@shopify/flash-list",
 ];
 
 /** Canonical typed ownership policy for auxiliary dependency automation. */
