@@ -33,7 +33,7 @@ type HeroItem = {
   scholarTitle?: string;
   format: FeedContentItemDto["kind"] | RecentProgressDto["format"];
   artworkUrl?: string;
-  scholarImageUrl?: string;
+  scholarImageUrl?: string | null;
 };
 
 function getHeroItem(
@@ -296,7 +296,7 @@ function HeroContent({
 
 type HeroArtworkProps = {
   artworkUrl?: string;
-  scholarImageUrl?: string;
+  scholarImageUrl?: string | null;
   scholarName: string;
 };
 

@@ -59,6 +59,7 @@ const baseItem: FeedContentItemDto = {
   slug: "importance-of-sunnah",
   scholarName: "Ibn Uthaymeen",
   scholarSlug: "ibn-uthaymeen",
+  scholarImageUrl: null,
   thumbnailUrl: null,
   durationSeconds: 1800,
   publishedAt: "2026-07-04T00:00:00.000Z",
