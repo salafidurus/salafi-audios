@@ -1,4 +1,5 @@
 import { Host } from "@expo/ui";
+import { useCallback } from "react";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -14,6 +15,9 @@ export type SearchResultItemProps = {
   /** Stores the media duration used by playback and progress presentation. */
   durationSeconds?: number;
   onPress?: () => void;
+  /** Identifies the listing passed to the stable navigation callback on activation. */
+  listingSlug?: string;
+  onNavigateToListing?: (slug: string) => void;
 };
 
 /**
@@ -29,8 +33,17 @@ export function SearchResultItem({
   lectureCount,
   durationSeconds,
   onPress,
+  listingSlug,
+  onNavigateToListing,
 }: SearchResultItemProps) {
   const { t } = useTranslation();
+  const handlePress = useCallback(() => {
+    if (listingSlug && onNavigateToListing) {
+      onNavigateToListing(listingSlug);
+      return;
+    }
+    onPress?.();
+  }, [listingSlug, onNavigateToListing, onPress]);
   const durationLabel = formatDuration(durationSeconds, t);
   const supportingText = [scholarName, formatLectureCount(lectureCount, t), durationLabel]
     .filter(Boolean)
@@ -53,7 +66,7 @@ export function SearchResultItem({
             <NativeIcon name="music" colorRole="muted" />
           )
         }
-        onPress={onPress}
+        onPress={handlePress}
         testID="native-list-item"
       >
         {null}

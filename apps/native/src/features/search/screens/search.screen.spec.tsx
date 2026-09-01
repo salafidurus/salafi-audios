@@ -20,10 +20,21 @@ jest.mock("../components/SearchFilter/SearchFilter", () => ({
 }));
 
 jest.mock("../components/SearchResultItem/SearchResultItem", () => ({
-  SearchResultItem: ({ title, onPress }: { title: string; onPress?: () => void }) => {
+  SearchResultItem: ({
+    title,
+    listingSlug,
+    onNavigateToListing,
+  }: {
+    title: string;
+    listingSlug?: string;
+    onNavigateToListing?: (slug: string) => void;
+  }) => {
     const { Pressable, Text } = jest.requireActual<typeof import("react-native")>("react-native");
     return (
-      <Pressable accessibilityRole="button" onPress={onPress}>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => listingSlug && onNavigateToListing?.(listingSlug)}
+      >
         <Text>{title}</Text>
       </Pressable>
     );

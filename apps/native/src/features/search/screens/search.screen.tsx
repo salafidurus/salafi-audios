@@ -1,4 +1,5 @@
 import { useSearchProcessing } from "@sd/domain-search";
+import { useCallback } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -8,7 +9,10 @@ import { AppText, NativeFormField, ScreenView } from "@/shared/ui";
 
 import { SearchFilter } from "../components/SearchFilter/SearchFilter";
 import { SearchResultItem } from "../components/SearchResultItem/SearchResultItem";
-import { SearchResultsList } from "../components/SearchResultsList/SearchResultsList";
+import {
+  SearchResultsList,
+  type SearchResultRow,
+} from "../components/SearchResultsList/SearchResultsList";
 
 /**
  * Provides the pushed global Search screen for public catalog discovery.
@@ -71,6 +75,24 @@ export function SearchScreen({ onNavigateToListing }: SearchScreenProps) {
     shouldSearch,
     errorMessage,
   } = useSearchProcessing({ showOriginal });
+  const handleListingPress = useCallback(
+    (slug: string) => onNavigateToListing?.(slug),
+    [onNavigateToListing],
+  );
+  const renderSearchResult = useCallback(
+    (item: SearchResultRow) => (
+      <SearchResultItem
+        title={item.title}
+        scholarName={item.scholarName}
+        imageUrl={item.imageUrl}
+        lectureCount={item.lectureCount}
+        durationSeconds={item.durationSeconds}
+        listingSlug={item.slug}
+        onNavigateToListing={handleListingPress}
+      />
+    ),
+    [handleListingPress],
+  );
 
   return (
     <ScreenView>
@@ -95,16 +117,7 @@ export function SearchScreen({ onNavigateToListing }: SearchScreenProps) {
               isFetching={isFetching}
               shouldSearch={shouldSearch}
               errorMessage={errorMessage}
-              renderItem={(item) => (
-                <SearchResultItem
-                  title={item.title}
-                  scholarName={item.scholarName}
-                  imageUrl={item.imageUrl}
-                  lectureCount={item.lectureCount}
-                  durationSeconds={item.durationSeconds}
-                  onPress={() => onNavigateToListing?.(item.slug)}
-                />
-              )}
+              renderItem={renderSearchResult}
             />
           ) : (
             <PopularSearches onSelect={setQuery} t={t} />
