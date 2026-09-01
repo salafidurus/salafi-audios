@@ -163,7 +163,7 @@
         "react-native-unistyles": "^3.1.1",
         "react-native-web": "~0.21.2",
         "react-native-worklets": "0.10.1",
-        "vexo-analytics": "^1.11.0",
+        "vexo-analytics": "^1.12.0",
         "zod": "catalog:",
         "zustand": "catalog:",
       },
@@ -1560,6 +1560,8 @@
     "@sd/domain-content": ["@sd/domain-content@workspace:packages/domain-content"],
 
     "@sd/domain-search": ["@sd/domain-search@workspace:packages/domain-search"],
+
+    "@sd/scripts": ["@sd/scripts@workspace:scripts"],
 
     "@sd/utils-error": ["@sd/utils-error@workspace:packages/utils-error"],
 
@@ -4091,7 +4093,7 @@
 
     "version-range": ["version-range@4.15.0", "", {}, "sha512-Ck0EJbAGxHwprkzFO966t4/5QkRuzh+/I1RxhLgUKKwEn+Cd8NwM60mE3AqBZg5gYODoXW0EFsQvbZjRlvdqbg=="],
 
-    "vexo-analytics": ["vexo-analytics@1.11.0", "", { "dependencies": { "async-mutex": "^0.5.0", "react-native-url-polyfill": "^4.0.0", "react-native-uuid": "^2.0.4" }, "peerDependencies": { "@react-navigation/native": ">= 5.1.5", "react": "*", "react-native": "*" }, "optionalPeers": ["@react-navigation/native"], "bin": { "vexo-upload-sourcemaps": "scripts/upload-sourcemaps.js" } }, "sha512-CWjfoAFBEfs1QlTQGv7Wk9Ovsrvgfwq43lI4JPY8zRbd39JtAo9tc1ZhvHTLiSLWQbM4jcQScITgr7Rz42KevQ=="],
+    "vexo-analytics": ["vexo-analytics@1.12.0", "", { "dependencies": { "async-mutex": "^0.5.0", "react-native-url-polyfill": "^4.0.0", "react-native-uuid": "^2.0.4" }, "peerDependencies": { "@react-navigation/native": ">= 5.1.5", "react": "*", "react-native": "*" }, "optionalPeers": ["@react-navigation/native"], "bin": { "vexo-upload-sourcemaps": "scripts/upload-sourcemaps.js" } }, "sha512-z7JNSbfd09lFgMj9UNdF7uXnXZmWNkSAZBLRGoRdZqPWsSeh63OFwTFdmdLelWXJTKexvcqXDoQdXqarvtXGVA=="],
 
     "vlq": ["vlq@1.0.1", "", {}, "sha512-gQpnTgkubC6hQgdIcRdYGDSDc+SaujOdyesZQMv6JlfQee/9Mp0Qhnys6WxDWvQnL5WZdT7o2Ul187aSt0Rq+w=="],
 
