@@ -12,6 +12,7 @@ const baseItem: FeedContentItemDto = {
   slug: "test-lecture",
   scholarName: "Scholar Name",
   scholarSlug: "scholar-name",
+  scholarImageUrl: null,
   thumbnailUrl: null,
   durationSeconds: 1800,
   publishedAt: "2026-06-20T10:00:00Z",

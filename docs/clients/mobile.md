@@ -60,6 +60,23 @@ is active.
 
 This means mobile now uses Expo Router tabs for peer-root navigation, with app-local chrome layered over them for product-specific visuals.
 
+### Home study surface
+
+Home is the mobile study landing surface. Its public sections use the same
+Catalog semantics as web: discovery, scholars, recently added material, and
+curated promotions. Public sections remain available to anonymous listeners
+and are queried independently from personal state.
+
+Continue Listening is shown only after authentication resolves and only when
+the authenticated unfinished-progress projection exists. It is not inferred
+from Catalog data. Local playback progress may update the displayed position
+immediately while the existing synchronization layer reconciles durable state.
+
+Home does not cache the Catalog for offline use. Mobile continuity comes from
+the existing downloaded-audio registry and local-first progress behavior; a
+network failure must render a localized recoverable state rather than inventing
+an offline Catalog result.
+
 ## 4. Offline and Sync Principles
 
 Offline support is implemented for selected personal listening state and

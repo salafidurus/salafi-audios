@@ -1,11 +1,10 @@
 import { useProgressStore } from "@sd/domain-audio";
-import { useExploreRecentScreen } from "@sd/domain-content";
+import { useExploreRecentScreen, useHomePromotions } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
 import { act, render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
 
-import { useHomePromotions } from "../../hooks/use-home-promotions";
 import { HomeScreen } from "./home.screen";
 
 const mockUseAuth = vi.fn();
@@ -63,14 +62,11 @@ vi.mock("@sd/domain-search", () => ({
 vi.mock("@sd/domain-content", () => ({
   useInfiniteScholarsList: () => ({ data: undefined }),
   useExploreRecentScreen: vi.fn(),
+  useHomePromotions: vi.fn(),
 }));
 
 vi.mock("@/core/auth", () => ({
   useAuth: mockUseAuth,
-}));
-
-vi.mock("../../hooks/use-home-promotions", () => ({
-  useHomePromotions: vi.fn(),
 }));
 
 describe("HomeScreen", () => {

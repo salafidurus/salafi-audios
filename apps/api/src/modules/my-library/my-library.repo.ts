@@ -3,6 +3,7 @@ import { Prisma } from '@sd/core-db';
 import type {
   Locale,
   ListingFormat,
+  ScholarTitle,
   MyLibraryItemDto,
   RecentProgressDto,
   ListingProgressSummaryDto,
@@ -25,6 +26,10 @@ type ProgressBucket = {
   /** Documents the latestUpdatedAt field's API projection semantics and lifecycle meaning. */ latestUpdatedAt: Date;
   summary: ListingProgressSummaryDto;
 };
+
+function optionalScholarTitle(title: ScholarTitle | null | undefined): ScholarTitle | undefined {
+  return title ?? undefined;
+}
 
 type RecentParent = {
   id: string;
@@ -54,6 +59,7 @@ type RecentProgressRecord = {
     scholar: {
       /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
       name: string;
+      title?: ScholarTitle | null;
       /** Documents the mainLanguage field's API projection semantics and lifecycle meaning. */ mainLanguage: Locale | null;
       imageUrl: string | null;
       translations: { name: string }[];
@@ -494,6 +500,7 @@ export class MyLibraryRepository {
               select: {
                 slug: true,
                 name: true,
+                title: true,
                 mainLanguage: true,
                 imageUrl: true,
                 translations: {
@@ -574,6 +581,7 @@ export class MyLibraryRepository {
       publishedLectureCount: scalars.publishedLectureCount,
       scholarName,
       scholarSlug: record.listing.scholar.slug,
+      scholarTitle: optionalScholarTitle(record.listing.scholar.title),
       durationSeconds: scalars.durationSeconds,
       positionSeconds: record.positionSeconds,
       artworkUrl: getRecentArtworkUrl(artworkKey, (value) => this.toPublicUrl(value)),
