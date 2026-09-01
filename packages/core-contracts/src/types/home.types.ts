@@ -97,6 +97,7 @@ export const RecentProgressDtoSchema = z.object({
   publishedLectureCount: z.number().optional(),
   scholarName: z.string(),
   scholarSlug: z.string(),
+  scholarTitle: ScholarTitleSchema.optional(),
   durationSeconds: z.number(),
   positionSeconds: z.number(),
   artworkUrl: z.string().optional(),

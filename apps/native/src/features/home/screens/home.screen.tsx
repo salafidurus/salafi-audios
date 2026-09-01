@@ -1,7 +1,12 @@
 import type { FeedContentItemDto, RecentProgressDto, ScholarListItemDto } from "@sd/core-contracts";
 
 import { useProgressStore } from "@sd/domain-audio";
-import { useExploreRecentScreen, useHomePromotions, useScholarsList } from "@sd/domain-content";
+import {
+  useExploreRecentScreen,
+  formatScholarName,
+  useHomePromotions,
+  useScholarsList,
+} from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
 import { useCallback, useMemo } from "react";
 import { FlatList, ScrollView, Pressable, View } from "react-native";
@@ -10,6 +15,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 import { AppText, ScreenView } from "@/shared/ui";
 
 /** Provides the native Home study surface and its public/personal content sections. */
@@ -22,15 +28,78 @@ export type HomeScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
+/** Resolves Home artwork while preserving the product's image fallback order. */
+export function resolveHomeAvatarImage(
+  primary?: string | null,
+  secondary?: string | null,
+): string | undefined {
+  return [primary, secondary].find((image) => Boolean(image?.trim())) ?? undefined;
+}
+
 function ContentCard({ item, onPress }: { item: FeedContentItemDto; onPress?: () => void }) {
+  const { t } = useTranslation();
+
   return (
-    <Pressable onPress={onPress} style={styles.contentCard} testID={`home-content-${item.slug}`}>
-      <AppText variant="titleMd" numberOfLines={2}>
-        {item.title}
-      </AppText>
-      <AppText variant="caption" colorRole="muted">
-        {item.scholarName}
-      </AppText>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${item.title}, ${item.scholarName}`}
+      onPress={onPress}
+      style={({ pressed }) => [styles.contentCard, pressed && styles.pressedCard]}
+      testID={`home-content-${item.slug}`}
+    >
+      <UserAvatar
+        image={resolveHomeAvatarImage(item.thumbnailUrl, item.scholarImageUrl)}
+        name={item.title}
+        size={56}
+        testID={`home-content-image-${item.slug}`}
+      />
+      <View style={styles.cardCopy}>
+        <AppText variant="titleMd" numberOfLines={2} style={styles.listingTitle}>
+          {item.title}
+        </AppText>
+        <AppText variant="caption" colorRole="muted" numberOfLines={2}>
+          {formatScholarName(item.scholarName, item.scholarTitle, t)}
+        </AppText>
+      </View>
+    </Pressable>
+  );
+}
+
+function ListingImageCard({
+  item,
+  onPress,
+  testID,
+}: {
+  item: FeedContentItemDto;
+  onPress?: () => void;
+  testID: string;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${item.title}, ${item.scholarName}`}
+      onPress={onPress}
+      style={({ pressed }) => [styles.featuredCard, pressed && styles.pressedFeaturedCard]}
+      testID={testID}
+    >
+      <View style={styles.featuredMedia}>
+        <UserAvatar
+          image={resolveHomeAvatarImage(item.thumbnailUrl, item.scholarImageUrl)}
+          name={item.title}
+          fill
+          testID={`home-featured-image-${item.slug}`}
+        />
+      </View>
+      <View style={styles.featuredCopy}>
+        <AppText variant="titleMd" colorRole="strong" numberOfLines={2} style={styles.listingTitle}>
+          {item.title}
+        </AppText>
+        <AppText variant="bodySm" colorRole="muted" numberOfLines={2}>
+          {formatScholarName(item.scholarName, item.scholarTitle, t)}
+        </AppText>
+      </View>
     </Pressable>
   );
 }
@@ -43,15 +112,25 @@ function ScholarCard({
   onSelect?: (slug: string) => void;
 }) {
   const handlePress = useCallback(() => onSelect?.(scholar.slug), [onSelect, scholar.slug]);
+  const { t } = useTranslation();
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={scholar.name}
       onPress={handlePress}
-      style={styles.scholarCard}
+      style={({ pressed }) => [styles.scholarCard, pressed && styles.pressedCard]}
       testID={`home-scholar-${scholar.slug}`}
     >
-      <AppText variant="labelMd" numberOfLines={2}>
-        {scholar.name}
+      <View style={styles.scholarImage}>
+        <UserAvatar image={scholar.imageUrl} name={scholar.name} fill />
+      </View>
+      <AppText
+        variant="labelMd"
+        numberOfLines={3}
+        style={[styles.scholarDetails, styles.listingTitle]}
+      >
+        {formatScholarName(scholar, undefined, t)}
       </AppText>
     </Pressable>
   );
@@ -68,7 +147,7 @@ function Section({
 }) {
   return (
     <View style={styles.section} testID={testID}>
-      <AppText variant="titleMd" colorRole="strong">
+      <AppText variant="titleLg" colorRole="strong">
         {title}
       </AppText>
       {children}
@@ -94,13 +173,37 @@ function ContinueListening({
       title={t("home.continue.title", "Continue Listening")}
       testID="home-continue-listening"
     >
-      <Pressable onPress={onPress} style={styles.resumeCard} testID="home-resume-listening">
-        <AppText variant="titleMd" numberOfLines={2}>
-          {progress.lectureTitle}
-        </AppText>
-        <AppText variant="caption" colorRole="muted">
-          {progress.scholarName} · {percent}%
-        </AppText>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${progress.lectureTitle}, ${percent}% listened`}
+        onPress={onPress}
+        style={({ pressed }) => [styles.resumeCard, pressed && styles.pressedResumeCard]}
+        testID="home-resume-listening"
+      >
+        <View style={styles.resumeBody}>
+          <UserAvatar
+            image={resolveHomeAvatarImage(progress.artworkUrl, progress.scholarImageUrl)}
+            name={progress.lectureTitle}
+            size={64}
+            testID="home-resume-image"
+          />
+          <View style={styles.resumeCopy}>
+            <AppText variant="titleMd" numberOfLines={2} style={styles.listingTitle}>
+              {progress.lectureTitle}
+            </AppText>
+            <AppText variant="caption" colorRole="muted" numberOfLines={1}>
+              {formatScholarName(progress.scholarName, progress.scholarTitle, t)}
+            </AppText>
+            <AppText variant="caption" colorRole="muted" numberOfLines={1}>
+              {percent}% listened
+            </AppText>
+          </View>
+        </View>
+        <View style={styles.progressTrack}>
+          <View
+            style={[styles.progressFill, { width: `${Math.min(100, Math.max(0, percent))}%` }]}
+          />
+        </View>
       </Pressable>
     </Section>
   );
@@ -152,9 +255,16 @@ function DiscoverySection({
 }) {
   const { t } = useTranslation();
   return (
-    <Section title={t("home.discovery.title", "Discovery")} testID="home-discovery-section">
+    <Section
+      title={t("home.discovery.title", "FEATURED FOR STUDY")}
+      testID="home-discovery-section"
+    >
       {item ? (
-        <ContentCard item={item} onPress={() => onPress?.(item.slug)} />
+        <ListingImageCard
+          item={item}
+          onPress={() => onPress?.(item.slug)}
+          testID={`home-featured-${item.slug}`}
+        />
       ) : (
         <EmptyState message={t("home.discovery.empty", "No lessons are available yet.")} />
       )}
@@ -273,17 +383,6 @@ function HomeSurface({
           emptyMessage={t("home.curated.empty", "Curated lessons will appear here soon.")}
           onPress={onNavigateToListing}
         />
-        <Section
-          title={t("home.mobile.title", "Keep your study close")}
-          testID="home-mobile-section"
-        >
-          <AppText colorRole="muted">
-            {t(
-              "home.mobile.description",
-              "Downloaded audio and local progress remain available for mobile continuity.",
-            )}
-          </AppText>
-        </Section>
       </ScrollView>
     </ScreenView>
   );
@@ -366,32 +465,85 @@ export function HomeScreen({ onNavigateToListing, onNavigateToScholar }: HomeScr
 }
 
 const styles = StyleSheet.create((theme) => ({
-  content: { paddingVertical: theme.spacing.layout.pageY, gap: theme.spacing.scale.lg },
-  header: { gap: theme.spacing.scale.sm },
-  section: { gap: theme.spacing.scale.sm },
+  content: { paddingVertical: theme.spacing.scale.xl, gap: theme.spacing.scale["3xl"] },
+  header: { gap: theme.spacing.scale.sm, paddingBottom: theme.spacing.scale.sm },
+  section: { gap: theme.spacing.scale.md },
+  eyebrow: { letterSpacing: 1.2 },
+  featuredCard: {
+    overflow: "hidden",
+    borderRadius: theme.radius.component.panel,
+    backgroundColor: theme.recipes.mixedPromotedPanel.backgroundColor,
+    borderWidth: theme.border.width.default,
+    borderColor: theme.recipes.mixedPromotedPanel.borderColor,
+  },
+  pressedFeaturedCard: { opacity: 0.9, transform: [{ scale: 0.985 }] },
+  featuredMedia: {
+    width: "100%",
+    aspectRatio: 1,
+    overflow: "hidden",
+    borderRadius: theme.radius.component.panelSm,
+    backgroundColor: theme.colors.surface.subtle,
+  },
+  featuredCopy: { gap: theme.spacing.scale.xs, padding: theme.spacing.scale.xl },
   contentCard: {
-    gap: theme.spacing.scale.xs,
+    minHeight: 84,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.md,
     padding: theme.spacing.scale.md,
     borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
     borderRadius: theme.radius.component.card,
     backgroundColor: theme.colors.surface.default,
   },
+  pressedCard: { backgroundColor: theme.colors.surface.hover },
+  cardCopy: { flex: 1, gap: theme.spacing.scale.xs },
+  listingTitle: { fontWeight: "600" },
+  inlineTextRow: { flexDirection: "row", alignItems: "center", gap: theme.spacing.scale.xs },
+  inlineTitle: { flexShrink: 1 },
+  inlineScholar: { flexShrink: 1 },
   resumeCard: {
-    gap: theme.spacing.scale.xs,
-    padding: theme.spacing.scale.md,
-    borderRadius: theme.radius.component.card,
+    gap: theme.spacing.scale.sm,
+    padding: theme.spacing.scale.xl,
+    borderRadius: theme.radius.component.panel,
     backgroundColor: theme.recipes.primarySubtleSurface.backgroundColor,
+    borderWidth: theme.border.width.default,
+    borderColor: theme.recipes.primarySubtleSurface.borderColor,
+  },
+  pressedResumeCard: { opacity: 0.9, transform: [{ scale: 0.985 }] },
+  resumeBody: { flexDirection: "row", alignItems: "center", gap: theme.spacing.scale.md },
+  resumeCopy: { flex: 1, gap: theme.spacing.scale.xs },
+  progressTrack: {
+    height: 6,
+    overflow: "hidden",
+    borderRadius: theme.radius.scale.full,
+    backgroundColor: theme.colors.surface.default,
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: theme.radius.scale.full,
+    backgroundColor: theme.colors.action.primary,
   },
   scholarCard: {
-    width: 120,
-    minHeight: 64,
-    justifyContent: "center",
-    padding: theme.spacing.scale.sm,
+    width: 136,
+    minHeight: 176,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: theme.spacing.scale.sm,
+    paddingBottom: theme.spacing.scale.md,
+    overflow: "hidden",
     borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
     borderRadius: theme.radius.component.card,
     backgroundColor: theme.colors.surface.default,
   },
+  scholarImage: {
+    width: "100%",
+    aspectRatio: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.surface.subtle,
+  },
+  scholarDetails: { paddingHorizontal: theme.spacing.scale.xs, textAlign: "center" },
   horizontalList: { gap: theme.spacing.scale.sm },
 }));

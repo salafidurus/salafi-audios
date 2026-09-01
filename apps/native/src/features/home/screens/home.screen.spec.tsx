@@ -1,10 +1,10 @@
 import { useExploreRecentScreen, useHomePromotions, useScholarsList } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
-import { render, screen, fireEvent } from "@testing-library/react-native";
+import { render, screen, fireEvent, within } from "@testing-library/react-native";
 
 import { useAuth } from "@/core/auth/use-auth";
 
-import { HomeScreen } from "./home.screen";
+import { HomeScreen, resolveHomeAvatarImage } from "./home.screen";
 
 jest.mock("@sd/domain-audio", () => ({
   useProgressStore: jest.fn((selector: (state: unknown) => unknown) =>
@@ -13,6 +13,11 @@ jest.mock("@sd/domain-audio", () => ({
 }));
 jest.mock("@sd/domain-search", () => ({ useContinueListening: jest.fn() }));
 jest.mock("@sd/domain-content", () => ({
+  formatScholarName: (scholar: string | { name: string; title?: string }, title?: string) => {
+    const name = typeof scholar === "string" ? scholar : scholar.name;
+    const scholarTitle = typeof scholar === "string" ? title : scholar.title;
+    return scholarTitle ? `${scholarTitle} ${name}` : name;
+  },
   useExploreRecentScreen: jest.fn(),
   useHomePromotions: jest.fn(),
   useScholarsList: jest.fn(),
@@ -70,6 +75,12 @@ beforeEach(() => {
 });
 
 describe("HomeScreen", () => {
+  it("resolves listing artwork before scholar artwork and leaves initials to UserAvatar", () => {
+    expect(resolveHomeAvatarImage("listing.jpg", "scholar.jpg")).toBe("listing.jpg");
+    expect(resolveHomeAvatarImage(null, "scholar.jpg")).toBe("scholar.jpg");
+    expect(resolveHomeAvatarImage("  ", "")).toBeUndefined();
+  });
+
   it("renders discovery, scholars, recent, curated, and mobile continuity sections", async () => {
     await render(<HomeScreen />);
 
@@ -77,7 +88,6 @@ describe("HomeScreen", () => {
     expect(screen.getByTestId("home-scholars-section")).toBeTruthy();
     expect(screen.getByTestId("home-recent-section")).toBeTruthy();
     expect(screen.getByTestId("home-curated-section")).toBeTruthy();
-    expect(screen.getByTestId("home-mobile-section")).toBeTruthy();
     expect(screen.queryByTestId("home-continue-listening")).toBeNull();
   });
 
@@ -112,6 +122,32 @@ describe("HomeScreen", () => {
     await fireEvent.press(screen.getByTestId("home-resume-listening"));
 
     expect(onNavigateToListing).toHaveBeenCalledWith("resume-lesson");
+  });
+
+  it("uses the featured section title and three-line continue listening hierarchy", async () => {
+    mockedAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, user: undefined });
+    mockedContinue.mockReturnValue({
+      recentProgress: {
+        lectureTitle: "Resume this lesson",
+        lectureSlug: "resume-lesson",
+        listingSlug: "resume-listing",
+        format: "series",
+        scholarName: "Scholar",
+        scholarSlug: "scholar",
+        durationSeconds: 100,
+        positionSeconds: 25,
+      },
+      data: null,
+      isLoading: false,
+    } as never);
+
+    await render(<HomeScreen />);
+
+    expect(screen.getByText("FEATURED FOR STUDY")).toBeTruthy();
+    expect(screen.getByText("Resume this lesson")).toBeTruthy();
+    expect(within(screen.getByTestId("home-resume-listening")).getByText("Scholar")).toBeTruthy();
+    expect(screen.getByText("25% listened")).toBeTruthy();
+    expect(screen.queryByText("PICK UP WHERE YOU LEFT OFF")).toBeNull();
   });
 
   it("renders a recoverable error when no public Home content is available", async () => {

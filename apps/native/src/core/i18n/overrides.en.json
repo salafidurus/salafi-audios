@@ -61,7 +61,7 @@
     "loading": "Loading your study space…",
     "error": "Home could not be loaded.",
     "continue": { "title": "Continue Listening" },
-    "discovery": { "title": "Discovery", "empty": "No lessons are available yet." },
+    "discovery": { "title": "FEATURED FOR STUDY", "empty": "No lessons are available yet." },
     "scholars": { "title": "Scholars" },
     "recent": {
       "title": "Recently Added",

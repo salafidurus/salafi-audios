@@ -64,8 +64,13 @@ export function NativeText({
         {...(props as RNTextProps)}
         numberOfLines={props.numberOfLines}
         onLayout={props.onLayout}
-        // SAFETY: the mapped UniversalTextStyle fields are all valid RN text-style fields.
-        style={[flattenedStyle, textStyle as RNTextProps["style"]]}
+        // SAFETY: the shared typography tokens and mapped UniversalTextStyle fields are valid RN text styles.
+        style={[
+          theme.typography[variant] as RNTextProps["style"],
+          { color: getTextColor(colorRole, theme) },
+          flattenedStyle,
+          textStyle as RNTextProps["style"],
+        ]}
       >
         {children}
       </RNText>
