@@ -13,7 +13,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { AppText, type AppTextProps } from "@/shared/components/AppText/AppText";
+import { NativeText as AppText, type NativeTextProps as AppTextProps } from "@/shared/ui";
 
 /** Provides a reusable native UI primitive with a focused rendering contract. */
 /** Describes the inputs, callbacks, and optional state accepted by Marquee Text. */

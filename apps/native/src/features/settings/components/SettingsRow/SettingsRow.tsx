@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { View, Pressable } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { AppText } from "@/shared/ui";
 
 /** Provides native account, preference, support, and settings workflows. */
 /** Describes the inputs, callbacks, and optional state accepted by Settings Row. */
@@ -69,19 +69,26 @@ export function SettingsRow({
 }: SettingsRowProps) {
   const isClickable = Boolean(onPress);
 
+  const content = (
+    <SettingsRowContent label={label} sublabel={sublabel} fullWidth={fullWidth} stacked={stacked}>
+      {children}
+    </SettingsRowContent>
+  );
+
+  if (!isClickable) {
+    return <View style={[styles.row, hideBorder && styles.noBorder]}>{content}</View>;
+  }
+
   return (
     <Pressable
       onPress={onPress}
-      disabled={!isClickable}
       style={({ pressed }) => [
         styles.row,
         hideBorder && styles.noBorder,
-        pressed && isClickable && styles.pressed,
+        pressed && styles.pressed,
       ]}
     >
-      <SettingsRowContent label={label} sublabel={sublabel} fullWidth={fullWidth} stacked={stacked}>
-        {children}
-      </SettingsRowContent>
+      {content}
     </Pressable>
   );
 }

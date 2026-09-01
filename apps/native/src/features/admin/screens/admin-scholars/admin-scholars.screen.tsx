@@ -1,4 +1,4 @@
-import type { ScholarListItemDto } from "@sd/core-contracts";
+import type { ScholarListDto } from "@sd/core-contracts";
 
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 import { Stack } from "expo-router";
@@ -7,10 +7,8 @@ import { ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { List } from "@/shared/components/List";
-import { MarqueeText } from "@/shared/components/MarqueeText";
+import { AppText, List, NativeBridgeHost } from "@/shared/ui";
 
 import { filterScholars } from "./filter-scholars";
 
@@ -22,12 +20,12 @@ type AdminScholarsScreenProps = {
 /** Renders the native admin scholars screen surface and coordinates its user-facing state. */
 export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreenProps) {
   const { theme } = useUnistyles();
-  const { data, isLoading } = useApiQuery<ScholarListItemDto[]>(["scholars", "list"], () =>
-    httpClient<ScholarListItemDto[]>({ url: endpoints.scholars.list, method: "GET" }),
+  const { data, isLoading } = useApiQuery<ScholarListDto>(["scholars", "list"], () =>
+    httpClient<ScholarListDto>({ url: endpoints.scholars.list, method: "GET" }),
   );
   const [searchQuery, setSearchQuery] = useState("");
 
-  const scholars = filterScholars(data ?? [], searchQuery);
+  const scholars = filterScholars(data?.scholars ?? [], searchQuery);
 
   const headerSearchOptions = {
     headerSearchBarOptions: {
@@ -39,32 +37,35 @@ export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreen
   };
 
   return (
-    <View style={styles.container}>
+    <>
       <Stack.Screen options={headerSearchOptions} />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <AppText variant="titleLg">Scholars</AppText>
+      <NativeBridgeHost testID="admin-scholars-host" matchContents={false}>
+        <View style={styles.container}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            {isLoading ? (
+              <EmptyState message="Loading…" variant="loading" />
+            ) : scholars.length === 0 ? (
+              <EmptyState message="No scholars found." variant="empty" />
+            ) : (
+              <List>
+                {scholars.map((item) => (
+                  <List.Item key={item.id} onPress={() => onNavigateToScholar(item.slug)}>
+                    <View style={styles.rowContent}>
+                      <AppText variant="bodyLg" style={styles.rowName}>
+                        {item.name}
+                      </AppText>
+                      <AppText variant="caption" style={styles.rowSlug}>
+                        @{item.slug}
+                      </AppText>
+                    </View>
+                  </List.Item>
+                ))}
+              </List>
+            )}
+          </ScrollView>
         </View>
-        {isLoading ? (
-          <EmptyState message="Loading…" variant="loading" />
-        ) : scholars.length === 0 ? (
-          <EmptyState message="No scholars found." variant="empty" />
-        ) : (
-          <List>
-            {scholars.map((item) => (
-              <List.Item key={item.id} onPress={() => onNavigateToScholar(item.slug)}>
-                <View style={styles.rowContent}>
-                  <MarqueeText text={item.name} variant="bodyMd" style={styles.rowName} />
-                  <AppText variant="caption" style={styles.rowSlug}>
-                    @{item.slug}
-                  </AppText>
-                </View>
-              </List.Item>
-            ))}
-          </List>
-        )}
-      </ScrollView>
-    </View>
+      </NativeBridgeHost>
+    </>
   );
 }
 
@@ -75,9 +76,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   scrollContent: {
     padding: theme.spacing.scale.md,
-  },
-  header: {
-    paddingVertical: theme.spacing.scale.md,
   },
   loadingText: {
     textAlign: "center",

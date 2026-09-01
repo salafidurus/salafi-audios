@@ -5,13 +5,11 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog/ConfirmDialog";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { AppText, ScreenView, TextInput } from "@/shared/ui";
 
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";

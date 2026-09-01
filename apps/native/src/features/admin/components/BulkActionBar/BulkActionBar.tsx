@@ -1,8 +1,7 @@
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
-import { Button } from "@/shared/components/Button/Button";
+import { AppText, Button } from "@/shared/ui";
 
 /** Provides authenticated native administration workflows and their data boundaries. */
 type BulkActionBarProps = {

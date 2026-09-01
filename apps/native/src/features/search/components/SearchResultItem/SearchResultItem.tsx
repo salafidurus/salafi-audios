@@ -1,10 +1,7 @@
-import { Image } from "expo-image";
-import { Clock3, Headphones } from "lucide-react-native";
-import { Pressable, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Host } from "@expo/ui";
+import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
-import { MarqueeText } from "@/shared/components/MarqueeText";
+import { List, NativeIcon, NativeImage } from "@/shared/ui";
 
 /** Implements native search input, filtering, results, and empty states. */
 /** Describes the inputs, callbacks, and optional state accepted by Search Result Item. */
@@ -18,7 +15,12 @@ export type SearchResultItemProps = {
   onPress?: () => void;
 };
 
-/** Defines the native search result item contract used by this module. */
+/**
+ * Renders one search result through the native list-row contract.
+ * Remote artwork remains an explicit RN image bridge because Expo UI has no
+ * universal remote-image primitive; result identity and activation remain
+ * owned by the caller through the existing title and press props.
+ */
 export function SearchResultItem({
   title,
   scholarName,
@@ -27,112 +29,48 @@ export function SearchResultItem({
   durationSeconds,
   onPress,
 }: SearchResultItemProps) {
-  const { theme } = useUnistyles();
   const durationLabel = formatDuration(durationSeconds);
+  const supportingText = [scholarName, formatLectureCount(lectureCount), durationLabel]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-    >
-      <View style={styles.row}>
-        <View style={styles.media}>
-          {imageUrl ? (
-            <Image source={{ uri: imageUrl }} style={styles.cover} contentFit="cover" />
+    <Host matchContents>
+      <List.Item
+        title={title}
+        supportingText={supportingText}
+        leading={
+          imageUrl ? (
+            <NativeImage
+              source={{ uri: imageUrl }}
+              style={styles.cover}
+              bridgeStyle={styles.media}
+              contentFit="cover"
+            />
           ) : (
-            <View style={styles.coverFallback}>
-              <Headphones size={20} color={theme.colors.content.subtle} />
-            </View>
-          )}
-        </View>
-        <View style={styles.body}>
-          <View>
-            <MarqueeText text={title} variant="titleMd" style={styles.title} />
-            <MarqueeText text={scholarName} variant="bodySm" style={styles.scholarName} />
-            <View style={styles.metaRow}>
-              <Headphones size={11} color={theme.colors.content.muted} />
-              <AppText variant="caption" style={styles.metaText}>
-                {formatLectureCount(lectureCount)}
-              </AppText>
-              {durationLabel ? (
-                <>
-                  <AppText variant="caption" style={styles.metaText}>
-                    {" "}
-                    ·{" "}
-                  </AppText>
-                  <Clock3 size={11} color={theme.colors.content.muted} />
-                  <AppText variant="caption" style={styles.metaText}>
-                    {durationLabel}
-                  </AppText>
-                </>
-              ) : null}
-            </View>
-          </View>
-        </View>
-      </View>
-    </Pressable>
+            <NativeIcon name="music" colorRole="muted" />
+          )
+        }
+        onPress={onPress}
+        testID="native-list-item"
+      >
+        {null}
+      </List.Item>
+    </Host>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  card: {
-    borderWidth: 1,
-    borderColor: theme.colors.border.subtle,
-    borderRadius: theme.radius.component.card,
-    backgroundColor: theme.colors.surface.default,
-    padding: theme.spacing.component.cardPadding,
-  },
-  cardPressed: {
-    opacity: 0.8,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.component.gapMd,
-    width: "100%",
-  },
   media: {
-    width: "20%",
-    aspectRatio: 4 / 5,
+    width: 48,
+    height: 60,
     borderRadius: theme.radius.component.panelSm,
     overflow: "hidden",
     backgroundColor: theme.colors.surface.subtle,
-    alignItems: "center",
-    justifyContent: "center",
   },
   cover: {
     width: "100%",
     height: "100%",
-  },
-  coverFallback: {
-    flex: 1,
-    width: "100%",
-    backgroundColor: theme.colors.surface.subtle,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  body: {
-    flex: 1,
-    gap: theme.spacing.scale.xs,
-    overflow: "hidden",
-  },
-  title: {
-    color: theme.colors.content.strong,
-    ...theme.typography.titleMd,
-  },
-  scholarName: {
-    color: theme.colors.content.muted,
-    ...theme.typography.bodySm,
-  },
-  metaRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.scale.xs,
-  },
-  metaText: {
-    color: theme.colors.content.muted,
-    ...theme.typography.caption,
   },
 }));
 

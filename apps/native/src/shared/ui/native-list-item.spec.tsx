@@ -1,8 +1,8 @@
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import { Text } from "react-native";
 
-import { ListItem } from "./ListItem";
-import { ListItemActions } from "./ListItemActions";
+import { ListItem } from "./native-list-item";
+import { ListItemActions } from "./native-list-item-actions";
 
 describe("ListItem", () => {
   it("uses the supported Expo UI ListItem row surface", async () => {

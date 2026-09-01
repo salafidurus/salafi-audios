@@ -1,28 +1,30 @@
 import { Host, Switch } from "@expo/ui";
-import { View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Text, View } from "react-native";
+import { useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
   setShowOriginalContent,
   useShowOriginalContent,
 } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
 
 /** Settings toggle that switches catalogue content (lectures, series,
  * collections) between the selected language and its original language. */
-/** Renders the native content language toggle surface and coordinates its user-facing state. */
+/** Toggles whether native content prefers the original source language. */
 export function ContentLanguageToggle() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const showOriginal = useShowOriginalContent();
-
   return (
-    <View style={styles.row}>
-      <AppText variant="bodySm" style={styles.label}>
-        {t("account.showOriginalContent", "Show content in its original language")}
-      </AppText>
-      <Host matchContents seedColor={theme.colors.action.primary}>
+    <View
+      style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.component.gapMd }}
+    >
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: 14, lineHeight: 20, color: theme.colors.content.strong }}>
+          {t("account.showOriginalContent", "Show content in its original language")}
+        </Text>
+      </View>
+      <Host matchContents>
         <Switch
           value={showOriginal}
           onValueChange={setShowOriginalContent}
@@ -32,17 +34,3 @@ export function ContentLanguageToggle() {
     </View>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: theme.spacing.component.gapMd,
-  },
-  label: {
-    flex: 1,
-    ...theme.typography.bodySm,
-    color: theme.colors.content.strong,
-  },
-}));

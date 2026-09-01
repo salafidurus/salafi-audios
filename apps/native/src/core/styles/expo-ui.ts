@@ -1,6 +1,8 @@
 import type { UniversalHostProps, UniversalStyle, UniversalTextStyle } from "@expo/ui";
 import type { TypographyVariant } from "@sd/design-tokens";
 
+import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
+
 import type { AppThemeNative } from "./theme";
 
 /** Defines the pure native theme conversion boundary for Expo UI universal components. */
@@ -17,6 +19,27 @@ export type UniversalHostPropsOutput = Pick<
 /** Converts supported native box values without admitting React Native layout styles. */
 export function toUniversalStyle(input: UniversalStyleInput): UniversalStyle {
   return { ...input };
+}
+
+/** Converts an RN style by retaining only the UniversalStyle keys supported by Expo UI. */
+export function toUniversalStyleFromRN(style: StyleProp<ViewStyle>): UniversalStyle {
+  const flattened = StyleSheet.flatten(style) ?? {};
+  return {
+    backgroundColor: flattened.backgroundColor,
+    borderColor: flattened.borderColor,
+    borderRadius: flattened.borderRadius,
+    borderWidth: flattened.borderWidth,
+    height: flattened.height,
+    opacity: flattened.opacity,
+    padding: flattened.padding,
+    paddingBottom: flattened.paddingBottom,
+    paddingHorizontal: flattened.paddingHorizontal,
+    paddingLeft: flattened.paddingLeft,
+    paddingRight: flattened.paddingRight,
+    paddingTop: flattened.paddingTop,
+    paddingVertical: flattened.paddingVertical,
+    width: Number.isFinite(flattened.width) ? flattened.width : undefined,
+  };
 }
 
 /** Converts one native semantic typography variant into Expo UI text styling. */

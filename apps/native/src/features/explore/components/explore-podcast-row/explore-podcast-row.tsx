@@ -17,10 +17,9 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { audioService } from "@/features/audio";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { AppText, List } from "@/shared/ui";
 
 /** Describes the inputs and callbacks accepted by Explore Podcast Row. */
 /** Describes the inputs, callbacks, and optional state accepted by Explore Podcast Row. */
@@ -144,7 +143,10 @@ function getPublishedDateText(publishedAt?: string | null) {
   return publishedAt ? new Date(publishedAt).toLocaleDateString() : "";
 }
 
-/** Renders the native explore podcast row surface and coordinates its user-facing state. */
+/**
+ * Renders the explore podcast row while retaining an RN fallback for its
+ * progress bar, remote artwork, marquee text, and long-press action menu.
+ */
 export function ExplorePodcastRow({ item, onPress, onNavigateToListing }: ExplorePodcastRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);

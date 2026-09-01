@@ -53,10 +53,6 @@
   "explore": {
     "searchRecent": "Search recent audios..."
   },
-  "navigation": {
-    "show_miniplayer": "Show mini player",
-    "show_subroutes": "Show section subroutes"
-  },
   "scholarContent": {
     "filterPlaceholder": "Filter content…",
     "searchNoMatch": "No scholars match your search.",

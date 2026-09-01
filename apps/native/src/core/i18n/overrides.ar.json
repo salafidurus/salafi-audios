@@ -53,10 +53,6 @@
   "explore": {
     "searchRecent": "البحث في الصوتيات الأخيرة..."
   },
-  "navigation": {
-    "show_miniplayer": "إظهار المشغل المصغر",
-    "show_subroutes": "إظهار أقسام القسم الفرعي"
-  },
   "scholarContent": {
     "filterPlaceholder": "تصفية المحتوى…",
     "searchNoMatch": "لا يوجد شيوخ يطابقون بحثك.",

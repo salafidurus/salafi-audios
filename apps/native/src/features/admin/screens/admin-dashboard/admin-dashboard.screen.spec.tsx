@@ -33,7 +33,7 @@ describe("AdminDashboardScreen", () => {
 
     await render(<AdminDashboardScreen />);
 
-    expect(screen.getByText("Admin Dashboard")).toBeTruthy();
+    expect(screen.getByTestId("admin-dashboard-host")).toBeTruthy();
     expect(screen.getByText("Listings")).toBeTruthy();
     expect(screen.getByText("Scholars")).toBeTruthy();
   });

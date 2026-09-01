@@ -36,15 +36,17 @@ describe("AdminScholarsScreen", () => {
 
   it("renders the list of scholars when loaded", async () => {
     mockUseApiQuery.mockReturnValue({
-      data: [
-        { id: "s1", name: "Scholar One", slug: "scholar-one" },
-        { id: "s2", name: "Scholar Two", slug: "scholar-two" },
-      ],
+      data: {
+        scholars: [
+          { id: "s1", name: "Scholar One", slug: "scholar-one" },
+          { id: "s2", name: "Scholar Two", slug: "scholar-two" },
+        ],
+      },
       isLoading: false,
     });
 
     await render(<AdminScholarsScreen onNavigateToScholar={() => {}} />);
-    expect(screen.getByText("Scholars")).toBeTruthy();
+    expect(screen.getByTestId("admin-scholars-host")).toBeTruthy();
     expect(screen.getByText("Scholar One")).toBeTruthy();
     expect(screen.getByText("scholar-one", { exact: false })).toBeTruthy();
     expect(screen.getByText("Scholar Two")).toBeTruthy();

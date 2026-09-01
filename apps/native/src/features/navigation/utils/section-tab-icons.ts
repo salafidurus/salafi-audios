@@ -1,3 +1,4 @@
+/** Maps registered subsection identities to platform-independent icon components. */
 import type { ComponentType } from "react";
 
 import {
@@ -14,8 +15,8 @@ import {
 
 import type { Section } from "../types";
 
-/** Defines native tab, subroute, and accessory navigation behavior. */
-/** Defines the native native navigation icon contract shared by its consumers. */
+/** Captures the color, size, and stroke inputs passed from subsection tab rendering. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- module/declaration comments are both present above.
 export type NativeNavigationIcon = ComponentType<{
   color?: string;
   size?: number;

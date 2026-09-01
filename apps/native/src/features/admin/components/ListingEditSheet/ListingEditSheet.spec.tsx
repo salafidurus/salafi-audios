@@ -59,7 +59,7 @@ describe("ListingEditSheet", () => {
     await render(<ListingEditSheet listingId="lst-1" onClose={() => {}} onSaved={() => {}} />);
     await screen.findByText("Edit Listing");
 
-    const saveButton = screen.getByText("Save").parent;
+    const saveButton = screen.getByRole("button", { name: "Save" });
     expect(saveButton?.props.accessibilityState?.disabled).toBeFalsy();
   }, 15000);
 
@@ -74,7 +74,7 @@ describe("ListingEditSheet", () => {
     await render(<ListingEditSheet listingId="lst-1" onClose={() => {}} onSaved={() => {}} />);
     await screen.findByText("Edit Listing");
 
-    const saveButton = screen.getByText("Save").parent;
+    const saveButton = screen.getByRole("button", { name: "Save" });
     expect(saveButton?.props.accessibilityState?.disabled).toBe(true);
   }, 15000);
 });

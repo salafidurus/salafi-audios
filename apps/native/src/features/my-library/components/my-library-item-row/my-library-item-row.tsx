@@ -9,9 +9,8 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { AppText, List } from "@/shared/ui";
 
 /** Describes the inputs and callbacks accepted by My Library Item Row. */
 /** Describes the inputs, callbacks, and optional state accepted by My Library Item Row. */
@@ -106,7 +105,10 @@ function renderActions(
   return <List.Item.Actions actions={actions} onAction={onAction} />;
 }
 
-/** Renders the native my library item row surface and coordinates its user-facing state. */
+/**
+ * Renders the library row while retaining an RN fallback for progress fill,
+ * marquee metadata, and saved/completed action-menu behavior.
+ */
 export function MyLibraryItemRow({
   item,
   variant,

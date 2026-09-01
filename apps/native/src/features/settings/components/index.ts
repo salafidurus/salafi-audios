@@ -1,4 +1,4 @@
-/** Provides native account, preference, support, and settings workflows. */
+/** Exposes reusable settings controls shared by native feature screens. */
 export { SettingsSection } from "./SettingsSection/SettingsSection";
 export { SettingsRow } from "./SettingsRow/SettingsRow";
 export { LanguageSwitch } from "./language-switch/language-switch";
