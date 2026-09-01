@@ -14,21 +14,21 @@ export function useInfiniteMyLibraryCompleted(options?: UseInfiniteMyLibraryComp
   return useInfiniteQuery({
     queryKey: queryKeys.myLibrary.completed.infinite(),
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
-      if (pageParam) {
-        return { items: [], nextCursor: undefined, hasMore: false };
-      }
-
       const url = endpoints.myLibrary.completed;
-      const response = await httpClient<MyLibraryPageDto>({ url, method: "GET" });
+      const response = await httpClient<MyLibraryPageDto>({
+        url,
+        method: "GET",
+        params: pageParam ? { cursor: pageParam } : undefined,
+      });
 
       return {
         items: response.items,
-        nextCursor: undefined,
-        hasMore: false,
+        nextCursor: response.nextCursor,
+        hasMore: response.hasMore,
       };
     },
     initialPageParam,
-    getNextPageParam: () => undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: options?.enabled !== false,
   });
 }

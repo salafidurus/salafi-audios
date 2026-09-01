@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { LocaleSchema } from "./localization.types";
+import { ScholarTitleSchema } from "./scholar.types";
 
 /** Personal saved, completed, and progress-backed library response contracts. */
 /** A personal library row combining catalog identity with saved and progress state. */
@@ -13,7 +14,10 @@ export const MyLibraryItemDtoSchema = z.object({
   scholarId: z.string(),
   scholarSlug: z.string(),
   scholarName: z.string(),
+  scholarTitle: ScholarTitleSchema.optional(),
   seriesTitle: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  scholarImageUrl: z.string().optional(),
   durationSeconds: z.number().optional(),
   savedAt: z.string().optional(),
   completedAt: z.string().optional(),

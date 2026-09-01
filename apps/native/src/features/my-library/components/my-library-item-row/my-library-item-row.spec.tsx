@@ -5,17 +5,12 @@ import React from "react";
 
 import { MyLibraryItemRow } from "./my-library-item-row";
 
-jest.mock("lucide-react-native", () => ({
-  Bookmark: "Bookmark",
-  Clock: "Clock",
-  CheckCircle: "CheckCircle",
-}));
-
 jest.mock("@sd/core-i18n", () => ({
   pickContentField: (title: string) => title,
 }));
 
 jest.mock("@sd/domain-content", () => ({
+  formatScholarName: (name: string) => name,
   getMyLibraryItemPercent: (item: MyLibraryItemDto) => {
     if (item.totalLeafCount && item.totalLeafCount > 0) {
       return Math.round(((item.completedLeafCount ?? 0) / item.totalLeafCount) * 100);
@@ -67,6 +62,7 @@ const baseItem: MyLibraryItemDto = {
   scholarId: "scholar-1",
   scholarSlug: "ibn-baz",
   scholarName: "Ibn Baz",
+  coverImageUrl: "https://example.com/cover.jpg",
   seriesTitle: "Explanation of Tawheed",
   durationSeconds: 3600,
   progressSeconds: 900,
@@ -90,24 +86,19 @@ describe("MyLibraryItemRow", () => {
     expect(screen.getByText(/60 min/)).toBeTruthy();
   });
 
-  it("shows Bookmark icon for saved variant", async () => {
+  it("shows listing artwork avatar for saved variant", async () => {
     await render(<MyLibraryItemRow item={baseItem} variant="saved" />);
-    expect(screen.getByTestId("my-library-item-icon-saved")).toBeTruthy();
+    expect(screen.getByTestId("my-library-saved-avatar")).toBeTruthy();
   });
 
-  it("shows Clock icon for progress variant", async () => {
-    await render(<MyLibraryItemRow item={baseItem} variant="progress" />);
-    expect(screen.getByTestId("my-library-item-icon-progress")).toBeTruthy();
-  });
-
-  it("shows CheckCircle icon for completed variant", async () => {
+  it("shows initials avatar when artwork is unavailable", async () => {
     await render(
       <MyLibraryItemRow
-        item={{ ...baseItem, completedAt: "2026-06-15T00:00:00Z" }}
-        variant="completed"
+        item={{ ...baseItem, coverImageUrl: undefined, scholarImageUrl: undefined }}
+        variant="progress"
       />,
     );
-    expect(screen.getByTestId("my-library-item-icon-completed")).toBeTruthy();
+    expect(screen.getByTestId("my-library-progress-avatar")).toBeTruthy();
   });
 
   it("shows progress bar for progress variant", async () => {

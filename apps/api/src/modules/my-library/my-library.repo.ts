@@ -160,6 +160,7 @@ const listingRelationSelect = (locale: Locale) =>
     slug: true,
     language: true,
     durationSeconds: true,
+    coverImageUrl: true,
     translations: {
       where: { locale, status: 'published' },
       select: { title: true },
@@ -170,7 +171,9 @@ const listingRelationSelect = (locale: Locale) =>
         id: true,
         slug: true,
         name: true,
+        title: true,
         mainLanguage: true,
+        imageUrl: true,
         translations: {
           where: { locale, status: 'published' },
           select: { name: true },
@@ -199,12 +202,15 @@ type ListingRelation = {
   /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
     | number
     | null;
+  coverImageUrl: string | null;
   translations: { title: string }[];
   scholar: {
     id: string;
     /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
     name: string;
+    title?: ScholarTitle | null;
     /** Documents the mainLanguage field's API projection semantics and lifecycle meaning. */ mainLanguage: Locale | null;
+    imageUrl: string | null;
     translations: { name: string }[];
   };
   parent: {
@@ -601,6 +607,7 @@ export class MyLibraryRepository {
 
   /** Shared resolution of the translatable listing relation shared by the
    * progress- and favorite-backed myLibrary item shapes. */
+  // eslint-disable-next-line complexity -- this mapper resolves translated catalog identity and presentation fallbacks together.
   private resolveListingRelation(
     listing: ListingRelation,
     locale: Locale,
@@ -611,8 +618,11 @@ export class MyLibraryRepository {
     | 'scholarId'
     | 'scholarSlug'
     | 'scholarName'
+    | 'scholarTitle'
     | 'seriesTitle'
     | 'durationSeconds'
+    | 'coverImageUrl'
+    | 'scholarImageUrl'
     | 'originalLanguage'
     | 'originalListingTitle'
   > {
@@ -643,8 +653,13 @@ export class MyLibraryRepository {
       scholarId: listing.scholar.id,
       scholarSlug: listing.scholar.slug,
       scholarName,
+      scholarTitle: optionalScholarTitle(listing.scholar.title),
       seriesTitle,
       durationSeconds: listing.durationSeconds ?? undefined,
+      coverImageUrl: listing.coverImageUrl ? this.toPublicUrl(listing.coverImageUrl) : undefined,
+      scholarImageUrl: listing.scholar.imageUrl
+        ? this.toPublicUrl(listing.scholar.imageUrl)
+        : undefined,
       originalLanguage: resolved.originalLanguage,
       originalListingTitle: resolved.original?.title,
     };

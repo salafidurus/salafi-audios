@@ -8,7 +8,7 @@ import { mergeLiveProgress } from "./utils/merge-live-progress";
 /** Selects in-progress My Library rows and overlays live playback state. */
 /** Returns authenticated remote progress or anonymous local progress rows. */
 export function useMyLibraryProgressScreen(isAuthenticated = false) {
-  const { data, isFetching, error } = useMyLibraryProgress(undefined, isAuthenticated);
+  const { data, isFetching, error, refetch } = useMyLibraryProgress(undefined, isAuthenticated);
   const progressMap = useProgressStore((s) => s.progressMap);
   const currentTrack = usePlaybackStore((s) => s.currentTrack);
 
@@ -27,6 +27,7 @@ export function useMyLibraryProgressScreen(isAuthenticated = false) {
       nextCursor: undefined,
       isFetching: false,
       error: null,
+      refetch: async () => {},
     };
   }
 
@@ -36,5 +37,8 @@ export function useMyLibraryProgressScreen(isAuthenticated = false) {
     nextCursor: data?.nextCursor,
     isFetching,
     error,
+    refetch: async () => {
+      await refetch();
+    },
   };
 }

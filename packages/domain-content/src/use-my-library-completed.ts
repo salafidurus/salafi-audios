@@ -7,7 +7,7 @@ import { localCompletedItems } from "./my-library.local";
 /** Selects completed My Library rows from remote or local personal state. */
 /** Returns completed Library data without requesting private state anonymously. */
 export function useMyLibraryCompletedScreen(isAuthenticated = false) {
-  const { data, isFetching, error } = useMyLibraryCompleted(undefined, isAuthenticated);
+  const { data, isFetching, error, refetch } = useMyLibraryCompleted(undefined, isAuthenticated);
   const progressMap = useProgressStore((s) => s.progressMap);
 
   const localItems = useMemo(() => localCompletedItems(progressMap), [progressMap]);
@@ -18,6 +18,9 @@ export function useMyLibraryCompletedScreen(isAuthenticated = false) {
     nextCursor: data?.nextCursor,
     isFetching,
     error,
+    refetch: async () => {
+      await refetch();
+    },
   });
   const localState = () => ({
     items: localItems,
@@ -25,6 +28,7 @@ export function useMyLibraryCompletedScreen(isAuthenticated = false) {
     nextCursor: undefined,
     isFetching: false,
     error: null,
+    refetch: async () => {},
   });
   return isAuthenticated ? remoteState() : localState();
 }

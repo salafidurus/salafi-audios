@@ -58,6 +58,9 @@ export type BrowserJourneyOptions = {
   height?: number;
 };
 
+/** Supported locale values used to establish deterministic browser journeys. */
+export type BrowserJourneyLocale = "en" | "ar";
+
 /** Running Next.js process and public proxy owned by one E2E file. */
 export type WebServer = {
   /** Child process serving the production Next.js build. */
@@ -305,6 +308,26 @@ export function createBrowserJourney(
     },
   });
   return { view, origin, console: consoleEntries, profileDirectory };
+}
+
+/**
+ * Establishes a clean, deterministic browser state before a journey navigates
+ * to its route. Bun.WebView profiles are isolated on disk, but the browser
+ * backend can retain origin state across views, so each journey explicitly
+ * resets storage and sets the locale it intends to exercise.
+ */
+export async function initializeBrowserJourney(
+  view: Bun.WebView,
+  origin: string,
+  locale: BrowserJourneyLocale = "en",
+): Promise<void> {
+  await view.navigate(origin);
+  await view.evaluate(`(() => {
+    document.cookie = ${JSON.stringify(`locale=${locale}; path=/; max-age=31536000; SameSite=Lax`)};
+    localStorage.clear();
+    sessionStorage.clear();
+    return true;
+  })()`);
 }
 
 /** Writes the required failure evidence for a journey before its view closes. */
