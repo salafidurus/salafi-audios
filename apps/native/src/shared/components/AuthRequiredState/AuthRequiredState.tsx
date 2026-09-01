@@ -1,9 +1,9 @@
 import { Column, Host, Text as ExpoText } from "@expo/ui";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { Button, ScreenView } from "@/shared/ui";
+
 import { toUniversalTextStyle } from "../../../core/styles/expo-ui";
-import { Button } from "../Button/Button";
-import { ScreenView } from "../ScreenView/ScreenView";
 
 /** Provides a reusable native UI primitive with a focused rendering contract. */
 /** Describes the inputs, callbacks, and optional state accepted by Auth Required State. */

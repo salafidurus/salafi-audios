@@ -8,9 +8,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { Button } from "@/shared/components/Button/Button";
-import { TextInput } from "@/shared/components/TextInput/TextInput";
+import { AppText, Button, TextInput } from "@/shared/ui";
 
 import { fetchAdminListingDetail, updateListing } from "../../api/admin-listings.api";
 

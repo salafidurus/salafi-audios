@@ -4,9 +4,9 @@ import type { ListRenderItemInfo } from "react-native";
 import { FlatList, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { AppText } from "@/shared/ui";
 
 /** Describes the inputs and callbacks accepted by Explore Scholar Row. */
 /** Describes the inputs, callbacks, and optional state accepted by Explore Scholar Row. */

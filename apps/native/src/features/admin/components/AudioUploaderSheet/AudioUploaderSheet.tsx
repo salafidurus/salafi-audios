@@ -10,8 +10,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { Button } from "@/shared/components/Button/Button";
+import { AppText, Button } from "@/shared/ui";
 
 import { getPresignedUrl, uploadToR2, createListing } from "../../api/admin-listings.api";
 

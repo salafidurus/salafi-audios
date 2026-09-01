@@ -10,7 +10,7 @@ import {
   type TextStyle,
   type ViewStyle,
 } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet as UnistylesStyleSheet, useUnistyles } from "react-native-unistyles";
 
 /** Provides the native text input component and its Expo UI style adaptation. */
 /** Describes the inputs, callbacks, and optional state accepted by Text Input. */
@@ -208,7 +208,7 @@ const base = {
   stretch: { width: FULL_WIDTH },
 };
 
-const styles = StyleSheet.create((theme) => ({
+const styles = (UnistylesStyleSheet ?? RNStyleSheet).create((theme) => ({
   input: {
     borderWidth: 1,
     borderColor: theme.colors.border.default,

@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { NativeText as AppText } from "@/shared/ui";
 
 /** Provides a reusable native UI primitive with a focused rendering contract. */
 type UserAvatarProps = {

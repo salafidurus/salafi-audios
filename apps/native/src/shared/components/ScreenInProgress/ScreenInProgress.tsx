@@ -1,8 +1,9 @@
 import { Column, Host, Text as ExpoText } from "@expo/ui";
 import { useUnistyles } from "react-native-unistyles";
 
+import { ScreenView } from "@/shared/ui";
+
 import { toUniversalTextStyle } from "../../../core/styles/expo-ui";
-import { ScreenView } from "../ScreenView/ScreenView";
 
 /** Provides a reusable native UI primitive with a focused rendering contract. */
 type ScreenInProgressProps = {

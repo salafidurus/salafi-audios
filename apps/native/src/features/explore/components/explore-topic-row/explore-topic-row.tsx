@@ -9,8 +9,8 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { AppText } from "@/shared/ui";
 
 /** Describes the inputs and callbacks accepted by Explore Topic Row. */
 /** Describes the inputs, callbacks, and optional state accepted by Explore Topic Row. */

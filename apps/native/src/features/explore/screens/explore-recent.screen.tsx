@@ -10,7 +10,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { ScreenView } from "@/shared/ui";
 
 import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
 import { ExploreScholarRow } from "../components/explore-scholar-row/explore-scholar-row";

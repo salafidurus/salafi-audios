@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react-native";
 
-import { TextInput } from "./TextInput";
+import { TextInput } from "./native-text-input";
 
 describe("TextInput", () => {
   it("renders the current value", async () => {

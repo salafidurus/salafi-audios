@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react-native";
 import React from "react";
 import { View } from "react-native";
 
-import { Button } from "./Button";
+import { NativeButton as Button } from "./native-button";
 
 describe("Button", () => {
   it("renders label text", async () => {

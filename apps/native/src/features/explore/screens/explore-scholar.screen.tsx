@@ -11,7 +11,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { ScreenView } from "@/shared/ui";
 
 import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
 import {

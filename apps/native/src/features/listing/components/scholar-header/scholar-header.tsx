@@ -4,8 +4,8 @@ import { useFormatScholarName } from "@sd/domain-content";
 import { Linking, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { AppText } from "@/shared/ui";
 
 /** Describes the inputs and callbacks accepted by Scholar Header. */
 /** Describes the inputs, callbacks, and optional state accepted by Scholar Header. */

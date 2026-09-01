@@ -1,8 +1,7 @@
 import { Host } from "@expo/ui";
 import { StyleSheet } from "react-native-unistyles";
 
-import { List } from "@/shared/components/List";
-import { NativeIcon, NativeImage } from "@/shared/ui";
+import { List, NativeIcon, NativeImage } from "@/shared/ui";
 
 /** Implements native search input, filtering, results, and empty states. */
 /** Describes the inputs, callbacks, and optional state accepted by Search Result Item. */

@@ -7,10 +7,8 @@ import { ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { List } from "@/shared/components/List";
-import { NativeBridgeHost } from "@/shared/ui/native-ui-host";
+import { AppText, List, NativeBridgeHost } from "@/shared/ui";
 
 import { filterScholars } from "./filter-scholars";
 

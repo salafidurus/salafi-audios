@@ -5,9 +5,8 @@ import { MenuView, type NativeActionEvent } from "@expo/ui/community/menu";
 import { Children, isValidElement } from "react";
 import { Alert, Platform, Pressable, Text, View } from "react-native";
 
-import { NativeText } from "@/shared/ui";
-
-import { ListItemActions, type ListItemActionsProps } from "./ListItemActions";
+import { ListItemActions, type ListItemActionsProps } from "./native-list-item-actions";
+import { NativeText } from "./native-text";
 
 /** Defines the content and interaction contract for an Expo UI list row. */
 /** Row layout, separators, pressed feedback, and platform-specific styling remain native-owned. */

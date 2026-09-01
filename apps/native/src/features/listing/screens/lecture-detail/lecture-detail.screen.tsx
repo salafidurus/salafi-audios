@@ -24,10 +24,8 @@ import { ListingContentView } from "@/features/listing/components/listing-conten
 import { SeriesContextBar } from "@/features/listing/components/series-context-bar/series-context-bar";
 import { TopicChips } from "@/features/listing/components/topic-chips/topic-chips";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { Button } from "@/shared/components/Button/Button";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText, Button, ScreenView } from "@/shared/ui";
 
 /** Builds native lecture and scholar content surfaces from canonical identities. */
 /** Describes the inputs, callbacks, and optional state accepted by Lecture Detail Screen. */
