@@ -2297,7 +2297,7 @@ export class ListingRepository {
         scholarName,
         scholarSlug: l.scholar!.slug,
         scholarTitle: toOptional(l.scholar!.title),
-        scholarImageUrl: toOptional(l.scholar!.imageUrl),
+        scholarImageUrl: toOptional(l.scholar!.imageUrl) ?? null,
         thumbnailUrl: thumbnailUrl ?? null,
         durationSeconds: durationSeconds ?? 0,
         publishedLectureCount,

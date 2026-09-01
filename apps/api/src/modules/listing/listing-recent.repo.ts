@@ -91,7 +91,7 @@ function buildRecentContentItem(
     scholarName,
     scholarSlug: record.scholar.slug,
     scholarTitle: record.scholar.title ?? undefined,
-    scholarImageUrl: record.scholar.imageUrl ?? undefined,
+    scholarImageUrl: record.scholar.imageUrl ?? null,
     thumbnailUrl: presentation.thumbnailUrl ?? null,
     durationSeconds: presentation.durationSeconds,
     publishedLectureCount: presentation.publishedLectureCount,

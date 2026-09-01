@@ -49,7 +49,7 @@ export const HomePromotionListingDtoSchema = z.object({
   scholarName: z.string(),
   scholarSlug: z.string(),
   scholarTitle: ScholarTitleSchema.optional(),
-  scholarImageUrl: z.string().optional(),
+  scholarImageUrl: z.string().nullable(),
   thumbnailUrl: z.string().nullable(),
   durationSeconds: z.number().nullable(),
   publishedLectureCount: z.number().optional(),
