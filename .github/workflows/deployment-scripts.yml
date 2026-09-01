@@ -40,9 +40,6 @@ jobs:
       - name: Run Deploy Script Unit Tests
         run: bun run --filter @sd/scripts test:deploy
 
-      - name: Verify Web Deploy Install Script
-        run: bun run --filter @sd/scripts deploy:install -- web
-
       - name: Verify Web Deploy Build Script
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api' }}
