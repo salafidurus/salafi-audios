@@ -8,12 +8,10 @@ Implement one approved ticket plan. Specification-level work is orchestrated
 by `implement-spec`, which selects tickets and invokes this lifecycle for each
 ticket.
 
-The final spec-finalization ticket is a special terminal ticket. For it,
-verify the spec candidate against current `main`, resolve conflicts if needed,
-and run the complete specification acceptance matrix. A direct pull request
-from `spec/<slug>` to `main` is sufficient when no boundary changes are
-required; do not create an intermediate feature branch or ordinary feature
-worktree for this ticket.
+The final spec-finalization ticket is a special terminal ticket handled by
+`implement-spec`. It verifies current `main` and runs the complete
+specification acceptance matrix. It has no implementation branch, code change,
+or pull request.
 
 Before editing, read the repository instructions in
 [AGENT.md](../../../AGENT.md), the nearest app/package `AGENT.md`, the `tdd`
@@ -40,11 +38,9 @@ not applicable.
 
 ## Checkout selection
 
-For the finalization ticket, use `origin/spec/<slug>` and `origin/main` as the
-integration inputs and perform the boundary verification in the checkout that
-holds the spec candidate. Do not apply the ordinary native/non-native feature
-classification to this ticket. If conflicts exist, resolve them at the
-spec-to-main boundary and record the resolution before running acceptance.
+For the finalization ticket, use current `origin/main` as the only integration
+input and perform verification without creating a checkout. Do not apply the
+ordinary native/non-native feature classification to this ticket.
 
 For an ordinary ticket, determine whether the approved scope includes committed files under
 `apps/native`:
@@ -52,19 +48,15 @@ For an ordinary ticket, determine whether the approved scope includes committed 
 - Native scope uses the current checkout because native changes may require the
   current development environment.
 - Non-native scope uses the approved isolated worktree under `.worktree/`.
-  For a specification ticket, branch it from the resolved `spec/<slug>`
-  integration branch. If `pre-implement` reported missing specification
-  branch metadata, use `origin/main` provisionally and preserve that warning;
-  do not describe the work as spec-branch-isolated or invent a spec-branch PR
-  target. Standalone tickets are branched from `origin/main`.
+  Specification and standalone tickets are branched from `origin/main` and
+  target `main`.
 - Mixed scope follows the native/current-checkout path.
 
 The approved plan carries the routing context explicitly:
 
 | Ticket context                                          | Branch base                 | Pull-request target                    |
 | ------------------------------------------------------- | --------------------------- | -------------------------------------- |
-| Specification ticket with a verified integration branch | `spec/<slug>`               | `spec/<slug>`                          |
-| Specification ticket with missing branch metadata       | `origin/main` provisionally | unresolved; report the missing context |
+| Specification ticket                                       | `origin/main`               | `main`                                 |
 | Standalone ticket                                       | `origin/main`               | `main`                                 |
 
 Resolve the branch base and pull-request target before creating the worktree or

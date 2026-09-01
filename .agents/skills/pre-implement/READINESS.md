@@ -4,9 +4,9 @@ This is the read-only lifecycle gate before planning one implementation ticket.
 
 - The issue must have exactly one category role and one state role.
 - Its state must be `ready-for-agent`.
-- A specification ticket must resolve its parent specification and recorded
-  `spec/<slug>` branch. Missing branch metadata is reported as a warning and
-  uses the provisional routing defined by [SKILL.md](SKILL.md).
+- A specification ticket must resolve its parent specification. It uses
+  `origin/main` as its base and `main` as its pull-request target; no
+  specification branch is required.
 - A standalone ticket uses `origin/main` as its base and `main` as its PR
   target.
 - Conflicting labels, missing parent context, or an incomplete ticket stops

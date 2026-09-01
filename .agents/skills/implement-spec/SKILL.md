@@ -11,14 +11,10 @@ The tickets form a task graph with blocking relationships. Maintain the
 frontier of unblocked tickets and process tickets in dependency order. This
 skill does not implement the specification as one undifferentiated task.
 
-Each specification has one disposable `spec/<slug>` integration context,
-created from `main` and associated with exactly one parent specification.
-Carry the parent issue, resolved spec branch, branch base, and pull-request
-target while selecting and handing off its tickets. If the parent has no
-recorded spec branch, carry the missing-context warning and use the provisional
-`origin/main` base defined by `pre-implement`; do not claim spec-branch
-isolation or invent a pull-request target. Tickets with no parent specification
-remain standalone and use the existing `origin/main` to `main` lifecycle.
+Specifications are tracker coordination contexts with no integration branch.
+Carry the parent issue, `origin/main` base, and `main` pull-request target while
+selecting and handing off its tickets. Tickets with no parent specification
+remain standalone and use the same `origin/main` to `main` lifecycle.
 
 Before editing, read the root and nearest workspace `AGENT.md` files and the
 `tdd` skill. Every ticket cycle follows the `pre-implement`, `implement`, and
@@ -47,34 +43,31 @@ delivery.
    pointers to its PR, commits, decisions, and follow-up work.
 6. Repeat through the finalization ticket. The specification graph is:
 
-   `spec → tickets → child ticket lifecycles → finalization ticket → main`
+   `spec → tickets → child ticket lifecycles → main → finalization verification`
 
    After all implementation tickets complete, the finalization ticket must be
-   the only remaining frontier node. Run its `pre-implement → implement →
-   post-implement` lifecycle, then choose exactly one terminal outcome:
-   completed finalization or abandonment.
+   the only remaining frontier node. Handle it directly after all
+   implementation tickets merge and close; do not run the ordinary
+   `pre-implement → implement → post-implement` lifecycle. Finalization does
+   not create a branch, change code, or open a pull request.
 
 ## Finalization and abandonment
 
-Finalization is the only path that can bring a specification into `main`. The
-published finalization ticket is the only remaining frontier after every
-implementation ticket completes. It starts from the latest spec branch and
-current `main`, resolves drift and conflicts at that boundary, runs the
-complete specification acceptance matrix plus applicable repository checks,
-and fails closed when any required check fails. Its pull request targets
-`main` and identifies both the parent specification and finalization ticket.
-Close the parent as completed only after that pull request is merged and its
-evidence is recorded.
+Finalization is a verification-only terminal step after every implementation
+ticket merges into `main`. It runs the complete specification acceptance matrix
+against current `main`, fails closed when a required check fails, records the
+evidence on the parent issue, and closes the parent as completed. It has no
+branch or pull request.
 
 Closing all child tickets is not finalization. The `triage` skill reconciles
 completed-ticket triage metadata but does not close the parent specification.
 
 Abandonment is a separate, auditable terminal path. Record the reason and
 outcome on the parent and child issues according to triage policy, distinguish
-it from completion, verify the spec branch and each ticket resource before
-deleting it, and preserve unrelated branches, worktrees, dirty state, and
-active specifications. If any identity or state check is uncertain, stop
-without deleting that resource.
+it from completion, verify each ticket resource before deleting it, and
+preserve unrelated branches, worktrees, dirty state, and active
+specifications. If any identity or state check is uncertain, stop without
+deleting that resource.
 
 Communication to and from subagents should be sparse. Use context pointers to
 the specification, tickets, research, and previous commits instead of
