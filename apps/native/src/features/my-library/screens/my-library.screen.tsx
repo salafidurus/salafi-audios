@@ -1,15 +1,15 @@
 import { useProgressStore } from "@sd/domain-audio";
 import { markUnsaved, useMyLibrarySections, type MyLibrarySection } from "@sd/domain-content";
 import { useCallback, useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Pressable, ScrollView, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { MyLibraryItemRow } from "@/features/my-library/components/my-library-item-row/my-library-item-row";
 import { RootScreenHeader } from "@/features/navigation";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { NativeSegmentedControl, ScreenView } from "@/shared/ui";
+import { AppText, ScreenView } from "@/shared/ui";
 
 /**
  * Supplies optional listing navigation while the root owns section selection
@@ -49,6 +49,56 @@ function getActions(section: MyLibrarySection, t: ReturnType<typeof useTranslati
   return undefined;
 }
 
+type MyLibrarySectionTabsProps = {
+  labels: string[];
+  selectedSection: MyLibrarySection;
+  onSelect: (section: MyLibrarySection) => void;
+};
+
+/** Presents the three library views as content tabs instead of a form control. */
+function MyLibrarySectionTabs({ labels, selectedSection, onSelect }: MyLibrarySectionTabsProps) {
+  const { theme } = useUnistyles();
+
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.tabsContent}
+      style={styles.tabs}
+      accessibilityRole="tablist"
+      testID="my-library-section-selector"
+    >
+      {SECTIONS.map((section, index) => {
+        const selected = section === selectedSection;
+        return (
+          <Pressable
+            key={section}
+            accessibilityRole="tab"
+            accessibilityState={{ selected }}
+            accessibilityLabel={labels[index]}
+            onPress={() => onSelect(section)}
+            style={({ pressed }) => [styles.tab, pressed && styles.tabPressed]}
+            testID={`my-library-section-tab-${section}`}
+          >
+            <AppText
+              variant="bodyMd"
+              colorRole={selected ? "primary" : "subtle"}
+              style={selected ? styles.tabLabelSelected : styles.tabLabel}
+            >
+              {labels[index]}
+            </AppText>
+            {selected ? (
+              <View
+                style={[styles.tabIndicator, { backgroundColor: theme.colors.action.primary }]}
+              />
+            ) : null}
+          </Pressable>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
 /**
  * Renders one My Library root with internal Started, Saved, and Completed
  * selection. Selection is presentation state and never becomes a route.
@@ -79,53 +129,37 @@ export function MyLibraryScreen({ onNavigateToListing }: MyLibraryScreenProps) {
   );
 
   const sectionLabel = t(`myLibrary.${selectedSection}`, sectionFallback(selectedSection));
-
-  if (isAuthLoading || (section.isFetching && section.items.length === 0)) {
-    return (
-      <ScreenView center>
-        <RootScreenHeader title={t("myLibrary.title", "My Library")} />
-        <EmptyState
-          message={t("myLibrary.loadingSection", "Loading {{section}}…", {
-            section: sectionLabel,
-          })}
-          variant="loading"
-        />
-      </ScreenView>
-    );
-  }
-
-  if (section.error && section.items.length === 0) {
-    return (
-      <ScreenView center>
-        <RootScreenHeader title={t("myLibrary.title", "My Library")} />
-        <EmptyState
-          message={t("myLibrary.error", "My Library could not be loaded.")}
-          variant="error"
-          onRetry={() => void section.refetch?.()}
-          retryLabel={t("serverError.retry", "Try Again")}
-        />
-      </ScreenView>
-    );
-  }
+  const isLoading = isAuthLoading || (section.isFetching && section.items.length === 0);
 
   return (
     <ScreenView>
       <RootScreenHeader title={t("myLibrary.title", "My Library")} />
-      <View
-        style={styles.selector}
-        accessibilityLabel={t("myLibrary.selectorLabel", "My Library sections")}
-      >
-        <NativeSegmentedControl
-          values={labels}
-          value={sectionLabel}
-          onValueChange={(label) => {
-            const index = labels.indexOf(label);
-            if (index >= 0) setSelectedSection(SECTIONS[index]!);
-          }}
-          testID="my-library-section-selector"
+      {!isAuthLoading ? (
+        <MyLibrarySectionTabs
+          labels={labels}
+          selectedSection={selectedSection}
+          onSelect={setSelectedSection}
         />
-      </View>
-      {section.items.length === 0 ? (
+      ) : null}
+      {isLoading ? (
+        <View style={styles.status}>
+          <EmptyState
+            message={t("myLibrary.loadingSection", "Loading {{section}}…", {
+              section: sectionLabel,
+            })}
+            variant="loading"
+          />
+        </View>
+      ) : section.error && section.items.length === 0 ? (
+        <View style={styles.status}>
+          <EmptyState
+            message={t("myLibrary.error", "My Library could not be loaded.")}
+            variant="error"
+            onRetry={() => void section.refetch?.()}
+            retryLabel={t("serverError.retry", "Try Again")}
+          />
+        </View>
+      ) : section.items.length === 0 ? (
         <View style={styles.status}>
           <EmptyState
             message={t(sectionEmptyKey(selectedSection), "Nothing here yet.")}
@@ -152,9 +186,43 @@ export function MyLibraryScreen({ onNavigateToListing }: MyLibraryScreenProps) {
 }
 
 const styles = StyleSheet.create((theme) => ({
-  selector: {
-    paddingHorizontal: theme.spacing.layout.pageX,
-    paddingBottom: theme.spacing.scale.sm,
+  tabs: {
+    marginHorizontal: theme.spacing.layout.pageX,
+    marginBottom: theme.spacing.scale.sm,
+    flexGrow: 0,
+    flexShrink: 0,
+    height: 56,
+    borderBottomWidth: theme.border.width.default,
+    borderBottomColor: theme.colors.border.default,
+  },
+  tabsContent: {
+    width: "100%",
+  },
+  tab: {
+    minHeight: 48,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: theme.spacing.scale.md,
+    position: "relative",
+  },
+  tabPressed: {
+    opacity: 0.7,
+  },
+  tabLabel: {
+    textAlign: "center",
+  },
+  tabLabelSelected: {
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  tabIndicator: {
+    position: "absolute",
+    bottom: 0,
+    left: theme.spacing.scale.sm,
+    right: theme.spacing.scale.sm,
+    height: 2,
+    borderRadius: theme.radius.scale.sm,
   },
   status: {
     flex: 1,
