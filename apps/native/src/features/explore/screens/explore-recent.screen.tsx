@@ -165,12 +165,17 @@ export function ExploreScreen({ onNavigateToListing, onNavigateToScholar }: Expl
   return (
     <ScreenView>
       <RootScreenHeader title={t("explore.title", "Explore")} />
-      <AppText variant="labelMd">{t("explore.exploreByTopic", "Explore by topic")}</AppText>
-      <SearchFilter
-        value={topicSlug ? [topicSlug] : []}
-        onChange={(value) => setTopicSlug(value[0])}
-        topics={topics}
-      />
+      <View style={styles.filterSection}>
+        <AppText variant="titleMd">{t("explore.exploreByTopic", "Explore by topic")}</AppText>
+        <AppText variant="bodySm" colorRole="muted">
+          {t("explore.exploreByTopicDescription", "Choose a topic to shape your study feed.")}
+        </AppText>
+        <SearchFilter
+          value={topicSlug ? [topicSlug] : []}
+          onChange={(value) => setTopicSlug(value[0])}
+          topics={topics}
+        />
+      </View>
       <View style={styles.screen}>
         {items.length === 0 ? (
           <ExploreRecentStatus
@@ -204,5 +209,10 @@ const styles = StyleSheet.create((theme) => ({
   listContent: {
     padding: theme.spacing.scale.md,
     gap: theme.spacing.scale.md,
+  },
+  filterSection: {
+    gap: theme.spacing.scale.xs,
+    paddingHorizontal: theme.spacing.layout.pageX,
+    paddingBottom: theme.spacing.scale.sm,
   },
 }));

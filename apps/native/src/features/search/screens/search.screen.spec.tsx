@@ -50,8 +50,15 @@ jest.mock("../components/SearchResultsList/SearchResultsList", () => ({
 }));
 
 jest.mock("@/shared/ui", () => {
-  const { TextInput } = jest.requireActual<typeof import("react-native")>("react-native");
+  const { Pressable, Text, TextInput } =
+    jest.requireActual<typeof import("react-native")>("react-native");
   return {
+    AppText: ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>,
+    NativeButton: ({ label, onPress }: { label: string; onPress?: () => void }) => (
+      <Pressable onPress={onPress}>
+        <Text>{label}</Text>
+      </Pressable>
+    ),
     NativeFormField: ({ value, onChangeText, placeholder, testID }: any) => (
       <TextInput
         value={value}

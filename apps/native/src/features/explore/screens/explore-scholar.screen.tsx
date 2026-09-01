@@ -10,7 +10,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
 import { RootScreenHeader } from "@/features/navigation";
-import { NativeButton, NativeFormField, ScreenView } from "@/shared/ui";
+import { AppText, NativeButton, NativeFormField, ScreenView } from "@/shared/ui";
 
 import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
 import {
@@ -99,6 +99,11 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
         placeholder={t("scholarContent.searchScholars", "Search scholars...")}
         testID="native-scholar-search-input"
       />
+      <View style={styles.intro}>
+        <AppText variant="bodySm" colorRole="muted">
+          {t("scholarContent.searchDescription", "Browse scholars and find their latest lessons.")}
+        </AppText>
+      </View>
       {filteredScholars.length === 0 ? (
         <View style={styles.status}>
           <ExploreScholarStatus
@@ -143,6 +148,10 @@ const styles = StyleSheet.create((theme) => ({
   status: {
     flex: 1,
     justifyContent: "center",
+  },
+  intro: {
+    paddingHorizontal: theme.spacing.scale.md,
+    paddingBottom: theme.spacing.scale.sm,
   },
   listCard: {
     flex: 1,

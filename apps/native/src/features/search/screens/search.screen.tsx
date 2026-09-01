@@ -1,3 +1,4 @@
+import { Host } from "@expo/ui";
 import { useSearchProcessing } from "@sd/domain-search";
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -45,13 +46,14 @@ function PopularSearches({
         contentContainerStyle={styles.popularList}
       >
         {searches.map((search) => (
-          <NativeButton
-            key={search}
-            label={search}
-            size="sm"
-            variant="outline"
-            onPress={() => onSelect(search)}
-          />
+          <Host key={search}>
+            <NativeButton
+              label={search}
+              size="sm"
+              variant="outline"
+              onPress={() => onSelect(search)}
+            />
+          </Host>
         ))}
       </ScrollView>
     </View>
@@ -84,6 +86,12 @@ export function SearchScreen({ onNavigateToListing }: SearchScreenProps) {
           placeholder={t("search.placeholder", "Search lectures, scholars, or topics")}
           testID="native-global-search-input"
         />
+        <View style={styles.intro}>
+          <AppText variant="titleMd">{t("search.title", "Find something to study")}</AppText>
+          <AppText variant="bodySm" colorRole="muted">
+            {t("search.description", "Search lectures, scholars, and topics across the catalog.")}
+          </AppText>
+        </View>
         <SearchFilter value={filter} onChange={setFilter} topics={topics} />
         <View style={styles.results}>
           {shouldSearch ? (
@@ -120,8 +128,13 @@ const styles = StyleSheet.create((theme) => ({
   results: {
     flex: 1,
   },
+  intro: {
+    gap: theme.spacing.scale.xs,
+    paddingTop: theme.spacing.scale.xs,
+  },
   popular: {
     gap: theme.spacing.scale.sm,
+    paddingTop: theme.spacing.scale.md,
   },
   popularList: {
     gap: theme.spacing.component.gapSm,

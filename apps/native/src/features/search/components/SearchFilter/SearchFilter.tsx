@@ -1,5 +1,6 @@
 import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
 
+import { Host } from "@expo/ui";
 import { getLocalizedName } from "@sd/core-i18n";
 import { useMemo } from "react";
 import { ScrollView } from "react-native";
@@ -58,21 +59,22 @@ export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
       {options.map((option) => {
         const isActive = option.id === "all" ? value.length === 0 : selected.has(option.id);
         return (
-          <NativeButton
-            key={option.id}
-            label={option.label}
-            size="sm"
-            variant={isActive ? "primary" : "outline"}
-            testID={`native-search-filter-${option.id}`}
-            onPress={() => {
-              if (option.id === "all") {
-                onChange([]);
-                return;
-              }
+          <Host key={option.id}>
+            <NativeButton
+              label={option.label}
+              size="sm"
+              variant={isActive ? "primary" : "outline"}
+              testID={`native-search-filter-${option.id}`}
+              onPress={() => {
+                if (option.id === "all") {
+                  onChange([]);
+                  return;
+                }
 
-              onChange(selected.has(option.id) ? [] : [option.id]);
-            }}
-          />
+                onChange(selected.has(option.id) ? [] : [option.id]);
+              }}
+            />
+          </Host>
         );
       })}
     </ScrollView>

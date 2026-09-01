@@ -2,6 +2,7 @@ import { Host } from "@expo/ui";
 import { routes } from "@sd/core-contracts";
 import { useRouter } from "expo-router";
 import { Pressable } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { NativeIcon } from "@/shared/ui";
@@ -21,6 +22,7 @@ export function GlobalSearchButton() {
       accessibilityLabel={label}
       hitSlop={8}
       onPress={() => router.push(routes.search)}
+      style={styles.button}
       testID="global-search-button"
     >
       <Host>
@@ -29,3 +31,16 @@ export function GlobalSearchButton() {
     </Pressable>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  button: {
+    width: theme.spacing.scale["4xl"],
+    height: theme.spacing.scale["4xl"],
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: theme.radius.scale.full,
+    backgroundColor: theme.colors.surface.elevated,
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.border.subtle,
+  },
+}));
