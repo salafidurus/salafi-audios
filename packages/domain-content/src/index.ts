@@ -18,6 +18,7 @@ export {
 } from "./hooks";
 
 export { useExploreRecentScreen } from "./use-explore-recent";
+export { useHomePromotions } from "./home.api";
 export { useMyLibrarySavedScreen } from "./use-my-library-saved";
 export { useMyLibraryCompletedScreen } from "./use-my-library-completed";
 export { useMyLibraryProgressScreen } from "./use-my-library-progress";

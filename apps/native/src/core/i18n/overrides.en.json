@@ -54,7 +54,24 @@
     "searchRecent": "Search recent audios..."
   },
   "home": {
-    "description": "Begin your study journey."
+    "description": "Begin your study journey.",
+    "eyebrow": "YOUR STUDY SPACE",
+    "title": "Build a steady listening path",
+    "intro": "Return to a lesson or find a thoughtful place to begin today.",
+    "loading": "Loading your study space…",
+    "error": "Home could not be loaded.",
+    "continue": { "title": "Continue Listening" },
+    "discovery": { "title": "Discovery", "empty": "No lessons are available yet." },
+    "scholars": { "title": "Scholars" },
+    "recent": {
+      "title": "Recently Added",
+      "empty": "New lessons will appear here as they are published."
+    },
+    "curated": { "title": "Curated for Study", "empty": "Curated lessons will appear here soon." },
+    "mobile": {
+      "title": "Keep your study close",
+      "description": "Downloaded audio and local progress remain available for mobile continuity."
+    }
   },
   "scholarContent": {
     "description": "Explore our scholars.",

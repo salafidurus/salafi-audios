@@ -1,10 +1,10 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides the web Home study surface and composes shared Catalog data capabilities. */
 "use client";
 
 import type { FeedContentItemDto, FeedItemDto } from "@sd/core-contracts";
 
 import { useProgressStore } from "@sd/domain-audio";
-import { useExploreRecentScreen } from "@sd/domain-content";
+import { useExploreRecentScreen, useHomePromotions } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
 
 import { useAuth } from "@/core/auth";
@@ -17,10 +17,10 @@ import { MobileDownloadSection } from "../../components/mobile-download-section/
 import { RecentlyAddedSectionContent } from "../../components/recently-added-section/recently-added-section";
 import { ScholarMedallions } from "../../components/scholar-medallions/scholar-medallions";
 import { TopicDiscoverySection } from "../../components/topic-discovery-section/topic-discovery-section";
-import { useHomePromotions } from "../../hooks/use-home-promotions";
 import { FEATURED_SENIOR_SCHOLAR_SLUG, MOBILE_APP_AVAILABILITY } from "./home.constants";
 import styles from "./home.screen.module.css";
 
+/** Describes navigation callbacks supplied by the web Home route. */
 export type HomeScreenProps = {
   onContinueListening?: (listingSlug: string) => void;
 };
@@ -44,7 +44,12 @@ function getContentItems(exploreData: { pages?: { items: FeedItemDto[] }[] } | u
 function getLiveRecentProgress(
   recentProgress: ReturnType<typeof useContinueListening>["recentProgress"],
   localProgress:
-    | { completedAt?: string | null; positionSeconds?: number; durationSeconds?: number }
+    | {
+        completedAt?: string | null;
+        positionSeconds?: number;
+        /** Duration used to reconcile local playback progress with the server projection. */
+        durationSeconds?: number;
+      }
     | undefined,
 ) {
   if (!recentProgress || localProgress?.completedAt) return null;
@@ -195,6 +200,7 @@ function HomeContent({
   );
 }
 
+/** Renders public Home content and overlays authenticated local-first listening continuity. */
 export function HomeScreen({ onContinueListening }: HomeScreenProps) {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { recentProgress } = useContinueListening({

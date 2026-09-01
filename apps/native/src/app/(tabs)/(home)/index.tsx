@@ -1,15 +1,21 @@
-import { useTranslation } from "@/core/i18n/use-translation";
-import { PlaceholderRouteScreen } from "@/shared/components/placeholder-route-screen";
+import { useRouter } from "expo-router";
 
-/** Defines the Home root entrypoint for the native listener-facing shell. */
-/** Keeps the Home root reachable and localized while #814 supplies its study-specific content. */
+import { HomeScreen } from "@/features/home";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
+
+/** Provides the native Home entrypoint for the listener-facing navigation shell. */
+/**
+ * Defines the public Home route and delegates its study-surface behavior to the feature layer.
+ * Navigation callbacks stay here so the feature screen remains independent of Expo Router.
+ */
 export default function HomeRoute() {
-  const { t } = useTranslation();
+  const router = useRouter();
+  const { navigateToListing } = useListingNavigation();
 
   return (
-    <PlaceholderRouteScreen
-      title={t("navigation.home", "Home")}
-      description={t("home.description", "Begin your study journey.")}
+    <HomeScreen
+      onNavigateToListing={navigateToListing}
+      onNavigateToScholar={(slug) => router.push(`/scholars/${slug}`)}
     />
   );
 }
