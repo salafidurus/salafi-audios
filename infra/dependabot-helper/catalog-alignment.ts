@@ -41,11 +41,7 @@ function defaultInstall(rootDir: string) {
 }
 
 function snapshotFiles(rootDir: string): Map<string, string | null> {
-  const paths = [
-    "package.json",
-    "bun.lock",
-    ...readWorkspacePackagePaths(rootDir),
-  ];
+  const paths = ["package.json", "bun.lock", ...readWorkspacePackagePaths(rootDir)];
   return new Map(
     [...new Set(paths)].map((filePath) => {
       const absolutePath = resolve(rootDir, filePath);

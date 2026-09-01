@@ -42,7 +42,7 @@ else
 fi
 # dependency alignment start
 printf "pre-commit: running Dependabot Helper alignment...\n"
-bun run dependabot-helper align
+bun run --filter dependabot-helper align
 
 # Stage any package.json files modified by the fixer
 git diff --name-only | grep 'package.json' | while read -r file; do
@@ -50,7 +50,7 @@ git diff --name-only | grep 'package.json' | while read -r file; do
 done
 
 # Run policy checks to verify no outstanding dependency issues remain
-if ! bun run dependabot-helper check; then
+if ! bun run --filter dependabot-helper check; then
   printf "\x1b[31mDependabot Helper validation failed. Commit blocked.\x1b[0m\n" >&2
   exit 1
 fi

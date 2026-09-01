@@ -10,8 +10,8 @@ Vercel. Backend API, Redis, Dokploy, and GHCR operations are separate concerns.
 The active Vercel configuration is `apps/web/vercel.json`:
 
 - Bun `1.x` is selected.
-- Installation uses `bun ../../scripts/deploy/install.mjs web`.
-- The build uses `bun ../../scripts/deploy/build.mjs web`.
+- Installation uses `bun --cwd ../../scripts run deploy:install -- web`.
+- The build uses `bun --cwd ../../scripts run deploy:build -- web`.
 
 These commands run from the Vercel project context while resolving the
 repository-root deployment scripts for the `web` workspace.

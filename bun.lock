@@ -364,6 +364,9 @@
         "tsup": "catalog:",
       },
     },
+    "scripts": {
+      "name": "@sd/scripts",
+    },
   },
   "trustedDependencies": [
     "@sentry/cli",

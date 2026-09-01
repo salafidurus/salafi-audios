@@ -14,6 +14,7 @@ export function parseCatalogs(rootJson: PackageJson): Catalogs {
   const workspaces = rootJson.workspaces;
   return {
     default: workspaces?.catalog || {},
+    // SAFETY: Bun's PackageJson type omits named catalogs, which are present in the validated workspace JSON.
     named: (workspaces as any)?.catalogs || {},
   };
 }

@@ -1,4 +1,4 @@
-name: script-test
+name: deployment-scripts
 
 on:
   pull_request:
@@ -8,14 +8,14 @@ on:
     paths:
       - "scripts/deploy/**"
       - "scripts/utils/**"
-      - "scripts/postinstall.mjs"
-      - ".github/workflows/script-test.yml"
+      - ".github/workflows/deployment-scripts.yml"
+      - "scripts/package.json"
       - "package.json"
       - "bun.lock"
       - "turbo.json"
 
 concurrency:
-  group: script-test-${{ github.workflow }}-${{ github.ref }}
+  group: deployment-scripts-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -35,13 +35,13 @@ jobs:
           bun-version: "1.4.0"
 
       - name: Run Deploy Script Unit Tests
-        run: bun test scripts/deploy/install.spec.mjs
+        run: bun run --filter @sd/scripts test:deploy
 
       - name: Verify Web Deploy Install Script
-        run: bun ./scripts/deploy/install.mjs web
+        run: bun run --filter @sd/scripts deploy:install -- web
 
       - name: Verify Web Deploy Build Script
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api' }}
           NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL || 'http://localhost:3000' }}
-        run: bun ./scripts/deploy/build.mjs web
+        run: bun run --filter @sd/scripts deploy:build -- web

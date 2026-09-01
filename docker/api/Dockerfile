@@ -71,7 +71,7 @@ COPY --from=pruner /repo/tsconfig.json /repo/tsconfig.base.json \
 # Strip husky `prepare` again (out/full re-adds it) so the runtime production
 # install below cannot attempt it. Then build api + its workspace closure.
 RUN sed -i '/"prepare"[[:space:]]*:/d' package.json \
-    && bun run build --filter=api...
+    && bun run build:all --filter=api...
 
 # Remove development node_modules and build caches before handing off.
 # The runtime stage reinstalls only production dependencies.

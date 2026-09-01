@@ -42,14 +42,14 @@ jobs:
           key: deps-state
 
       - name: Validate Helper policy and checks
-        run: bun infra/dependabot-helper/cli.ts check
+        run: bun run --filter dependabot-helper check
 
       - name: Run Helper-owned dependency update
         run: |
           if [ "${{ inputs.report_only }}" = "true" ]; then
-            bun infra/dependabot-helper/cli.ts update --report-only
+            bun run --filter dependabot-helper update -- --report-only
           else
-            bun infra/dependabot-helper/cli.ts update
+            bun run --filter dependabot-helper update
           fi
         env:
           GH_TOKEN: ${{ secrets.SALAFIDURUS_PR_WRITE }}

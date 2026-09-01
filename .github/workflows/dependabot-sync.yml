@@ -35,7 +35,7 @@ jobs:
           bun-version: "1.4.0"
 
       - name: Validate Dependabot Helper policy
-        run: bun infra/dependabot-helper/cli.ts validate
+        run: bun run --filter dependabot-helper validate
 
       - name: Determine changed files
         id: files
@@ -54,7 +54,7 @@ jobs:
         id: input-files
         if: steps.files.outputs.needs-update == 'true'
         continue-on-error: true
-        run: bun infra/dependabot-helper/cli.ts validate-files /tmp/pr-files.txt
+        run: bun run --filter dependabot-helper validate-files -- /tmp/pr-files.txt
 
       - name: Apply PR package.json changes (data only, no scripts)
         if: steps.files.outputs.needs-update == 'true' && steps.input-files.outcome == 'success'
@@ -72,7 +72,7 @@ jobs:
           REPORT_FILE: /tmp/dependabot-report.json
         run: |
           set +e
-          bun infra/dependabot-helper/cli.ts align > "$REPORT_FILE"
+          bun run --filter dependabot-helper align > "$REPORT_FILE"
           status=$?
           if [ ! -s "$REPORT_FILE" ]; then
             exit 1
@@ -92,7 +92,7 @@ jobs:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           git diff --name-only "$PR_HEAD_SHA" > /tmp/final-files.txt
-          bun infra/dependabot-helper/cli.ts validate-files /tmp/final-files.txt
+          bun run --filter dependabot-helper validate-files -- /tmp/final-files.txt
 
       - name: Stage + commit scoped changes
         id: commit
@@ -154,7 +154,7 @@ jobs:
           DEPENDABOT_VALIDATION: ${{ steps.install.outcome == 'success' && 'passed' || 'failed' }}
           DEPENDABOT_COMMIT_SHA: ${{ steps.commit.outputs.commit_sha }}
           DEPENDABOT_REJECTION_REASON: ${{ steps.repair.outcome != 'success' && 'Repair was rejected or failed; no write-back was performed.' || steps.output-files.outcome != 'success' && 'Generated files failed the Dependabot allowlist.' || steps.push.outcome == 'failure' && 'Repair commit was created but push-back failed.' || '' }}
-        run: bun infra/dependabot-helper/cli.ts render /tmp/dependabot-report.json /tmp/dependabot-audit.md
+        run: bun run --filter dependabot-helper render -- /tmp/dependabot-report.json /tmp/dependabot-audit.md
 
       - name: Comment audit result
         if: always() && steps.files.outputs.needs-update == 'true'

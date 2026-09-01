@@ -49,6 +49,7 @@ export function runAuxiliaryUpdates(
 }
 
 function readCatalog(rootDir: string): Record<string, string> {
+  // SAFETY: The repository root package is validated JSON with the typed workspace catalog shape.
   const rootPackage = JSON.parse(
     readFileSync(resolve(rootDir, "package.json"), "utf8"),
   ) as PackageJson;
@@ -78,6 +79,7 @@ function packageVersionMap(rootDir: string, family: DependencyFamily): Map<strin
   for (const workspace of resolvedWorkspaces) {
     const packagePath = resolve(rootDir, workspace, "package.json");
     if (!existsSync(packagePath)) continue;
+    // SAFETY: Workspace package files are parsed as package.json objects before dependency fields are read.
     const pkg = JSON.parse(readFileSync(packagePath, "utf8")) as PackageJson;
     for (const section of [pkg.dependencies, pkg.devDependencies, pkg.peerDependencies]) {
       for (const [name, version] of Object.entries(section ?? {})) {

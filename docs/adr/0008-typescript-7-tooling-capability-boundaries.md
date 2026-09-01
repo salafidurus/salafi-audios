@@ -65,18 +65,18 @@ means the current path is not required when a named alternative preserves that
 contract. “Compatibility exception-only” means the tool must remain isolated
 behind its own legacy compiler boundary until its support changes.
 
-| Capability | Repository boundary | Classification | Evidence and contract check | Owner |
-| --- | --- | --- | --- | --- |
-| Typechecking | Root `typecheck`, package `typecheck` scripts, and Turbo task graph | TypeScript 7-compatible | Run the root and package checks under TypeScript 7; preserve dependency order and diagnostics ownership | #745 |
-| Project references | Root `tsconfig.json` and composite package projects | TypeScript 7-compatible | Run the complete reference graph with `tsc -b`; verify every referenced project is checked exactly once | #745 |
-| Declaration emit | `tsc` build configs and `tsup` declaration mode | TypeScript 7-compatible | Build every declaration package; compare declarations, declaration maps, exports, and CJS/ESM entry points | #745/#748 |
-| Module resolution | Bundler, Node10, package exports, aliases, and native suffixes | TypeScript 7-compatible | Run focused probes for package exports, aliases, `.native` precedence, and `.web` fallback; native resolution must remain native-first | #744/#745 |
-| Editor/compiler integrations | React Doctor and compiler-API consumers | Compatibility-exception-only | Inspect declared compiler API ranges and run each supported command from the frozen install; this classification applies specifically to React Doctor | #747 |
-| Package builds | `tsc`, `tsup`, Bun, Next.js, and Expo build boundaries | TypeScript 7-compatible | Run filtered builds and inspect emitted files, source maps, package exports, and runtime entry points | #745/#748 |
-| Linting | OxLint, `oxlint-tsgolint`, and React Doctor plugin | TypeScript 7-compatible | Run OxLint and the React Doctor plugin independently; preserve diagnostics and suppressions | #747 |
-| Framework tooling | Expo/Metro, Next.js/SWC, and API Bun/SWC execution | Replaceable | Confirm framework transforms and API decorator metadata without routing runtime builds through TypeScript emit; unused Nest CLI is handled by #746 | #746 |
-| Generated-client paths | Prisma generation and `@sd/core-db` consumers | TypeScript 7-compatible | Generate Prisma output, typecheck consumers, and verify generated exports and runtime imports | #745/#748 |
-| CI wrappers | Dependabot Helper, Turbo, GitHub Actions, Docker install/build paths | TypeScript 7-compatible | Run frozen installation and CI-equivalent checks; classify wrapper failures by owning root, compiler API, or network boundary | #748 |
+| Capability                   | Repository boundary                                                  | Classification               | Evidence and contract check                                                                                                                           | Owner     |
+| ---------------------------- | -------------------------------------------------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Typechecking                 | Root `typecheck`, package `typecheck` scripts, and Turbo task graph  | TypeScript 7-compatible      | Run the root and package checks under TypeScript 7; preserve dependency order and diagnostics ownership                                               | #745      |
+| Project references           | Root `tsconfig.json` and composite package projects                  | TypeScript 7-compatible      | Run the complete reference graph with `tsc -b`; verify every referenced project is checked exactly once                                               | #745      |
+| Declaration emit             | `tsc` build configs and `tsup` declaration mode                      | TypeScript 7-compatible      | Build every declaration package; compare declarations, declaration maps, exports, and CJS/ESM entry points                                            | #745/#748 |
+| Module resolution            | Bundler, Node10, package exports, aliases, and native suffixes       | TypeScript 7-compatible      | Run focused probes for package exports, aliases, `.native` precedence, and `.web` fallback; native resolution must remain native-first                | #744/#745 |
+| Editor/compiler integrations | React Doctor and compiler-API consumers                              | Compatibility-exception-only | Inspect declared compiler API ranges and run each supported command from the frozen install; this classification applies specifically to React Doctor | #747      |
+| Package builds               | `tsc`, `tsup`, Bun, Next.js, and Expo build boundaries               | TypeScript 7-compatible      | Run filtered builds and inspect emitted files, source maps, package exports, and runtime entry points                                                 | #745/#748 |
+| Linting                      | OxLint, `oxlint-tsgolint`, and React Doctor plugin                   | TypeScript 7-compatible      | Run OxLint and the React Doctor plugin independently; preserve diagnostics and suppressions                                                           | #747      |
+| Framework tooling            | Expo/Metro, Next.js/SWC, and API Bun/SWC execution                   | Replaceable                  | Confirm framework transforms and API decorator metadata without routing runtime builds through TypeScript emit; unused Nest CLI is handled by #746    | #746      |
+| Generated-client paths       | Prisma generation and `@sd/core-db` consumers                        | TypeScript 7-compatible      | Generate Prisma output, typecheck consumers, and verify generated exports and runtime imports                                                         | #745/#748 |
+| CI wrappers                  | Dependabot Helper, Turbo, GitHub Actions, Docker install/build paths | TypeScript 7-compatible      | Run frozen installation and CI-equivalent checks; classify wrapper failures by owning root, compiler API, or network boundary                         | #748      |
 
 The audit is evidence-backed only when the command result is recorded with the
 tool version, compiler version, configuration used, and any failure's owning
@@ -85,17 +85,17 @@ that the package consumes the compiler at runtime.
 
 The tool-level classifications are:
 
-| Tool | Classification | Boundary rationale |
-| --- | --- | --- |
-| TypeScript compiler and project-reference driver | TypeScript 7-compatible | Owns the repository's public compiler path after #745's adoption and parity checks |
-| `tsup` | TypeScript 7-compatible | Declares a TypeScript peer range and must preserve package declaration/build outputs |
-| Turbo | TypeScript 7-compatible | Orchestrates commands and ordering; it does not own a second compiler contract |
-| Bun/SWC, Next.js/SWC, and Expo/Metro | TypeScript 7-compatible | Runtime transformation is independent of TypeScript emit; TypeScript resolution remains subject to the platform gate |
-| Prisma generator and generated-client consumers | TypeScript 7-compatible | Generated artifacts must remain consumable by the TypeScript 7-owned checks |
-| OxLint, `oxlint-tsgolint`, and React Doctor OxLint plugin | TypeScript 7-compatible | Linting remains an independent boundary and must preserve existing diagnostics and suppressions |
-| Nest CLI | Replaceable | The API uses Bun/SWC and does not require Nest CLI as its runtime build boundary; removal is #746's implementation |
-| React Doctor CLI | Compatibility-exception-only | Its locked `typescript >=5.0.4 <6` requirement has no supported TypeScript 7 path in the current dependency |
-| Dependabot Helper | TypeScript 7-compatible | Its check must run with an explicit repository root boundary; the observed `TS6059` is a wrapper configuration failure, not a reason to expose a public compatibility compiler |
+| Tool                                                      | Classification               | Boundary rationale                                                                                                                                                             |
+| --------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| TypeScript compiler and project-reference driver          | TypeScript 7-compatible      | Owns the repository's public compiler path after #745's adoption and parity checks                                                                                             |
+| `tsup`                                                    | TypeScript 7-compatible      | Declares a TypeScript peer range and must preserve package declaration/build outputs                                                                                           |
+| Turbo                                                     | TypeScript 7-compatible      | Orchestrates commands and ordering; it does not own a second compiler contract                                                                                                 |
+| Bun/SWC, Next.js/SWC, and Expo/Metro                      | TypeScript 7-compatible      | Runtime transformation is independent of TypeScript emit; TypeScript resolution remains subject to the platform gate                                                           |
+| Prisma generator and generated-client consumers           | TypeScript 7-compatible      | Generated artifacts must remain consumable by the TypeScript 7-owned checks                                                                                                    |
+| OxLint, `oxlint-tsgolint`, and React Doctor OxLint plugin | TypeScript 7-compatible      | Linting remains an independent boundary and must preserve existing diagnostics and suppressions                                                                                |
+| Nest CLI                                                  | Replaceable                  | The API uses Bun/SWC and does not require Nest CLI as its runtime build boundary; removal is #746's implementation                                                             |
+| React Doctor CLI                                          | Compatibility-exception-only | Its locked `typescript >=5.0.4 <6` requirement has no supported TypeScript 7 path in the current dependency                                                                    |
+| Dependabot Helper                                         | TypeScript 7-compatible      | Its check must run with an explicit repository root boundary; the observed `TS6059` is a wrapper configuration failure, not a reason to expose a public compatibility compiler |
 
 ## Compatibility boundary
 
@@ -162,12 +162,12 @@ frozen dependency installation:
 
 ```bash
 bun install --frozen-lockfile --ignore-scripts
-bun run build
-bun run lint
-bun run typecheck
-bun run test
+bun run build:all
+bun run lint:all
+bun run typecheck:all
+bun run test:all
 bun run --filter @sd/core-db prisma:generate
-bun run dependabot-helper align
+bun run --filter dependabot-helper align
 bun run doctor
 bun run verify:build-configs
 ```

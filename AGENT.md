@@ -6,7 +6,7 @@ workspace `AGENT.md` before changing code.
 ## Agent files and skills
 
 - `AGENT.md` is canonical; `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md` are aliases.
-- Edit canonical files only. Run `node scripts/sync-agents.mjs` after changing
+- Edit canonical files only. Run `bun run --filter @sd/scripts sync-agents` after changing
   agent resources.
 - Shared skills live in `.agents/skills/`; always-on rules live in
   `.agents/rules/`.

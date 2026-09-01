@@ -26,6 +26,7 @@ export function cachePath(rootDir: string): string {
 export function readCache(rootDir: string): DepsCache {
   try {
     const raw = readFileSync(cachePath(rootDir), "utf-8");
+    // SAFETY: The version check below is the cache-format discriminator before the value is returned.
     const parsed = JSON.parse(raw) as DepsCache;
     if (parsed.version === 1) return parsed;
   } catch {

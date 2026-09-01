@@ -27,7 +27,7 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 - Install: `bun install`
 - Run all in dev: `bun run dev`
 - Run single app: `bun run dev:api`, `bun run dev:web`, `bun run dev:native`
-- Build / Test / Lint / Typecheck: `bun run build`, `bun run test`, `bun run lint`, `bun run typecheck` (use Turbo filters to scope)
+- Build / Test / Lint / Typecheck: `bun run build`, `bun run test`, `bun run lint`, `bun run typecheck` (affected workspaces; use the `:all` variants for the full repository)
 - API-only tests: `bun run --filter api test`
 - Web E2E (Bun.WebView): `bun run test:e2e`
 - Shared contract updates: edit `packages/core-contracts` manually when backend response shapes change, then build/typecheck the package.
@@ -93,11 +93,13 @@ Bug fixes start with a failing test that reproduces the bug.
 ### Test commands
 
 ```bash
-bun run test                                                  # all
+bun run test                                                  # affected only
+bun run test:all                                              # all workspaces
 bun run --filter api test                                     # API only
 bun run --filter api test -- src/modules/scholars/scholars.service.spec.ts
 bun run --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts
-bun run test:e2e                                              # Bun.WebView
+bun run test:e2e                                              # affected E2E workspaces
+bun run test:e2e:all                                          # all E2E workspaces
 bun run test:prepush                                          # CI gate (changed files only)
 ```
 
@@ -130,7 +132,8 @@ Add `POST /admin/listings/:id/publish` →
 3. Add or update the API interface in `apps/api/src` and keep request/response DTOs explicit.
 4. Update `packages/core-contracts` to keep shared response types in sync.
 5. Add an integration test that verifies `POST /admin/listings/:id/publish` returns 401 without auth.
-6. Run `bun run test` — all tests pass, commit.
+6. Run `bun run test` for affected tests; use `bun run test:all` for a full
+   repository validation before committing when the change requires it.
 
 ---
 
