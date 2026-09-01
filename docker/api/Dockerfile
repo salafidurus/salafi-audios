@@ -88,7 +88,7 @@ FROM oven/bun:1.4.0 AS runtime
 # can probe the API. Debian-based oven/bun image; done before the non-root
 # user switch below.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl=7.88.1-10+deb12u15 \
+    && apt-get install -y --no-install-recommends curl=8.14.1-2+deb13u4 \
     && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production \
