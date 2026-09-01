@@ -176,7 +176,12 @@ export function ExplorePodcastRow({ item, onPress, onNavigateToListing }: Explor
     <List.Item onPress={handlePlay} testID="podcast-row-item">
       <View style={styles.rowContent} testID="podcast-row">
         <View style={styles.rowLayout}>
-          <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
+          <UserAvatar
+            image={item.thumbnailUrl ?? item.scholarImageUrl}
+            name={title}
+            size={64}
+            testID="explore-listing-avatar"
+          />
           <View style={styles.content}>
             <View style={styles.columnLayout}>
               <MarqueeText text={title} variant="titleMd" />

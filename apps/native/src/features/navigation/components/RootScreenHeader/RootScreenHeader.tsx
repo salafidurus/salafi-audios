@@ -44,7 +44,6 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.scale.md,
-    paddingHorizontal: theme.spacing.layout.pageX,
     paddingTop: theme.spacing.layout.pageY,
     paddingBottom: theme.spacing.scale.sm,
     backgroundColor: theme.colors.surface.canvas,

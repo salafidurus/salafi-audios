@@ -57,7 +57,6 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.scale.md,
-    paddingHorizontal: theme.spacing.scale.md,
     paddingVertical: theme.spacing.scale.sm,
   },
   content: {

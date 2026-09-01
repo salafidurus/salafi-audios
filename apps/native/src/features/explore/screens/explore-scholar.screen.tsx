@@ -150,11 +150,10 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
   },
   intro: {
-    paddingHorizontal: theme.spacing.scale.md,
     paddingBottom: theme.spacing.scale.sm,
   },
   listCard: {
     flex: 1,
-    margin: theme.spacing.scale.md,
+    marginVertical: theme.spacing.scale.md,
   },
 }));

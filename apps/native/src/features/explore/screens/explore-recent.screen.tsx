@@ -207,12 +207,11 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surface.canvas,
   },
   listContent: {
-    padding: theme.spacing.scale.md,
+    paddingVertical: theme.spacing.scale.md,
     gap: theme.spacing.scale.md,
   },
   filterSection: {
     gap: theme.spacing.scale.xs,
-    paddingHorizontal: theme.spacing.layout.pageX,
     paddingBottom: theme.spacing.scale.sm,
   },
 }));
