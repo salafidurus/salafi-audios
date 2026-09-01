@@ -83,6 +83,7 @@ function MyLibrarySectionTabs({ labels, selectedSection, onSelect }: MyLibrarySe
             <AppText
               variant="bodyMd"
               colorRole={selected ? "primary" : "subtle"}
+              numberOfLines={1}
               style={selected ? styles.tabLabelSelected : styles.tabLabel}
             >
               {labels[index]}
@@ -196,11 +197,11 @@ const styles = StyleSheet.create((theme) => ({
     borderBottomColor: theme.colors.border.default,
   },
   tabsContent: {
-    width: "100%",
+    flexGrow: 1,
   },
   tab: {
     minHeight: 48,
-    flex: 1,
+    minWidth: 96,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: theme.spacing.scale.md,
