@@ -40,9 +40,18 @@ bun run build
 bun run lint
 bun run typecheck
 bun run test
+
+# Full repository checks
+bun run build:all
+bun run lint:all
+bun run typecheck:all
+bun run test:all
+bun run test:e2e:all
 ```
 
-Run scoped scripts with `bun run --filter <workspace> <script>`.
+The default build, lint, typecheck, and test commands use Turbo's affected
+graph for fast local feedback. Run scoped scripts with
+`bun run --filter <workspace> <script>`.
 
 ## Architecture rules
 

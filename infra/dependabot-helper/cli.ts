@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 import type { CatalogRepairReport } from "./catalog/types";
 
-import { formatDependabotAuditComment, validateDependabotFiles } from "./catalog/dependabot";
 import {
   runAuxiliaryUpdates,
   runHelperChecks,
@@ -10,6 +10,7 @@ import {
   type HelperCheckResult,
 } from "./auxiliary";
 import { runCatalogAlignment } from "./catalog-alignment";
+import { formatDependabotAuditComment, validateDependabotFiles } from "./catalog/dependabot";
 
 /** Reads native Dependabot ignore entries without making YAML a runtime dependency. */
 export function extractDependabotIgnoredPatterns(source: string): string[] {
@@ -72,7 +73,9 @@ export async function main(args: string[], rootDir: string): Promise<number> {
   }
 
   if (args[0] !== "validate" && args[0] !== "check" && args[0] !== "update") {
-    console.error("Usage: bun infra/dependabot-helper/cli.ts <validate|check|update|align>");
+    console.error(
+      "Usage: bun run --filter dependabot-helper <validate|check|update|align|validate-files|render>",
+    );
     return 1;
   }
 
@@ -96,4 +99,7 @@ export async function main(args: string[], rootDir: string): Promise<number> {
   return 0;
 }
 
-if (import.meta.main) process.exitCode = await main(process.argv.slice(2), process.cwd());
+if (import.meta.main) {
+  const rootDir = resolve(import.meta.dirname, "../..");
+  process.exitCode = await main(process.argv.slice(2), rootDir);
+}

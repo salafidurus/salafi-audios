@@ -3,7 +3,16 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "cli": "bun cli.ts",
+    "validate": "bun cli.ts validate",
+    "check": "bun cli.ts check",
+    "update": "bun cli.ts update",
+    "align": "bun cli.ts align",
+    "validate-files": "bun cli.ts validate-files",
+    "render": "bun cli.ts render",
+    "lint": "oxlint . && oxfmt --check .",
     "test": "bun test",
+    "test:prepush": "bun test",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

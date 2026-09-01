@@ -45,11 +45,13 @@ interface GroupBatch {
   candidates: UpdateCandidate[];
 }
 
-function exec(
-  cmd: string,
-  args: string[],
-  opts?: { cwd?: string },
-): { stdout: string; stderr: string; status: number | null } {
+interface ExecResult {
+  stdout: string;
+  stderr: string;
+  status: number | null;
+}
+
+function exec(cmd: string, args: string[], opts?: { cwd?: string }): ExecResult {
   // nosemgrep
   const result = spawnSync(cmd, args, {
     encoding: "utf-8",
@@ -103,6 +105,7 @@ async function latestClosedPr(branch: string, execFn: ExecFn = exec): Promise<nu
     "number,state,closedAt",
   ]);
   if (!result.stdout) return null;
+  // SAFETY: gh is asked for exactly these fields through --json, and stdout is checked above.
   const prs = JSON.parse(result.stdout) as {
     number: number;
     state: string;
@@ -379,7 +382,7 @@ async function createOrUpdatePr(
   dryRun: boolean,
 ): Promise<number | null> {
   const title = `chore(deps): update ${group}`;
-  const labels = ["dependencies"] as string[];
+  const labels = ["dependencies"];
   const autoMerge = bump === "minor" || bump === "patch";
 
   if (dryRun) {
@@ -452,7 +455,7 @@ async function createOrUpdatePr(
 }
 
 function applyUpdatesToWorktree(candidates: UpdateCandidate[], wtDir: string): Promise<boolean> {
-  let chain = Promise.resolve(true) as Promise<boolean>;
+  let chain = Promise.resolve(true);
   candidates.forEach((c) => {
     chain = chain.then((ok) => (ok ? applyUpdate(c, wtDir, config) : false));
   });
@@ -619,7 +622,7 @@ function scheduleBatches(
   retryOpts: RetryOptions,
   summaries: CiSummary[],
 ): Promise<void> {
-  let chain = Promise.resolve() as Promise<void>;
+  let chain = Promise.resolve();
   batches.forEach((batch) => {
     chain = chain.then(() =>
       processBatch(batch, rootDir, options, retryOpts).then((s) => {

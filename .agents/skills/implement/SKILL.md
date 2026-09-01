@@ -99,11 +99,11 @@ Before implementation, run the applicable pre-work checks and record their
 baseline. The repository baseline is:
 
 ```bash
-bun run build
-bun run lint
-bun run typecheck
-bun run test
-bun run test:e2e
+bun run build:all
+bun run lint:all
+bun run typecheck:all
+bun run test:all
+bun run test:e2e:all
 bun run doctor
 ```
 

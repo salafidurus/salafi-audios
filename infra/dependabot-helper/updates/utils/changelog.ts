@@ -26,6 +26,7 @@ async function fetchNpmRepoUrl(packageName: string): Promise<string | null> {
         headers: { Accept: "application/json" },
       });
       if (!res.ok) return null;
+      // SAFETY: The npm registry response is consumed only for this optional repository URL shape.
       const data = (await res.json()) as {
         repository?: { url?: string };
       };
@@ -52,8 +53,8 @@ async function fetchGitCompareUrl(
 
   const owner = match[1]!;
   const repo = match[2]!;
-  const headers: Record<string, string> = { Accept: "application/vnd.github+json" };
-  if (token) headers.Authorization = `Bearer ${token}`;
+  const headers = new Headers({ Accept: "application/vnd.github+json" });
+  if (token) headers.set("Authorization", `Bearer ${token}`);
 
   try {
     const res = await fetch(
@@ -62,6 +63,7 @@ async function fetchGitCompareUrl(
     );
     if (!res.ok) return null;
 
+    // SAFETY: The GitHub compare response is consumed only for these optional fields.
     const data = (await res.json()) as {
       commits?: Array<{ commit?: { message?: string } }>;
       html_url?: string;

@@ -1,6 +1,12 @@
 import { spawnSync } from "child_process";
 
-function git(args: string[]): { stdout: string; stderr: string; status: number | null } {
+interface GitResult {
+  stdout: string;
+  stderr: string;
+  status: number | null;
+}
+
+function git(args: string[]): GitResult {
   const result = spawnSync("git", args, { encoding: "utf-8" });
   return {
     stdout: result.stdout ?? "",

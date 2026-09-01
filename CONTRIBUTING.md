@@ -209,6 +209,11 @@ You must update documentation if you:
 - Modify guarantees or constraints
 - Adjust responsibilities between components
 
+The root `build`, `lint`, `typecheck`, `test`, and `test:prepush` commands are
+affected-only local checks. Use the corresponding `build:all`, `lint:all`,
+`typecheck:all`, and `test:all` commands when a full repository check is
+required, such as in CI or before validating an unrelated workspace.
+
 Undocumented behavior is considered incomplete.
 
 ---

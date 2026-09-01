@@ -18,7 +18,6 @@ on:
       - "turbo.json"
       - "tsconfig*.json"
       - ".github/workflows/docker-build.yml"
-      - ".github/workflows/docker-deploy.yml"
 
 concurrency:
   group: docker-build-${{ github.event.pull_request.number }}
