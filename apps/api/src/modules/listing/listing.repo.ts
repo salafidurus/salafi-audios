@@ -2236,6 +2236,7 @@ export class ListingRepository {
                   name: true,
                   slug: true,
                   title: true,
+                  imageUrl: true,
                   mainLanguage: true,
                   translations: {
                     where: { locale, status: 'published' },
