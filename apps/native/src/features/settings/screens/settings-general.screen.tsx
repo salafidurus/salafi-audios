@@ -9,6 +9,11 @@ import { NativeBridgeHost } from "@/shared/ui";
 import { ContentLanguageToggle } from "../components/content-language-toggle/content-language-toggle";
 import { LanguageSwitch } from "../components/language-switch/language-switch";
 import { SegmentedControl } from "../components/SegmentedControl/SegmentedControl";
+import {
+  SettingsAccountActions,
+  SettingsSupportLegalActions,
+  type SettingsAccountActionsProps,
+} from "./settings-account-actions.screen";
 
 /** Renders the general settings form with RN layout and isolated Expo UI controls. */
 type ThemePreference = "system" | "light" | "dark";
@@ -24,7 +29,7 @@ function getInitialTheme(): ThemePreference {
 }
 
 /** Owns theme, language, and notification preferences for the Settings tab. */
-export function SettingsGeneralScreen() {
+export function SettingsGeneralScreen(props: SettingsAccountActionsProps = {}) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const [themePreference, setThemePreference] = useState<ThemePreference>(getInitialTheme);
@@ -66,6 +71,7 @@ export function SettingsGeneralScreen() {
               gap: theme.spacing.layout.sectionY,
             }}
           >
+            <SettingsAccountActions {...props} />
             <SettingsSection
               title={t("settings.general.languageSection", "Language")}
               theme={theme}
@@ -132,6 +138,7 @@ export function SettingsGeneralScreen() {
                 </>
               ) : null}
             </SettingsSection>
+            <SettingsSupportLegalActions {...props} />
           </ScrollView>
         </View>
       </NativeBridgeHost>

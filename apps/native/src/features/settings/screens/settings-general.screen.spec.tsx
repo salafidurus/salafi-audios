@@ -61,6 +61,11 @@ jest.mock("../components/SegmentedControl/SegmentedControl", () => ({
   },
 }));
 
+jest.mock("./settings-account-actions.screen", () => ({
+  SettingsAccountActions: () => null,
+  SettingsSupportLegalActions: () => null,
+}));
+
 jest.mock("@/shared/ui", () => {
   const actual = jest.requireActual<typeof import("@/shared/ui")>("@/shared/ui");
   return { ...actual, NativeSegmentedControl: () => null };
