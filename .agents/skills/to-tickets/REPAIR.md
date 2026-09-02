@@ -8,8 +8,9 @@ Repair the graph in place; do not create replacement issues.
 1. Read the parent specification and every linked ticket, including comments,
    labels, state, PR references, branch references, and native dependency
    edges.
-2. Resolve the parent's recorded `spec/<slug>` branch before editing any
-   ticket. A missing or conflicting branch is a blocking ambiguity.
+2. Treat any recorded `spec/<slug>` branch as legacy metadata. A missing spec
+   branch is not a blocking ambiguity; new and repaired ticket work targets
+   `main`.
 3. Build a complete current dependency matrix, including tickets with no
    blockers. Distinguish historical completed blockers from active blockers.
 4. Present proposed ticket, dependency, label, and branch changes for approval
@@ -24,8 +25,8 @@ Repair the graph in place; do not create replacement issues.
 - Add the lifecycle contract: `pre-implement` verifies readiness read-only;
   `implement` invokes `triage` to enter `in-progress`; and
   `post-implement` invokes `triage` after merge before cleanup.
-- Record the integration branch and PR target in each ticket. Ordinary child
-  tickets target `spec/<slug>`; the final validation ticket targets `main`.
+- Record `origin/main` as the branch base and `main` as the PR target in each
+  implementation ticket. The finalization ticket has no branch or PR target.
 - Repair both textual `Blocked by` sections and GitHub native dependency edges.
   Remove only edges that no longer represent a genuine blocker, and retain
   completed work as historical evidence when useful.

@@ -70,10 +70,9 @@ Verify the implementation evidence, then prepare the PR with this minimal body:
 Use the actual issue/spec numbers. If an implementation issue exists, include
 `Closes #<issue>` for it; when no issue exists, omit the closing reference and
 state that no issue was available. Verify that the PR's head branch and commit
-match the intended worktree. For a specification ticket, also verify that the
-PR targets the verified parent specification branch. If the parent branch is
-missing, fail closed and report the missing integration context; never invent a
-specification branch or claim isolated integration. If risks or follow-up work
+match the intended worktree. For a specification ticket, verify that the PR
+targets `main`, just like a standalone ticket. Do not require or invent a
+specification integration branch. If risks or follow-up work
 are identified, ask whether they should be drilled further into a new
 specification or ticket before finalizing the PR.
 
@@ -98,49 +97,30 @@ both gates pass. Then:
 3. Independently verify every implementation issue is closed and its labels
    match the completed-ticket policy. Stop before resource cleanup if triage or
    verification is uncertain.
-4. If this is a specification ticket, verify its PR targeted the verified
-   parent spec branch, remove only the confirmed completed ticket worktree,
-   and delete only its local and remote ticket branch. Do not fast-forward
-   local `main`, delete the active spec branch, or remove sibling ticket
-   branches and worktrees.
+4. If this is a specification ticket, verify its PR targeted `main`, remove
+   only the confirmed completed ticket worktree, and delete only its local and
+   remote ticket branch. Preserve unrelated branches and worktrees.
 5. If this is a standalone ticket, fast-forward local `main` from the merged
    remote state and remove only the confirmed completed worktree and branch.
-6. Verify the applicable integration branch is clean and current, the
-   completed worktree is absent, and unrelated dirty checkout state, unrelated
-   worktrees, and sibling ticket branches and worktrees remain unchanged.
+6. Verify `main` is clean and current, the completed worktree is absent, and
+   unrelated dirty checkout state, unrelated worktrees, and sibling ticket
+   branches and worktrees remain unchanged.
 
 For native work performed in the current checkout, preserve the checkout and
 do not remove it as a worktree. Clean only the associated branch/resources
 that are explicitly confirmed safe to delete.
 
-Standalone tickets retain the existing `main`-based cleanup. Specification
-tickets use the parent spec branch as their integration target and preserve
-that branch until final specification validation or abandonment.
+Standalone and specification tickets use the same `main`-based integration and
+cleanup. Specifications have no implementation branch to preserve.
 
-## Finalization or abandonment
+## Finalization boundary
 
-Finalization is the terminal post-implement path for a specification. It is
-executed only for the published finalization ticket, after every
-implementation ticket has completed. Open or update the direct
-`spec/<slug>` → `main` PR, wait for all required CI including Docker, and merge
-it only after the complete specification acceptance matrix and applicable
-repository checks pass. Verify the merged PR, final head, and recorded
-acceptance evidence; then close the parent specification.
-
-Only after merge verification may you delete the disposable `spec/<slug>`
-branch and any remaining specification resources, including the finalization
-ticket resources. Verify Git registration, local and remote refs, and physical
-worktree paths before each deletion. Preserve unrelated dirty state,
-worktrees, branches, and active specifications. If the direct PR needs no
-boundary changes, do not create an intermediate branch.
-
-If the specification is abandoned, record the reason and distinct abandoned
-outcome on the parent and child issues according to tracker policy. Verify the
-remote spec branch, ticket branch, and worktree identity and state before each
-deletion. Stop on uncertainty and preserve unrelated dirty state, branches,
-worktrees, and active specifications.
+`implement-spec` owns specification finalization and abandonment. Do not invoke
+this skill for the finalization ticket; it has no implementation branch, code
+change, or pull request.
 
 ## Completion
 
-Report the PR, final commit, issue states, cleanup actions, and final Git state.
+For an ordinary implementation ticket, report the PR, final commit, issue
+states, cleanup actions, and final Git state.
 Do not claim delivery complete until each applicable verification has evidence.

@@ -5,27 +5,26 @@ Repair is an in-place reconciliation mode, not a second publication.
 
 ## Preconditions
 
-1. Read the complete parent issue, comments, labels, linked tickets, native
-   dependency edges, and recorded integration-branch metadata.
+1. Read the complete parent issue, comments, labels, linked tickets, and native
+   dependency edges. Treat historical branch metadata as evidence, not as a
+   required integration context.
 2. Confirm the issue is a specification artifact. If it is a ticket, hand it
    to `to-tickets` or `pre-implement` as appropriate.
-3. Compare the body, comments, and remote branches. Surface contradictory
-   branch names, stale acceptance criteria, missing parent links, and closed
-   child tickets before proposing changes.
+3. Compare the body, comments, and linked ticket branches. Surface stale
+   acceptance criteria, missing parent links, open PRs targeting legacy spec
+   branches, and closed child tickets before proposing changes.
 4. Present the repair scope and seams for approval before tracker writes.
 
 ## Reconciliation contract
 
 - Preserve the existing specification number, comments, issue history, and
   valid decisions.
-- Resolve exactly one `spec/<slug>` branch for the specification. Never invent
-  a branch from an ambiguous comment; create a missing branch only after the
-  slug and base are approved.
-- Record the parent issue number and integration branch together in the
-  current specification body or an explicit metadata comment.
-- Normalize the parent body to distinguish the integration branch from the
-  final validation PR target. The normal target is `spec/<slug>`; final
-  validation targets `main`.
+- Do not create or require a specification integration branch.
+- Record the parent issue number and direct-to-`main` delivery model in the
+  current specification body or an explicit metadata comment when repair
+  requires lifecycle clarification.
+- Preserve legacy branch names only as historical evidence. Retarget open or
+  future implementation work to `main` through the separate ticket repair.
 - Preserve `spec` and `ready-for-agent` on an open parent. Do not apply
   implementation state labels to the parent.
 - Keep child ticket repair separate. Do not rewrite ticket acceptance criteria
@@ -33,6 +32,6 @@ Repair is an in-place reconciliation mode, not a second publication.
 
 ## Completion
 
-Verify the updated parent body, labels, branch identity, and child-ticket
-membership. Hand the reconciled parent to `to-tickets` for ticket-graph repair.
+Verify the updated parent body, labels, and child-ticket membership. Hand the
+reconciled parent to `to-tickets` for ticket-graph repair.
 Do not invoke `pre-implement` directly from this procedure.

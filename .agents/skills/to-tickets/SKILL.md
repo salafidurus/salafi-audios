@@ -34,7 +34,7 @@ Never treat a repair or revision as a fresh ticket publication.
 
 ### 1. Gather context
 
-Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments. For a specification ticket, resolve the parent specification and its recorded `spec/<slug>` branch before drafting the ticket. A standalone ticket has no parent specification and no spec-branch context.
+Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments. For a specification ticket, resolve the parent specification before drafting the ticket. Implementation tickets use `origin/main` as their base and `main` as their PR target; finalization has no branch or PR.
 
 ### 2. Explore the codebase (optional)
 
@@ -72,17 +72,18 @@ its blockers to **every implementation ticket in the specification**. It is
 the terminal node of the existing graph, not a new lifecycle stage. Its
 acceptance criteria must require:
 
-- Merge `spec/<slug>` into `main` and resolve any conflicts.
 - Run the complete specification acceptance matrix.
-- Open the final pull request with `spec/<slug>` as head and `main` as base.
-- Preserve the `spec/<slug>` branch until that pull request is merged.
+- Verify the complete implementation set is merged into current `main`.
+- Record the acceptance evidence on the specification issue and close it
+  through the completed-specification triage path.
+- Do not create a branch or pull request for finalization.
 
-The finalization ticket must identify the parent specification and recorded
-`spec/<slug>` branch. Do not publish it for a standalone ticket set. If the
+The finalization ticket must identify the parent specification. Do not publish
+it for a standalone ticket set. If the
 specification has no implementation tickets, its blocker set must explicitly
 say `None (can start immediately)`.
 
-**Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change (rename a column, retype a shared symbol) whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket; green is promised only there.
+**Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change (rename a column, retype a shared symbol) whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches cannot stay green alone, use a temporary technical coordination branch only for that refactor; it is not a specification branch and never replaces the required `main` integration target.
 
 ### 4. Quiz the user
 
@@ -186,10 +187,10 @@ differences:
 - **GitHub:** when the ticket belongs to a specification, the first line must
   be `Part of #<spec-number>`. Use a concise Conventional Commit-style title,
   and apply the `ticket` and `ready-for-agent` labels unless the workflow says
-  otherwise. Preserve the parent specification and spec branch in the ticket's
-  lifecycle context; specification ticket branches use the recorded spec
-  branch as their integration context. Represent blockers in both the body and
-  GitHub's native dependency graph when available.
+  otherwise. Preserve the parent specification in the ticket's lifecycle
+  context; ticket branches use `origin/main` as their base and `main` as their
+  PR target. Represent blockers in both the body and GitHub's native dependency
+  graph when available.
 - **Local files:** number files from `01` in dependency order under the
   feature's issue directory. Keep the ticket title, contracts, acceptance
   criteria, out-of-scope boundary, and blocker wording from the canonical
