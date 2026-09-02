@@ -1,4 +1,5 @@
 import { hasAnyAdminAccess, useAbility, useAccountProfile } from "@sd/domain-account";
+import { ChevronRight } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
@@ -116,7 +117,7 @@ function AccountIdentityRow({
         </Text>
         <Text style={{ color: theme.colors.content.muted, fontSize: 14 }}>{email}</Text>
       </View>
-      <Text style={{ color: theme.colors.content.muted, fontSize: 24 }}>›</Text>
+      <ChevronRight color={theme.colors.content.muted} size={22} strokeWidth={2.25} />
     </Pressable>
   );
 }
@@ -133,7 +134,7 @@ function AccountAdminRow({
   if (!visible) return null;
   return (
     <SettingsRow label="Admin" onPress={onPress}>
-      <Text style={{ color: theme.colors.content.muted, fontSize: 24 }}>›</Text>
+      <ChevronRight color={theme.colors.content.muted} size={22} strokeWidth={2.25} />
     </SettingsRow>
   );
 }
@@ -154,7 +155,9 @@ export function SettingsSupportLegalActions({
 >) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
-  const disclosure = <Text style={{ color: theme.colors.content.muted, fontSize: 24 }}>›</Text>;
+  const disclosure = (
+    <ChevronRight color={theme.colors.content.muted} size={22} strokeWidth={2.25} />
+  );
 
   return (
     <>
