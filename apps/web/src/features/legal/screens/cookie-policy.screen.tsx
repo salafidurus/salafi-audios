@@ -8,6 +8,5 @@ import { LegalDocument } from "../components/LegalDocument";
 /** Selects the shared Cookie Policy document and renders its web presentation. */
 export function CookiePolicyScreen() {
   const document = getLegalDocument("cookies");
-  if (!document) return null;
   return <LegalDocument document={document} />;
 }

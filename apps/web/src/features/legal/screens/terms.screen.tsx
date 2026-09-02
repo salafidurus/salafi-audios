@@ -8,6 +8,5 @@ import { LegalDocument } from "../components/LegalDocument";
 /** Selects the shared Terms and Conditions document and renders its web presentation. */
 export function TermsScreen() {
   const document = getLegalDocument("terms");
-  if (!document) return null;
   return <LegalDocument document={document} />;
 }

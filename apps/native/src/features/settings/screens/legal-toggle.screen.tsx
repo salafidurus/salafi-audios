@@ -1,4 +1,3 @@
-import { Column, ScrollView } from "@expo/ui";
 import {
   getLegalDocument,
   type LegalBlock,
@@ -6,13 +5,13 @@ import {
   type LegalLocale,
 } from "@sd/domain-legal";
 import { useTranslation } from "react-i18next";
-import { Pressable, View } from "react-native";
+import { Linking, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUnistyles } from "react-native-unistyles";
 
 import { i18n } from "@/core/i18n/i18n";
 import { RootScreenHeader } from "@/features/navigation";
-import { NativeScreenHost, NativeText } from "@/shared/ui";
+import { NativeBridgeHost, NativeText } from "@/shared/ui";
 
 /** Configures the document identity and navigation callbacks for a legal detail screen. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- the fields are documented by the exported contract and callback names.
@@ -34,8 +33,6 @@ export function LegalToggleScreen({
   const document = getLegalDocument(documentId);
   const locale: LegalLocale = i18n.language.startsWith("ar") ? "ar" : "en";
 
-  if (!document) return null;
-
   return (
     <View style={{ flex: 1 }}>
       <View
@@ -46,10 +43,9 @@ export function LegalToggleScreen({
       >
         <RootScreenHeader title={document.title[locale]} showSearch={false} onBack={onBack} />
       </View>
-      <NativeScreenHost testID={`legal-${documentId}-screen-host`}>
-        <ScrollView showsIndicators={false}>
-          <Column
-            spacing={theme.spacing.scale.lg}
+      <NativeBridgeHost testID={`legal-${documentId}-screen-host`} matchContents={false}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View
             style={{
               paddingHorizontal: theme.spacing.layout.pageX,
               paddingVertical: theme.spacing.layout.pageY,
@@ -65,7 +61,7 @@ export function LegalToggleScreen({
               </NativeText>
             ))}
             {document.sections.map((section) => (
-              <Column key={section.id} spacing={theme.spacing.scale.sm}>
+              <View key={section.id} style={{ gap: theme.spacing.scale.sm }}>
                 <NativeText variant="titleMd" colorRole="strong">
                   {section.heading[locale]}
                 </NativeText>
@@ -76,11 +72,11 @@ export function LegalToggleScreen({
                     onNavigateToSupport={onNavigateToSupport}
                   />
                 ))}
-              </Column>
+              </View>
             ))}
-          </Column>
+          </View>
         </ScrollView>
-      </NativeScreenHost>
+      </NativeBridgeHost>
     </View>
   );
 }
@@ -106,27 +102,28 @@ function LegalBlockView({
   }
   if (block.type === "bullets") {
     return (
-      <Column spacing={theme.spacing.scale.xs}>
+      <View style={{ gap: theme.spacing.scale.xs }}>
         {block.items.map((item) => (
           <NativeText key={item} variant="bodyMd" colorRole="subtle">
             • {item}
           </NativeText>
         ))}
-      </Column>
+      </View>
     );
   }
   if (block.type === "definitions") {
     return (
-      <Column spacing={theme.spacing.scale.xs}>
+      <View style={{ gap: theme.spacing.scale.xs }}>
         {block.items.map((item) => (
           <NativeText key={item.term} variant="bodyMd" colorRole="subtle">
             {item.term}: {item.definition}
           </NativeText>
         ))}
-      </Column>
+      </View>
     );
   }
-  if (block.href.kind === "internal") {
+  const href = block.href;
+  if (href.kind === "internal") {
     return (
       <Pressable accessibilityRole="button" onPress={onNavigateToSupport}>
         <NativeText variant="bodyMd" colorRole="primary">
@@ -136,8 +133,10 @@ function LegalBlockView({
     );
   }
   return (
-    <NativeText variant="bodyMd" colorRole="primary">
-      {block.text}
-    </NativeText>
+    <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(href.url)}>
+      <NativeText variant="bodyMd" colorRole="primary">
+        {block.text}
+      </NativeText>
+    </Pressable>
   );
 }

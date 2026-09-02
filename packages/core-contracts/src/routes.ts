@@ -24,7 +24,6 @@ export const routes = {
   settings: {
     index: "/settings",
     profile: "/settings/profile",
-    legal: "/settings/legal",
     support: "/settings/support",
     terms: "/settings/terms",
     privacy: "/settings/privacy",
@@ -83,7 +82,6 @@ export interface RouteDefinition {
  */
 export const routeDefinitions: RouteDefinition[] = [
   { path: routes.explore.index, access: "public" },
-  { path: routes.settings.legal, access: "public" },
   { path: routes.settings.terms, access: "public" },
   { path: routes.settings.privacy, access: "public" },
   { path: routes.settings.index, access: "auth-optional" },

@@ -1,3 +1,4 @@
+import { routes } from "@sd/core-contracts";
 import { useRouter } from "expo-router";
 
 import { SupportScreen } from "@/features/settings";
@@ -6,5 +7,11 @@ import { SupportScreen } from "@/features/settings";
 /** Renders the native support route surface and coordinates its user-facing state. */
 export default function SupportRoute() {
   const router = useRouter();
-  return <SupportScreen onBack={() => router.back()} />;
+  return (
+    <SupportScreen
+      onBack={() => router.back()}
+      onNavigateToTerms={() => router.push(routes.settings.terms)}
+      onNavigateToPrivacy={() => router.push(routes.settings.privacy)}
+    />
+  );
 }

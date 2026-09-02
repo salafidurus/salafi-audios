@@ -93,16 +93,23 @@ function AccountIdentityRow({
         alignItems: "center",
         flexDirection: "row",
         gap: theme.spacing.component.gapMd,
-        minHeight: 72,
+        minHeight: theme.spacing.scale["4xl"] + theme.spacing.scale["2xl"] + theme.spacing.scale.sm,
         paddingVertical: theme.spacing.scale.md,
       }}
     >
-      <UserAvatar image={avatarUrl} name={displayName} size={48} testID="settings-account-avatar" />
+      <UserAvatar
+        image={avatarUrl}
+        name={displayName}
+        size={theme.spacing.scale["4xl"] + theme.spacing.scale.sm}
+        testID="settings-account-avatar"
+      />
       <View style={{ flex: 1, gap: theme.spacing.scale.xs }}>
-        <Text style={{ color: theme.colors.content.strong, fontSize: 16, fontWeight: "600" }}>
+        <Text style={[theme.typography.bodyLg, { color: theme.colors.content.strong }]}>
           {displayName}
         </Text>
-        <Text style={{ color: theme.colors.content.muted, fontSize: 14 }}>{email}</Text>
+        <Text style={[theme.typography.bodySm, { color: theme.colors.content.muted }]}>
+          {email}
+        </Text>
       </View>
     </View>
   );
@@ -115,9 +122,14 @@ function AccountProfileRow({
   onPress?: () => void;
   theme: ReturnType<typeof useUnistyles>["theme"];
 }) {
+  const { t } = useTranslation();
   return (
-    <SettingsRow label="Profile" onPress={onPress}>
-      <ChevronRight color={theme.colors.content.muted} size={22} strokeWidth={2.25} />
+    <SettingsRow label={t("account.profile.title", "Profile")} onPress={onPress}>
+      <ChevronRight
+        color={theme.colors.content.muted}
+        size={theme.spacing.scale["2xl"]}
+        strokeWidth={2.25}
+      />
     </SettingsRow>
   );
 }
@@ -131,10 +143,15 @@ function AccountAdminRow({
   onPress?: () => void;
   theme: ReturnType<typeof useUnistyles>["theme"];
 }) {
+  const { t } = useTranslation();
   if (!visible) return null;
   return (
-    <SettingsRow label="Admin" onPress={onPress} hideBorder>
-      <ChevronRight color={theme.colors.content.muted} size={22} strokeWidth={2.25} />
+    <SettingsRow label={t("admin.title", "Admin")} onPress={onPress} hideBorder>
+      <ChevronRight
+        color={theme.colors.content.muted}
+        size={theme.spacing.scale["2xl"]}
+        strokeWidth={2.25}
+      />
     </SettingsRow>
   );
 }
@@ -151,7 +168,12 @@ export function SettingsSupportLegalActions({
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const disclosure = (
-    <ChevronRight color={theme.colors.content.muted} size={22} strokeWidth={2.25} />
+    <ChevronRight
+      color={theme.colors.content.muted}
+      size={theme.spacing.scale["2xl"]}
+      strokeWidth={2.25}
+      style={theme.direction === "rtl" ? { transform: [{ rotate: "180deg" }] } : undefined}
+    />
   );
 
   return (
@@ -198,9 +220,7 @@ function AccountSettingsSection({
       <Text
         style={{
           color: theme.colors.content.strong,
-          fontSize: 18,
-          fontWeight: "600",
-          lineHeight: 24,
+          ...theme.typography.titleMd,
         }}
       >
         {title}

@@ -718,7 +718,16 @@ export const legalDocuments: LegalDocument[] = [
   },
 ];
 
-/** Returns a stable legal document or undefined for an unknown policy ID. */
-export function getLegalDocument(id: LegalDocument["id"]): LegalDocument | undefined {
-  return legalDocuments.find((document) => document.id === id);
+const legalDocumentsById = legalDocuments.reduce<Record<LegalDocument["id"], LegalDocument>>(
+  (documents, document) => {
+    documents[document.id] = document;
+    return documents;
+  },
+  // SAFETY: every document in the canonical array has one of the three closed IDs.
+  {} as Record<LegalDocument["id"], LegalDocument>,
+);
+
+/** Returns the complete legal document for a route-safe policy ID. */
+export function getLegalDocument(id: LegalDocument["id"]): LegalDocument {
+  return legalDocumentsById[id];
 }
