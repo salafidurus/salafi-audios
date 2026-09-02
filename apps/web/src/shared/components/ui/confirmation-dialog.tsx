@@ -23,6 +23,7 @@ type ConfirmationDialogProps = {
   confirmLabel: string;
   cancelLabel?: string;
   variant?: "default" | "destructive";
+  /** Displays the caller's failure state while keeping the dialog available for retry. */
   error?: ReactNode;
   children?: ReactNode;
   confirmDisabled?: boolean;
@@ -79,6 +80,7 @@ function ConfirmationDialogFooter({
   );
 }
 
+/** Coordinates asynchronous confirmation, loading state, cancellation, and caller-owned errors. */
 export function ConfirmationDialog({
   open,
   onOpenChange,
@@ -152,6 +154,7 @@ type ConfirmationTextDialogProps = Omit<ConfirmationDialogProps, "description" |
   confirmWord: string;
 };
 
+/** Adds exact-text confirmation gating before delegating to the shared confirmation dialog. */
 export function ConfirmationTextDialog({
   message,
   confirmWord,

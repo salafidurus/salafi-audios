@@ -37,7 +37,7 @@ export function SupportScreen({
   const [openFaq, setOpenFaq] = useState<string | null>(null);
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.recipes.mixedHeroSurface.backgroundColor }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.surface.canvas }}>
       <View style={{ paddingTop: insets.top, paddingHorizontal: theme.spacing.layout.pageX }}>
         <RootScreenHeader title={t("support.title")} showSearch={false} onBack={onBack} />
       </View>

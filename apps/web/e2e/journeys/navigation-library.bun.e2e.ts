@@ -64,12 +64,24 @@ describe("navigation and My Library Bun.WebView journeys", () => {
           await view.navigate(`${config.origin}/`);
           await view.navigate(`${config.origin}/scholars`);
           await waitForUrl(view, `${config.origin}/scholars`);
+          await waitForBrowserCondition(
+            view,
+            "scholars page content",
+            `!document.body.innerText.includes("Something went wrong")`,
+          );
+          expect((await readPageState(view)).visibleText).toContain("Scholars");
 
           await view.navigate(`${config.origin}/my-library`);
           await waitForUrl(view, `${config.origin}/my-library`);
 
           await view.navigate(`${config.origin}/explore`);
           await waitForUrl(view, `${config.origin}/explore`);
+          await waitForBrowserCondition(
+            view,
+            "explore page content",
+            `!document.body.innerText.includes("Something went wrong")`,
+          );
+          expect((await readPageState(view)).visibleText).toContain("Explore");
         },
       );
     });

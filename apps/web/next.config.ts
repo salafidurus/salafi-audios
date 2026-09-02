@@ -3,6 +3,20 @@ import type { NextConfig } from "next";
 import path from "node:path";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "preview-cdn.salafidurus.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.salafidurus.com",
+        pathname: "/**",
+      },
+    ],
+  },
   turbopack: {
     root: path.resolve(__dirname, "../.."),
   },
