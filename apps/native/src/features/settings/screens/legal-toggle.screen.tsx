@@ -34,7 +34,7 @@ export function LegalToggleScreen({
   const locale: LegalLocale = i18n.language.startsWith("ar") ? "ar" : "en";
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.surface.canvas }}>
       <View
         style={{
           paddingTop: insets.top,
