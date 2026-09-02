@@ -19,6 +19,7 @@ export default function SettingsProfileRoute() {
   return (
     <SettingsProfileScreen
       onSignOut={handleSignOut}
+      onBack={() => router.back()}
       onSignIn={() =>
         router.push({
           pathname: routes.signIn,

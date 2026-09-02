@@ -1,6 +1,7 @@
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, TextInput as RNTextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
@@ -9,8 +10,9 @@ import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthReq
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog/ConfirmDialog";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
-import { AppText, ScreenView, TextInput } from "@/shared/ui";
+import { AppText, ScreenView } from "@/shared/ui";
 
+import { RootScreenHeader } from "../../navigation";
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 import { getRtlAwareTextAlign } from "../utils/rtl-text-align";
@@ -20,6 +22,7 @@ import { getRtlAwareTextAlign } from "../utils/rtl-text-align";
 export type SettingsProfileScreenProps = {
   onSignOut?: () => void;
   onSignIn?: () => void;
+  onBack?: () => void;
 };
 
 /** Contains the account roles used to decide which profile or administrative controls are visible. */
@@ -167,7 +170,11 @@ function notifySignOut(onSignOut: (() => void) | undefined) {
 function ProfileIdentity({ profile }: { profile: ProfileData }) {
   return (
     <View style={styles.avatarRow}>
-      <UserAvatar name={profile.displayName || profile.email} size={56} />
+      <UserAvatar
+        image={profile.avatarUrl ?? null}
+        name={profile.displayName || profile.email}
+        size={56}
+      />
       <View>
         <AppText variant="bodyLg" style={styles.profileName}>
           {profile.displayName}
@@ -280,7 +287,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
           stacked
         >
           <View style={styles.editableField}>
-            <TextInput
+            <RNTextInput
               value={displayName}
               onChangeText={setDisplayName}
               placeholder={t("account.profile.displayNamePlaceholder", "Your display name")}
@@ -354,36 +361,52 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
 }
 
 /** Renders the native settings profile screen surface and coordinates its user-facing state. */
-export function SettingsProfileScreen({ onSignOut, onSignIn }: SettingsProfileScreenProps) {
+export function SettingsProfileScreen({ onSignOut, onSignIn, onBack }: SettingsProfileScreenProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const { theme } = useUnistyles();
 
-  if (isLoading) {
-    return (
-      <ScreenView center>
-        <EmptyState message={t("account.profile.loading", "Loading profile…")} variant="loading" />
-      </ScreenView>
-    );
-  }
+  const content = isLoading ? (
+    <ScreenView center>
+      <EmptyState message={t("account.profile.loading", "Loading profile…")} variant="loading" />
+    </ScreenView>
+  ) : !isAuthenticated ? (
+    <AuthRequiredState
+      title={t("account.profile.signInTitle", "Sign in to view your profile")}
+      description={t(
+        "account.profile.signInDesc",
+        "Create an account or sign in to manage your profile and roles.",
+      )}
+      actionLabel={t("account.profile.signIn", "Sign In")}
+      onPress={() => onSignIn?.()}
+    />
+  ) : (
+    <ProfileContent onSignOut={onSignOut} />
+  );
 
-  if (!isAuthenticated) {
-    return (
-      <AuthRequiredState
-        title={t("account.profile.signInTitle", "Sign in to view your profile")}
-        description={t(
-          "account.profile.signInDesc",
-          "Create an account or sign in to manage your profile and roles.",
-        )}
-        actionLabel={t("account.profile.signIn", "Sign In")}
-        onPress={() => onSignIn?.()}
-      />
-    );
-  }
-
-  return <ProfileContent onSignOut={onSignOut} />;
+  return (
+    <View style={styles.shell}>
+      <View style={{ paddingTop: insets.top, paddingHorizontal: theme.spacing.layout.pageX }}>
+        <RootScreenHeader
+          title={t("account.profile.title", "Profile")}
+          showSearch={false}
+          onBack={onBack}
+        />
+      </View>
+      <View style={styles.body}>{content}</View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create((theme) => ({
+  shell: {
+    flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
+  },
+  body: {
+    flex: 1,
+  },
   centered: {
     flex: 1,
     justifyContent: "center",
