@@ -171,3 +171,32 @@ The tab bar is a product-specific navigation surface layered over a standard Exp
   composition.
 - Native runtime smoke coverage is required to confirm root navigation and the
   absence of the old shell-era crash on device.
+
+#### Native web-parity acceptance run (2026-09-02)
+
+The Android SDK 34 emulator (`emulator-5554`, development build) was used for
+the device portion of the acceptance run. Each visible state was inspected with
+Argent's accessibility description and captured with ADB screenshots when the
+Argent simulator-server screenshot/gesture transport was unavailable.
+
+- Home, Explore, Scholars, My Library, and Settings were each reached from the
+  persistent shell; no additional persistent root was exposed.
+- My Library's Started, Saved, and Completed selections stayed internal to the
+  My Library stack. Completed rendered its localized empty state.
+- Global Search opened as a pushed surface from a root. Profile, Support,
+  Terms, Privacy, and Admin opened as secondary/independent destinations, with
+  visible back navigation where applicable.
+- Settings rendered authenticated account and capability-aware Admin controls,
+  theme controls, notification controls, Support, and Legal. Terms rendered as
+  a document surface rather than redirecting to a root.
+- The existing native unit/integration suites cover playback, mini-player
+  exclusivity, progress, saved-state synchronization, downloads, and offline
+  outbox behavior; this run did not mutate the seeded account's listening state.
+
+The run was Android-only because no iOS simulator was available in the
+environment. Argent discovery succeeded, but its screenshot and gesture calls
+failed before device transport with a simulator-server startup error; the
+reproducible fallback was the configured ADB binary and serial above. API-backed
+aggregate tests remain subject to the environment's unavailable PostgreSQL
+listener and restricted test-server sockets; those failures are tracked as
+environment-only evidence rather than native acceptance regressions.
