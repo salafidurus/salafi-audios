@@ -22,6 +22,8 @@ export const SCHOLARS: ScholarData[] = [
     slug: "uthaymin",
     name: "محمد بن صالح العثيمين",
     bio: "الإمام العلَّامة، ومن أبرز علماء القرن الخامس عشر الهجري، وأحد أكثر العلماء رسوخًا في شتى علوم الشريعة الإسلامية. تتلمذ على أيدي الشيخ عبد الرحمن بن ناصر السعدي، والشيخ محمد الأمين الشنقيطي، والشيخ عبد العزيز بن عبد الله بن باز، وغيرهم من أهل العلم.",
+    imageUrl: "https://preview-cdn.salafidurus.com/images/scholar/uthaymin.png",
+    imageKey: "images/scholar/uthaymin.png",
     nameEn: "Muhammad ibn Salih al-Uthaymin",
     bioEn:
       "The great scholar, from the most foremost scholars of the 15th hijri century. He is a well-grounded scholar in almost all the fields of knowledge. He is from the students of Shaykh Abdrurahman As-Sa'adi, Shaykh Ameen Ash-Shinqiti, Shaykh Ibn Baaz and other than them.",
@@ -35,6 +37,8 @@ export const SCHOLARS: ScholarData[] = [
     slug: "fawzan",
     name: "صالح بن فوزان الفوزان",
     bio: "المفتي العام للمملكة العربية السعودية، وأحد كبار علماء المسلمين، ومتخصِّص في علوم الشريعة الإسلامية، ومنها: العقيدة، والفقه، والتفسير، وغيرها.",
+    imageUrl: "https://preview-cdn.salafidurus.com/images/scholar/fawzan.png",
+    imageKey: "images/scholar/fawzan.png",
     nameEn: "Salih ibn Fawzan al-Fawzan",
     bioEn:
       "The Grand Mufti of the Kingdom of Saudi Arabia. Expert in various field of Islamic knowledge: Aqeedah, Fiqh, Tafsir, etc.",
@@ -93,8 +97,8 @@ export const SCHOLARS: ScholarData[] = [
     slug: "khalid",
     name: "خالد الظفيري",
     bio: "",
-    imageUrl: "https://preview-cdn.salafidurus.com/images/scholar/khalid.jpg",
-    imageKey: "images/scholar/khalid.jpg",
+    imageUrl: "https://preview-cdn.salafidurus.com/images/scholar/khalid.png",
+    imageKey: "images/scholar/khalid.png",
     nameEn: "Khalid Adh-Dhafiri",
     bioEn: undefined,
     country: "KW",
