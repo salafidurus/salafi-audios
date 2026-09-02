@@ -36,7 +36,7 @@ export function SegmentedControl<T extends string>({
   const effectiveIndex = effectiveOptions.findIndex((opt) => opt.value === value);
 
   return (
-    <Host matchContents={false} style={{ flex: 1 }}>
+    <Host matchContents={false} style={{ width: "100%", height: 60 }}>
       <NativeSegmentedControl
         testID={testID}
         values={effectiveOptions.map((opt) => opt.label)}

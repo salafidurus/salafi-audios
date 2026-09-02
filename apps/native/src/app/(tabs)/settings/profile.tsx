@@ -22,7 +22,7 @@ export default function SettingsProfileRoute() {
       onSignIn={() =>
         router.push({
           pathname: routes.signIn,
-          params: { from: `${routes.settings.index}?tab=profile` },
+          params: { from: routes.settings.profile },
         })
       }
     />

@@ -23,7 +23,9 @@ export const routes = {
 
   settings: {
     index: "/settings",
+    profile: "/settings/profile",
     legal: "/settings/legal",
+    support: "/settings/support",
   },
 
   scholars: {
