@@ -6,11 +6,11 @@ dependency family must have one proposal owner.
 
 ## Ownership summary
 
-| System | Owns | Must not do |
-| --- | --- | --- |
-| Dependabot | Ordinary dependency and GitHub Actions updates | Update dependencies owned by a compatibility pipeline |
+| System              | Owns                                                                                             | Must not do                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| Dependabot          | Ordinary dependency and GitHub Actions updates                                                   | Update dependencies owned by a compatibility pipeline           |
 | `dependabot-helper` | Compatibility-sensitive updates and invariant checks that Dependabot cannot safely resolve alone | Re-propose ordinary dependencies or create proposals for checks |
-| Catalog alignment | Bounded normalization of authorized manifests, catalogs, and lockfiles | Select dependency versions or act as an update owner |
+| Catalog alignment   | Bounded normalization of authorized manifests, catalogs, and lockfiles                           | Select dependency versions or act as an update owner            |
 
 ## Dependabot
 
@@ -42,8 +42,10 @@ helper-checked family remains Dependabot-owned, but the helper validates an
 invariant after Dependabot proposes the change.
 
 The Expo pipeline selects the Expo SDK target, updates the Expo dependency,
-runs `expo install --fix`, and then runs `expo-doctor`. `jest-expo` is managed
-only as part of this pipeline; it is not a standalone candidate.
+runs `expo install --fix`, and then runs `expo-doctor`. Install compatibility
+and lockfile validation are blocking; known Bun-linker Expo Doctor diagnostics
+are reported as advisory because they are a repository baseline. `jest-expo`
+is managed only as part of this pipeline; it is not a standalone candidate.
 
 Every package in a helper-owned family must be ignored by Dependabot in each
 relevant ecosystem entry. This prevents Dependabot from creating a competing

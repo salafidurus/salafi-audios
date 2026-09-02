@@ -7,7 +7,8 @@ the implementation checkout.
 2. Verify the issue has one category role, one artifact label, and an approved
    state transition from `ready-for-agent` (or an explicitly approved
    `ready-for-human`) to `in-progress`.
-3. Preserve the parent specification and its `spec/<slug>` integration target.
+3. Preserve the parent specification and use `origin/main` as the branch base
+   with `main` as the pull-request target.
 4. Stop before checkout or source changes if the transition is missing,
    conflicting, or unverifiable.
 

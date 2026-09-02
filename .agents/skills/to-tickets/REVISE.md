@@ -34,8 +34,9 @@ shortcut.
 - Remove `ready-for-agent` while the ticket is materially incomplete; restore
   it only after the revised ticket is execution-ready and triage has confirmed
   the state.
-- Preserve the parent specification's `spec/<slug>` integration branch and
-  ordinary versus final-validation PR target.
+- Preserve the parent specification relationship. Use `origin/main` as the
+  implementation base and `main` as the PR target; finalization has no branch
+  or PR target.
 
 ## Handoff
 

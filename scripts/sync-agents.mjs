@@ -13,7 +13,7 @@
  * AGENT.md aliases — file symlinks next to every AGENT.md:
  *   AGENT.md → AGENTS.md, CLAUDE.md, GEMINI.md (root + all sub-packages)
  *
- * Run from repo root: node scripts/sync-agents.mjs
+ * Run from the repository root: bun run --filter @sd/scripts sync-agents
  */
 
 import {

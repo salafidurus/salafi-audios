@@ -18,10 +18,7 @@ export interface DependabotFileValidation {
 }
 
 function isAllowedFile(filePath: string): boolean {
-  return (
-    filePath === "bun.lock" ||
-    /(^|\/)package\.json$/.test(filePath)
-  );
+  return filePath === "bun.lock" || /(^|\/)package\.json$/.test(filePath);
 }
 
 export function validateDependabotFiles(filePaths: string[]): DependabotFileValidation {

@@ -31,20 +31,20 @@ Present the proposed seams and any material scope decisions for approval before
 publishing or repairing the tracker. This is a decision checkpoint, not a new
 discovery interview.
 
-3. For a new specification, choose a concise slug and create `spec/<slug>`
-   from `main` (the local equivalent is `origin/main`) before publishing. For
-   an existing specification, resolve its recorded branch and repair it only
-   through [REPAIR.md](REPAIR.md). A spec branch is disposable integration
-   context and belongs to exactly one specification.
+3. For a new specification, publish the specification issue without creating
+   an integration branch. For an existing specification, repair the issue
+   only through [REPAIR.md](REPAIR.md). A specification is tracker coordination
+   context, not an implementation branch.
 
 4. Write or reconcile the spec using the template below, then publish the
    approved new or changed body to the project issue tracker. Apply both
    `ready-for-agent` and the `spec` artifact label to an open specification;
    no additional triage transition is needed for publication. If the tracker
    does not have `spec` yet, create it before publishing. Record the
-   specification issue number and `spec/<slug>` branch together on the
-   specification issue so `to-tickets` and later lifecycle stages resolve the
-   same context. Existing issue comments remain historical evidence.
+   specification issue number on the specification issue so `to-tickets` and
+   later lifecycle stages resolve the same context. Existing issue comments
+   remain historical evidence. Do not record or create a specification
+   integration branch.
 
 5. End with the lifecycle handoff: recommend `to-tickets` for a new or
    reconciled specification, and do not start implementation from this skill.

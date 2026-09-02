@@ -7,6 +7,8 @@ on:
       - "packages/core-api/**"
       - "packages/core-contracts/**"
       - "packages/core-i18n/**"
+      - "packages/core-sync/**"
+      - "packages/utils-error/**"
       - "packages/design-tokens/**"
       - "packages/domain-account/**"
       - "packages/domain-audio/**"
@@ -14,6 +16,9 @@ on:
       - "packages/domain-search/**"
       - "tsconfig.base.json"
       - "tsconfig.packages.json"
+      - ".bun-version"
+      - "bunfig.toml"
+      - "package.json"
       - "bun.lock"
       - "turbo.json"
       - ".github/workflows/e2e-web.yml"
@@ -47,7 +52,7 @@ jobs:
           NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL || 'http://localhost:3000' }}
           TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-        run: bun run turbo run build --filter=web...
+        run: bun run build:all --filter=web...
 
       - name: Verify Bun.WebView Chrome prerequisite
         run: |

@@ -42,23 +42,19 @@ branch name. Apply the appropriate prefix:
 For example, use the slug `audio-improve` to recommend
 `.worktree/c-audio-improve` with branch `c/audio-improve`.
 
-For a specification ticket, resolve the parent specification and its recorded
-`spec/<slug>` integration branch. The plan must identify that parent and carry
-the current spec branch as the ticket's branch context. If the parent
-specification does not define a `spec/<slug>` branch, use `origin/main` as the
-provisional base, continue planning, and explicitly report that the
-specification integration context is missing; do not claim spec-branch
-isolation or invent a spec-branch PR target. For standalone bug, research,
-maintenance, or other non-specification work, explicitly record that no parent
-specification or spec branch applies and retain the existing `origin/main`
-base with `main` as the pull-request target.
+For a specification ticket, resolve the parent specification but do not seek a
+specification integration branch. For standalone bug, research, maintenance,
+or other non-specification work, explicitly record that no parent
+specification applies. Branch and pull-request routing are defined in
+[issue-tracker.md](../../../docs/agents/issue-tracker.md); implementation uses
+`origin/main → main`, while finalization is verification-only on current
+`main`.
 
 Every plan records this routing context:
 
 | Ticket context                               | Branch base                 | Pull-request target            |
 | -------------------------------------------- | --------------------------- | ------------------------------ |
-| Specification ticket with a verified branch  | `spec/<slug>`               | `spec/<slug>`                  |
-| Specification ticket without branch metadata | `origin/main` provisionally | unresolved; report the warning |
+| Specification ticket                         | `origin/main`              | `main`                         |
 | Standalone ticket                            | `origin/main`               | `main`                         |
 
 For the final spec-finalization ticket, use this classification instead of
@@ -66,12 +62,12 @@ the ordinary specification-ticket row:
 
 | Ticket context      | Branch base                                      | Pull-request target |
 | ------------------- | ------------------------------------------------ | ------------------- |
-| Finalization ticket | current `origin/spec/<slug>` and `origin/main`   | `main`              |
+| Finalization ticket | current `origin/main`                            | none                |
 
 No ordinary feature work is expected for this ticket. The plan must identify
-the parent specification, confirm that every implementation ticket is
-complete, and treat the latest spec candidate and current `main` as the two
-integration inputs.
+the parent specification, confirm that every implementation ticket is merged
+into current `main`, and run the acceptance matrix without creating a branch or
+pull request.
 
 Read and cross-reference:
 

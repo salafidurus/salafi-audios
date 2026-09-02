@@ -83,6 +83,7 @@ describe("Dependabot workflow safety contract", () => {
     expect(workflow).toContain("bun infra/dependabot-helper/cli.ts align");
     expect(workflow).toContain("bun infra/dependabot-helper/cli.ts validate-files");
     expect(workflow).toContain("bun infra/dependabot-helper/cli.ts render");
+    expect(workflow).not.toContain("bun run --filter dependabot-helper");
     expect(workflow).toContain("id: push");
     expect(workflow).toContain(
       "git checkout \"$PR_HEAD_SHA\" -- ':(glob)**/package.json' 'bun.lock'",
@@ -113,8 +114,8 @@ describe("Dependabot workflow safety contract", () => {
       existsSync(resolve(import.meta.dirname, "../../../../.github/workflows/deps-update.yml")),
     ).toBe(false);
     expect(workflow).toContain("name: Dependabot Auxiliary Updates");
-    expect(workflow).toContain("bun infra/dependabot-helper/cli.ts check");
-    expect(workflow).toContain("bun infra/dependabot-helper/cli.ts update");
+    expect(workflow).toContain("bun run --filter dependabot-helper check");
+    expect(workflow).toContain("bun run --filter dependabot-helper update");
     expect(workflow).toContain("--report-only");
   });
 });
@@ -140,5 +141,11 @@ describe("dependency update ownership contract", () => {
     expect(dependabot.slice(jestStart, familyStart)).toContain("          - minor");
     expect(dependabot.slice(jestStart, familyStart)).toContain("          - patch");
     expect(dependabot.slice(jestStart, familyStart)).not.toContain("          - major");
+
+    const jestIgnore = dependabot.slice(dependabot.indexOf('dependency-name: "jest"'));
+    expect(jestIgnore).toContain('update-types:\n          - "version-update:semver-major"');
+
+    const typesJestIgnore = dependabot.slice(dependabot.indexOf('dependency-name: "@types/jest"'));
+    expect(typesJestIgnore).toContain('update-types:\n          - "version-update:semver-major"');
   });
 });

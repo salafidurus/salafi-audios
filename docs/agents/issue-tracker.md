@@ -19,9 +19,9 @@ Issues and specs for this repository live as GitHub issues. Use the `gh` CLI for
 Specs are umbrella issues labelled `spec`; implementation issues are labelled
 `ticket` and begin their body with `Part of #<spec-number>`. Closing every
 ticket is necessary evidence, but it does not complete the specification.
-The final validation ticket must reconcile the latest spec candidate with
-current `main`, run the complete acceptance matrix, and produce a merged PR
-targeting `main` before the parent spec can be closed as completed.
+The finalization ticket must verify current `main`, run the complete acceptance
+matrix, and record the evidence before the parent spec can be closed as
+completed. It does not create a branch or PR.
 If a required acceptance check fails, finalization fails closed.
 
 The `triage` skill owns completed-ticket state reconciliation after the merged
@@ -29,25 +29,25 @@ PR is confirmed. It does not close or relabel the parent spec merely because a
 child ticket closes: child-ticket completion cannot prove final-merge or
 acceptance-matrix evidence.
 
-For successful finalization, record the merged validation PR, acceptance
-results, and the completed parent state. Remove active triage-state labels,
-preserve `spec`, and do not apply `wontfix`.
+For successful finalization, record the acceptance results and completed parent
+state. Remove active triage-state labels, preserve `spec`, and do not apply
+`wontfix`.
 
 For abandonment, record the decision and reason on the parent and child
 issues, apply `wontfix` according to triage policy, and keep the outcome
-distinct from successful completion. Verify the spec branch and each ticket
-branch/worktree belong to this specification before deleting them. Delete no
-resource when identity or state is uncertain, and preserve unrelated dirty
-checkout state, worktrees, branches, and active specifications.
+distinct from successful completion. Verify each ticket branch/worktree belongs
+to this specification before deleting it. Delete no resource when identity or
+state is uncertain, and preserve unrelated dirty checkout state, worktrees,
+branches, and active specifications.
 
 Infer the repository from `git remote -v`; `gh` does this automatically inside the clone.
 
-Specification ticket delivery is merge-gated against the parent
-`spec/<slug>` branch. Verify the PR target, merged state, and closed ticket
-state independently before removing the ticket branch or worktree. Cleanup
-must preserve the active specification branch, sibling ticket branches and
-worktrees, unrelated worktrees, and unrelated dirty checkout state. Standalone
-tickets continue to target and clean up through `main`.
+Specification ticket delivery is merge-gated against `main`, like standalone
+ticket delivery. Verify the PR target, merged state, and closed ticket state
+independently before removing the ticket branch or worktree. Cleanup must
+preserve sibling ticket branches and worktrees, unrelated worktrees, and
+unrelated dirty checkout state. Specifications have no implementation branch
+to preserve.
 
 ## Pull requests as a triage surface
 

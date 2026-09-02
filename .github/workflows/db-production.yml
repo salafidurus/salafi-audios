@@ -37,7 +37,7 @@ jobs:
         run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Build deps needed for typecheck
-        run: bun run build --filter=@sd/core-db^...
+        run: bun run build:all --filter=@sd/core-db^...
 
       - name: Validate Prisma schema
         env:

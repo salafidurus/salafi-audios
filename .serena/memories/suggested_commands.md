@@ -48,11 +48,11 @@ snip -- bun run --filter @sd/core-db prisma:generate
 ## Quality & Build
 
 ```bash
-snip -- bun run lint
+snip -- bun run lint:all
 snip -- bun run format
-snip -- bun run typecheck
-snip -- bun run test
-snip -- bun run build
+snip -- bun run typecheck:all
+snip -- bun run test:all
+snip -- bun run build:all
 ```
 
 ## Git (Always use snip)

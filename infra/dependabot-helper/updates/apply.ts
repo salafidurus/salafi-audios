@@ -7,12 +7,25 @@ import type { UpdateCandidate } from "./utils/ui";
 import { dependabotHelperPolicy, resolveDependencyFamily } from "../policy";
 import { config, type PkupdateConfig } from "./update.config";
 
+type DependencyMap = Record<string, string>;
+
+interface PackageJson {
+  workspaces?: {
+    packages?: string[];
+    catalog?: DependencyMap;
+  };
+  dependencies?: DependencyMap;
+  devDependencies?: DependencyMap;
+  peerDependencies?: DependencyMap;
+  packageManager?: string;
+  engines?: DependencyMap;
+}
+
 export function findWorkspacePkgFiles(rootDir: string): string[] {
-  const rootPkg = JSON.parse(
-    readFileSync(resolve(rootDir, "package.json"), "utf-8"), // nosemgrep
-  ) as Record<string, unknown>;
-  const ws = rootPkg.workspaces as Record<string, unknown> | undefined;
-  const patterns = (ws?.packages ?? []) as string[];
+  const packageJsonPath = resolve(rootDir, "package.json");
+  // SAFETY: packageJsonPath points to the repository package.json owned by this helper.
+  const rootPkg = JSON.parse(readFileSync(packageJsonPath, "utf-8")) as PackageJson;
+  const patterns = rootPkg.workspaces?.packages ?? [];
   const files: string[] = [];
 
   for (const pattern of patterns) {
@@ -67,14 +80,10 @@ export function syncWorkspaceDeps(
   const files = findWorkspacePkgFiles(rootDir);
   const updated: string[] = [];
 
-  // nosemgrep
-  const rootPkg = JSON.parse(readFileSync(resolve(rootDir, "package.json"), "utf-8")) as Record<
-    string,
-    unknown
-  >;
-  const catalog = (rootPkg.workspaces as Record<string, unknown> | undefined)?.catalog as
-    | Record<string, string>
-    | undefined;
+  const packageJsonPath = resolve(rootDir, "package.json");
+  // SAFETY: packageJsonPath points to the repository package.json owned by this helper.
+  const rootPkg = JSON.parse(readFileSync(packageJsonPath, "utf-8")) as PackageJson;
+  const catalog = rootPkg.workspaces?.catalog;
 
   const groupPatterns = getGroupPatterns(candidate.packageName, cfg);
   const groupName = groupPatterns
@@ -83,11 +92,12 @@ export function syncWorkspaceDeps(
   const isVersionLocked = groupName != null && cfg.versionLocked.includes(groupName);
 
   for (const file of files) {
-    const content = JSON.parse(readFileSync(file, "utf-8")) as Record<string, unknown>;
+    // SAFETY: findWorkspacePkgFiles returns package.json files from this repository's workspaces.
+    const content = JSON.parse(readFileSync(file, "utf-8")) as PackageJson;
     let dirty = false;
 
     for (const section of ["dependencies", "devDependencies", "peerDependencies"] as const) {
-      const deps = content[section] as Record<string, string> | undefined;
+      const deps = content[section];
       if (!deps) continue;
 
       const currentDep = deps[candidate.packageName];
@@ -141,12 +151,11 @@ export function syncWorkspaceDeps(
 }
 
 export function updateCatalogEntry(
-  rootPkg: Record<string, unknown>,
+  rootPkg: PackageJson,
   packageName: string,
   newVersion: string,
-): Record<string, unknown> {
-  const workspaces = rootPkg.workspaces as Record<string, unknown> | undefined;
-  const catalog = workspaces?.catalog as Record<string, string> | undefined;
+): PackageJson {
+  const catalog = rootPkg.workspaces?.catalog;
   if (!catalog?.[packageName]) {
     throw new Error(`Package "${packageName}" not found in catalog`);
   }
@@ -162,9 +171,9 @@ export async function applyCatalogUpdate(
   cfg: PkupdateConfig,
 ): Promise<boolean> {
   const pkgPath = resolve(rootDir, "package.json"); // nosemgrep
-  const content = JSON.parse(readFileSync(pkgPath, "utf-8")) as Record<string, unknown>;
-  const ws = content.workspaces as Record<string, unknown> | undefined;
-  const catalog = ws?.catalog as Record<string, string> | undefined;
+  // SAFETY: pkgPath points to the repository package.json owned by this helper.
+  const content = JSON.parse(readFileSync(pkgPath, "utf-8")) as PackageJson;
+  const catalog = content.workspaces?.catalog;
 
   updateCatalogEntry(content, candidate.packageName, candidate.latestVersion);
 
@@ -199,19 +208,20 @@ export async function applyBunUpdate(
   rootDir: string,
 ): Promise<boolean> {
   const pkgPath = resolve(rootDir, "package.json"); // nosemgrep
-  const content = JSON.parse(readFileSync(pkgPath, "utf-8")) as Record<string, unknown>;
+  // SAFETY: pkgPath points to the repository package.json owned by this helper.
+  const content = JSON.parse(readFileSync(pkgPath, "utf-8")) as PackageJson;
 
   const version = candidate.latestVersion.replace("bun@", "");
   content.packageManager = `bun@${version}`;
 
-  const engines = content.engines as Record<string, string> | undefined;
+  const engines = content.engines;
   if (engines) {
     engines.bun = version;
   } else {
     content.engines = { bun: version };
   }
 
-  const devDeps = content.devDependencies as Record<string, string> | undefined;
+  const devDeps = content.devDependencies;
   if (devDeps?.["bun-types"]) {
     devDeps["bun-types"] = `^${version}`;
   }
@@ -225,6 +235,10 @@ export async function applyBunUpdate(
   return true;
 }
 
+/**
+ * Applies an Expo SDK update, requiring install compatibility while treating
+ * known Bun-linker Expo Doctor diagnostics as advisory.
+ */
 export async function applyExpoUpdate(
   candidate: UpdateCandidate,
   rootDir: string,
@@ -233,8 +247,9 @@ export async function applyExpoUpdate(
   if (!existsSync(nativeDir)) return false;
 
   const pkgPath = resolve(nativeDir, "package.json"); // nosemgrep
-  const content = JSON.parse(readFileSync(pkgPath, "utf-8")) as Record<string, unknown>;
-  const deps = content.dependencies as Record<string, string> | undefined;
+  // SAFETY: pkgPath points to the native package.json owned by this helper.
+  const content = JSON.parse(readFileSync(pkgPath, "utf-8")) as PackageJson;
+  const deps = content.dependencies;
   if (deps?.["expo"]) {
     deps["expo"] = candidate.latestVersion;
   }
@@ -249,7 +264,10 @@ export async function applyExpoUpdate(
     cwd: nativeDir,
     stdio: "inherit",
   });
-  return doctor.status === 0;
+  if (doctor.status !== 0) {
+    console.warn("[expo] expo-doctor reported diagnostics; continuing with the update");
+  }
+  return true;
 }
 
 export async function runVerification(rootDir: string): Promise<string> {

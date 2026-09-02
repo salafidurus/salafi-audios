@@ -7,6 +7,11 @@ on:
       - "packages/core-db/prisma/**"
       - "packages/core-db/package.json"
       - "packages/core-contracts/**"
+      - "packages/core-i18n/**"
+      - "tsconfig*.json"
+      - ".bun-version"
+      - "bunfig.toml"
+      - "package.json"
       - "bun.lock"
       - "turbo.json"
       - ".github/workflows/e2e-api.yml"
@@ -73,7 +78,7 @@ jobs:
         env:
           DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
           DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
-        run: bun run turbo run build --filter=api...
+        run: bun run build:all --filter=api...
 
       - name: Run Prisma migrations
         env:

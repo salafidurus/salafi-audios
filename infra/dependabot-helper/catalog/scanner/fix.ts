@@ -1,18 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import type {
-  PackageJson,
-  CatalogRepairMutation,
-  CatalogRepairReport,
-} from "../types";
+import type { PackageJson, CatalogRepairMutation, CatalogRepairReport } from "../types";
 
-import {
-  parseCatalogs,
-  getWorkspaces,
-  getDependencyGroup,
-  sanitizeGroupName,
-} from "../helpers";
+import { parseCatalogs, getWorkspaces, getDependencyGroup, sanitizeGroupName } from "../helpers";
 import { resolveCatalogPolicy } from "../policy";
 import { type DepUsage } from "./shared";
 
@@ -61,8 +52,10 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
   for (const pkg of allWorkspacePkgs) {
     const depTypes = ["dependencies", "devDependencies"] as const;
     for (const depType of depTypes) {
+      // SAFETY: Workspace package contents are parsed package.json objects whose dependency sections are records.
       const deps = (pkg.content as any)[depType] || {};
       for (const [name, version] of Object.entries(deps)) {
+        // SAFETY: Dependency manifest values are strings by the package.json schema.
         const v = version as string;
         if (v.startsWith("workspace:") || name.startsWith("@sd/")) continue;
         if (v.startsWith("catalog:")) continue;
@@ -196,8 +189,10 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
   for (const pkg of allWorkspacePkgs) {
     const depTypes = ["dependencies", "devDependencies"] as const;
     for (const depType of depTypes) {
+      // SAFETY: Workspace package contents are parsed package.json objects whose dependency sections are records.
       const deps = (pkg.content as any)[depType] || {};
       for (const [name, version] of Object.entries(deps)) {
+        // SAFETY: Dependency manifest values are strings by the package.json schema.
         const v = version as string;
         if (v.startsWith("workspace:") || name.startsWith("@sd/")) continue;
         if (v.startsWith("catalog:")) continue;
@@ -249,6 +244,7 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
   for (const pkg of allWorkspacePkgs) {
     const depTypes = ["dependencies", "devDependencies"] as const;
     for (const depType of depTypes) {
+      // SAFETY: Workspace package contents are parsed package.json objects whose dependency sections are records.
       const deps = (pkg.content as any)[depType] || {};
       for (const [name] of Object.entries(deps)) {
         if (name.startsWith("@sd/")) continue;
@@ -276,7 +272,9 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
 
   for (const orphan of orphanRemovals) {
     if (orphan.group) {
+      // SAFETY: The parsed root package is mutable JSON and this optional branch confirms the catalog group exists.
       if ((rootJson as any).workspaces?.catalogs?.[orphan.group]) {
+        // SAFETY: The preceding guard confirms the named catalog group is an object available for mutation.
         delete (rootJson as any).workspaces.catalogs[orphan.group][orphan.depName];
       }
     } else {
@@ -287,6 +285,7 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
     for (const pkg of allWorkspacePkgs) {
       const depTypes = ["dependencies", "devDependencies"] as const;
       for (const depType of depTypes) {
+        // SAFETY: Workspace package contents are parsed package.json objects whose dependency sections are records.
         const deps = (pkg.content as any)[depType] || {};
         for (const [name, version] of Object.entries(deps)) {
           if (name !== orphan.depName) continue;
@@ -313,14 +312,20 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
     orphanRemovals.length === 0
   ) {
     let hadEmptyGroupCleanup = false;
+    // SAFETY: The parsed root package is mutable JSON and this optional branch confirms named catalogs exist.
     if ((rootJson as any).workspaces?.catalogs) {
+      // SAFETY: The preceding guard confirms the named catalogs object exists before enumerating it.
       for (const group of Object.keys((rootJson as any).workspaces.catalogs)) {
+        // SAFETY: Each enumerated catalog group is an object-valued entry in the parsed package.json.
         if (Object.keys((rootJson as any).workspaces.catalogs[group]).length === 0) {
+          // SAFETY: The preceding check identifies an empty named catalog group for removal.
           delete (rootJson as any).workspaces.catalogs[group];
           hadEmptyGroupCleanup = true;
         }
       }
+      // SAFETY: The preceding guard confirms the named catalogs object remains available for inspection.
       if (Object.keys((rootJson as any).workspaces.catalogs).length === 0) {
+        // SAFETY: The preceding check confirms all named catalog groups were removed.
         delete (rootJson as any).workspaces.catalogs;
       }
     }
@@ -332,13 +337,19 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
   }
 
   // Step 7: Clean up empty named catalog groups
+  // SAFETY: The parsed root package is mutable JSON and this optional branch confirms named catalogs exist.
   if ((rootJson as any).workspaces?.catalogs) {
+    // SAFETY: The preceding guard confirms the named catalogs object exists before enumerating it.
     for (const group of Object.keys((rootJson as any).workspaces.catalogs)) {
+      // SAFETY: Each enumerated catalog group is an object-valued entry in the parsed package.json.
       if (Object.keys((rootJson as any).workspaces.catalogs[group]).length === 0) {
+        // SAFETY: The preceding check identifies an empty named catalog group for removal.
         delete (rootJson as any).workspaces.catalogs[group];
       }
     }
+    // SAFETY: The preceding guard confirms the named catalogs object remains available for inspection.
     if (Object.keys((rootJson as any).workspaces.catalogs).length === 0) {
+      // SAFETY: The preceding check confirms all named catalog groups were removed.
       delete (rootJson as any).workspaces.catalogs;
     }
   }
@@ -350,17 +361,24 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
   if (defaultCatalogUpdates.size > 0 || namedCatalogUpdates.size > 0) {
     if (!rootJson.workspaces) rootJson.workspaces = {};
     if (!rootJson.workspaces.catalog) rootJson.workspaces.catalog = {};
-    if (!(rootJson as any).workspaces.catalogs) (rootJson as any).workspaces.catalogs = {};
+    // SAFETY: workspaces was initialized above; this assignment creates the mutable named-catalog record.
+    if (!(rootJson as any).workspaces.catalogs) {
+      // SAFETY: The preceding check confirms the named-catalog record is absent and must be initialized.
+      (rootJson as any).workspaces.catalogs = {};
+    }
 
     for (const [depName, version] of defaultCatalogUpdates) {
       rootJson.workspaces.catalog[depName] = version;
     }
 
     for (const [groupName, deps] of namedCatalogUpdates) {
+      // SAFETY: workspaces and catalogs were initialized above before adding a named group.
       if (!(rootJson as any).workspaces.catalogs[groupName]) {
+        // SAFETY: The preceding check confirms this catalog group does not yet exist.
         (rootJson as any).workspaces.catalogs[groupName] = {};
       }
       for (const [depName, version] of deps) {
+        // SAFETY: The preceding initialization guarantees this named catalog group is an object.
         (rootJson as any).workspaces.catalogs[groupName][depName] = version;
       }
     }
@@ -391,6 +409,7 @@ export function runCatalogFix(rootDir: string, options: CatalogFixOptions = {}):
   const mutations: CatalogRepairMutation[] = refUpdates.map((update) => {
     const packageState = allWorkspacePkgs.find((pkg) => pkg.filePath === update.filePath);
     const before =
+      // SAFETY: Workspace content is parsed package.json data and the dependency section is selected by a validated key.
       (packageState?.content as any)?.[update.depType]?.[update.depName] ?? "<missing>";
     const policy = resolveCatalogPolicy(
       update.depName,

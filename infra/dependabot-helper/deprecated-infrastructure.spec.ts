@@ -19,6 +19,14 @@ describe("deprecated dependency automation boundary", () => {
     expect(scripts.pkgUpdate).toBeUndefined();
     expect(scripts["pkg" + "-update"]).toBeUndefined();
     expect(scripts["pkg" + "-update:ci"]).toBeUndefined();
-    expect(scripts["dependabot-helper"]).toBe("bun ./infra/dependabot-helper/cli.ts");
+    expect(scripts["dependabot-helper"]).toBe("bun run --filter dependabot-helper cli");
+
+    const helperScripts = JSON.parse(
+      readFileSync(resolve(rootDir, "infra", "dependabot-helper", "package.json"), "utf8"),
+    ).scripts;
+    expect(helperScripts.validate).toBe("bun cli.ts validate");
+    expect(helperScripts.check).toBe("bun cli.ts check");
+    expect(helperScripts.update).toBe("bun cli.ts update");
+    expect(helperScripts.align).toBe("bun cli.ts align");
   });
 });

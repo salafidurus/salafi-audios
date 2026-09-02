@@ -71,7 +71,7 @@ COPY --from=pruner /repo/tsconfig.json /repo/tsconfig.base.json \
 # Strip husky `prepare` again (out/full re-adds it) so the runtime production
 # install below cannot attempt it. Then build api + its workspace closure.
 RUN sed -i '/"prepare"[[:space:]]*:/d' package.json \
-    && bun run build --filter=api...
+    && bun run build:all --filter=api...
 
 # Remove development node_modules and build caches before handing off.
 # The runtime stage reinstalls only production dependencies.
@@ -88,7 +88,7 @@ FROM oven/bun:1.4.0 AS runtime
 # can probe the API. Debian-based oven/bun image; done before the non-root
 # user switch below.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
+    && apt-get install -y --no-install-recommends curl=8.14.1-2+deb13u4 \
     && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production \

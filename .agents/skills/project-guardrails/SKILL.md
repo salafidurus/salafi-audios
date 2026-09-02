@@ -142,9 +142,13 @@ bun run dev              # All apps (api, web, native)
 bun run dev:api          # Backend only
 bun run dev:web          # Web only
 bun run dev:native       # Native only
-bun run build            # Build all
-bun run lint             # Lint all
-bun run typecheck        # Typecheck all
-bun run test             # Test all
+bun run build            # Build affected workspaces
+bun run lint             # Lint affected workspaces
+bun run typecheck        # Typecheck affected workspaces
+bun run test             # Test affected workspaces
+bun run build:all        # Build all workspaces
+bun run lint:all         # Lint all workspaces
+bun run typecheck:all    # Typecheck all workspaces
+bun run test:all         # Test all workspaces
 bun run format           # Format codebase
 ```

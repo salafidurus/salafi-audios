@@ -137,92 +137,25 @@ describe("checkCatalog", () => {
     expect(result).toHaveLength(0);
   });
 
-  it("returns candidates for outdated packages", async () => {
+  it("does not return ordinary catalog updates", async () => {
     const dir = createTempPkg({
-      workspaces: { catalog: { zod: "1.0.0" } },
+      workspaces: {
+        catalog: {
+          zod: "1.0.0",
+          react: "18.0.0",
+          "@babel/core": "7.0.0",
+          jest: "29.0.0",
+        },
+      },
     });
     const result = await checkCatalog(dir, testConfig);
-    expect(result).toHaveLength(1);
-    expect(result[0]!.packageName).toBe("zod");
+    expect(result).toEqual([]);
   });
 
   it("handles empty catalog", async () => {
     const dir = createTempPkg({ workspaces: { catalog: {} } });
     const result = await checkCatalog(dir, testConfig);
     expect(result).toHaveLength(0);
-  });
-
-  it("assigns each never package its own group", async () => {
-    const cfg: PkupdateConfig = {
-      groups: {},
-      skip: [],
-      never: ["typescript", "@babel/runtime"],
-      versionLocked: [],
-      bun: { enabled: false },
-      expo: { enabled: false },
-    };
-    const dir = createTempPkg({
-      workspaces: { catalog: { typescript: "5.0.0", "@babel/runtime": "7.24.0" } },
-    });
-    const result = await checkCatalog(dir, cfg);
-    expect(result).toHaveLength(2);
-    const ts = result.find((c) => c.packageName === "typescript")!;
-    expect(ts.group).toBe("typescript");
-    const babel = result.find((c) => c.packageName === "@babel/runtime")!;
-    expect(babel.group).toBe("@babel/runtime");
-  });
-});
-
-describe("updateTypes cap", () => {
-  const capCfg: PkupdateConfig = {
-    groups: {
-      babel: { patterns: ["@babel/core", "@babel/runtime"], updateTypes: ["minor", "patch"] },
-      nestjs: { patterns: ["@nestjs/*"] },
-      typescript: { patterns: ["typescript"], updateTypes: ["minor", "patch"] },
-    },
-    skip: [],
-    never: [],
-    versionLocked: [],
-    bun: { enabled: false },
-    expo: { enabled: false },
-  };
-
-  it("excludes a major bump when the group cap allows only minor/patch", async () => {
-    const dir = createTempPkg({ workspaces: { catalog: { "@babel/core": "7.29.7" } } });
-    const result = await checkCatalog(dir, capCfg);
-    expect(result).toHaveLength(0);
-  });
-
-  it("includes a patch bump when the group cap allows minor/patch", async () => {
-    const dir = createTempPkg({ workspaces: { catalog: { "@babel/core": "8.0.0" } } });
-    const result = await checkCatalog(dir, capCfg);
-    expect(result).toHaveLength(1);
-    expect(result[0]!.group).toBe("babel");
-  });
-
-  it("does not apply the cap to groups without updateTypes", async () => {
-    const dir = createTempPkg({ workspaces: { catalog: { "@nestjs/core": "10.0.0" } } });
-    const result = await checkCatalog(dir, capCfg);
-    expect(result).toHaveLength(1);
-  });
-
-  it("groups @babel/runtime under babel via the runtime config", async () => {
-    const dir = createTempPkg({ workspaces: { catalog: { "@babel/runtime": "7.24.0" } } });
-    const result = await checkCatalog(dir, capCfg);
-    expect(result[0]!.group).toBe("babel");
-  });
-
-  it("excludes a typescript major bump via the runtime config", async () => {
-    const dir = createTempPkg({ workspaces: { catalog: { typescript: "4.0.0" } } });
-    const result = await checkCatalog(dir, capCfg);
-    expect(result).toHaveLength(0);
-  });
-
-  it("includes a typescript minor bump when the cap allows minor/patch", async () => {
-    const dir = createTempPkg({ workspaces: { catalog: { typescript: "5.5.0" } } });
-    const result = await checkCatalog(dir, capCfg);
-    expect(result).toHaveLength(1);
-    expect(result[0]!.group).toBe("typescript");
   });
 });
 
@@ -298,14 +231,15 @@ describe("checkExpo", () => {
 });
 
 describe("checkAll", () => {
-  it("returns results from catalog and bun checks", async () => {
+  it("returns dedicated Bun checks without ordinary catalog proposals", async () => {
     const dir = createTempPkg({
       name: "test",
       packageManager: "bun@1.0.0",
       workspaces: { catalog: { zod: "1.0.0" } },
     });
     const result = await checkAll(dir, config);
-    expect(result.length).toBeGreaterThanOrEqual(2);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.type).toBe("bun");
   });
 
   it("returns empty when everything current", async () => {
