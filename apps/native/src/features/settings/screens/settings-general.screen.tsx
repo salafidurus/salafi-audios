@@ -4,6 +4,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { UnistylesRuntime, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import {
+  applyThemePreference,
+  setStoredThemePreference,
+  type ThemePreference,
+} from "@/core/styles/theme/theme-preference";
 import { RootScreenHeader } from "@/features/navigation";
 import { NativeBridgeHost } from "@/shared/ui";
 
@@ -17,7 +22,6 @@ import {
 } from "./settings-account-actions.screen";
 
 /** Renders the general settings form with RN layout and isolated Expo UI controls. */
-type ThemePreference = "system" | "light" | "dark";
 interface NotificationState {
   master: boolean;
   scholars: boolean;
@@ -43,12 +47,8 @@ export function SettingsGeneralScreen(props: SettingsAccountActionsProps = {}) {
 
   const handleThemeChange = useCallback((value: ThemePreference) => {
     setThemePreference(value);
-    if (value === "system") {
-      UnistylesRuntime.setAdaptiveThemes(true);
-    } else {
-      UnistylesRuntime.setAdaptiveThemes(false);
-      UnistylesRuntime.setTheme(value);
-    }
+    applyThemePreference(value);
+    void setStoredThemePreference(value);
   }, []);
   const handleNotifChange = useCallback(
     (key: keyof NotificationState) => (checked: boolean) =>
@@ -62,7 +62,7 @@ export function SettingsGeneralScreen(props: SettingsAccountActionsProps = {}) {
   ];
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.surface.canvas }}>
       <NativeBridgeHost testID="settings-general-host" matchContents={false}>
         <View style={{ flex: 1 }}>
           <View

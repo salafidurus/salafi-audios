@@ -9,6 +9,7 @@ export default function AdminIndexRoute() {
 
   return (
     <AdminDashboardScreen
+      onBack={() => router.back()}
       onNavigateToListings={() => router.push("/admin/listings")}
       onNavigateToScholars={() => router.push("/admin/scholars")}
     />

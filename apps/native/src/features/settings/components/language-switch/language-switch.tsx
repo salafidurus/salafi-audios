@@ -2,9 +2,11 @@
 import { Host, Picker } from "@expo/ui";
 import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
 import { useQueryClient } from "@tanstack/react-query";
+import { useUnistyles } from "react-native-unistyles";
 
 import { changeLocale } from "@/core/i18n/i18n";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { createUniversalHostProps } from "@/core/styles/expo-ui";
 
 /** Owns locale labels and query invalidation after a locale change. */
 const LOCALE_LABELS = {
@@ -16,6 +18,7 @@ const LOCALE_LABELS = {
 /** Switches locale after clearing stale data that was fetched under the old locale. */
 export function LanguageSwitch() {
   const { i18n } = useTranslation();
+  const { theme, rt } = useUnistyles();
   const queryClient = useQueryClient();
 
   const activeLocale =
@@ -37,7 +40,7 @@ export function LanguageSwitch() {
   };
 
   return (
-    <Host matchContents>
+    <Host matchContents {...createUniversalHostProps(theme, rt.themeName)}>
       <Picker
         testID="language-switch-menu"
         selectedValue={activeLocale}
