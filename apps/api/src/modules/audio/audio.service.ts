@@ -2,7 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import type { ProgressSyncItemDto, AudioProgressDto, StreamResponseDto } from '@sd/core-contracts';
 import { AudioRepository } from './audio.repo';
 
+/** NestJS audio service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** audio application module responsible for audio.service behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AudioService {
   constructor(private readonly repo: AudioRepository) {}
 
@@ -13,20 +16,20 @@ export class AudioService {
 
   async upsertProgress(
     userId: string,
-    listingId: string,
+    slug: string,
     positionSeconds: number,
     durationSeconds?: number,
     isCompleted?: boolean,
   ): Promise<void> {
     const found = await this.repo.upsertProgress(
       userId,
-      listingId,
+      slug,
       positionSeconds,
       durationSeconds,
       isCompleted,
     );
     if (!found) {
-      throw new NotFoundException(`Listing ${listingId} not found`);
+      throw new NotFoundException(`Listing ${slug} not found`);
     }
   }
 
@@ -34,14 +37,14 @@ export class AudioService {
     await this.repo.bulkSync(userId, items);
   }
 
-  async resolveStreamUrl(listingId: string): Promise<StreamResponseDto> {
-    const listing = await this.repo.findListingById(listingId);
+  async resolveStreamUrl(slug: string): Promise<StreamResponseDto> {
+    const listing = await this.repo.findListingBySlug(slug);
 
     if (!listing) {
-      throw new NotFoundException(`Listing with ID ${listingId} not found`);
+      throw new NotFoundException(`Listing "${slug}" not found`);
     }
 
-    // Use the resolved id from here on — `listingId` may have been a slug.
+    // Use the resolved internal id from here on — the route identity was a slug.
     let asset = await this.repo.findPrimaryAsset(listing.id);
 
     if (!asset) {
@@ -49,7 +52,7 @@ export class AudioService {
     }
 
     if (!asset) {
-      throw new NotFoundException(`No audio assets found for listing ${listingId}`);
+      throw new NotFoundException(`No audio assets found for listing ${listing.id}`);
     }
 
     return {

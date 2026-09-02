@@ -1,6 +1,8 @@
 import type { Locale } from '@sd/core-contracts';
 import { resolveTranslatedFields } from './resolve-translated-fields';
 
+/** Shared API resolve content translation utilities and boundary definitions used by backend modules. */
+/** API type describing the content translation result contract. */
 export type ContentTranslationResult<F extends Record<string, string | null | undefined>> = {
   /** Preferred-language fields: the published translation overlaid on the base,
    * falling back to the base for any field the translation omits. */
@@ -24,6 +26,7 @@ export function resolveContentTranslation<
   F extends Record<string, string | null | undefined>,
 >(args: {
   base: F;
+  /** Documents the originalLanguage field's API projection semantics and lifecycle meaning. */
   originalLanguage?: Locale | null;
   targetLocale: Locale;
   publishedTranslation?: Partial<F> | null;
@@ -37,6 +40,8 @@ export function resolveContentTranslation<
 
   if (publishedTranslation && !sameAsOriginal) {
     const merged = resolveTranslatedFields(base, publishedTranslation);
+    // SAFETY: `base` is the owner object for `F`, so its own keys are the
+    // concrete keys that can be compared on both `merged` and `base`.
     const changed = (Object.keys(base) as (keyof F)[]).some((key) => merged[key] !== base[key]);
     if (changed) {
       result.fields = merged;

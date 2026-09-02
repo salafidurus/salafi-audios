@@ -47,6 +47,8 @@ import { SearchBar, type SearchBarProps } from "./Search.Bar";
 import { SearchButton, type SearchButtonProps } from "./Search.Button";
 import { SearchFilter, type SearchFilterProps, type FilterChip } from "./Search.Filter";
 
+/** Exposes the shared compound search controls used by public and admin screens. */
+/** Compound search API exposing the editable bar, filter group, and button. */
 export const Search = Object.assign({
   Bar: SearchBar,
   Filter: SearchFilter,

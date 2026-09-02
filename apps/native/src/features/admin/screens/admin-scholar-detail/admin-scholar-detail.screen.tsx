@@ -12,13 +12,16 @@ import { useAuth } from "@/core/auth/use-auth";
 import { DraggableList, type RenderItemParams } from "@/shared/components/DraggableList";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { NativeBridgeHost } from "@/shared/ui";
 
 import { updateSeries, updateCollection } from "../../api/admin-scholars.api";
 import { CollectionSheet } from "../../components/CollectionSheet/CollectionSheet";
 import { SeriesSheet } from "../../components/SeriesSheet/SeriesSheet";
 import { useAdminSeries, useAdminCollections } from "../../hooks/use-admin-scholars";
 
+/** Provides authenticated native administration workflows and their data boundaries. */
 type AdminScholarDetailScreenProps = {
+  /** Carries the canonical scholar identity used to scope content and admin requests. */
   scholarSlug: string;
 };
 
@@ -33,6 +36,29 @@ type ScreenState = {
 
 function reduce(state: ScreenState, patch: Partial<ScreenState>): ScreenState {
   return { ...state, ...patch };
+}
+
+async function persistOrder(
+  data: AdminListingListItemDto[],
+  to: number,
+  previous: AdminListingListItemDto[],
+  setState: (patch: Partial<ScreenState>) => void,
+  update: (id: string, patch: { orderIndex: number }) => Promise<void>,
+  stateKey: "seriesOrder" | "collectionOrder",
+) {
+  setState({ [stateKey]: data });
+  try {
+    await update(data[to]!.id, { orderIndex: to });
+  } catch {
+    setState({ [stateKey]: previous });
+  }
+}
+
+function getDisplayList(
+  ordered: AdminListingListItemDto[] | null,
+  fetched: AdminListingListItemDto[] | undefined,
+) {
+  return ordered ?? fetched ?? [];
 }
 
 function SeriesItem({
@@ -111,6 +137,140 @@ function SectionHeader({
   );
 }
 
+type ScholarDetailContentProps = {
+  scholar: ScholarDetailDto;
+  scholarId: string;
+  /** Carries the canonical scholar identity used to scope content and admin requests. */
+  scholarSlug: string;
+  canAdd: boolean;
+  seriesExpanded: boolean;
+  collectionsExpanded: boolean;
+  showSeriesSheet: boolean;
+  showCollectionSheet: boolean;
+  displaySeries: AdminListingListItemDto[];
+  displayCollections: AdminListingListItemDto[];
+  onToggleSeries: () => void;
+  onToggleCollections: () => void;
+  onAddSeries: () => void;
+  onAddCollection: () => void;
+  onSeriesDragEnd: (params: {
+    data: AdminListingListItemDto[];
+    from: number;
+    to: number;
+  }) => Promise<void>;
+  onCollectionDragEnd: (params: {
+    data: AdminListingListItemDto[];
+    from: number;
+    to: number;
+  }) => Promise<void>;
+  onCloseSeries: () => void;
+  onCloseCollection: () => void;
+  onSeriesSaved: () => void;
+  onCollectionSaved: () => void;
+};
+
+function ScholarDetailContent({
+  scholar,
+  scholarId,
+  scholarSlug,
+  canAdd,
+  seriesExpanded,
+  collectionsExpanded,
+  showSeriesSheet,
+  showCollectionSheet,
+  displaySeries,
+  displayCollections,
+  onToggleSeries,
+  onToggleCollections,
+  onAddSeries,
+  onAddCollection,
+  onSeriesDragEnd,
+  onCollectionDragEnd,
+  onCloseSeries,
+  onCloseCollection,
+  onSeriesSaved,
+  onCollectionSaved,
+}: ScholarDetailContentProps) {
+  return (
+    <NativeBridgeHost testID="admin-scholar-detail-host" matchContents={false}>
+      <GestureHandlerRootView style={styles.root}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.scholarName}>{scholar.name}</Text>
+          <Text style={styles.scholarSlug}>@{scholar.slug}</Text>
+
+          <SectionHeader
+            title="Series"
+            isExpanded={seriesExpanded}
+            onToggle={onToggleSeries}
+            onAdd={onAddSeries}
+            canAdd={canAdd}
+          />
+          {seriesExpanded &&
+            (displaySeries.length === 0 ? (
+              <EmptyState message="No series added yet." variant="empty" />
+            ) : (
+              <DraggableList
+                data={displaySeries}
+                keyExtractor={(item) => item.id}
+                onDragEnd={onSeriesDragEnd}
+                scrollEnabled={false}
+                renderItem={({
+                  item,
+                  drag,
+                  isActive,
+                }: RenderItemParams<AdminListingListItemDto>) => (
+                  <SeriesItem item={item} drag={drag} isActive={isActive} />
+                )}
+              />
+            ))}
+
+          <SectionHeader
+            title="Collections"
+            isExpanded={collectionsExpanded}
+            onToggle={onToggleCollections}
+            onAdd={onAddCollection}
+            canAdd={canAdd}
+          />
+          {collectionsExpanded &&
+            (displayCollections.length === 0 ? (
+              <EmptyState message="No collections added yet." variant="empty" />
+            ) : (
+              <DraggableList
+                data={displayCollections}
+                keyExtractor={(item) => item.id}
+                onDragEnd={onCollectionDragEnd}
+                scrollEnabled={false}
+                renderItem={({
+                  item,
+                  drag,
+                  isActive,
+                }: RenderItemParams<AdminListingListItemDto>) => (
+                  <CollectionItem item={item} drag={drag} isActive={isActive} />
+                )}
+              />
+            ))}
+
+          <SeriesSheet
+            isOpen={showSeriesSheet}
+            scholarId={scholarId}
+            scholarSlug={scholarSlug}
+            onClose={onCloseSeries}
+            onSaved={onSeriesSaved}
+          />
+          <CollectionSheet
+            isOpen={showCollectionSheet}
+            scholarId={scholarId}
+            scholarSlug={scholarSlug}
+            onClose={onCloseCollection}
+            onSaved={onCollectionSaved}
+          />
+        </ScrollView>
+      </GestureHandlerRootView>
+    </NativeBridgeHost>
+  );
+}
+
+/** Renders the native admin scholar detail screen surface and coordinates its user-facing state. */
 export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScreenProps) {
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
@@ -118,7 +278,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     httpClient<ScholarDetailDto>({ url: endpoints.scholars.detail(scholarSlug), method: "GET" }),
   );
 
-  const scholarId = scholar?.id ?? "";
+  const scholarId = scholar ? scholar.id : "";
   const canAdd = ability.can("create", subject("Listing", { scholarSlug }));
 
   const { data: seriesList, refetch: refetchSeries } = useAdminSeries(scholarId);
@@ -142,8 +302,8 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     collectionOrder,
   } = state;
 
-  const displaySeries = seriesOrder ?? seriesList ?? [];
-  const displayCollections = collectionOrder ?? collectionList ?? [];
+  const displaySeries = getDisplayList(seriesOrder, seriesList);
+  const displayCollections = getDisplayList(collectionOrder, collectionList);
 
   const handleSeriesDragEnd = async ({
     data,
@@ -153,13 +313,17 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     from: number;
     to: number;
   }) => {
-    const prevOrder = seriesOrder ?? seriesList ?? [];
-    dispatch({ seriesOrder: data });
-    try {
-      await updateSeries(data[to]!.id, { orderIndex: to });
-    } catch {
-      dispatch({ seriesOrder: prevOrder });
-    }
+    const prevOrder = getDisplayList(seriesOrder, seriesList);
+    await persistOrder(
+      data,
+      to,
+      prevOrder,
+      dispatch,
+      async (id, patch) => {
+        await updateSeries(id, patch);
+      },
+      "seriesOrder",
+    );
   };
 
   const handleCollectionDragEnd = async ({
@@ -170,97 +334,58 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     from: number;
     to: number;
   }) => {
-    const prevOrder = collectionOrder ?? collectionList ?? [];
-    dispatch({ collectionOrder: data });
-    try {
-      await updateCollection(data[to]!.id, { orderIndex: to });
-    } catch {
-      dispatch({ collectionOrder: prevOrder });
-    }
+    const prevOrder = getDisplayList(collectionOrder, collectionList);
+    await persistOrder(
+      data,
+      to,
+      prevOrder,
+      dispatch,
+      async (id, patch) => {
+        await updateCollection(id, patch);
+      },
+      "collectionOrder",
+    );
   };
 
   if (!scholar) {
     return (
-      <View style={styles.loadingContainer}>
-        <EmptyState message="Loading scholar…" variant="loading" />
-      </View>
+      <NativeBridgeHost testID="admin-scholar-detail-host" matchContents={false}>
+        <View style={styles.loadingContainer}>
+          <EmptyState message="Loading scholar…" variant="loading" />
+        </View>
+      </NativeBridgeHost>
     );
   }
 
   return (
-    <GestureHandlerRootView style={styles.root}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.scholarName}>{scholar.name}</Text>
-        <Text style={styles.scholarSlug}>@{scholar.slug}</Text>
-
-        {/* Series section */}
-        <SectionHeader
-          title="Series"
-          isExpanded={seriesExpanded}
-          onToggle={() => dispatch({ seriesExpanded: !seriesExpanded })}
-          onAdd={() => dispatch({ showSeriesSheet: true })}
-          canAdd={canAdd}
-        />
-        {seriesExpanded &&
-          (displaySeries.length === 0 ? (
-            <EmptyState message="No series added yet." variant="empty" />
-          ) : (
-            <DraggableList
-              data={displaySeries}
-              keyExtractor={(item) => item.id}
-              onDragEnd={handleSeriesDragEnd}
-              scrollEnabled={false}
-              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
-                <SeriesItem item={item} drag={drag} isActive={isActive} />
-              )}
-            />
-          ))}
-
-        {/* Collections section */}
-        <SectionHeader
-          title="Collections"
-          isExpanded={collectionsExpanded}
-          onToggle={() => dispatch({ collectionsExpanded: !collectionsExpanded })}
-          onAdd={() => dispatch({ showCollectionSheet: true })}
-          canAdd={canAdd}
-        />
-        {collectionsExpanded &&
-          (displayCollections.length === 0 ? (
-            <EmptyState message="No collections added yet." variant="empty" />
-          ) : (
-            <DraggableList
-              data={displayCollections}
-              keyExtractor={(item) => item.id}
-              onDragEnd={handleCollectionDragEnd}
-              scrollEnabled={false}
-              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
-                <CollectionItem item={item} drag={drag} isActive={isActive} />
-              )}
-            />
-          ))}
-
-        <SeriesSheet
-          isOpen={showSeriesSheet}
-          scholarId={scholarId}
-          scholarSlug={scholarSlug}
-          onClose={() => dispatch({ showSeriesSheet: false })}
-          onSaved={() => {
-            dispatch({ showSeriesSheet: false, seriesOrder: null });
-            refetchSeries();
-          }}
-        />
-        <CollectionSheet
-          isOpen={showCollectionSheet}
-          scholarId={scholarId}
-          scholarSlug={scholarSlug}
-          onClose={() => dispatch({ showCollectionSheet: false })}
-          onSaved={() => {
-            dispatch({ showCollectionSheet: false, collectionOrder: null });
-            refetchCollections();
-          }}
-        />
-      </ScrollView>
-    </GestureHandlerRootView>
+    <ScholarDetailContent
+      scholar={scholar}
+      scholarId={scholarId}
+      scholarSlug={scholarSlug}
+      canAdd={canAdd}
+      seriesExpanded={seriesExpanded}
+      collectionsExpanded={collectionsExpanded}
+      showSeriesSheet={showSeriesSheet}
+      showCollectionSheet={showCollectionSheet}
+      displaySeries={displaySeries}
+      displayCollections={displayCollections}
+      onToggleSeries={() => dispatch({ seriesExpanded: !seriesExpanded })}
+      onToggleCollections={() => dispatch({ collectionsExpanded: !collectionsExpanded })}
+      onAddSeries={() => dispatch({ showSeriesSheet: true })}
+      onAddCollection={() => dispatch({ showCollectionSheet: true })}
+      onSeriesDragEnd={handleSeriesDragEnd}
+      onCollectionDragEnd={handleCollectionDragEnd}
+      onCloseSeries={() => dispatch({ showSeriesSheet: false })}
+      onCloseCollection={() => dispatch({ showCollectionSheet: false })}
+      onSeriesSaved={() => {
+        dispatch({ showSeriesSheet: false, seriesOrder: null });
+        refetchSeries();
+      }}
+      onCollectionSaved={() => {
+        dispatch({ showCollectionSheet: false, collectionOrder: null });
+        refetchCollections();
+      }}
+    />
   );
 }
 

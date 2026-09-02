@@ -1,14 +1,15 @@
+/** Public hook exports for catalog, scholar, topic, and personal-library data. */
 export { useInfiniteScholarsList } from "./use-infinite-scholars-list";
 export type { UseInfiniteScholarsListOptions } from "./use-infinite-scholars-list";
 
-export { useInfiniteLibrarySaved } from "./use-infinite-library-saved";
-export type { UseInfiniteLibrarySavedOptions } from "./use-infinite-library-saved";
+export { useInfiniteMyLibrarySaved } from "./use-infinite-my-library-saved";
+export type { UseInfiniteMyLibrarySavedOptions } from "./use-infinite-my-library-saved";
 
-export { useInfiniteLibraryCompleted } from "./use-infinite-library-completed";
-export type { UseInfiniteLibraryCompletedOptions } from "./use-infinite-library-completed";
+export { useInfiniteMyLibraryCompleted } from "./use-infinite-my-library-completed";
+export type { UseInfiniteMyLibraryCompletedOptions } from "./use-infinite-my-library-completed";
 
-export { useInfiniteLibraryProgress } from "./use-infinite-library-progress";
-export type { UseInfiniteLibraryProgressOptions } from "./use-infinite-library-progress";
+export { useInfiniteMyLibraryProgress } from "./use-infinite-my-library-progress";
+export type { UseInfiniteMyLibraryProgressOptions } from "./use-infinite-my-library-progress";
 
 export { useInfiniteAdminScholars } from "./use-infinite-admin-scholars";
 export type { UseInfiniteAdminScholarsOptions } from "./use-infinite-admin-scholars";

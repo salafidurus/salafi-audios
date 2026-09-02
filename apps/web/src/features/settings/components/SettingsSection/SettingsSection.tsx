@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import styles from "./settings-section.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export interface SettingsSectionProps {
   title: string;
   description?: string;

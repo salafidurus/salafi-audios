@@ -1,307 +1,251 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Trash2, Plus, Star, Award } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useAbility } from "@sd/domain-account";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
+  fetchAdminLectures,
   getAdminPromotions,
   updateAdminPromotions,
-  fetchAdminLectures,
 } from "@/features/admin/api/admin-lectures.api";
-import { Button } from "@/shared/components/Button";
-import { InputField } from "@/shared/components/InputField";
+import { AdminAccessState } from "@/features/admin/components/AdminAccessState/AdminAccessState";
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import { Button } from "@/shared/components/ui/button";
 
+import { EditorsPicksSection } from "./EditorsPicksSection";
 import styles from "./promotions-content.module.css";
+import { PromotionsHeroSection, type PromotionListingOption } from "./PromotionsHeroSection";
+
+function buildPromotionPayload(
+  heroListingId: string,
+  heroHeadline: string,
+  editorsPicks: PromotionListingOption[],
+) {
+  return {
+    heroListingId: heroListingId || null,
+    heroHeadline: heroHeadline || null,
+    editorsPickListingIds: editorsPicks.map((pick) => pick.id),
+  };
+}
+
+function hasSearchTerm(value: string) {
+  return value.length > 0;
+}
+
+function findActiveHero(
+  options: PromotionListingOption[],
+  selectedId: string,
+  fallback: PromotionListingOption | undefined,
+) {
+  return options.find((option) => option.id === selectedId) ?? fallback;
+}
+
+type PromotionState = {
+  hero?: { listingId?: string | null; headline?: string | null } | null;
+  editorsPicks?: Array<{ listing: PromotionListingOption }> | null;
+};
+
+function applyPromotionState(
+  promotions: PromotionState,
+  setHeroListingId: (value: string) => void,
+  setHeroHeadline: (value: string) => void,
+  setEditorsPicks: (value: PromotionListingOption[]) => void,
+) {
+  setHeroListingId(promotions.hero?.listingId ?? "");
+  setHeroHeadline(promotions.hero?.headline ?? "");
+  setEditorsPicks(promotions.editorsPicks?.map((pick) => pick.listing) ?? []);
+}
+
+function PromotionsStatus({
+  isLoading,
+  isError,
+  onRetry,
+  t,
+}: {
+  isLoading: boolean;
+  isError: boolean;
+  onRetry: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  if (isLoading) return <div className={styles.loading}>{t("common.loading", "Loading...")}</div>;
+  if (!isError) return null;
+  return (
+    <Alert variant="destructive" className={styles.errorState}>
+      <AlertDescription>{t("admin.promotions.loadError")}</AlertDescription>
+      <Button variant="secondary" size="sm" onClick={onRetry}>
+        {t("admin.promotions.retry")}
+      </Button>
+    </Alert>
+  );
+}
+
+function PromotionsFooter({
+  feedback,
+  error,
+  pending,
+  onSave,
+  t,
+}: {
+  feedback: "success" | "error" | null;
+  error: string | null;
+  pending: boolean;
+  onSave: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <div className={styles.footerActions}>
+      <div
+        className={styles.feedback}
+        aria-live="polite"
+        role={feedback === "error" ? "alert" : "status"}
+      >
+        {feedback === "success" &&
+          t("admin.promotions.success", "Promotions updated successfully.")}
+        {feedback === "error" && t("admin.promotions.error", "Promotions could not be saved.")}
+        {error && <span>{error}</span>}
+      </div>
+      <Button variant="primary" onClick={onSave} disabled={pending} className="ml-auto">
+        {pending ? t("common.saving", "Saving...") : t("common.save", "Save Curation")}
+      </Button>
+    </div>
+  );
+}
+
+function PromotionsGate({
+  canManage,
+  status,
+  children,
+}: {
+  canManage: boolean;
+  status: { isLoading: boolean; isError: boolean; onRetry: () => void };
+  children: ReactNode;
+}) {
+  const { t } = useTranslation();
+  if (!canManage) return <AdminAccessState status="denied" />;
+  if (status.isLoading || status.isError) {
+    return (
+      <PromotionsStatus
+        isLoading={status.isLoading}
+        isError={status.isError}
+        onRetry={status.onRetry}
+        t={t}
+      />
+    );
+  }
+  return children;
+}
 
 export function PromotionsContent() {
   const { t } = useTranslation();
-
-  // Search queries for autocomplete
+  const { ability } = useAbility();
+  const canManagePromotions = ability.can("write", "Listing");
   const [heroSearch, setHeroSearch] = useState("");
   const [picksSearch, setPicksSearch] = useState("");
-
-  // Select choices
   const [selectedHeroSearchId, setSelectedHeroSearchId] = useState("");
   const [selectedPicksSearchId, setSelectedPicksSearchId] = useState("");
-
-  // Saved/local states
   const [heroListingId, setHeroListingId] = useState("");
   const [heroHeadline, setHeroHeadline] = useState("");
-  const [editorsPicks, setEditorsPicks] = useState<any[]>([]);
+  const [editorsPicks, setEditorsPicks] = useState<PromotionListingOption[]>([]);
+  const [saveFeedback, setSaveFeedback] = useState<"success" | "error" | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  // 1. Fetch current promotions
   const {
     data: promotions,
     refetch: refetchPromotions,
     isLoading,
+    isError,
   } = useQuery({
     queryKey: ["admin", "promotions"],
     queryFn: getAdminPromotions,
+    enabled: canManagePromotions,
   });
 
-  // 2. Fetch search options for Hero
   const { data: heroListingsData } = useQuery({
     queryKey: ["admin", "listings", "search-hero", heroSearch],
     queryFn: () => fetchAdminLectures({ search: heroSearch }),
-    enabled: heroSearch.length > 0,
+    enabled: hasSearchTerm(heroSearch),
   });
-  const heroSearchOptions = heroListingsData?.items ?? [];
-
-  // 3. Fetch search options for Editors' Picks
   const { data: picksListingsData } = useQuery({
     queryKey: ["admin", "listings", "search-picks", picksSearch],
     queryFn: () => fetchAdminLectures({ search: picksSearch }),
-    enabled: picksSearch.length > 0,
+    enabled: hasSearchTerm(picksSearch),
   });
+  const heroSearchOptions = heroListingsData?.items ?? [];
   const picksSearchOptions = picksListingsData?.items ?? [];
 
-  // Populate form state when promotions data loads
   useEffect(() => {
-    if (promotions) {
-      setHeroListingId(promotions.hero?.listingId ?? "");
-      setHeroHeadline(promotions.hero?.headline ?? "");
-      setEditorsPicks(promotions.editorsPicks?.map((p: any) => p.listing) ?? []);
-    }
+    if (!promotions) return;
+    applyPromotionState(promotions, setHeroListingId, setHeroHeadline, setEditorsPicks);
   }, [promotions]);
 
-  // Mutation to save promotions
   const mutation = useMutation({
     mutationFn: updateAdminPromotions,
     onSuccess: () => {
-      alert(t("admin.promotions.success", "Promotions updated successfully!"));
+      setSaveFeedback("success");
+      setSaveError(null);
       void refetchPromotions();
     },
-    onError: (err: any) => {
-      alert(t("admin.promotions.error", `Failed to save promotions: ${err.message || err}`));
+    onError: () => {
+      setSaveFeedback("error");
+      setSaveError(
+        t("admin.promotions.errorDetails", "Please try again or contact an administrator."),
+      );
     },
   });
 
   const handleSave = () => {
-    mutation.mutate({
-      heroListingId: heroListingId || null,
-      heroHeadline: heroHeadline || null,
-      editorsPickListingIds: editorsPicks.map((p) => p.id),
-    });
+    setSaveFeedback(null);
+    setSaveError(null);
+    mutation.mutate(buildPromotionPayload(heroListingId, heroHeadline, editorsPicks));
   };
 
-  const handleAddPick = () => {
-    if (!selectedPicksSearchId) return;
-    const match = picksSearchOptions.find((o: any) => o.id === selectedPicksSearchId);
-    if (!match) return;
-
-    // Check if already in list
-    if (editorsPicks.some((p) => p.id === match.id)) {
-      alert(t("admin.promotions.alreadyAdded", "This listing is already in Editors' Picks."));
-      return;
-    }
-
-    setEditorsPicks((prev) => [...prev, match]);
-    setPicksSearch("");
-    setSelectedPicksSearchId("");
-  };
-
-  const handleRemovePick = (id: string) => {
-    setEditorsPicks((prev) => prev.filter((p) => p.id !== id));
-  };
-
-  // Find active hero listing info for display
-  const activeHeroListing =
-    heroSearchOptions.find((o: any) => o.id === heroListingId) || promotions?.hero?.listing;
-
-  if (isLoading) {
-    return <div className={styles.loading}>{t("common.loading", "Loading...")}</div>;
-  }
+  const activeHeroListing = findActiveHero(
+    heroSearchOptions,
+    heroListingId,
+    promotions?.hero?.listing,
+  );
 
   return (
-    <div className={styles.container}>
-      <div className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <Star className={styles.sectionIcon} size={20} />
-          <h2>{t("admin.promotions.featuredHeroTitle", "Featured Hero Curation")}</h2>
-        </div>
-        <p className={styles.sectionDesc}>
-          {t(
-            "admin.promotions.featuredHeroDesc",
-            "Select the main listing highlighted at the top of the homepage hero banner.",
-          )}
-        </p>
-
-        <div className={styles.row}>
-          <label className={styles.label} htmlFor="hero-search-input">
-            {t("admin.promotions.heroSearch", "Search & Select Listing")}
-          </label>
-          <InputField
-            id="hero-search-input"
-            value={heroSearch}
-            onChange={(val) => {
-              setHeroSearch(val);
-              setSelectedHeroSearchId("");
-            }}
-            placeholder={t(
-              "admin.promotions.searchPlaceholder",
-              "Search lectures by title or scholar...",
-            )}
-          />
-          {heroSearchOptions.length > 0 && (
-            <select
-              id="hero-select-dropdown"
-              aria-label={t("admin.promotions.selectMatch", "Select matching listing")}
-              className={styles.select}
-              value={selectedHeroSearchId}
-              onChange={(e) => {
-                const val = e.target.value;
-                setSelectedHeroSearchId(val);
-                setHeroListingId(val);
-              }}
-            >
-              <option value="">
-                -- {t("admin.promotions.selectMatch", "Select matching listing")} --
-              </option>
-              {heroSearchOptions.map((opt: any) => (
-                <option key={opt.id} value={opt.id}>
-                  {opt.title} ({opt.scholarName})
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-
-        {activeHeroListing && (
-          <div className={styles.activePromoCard}>
-            <Award className="text-[var(--action-primary)]" size={24} />
-            <div className={styles.promoDetails}>
-              <span className={styles.promoTag}>
-                {t("admin.promotions.currentlySelected", "Active Hero Selection")}
-              </span>
-              <p className={styles.promoTitle}>{activeHeroListing.title}</p>
-              <p className={styles.promoSub}>{activeHeroListing.scholarName}</p>
-            </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                setHeroListingId("");
-                setHeroSearch("");
-                setSelectedHeroSearchId("");
-              }}
-            >
-              {t("common.clear", "Clear")}
-            </Button>
-          </div>
-        )}
-
-        <div className={styles.row}>
-          <label className={styles.label} htmlFor="hero-headline-input">
-            {t("admin.promotions.heroHeadline", "Featured Headline/Text")}
-          </label>
-          <InputField
-            id="hero-headline-input"
-            value={heroHeadline}
-            onChange={setHeroHeadline}
-            placeholder={t("admin.promotions.headlinePlaceholder", "e.g. Featured Lecture")}
-          />
-        </div>
+    <PromotionsGate
+      canManage={canManagePromotions}
+      status={{ isLoading, isError, onRetry: () => void refetchPromotions() }}
+    >
+      <div className={styles.container}>
+        <PromotionsHeroSection
+          search={heroSearch}
+          onSearchChange={setHeroSearch}
+          selectedSearchId={selectedHeroSearchId}
+          onSelectedSearchIdChange={setSelectedHeroSearchId}
+          onListingIdChange={setHeroListingId}
+          headline={heroHeadline}
+          onHeadlineChange={setHeroHeadline}
+          searchOptions={heroSearchOptions}
+          activeListing={activeHeroListing}
+        />
+        <EditorsPicksSection
+          search={picksSearch}
+          onSearchChange={setPicksSearch}
+          selectedSearchId={selectedPicksSearchId}
+          onSelectedSearchIdChange={setSelectedPicksSearchId}
+          searchOptions={picksSearchOptions}
+          editorsPicks={editorsPicks}
+          onEditorsPicksChange={setEditorsPicks}
+          onError={(message) => {
+            setSaveFeedback("error");
+            setSaveError(message);
+          }}
+        />
+        <PromotionsFooter
+          feedback={saveFeedback}
+          error={saveError}
+          pending={mutation.isPending}
+          onSave={handleSave}
+          t={t}
+        />
       </div>
-
-      <hr className={styles.divider} />
-
-      <div className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <Star className={styles.sectionIcon} size={20} />
-          <h2>{t("admin.promotions.editorsPicksTitle", "Editors' Picks Curation")}</h2>
-        </div>
-        <p className={styles.sectionDesc}>
-          {t(
-            "admin.promotions.editorsPicksDesc",
-            "Manage the listings highlighted inside the Editors' Picks feed widget on the homepage.",
-          )}
-        </p>
-
-        <div className={styles.row}>
-          <label className={styles.label} htmlFor="picks-search-input">
-            {t("admin.promotions.addPickLabel", "Add Listing to Picks")}
-          </label>
-          <div className={styles.searchAddRow}>
-            <InputField
-              id="picks-search-input"
-              value={picksSearch}
-              onChange={(val) => {
-                setPicksSearch(val);
-                setSelectedPicksSearchId("");
-              }}
-              placeholder={t(
-                "admin.promotions.searchPlaceholder",
-                "Search lectures by title or scholar...",
-              )}
-            />
-            <Button
-              variant="primary"
-              onClick={handleAddPick}
-              disabled={!selectedPicksSearchId}
-              icon={<Plus size={16} />}
-            >
-              {t("common.add", "Add")}
-            </Button>
-          </div>
-          {picksSearchOptions.length > 0 && (
-            <select
-              id="picks-select-dropdown"
-              aria-label={t("admin.promotions.selectMatch", "Select matching listing")}
-              className={styles.select}
-              value={selectedPicksSearchId}
-              onChange={(e) => setSelectedPicksSearchId(e.target.value)}
-            >
-              <option value="">
-                -- {t("admin.promotions.selectMatch", "Select matching listing")} --
-              </option>
-              {picksSearchOptions.map((opt: any) => (
-                <option key={opt.id} value={opt.id}>
-                  {opt.title} ({opt.scholarName})
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-
-        <div className={styles.picksList}>
-          {editorsPicks.length === 0 ? (
-            <p className={styles.emptyPicks}>
-              {t("admin.promotions.emptyPicks", "No Editors' Picks selected yet.")}
-            </p>
-          ) : (
-            editorsPicks.map((pick, idx) => (
-              <div key={pick.id} className={styles.pickRow}>
-                <span className={styles.pickIndex}>#{idx + 1}</span>
-                <div className={styles.pickDetails}>
-                  <p className={styles.pickTitle}>{pick.title}</p>
-                  <p className={styles.pickSub}>{pick.scholarName}</p>
-                </div>
-                <button
-                  type="button"
-                  className={styles.removeButton}
-                  onClick={() => handleRemovePick(pick.id)}
-                  aria-label={t("admin.promotions.removePick", "Remove Pick")}
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      <div className={styles.footerActions}>
-        <Button
-          variant="primary"
-          onClick={handleSave}
-          disabled={mutation.isPending}
-          className="ml-auto"
-        >
-          {mutation.isPending ? t("common.saving", "Saving...") : t("common.save", "Save Curation")}
-        </Button>
-      </div>
-    </div>
+    </PromotionsGate>
   );
 }

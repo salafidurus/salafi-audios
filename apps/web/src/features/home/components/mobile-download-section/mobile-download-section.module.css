@@ -3,26 +3,32 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 1.5rem;
-  padding: 0 1rem;
-  border: none;
-  border-radius: 0;
-  background: transparent;
+  flex-wrap: wrap;
+  gap: clamp(1.25rem, 2.5vw, 2.5rem);
+  padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 3rem);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-subtle);
   width: 100%;
+}
+
+.downloadSection > div {
+  display: flex;
+  justify-content: center;
+  width: auto;
 }
 
 @media (min-width: 901px) {
   .downloadSection {
-    gap: 2rem;
-    padding: 0;
+    gap: clamp(1.5rem, 3vw, 3rem);
   }
 }
 
 @media (max-width: 640px) {
   .downloadSection {
     flex-direction: column;
-    gap: 1.5rem;
-    width: 70%;
+    gap: 1.75rem;
+    width: 100%;
     margin: 0 auto;
   }
 

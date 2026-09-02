@@ -8,27 +8,25 @@
  *   auth-optional — full UI for everyone; anonymous = local storage, authenticated = API
  *   auth-required — requires a signed-in session; redirects to sign-in if absent
  */
+/** Defines the runtime contract value for routes. */
 export const routes = {
   home: "/",
   search: "/search",
 
   explore: {
     index: "/explore",
-    recent: "/explore/recent",
-    scholar: "/explore/scholar",
-    curation: "/explore/curation",
   },
 
-  library: {
-    index: "/library",
-    saved: "/library/saved",
-    completed: "/library/completed",
+  myLibrary: {
+    index: "/my-library",
   },
 
   settings: {
     index: "/settings",
     profile: "/settings/profile",
-    legal: "/settings/legal",
+    support: "/settings/support",
+    terms: "/settings/terms",
+    privacy: "/settings/privacy",
   },
 
   scholars: {
@@ -67,6 +65,7 @@ export const routes = {
  */
 export type RouteAccess = "public" | "auth-optional" | "auth-required";
 
+/** Defines the contract type for route definition. */
 export interface RouteDefinition {
   path: string;
   access: RouteAccess;
@@ -83,13 +82,10 @@ export interface RouteDefinition {
  */
 export const routeDefinitions: RouteDefinition[] = [
   { path: routes.explore.index, access: "public" },
-  { path: routes.explore.recent, access: "public" },
-  { path: routes.explore.scholar, access: "public" },
-  { path: routes.explore.curation, access: "public" },
-  { path: routes.settings.profile, access: "auth-optional" },
-  { path: routes.settings.legal, access: "public" },
+  { path: routes.settings.terms, access: "public" },
+  { path: routes.settings.privacy, access: "public" },
   { path: routes.settings.index, access: "auth-optional" },
-  { path: routes.library.index, access: "auth-optional" },
+  { path: routes.myLibrary.index, access: "auth-optional" },
   { path: routes.search, access: "public" },
   { path: routes.scholars.index, access: "public" },
   { path: routes.support, access: "public" },

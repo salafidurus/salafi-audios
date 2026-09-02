@@ -1,13 +1,8 @@
 import { StyleSheet } from "react-native-unistyles";
 
-import {
-  lightNativeTheme,
-  parchmentNativeTheme,
-  manuscriptNativeTheme,
-  midnightNativeTheme,
-  emberNativeTheme,
-} from "./theme";
+import { lightNativeTheme, darkNativeTheme } from "./theme";
 
+/** Configures native themes, breakpoints, and the Unistyles runtime. */
 const breakpoints = {
   xs: 0,
   sm: 576,
@@ -22,13 +17,13 @@ type NativeBreakpoints = typeof breakpoints;
 
 declare module "react-native-unistyles" {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  /** Defines the native shape consumed by unistyles breakpoints integrations. */
   export interface UnistylesBreakpoints extends NativeBreakpoints {}
+  /** Defines the native shape consumed by unistyles themes integrations. */
   export interface UnistylesThemes {
     system: typeof lightNativeTheme;
-    parchment: typeof parchmentNativeTheme;
-    manuscript: typeof manuscriptNativeTheme;
-    midnight: typeof midnightNativeTheme;
-    ember: typeof emberNativeTheme;
+    light: typeof lightNativeTheme;
+    dark: typeof darkNativeTheme;
   }
 }
 
@@ -36,10 +31,8 @@ StyleSheet.configure({
   breakpoints,
   themes: {
     system: lightNativeTheme,
-    parchment: parchmentNativeTheme,
-    manuscript: manuscriptNativeTheme,
-    midnight: midnightNativeTheme,
-    ember: emberNativeTheme,
+    light: lightNativeTheme,
+    dark: darkNativeTheme,
   },
   settings: {
     initialTheme: "system",

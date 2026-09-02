@@ -1,8 +1,13 @@
 import { drainOutbox, type DrainResult } from "@sd/core-sync";
 
-import { downloadsOutbox } from "./outbox.store";
+import { downloadsOutbox, type DownloadOutboxPayload } from "./outbox.store";
 
-export type DownloadMutationHandler = (type: string, payload: unknown) => Promise<void>;
+/** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
+/** Defines the native download mutation handler contract shared by its consumers. */
+export type DownloadMutationHandler = (
+  type: string,
+  payload: DownloadOutboxPayload,
+) => Promise<void>;
 
 /**
  * Drains the downloads outbox: attempts to run every queued mutation via
@@ -15,6 +20,6 @@ export function drainDownloadsOutbox(handler: DownloadMutationHandler): Promise<
 }
 
 /** Enqueue a mutation for later sync — use when the device may be offline. */
-export function enqueueDownloadMutation(type: string, payload: unknown): void {
+export function enqueueDownloadMutation(type: string, payload: DownloadOutboxPayload): void {
   downloadsOutbox.useOutboxStore.getState().actions.enqueue(type, payload);
 }

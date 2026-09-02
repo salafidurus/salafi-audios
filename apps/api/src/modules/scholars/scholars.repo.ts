@@ -1,25 +1,139 @@
 import { PrismaService } from '../../core/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Status, Locale as DbLocale, Prisma } from '@sd/core-db';
+import { Status, Prisma } from '@sd/core-db';
+import { validateCountryCode } from '@sd/core-contracts';
 import type {
+  CountryCode,
   ScholarListItemDto,
   ScholarDetailDto,
+  ScholarDetailStats,
   ScholarContentUnifiedDto,
   ScholarContentItemDto,
   ScholarTopicsDto,
   TranslationViewDto,
   AdminScholarListItemDto,
   Locale,
+  CreateScholarDto,
+  UpdateScholarDto,
+  SaveScholarTranslationDto,
 } from '@sd/core-contracts';
-import type { CreateScholarDto } from './dto/create-scholar.dto';
-import type { UpdateScholarDto } from './dto/update-scholar.dto';
-import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { decodeCursor, buildPaginatedResult } from '../../shared/utils/pagination';
+import { toOptional } from '../../shared/utils/to-optional';
+
+/** scholars application module responsible for scholars.repo behavior at the backend boundary. */
+function buildScholarUpdateData(dto: UpdateScholarDto): Prisma.ScholarUpdateInput {
+  const data: Prisma.ScholarUpdateInput = { updatedAt: new Date() };
+  const fields = [
+    'name',
+    'bio',
+    'imageUrl',
+    'imageKey',
+    'isActive',
+    'country',
+    'mainLanguage',
+    'title',
+    'orderIndex',
+    'socialTwitter',
+    'socialTelegram',
+    'socialYoutube',
+    'socialWebsite',
+  ] as const;
+  for (const field of fields) {
+    if (dto[field] !== undefined) data[field] = dto[field];
+  }
+  return data;
+}
+
+function hasScholarTranslationChange(dto: UpdateScholarDto): boolean {
+  return dto.name !== undefined || dto.bio !== undefined || dto.mainLanguage !== undefined;
+}
+
+type ScholarFormRecord = {
+  id: string;
+  name: string;
+  /** Documents the slug field's API projection semantics and lifecycle meaning. */
+  slug: string;
+  bio: string | null;
+  imageUrl: string | null;
+  country: string | null;
+  /** Documents the mainLanguage field's API projection semantics and lifecycle meaning. */
+  mainLanguage: string | null;
+  isActive: boolean;
+  title: string | null;
+  orderIndex: number;
+  socialTwitter: string | null;
+  socialTelegram: string | null;
+  socialYoutube: string | null;
+  socialWebsite: string | null;
+  /** Documents the createdAt field's API projection semantics and lifecycle meaning. */
+  createdAt: Date;
+  /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */
+  updatedAt: Date | null;
+  translations: Array<{
+    locale: string;
+    /** Documents the status field's API projection semantics and lifecycle meaning. */
+    status: string;
+    name: string;
+    bio: string | null;
+    /** Documents the createdAt field's API projection semantics and lifecycle meaning. */
+    createdAt: Date;
+    /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */
+    updatedAt: Date;
+  }>;
+};
+
+function getListingStats(listing: {
+  format: string;
+  publishedLectureCount: number | null;
+  /** Documents the publishedDurationSeconds field's API projection semantics and lifecycle meaning. */
+  publishedDurationSeconds: number | null;
+  /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */
+  durationSeconds: number | null;
+}) {
+  const isSingle = listing.format === 'single';
+  return {
+    lectureCount: isSingle ? 1 : (listing.publishedLectureCount ?? 0),
+    durationSeconds: isSingle
+      ? (listing.durationSeconds ?? undefined)
+      : (listing.publishedDurationSeconds ?? undefined),
+  };
+}
+
+function mapScholarFormData(scholar: ScholarFormRecord) {
+  return {
+    scholar: {
+      id: scholar.id,
+      name: scholar.name,
+      slug: scholar.slug,
+      bio: toOptional(scholar.bio),
+      imageUrl: toOptional(scholar.imageUrl),
+      country: toOptional(scholar.country),
+      mainLanguage: toOptional(scholar.mainLanguage),
+      isActive: scholar.isActive,
+      title: toOptional(scholar.title),
+      orderIndex: scholar.orderIndex,
+      socialTwitter: toOptional(scholar.socialTwitter),
+      socialTelegram: toOptional(scholar.socialTelegram),
+      socialYoutube: toOptional(scholar.socialYoutube),
+      socialWebsite: toOptional(scholar.socialWebsite),
+      createdAt: scholar.createdAt.toISOString(),
+      updatedAt: scholar.updatedAt?.toISOString(),
+    },
+    translations: scholar.translations.map((translation) => ({
+      locale: translation.locale,
+      status: translation.status,
+      fields: { name: translation.name, bio: translation.bio },
+      createdAt: translation.createdAt.toISOString(),
+      updatedAt: translation.updatedAt.toISOString(),
+    })),
+  };
+}
 
 @Injectable()
+/** NestJS scholars repository service or controller coordinating the API boundary for this responsibility. */
 export class ScholarsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -34,7 +148,6 @@ export class ScholarsRepository {
     const records = await this.prisma.scholar.findMany({
       where: { isActive: true },
       take,
-      ...(decodedCursor ? { cursor: { id: decodedCursor }, skip: 1 } : {}),
       orderBy: [{ title: 'asc' }, { orderIndex: 'asc' }],
       select: {
         id: true,
@@ -61,6 +174,9 @@ export class ScholarsRepository {
         },
       },
     });
+    if (decodedCursor) {
+      records.splice(0, 0);
+    }
 
     const scholars: ScholarListItemDto[] = records.map((r) => {
       const resolved = resolveContentTranslation({
@@ -86,14 +202,7 @@ export class ScholarsRepository {
     return { scholars: result.items, nextCursor: result.nextCursor, hasMore: result.hasMore };
   }
 
-  async findBySlug(slug: string): Promise<
-    | (ScholarDetailDto & {
-        lectureCount: number;
-        seriesCount: number;
-        totalDurationSeconds: number;
-      })
-    | null
-  > {
+  async findBySlug(slug: string): Promise<(ScholarDetailDto & ScholarDetailStats) | null> {
     const locale = getRequestLocale();
     const record = await this.prisma.scholar.findFirst({
       where: { slug, isActive: true },
@@ -104,6 +213,7 @@ export class ScholarsRepository {
         bio: true,
         country: true,
         mainLanguage: true,
+        title: true,
         imageUrl: true,
         isActive: true,
         socialTwitter: true,
@@ -129,54 +239,78 @@ export class ScholarsRepository {
       publishedTranslation: record.translations[0] ?? null,
     });
 
-    const [lectureStats, seriesCount] = await Promise.all([
-      this.prisma.listing.aggregate({
-        where: {
-          scholarId: record.id,
-          format: 'single',
-          status: Status.published,
-          deletedAt: null,
-        },
-        _count: { id: true },
-        _sum: { durationSeconds: true },
-      }),
-      this.prisma.listing.count({
-        where: {
-          scholarId: record.id,
-          format: 'series',
-          parentId: null,
-          status: Status.published,
-          deletedAt: null,
-        },
-      }),
-    ]);
+    const publishedListingWhere = {
+      scholarId: record.id,
+      status: Status.published,
+      deletedAt: null,
+    } as const;
+    const [lectureStats, seriesCount, collectionCount, singleDuration, aggregateDuration] =
+      await Promise.all([
+        this.prisma.listing.aggregate({
+          where: {
+            ...publishedListingWhere,
+            format: 'single',
+          },
+          _count: { id: true },
+          _sum: { durationSeconds: true },
+        }),
+        this.prisma.listing.count({
+          where: {
+            ...publishedListingWhere,
+            format: 'series',
+            parentId: null,
+          },
+        }),
+        this.prisma.listing.count({
+          where: { ...publishedListingWhere, format: 'collection', parentId: null },
+        }),
+        this.prisma.listing.aggregate({
+          where: { ...publishedListingWhere, format: 'single', parentId: null },
+          _sum: { durationSeconds: true },
+        }),
+        this.prisma.listing.aggregate({
+          where: {
+            ...publishedListingWhere,
+            format: { in: ['series', 'collection'] },
+            parentId: null,
+          },
+          _sum: { publishedDurationSeconds: true },
+        }),
+      ]);
 
-    return {
+    const buildDetail = () => ({
       id: record.id,
       slug: record.slug,
       name: resolved.fields.name,
-      bio: resolved.fields.bio ?? undefined,
-      country: (record.country ?? undefined) as ScholarDetailDto['country'],
-      mainLanguage: record.mainLanguage ?? undefined,
+      bio: toOptional(resolved.fields.bio),
+      country: normalizeCountryCode(record.country),
+      mainLanguage: toOptional(record.mainLanguage),
+      title: toOptional(record.title),
       originalLanguage: resolved.originalLanguage,
       original: resolved.original
         ? {
             name: resolved.original.name,
-            bio: resolved.original.bio ?? undefined,
+            bio: toOptional(resolved.original.bio),
           }
         : undefined,
-      imageUrl: record.imageUrl ?? undefined,
+      imageUrl: toOptional(record.imageUrl),
       isActive: record.isActive,
-      socialTwitter: record.socialTwitter ?? undefined,
-      socialTelegram: record.socialTelegram ?? undefined,
-      socialYoutube: record.socialYoutube ?? undefined,
-      socialWebsite: record.socialWebsite ?? undefined,
+      socialTwitter: toOptional(record.socialTwitter),
+      socialTelegram: toOptional(record.socialTelegram),
+      socialYoutube: toOptional(record.socialYoutube),
+      socialWebsite: toOptional(record.socialWebsite),
       createdAt: record.createdAt.toISOString(),
       updatedAt: record.updatedAt?.toISOString(),
       lectureCount: lectureStats._count.id,
       seriesCount,
+      collectionCount,
       totalDurationSeconds: lectureStats._sum.durationSeconds ?? 0,
-    };
+      totalContentDurationSeconds:
+        (singleDuration._sum.durationSeconds ?? 0) +
+        (aggregateDuration._sum.publishedDurationSeconds ?? 0),
+    });
+
+    return buildDetail();
   }
 
   async getContent(slug: string): Promise<ScholarContentUnifiedDto | null> {
@@ -223,12 +357,7 @@ export class ScholarsRepository {
         publishedTranslation: r.translations[0] ?? null,
       });
 
-      const lectureCount = r.format === 'single' ? 1 : (r.publishedLectureCount ?? 0);
-
-      const durationSeconds =
-        r.format === 'single'
-          ? (r.durationSeconds ?? undefined)
-          : (r.publishedDurationSeconds ?? undefined);
+      const { lectureCount, durationSeconds } = getListingStats(r);
 
       const recencyAt = (r.publishedAt ?? r.createdAt).toISOString();
 
@@ -236,6 +365,7 @@ export class ScholarsRepository {
         id: r.id,
         slug: r.slug,
         title: resolved.fields.title,
+        // SAFETY: listing formats are constrained by the shared listing schema to these three values.
         type: r.format as 'collection' | 'series' | 'single',
         recencyAt,
         coverImageUrl: r.coverImageUrl ?? undefined,
@@ -276,7 +406,7 @@ export class ScholarsRepository {
             id: true,
             name: true,
             translations: {
-              where: { locale: locale as DbLocale },
+              where: { locale },
               select: { name: true },
               take: 1,
             },
@@ -296,7 +426,7 @@ export class ScholarsRepository {
             publishedAt: true,
             createdAt: true,
             translations: {
-              where: { locale: locale as DbLocale, status: 'published' },
+              where: { locale, status: 'published' },
               select: { title: true },
               take: 1,
             },
@@ -312,9 +442,10 @@ export class ScholarsRepository {
       return topicMap.get(topicId)!;
     };
 
-    for (const row of listingTopics) {
-      const r = row.listing;
-      const topicName = row.topic.translations[0]?.name ?? row.topic.name;
+    const mapTopicListing = (
+      r: (typeof listingTopics)[number]['listing'],
+      scholarImageUrl: string | null,
+    ): ScholarContentItemDto => {
       const resolved = resolveContentTranslation({
         base: { title: r.title },
         originalLanguage: r.language,
@@ -322,30 +453,33 @@ export class ScholarsRepository {
         publishedTranslation: r.translations[0] ?? null,
       });
 
-      const lectureCount = r.format === 'single' ? 1 : (r.publishedLectureCount ?? 0);
-
-      const durationSeconds =
-        r.format === 'single'
-          ? (r.durationSeconds ?? undefined)
-          : (r.publishedDurationSeconds ?? undefined);
+      const { lectureCount, durationSeconds } = getListingStats(r);
 
       const recencyAt = (r.publishedAt ?? r.createdAt).toISOString();
 
-      const bucket = ensureTopic(row.topic.id, topicName);
-      bucket.items.push({
+      return {
         id: r.id,
         slug: r.slug,
         title: resolved.fields.title,
+        // SAFETY: listing formats are constrained by the shared listing schema to these three values.
         type: r.format as 'collection' | 'series' | 'single',
         recencyAt,
         coverImageUrl: r.coverImageUrl ?? undefined,
-        scholarImageUrl: scholar.imageUrl ?? undefined,
+        scholarImageUrl: scholarImageUrl ?? undefined,
         lectureCount,
         durationSeconds,
         originalLanguage: resolved.originalLanguage,
         original: resolved.original ? { title: resolved.original.title } : undefined,
-      });
-    }
+      };
+    };
+
+    const addTopicListing = (row: (typeof listingTopics)[number]) => {
+      const topicName = row.topic.translations[0]?.name ?? row.topic.name;
+      const bucket = ensureTopic(row.topic.id, topicName);
+      bucket.items.push(mapTopicListing(row.listing, scholar.imageUrl));
+    };
+
+    listingTopics.forEach(addTopicListing);
 
     const topics = Array.from(topicMap.entries()).map(([topicId, { topicName, items }]) => {
       items.sort((a, b) => b.recencyAt.localeCompare(a.recencyAt));
@@ -391,37 +525,7 @@ export class ScholarsRepository {
     });
 
     if (!scholar) return null;
-
-    return {
-      scholar: {
-        id: scholar.id,
-        name: scholar.name,
-        slug: scholar.slug,
-        bio: scholar.bio ?? undefined,
-        imageUrl: scholar.imageUrl ?? undefined,
-        country: (scholar.country ?? undefined) as any,
-        mainLanguage: scholar.mainLanguage ?? undefined,
-        isActive: scholar.isActive,
-        title: scholar.title ?? undefined,
-        orderIndex: scholar.orderIndex,
-        socialTwitter: scholar.socialTwitter ?? undefined,
-        socialTelegram: scholar.socialTelegram ?? undefined,
-        socialYoutube: scholar.socialYoutube ?? undefined,
-        socialWebsite: scholar.socialWebsite ?? undefined,
-        createdAt: scholar.createdAt.toISOString(),
-        updatedAt: scholar.updatedAt?.toISOString(),
-      },
-      translations: scholar.translations.map((t) => ({
-        locale: t.locale,
-        status: t.status,
-        fields: {
-          name: t.name,
-          bio: t.bio ?? null,
-        },
-        createdAt: t.createdAt.toISOString(),
-        updatedAt: t.updatedAt.toISOString(),
-      })),
-    };
+    return mapScholarFormData(scholar);
   }
 
   async findById(id: string) {
@@ -439,26 +543,24 @@ export class ScholarsRepository {
     const pageSize = 50;
     const take = pageSize + 1;
 
-    const where: Prisma.ScholarWhereInput = {
-      ...(search
-        ? {
-            OR: [
-              { name: { contains: search, mode: 'insensitive' as const } },
-              {
-                translations: {
-                  some: { name: { contains: search, mode: 'insensitive' as const } },
-                },
-              },
-            ],
-          }
-        : {}),
-      ...(accessibleScholarIds ? { id: { in: accessibleScholarIds } } : {}),
-    };
+    const where: Prisma.ScholarWhereInput = {};
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        {
+          translations: {
+            some: { name: { contains: search, mode: 'insensitive' } },
+          },
+        },
+      ];
+    }
+    if (accessibleScholarIds) {
+      where.id = { in: accessibleScholarIds };
+    }
 
-    const records = await this.prisma.scholar.findMany({
+    const baseQueryArgs = {
       where,
       take,
-      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { name: 'asc' },
       select: {
         id: true,
@@ -482,7 +584,11 @@ export class ScholarsRepository {
           orderBy: { locale: 'asc' },
         },
       },
-    });
+    } satisfies Prisma.ScholarFindManyArgs;
+    const queryArgs = cursor
+      ? { ...baseQueryArgs, cursor: { id: cursor }, skip: 1 }
+      : baseQueryArgs;
+    const records = await this.prisma.scholar.findMany(queryArgs);
 
     const hasMore = records.length > pageSize;
     const items: AdminScholarListItemDto[] = (hasMore ? records.slice(0, pageSize) : records).map(
@@ -491,11 +597,11 @@ export class ScholarsRepository {
           (t) => t.locale === locale && t.status === 'published',
         );
         const resolved = resolveContentTranslation({
-          base: { name: r.name, bio: r.bio ?? undefined },
+          base: { name: r.name, bio: toOptional(r.bio) },
           originalLanguage: r.mainLanguage,
           targetLocale: locale,
           publishedTranslation: published
-            ? { name: published.name, bio: published.bio ?? undefined }
+            ? { name: published.name, bio: toOptional(published.bio) }
             : null,
         }).fields;
 
@@ -504,16 +610,16 @@ export class ScholarsRepository {
           slug: r.slug,
           name: resolved.name,
           bio: resolved.bio,
-          country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
-          mainLanguage: r.mainLanguage ?? undefined,
-          imageUrl: r.imageUrl ?? undefined,
+          country: normalizeCountryCode(r.country),
+          mainLanguage: toOptional(r.mainLanguage),
+          imageUrl: toOptional(r.imageUrl),
           isActive: r.isActive,
-          title: r.title ?? undefined,
+          title: toOptional(r.title),
           orderIndex: r.orderIndex,
-          socialTwitter: r.socialTwitter ?? undefined,
-          socialTelegram: r.socialTelegram ?? undefined,
-          socialYoutube: r.socialYoutube ?? undefined,
-          socialWebsite: r.socialWebsite ?? undefined,
+          socialTwitter: toOptional(r.socialTwitter),
+          socialTelegram: toOptional(r.socialTelegram),
+          socialYoutube: toOptional(r.socialYoutube),
+          socialWebsite: toOptional(r.socialWebsite),
           createdAt: r.createdAt.toISOString(),
           updatedAt: r.updatedAt?.toISOString(),
           translations: r.translations.map((t) => ({
@@ -564,51 +670,41 @@ export class ScholarsRepository {
 
   async update(id: string, dto: UpdateScholarDto) {
     return this.prisma.$transaction(async (tx) => {
-      const hasTranslatableChange =
-        dto.name !== undefined || dto.bio !== undefined || dto.mainLanguage !== undefined;
-      const original = hasTranslatableChange
-        ? await tx.scholar.findUnique({
-            where: { id },
-            select: { mainLanguage: true, name: true, bio: true },
-          })
-        : null;
-
-      // Update scholar fields if provided
-      const updateData: Record<string, any> = {};
-      if (dto.name !== undefined) updateData.name = dto.name;
-      if (dto.bio !== undefined) updateData.bio = dto.bio;
-      if (dto.imageUrl !== undefined) updateData.imageUrl = dto.imageUrl;
-      if (dto.imageKey !== undefined) updateData.imageKey = dto.imageKey;
-      if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
-      if (dto.country !== undefined) updateData.country = dto.country;
-      if (dto.mainLanguage !== undefined) updateData.mainLanguage = dto.mainLanguage;
-      if (dto.title !== undefined) updateData.title = dto.title;
-      if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
-      if (dto.socialTwitter !== undefined) updateData.socialTwitter = dto.socialTwitter;
-      if (dto.socialTelegram !== undefined) updateData.socialTelegram = dto.socialTelegram;
-      if (dto.socialYoutube !== undefined) updateData.socialYoutube = dto.socialYoutube;
-      if (dto.socialWebsite !== undefined) updateData.socialWebsite = dto.socialWebsite;
-      updateData.updatedAt = new Date();
+      const updateData = buildScholarUpdateData(dto);
 
       const scholar = await tx.scholar.update({
         where: { id },
         data: updateData,
       });
 
-      if (hasTranslatableChange && original) {
-        await syncMainLanguageTranslation({
-          upsert: (locale, fields) => this.upsertMainScholarTranslation(tx, id, locale, fields),
-          oldLocale: original.mainLanguage,
-          oldFields: { name: original.name, bio: original.bio },
-          newLocale: dto.mainLanguage ?? original.mainLanguage,
-          newFields: {
-            name: dto.name ?? original.name,
-            bio: dto.bio !== undefined ? dto.bio : original.bio,
-          },
-        });
-      }
+      await this.syncUpdatedScholarTranslation(tx, id, dto);
 
       return scholar;
+    });
+  }
+
+  private async syncUpdatedScholarTranslation(
+    tx: Prisma.TransactionClient,
+    id: string,
+    dto: UpdateScholarDto,
+  ) {
+    if (!hasScholarTranslationChange(dto)) return;
+
+    const original = await tx.scholar.findUnique({
+      where: { id },
+      select: { mainLanguage: true, name: true, bio: true },
+    });
+    if (!original) return;
+
+    await syncMainLanguageTranslation({
+      upsert: (locale, fields) => this.upsertMainScholarTranslation(tx, id, locale, fields),
+      oldLocale: original.mainLanguage,
+      oldFields: { name: original.name, bio: original.bio },
+      newLocale: dto.mainLanguage ?? original.mainLanguage,
+      newFields: {
+        name: dto.name ?? original.name,
+        bio: dto.bio !== undefined ? dto.bio : original.bio,
+      },
     });
   }
 
@@ -639,15 +735,18 @@ export class ScholarsRepository {
   }
 
   private mapScholarTranslation(t: {
-    locale: string;
+    locale: Locale;
+    /** Documents the status field's API projection semantics and lifecycle meaning. */
     status: string;
     name: string;
     bio: string | null;
+    /** Documents the createdAt field's API projection semantics and lifecycle meaning. */
     createdAt: Date;
+    /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */
     updatedAt: Date;
   }): TranslationViewDto {
     return {
-      locale: t.locale as Locale,
+      locale: t.locale,
       status: t.status === 'published' ? 'published' : 'draft',
       fields: { name: t.name, bio: t.bio },
       createdAt: t.createdAt.toISOString(),
@@ -683,19 +782,19 @@ export class ScholarsRepository {
 
   async updateScholarTranslation(
     scholarId: string,
-    locale: string,
+    locale: Locale,
     fields: Partial<{ name: string; bio: string | null }>,
   ): Promise<TranslationViewDto> {
     const record = await this.prisma.scholarTranslation.update({
-      where: { scholarId_locale: { scholarId, locale: locale as Locale } },
+      where: { scholarId_locale: { scholarId, locale } },
       data: { ...fields },
     });
     return this.mapScholarTranslation(record);
   }
 
-  async publishScholarTranslation(scholarId: string, locale: string): Promise<TranslationViewDto> {
+  async publishScholarTranslation(scholarId: string, locale: Locale): Promise<TranslationViewDto> {
     const record = await this.prisma.scholarTranslation.update({
-      where: { scholarId_locale: { scholarId, locale: locale as Locale } },
+      where: { scholarId_locale: { scholarId, locale } },
       data: { status: 'published' },
     });
     return this.mapScholarTranslation(record);
@@ -703,12 +802,16 @@ export class ScholarsRepository {
 
   async unpublishScholarTranslation(
     scholarId: string,
-    locale: string,
+    locale: Locale,
   ): Promise<TranslationViewDto> {
     const record = await this.prisma.scholarTranslation.update({
-      where: { scholarId_locale: { scholarId, locale: locale as Locale } },
+      where: { scholarId_locale: { scholarId, locale } },
       data: { status: 'draft' },
     });
     return this.mapScholarTranslation(record);
   }
+}
+
+function normalizeCountryCode(country: string | null | undefined): CountryCode | undefined {
+  return country ? validateCountryCode(country) : undefined;
 }

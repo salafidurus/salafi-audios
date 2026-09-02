@@ -1,11 +1,14 @@
 import { describe, expect, it } from "bun:test";
 
-import { ACCENT_THEME_IDS, buildAccentColors } from "./variants";
+import { darkWebTheme, lightWebTheme } from "./index";
 
 function parseHex(hex: string): [number, number, number] {
   let h = hex.replace("#", "").trim();
   if (h.length === 3) {
-    h = h.split("").map((c) => c + c).join("");
+    h = h
+      .split("")
+      .map((c) => c + c)
+      .join("");
   }
   const int = parseInt(h, 16);
   return [(int >> 16) & 255, (int >> 8) & 255, int & 255];
@@ -26,10 +29,13 @@ function contrastRatio(hex1: string, hex2: string): number {
   return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
 }
 
-describe("Accent Themes Contrast Ratios (WCAG 2.1 AA)", () => {
-  for (const id of ACCENT_THEME_IDS) {
+describe("Base theme contrast ratios (WCAG 2.1 AA)", () => {
+  for (const [id, theme] of [
+    ["light", lightWebTheme],
+    ["dark", darkWebTheme],
+  ] as const) {
     it(`theme '${id}' text tokens pass >= 4.5:1 contrast against surface layers`, () => {
-      const c = buildAccentColors(id);
+      const c = theme.colors;
       const surfaces = [c.surface.canvas, c.surface.default, c.surface.subtle, c.surface.elevated];
       const textTokens = [
         { name: "content.strong", val: c.content.strong },
@@ -47,13 +53,13 @@ describe("Accent Themes Contrast Ratios (WCAG 2.1 AA)", () => {
     });
 
     it(`theme '${id}' danger action button text achieves >= 4.5:1 contrast`, () => {
-      const c = buildAccentColors(id);
+      const c = theme.colors;
       const cr = contrastRatio(c.content.onDanger, c.action.danger);
       expect(cr).toBeGreaterThanOrEqual(4.5);
     });
 
     it(`theme '${id}' focus ring achieves >= 3.0:1 UI contrast against default surface`, () => {
-      const c = buildAccentColors(id);
+      const c = theme.colors;
       const cr = contrastRatio(c.border.focus, c.surface.default);
       expect(cr).toBeGreaterThanOrEqual(3.0);
     });

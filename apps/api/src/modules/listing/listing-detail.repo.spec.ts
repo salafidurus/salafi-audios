@@ -24,7 +24,7 @@ const baseListingSelect = {
   audioAssets: [],
 };
 
-describe('ListingRepository — findDetailById rootListing resolution', () => {
+describe('ListingRepository — findDetailBySlug rootListing resolution', () => {
   let repo: ListingRepository;
   let prisma: any;
 
@@ -36,7 +36,7 @@ describe('ListingRepository — findDetailById rootListing resolution', () => {
   it('returns a null rootListing for an already top-level listing', async () => {
     prisma.listing.findFirst.mockResolvedValueOnce({ ...baseListingSelect, parentId: null });
 
-    const result = await repo.findDetailById('lesson-1');
+    const result = await repo.findDetailBySlug('lesson-1');
 
     expect(result?.rootListing).toBeNull();
     expect(result?.seriesContext).toBeNull();
@@ -55,7 +55,7 @@ describe('ListingRepository — findDetailById rootListing resolution', () => {
         translations: [],
       });
 
-    const result = await repo.findDetailById('lesson-1');
+    const result = await repo.findDetailBySlug('lesson-1');
 
     expect(result?.rootListing).toEqual({
       id: 'series-1',
@@ -90,7 +90,7 @@ describe('ListingRepository — findDetailById rootListing resolution', () => {
         translations: [],
       });
 
-    const result = await repo.findDetailById('lesson-1');
+    const result = await repo.findDetailBySlug('lesson-1');
 
     expect(result?.rootListing).toEqual({
       id: 'collection-1',
@@ -112,7 +112,7 @@ describe('ListingRepository — findDetailById rootListing resolution', () => {
       .mockResolvedValueOnce({ ...baseListingSelect, parentId: 'series-1' })
       .mockResolvedValueOnce(null);
 
-    const result = await repo.findDetailById('lesson-1');
+    const result = await repo.findDetailBySlug('lesson-1');
 
     expect(result?.rootListing).toBeNull();
     expect(result?.seriesContext).toBeNull();

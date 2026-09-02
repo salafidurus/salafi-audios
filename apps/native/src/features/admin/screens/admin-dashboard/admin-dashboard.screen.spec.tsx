@@ -13,6 +13,21 @@ jest.mock("@/core/auth/use-auth", () => ({
   useAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false, user: undefined })),
 }));
 
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
+}));
+
+jest.mock("react-native-unistyles", () => {
+  const { lightNativeTheme } = require("@/core/styles/theme");
+  return {
+    StyleSheet: {
+      create: (styles: unknown) =>
+        typeof styles === "function" ? styles(lightNativeTheme) : styles,
+    },
+    useUnistyles: () => ({ theme: lightNativeTheme, rt: { themeName: "light" } }),
+  };
+});
+
 jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     t: (_key: string, fallback: string) => fallback,
@@ -33,7 +48,7 @@ describe("AdminDashboardScreen", () => {
 
     await render(<AdminDashboardScreen />);
 
-    expect(screen.getByText("Admin Dashboard")).toBeTruthy();
+    expect(screen.getByTestId("admin-dashboard-host")).toBeTruthy();
     expect(screen.getByText("Listings")).toBeTruthy();
     expect(screen.getByText("Scholars")).toBeTruthy();
   });

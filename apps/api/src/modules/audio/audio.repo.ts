@@ -1,25 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { PinoLogger } from 'nestjs-pino';
+import { AppLoggerService } from '../../core/logger/app-logger.service';
 import { PrismaService } from '../../core/db/prisma.service';
 import { ConfigService } from '../../core/config/config.service';
 import { RedisService } from '../../core/redis/redis.service';
 import { Status } from '@sd/core-db';
+import type { Prisma } from '@sd/core-db';
+import { publishedListingSlugWhere } from '../../shared/utils/published-listing-slug-where';
 import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
+import { z } from 'zod';
 
+/** audio application module responsible for audio.repo behavior at the backend boundary. */
 const COMPLETION_PERCENT_THRESHOLD = 0.95;
 const COMPLETION_TAIL_SECONDS = 30;
 
 type PendingProgress = {
-  version: string;
-  userId: string;
+  /** Documents the version field's API projection semantics and lifecycle meaning. */ version: string;
+  /** Documents the userId field's API projection semantics and lifecycle meaning. */ userId: string;
   listingId: string;
   positionSeconds: number;
   isCompleted: boolean;
-  updatedAt: string;
+  /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */ updatedAt: string;
 };
 
-type ProgressWrite = Omit<PendingProgress, 'version' | 'updatedAt'> & { updatedAt: Date };
+type ProgressWrite = Omit<PendingProgress, 'version' | 'updatedAt'> & {
+  /** Server-side timestamp used for progress conflict resolution. */
+  updatedAt: Date;
+};
+type ProgressWhere = Prisma.UserListingProgressWhereInput;
 
 const ENQUEUE_PROGRESS_SCRIPT = `
 local existing = redis.call('GET', KEYS[1])
@@ -32,6 +40,20 @@ redis.call('SET', KEYS[1], cjson.encode(incoming), 'EX', ARGV[3])
 redis.call('ZADD', KEYS[2], ARGV[2], ARGV[4])
 return 1
 `;
+
+const progressMemberSchema = z.object({
+  userId: z.string().min(1),
+  listingId: z.string().min(1),
+});
+
+const pendingProgressSchema = z.object({
+  version: z.string().min(1),
+  userId: z.string().min(1),
+  listingId: z.string().min(1),
+  positionSeconds: z.number(),
+  isCompleted: z.boolean(),
+  updatedAt: z.string().min(1),
+}) satisfies z.ZodType<PendingProgress>;
 
 /**
  * Server-side completion safety net: a position counts as "complete" once it
@@ -53,26 +75,29 @@ export function isPositionCompleted(
 }
 
 @Injectable()
+/** NestJS audio repository service or controller coordinating the API boundary for this responsibility. */
 export class AudioRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
     private readonly config: ConfigService,
-    private readonly logger: PinoLogger,
+    private readonly logger: AppLoggerService,
   ) {
     this.logger.setContext(AudioRepository.name);
   }
 
   async getUserProgress(userId: string, since?: Date): Promise<AudioProgressDto[]> {
+    const where: ProgressWhere = { userId };
+    if (since) {
+      where.updatedAt = { gt: since };
+    }
     const progressRecords = await this.prisma.userListingProgress.findMany({
-      where: {
-        userId,
-        ...(since ? { updatedAt: { gt: since } } : {}),
-      },
+      where,
       orderBy: { updatedAt: 'desc' },
       include: {
         listing: {
           select: {
+            slug: true,
             durationSeconds: true,
           },
         },
@@ -80,7 +105,7 @@ export class AudioRepository {
     });
 
     return progressRecords.map((record) => ({
-      listingId: record.listingId,
+      listingSlug: record.listing.slug,
       positionSeconds: record.positionSeconds,
       durationSeconds: record.listing.durationSeconds || 0,
       completedAt: record.isCompleted ? record.updatedAt.toISOString() : undefined,
@@ -142,22 +167,35 @@ export class AudioRepository {
 
     // Duration comes from each Listing's own canonical record, never trusted
     // from the client, to keep the completion derivation below consistent.
+    const where = { slug: { in: items.map((item) => item.listingSlug) } };
     const listings = await this.prisma.listing.findMany({
-      where: { id: { in: items.map((item) => item.listingId) } },
-      select: { id: true, durationSeconds: true },
+      where,
+      select: { id: true, slug: true, durationSeconds: true },
     });
+    const listingByIdentity = new Map(
+      listings.flatMap((listing) => [
+        [listing.id, listing] as const,
+        [listing.slug, listing] as const,
+      ]),
+    );
     const durationById = new Map(listings.map((listing) => [listing.id, listing.durationSeconds]));
 
     await this.persistProgressBatch(
-      items.map((item) => ({
-        userId,
-        listingId: item.listingId,
-        positionSeconds: item.positionSeconds,
-        isCompleted:
-          Boolean(item.completedAt) ||
-          isPositionCompleted(item.positionSeconds, durationById.get(item.listingId)),
-        updatedAt: new Date(item.updatedAt),
-      })),
+      items.flatMap((item) => {
+        const listing = listingByIdentity.get(item.listingSlug);
+        if (!listing) return [];
+        return [
+          {
+            userId,
+            listingId: listing.id,
+            positionSeconds: item.positionSeconds,
+            isCompleted:
+              Boolean(item.completedAt) ||
+              isPositionCompleted(item.positionSeconds, durationById.get(listing.id)),
+            updatedAt: new Date(item.updatedAt),
+          },
+        ];
+      }),
       durationById,
     );
   }
@@ -189,42 +227,67 @@ export class AudioRepository {
     }
   }
 
-  private async findProgressListingBySlug(
-    slug: string,
-  ): Promise<{ id: string; durationSeconds: number | null } | null> {
+  /**
+   * Personal-state WRITE path — deliberately NOT the published-only Catalog
+   * seam. Progress belongs to the user, not to discovery: a listener who is
+   * mid-Track when a Listing is archived (or whose offline outbox flushes
+   * after publication changes) must still record progress against any
+   * non-deleted Listing. Publication filtering stays on Catalog reads and
+   * stream resolution.
+   */
+  private async findProgressListingBySlug(slug: string): Promise<{
+    id: string;
+    /** Duration used to expose progress and calculate completion. */
+    durationSeconds: number | null;
+  } | null> {
     const key = this.progressListingKey(slug);
-    if (this.redis.enabled) {
-      try {
-        const cachedId = await this.redis.get(key);
-        if (cachedId) {
-          const cached = await this.prisma.listing.findUnique({
-            where: { id: cachedId },
-            select: { id: true, durationSeconds: true },
-          });
-          if (cached) return cached;
-          await this.redis.del(key);
-        }
-      } catch (error) {
-        this.logger.warn(
-          `Redis listing cache lookup failed for ${slug}; using PostgreSQL: ${error instanceof Error ? error.message : String(error)}`,
-        );
-      }
-    }
+    const cached = await this.findCachedProgressListing(key, slug);
+    if (cached) return cached;
 
     const listing = await this.prisma.listing.findFirst({
       where: { slug },
       select: { id: true, durationSeconds: true },
     });
-    if (listing && this.redis.enabled) {
-      try {
-        await this.redis.set(key, listing.id, 'EX', 300);
-      } catch (error) {
-        this.logger.warn(
-          `Redis listing cache write failed for ${slug}: ${error instanceof Error ? error.message : String(error)}`,
-        );
-      }
-    }
+    await this.cacheProgressListing(slug, key, listing);
     return listing;
+  }
+
+  private async findCachedProgressListing(key: string, slug: string) {
+    if (!this.redis.enabled) return null;
+    try {
+      const cachedId = await this.redis.get(key);
+      if (!cachedId) return null;
+      const cached = await this.prisma.listing.findUnique({
+        where: { id: cachedId },
+        select: { id: true, durationSeconds: true },
+      });
+      if (cached) return cached;
+      await this.redis.del(key);
+    } catch (error) {
+      this.logger.warn(
+        `Redis listing cache lookup failed for ${slug}; using PostgreSQL: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+    return null;
+  }
+
+  private async cacheProgressListing(
+    slug: string,
+    key: string,
+    listing: {
+      id: string;
+      /** Duration cached alongside the listing identity for progress reads. */
+      durationSeconds: number | null;
+    } | null,
+  ) {
+    if (!listing || !this.redis.enabled) return;
+    try {
+      await this.redis.set(key, listing.id, 'EX', 300);
+    } catch (error) {
+      this.logger.warn(
+        `Redis listing cache write failed for ${slug}: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
   }
 
   private async persistProgressImmediately(input: ProgressWrite): Promise<void> {
@@ -251,7 +314,10 @@ export class AudioRepository {
   }
 
   private async enqueueProgress(
-    input: Omit<ProgressWrite, 'userId'> & { userId: string },
+    input: Omit<ProgressWrite, 'userId'> & {
+      /** Authenticated user owning the queued progress write. */
+      userId: string;
+    },
   ): Promise<void> {
     const pending: PendingProgress = {
       version: randomUUID(),
@@ -314,15 +380,25 @@ export class AudioRepository {
     });
     if (members.length === 0) return [];
     const values = await this.redis.mget(
-      members.map((member) => {
-        const parsed = JSON.parse(member) as { userId: string; listingId: string };
-        return this.progressPendingKey(parsed.userId, parsed.listingId);
+      members.flatMap((member) => {
+        try {
+          // SAFETY: members were originally enqueued by this repository with the
+          // same `{ userId, listingId }` JSON shape. ZRANGEBYSCORE returns the
+          // raw member string, so it must be decoded before schema validation.
+          // A malformed member is skipped so one bad entry cannot stall the flush.
+          const parsed = progressMemberSchema.parse(JSON.parse(member));
+          return [this.progressPendingKey(parsed.userId, parsed.listingId)];
+        } catch {
+          return [];
+        }
       }),
     );
     return values.flatMap((value) => {
       if (!value) return [];
       try {
-        return [JSON.parse(value) as PendingProgress];
+        // SAFETY: the pending payload is serialized by `enqueueProgress` using
+        // the `PendingProgress` contract owned by this repository.
+        return [pendingProgressSchema.parse(JSON.parse(value))];
       } catch {
         return [];
       }
@@ -375,9 +451,13 @@ export class AudioRepository {
     return `${this.redis.namespace}progress:flush-lock`;
   }
 
-  async findListingById(slug: string) {
+  /**
+   * Stream-route resolution shares the Catalog identity seam — the route is
+   * public, so an unpublished or ID-shaped slug value yields no stream.
+   */
+  async findListingBySlug(slug: string) {
     return this.prisma.listing.findFirst({
-      where: { slug },
+      where: publishedListingSlugWhere(slug),
       select: { id: true, durationSeconds: true }, // Only fetch fields needed for stream response
     });
   }

@@ -8,7 +8,8 @@
     // See: https://better-auth.com/docs/concepts/typescript
     "incremental": true,
     "types": ["jest", "node"],
-    "moduleSuffixes": [".native", ".web", ""],
+    // Native consumers must not select web-only declarations; web resolution is owned by apps/web.
+    "moduleSuffixes": [".native", ""],
     "paths": {
       "expo-bottom-accessory": ["./modules/expo-bottom-accessory/src/index.ts"],
       "@/*": ["./src/*"],

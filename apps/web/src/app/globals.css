@@ -1,8 +1,34 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 /* Include shared package sources so desktop-web utility classes are emitted in the app build. */
 @source "../../../../packages/**/*.{js,jsx,ts,tsx}";
 
+/* Keep shadcn's dark variant in lockstep with ThemeSync's document state. */
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
+  /* shadcn semantic roles — every value resolves to an authoritative token. */
+  --color-background: var(--surface-canvas);
+  --color-foreground: var(--content-default);
+  --color-card: var(--surface-default);
+  --color-card-foreground: var(--content-default);
+  --color-popover: var(--surface-elevated);
+  --color-popover-foreground: var(--content-default);
+  --color-primary: var(--action-primary);
+  --color-primary-foreground: var(--content-on-primary);
+  --color-secondary: var(--action-secondary);
+  --color-secondary-foreground: var(--content-on-secondary);
+  --color-muted: var(--surface-subtle);
+  --color-muted-foreground: var(--content-muted);
+  --color-accent: var(--surface-hover);
+  --color-accent-foreground: var(--content-strong);
+  --color-destructive: var(--action-danger);
+  --color-destructive-foreground: var(--content-on-danger);
+  --color-border: var(--border-default);
+  --color-input: var(--input-border-rest);
+  --color-ring: var(--border-focus);
+
   --surface-default: var(--surface-default);
   --action-primary: var(--action-primary);
   --border-default: var(--border-default);
@@ -12,12 +38,33 @@
   --spacing-card-p: var(--space-component-card-padding);
   --radius-component-panel: var(--radius-component-panel);
   --radius-component-chip: var(--radius-component-chip);
+  --radius-lg: var(--radius-component-panel);
+  --radius-md: var(--radius-scale-md);
+  --radius-sm: var(--radius-scale-sm);
   --shadow-lg: var(--shadow-lg);
   --text-h1: var(--typo-display-lg-font-size);
   --text-h2: var(--typo-title-lg-font-size);
   --text-caption: var(--typo-caption-font-size);
-  --font-sans: var(--typo-body-md-font-family);
+  --font-sans: var(--font-body);
   --typo-display-lg-font-family: var(--typo-display-lg-font-family);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--border-focus);
+  --color-sidebar-border: var(--border-default);
+  --color-sidebar-accent-foreground: var(--content-strong);
+  --color-sidebar-accent: var(--surface-hover);
+  --color-sidebar-primary-foreground: var(--content-on-primary);
+  --color-sidebar-primary: var(--action-primary);
+  --color-sidebar-foreground: var(--content-default);
+  --color-sidebar: var(--surface-default);
+  --color-chart-5: var(--action-danger);
+  --color-chart-4: var(--action-warning);
+  --color-chart-3: var(--action-success);
+  --color-chart-2: var(--action-info);
+  --color-chart-1: var(--action-primary);
+  --radius-xl: var(--radius-component-panel);
+  --radius-2xl: var(--radius-component-panel);
+  --radius-3xl: var(--radius-component-panel);
+  --radius-4xl: var(--radius-component-panel);
 }
 
 /* =============================================
@@ -80,9 +127,10 @@ body {
   overflow: hidden;
 }
 
-/* Consent-required layout (sidebar + main content) */
+/* Consent-required layout (Public workspace top navigation + content) */
 .appConsentShell {
   display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
 }
@@ -91,7 +139,6 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding-inline-start: 244px;
   padding-top: 0;
   min-height: 0;
   width: 100%;
@@ -106,65 +153,6 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-}
-
-/* No-consent layout (two-column grid with sidebar nav) */
-.appNoConsentShell {
-  display: grid;
-  grid-template-columns: 1fr 240px;
-  gap: var(--space-component-gap-xl);
-  align-items: stretch;
-  padding: var(--space-layout-page-y) var(--space-layout-page-x);
-  flex: 1;
-  min-height: 0;
-  height: 100%;
-}
-
-.appNoConsentContent {
-  grid-column: 1;
-  min-height: 0;
-  overflow-x: clip;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.appNoConsentContent::-webkit-scrollbar {
-  display: none;
-}
-
-/* Responsive: hide sidebar on tablet and below */
-@media (max-width: 1200px) {
-  .appNoConsentShell {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Tablet: collapsed sidebar (641px - 900px) */
-@media (min-width: 641px) and (max-width: 900px) {
-  .appConsentShell {
-    flex-direction: row;
-  }
-
-  .appConsentMain {
-    padding-inline-start: 244px;
-    padding-bottom: 0;
-  }
-}
-
-/* Mobile: header at top, drawer navigation (<= 640px) */
-@media (max-width: 640px) {
-  .appConsentShell {
-    flex-direction: column;
-  }
-
-  .appConsentMain {
-    padding-inline-start: 0;
-    padding-top: calc(var(--mobile-header-height) + env(safe-area-inset-top));
-    padding-bottom: 0;
-  }
 }
 
 h1,
@@ -200,6 +188,25 @@ textarea:focus {
   scrollbar-width: none;
 }
 
+.styled-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-primary) transparent;
+}
+
+.styled-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.styled-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.styled-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--border-primary);
+}
+
 .listRow {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-subtle);
@@ -216,4 +223,16 @@ button.listRow:hover,
 a.listRow:hover,
 [role="button"].listRow:hover {
   background-color: var(--surface-hover);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }

@@ -1,3 +1,5 @@
+/** Canonical API endpoint paths shared by web, native, and backend-facing clients. */
+/** Defines the runtime contract value for endpoints. */
 export const endpoints = {
   search: {
     general: "/search",
@@ -8,26 +10,27 @@ export const endpoints = {
   },
   scholars: {
     list: "/scholars",
-    detail: (slug: string) => `/scholars/${slug}`,
-    content: (slug: string) => `/scholars/${slug}/content`,
-    topics: (slug: string) => `/scholars/${slug}/topics`,
+    detail: (scholarSlug: string) => `/scholars/${scholarSlug}`,
+    content: (scholarSlug: string) => `/scholars/${scholarSlug}/content`,
+    topics: (scholarSlug: string) => `/scholars/${scholarSlug}/topics`,
   },
   listings: {
-    detail: (id: string) => `/listings/${id}`,
-    contents: (id: string) => `/listings/${id}/contents`,
-    lastPlayed: (id: string) => `/listings/${id}/last-played`,
-    progressSummary: (id: string) => `/listings/${id}/progress-summary`,
+    detail: (listingSlug: string) => `/listings/${listingSlug}`,
+    contents: (listingSlug: string) => `/listings/${listingSlug}/contents`,
+    related: (listingSlug: string) => `/listings/${listingSlug}/related`,
+    lastPlayed: (listingSlug: string) => `/listings/${listingSlug}/last-played`,
+    progressSummary: (listingSlug: string) => `/listings/${listingSlug}/progress-summary`,
     recent: "/listings/recent",
     promotions: "/listings/promotions",
   },
-  library: {
-    saved: "/me/library/saved",
-    savedDelta: "/me/library/saved/delta",
-    savedSync: "/me/library/saved/sync",
-    completed: "/me/library/completed",
-    progress: "/me/library/progress",
-    recentProgress: "/me/library/recent-progress",
-    saveListing: (listingId: string) => `/me/library/save/${listingId}`,
+  myLibrary: {
+    saved: "/me/my-library/saved",
+    savedDelta: "/me/my-library/saved/delta",
+    savedSync: "/me/my-library/saved/sync",
+    completed: "/me/my-library/completed",
+    progress: "/me/my-library/progress",
+    recentProgress: "/me/my-library/recent-progress",
+    saveListing: (listingSlug: string) => `/me/my-library/save/${listingSlug}`,
   },
   account: {
     profile: "/account/profile",
@@ -37,13 +40,14 @@ export const endpoints = {
     progress: {
       get: "/audio/progress",
       sync: "/audio/progress/sync",
-      update: (listingId: string) => `/audio/progress/${listingId}`,
+      update: (listingSlug: string) => `/audio/progress/${listingSlug}`,
     },
     listings: {
-      stream: (id: string) => `/audio/listings/${id}/stream`,
+      stream: (listingSlug: string) => `/audio/listings/${listingSlug}/stream`,
     },
   },
   admin: {
+    dashboard: "/admin/dashboard",
     users: {
       list: "/admin/users",
       access: (userId: string) => `/admin/users/${userId}/access`,
@@ -93,11 +97,12 @@ export const endpoints = {
       unpublish: (id: string, locale: string) => `/scholars/${id}/translations/${locale}/unpublish`,
     },
     listings: {
-      list: (id: string) => `/listings/${id}/translations`,
-      save: (id: string) => `/listings/${id}/translations`,
-      update: (id: string, locale: string) => `/listings/${id}/translations/${locale}`,
-      publish: (id: string, locale: string) => `/listings/${id}/translations/${locale}/publish`,
-      unpublish: (id: string, locale: string) => `/listings/${id}/translations/${locale}/unpublish`,
+      list: (slug: string) => `/listings/${slug}/translations`,
+      save: (slug: string) => `/listings/${slug}/translations`,
+      update: (slug: string, locale: string) => `/listings/${slug}/translations/${locale}`,
+      publish: (slug: string, locale: string) => `/listings/${slug}/translations/${locale}/publish`,
+      unpublish: (slug: string, locale: string) =>
+        `/listings/${slug}/translations/${locale}/unpublish`,
     },
     topics: {
       list: (id: string) => `/topics/${id}/translations`,

@@ -2,6 +2,7 @@ import { httpClient, endpoints, type SavedDeltaItemDto } from "@sd/core-contract
 import {
   createOutboxStore,
   createSyncEngine,
+  type Outbox,
   type StorageAdapter,
   type SyncEngine,
 } from "@sd/core-sync";
@@ -13,6 +14,7 @@ import {
   type SavedEntry,
 } from "./saved.store";
 
+/** Synchronizes optimistic saved Listing intent with the authoritative API. */
 function createInMemoryStorageAdapter(): StorageAdapter {
   const backing = new Map<string, string>();
   return {
@@ -32,7 +34,7 @@ const proxyAdapter: StorageAdapter = {
   removeItem: (key) => delegateAdapter.removeItem(key),
 };
 
-function buildEngine(outbox: ReturnType<typeof createOutboxStore>): SyncEngine<SavedEntry> {
+function buildEngine(outbox: Outbox<SavedEntry>): SyncEngine<SavedEntry> {
   return createSyncEngine<SavedEntry>({
     store: useSavedStore,
     outbox,
@@ -41,16 +43,16 @@ function buildEngine(outbox: ReturnType<typeof createOutboxStore>): SyncEngine<S
     // collapses an accidental double-tap rather than batching a stream of writes.
     debounceMs: 3_000,
     pushOne: async (entry) => {
-      // Resolves by slug, not the uuid id (LibraryRepository.resolveListingId) —
+      // Resolves by slug, not the uuid id (MyLibraryRepository.resolveListingId) —
       // fall back to id only if no slug was ever recorded for this entry.
       await httpClient({
-        url: endpoints.library.saveListing(entry.slug ?? entry.id),
+        url: endpoints.myLibrary.saveListing(entry.slug ?? entry.id),
         method: entry.deletedAt ? "DELETE" : "POST",
       });
     },
     pushBulk: async (entries) => {
       await httpClient({
-        url: endpoints.library.savedSync,
+        url: endpoints.myLibrary.savedSync,
         method: "POST",
         body: {
           items: entries.map((entry) => ({
@@ -63,7 +65,7 @@ function buildEngine(outbox: ReturnType<typeof createOutboxStore>): SyncEngine<S
     },
     pullSince: async (since) => {
       const entries = await httpClient<SavedDeltaItemDto[]>({
-        url: endpoints.library.savedDelta,
+        url: endpoints.myLibrary.savedDelta,
         method: "GET",
         params: since ? { since } : undefined,
       });
@@ -78,9 +80,9 @@ function buildEngine(outbox: ReturnType<typeof createOutboxStore>): SyncEngine<S
 }
 
 // Namespaced by userId (see `initSavedSync`), same isolation rationale as progress's outbox.
-let outbox = createOutboxStore(proxyAdapter, "saved");
+let outbox = createOutboxStore<SavedEntry>(proxyAdapter, "saved");
 let engine = buildEngine(outbox);
-let lastSyncedAt: string | null = null;
+let activeUserId: string | null = null;
 
 /**
  * Upgrades the retry queue to a persisted `StorageAdapter`, scoped to `userId`,
@@ -89,10 +91,14 @@ let lastSyncedAt: string | null = null;
  * call, after the app's platform storage adapter is constructed.
  */
 export async function initSavedSync(adapter: StorageAdapter, userId: string): Promise<void> {
+  engine.dispose();
+  if (activeUserId && activeUserId !== userId) {
+    useSavedStore.setState({ entities: {} });
+  }
+  activeUserId = userId;
   delegateAdapter = adapter;
-  outbox = createOutboxStore(proxyAdapter, `saved:${userId}`);
+  outbox = createOutboxStore<SavedEntry>(proxyAdapter, `saved:${userId}`);
   engine = buildEngine(outbox);
-  lastSyncedAt = null;
   await outbox.hydrate();
 }
 
@@ -136,8 +142,5 @@ export function onSavedFlushed(listener: () => void): () => void {
  * as before this module existed; only within-session refreshes narrow by `since`.
  */
 export async function hydrateSavedFromServer(): Promise<void> {
-  const entries = await engine.hydrate(lastSyncedAt ?? undefined);
-  for (const entry of entries) {
-    if (!lastSyncedAt || entry.updatedAt > lastSyncedAt) lastSyncedAt = entry.updatedAt;
-  }
+  await engine.hydrate();
 }

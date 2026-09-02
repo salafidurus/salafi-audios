@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+/** search application module responsible for search results.dto behavior at the backend boundary. */
+/** NestJS search result item dto service or controller coordinating the API boundary for this responsibility. */
 export class SearchResultItemDto {
   @ApiProperty()
   id!: string;
@@ -29,6 +31,7 @@ export class SearchResultItemDto {
   durationSeconds?: number;
 }
 
+/** NestJS search results dto service or controller coordinating the API boundary for this responsibility. */
 export class SearchResultsDto {
   @ApiProperty({
     description: 'Matching collections',

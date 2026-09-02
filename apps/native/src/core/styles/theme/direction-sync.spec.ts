@@ -15,12 +15,10 @@ describe("syncDirectionToLocale", () => {
 
   it("calls updateTheme for all registered themes", () => {
     syncDirectionToLocale("en");
-    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledTimes(5);
+    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledTimes(3);
     expect(UnistylesRuntime.updateTheme).toHaveBeenCalledWith("system", expect.any(Function));
-    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledWith("parchment", expect.any(Function));
-    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledWith("manuscript", expect.any(Function));
-    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledWith("midnight", expect.any(Function));
-    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledWith("ember", expect.any(Function));
+    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledWith("light", expect.any(Function));
+    expect(UnistylesRuntime.updateTheme).toHaveBeenCalledWith("dark", expect.any(Function));
   });
 
   it("sets direction to 'ltr' for a non-RTL locale", () => {

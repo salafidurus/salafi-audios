@@ -71,7 +71,7 @@ describe("SeriesSheet", () => {
         onSaved={() => {}}
       />,
     );
-    const saveButton = screen.getByText("Save").parent;
+    const saveButton = screen.getByRole("button", { name: "Save" });
     expect(saveButton?.props.accessibilityState?.disabled).toBeFalsy();
   });
 
@@ -92,7 +92,7 @@ describe("SeriesSheet", () => {
         onSaved={() => {}}
       />,
     );
-    const saveButton = screen.getByText("Save").parent;
+    const saveButton = screen.getByRole("button", { name: "Save" });
     expect(saveButton?.props.accessibilityState?.disabled).toBe(true);
   });
 });

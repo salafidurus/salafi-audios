@@ -7,7 +7,7 @@ import {
 import { routes, queryKeys } from "@sd/core-contracts";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
-import { type Href, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { type ReactNode, useEffect, useState } from "react";
 import { I18nextProvider } from "react-i18next";
 import { AppState, type AppStateStatus, LogBox, View } from "react-native";
@@ -28,9 +28,19 @@ import { i18n, initI18n } from "./i18n/i18n";
 import { initIntegrations } from "./integrations";
 import { onNetworkReconnect } from "./network/network-status";
 import { queryClient } from "./query-client";
+import {
+  applyThemePreference,
+  getStoredThemePreference,
+  subscribeToSystemTheme,
+} from "./styles/theme/theme-preference";
 import { syncTypographyToLocale } from "./styles/theme/typography-sync";
 
+/** Composes the native provider tree and establishes app-wide runtime dependencies. */
 LogBox.ignoreLogs(["API client initialization failed", "Open debugger to view warnings"]);
+
+function getSupportedLocale(locale: string): "en" | "ar" {
+  return locale === "ar" ? "ar" : "en";
+}
 
 function AppFontsProvider({ children }: { children: ReactNode }) {
   const [loaded] = useFonts({
@@ -86,8 +96,10 @@ type Props = {
   apiBaseUrl?: string;
 };
 
+/** Defines the native providers contract used by this module. */
 export function Providers({ children, apiBaseUrl }: Props) {
   const [i18nReady, setI18nReady] = useState(false);
+  const [themeReady, setThemeReady] = useState(false);
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
 
@@ -97,6 +109,27 @@ export function Providers({ children, apiBaseUrl }: Props) {
       initApiClient({ baseUrl: apiBaseUrl });
     }
   });
+
+  useEffect(() => {
+    let active = true;
+    let preference: "system" | "light" | "dark" = "system";
+
+    void getStoredThemePreference().then((storedPreference) => {
+      if (!active) return;
+      preference = storedPreference;
+      applyThemePreference(preference);
+      setThemeReady(true);
+    });
+
+    const unsubscribeAppearance = subscribeToSystemTheme(() => {
+      if (preference === "system") applyThemePreference(preference);
+    });
+
+    return () => {
+      active = false;
+      unsubscribeAppearance();
+    };
+  }, []);
 
   useEffect(() => {
     // RN fetch has no cookie jar, so forward the @better-auth/expo session
@@ -115,7 +148,7 @@ export function Providers({ children, apiBaseUrl }: Props) {
         })
         .finally(() => {
           queryClient.clear();
-          router.replace(routes.home as Href);
+          router.replace(routes.home);
         });
     });
   }, [router]);
@@ -126,7 +159,7 @@ export function Providers({ children, apiBaseUrl }: Props) {
     if (!isAuthenticated || !user?.id) return;
     return initProgressPersistence(user.id, {
       onFlushed: () => {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.library.all });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.myLibrary.all });
       },
     });
   }, [isAuthenticated, user?.id]);
@@ -158,7 +191,7 @@ export function Providers({ children, apiBaseUrl }: Props) {
     void initI18n()
       .then(() => {
         setI18nReady(true);
-        syncTypographyToLocale(i18n.language as "en" | "ar");
+        syncTypographyToLocale(getSupportedLocale(i18n.language));
       })
       .catch((err) => {
         console.warn("[i18n] init failed, falling back to default:", err);
@@ -166,7 +199,7 @@ export function Providers({ children, apiBaseUrl }: Props) {
       });
   }, []);
 
-  if (!i18nReady) {
+  if (!i18nReady || !themeReady) {
     return null;
   }
 

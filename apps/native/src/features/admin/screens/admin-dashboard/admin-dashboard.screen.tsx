@@ -1,14 +1,20 @@
 import type { AppActions, AppSubjectType } from "@sd/core-contracts";
+import type { ReactElement } from "react";
 
 import { useAbility } from "@sd/domain-account";
-import { Pressable, ScrollView, Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { RootScreenHeader } from "@/features/navigation";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
+import { NativeBridgeHost } from "@/shared/ui";
 
+/** Provides authenticated native administration workflows and their data boundaries. */
 type AdminDashboardScreenProps = {
+  onBack?: () => void;
   onNavigateToListings?: () => void;
   onNavigateToScholars?: () => void;
   onNavigateToAccess?: () => void;
@@ -24,7 +30,9 @@ type AdminCard = {
   subject: AppSubjectType;
 };
 
+/** Renders the native admin dashboard screen surface and coordinates its user-facing state. */
 export function AdminDashboardScreen({
+  onBack,
   onNavigateToListings,
   onNavigateToScholars,
 }: AdminDashboardScreenProps) {
@@ -54,26 +62,53 @@ export function AdminDashboardScreen({
   ];
 
   if (isLoading) {
-    return <EmptyState variant="loading" message={t("admin.dashboard.loading", "Loading…")} />;
+    return (
+      <AdminDashboardShell onBack={onBack}>
+        <EmptyState variant="loading" message={t("admin.dashboard.loading", "Loading…")} />
+      </AdminDashboardShell>
+    );
   }
 
   const visibleCards = cards.filter((card) => ability.can(card.action, card.subject));
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{t("admin.dashboard.title", "Admin Dashboard")}</Text>
+    <AdminDashboardShell onBack={onBack}>
+      <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+        {visibleCards.length === 0 ? (
+          <EmptyState message={t("admin.dashboard.noAccess", "You don't have any admin access.")} />
+        ) : (
+          visibleCards.map((card) => (
+            <Pressable key={card.key} onPress={card.onPress} style={[styles.card, card.cardStyle]}>
+              <Text style={styles.cardTitle}>{card.title}</Text>
+              <Text style={styles.cardSubtitle}>{card.subtitle}</Text>
+            </Pressable>
+          ))
+        )}
+      </ScrollView>
+    </AdminDashboardShell>
+  );
+}
 
-      {visibleCards.length === 0 ? (
-        <EmptyState message={t("admin.dashboard.noAccess", "You don't have any admin access.")} />
-      ) : (
-        visibleCards.map((card) => (
-          <Pressable key={card.key} onPress={card.onPress} style={[styles.card, card.cardStyle]}>
-            <Text style={styles.cardTitle}>{card.title}</Text>
-            <Text style={styles.cardSubtitle}>{card.subtitle}</Text>
-          </Pressable>
-        ))
-      )}
-    </ScrollView>
+function AdminDashboardShell({
+  children,
+  onBack,
+}: {
+  children: ReactElement;
+  onBack?: () => void;
+}) {
+  const { theme } = useUnistyles();
+  const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
+
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.colors.surface.canvas }}>
+      <View style={{ paddingTop: insets.top, paddingHorizontal: theme.spacing.layout.pageX }}>
+        <RootScreenHeader title={t("admin.dashboard.title", "Admin Dashboard")} onBack={onBack} />
+      </View>
+      <NativeBridgeHost testID="admin-dashboard-host" matchContents={false}>
+        {children}
+      </NativeBridgeHost>
+    </View>
   );
 }
 
@@ -85,12 +120,6 @@ const styles = StyleSheet.create((theme) => ({
   content: {
     padding: theme.spacing.scale.lg,
     paddingBottom: theme.spacing.scale["4xl"],
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: theme.spacing.scale["2xl"],
-    color: theme.colors.content.strong,
   },
   card: {
     padding: theme.spacing.scale.lg,

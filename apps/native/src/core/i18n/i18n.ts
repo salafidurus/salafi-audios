@@ -6,20 +6,22 @@ import { initReactI18next } from "react-i18next";
 import { syncDirectionToLocale } from "../styles/theme/direction-sync";
 import { syncTypographyToLocale } from "../styles/theme/typography-sync";
 import { getStoredLocale, storeLocale } from "./locale-storage";
-import { mergeLocaleMessages } from "./merge-locale-messages";
+import { mergeLocaleMessages, type LocaleMessages } from "./merge-locale-messages";
 
+/** Initializes native localization, locale persistence, and translated message lookup. */
+/** Exposes the configured i18next instance used by native localization. */
 export const i18n = i18next;
 
 const loadedLocaleBundles = new Set<Locale>();
 
-function loadLocaleBundle(locale: Locale): Record<string, unknown> {
+function loadLocaleBundle(locale: Locale): LocaleMessages {
   if (locale === "ar") {
-    const arShared = require("@sd/core-i18n/locales/ar.json") as Record<string, unknown>;
-    const arOverrides = require("./overrides.ar.json") as Partial<Record<string, unknown>>;
+    const arShared = require("@sd/core-i18n/locales/ar.json") satisfies LocaleMessages;
+    const arOverrides = require("./overrides.ar.json") satisfies Partial<LocaleMessages>;
     return mergeLocaleMessages(arShared, arOverrides);
   }
-  const enShared = require("@sd/core-i18n/locales/en.json") as Record<string, unknown>;
-  const enOverrides = require("./overrides.en.json") as Partial<Record<string, unknown>>;
+  const enShared = require("@sd/core-i18n/locales/en.json") satisfies LocaleMessages;
+  const enOverrides = require("./overrides.en.json") satisfies Partial<LocaleMessages>;
   return mergeLocaleMessages(enShared, enOverrides);
 }
 
@@ -58,6 +60,7 @@ if (!i18n.isInitialized) {
 
 let initPromise: Promise<void> | null = null;
 
+/** Initializes the i18n used by the native runtime. */
 export async function initI18n(): Promise<void> {
   if (!initPromise) {
     initPromise = (async () => {
@@ -65,7 +68,7 @@ export async function initI18n(): Promise<void> {
       try {
         locale = await getStoredLocale();
       } catch {
-        locale = "en" as Locale;
+        locale = "en";
       }
 
       ensureLocaleLoaded(locale);
@@ -81,6 +84,7 @@ export async function initI18n(): Promise<void> {
   await initPromise;
 }
 
+/** Defines the native change locale contract used by this module. */
 export async function changeLocale(locale: Locale): Promise<void> {
   await storeLocale(locale);
   ensureLocaleLoaded(locale);

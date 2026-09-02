@@ -76,14 +76,14 @@ describe("SignInRoute", () => {
   });
 
   it("redirects to the from param when sign-in succeeds", async () => {
-    mockUseLocalSearchParams.mockReturnValue({ from: "/library/saved" });
+    mockUseLocalSearchParams.mockReturnValue({ from: "/my-library" });
     mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, user: {} as any });
     const React = require("react");
     const { render } = require("@testing-library/react-native");
 
     await render(React.createElement(SignInRoute));
 
-    expect(mockRouterReplace).toHaveBeenCalledWith("/library/saved");
+    expect(mockRouterReplace).toHaveBeenCalledWith("/my-library");
   });
 
   it("falls back to router.back() when authenticated with no from param", async () => {

@@ -10,6 +10,8 @@
     "and": "و",
     "comingSoon": "قريبًا",
     "cancel": "إلغاء",
+    "typeToConfirm": "اكتب {{word}} للتأكيد",
+    "confirmationPlaceholder": "اكتب \"{{word}}\" للتأكيد",
     "save": "حفظ",
     "add": "إضافة",
     "english": "الإنجليزية",
@@ -29,7 +31,9 @@
       "noAccount": "ليس لديك حساب؟ أنشئ حسابًا",
       "noAccountSplit": "ليس لديك حساب؟",
       "noAccountLink": "أنشئ حسابًا",
-      "failed": "فشل تسجيل الدخول"
+      "failed": "فشل تسجيل الدخول",
+      "privacyNote": "بالمتابعة، أنت توافق على",
+      "and": "و"
     }
   },
   "validation": {
@@ -37,6 +41,7 @@
   },
   "account": {
     "title": "الحساب",
+    "guest": "زائر",
     "defaultUser": "مستخدم",
     "editProfile": "تعديل الملف الشخصي",
     "legal": "الشؤون القانونية",
@@ -67,6 +72,7 @@
       "signOutTitle": "تسجيل الخروج؟",
       "signOutConfirm": "تسجيل الخروج",
       "signOutPrompt": "هل أنت متأكد من رغبتك في تسجيل الخروج؟",
+      "signOutError": "فشل تسجيل الخروج. يُرجى المحاولة مرة أخرى.",
       "deleteAccountConfirm": "حذف الحساب",
       "deleteAccountPrompt": "هذا الإجراء دائم ولا يمكن التراجع عنه. سيتم حذف جميع بياناتك.",
       "deleteConfirmWord": "حذف",
@@ -79,22 +85,40 @@
   "tabs": {
     "search": "بحث",
     "feed": "الرئيسية",
-    "library": "المكتبة",
+    "myLibrary": "مكتبتي",
     "account": "الحساب"
   },
   "navigation": {
     "explore": "استكشاف",
     "home": "الرئيسية",
     "scholars": "العلماء",
-    "library": "المكتبة",
+    "myLibrary": "مكتبتي",
     "account": "الحساب",
     "siteTitle": "دروس سلفية",
     "primarySidebar": "الشريط الجانبي الرئيسي",
     "mainNav": "التنقل الرئيسي",
+    "searchAnything": "ابحث عن أي شيء",
+    "searchCatalog": "البحث في الفهرس",
+    "searchCatalogDescription": "ابحث عن الموضوعات والعلماء والقوائم.",
+    "searchCatalogPlaceholder": "ابحث عن موضوع أو عالم أو قائمة",
+    "searchCatalogLoading": "جارٍ تحميل الفهرس",
+    "searchCatalogEmpty": "لا توجد نتائج في الفهرس",
+    "searchCatalogHint": "اكتب للبحث في محتوى الفهرس العام",
+    "searchCatalogScholarMetadata": "{{count}} قائمة",
+    "searchCatalogType": {
+      "topic": "موضوع",
+      "scholar": "عالم",
+      "listing": "قائمة"
+    },
+    "backToApp": "العودة إلى التطبيق",
+    "adminDashboard": "لوحة الإدارة",
+    "adminWorkspace": "مساحة الإدارة",
     "expandSidebar": "توسيع الشريط الجانبي",
     "collapseSidebar": "طيّ الشريط الجانبي",
     "siteFooter": "تذييل الموقع",
     "languageSwitch": "تغيير اللغة",
+    "switchToDark": "التبديل إلى الوضع الداكن",
+    "switchToLight": "التبديل إلى الوضع الفاتح",
     "settings": "الإعدادات",
     "keepYourPlace": "احفظ مكانك",
     "keepYourPlaceDesc": "سجّل الدخول لمزامنة التقدّم والدروس المحفوظة عبر أجهزتك.",
@@ -112,7 +136,7 @@
         "scholar": "العلماء",
         "curation": "المنتقى"
       },
-      "library": {
+      "myLibrary": {
         "started": "قيد التشغيل",
         "saved": "المحفوظة",
         "completed": "المكتملة"
@@ -134,6 +158,8 @@
   "settings": {
     "general": {
       "title": "الإعدادات",
+      "eyebrow": "مساحتك الشخصية",
+      "description": "خصّص تجربة القراءة والإشعارات وتفضيلات حسابك.",
       "languageSection": "اللغة",
       "languageDesc": "ضبط لغة التطبيق والمحتوى.",
       "appLanguage": "لغة التطبيق",
@@ -149,7 +175,9 @@
         "system": "تلقائي",
         "systemDesc": "يتبع تفضيل النظام",
         "light": "فاتح",
+        "lightDesc": "استخدم ألوانًا فاتحة",
         "dark": "داكن",
+        "darkDesc": "استخدم ألوانًا داكنة",
         "parchment": "ورق بردي",
         "parchmentDesc": "عاجي وذهبي عتيق",
         "manuscript": "مخطوطة",
@@ -167,12 +195,40 @@
       "followedScholarsDesc": "إشعار عند نشر شيخ تتابعه",
       "newLectures": "المحاضرات الجديدة",
       "newLecturesDesc": "إشعار عند نشر محاضرات جديدة"
+    },
+    "tabs": {
+      "label": "أقسام الإعدادات",
+      "general": "عام",
+      "profile": "الملف الشخصي"
     }
   },
   "support": {
     "title": "الدعم",
+    "subtitle": "اعثر على إجابات وتواصل مع الفريق عندما تحتاج إلى المساعدة.",
+    "faqEyebrow": "إجابات",
+    "contactEyebrow": "تواصل معنا",
+    "faqDescription": "إجابات سريعة عن الأسئلة الشائعة حول الاستماع.",
+    "contactCopy": "نسعى إلى الرد خلال 48 ساعة.",
+    "legalPrompt": "يمكنك أيضًا مراجعة:",
     "faqSection": "الأسئلة الشائعة",
     "contactSection": "تواصل معنا",
+    "formEyebrow": "إرسال رسالة",
+    "formSection": "الإبلاغ عن مشكلة",
+    "formDescription": "أخبر القائمين على الموقع بما حدث وسنراجع رسالتك.",
+    "form": {
+      "name": "اسمك",
+      "email": "البريد الإلكتروني",
+      "category": "كيف يمكننا مساعدتك؟",
+      "technical": "مشكلة تقنية",
+      "content": "مشكلة في المحتوى",
+      "account": "الحساب أو الوصول",
+      "other": "شيء آخر",
+      "subject": "الموضوع",
+      "message": "ماذا حدث؟",
+      "messageHint": "اذكر الصفحة والجهاز وخطوات إعادة المشكلة إن أمكن.",
+      "submit": "إرسال إلى القائمين على الموقع",
+      "comingSoon": "سيصبح إرسال البلاغات متاحًا عند ربط خدمة الدعم."
+    },
     "faq": {
       "whatIs": {
         "q": "ما هو سلفي دروس؟",
@@ -228,14 +284,20 @@
     "filterAllAria": "عرض جميع العناصر",
     "filterByAria": "تصفية حسب {{label}}",
     "filterRemoveAria": "إزالة تصفية {{label}}",
-    "enterQuery": "أدخل كلمة بحث للبدء"
+    "enterQuery": "أدخل كلمة بحث للبدء",
+    "title": "بحث",
+    "lectureCount": "{{count}} محاضرات",
+    "durationHours": "{{hours}}س {{minutes}}د",
+    "durationMinutes": "{{minutes}}د"
   },
-  "library": {
+  "myLibrary": {
     "title": "مكتبتي",
+    "started": "قيد البدء",
     "inProgress": "قيد الاستماع",
     "saved": "المحفوظة",
     "completed": "المكتملة",
     "loadingSection": "جارٍ تحميل {{section}}…",
+    "error": "تعذّر تحميل مكتبتي.",
     "emptyProgress": "لم تبدأ أي محاضرات بعد. تصفح الفهرس لبدء الاستماع.",
     "emptySaved": "لا توجد محاضرات محفوظة بعد. احفظ بعض المحاضرات لمتابعتها.",
     "emptyCompleted": "لا توجد محاضرات مكتملة بعد. أكمل المحاضرات لمتابعة تعلمك.",
@@ -274,9 +336,24 @@
     "lectureCount": "{{count}} محاضرة",
     "showLess": "عرض أقل",
     "showMore": "عرض المزيد",
+    "readLess": "قراءة أقل",
+    "readMore": "قراءة المزيد",
     "statLectures": "المحاضرات",
     "statSeries": "السلاسل",
-    "statTotal": "الإجمالي"
+    "statTotal": "الإجمالي",
+    "catalogLabel": "دليل العالم",
+    "publishedContent": "المحتوى المنشور",
+    "item": "عنصر",
+    "items": "عناصر"
+  },
+  "listing": {
+    "listenNow": "استمع الآن",
+    "lessons": "الدروس",
+    "collectionContent": "محتوى المجموعة",
+    "item": "عنصر",
+    "items": "عناصر",
+    "module": "وحدة",
+    "modules": "وحدات"
   },
   "feed": {
     "newInTopic": "جديد في {{topic}}",
@@ -351,6 +428,9 @@
     "completingSignIn": "جارٍ إكمال تسجيل الدخول..."
   },
   "legal": {
+    "contents": "محتويات الوثيقة القانونية",
+    "contentsTitle": "في هذه الصفحة",
+    "skipToDocument": "انتقل إلى الوثيقة",
     "privacy": {
       "title": "سياسة الخصوصية",
       "sections": {
@@ -416,8 +496,9 @@
     }
   },
   "cookieConsent": {
-    "message": "نستخدم ملفات تعريف الارتباط لتتبع حركة الموقع وأدائه. لا نجمع بيانات شخصية ولا نخصص المحتوى من ملفات تعريف الارتباط ولا نستخدم ملفات تعريف الارتباط للتسويق أو الإعلانات. بمتابعة الاستخدام، فإنك توافق على استخدام ملفات تعريف الارتباط.",
-    "accept": "قبول",
+    "title": "ملفات تعريف الارتباط والتحليلات",
+    "message": "نستخدم ملفات تعريف الارتباط لفهم حركة الموقع وأدائه. يشير استمرارك في استخدام الموقع إلى موافقتك على تقنيات التتبع هذه.",
+    "close": "إغلاق",
     "policyLink": "سياسة ملفات تعريف الارتباط"
   },
   "role": {
@@ -445,7 +526,10 @@
     "dashboard": {
       "title": "لوحة تحكم الإدارة",
       "titleMobile": "إدارة",
+      "subtitle": "عرض مركز للأعمال والموارد المتاحة وفقًا لصلاحياتك.",
       "loading": "جارٍ التحميل...",
+      "error": "لوحة التحكم غير متاحة حاليًا. حاول مرة أخرى لاحقًا.",
+      "empty": "لا تتوفر بيانات لوحة التحكم.",
       "noAccess": "ليس لديك وصول إلى الإدارة.",
       "noAccessMobile": "لا يوجد وصول إلى الإدارة.",
       "scholarsDesc": "إدارة العلماء، ملفاتهم الشخصية وظهورهم",
@@ -457,7 +541,27 @@
     },
     "stats": {
       "title": "إحصائيات الإدارة",
-      "desc": "ستظهر إحصائيات المنصة والتحليلات هنا."
+      "desc": "البيانات التشغيلية المتاحة لحسابك.",
+      "loadingLabel": "جارٍ تحميل إحصائيات الإدارة",
+      "loading": "جارٍ تحميل الإحصائيات المتاحة…",
+      "unavailable": "لا تتوفر إحصائيات مصرح بها.",
+      "summary": "ملخص البيانات المتاحة",
+      "scholars": "العلماء",
+      "listings": "المحتوى",
+      "users": "المستخدمون",
+      "contentHeading": "المحتوى المتاح",
+      "contentDescription": "يعرض المحتوى الذي أرجعه النظام وفق صلاحياتك الحالية.",
+      "content": "المحتوى",
+      "scholar": "العالم",
+      "format": "الصيغة",
+      "status": "الحالة",
+      "created": "أُنشئ في",
+      "filterStatus": "تصفية حسب الحالة",
+      "allStatuses": "كل الحالات",
+      "contentTable": "بيانات المحتوى المتاح",
+      "empty": "لا يوجد محتوى متاح يطابق هذا المرشح.",
+      "error": "تعذر تحميل الإحصائيات المتاحة.",
+      "partialError": "تعذر تحديث بعض البيانات المتاحة."
     },
     "scholars": {
       "manageTitle": "إدارة العلماء",
@@ -498,9 +602,37 @@
     "users": {
       "title": "إدارة المستخدمين",
       "titleMobile": "المستخدمون",
+      "description": "مراجعة المستخدمين والتحكم فيمن يمكنه إدارة مكتبة التعلم.",
+      "filtersTitle": "البحث عن المستخدمين",
+      "filtersDescription": "ابحث بالهوية أو ضيّق القائمة حسب الدور والصلاحية.",
+      "roleLabel": "الدور",
+      "visibleUsers": "المستخدمون المعروضون",
+      "adminAccess": "لديهم وصول إداري",
+      "directoryTitle": "دليل المستخدمين",
       "searchPlaceholder": "البحث عن المستخدمين بالاسم أو البريد الإلكتروني...",
       "searchNoMatch": "لم يتم العثور على مستخدمين يطابقون بحثك.",
-      "noUsersFound": "لم يتم العثور على مستخدمين."
+      "noUsersFound": "لم يتم العثور على مستخدمين.",
+      "noAccessGrants": "لا توجد صلاحيات وصول",
+      "unnamed": "مستخدم بلا اسم",
+      "moreActions": "المزيد من الإجراءات لـ {{name}}",
+      "copyEmail": "نسخ البريد الإلكتروني",
+      "copyEmailFor": "نسخ البريد الإلكتروني لـ {{name}}",
+      "statusLabel": "حالة الوصول",
+      "status": {
+        "active": "وصول إداري فعال",
+        "none": "لا يوجد وصول إداري",
+        "activeFilter": "لديه وصول إداري",
+        "noneFilter": "لا يوجد وصول إداري"
+      },
+      "resultSummary": "{{shown}} معروض · {{active}} لديه وصول إداري",
+      "columnsLabel": "أعمدة إدارة المستخدمين",
+      "columns": {
+        "user": "المستخدم",
+        "joined": "تاريخ الانضمام",
+        "status": "حالة الوصول",
+        "roles": "الأدوار",
+        "actions": "الإجراءات"
+      }
     },
     "access": {
       "title": "إدارة الوصول",
@@ -552,6 +684,10 @@
       "deleteWarning": "لا يمكن التراجع عن هذا الإجراء.",
       "title": "إدارة المحتوى",
       "titleMobile": "المحتوى",
+      "sectionsLabel": "أقسام المحتوى",
+      "tabListings": "القوائم",
+      "tabTopics": "المواضيع",
+      "tabPromotions": "الترويج",
       "topicManagement": "إدارة المواضيع",
       "listingManagement": "إدارة المحتوى",
       "addTopic": "إضافة موضوع",
@@ -560,6 +696,13 @@
       "addListingMobile": "محتوى",
       "searchPlaceholderTopics": "البحث عن المواضيع...",
       "searchPlaceholderListings": "البحث عن القوائم...",
+      "topicColumn": "الموضوع",
+      "slugColumn": "المعرف",
+      "orderColumn": "الترتيب",
+      "listingColumn": "المحتوى",
+      "scholarColumn": "العالم",
+      "statusColumn": "الحالة",
+      "actionsColumn": "الإجراءات",
       "searchNoMatchTopics": "لم يتم العثور على مواضيع تطابق بحثك.",
       "noTopicsFound": "لا توجد مواضيع بعد.",
       "searchNoMatchListings": "لم يتم العثور على محتوى يطابق بحثك.",
@@ -697,5 +840,29 @@
       "childrenTab": "العناصر الفرعية",
       "childrenEmpty": "لا توجد عناصر فرعية بعد"
     }
+  },
+  "promotions": {
+    "featuredHeroTitle": "تنسيق المحتوى المميز",
+    "featuredHeroDesc": "اختر المحتوى الرئيسي المميز في أعلى لافتة الصفحة الرئيسية.",
+    "heroSearch": "البحث عن محتوى واختياره",
+    "searchPlaceholder": "البحث في المحاضرات بالعنوان أو اسم العالم...",
+    "selectMatch": "اختر المحتوى المطابق",
+    "currentlySelected": "المحتوى الرئيسي النشط",
+    "heroHeadline": "العنوان أو النص المميز",
+    "headlinePlaceholder": "مثال: محاضرة مميزة",
+    "editorsPicksTitle": "تنسيق اختيارات المحررين",
+    "editorsPicksDesc": "إدارة المحتوى المميز داخل أداة اختيارات المحررين في الصفحة الرئيسية.",
+    "addPickLabel": "إضافة محتوى إلى الاختيارات",
+    "emptyPicks": "لم يتم اختيار محتوى لاختيارات المحررين بعد.",
+    "removePick": "إزالة الاختيار",
+    "listingColumn": "المحتوى",
+    "scholarColumn": "العالم",
+    "actionsColumn": "الإجراءات",
+    "alreadyAdded": "هذا المحتوى موجود بالفعل في اختيارات المحررين.",
+    "success": "تم تحديث الترويجات بنجاح.",
+    "error": "تعذر حفظ الترويجات.",
+    "errorDetails": "يرجى المحاولة مرة أخرى أو التواصل مع المسؤول.",
+    "loadError": "تعذر تحميل الترويجات.",
+    "retry": "إعادة المحاولة"
   }
 }

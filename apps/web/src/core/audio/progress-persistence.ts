@@ -1,5 +1,7 @@
+/** Coordinates local progress caches with deferred authenticated server synchronization. */
 "use client";
 
+import { ListingProgressDtoSchema } from "@sd/core-contracts";
 import {
   drainPendingProgress,
   flushPendingProgress,
@@ -17,8 +19,11 @@ import {
   onSavedFlushed,
 } from "@sd/domain-content";
 
+import { hasWindow } from "@/shared/lib/runtime-guards";
+
 import { createLocalStorageAdapter } from "../sync/local-storage-adapter";
 
+/** Bridges authenticated browser state with per-user local caches and deferred server sync. */
 const STORAGE_KEY_PREFIX = "sd:progress-cache:v1:";
 const DEFAULT_PERSIST_THROTTLE_MS = 5000;
 
@@ -27,19 +32,24 @@ function storageKey(userId: string): string {
 }
 
 function readCachedProgress(userId: string): ListingProgress[] {
-  if (typeof window === "undefined") return [];
+  if (!hasWindow()) return [];
   try {
     const raw = window.localStorage.getItem(storageKey(userId));
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed)
+      ? parsed.flatMap((entry) => {
+          const result = ListingProgressDtoSchema.safeParse(entry);
+          return result.success ? [result.data] : [];
+        })
+      : [];
   } catch {
     return [];
   }
 }
 
 function writeCachedProgress(userId: string, entries: ListingProgress[]): void {
-  if (typeof window === "undefined") return;
+  if (!hasWindow()) return;
   try {
     window.localStorage.setItem(storageKey(userId), JSON.stringify(entries));
   } catch {

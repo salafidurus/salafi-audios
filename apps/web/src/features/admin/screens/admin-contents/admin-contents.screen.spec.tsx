@@ -2,7 +2,7 @@ import { createMongoAbility } from "@casl/ability";
 import { useApiQuery } from "@sd/core-contracts";
 import { useAbility } from "@sd/domain-account";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -49,7 +49,7 @@ describe("AdminContentsScreen — topics tab access gates", () => {
     return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
   };
 
-  it("hides Add Topic button when user cannot create topics", () => {
+  it("hides Add Topic button when user cannot create topics", async () => {
     (useAbility as Mock<any>).mockReturnValue({
       ability: createMongoAbility([{ action: "read", subject: "Listing" }]),
     });
@@ -57,12 +57,12 @@ describe("AdminContentsScreen — topics tab access gates", () => {
     renderWithProviders(<AdminContentsScreen />);
 
     // Switch to Topics tab
-    fireEvent.click(screen.getByText("Topics"));
+    await act(async () => fireEvent.mouseDown(screen.getByRole("tab", { name: "Topics" })));
 
     expect(screen.queryByText("Add Topic")).not.toBeInTheDocument();
   });
 
-  it("shows Add Topic button when user can create topics", () => {
+  it("shows Add Topic button when user can create topics", async () => {
     (useAbility as Mock<any>).mockReturnValue({
       ability: createMongoAbility([{ action: "create", subject: "Topic" }]),
     });
@@ -70,9 +70,34 @@ describe("AdminContentsScreen — topics tab access gates", () => {
     renderWithProviders(<AdminContentsScreen />);
 
     // Switch to Topics tab
-    fireEvent.click(screen.getByText("Topics"));
+    await act(async () => fireEvent.mouseDown(screen.getByRole("tab", { name: "Topics" })));
 
     expect(screen.getByText("Add Topic")).toBeInTheDocument();
+  });
+
+  it("exposes Content sections as accessible tabs", async () => {
+    renderWithProviders(<AdminContentsScreen />);
+
+    expect(screen.getByRole("tablist", { name: "Content sections" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Listings" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel", { name: "Listings" })).toBeInTheDocument();
+
+    await act(async () => fireEvent.mouseDown(screen.getByRole("tab", { name: "Topics" })));
+
+    expect(screen.getByRole("tab", { name: "Topics" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel", { name: "Topics" })).toBeInTheDocument();
+  });
+
+  it("shows a denied state for Promotions when the user cannot write listings", async () => {
+    (useAbility as Mock<any>).mockReturnValue({
+      ability: createMongoAbility([{ action: "read", subject: "Listing" }]),
+    });
+
+    renderWithProviders(<AdminContentsScreen />);
+    await act(async () => fireEvent.mouseDown(screen.getByRole("tab", { name: "Promotions" })));
+
+    expect(screen.getByRole("heading", { name: "Access Denied" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Save Curation" })).not.toBeInTheDocument();
   });
 
   it("uses the correct query function to fetch topics", async () => {

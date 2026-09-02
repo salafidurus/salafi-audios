@@ -1,5 +1,5 @@
 import { routes } from "@sd/core-contracts";
-import { type Href, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, type Href } from "expo-router";
 import { useEffect } from "react";
 
 import { useAuth } from "@/core/auth";
@@ -7,6 +7,8 @@ import { useNativeAppleSignIn } from "@/features/auth/hooks/use-native-apple-sig
 import { useNativeGoogleSignIn } from "@/features/auth/hooks/use-native-google-sign-in";
 import { SignInScreen } from "@/features/auth/screens/sign-in/sign-in.screen";
 
+/** Defines the Expo Router entrypoint for the native (auth)/sign-in route and delegates behavior to the feature layer. */
+/** Renders the native sign in route surface and coordinates its user-facing state. */
 export default function SignInRoute() {
   const router = useRouter();
   const { from } = useLocalSearchParams<{ from?: string }>();
@@ -22,17 +24,20 @@ export default function SignInRoute() {
     error: googleError,
   } = useNativeGoogleSignIn();
 
+  const fallbackPath = routes.home;
+
   useEffect(() => {
     if (isAuthenticated) {
       if (from) {
+        // SAFETY: `from` is produced by this app's same-origin route query.
         router.replace(from as Href);
       } else if (router.canGoBack()) {
         router.back();
       } else {
-        router.replace(routes.home as Href);
+        router.replace(fallbackPath);
       }
     }
-  }, [isAuthenticated, from, router]);
+  }, [fallbackPath, isAuthenticated, from, router]);
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -40,7 +45,7 @@ export default function SignInRoute() {
       return;
     }
 
-    router.replace(routes.home as Href);
+    router.replace(fallbackPath);
   };
 
   return (

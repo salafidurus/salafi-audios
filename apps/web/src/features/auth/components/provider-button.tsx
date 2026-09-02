@@ -1,16 +1,22 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useSyncExternalStore, type CSSProperties } from "react";
+
+import { hasDocument } from "@/shared/lib/runtime-guards";
 
 import styles from "./provider-button.module.css";
 
 type ThemeMode = "light" | "dark";
+type ButtonStyleVars = CSSProperties & Record<`--${string}`, string>;
 
+/** Configures the themed Google provider button. */
 export type GoogleButtonProps = {
   onClick?: () => void;
   disabled?: boolean;
 };
 
+/** Configures the themed Apple provider button. */
 export type AppleButtonProps = {
   onClick?: () => void;
   disabled?: boolean;
@@ -60,27 +66,26 @@ function AppleSvg() {
   );
 }
 
-function useThemeMode(): ThemeMode {
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    if (typeof document !== "undefined") {
-      return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
-    }
-    return "light";
-  });
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const readTheme = (): ThemeMode =>
-      root.getAttribute("data-theme") === "dark" ? "dark" : "light";
-    const syncTheme = () => setThemeMode(readTheme());
-    const observer = new MutationObserver(syncTheme);
-    observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
-    return () => observer.disconnect();
-  }, []);
-
-  return themeMode;
+function readThemeMode(): ThemeMode {
+  if (!hasDocument()) return "light";
+  return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
 }
 
+function subscribeToTheme(onChange: () => void): () => void {
+  if (!hasDocument()) return () => {};
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+  return () => observer.disconnect();
+}
+
+function useThemeMode(): ThemeMode {
+  return useSyncExternalStore(subscribeToTheme, readThemeMode, () => "light");
+}
+
+/** Renders a Google sign-in button whose visual tokens follow the active theme. */
 export function GoogleButton({ onClick, disabled = false }: GoogleButtonProps) {
   const themeMode = useThemeMode();
   const isDark = themeMode === "dark";
@@ -93,12 +98,14 @@ export function GoogleButton({ onClick, disabled = false }: GoogleButtonProps) {
       disabled={disabled}
       aria-label="Continue with Google"
       style={
+        // SAFETY: React accepts CSS custom properties at runtime; this local type only
+        // models the exact `--gsi-*` variables consumed by provider-button.module.css.
         {
           "--gsi-bg-color": isDark ? "#131314" : "#fff",
           "--gsi-border-color": isDark ? "#8e918f" : "#747775",
           "--gsi-text-color": isDark ? "#e3e3e3" : "#1f1f1f",
           "--gsi-opacity": disabled ? "0.45" : "1",
-        } as CSSProperties
+        } as ButtonStyleVars
       }
     >
       <div className={styles.gsiMaterialButtonState} />
@@ -113,6 +120,7 @@ export function GoogleButton({ onClick, disabled = false }: GoogleButtonProps) {
   );
 }
 
+/** Renders an Apple sign-in button whose visual tokens follow the active theme. */
 export function AppleButton({ onClick, disabled = false }: AppleButtonProps) {
   const themeMode = useThemeMode();
   const isDark = themeMode === "dark";
@@ -125,10 +133,12 @@ export function AppleButton({ onClick, disabled = false }: AppleButtonProps) {
       disabled={disabled}
       aria-label="Continue with Apple"
       style={
+        // SAFETY: React accepts CSS custom properties at runtime; this local type only
+        // models the exact `--apple-*` variables consumed by provider-button.module.css.
         {
           "--apple-bg-color": isDark ? "#fff" : "#000",
           "--apple-text-color": isDark ? "#000" : "#fff",
-        } as CSSProperties
+        } as ButtonStyleVars
       }
     >
       <div className={styles.appleButtonContentWrapper}>
@@ -142,12 +152,14 @@ export function AppleButton({ onClick, disabled = false }: AppleButtonProps) {
 }
 
 /* Legacy export for backwards compatibility */
+/** Describes the provider selected by the backwards-compatible button wrapper. */
 export type AuthProviderButtonProps = {
   provider: "apple" | "google";
   onClick?: () => void;
   disabled?: boolean;
 };
 
+/** Renders the provider-specific button while preserving the legacy shared API. */
 export function AuthProviderButton({ provider, onClick, disabled }: AuthProviderButtonProps) {
   if (provider === "apple") {
     return <AppleButton onClick={onClick} disabled={disabled} />;

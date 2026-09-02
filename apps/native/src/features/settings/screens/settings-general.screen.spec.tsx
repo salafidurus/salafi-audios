@@ -1,64 +1,88 @@
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import { render, screen } from "@testing-library/react-native";
 import React from "react";
-import { UnistylesRuntime } from "react-native-unistyles";
 
 import { SettingsGeneralScreen } from "./settings-general.screen";
 
 jest.mock("react-native-unistyles", () => {
-  const { lightNativeTheme } = require("../../../core/styles/theme");
+  const { lightNativeTheme } = require("@/core/styles/theme");
   return {
-    StyleSheet: {
-      create: (styles: any) =>
-        typeof styles === "function" ? styles(lightNativeTheme, {}) : styles,
-      configure: jest.fn(),
-    },
-    useUnistyles: () => ({
-      theme: lightNativeTheme,
-      rt: {},
-    }),
-    UnistylesRuntime: {
-      themeName: "system",
-      setTheme: jest.fn(),
-    },
+    UnistylesRuntime: { hasAdaptiveThemes: true, themeName: "light" },
+    useUnistyles: () => ({ theme: lightNativeTheme, rt: {} }),
   };
 });
 
 jest.mock("@/core/i18n/use-translation", () => ({
-  useTranslation: () => ({
-    t: (_key: string, fallback: string) => fallback,
-  }),
+  useTranslation: () => ({ t: (_key: string, fallback: string) => fallback }),
+}));
+
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
+}));
+
+jest.mock("@expo/ui", () => {
+  const { Text, View } = require("react-native");
+  const Container = ({ children, testID }: { children?: React.ReactNode; testID?: string }) => (
+    <View testID={testID}>{children}</View>
+  );
+  const Picker = Object.assign(Container, { Item: () => null });
+
+  return {
+    Column: Container,
+    Host: Container,
+    Picker,
+    Row: Container,
+    ScrollView: Container,
+    Switch: Container,
+    Text,
+    RNHostView: Container,
+  };
+});
+
+jest.mock("../components/language-switch/language-switch", () => ({
+  LanguageSwitch: () => null,
 }));
 
 jest.mock("../components/content-language-toggle/content-language-toggle", () => ({
   ContentLanguageToggle: () => null,
 }));
 
-jest.mock("../components/language-switch/language-switch", () => ({
-  LanguageSwitch: () => null,
+jest.mock("../components/SegmentedControl/SegmentedControl", () => ({
+  SegmentedControl: ({
+    options,
+    ariaLabel,
+  }: {
+    options: Array<{ label: string }>;
+    ariaLabel?: string;
+  }) => {
+    const { Text, View } = require("react-native");
+    return (
+      <View testID="theme-segmented-control" accessibilityLabel={ariaLabel}>
+        {options.map((opt) => (
+          <Text key={opt.label}>{opt.label}</Text>
+        ))}
+      </View>
+    );
+  },
 }));
 
+jest.mock("./settings-account-actions.screen", () => ({
+  SettingsAccountActions: () => null,
+  SettingsSupportLegalActions: () => null,
+}));
+
+jest.mock("@/shared/ui", () => {
+  const actual = jest.requireActual<typeof import("@/shared/ui")>("@/shared/ui");
+  return { ...actual, NativeSegmentedControl: () => null };
+});
+
 describe("SettingsGeneralScreen", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("renders theme cards options instead of segmented control", async () => {
+  it("uses the shared Expo UI screen host and SegmentedControl for theme preference", async () => {
     await render(<SettingsGeneralScreen />);
 
-    // Check that we render the horizontal cards options
+    expect(screen.getByTestId("settings-general-host")).toBeTruthy();
+    expect(screen.getByTestId("theme-segmented-control")).toBeTruthy();
     expect(screen.getByText("System")).toBeTruthy();
-    expect(screen.getByText("Parchment")).toBeTruthy();
-    expect(screen.getByText("Manuscript")).toBeTruthy();
-    expect(screen.getByText("Midnight")).toBeTruthy();
-    expect(screen.getByText("Ember")).toBeTruthy();
-  });
-
-  it("calls UnistylesRuntime.setTheme when a theme card is clicked", async () => {
-    await render(<SettingsGeneralScreen />);
-
-    const parchmentCard = screen.getByText("Parchment");
-    fireEvent.press(parchmentCard);
-
-    expect(UnistylesRuntime.setTheme).toHaveBeenCalledWith("parchment");
+    expect(screen.getByText("Light")).toBeTruthy();
+    expect(screen.getByText("Dark")).toBeTruthy();
   });
 });

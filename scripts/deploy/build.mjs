@@ -86,7 +86,7 @@ try {
 
   // Build the target application
   log(`Building application: "${target}"...`);
-  await Bun.$`bun run build --filter=${target}...`;
+  await Bun.$`bun run build:all --filter=${target}...`;
   log(`Building application: "${target}"... Done`);
 
   success(`Build process completed successfully for "${target}"!`);

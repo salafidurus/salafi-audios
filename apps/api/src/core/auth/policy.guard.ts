@@ -1,14 +1,19 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { subject } from '@casl/ability';
 import type { Request } from 'express';
 import { CHECK_POLICY_KEY } from './decorators/check-policy.decorator';
-import type { CheckPolicyMetadata } from './decorators/check-policy.decorator';
-import { defineAbilityFor } from './ability/ability.factory';
+import type {
+  CheckPolicyMetadata,
+  PolicyRequestContext,
+} from './decorators/check-policy.decorator';
+import { canAccess, type PolicyResource } from './policy';
 import { PrismaService } from '../db/prisma.service';
 
+/** NestJS policy guard service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** Core API policy.guard module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class PolicyGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
@@ -28,27 +33,25 @@ export class PolicyGuard implements CanActivate {
     const user = request.user;
     if (!user?.id) throw new ForbiddenException('Authentication required');
 
-    const ability = defineAbilityFor(user);
-
-    let resource: Record<string, unknown> | undefined;
+    let resource: PolicyResource | undefined;
     if (metadata.resolve) {
-      resource = await metadata.resolve(
-        {
-          params: (request.params as Record<string, string>) ?? {},
-          body: request.body,
-          query: (request.query as Record<string, unknown>) ?? {},
-        },
-        this.prisma,
-      );
+      const policyContext: PolicyRequestContext = {
+        // SAFETY: Fastify/Nest route params are string-keyed path params at this boundary.
+        params: (request.params as Record<string, string>) ?? {},
+        body: request.body,
+        query: {},
+      };
+      resource = await metadata.resolve(policyContext, this.prisma);
     }
 
-    // The resolver's return shape is only known at each @CheckPolicy call site,
-    // not to this generic guard — the cast below is the dynamic-dispatch
-    // boundary; correctness is verified by ability.factory/policy.guard specs.
-    const target = resource
-      ? subject(metadata.subjectType, resource as never)
-      : metadata.subjectType;
-    if (!ability.can(metadata.action, target)) {
+    if (
+      !canAccess(user, {
+        action: metadata.action,
+        subjectType: metadata.subjectType,
+        resource,
+        resourceResolved: Boolean(metadata.resolve),
+      })
+    ) {
       throw new ForbiddenException(
         `Missing capability: ${metadata.action} ${metadata.subjectType}`,
       );

@@ -1,6 +1,9 @@
-import { Pressable, Text, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { AppText, Button } from "@/shared/ui";
+
+/** Provides authenticated native administration workflows and their data boundaries. */
 type BulkActionBarProps = {
   selectedCount: number;
   onPublish: () => void;
@@ -10,6 +13,7 @@ type BulkActionBarProps = {
   isLoading?: boolean;
 };
 
+/** Renders the native bulk action bar surface and coordinates its user-facing state. */
 export function BulkActionBar({
   selectedCount,
   onPublish,
@@ -22,16 +26,26 @@ export function BulkActionBar({
   if (!canPublish && !canArchive) return null;
   return (
     <View style={styles.container}>
-      <Text style={styles.countText}>{selectedCount} selected</Text>
+      <AppText variant="caption" style={styles.countText}>
+        {selectedCount} selected
+      </AppText>
       {canPublish ? (
-        <Pressable onPress={onPublish} disabled={isLoading} style={styles.publishBtn}>
-          <Text style={[styles.btnText, styles.publishBtnText]}>Publish</Text>
-        </Pressable>
+        <Button
+          label="Publish"
+          variant="surface"
+          onPress={onPublish}
+          disabled={isLoading}
+          style={styles.publishBtn}
+        />
       ) : null}
       {canArchive ? (
-        <Pressable onPress={onArchive} disabled={isLoading} style={styles.archiveBtn}>
-          <Text style={[styles.btnText, styles.archiveBtnText]}>Archive</Text>
-        </Pressable>
+        <Button
+          label="Archive"
+          variant="danger"
+          onPress={onArchive}
+          disabled={isLoading}
+          style={styles.archiveBtn}
+        />
       ) : null}
     </View>
   );

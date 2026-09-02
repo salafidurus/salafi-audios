@@ -11,7 +11,7 @@ import {
 } from "@sd/domain-content";
 import { router, useLocalSearchParams } from "expo-router";
 import { Play, Pause, Bookmark } from "lucide-react-native";
-import { useEffect } from "react";
+import { type ComponentProps, useEffect } from "react";
 import { ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -24,47 +24,154 @@ import { ListingContentView } from "@/features/listing/components/listing-conten
 import { SeriesContextBar } from "@/features/listing/components/series-context-bar/series-context-bar";
 import { TopicChips } from "@/features/listing/components/topic-chips/topic-chips";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { Button } from "@/shared/components/Button/Button";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText, Button, ScreenView } from "@/shared/ui";
 
+/** Builds native lecture and scholar content surfaces from canonical identities. */
+/** Describes the inputs, callbacks, and optional state accepted by Lecture Detail Screen. */
 export type LectureDetailScreenProps = {
+  /** Carries the canonical route identity used to load the selected content. */
   slug: string;
 };
 
-export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
-  const { theme } = useUnistyles();
-  const { anchor } = useLocalSearchParams<{ slug: string; anchor?: string }>();
-  const { data: lecture, isFetching } = useListingDetail(slug);
-  const { data: seriesContents } = useListingContents(lecture?.seriesContext?.seriesSlug ?? "");
-  const isContainer = lecture?.format === "series" || lecture?.format === "collection";
-  const { data: ownContents } = useListingContents(isContainer ? lecture!.slug : "");
-  const showOriginal = useShowOriginalContent();
-  const { t } = useTranslation();
+function standaloneTrack(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]>,
+  title: string,
+): Track {
+  return {
+    id: lecture.id,
+    slug: lecture.slug,
+    title,
+    artist: lecture.scholar.name,
+    scholarSlug: lecture.scholar.slug,
+    url: "",
+    durationSeconds: lecture.durationSeconds ?? 0,
+    artworkUrl: lecture.scholar.imageUrl ?? undefined,
+    seriesId: null,
+    seriesTitle: null,
+  };
+}
 
-  const { isPlaying, currentTrack } = useAudio();
-  const isCurrentTrack = lecture ? currentTrack?.id === lecture.id : false;
+async function playLecture(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]>,
+  title: string,
+  seriesContents: NonNullable<ReturnType<typeof useListingContents>["data"]> | undefined,
+  isCurrentTrack: boolean,
+  isPlaying: boolean,
+): Promise<void> {
+  if (isCurrentTrack) {
+    if (isPlaying) await audioService.pause();
+    else await audioService.resume();
+    return;
+  }
 
-  const isSaved = useIsSaved(lecture?.id ?? "");
-
-  // Slugs are flat and don't encode nesting, so a Lesson/Module's own slug
-  // resolves to itself — redirect to the top-level page it belongs under,
-  // anchored to this item so the parent page can scroll to and highlight it.
-  useEffect(() => {
-    if (lecture?.rootListing) {
-      router.replace(`/listings/${lecture.rootListing.slug}?anchor=${lecture.id}`);
+  if (lecture.seriesContext && seriesContents) {
+    const queue = buildTrackQueue(
+      {
+        id: lecture.seriesContext.seriesId,
+        title: lecture.seriesContext.seriesTitle,
+        format: seriesContents.format,
+        scholarName: lecture.scholar.name,
+        scholarSlug: lecture.scholar.slug,
+        artworkUrl: lecture.scholar.imageUrl ?? undefined,
+      },
+      seriesContents,
+      { startAtId: lecture.id },
+    );
+    const track = queue.find((item) => item.id === lecture.id);
+    if (track) {
+      await audioService.playListing(track, queue);
+      return;
     }
-  }, [lecture]);
+  }
 
-  if (isFetching) {
+  const track = standaloneTrack(lecture, title);
+  await audioService.playListing(track, [track]);
+}
+
+type LoadedLectureView = {
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]>;
+  title: string;
+  description?: string;
+  anchor?: string;
+  ownContents: NonNullable<ReturnType<typeof useListingContents>["data"]> | undefined;
+  loadingMessage: string;
+  isSaved: boolean;
+  isCurrentTrack: boolean;
+  isPlaying: boolean;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+  onPlay: () => Promise<void>;
+  onSave: () => void;
+};
+
+function getPlayLabel(isCurrentlyPlaying: boolean) {
+  return isCurrentlyPlaying ? "Pause" : "Play";
+}
+
+function getSaveLabel(isSaved: boolean) {
+  return isSaved ? "Saved" : "Save";
+}
+
+function LectureActions({
+  isCurrentTrack,
+  isPlaying,
+  isSaved,
+  theme,
+  onPlay,
+  onSave,
+}: Pick<
+  LoadedLectureView,
+  "isCurrentTrack" | "isPlaying" | "isSaved" | "theme" | "onPlay" | "onSave"
+>) {
+  const isCurrentlyPlaying = isCurrentTrack && isPlaying;
+  return (
+    <View style={styles.actionsRow}>
+      <View style={styles.actionBtnWrapper}>
+        <Button
+          variant="primary"
+          size="md"
+          label={getPlayLabel(isCurrentlyPlaying)}
+          icon={
+            isCurrentlyPlaying ? (
+              <Pause size={18} color={theme.colors.content.onPrimary} />
+            ) : (
+              <Play size={18} color={theme.colors.content.onPrimary} />
+            )
+          }
+          onPress={onPlay}
+        />
+      </View>
+      <View style={styles.actionBtnWrapper}>
+        <Button
+          variant="surface"
+          size="md"
+          label={getSaveLabel(isSaved)}
+          icon={
+            <Bookmark
+              size={18}
+              color={isSaved ? theme.colors.action.primary : theme.colors.content.strong}
+              fill={isSaved ? theme.colors.action.primary : "none"}
+            />
+          }
+          onPress={onSave}
+        />
+      </View>
+    </View>
+  );
+}
+
+function getLectureStateView(
+  isFetching: boolean,
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+  t: (key: string, fallback: string) => string,
+) {
+  if (isFetching || lecture?.rootListing) {
     return (
       <ScreenView center>
         <EmptyState message={t("lecture.loading", "Loading lecture…")} variant="loading" />
       </ScreenView>
     );
   }
-
   if (!lecture) {
     return (
       <ScreenView center>
@@ -72,169 +179,201 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
       </ScreenView>
     );
   }
+  return null;
+}
 
-  if (lecture.rootListing) {
-    return (
-      <ScreenView center>
-        <EmptyState message={t("lecture.loading", "Loading lecture…")} variant="loading" />
-      </ScreenView>
-    );
-  }
+function isContainerLecture(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+): boolean {
+  return lecture?.format === "series" || lecture?.format === "collection";
+}
 
-  const title = pickContentField(lecture.title, lecture.original?.title, showOriginal);
-  const description = lecture.description
+function getOwnContentsSlug(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+): string {
+  return isContainerLecture(lecture) ? (lecture?.slug ?? "") : "";
+}
+
+function getSeriesContentsSlug(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+) {
+  return lecture?.seriesContext?.seriesSlug ?? "";
+}
+
+function getLectureId(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+) {
+  return lecture?.id ?? "";
+}
+
+function getLectureDescription(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]>,
+  showOriginal: boolean,
+) {
+  return lecture.description
     ? pickContentField(lecture.description, lecture.original?.description, showOriginal)
     : undefined;
+}
 
-  if (isContainer) {
-    return (
-      <ScreenView>
-        <View style={styles.headerSection}>
-          <AppText variant="titleLg">{title}</AppText>
-          <LectureMeta lecture={lecture} />
-          {description ? (
-            <AppText variant="bodyMd" style={styles.descriptionSection}>
-              {description}
-            </AppText>
-          ) : null}
-        </View>
-        {ownContents ? (
-          <ListingContentView
-            contents={ownContents}
-            listingRef={{
-              id: lecture.id,
-              title,
-              format: lecture.format,
-              scholarName: lecture.scholar.name,
-              scholarSlug: lecture.scholar.slug,
-              artworkUrl: lecture.scholar.imageUrl ?? undefined,
-            }}
-            highlightItemId={anchor}
-          />
-        ) : (
-          <EmptyState message={t("lecture.loading", "Loading lessons…")} variant="loading" />
-        )}
-      </ScreenView>
-    );
+function toggleLectureSaved(
+  isSaved: boolean,
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]>,
+) {
+  if (isSaved) {
+    markUnsaved(lecture.id, lecture.slug);
+  } else {
+    markSaved(lecture.id, lecture.slug);
   }
+}
 
-  const handlePlay = async () => {
-    if (isCurrentTrack) {
-      if (isPlaying) {
-        await audioService.pause();
-      } else {
-        await audioService.resume();
-      }
-      return;
+function isCurrentLectureTrack(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+  currentTrack: Track | null,
+): boolean {
+  return lecture !== undefined && currentTrack?.slug === lecture.slug;
+}
+
+function useLectureRedirect(
+  lecture: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+) {
+  useEffect(() => {
+    if (lecture?.rootListing) {
+      router.replace(`/listings/${lecture.rootListing.slug}?anchor=${lecture.id}`);
     }
+  }, [lecture]);
+}
 
-    // When the immediate parent's contents have loaded, play the full
-    // ordered queue for that Series/Module so Next/auto-advance continue
-    // through it — not just this one lesson.
-    if (lecture.seriesContext && seriesContents) {
-      const queue = buildTrackQueue(
-        {
-          id: lecture.seriesContext.seriesId,
-          title: lecture.seriesContext.seriesTitle,
-          format: seriesContents.format,
-          scholarName: lecture.scholar.name,
-          scholarSlug: lecture.scholar.slug,
-          artworkUrl: lecture.scholar.imageUrl ?? undefined,
-        },
-        seriesContents,
-        { startAtId: lecture.id },
-      );
-      const track = queue.find((t) => t.id === lecture.id);
-      if (track) {
-        await audioService.playListing(track, queue);
-        return;
-      }
-    }
-
-    const track: Track = {
-      id: lecture.id,
-      slug: lecture.slug,
-      title,
-      artist: lecture.scholar.name,
-      scholarSlug: lecture.scholar.slug,
-      url: "",
-      durationSeconds: lecture.durationSeconds ?? 0,
-      artworkUrl: lecture.scholar.imageUrl ?? undefined,
-      seriesId: null,
-      seriesTitle: null,
-    };
-
-    await audioService.playListing(track, [track]);
+function ContainerLectureBody({ view }: { view: LoadedLectureView }) {
+  const { lecture, title, description, anchor, ownContents, loadingMessage } = view;
+  const listingRef: ComponentProps<typeof ListingContentView>["listingRef"] = {
+    id: lecture.id,
+    title,
+    format: lecture.format,
+    scholarName: lecture.scholar.name,
+    scholarSlug: lecture.scholar.slug,
+    artworkUrl: lecture.scholar.imageUrl ?? undefined,
   };
+  return (
+    <ScreenView>
+      <View style={styles.headerSection}>
+        <AppText variant="titleLg">{title}</AppText>
+        <LectureMeta lecture={lecture} />
+        {description ? (
+          <AppText variant="bodyMd" style={styles.descriptionSection}>
+            {description}
+          </AppText>
+        ) : null}
+      </View>
+      {ownContents ? (
+        <ListingContentView
+          contents={ownContents}
+          listingRef={listingRef}
+          highlightItemId={anchor}
+        />
+      ) : (
+        <EmptyState message={loadingMessage} variant="loading" />
+      )}
+    </ScreenView>
+  );
+}
 
-  const handleSave = () => {
-    if (isSaved) {
-      markUnsaved(lecture.id, lecture.slug);
-    } else {
-      markSaved(lecture.id, lecture.slug);
-    }
-  };
-
+function SingleLectureBody({ view }: { view: LoadedLectureView }) {
+  const { lecture, title, description, isSaved, isCurrentTrack, isPlaying, theme, onPlay, onSave } =
+    view;
   return (
     <ScreenView>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <AppText variant="titleLg">{title}</AppText>
         <LectureMeta lecture={lecture} />
-
-        {/* Quick action buttons side by side */}
-        <View style={styles.actionsRow}>
-          <View style={styles.actionBtnWrapper}>
-            <Button
-              variant="primary"
-              size="md"
-              label={isCurrentTrack && isPlaying ? "Pause" : "Play"}
-              icon={
-                isCurrentTrack && isPlaying ? (
-                  <Pause size={18} color={theme.colors.content.onPrimary} />
-                ) : (
-                  <Play size={18} color={theme.colors.content.onPrimary} />
-                )
-              }
-              onPress={handlePlay}
-            />
-          </View>
-          <View style={styles.actionBtnWrapper}>
-            <Button
-              variant="surface"
-              size="md"
-              label={isSaved ? "Saved" : "Save"}
-              icon={
-                <Bookmark
-                  size={18}
-                  color={isSaved ? theme.colors.action.primary : theme.colors.content.strong}
-                  fill={isSaved ? theme.colors.action.primary : "none"}
-                />
-              }
-              onPress={handleSave}
-            />
-          </View>
-        </View>
-
-        <DownloadProgress lectureId={lecture.id} />
-
+        <LectureActions
+          isCurrentTrack={isCurrentTrack}
+          isPlaying={isPlaying}
+          isSaved={isSaved}
+          theme={theme}
+          onPlay={onPlay}
+          onSave={onSave}
+        />
+        <DownloadProgress listingSlug={lecture.slug} />
         {lecture.primaryAudioAsset?.url ? (
-          <DownloadButton lectureId={lecture.id} audioUrl={lecture.primaryAudioAsset.url} />
+          <DownloadButton listingSlug={lecture.slug} audioUrl={lecture.primaryAudioAsset.url} />
         ) : null}
-
         <TopicChips topics={lecture.topics} />
-
         {description ? (
           <View style={styles.descriptionSection}>
             <AppText variant="bodyMd">{description}</AppText>
           </View>
         ) : null}
-
         {lecture.seriesContext ? (
-          <SeriesContextBar seriesContext={lecture.seriesContext} lectureId={lecture.id} />
+          <SeriesContextBar seriesContext={lecture.seriesContext} listingSlug={lecture.slug} />
         ) : null}
       </ScrollView>
     </ScreenView>
   );
+}
+
+function LoadedLectureBody({ view }: { view: LoadedLectureView }) {
+  const isContainer = view.lecture.format === "series" || view.lecture.format === "collection";
+  return isContainer ? <ContainerLectureBody view={view} /> : <SingleLectureBody view={view} />;
+}
+
+/** Renders the native lecture detail screen surface and coordinates its user-facing state. */
+export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
+  const { theme } = useUnistyles();
+  /** Carries the canonical route identity used to load the selected content. */
+  const { anchor } = useLocalSearchParams<{
+    /** Carries the canonical route identity used to load the selected content. */
+    slug: string;
+    anchor?: string;
+  }>();
+  const { data: lecture, isFetching } = useListingDetail(slug);
+  const { data: seriesContents } = useListingContents(getSeriesContentsSlug(lecture));
+  const { data: ownContents } = useListingContents(getOwnContentsSlug(lecture));
+  const showOriginal = useShowOriginalContent();
+  const { t } = useTranslation();
+
+  const { isPlaying, currentTrack } = useAudio();
+  const isCurrentTrack = isCurrentLectureTrack(lecture, currentTrack);
+
+  const isSaved = useIsSaved(getLectureId(lecture));
+
+  // Slugs are flat and don't encode nesting, so a Lesson/Module's own slug
+  // resolves to itself — redirect to the top-level page it belongs under,
+  // anchored to this item so the parent page can scroll to and highlight it.
+  useLectureRedirect(lecture);
+
+  const lectureStateView = getLectureStateView(isFetching, lecture, t);
+  if (lectureStateView) return lectureStateView;
+
+  // SAFETY: getLectureStateView returns a fallback whenever lecture is absent.
+  const loadedLecture = lecture as NonNullable<ReturnType<typeof useListingDetail>["data"]>;
+
+  const title = pickContentField(loadedLecture.title, loadedLecture.original?.title, showOriginal);
+  const description = getLectureDescription(loadedLecture, showOriginal);
+
+  const handlePlay = async () => {
+    await playLecture(loadedLecture, title, seriesContents, isCurrentTrack, isPlaying);
+  };
+
+  const handleSave = () => {
+    toggleLectureSaved(isSaved, loadedLecture);
+  };
+
+  const view: LoadedLectureView = {
+    lecture: loadedLecture,
+    title,
+    description,
+    anchor,
+    ownContents,
+    loadingMessage: t("lecture.loading", "Loading lessons…"),
+    isSaved,
+    isCurrentTrack,
+    isPlaying,
+    theme,
+    onPlay: handlePlay,
+    onSave: handleSave,
+  };
+
+  return <LoadedLectureBody view={view} />;
 }
 
 const styles = StyleSheet.create((theme) => ({

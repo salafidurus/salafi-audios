@@ -1,3 +1,5 @@
+/** Configures native themes, breakpoints, and the Unistyles runtime. */
+/** Defines the native spacing token set consumed by themed components. */
 export const spacingNative = {
   scale: {
     xs: 4,
@@ -29,4 +31,5 @@ export const spacingNative = {
   },
 } as const;
 
+/** Defines shared native spacing tokens consumed by the application theme. */
 export type SpacingNative = typeof spacingNative;

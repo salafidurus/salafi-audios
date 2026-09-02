@@ -1,44 +1,42 @@
-import { View, Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Column, Host } from "@expo/ui";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { toUniversalStyleFromRN } from "@/core/styles/expo-ui";
 import { useDownload } from "@/features/downloads/hooks/use-download";
+import { NativeProgress, NativeText } from "@/shared/ui";
 
-type DownloadProgressProps = {
-  lectureId: string;
+/** Renders native transfer progress while the download hook owns lifecycle state. */
+/**
+ * Identifies the lecture whose active device-local transfer is displayed.
+ * The component renders nothing for idle or completed states; progress values
+ * remain owned by the download hook and are never mutated by this surface.
+ */
+export type DownloadProgressProps = {
+  /** Identifies the lecture whose active device-local download percentage is displayed. */
+  listingSlug: string;
 };
 
-export function DownloadProgress({ lectureId }: DownloadProgressProps) {
-  const { isDownloading, progress } = useDownload(lectureId);
+/** Renders active device-local download progress and hides completed/idle states. */
+export function DownloadProgress({ listingSlug }: DownloadProgressProps) {
+  const { isDownloading, progress } = useDownload(listingSlug);
+  const { theme } = useUnistyles();
 
   if (!isDownloading) return null;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.track}>
-        <View style={[styles.fill, { width: `${progress}%` }]} />
-      </View>
-      <Text style={styles.label}>{Math.round(progress)}%</Text>
-    </View>
+    <Host>
+      <Column spacing={theme.spacing.scale.xs} style={toUniversalStyleFromRN(styles.container)}>
+        <NativeProgress variant="linear" value={progress / 100} testID="download-progress-bar" />
+        <NativeText variant="caption" colorRole="muted">
+          {`${Math.round(progress)}%`}
+        </NativeText>
+      </Column>
+    </Host>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create(() => ({
   container: {
-    gap: theme.spacing.scale.xs,
-  },
-  track: {
-    height: 3,
-    backgroundColor: theme.colors.surface.subtle,
-    borderRadius: 2,
-    overflow: "hidden",
-  },
-  fill: {
-    height: "100%",
-    backgroundColor: theme.colors.action.primary,
-    borderRadius: 2,
-  },
-  label: {
-    fontSize: 12,
-    color: theme.colors.content.muted,
+    alignSelf: "stretch",
   },
 }));

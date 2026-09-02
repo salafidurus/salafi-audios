@@ -24,6 +24,9 @@ const mockScholars = [
     name: "Muhammad Nasiruddin al-Albani",
     isActive: true,
     createdAt: "2025-01-01T00:00:00.000Z",
+    title: "sheikh",
+    mainLanguage: "ar",
+    lectureCount: 42,
   },
   {
     id: "s2",
@@ -63,6 +66,14 @@ describe("ScholarMedallions", () => {
     expect(medallions[0]!.getAttribute("href")).toBe("/scholars/al-albani");
     expect(medallions[1]!.getAttribute("href")).toBe("/scholars/ibn-baz");
     expect(medallions[2]!.getAttribute("href")).toBe("/scholars/ibn-uthaymeen");
+  });
+
+  it("shows scholar metadata when the list provides it", () => {
+    render(<ScholarMedallions />);
+
+    expect(screen.getByText("Shaykh")).toBeTruthy();
+    expect(screen.getByText("42 lectures")).toBeTruthy();
+    expect(screen.getByText("Arabic")).toBeTruthy();
   });
 
   it("renders nothing when there are no scholars", () => {

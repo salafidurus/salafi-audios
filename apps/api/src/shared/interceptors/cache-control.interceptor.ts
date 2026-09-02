@@ -3,7 +3,10 @@ import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
+/** NestJS cache control interceptor service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** Shared API cache control.interceptor utilities and boundary definitions used by backend modules. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class CacheControlInterceptor implements NestInterceptor {
   constructor(private readonly reflector: Reflector) {}
 

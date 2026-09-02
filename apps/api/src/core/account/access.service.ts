@@ -4,11 +4,79 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type { ReplaceUserAccessRequest, UserAccessSnapshot } from '@sd/core-contracts';
+import type {
+  AccessCapability,
+  AccessTarget,
+  Locale,
+  ReplaceUserAccessRequest,
+  UserAccessSnapshot,
+} from '@sd/core-contracts';
 
 import { PrismaService } from '../db/prisma.service';
 
+/** Core API access.service module providing shared backend infrastructure and authority-boundary services. */
+type AccessGrant = {
+  target: AccessTarget;
+  capability: AccessCapability;
+  scholarId: string | null;
+  locale: Locale | null;
+  scholar: {
+    /** Stable scholar identity used to preserve scoped access grants. */
+    slug: string;
+  } | null;
+};
+
+function groupAccessGrants(grants: AccessGrant[]) {
+  const grouped = new Map<
+    string,
+    {
+      target: AccessTarget;
+      capability: AccessCapability;
+      /** Documents the scholarSlugs field's API projection semantics and lifecycle meaning. */ scholarSlugs: Set<string>;
+      locales: Set<Locale>;
+    }
+  >();
+  for (const grant of grants) {
+    const key = `${grant.target}:${grant.capability}:${grant.scholarId ? 'scoped' : 'global'}`;
+    const current = grouped.get(key) ?? {
+      target: grant.target,
+      capability: grant.capability,
+      scholarSlugs: new Set<string>(),
+      locales: new Set<Locale>(),
+    };
+    if (grant.scholar?.slug) current.scholarSlugs.add(grant.scholar.slug);
+    if (grant.locale) current.locales.add(grant.locale);
+    grouped.set(key, current);
+  }
+  return [...grouped.values()].map((grant) => ({
+    target: grant.target,
+    capability: grant.capability,
+    scholarSlugs: [...grant.scholarSlugs].sort(),
+    locales: [...grant.locales].sort(),
+  }));
+}
+
+function deriveAccessRoles(
+  grants: Array<{ target: AccessTarget; capability: AccessCapability }>,
+): string[] {
+  const roles = new Set<string>();
+  const roleRules: Array<
+    [string, (grant: { target: AccessTarget; capability: AccessCapability }) => boolean]
+  > = [
+    ['Editor', (grant) => grant.capability === 'write'],
+    ['Translator', (grant) => grant.capability === 'translate'],
+    ['Publisher', (grant) => grant.capability === 'publish'],
+    ['Deleter', (grant) => grant.capability === 'delete'],
+    ['User manager', (grant) => grant.target === 'user' && grant.capability === 'manage'],
+  ];
+  for (const [role, matches] of roleRules) {
+    if (grants.some(matches)) roles.add(role);
+  }
+  return [...roles].sort();
+}
+
 @Injectable()
+/** NestJS access service service or controller coordinating the API boundary for this responsibility. */
 export class AccessService {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -28,48 +96,14 @@ export class AccessService {
     ]);
     if (!user) throw new NotFoundException('User not found');
 
-    const grouped = new Map<
-      string,
-      {
-        target: string;
-        capability: string;
-        scholarSlugs: Set<string>;
-        locales: Set<string>;
-      }
-    >();
-    for (const grant of user.accessGrants) {
-      const key = `${grant.target}:${grant.capability}:${grant.scholarId ? 'scoped' : 'global'}`;
-      const current = grouped.get(key) ?? {
-        target: grant.target,
-        capability: grant.capability,
-        scholarSlugs: new Set<string>(),
-        locales: new Set<string>(),
-      };
-      if (grant.scholar?.slug) current.scholarSlugs.add(grant.scholar.slug);
-      if (grant.locale) current.locales.add(grant.locale);
-      grouped.set(key, current);
-    }
-
-    const grants = [...grouped.values()].map((grant) => ({
-      target: grant.target,
-      capability: grant.capability,
-      scholarSlugs: [...grant.scholarSlugs].sort(),
-      locales: [...grant.locales].sort(),
-    })) as UserAccessSnapshot['grants'];
-    const roles = new Set<string>();
-    if (grants.some((grant) => grant.capability === 'write')) roles.add('Editor');
-    if (grants.some((grant) => grant.capability === 'translate')) roles.add('Translator');
-    if (grants.some((grant) => grant.capability === 'publish')) roles.add('Publisher');
-    if (grants.some((grant) => grant.capability === 'delete')) roles.add('Deleter');
-    if (grants.some((grant) => grant.target === 'user' && grant.capability === 'manage')) {
-      roles.add('User manager');
-    }
+    const grants = groupAccessGrants(user.accessGrants);
+    const roles = deriveAccessRoles(grants);
 
     return {
       userId,
       version: user.accessVersion,
       grants,
-      roles: [...roles].sort(),
+      roles,
       isSuperadmin: user.roles.some((role) => role.role === 'superadmin'),
       scholars,
     };
@@ -134,7 +168,11 @@ export class AccessService {
       });
       if (updated.count !== 1) throw new ConflictException('Access changed; reload and try again');
       await tx.userAccessGrant.deleteMany({ where: { userId } });
-      if (uniqueRows.length) await tx.userAccessGrant.createMany({ data: uniqueRows as never });
+      if (uniqueRows.length) {
+        // SAFETY: `uniqueRows` is built from validated request grants plus
+        // resolved scholar ids, matching the userAccessGrant create shape.
+        await tx.userAccessGrant.createMany({ data: uniqueRows as never });
+      }
 
       if (granterIsSuperadmin && request.isSuperadmin !== undefined) {
         if (request.isSuperadmin) {

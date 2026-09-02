@@ -1,9 +1,8 @@
+/** Installs the shared runtime providers used by every web route. */
 "use client";
 
-import type { Locale } from "@sd/core-contracts";
-
 import { initApiClient, setLocaleProvider, setUnauthorizedHandler } from "@sd/core-api";
-import { createQueryClient, queryKeys } from "@sd/core-contracts";
+import { LocaleSchema, createQueryClient, queryKeys, type Locale } from "@sd/core-contracts";
 import { localeToDir } from "@sd/core-i18n";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
@@ -12,17 +11,20 @@ import { I18nextProvider } from "react-i18next";
 import { authClient } from "@/core/auth/auth-client";
 import { useAuth } from "@/core/auth/use-auth";
 import { ToastContainer } from "@/core/toast";
+import { hasDocument, hasWindow } from "@/shared/lib/runtime-guards";
 
 import { initProgressPersistence } from "./audio/progress-persistence";
 import { createI18n } from "./i18n/i18n";
 
+/** Installs the shared runtime providers used by every web route. */
+/** Composes API, query, auth, locale, toast, and local-first persistence for every web route. */
 // Initialize the API client at module load time to prevent race conditions during hydration/mount
 if (process.env.NEXT_PUBLIC_API_URL) {
   initApiClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL });
 }
 
 setLocaleProvider(() => {
-  if (typeof window !== "undefined") {
+  if (hasDocument()) {
     return document.documentElement.lang;
   }
   return "en";
@@ -36,6 +38,7 @@ type Props = {
   initialLocale: Locale;
 };
 
+/** Installs the shared clients and synchronizes authenticated progress with the API. */
 export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   const [i18n] = useState(() => createI18n(initialLocale));
   const { isAuthenticated, user } = useAuth();
@@ -52,7 +55,7 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
     if (!isAuthenticated || !user?.id) return;
     return initProgressPersistence(user.id, {
       onFlushed: () => {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.library.all });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.myLibrary.all });
       },
     });
   }, [isAuthenticated, user?.id]);
@@ -62,7 +65,7 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   // lang/dir before paint, but the i18n instance needs a post-hydration sync.
   useEffect(() => {
     const match = document.cookie.match(/(?:^|; )locale=([^;]*)/);
-    const locale = (match?.[1] ?? "en") as Locale;
+    const locale = LocaleSchema.safeParse(match?.[1] ?? "en").data ?? "en";
     if (locale !== i18n.language) {
       i18n.changeLanguage(locale);
     }
@@ -73,8 +76,9 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   // hard reload, since router.refresh() doesn't re-run the layout script.
   useEffect(() => {
     const applyDirection = (lng: string) => {
-      document.documentElement.lang = lng;
-      document.documentElement.dir = localeToDir(lng as Locale);
+      const locale = LocaleSchema.safeParse(lng).data ?? "en";
+      document.documentElement.lang = locale;
+      document.documentElement.dir = localeToDir(locale);
     };
     applyDirection(i18n.language);
     i18n.on("languageChanged", applyDirection);
@@ -91,11 +95,7 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
       if (isAuthenticated) {
         authClient.signOut().then(() => {
           queryClient.clear();
-          if (
-            typeof window !== "undefined" &&
-            window.location &&
-            !window.location.pathname.startsWith("/sign-in")
-          ) {
+          if (hasWindow() && window.location && !window.location.pathname.startsWith("/sign-in")) {
             window.location.href = "/sign-in";
           }
         });

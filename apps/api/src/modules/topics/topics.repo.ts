@@ -6,12 +6,13 @@ import type {
   TopicLectureViewDto,
   TranslationViewDto,
   Locale,
+  SaveTopicTranslationDto,
 } from '@sd/core-contracts';
-import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 
+/** topics application module responsible for topics.repo behavior at the backend boundary. */
 const topicViewSelect = {
   id: true,
   slug: true,
@@ -30,9 +31,34 @@ type TopicViewRecord = Prisma.TopicGetPayload<{
   select: typeof topicViewSelect;
 }>;
 
+function optionalValue<T>(value: T | null | undefined): T | undefined {
+  return value ?? undefined;
+}
+
+function mapOriginalLecture(
+  original:
+    | {
+        title: string;
+        description: string | null;
+      }
+    | null
+    | undefined,
+) {
+  if (!original) return undefined;
+  return {
+    title: original.title,
+    description: optionalValue(original.description),
+  };
+}
+
 @Injectable()
+/** NestJS topics repository service or controller coordinating the API boundary for this responsibility. */
 export class TopicsRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  private normalizeLectureLimit(limit?: number): number {
+    return limit != null && Number.isFinite(limit) ? Math.max(1, Math.min(100, limit)) : 50;
+  }
 
   async list(): Promise<TopicDetailDto[]> {
     const records = await this.findManyTopics();
@@ -80,13 +106,11 @@ export class TopicsRepository {
         topics: { some: { topicId: topic.id } },
       },
       orderBy: [{ publishedAt: 'desc' }, { title: 'asc' }],
-      take:
-        typeof limit === 'number' && Number.isFinite(limit)
-          ? Math.max(1, Math.min(100, limit))
-          : 50,
+      take: this.normalizeLectureLimit(limit),
       select: {
         id: true,
         scholarId: true,
+        scholar: { select: { slug: true } },
         parentId: true,
         slug: true,
         title: true,
@@ -113,21 +137,17 @@ export class TopicsRepository {
       return {
         id: r.id,
         scholarId: r.scholarId,
-        seriesId: r.parentId ?? undefined,
+        scholarSlug: r.scholar.slug,
+        seriesId: optionalValue(r.parentId),
         slug: r.slug,
         title: resolved.fields.title,
-        description: resolved.fields.description ?? undefined,
-        language: r.language ?? undefined,
+        description: optionalValue(resolved.fields.description),
+        language: optionalValue(r.language),
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? {
-              title: resolved.original.title,
-              description: resolved.original.description ?? undefined,
-            }
-          : undefined,
+        original: mapOriginalLecture(resolved.original),
         status: r.status,
         publishedAt: r.publishedAt?.toISOString(),
-        durationSeconds: r.durationSeconds ?? undefined,
+        durationSeconds: optionalValue(r.durationSeconds),
       };
     });
   }
@@ -142,7 +162,7 @@ export class TopicsRepository {
    * Upsert Topic by slug.
    */
   async upsertBySlug(input: {
-    slug: string;
+    /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
     name: string;
     orderIndex?: number;
   }): Promise<TopicDetailDto> {
@@ -187,13 +207,13 @@ export class TopicsRepository {
   // ─── Topic translations ───────────────────────────────────────────────────
 
   private mapTopicTranslation(t: {
-    locale: string;
+    locale: Locale;
     name: string;
-    createdAt: Date;
-    updatedAt: Date;
+    /** Documents the createdAt field's API projection semantics and lifecycle meaning. */ createdAt: Date;
+    /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */ updatedAt: Date;
   }): TranslationViewDto {
     return {
-      locale: t.locale as Locale,
+      locale: t.locale,
       fields: { name: t.name },
       createdAt: t.createdAt.toISOString(),
       updatedAt: t.updatedAt.toISOString(),
@@ -222,18 +242,21 @@ export class TopicsRepository {
 
   async updateTopicTranslation(
     topicId: string,
-    locale: string,
+    locale: Locale,
     fields: Partial<{ name: string }>,
   ): Promise<TranslationViewDto> {
     const record = await this.prisma.topicTranslation.update({
-      where: { topicId_locale: { topicId, locale: locale as Locale } },
+      where: { topicId_locale: { topicId, locale } },
       data: { ...fields },
     });
     return this.mapTopicTranslation(record);
   }
 
   private async findManyTopics(
-    where?: { slug?: string },
+    where?: {
+      /** Optional slug identity used to constrain the topic lookup. */
+      slug?: string;
+    },
     take?: number,
   ): Promise<TopicViewRecord[]> {
     return this.prisma.topic.findMany({

@@ -61,5 +61,5 @@ src/
 
 ## Related Docs
 
-- `docs/api.md` — content API endpoints and response shapes
+- `docs/backend/api.md` — content API endpoints and response shapes
 - `docs/architecture.md` — monorepo package boundaries

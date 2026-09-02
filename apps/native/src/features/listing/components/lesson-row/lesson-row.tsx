@@ -10,8 +10,9 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { audioService } from "@/features/audio";
 import { DownloadButton } from "@/features/downloads/components/download-button/download-button";
 import { DownloadProgress } from "@/features/downloads/components/download-progress/download-progress";
-import { AppText } from "@/shared/components/AppText/AppText";
+import { AppText } from "@/shared/ui";
 
+/** Builds native lecture and scholar content surfaces from canonical identities. */
 function formatDuration(seconds?: number): string {
   if (!seconds) return "";
   const h = Math.floor(seconds / 3600);
@@ -19,6 +20,83 @@ function formatDuration(seconds?: number): string {
   return h > 0 ? `${h}h ${m}m` : `${m} min`;
 }
 
+async function playLesson(
+  item: ListingContentItemDto,
+  queue: Track[],
+  isCurrentTrack: boolean,
+  isPlaying: boolean,
+) {
+  if (isCurrentTrack) {
+    if (isPlaying) await audioService.pause();
+    else await audioService.resume();
+    return;
+  }
+
+  const track = queue.find((candidate) => candidate.slug === item.slug);
+  if (track) await audioService.playListing(track, queue);
+}
+
+function renderProgress(progressPercent: number, isCompleted: boolean) {
+  if (progressPercent <= 0 || isCompleted) return null;
+  return (
+    <View style={styles.progressTrack}>
+      <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
+    </View>
+  );
+}
+
+function renderDownload(item: ListingContentItemDto) {
+  if (!item.primaryAudioAsset?.url) return null;
+  return <DownloadButton listingSlug={item.slug} audioUrl={item.primaryAudioAsset.url} />;
+}
+
+function LessonRowContent({
+  item,
+  duration,
+  progressPercent,
+  isCompleted,
+}: {
+  item: ListingContentItemDto;
+  /** Stores the media duration used by playback and progress presentation. */
+  duration: string;
+  progressPercent: number;
+  isCompleted: boolean;
+}) {
+  return (
+    <View style={styles.content}>
+      <AppText variant="bodyLg" numberOfLines={2}>
+        {item.title}
+      </AppText>
+      {duration ? (
+        <AppText variant="bodySm" style={styles.meta}>
+          {duration}
+        </AppText>
+      ) : null}
+      {renderProgress(progressPercent, isCompleted)}
+      <DownloadProgress listingSlug={item.slug} />
+    </View>
+  );
+}
+
+function LessonRowPlayButton({
+  isCurrentlyPlaying,
+  theme,
+}: {
+  isCurrentlyPlaying: boolean;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+}) {
+  return (
+    <View style={styles.playButton}>
+      {isCurrentlyPlaying ? (
+        <Pause size={18} color={theme.colors.content.strong} />
+      ) : (
+        <Play size={18} color={theme.colors.content.strong} />
+      )}
+    </View>
+  );
+}
+
+/** Describes the inputs and callbacks accepted by Lesson Row. */
 export type LessonRowProps = {
   item: ListingContentItemDto;
   queue: Track[];
@@ -28,32 +106,22 @@ export type LessonRowProps = {
   onLayout?: (id: string, y: number) => void;
 };
 
+/**
+ * Renders the lesson row through RN because playback gestures, download state,
+ * progress animation, and the nested action controls need explicit fallbacks.
+ */
 export function LessonRow({ item, queue, highlighted = false, onLayout }: LessonRowProps) {
   const { theme } = useUnistyles();
   const { isPlaying, currentTrack } = useAudio();
-  const { progressPercent, isCompleted } = useListingProgress(item.id);
+  const { progressPercent, isCompleted } = useListingProgress(item.slug);
 
-  const isCurrentTrack = currentTrack?.id === item.id;
+  const isCurrentTrack = currentTrack?.slug === item.slug;
   const isCurrentlyPlaying = isCurrentTrack && isPlaying;
   const durationStr = formatDuration(
     item.durationSeconds || item.primaryAudioAsset?.durationSeconds,
   );
 
-  const handlePress = async () => {
-    if (isCurrentTrack) {
-      if (isPlaying) {
-        await audioService.pause();
-      } else {
-        await audioService.resume();
-      }
-      return;
-    }
-
-    const track = queue.find((t) => t.id === item.id);
-    if (track) {
-      await audioService.playListing(track, queue);
-    }
-  };
+  const handlePress = () => playLesson(item, queue, isCurrentTrack, isPlaying);
 
   return (
     <View
@@ -65,34 +133,18 @@ export function LessonRow({ item, queue, highlighted = false, onLayout }: Lesson
         animate={{ backgroundColor: "transparent" }}
         transition={{ type: "timing", duration: 2000 }}
       >
-        <Pressable onPress={handlePress} style={styles.row}>
-          <View style={styles.content}>
-            <AppText variant="bodyLg" numberOfLines={2}>
-              {item.title}
-            </AppText>
-            {durationStr ? (
-              <AppText variant="bodySm" style={styles.meta}>
-                {durationStr}
-              </AppText>
-            ) : null}
-            {progressPercent > 0 && !isCompleted ? (
-              <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
-              </View>
-            ) : null}
-            <DownloadProgress lectureId={item.id} />
-          </View>
-          {item.primaryAudioAsset?.url ? (
-            <DownloadButton lectureId={item.id} audioUrl={item.primaryAudioAsset.url} />
-          ) : null}
-          <View style={styles.playButton}>
-            {isCurrentlyPlaying ? (
-              <Pause size={18} color={theme.colors.content.strong} />
-            ) : (
-              <Play size={18} color={theme.colors.content.strong} />
-            )}
-          </View>
-        </Pressable>
+        <View style={styles.row}>
+          <Pressable onPress={handlePress} style={styles.primaryAction}>
+            <LessonRowContent
+              item={item}
+              duration={durationStr}
+              progressPercent={progressPercent}
+              isCompleted={isCompleted}
+            />
+            <LessonRowPlayButton isCurrentlyPlaying={isCurrentlyPlaying} theme={theme} />
+          </Pressable>
+          {renderDownload(item)}
+        </View>
       </EaseView>
     </View>
   );
@@ -108,6 +160,12 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.layout.pageX,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border.subtle,
+  },
+  primaryAction: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.md,
   },
   content: {
     flex: 1,

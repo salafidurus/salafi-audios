@@ -4,33 +4,26 @@ import {
   type AudioProgressDto,
   type ProgressSyncItemDto,
 } from "@sd/core-contracts";
-import { createOutboxStore, drainOutbox, type StorageAdapter } from "@sd/core-sync";
+import {
+  createOutboxStore,
+  createSyncEngine,
+  type Outbox,
+  type StorageAdapter,
+  type SyncEngine,
+  type SyncStore,
+} from "@sd/core-sync";
 
-import { useProgressStore } from "./progress.store";
+import { useProgressStore, type ListingProgress, type ProgressSyncEntity } from "./progress.store";
 
-let syncTimeout: ReturnType<typeof setTimeout> | null = null;
-// Batched: individual position ticks debounce into one write per listing every
-// couple of minutes rather than every few seconds. `flushPendingProgress` is
-// still called directly at lesson-end and app-background, so completion and
-// backgrounding are never delayed by this window.
-const SYNC_DEBOUNCE_MS = 120_000;
-
-type PendingUpdate = { listingId: string; positionSeconds: number; durationSeconds: number };
-
-const pendingUpdates = new Map<string, PendingUpdate>();
-
-const flushListeners = new Set<() => void>();
-
-/**
- * Subscribes to "a progress flush just completed" — used by each app's
- * progress-persistence layer to invalidate library queries once fresh data
- * has actually reached the server, without domain-audio depending on
- * react-query. Returns an unsubscribe function.
- */
-export function onProgressFlushed(listener: () => void): () => void {
-  flushListeners.add(listener);
-  return () => flushListeners.delete(listener);
-}
+/** Progress synchronization module bridging local Listening state and the backend. */
+type ProgressUpdateBody = {
+  /** Latest playback position in seconds. */
+  positionSeconds: number;
+  /** Track duration in seconds. */
+  durationSeconds: number;
+  /** Whether the backend should record natural completion. */
+  isCompleted?: boolean;
+};
 
 function createInMemoryStorageAdapter(): StorageAdapter {
   const backing = new Map<string, string>();
@@ -41,143 +34,136 @@ function createInMemoryStorageAdapter(): StorageAdapter {
   };
 }
 
-// In-memory by default, matching the module's prior (pre-outbox) behavior, so it
-// works standalone with no required setup. Apps upgrade this to a real persisted
-// adapter via `initProgressSync` (see apps/*/core/audio/progress-persistence.ts)
-// so a failed push survives an app restart/crash instead of vanishing.
+function toProgressEntity(entry: ListingProgress): ProgressSyncEntity {
+  const entity: ProgressSyncEntity = {
+    ...entry,
+    id: entry.listingSlug,
+  };
+  return entity;
+}
+
+function fromProgressEntity(entity: ProgressSyncEntity): ListingProgress {
+  const { id: _id, ...entry } = entity;
+  return entry;
+}
+
+const progressStore: SyncStore<ProgressSyncEntity> = {
+  get: (id) => {
+    const entry = useProgressStore.getState().actions.getProgress(id);
+    return entry ? toProgressEntity(entry) : undefined;
+  },
+  upsert: (entity) => {
+    useProgressStore.getState().actions.upsertProgress(fromProgressEntity(entity));
+  },
+  mergeMany: (entities) => {
+    useProgressStore.getState().actions.loadProgress(entities.map(fromProgressEntity));
+  },
+};
+
 let delegateAdapter: StorageAdapter = createInMemoryStorageAdapter();
 const proxyAdapter: StorageAdapter = {
   getItem: (key) => delegateAdapter.getItem(key),
   setItem: (key, value) => delegateAdapter.setItem(key, value),
   removeItem: (key) => delegateAdapter.removeItem(key),
 };
-// Namespaced by userId (see `initProgressSync`) so a second user signing in on
-// the same device never sees — or retries — a prior user's queued push. Starts
-// under a generic namespace until the first `initProgressSync` call scopes it.
-let outbox = createOutboxStore(proxyAdapter, "progress");
 
-/**
- * Upgrades the retry queue to a persisted `StorageAdapter`, scoped to `userId`,
- * and recovers any entries a previous session for that same user left queued
- * after a failed push. Call once per authenticated session, before the first
- * `syncProgressToBackend` call, after the app's platform storage adapter is
- * constructed.
- */
-export async function initProgressSync(adapter: StorageAdapter, userId: string): Promise<void> {
-  delegateAdapter = adapter;
-  outbox = createOutboxStore(proxyAdapter, `progress:${userId}`);
-  await outbox.hydrate();
-}
+let activeUserId: string | null = null;
+let outbox: Outbox<ProgressSyncEntity> = createOutboxStore(proxyAdapter, "progress");
+let engine: SyncEngine<ProgressSyncEntity>;
 
-async function pushUpdate(update: PendingUpdate): Promise<void> {
-  await httpClient({
-    url: endpoints.audio.progress.update(update.listingId),
-    method: "PUT",
-    body: {
-      positionSeconds: update.positionSeconds,
-      durationSeconds: update.durationSeconds,
+function buildEngine(nextOutbox: Outbox<ProgressSyncEntity>): SyncEngine<ProgressSyncEntity> {
+  return createSyncEngine<ProgressSyncEntity>({
+    store: progressStore,
+    outbox: nextOutbox,
+    entryType: "progress-update",
+    pushOne: async (entry) => {
+      const body: ProgressUpdateBody = {
+        positionSeconds: entry.positionSeconds,
+        durationSeconds: entry.durationSeconds,
+      };
+      if (entry.completedAt) body.isCompleted = true;
+
+      await httpClient({
+        url: endpoints.audio.progress.update(entry.listingSlug),
+        method: "PUT",
+        body,
+      });
+    },
+    pullSince: async (since) => {
+      const entries = await httpClient<AudioProgressDto[]>({
+        url: endpoints.audio.progress.get,
+        method: "GET",
+        params: since ? { since } : undefined,
+      });
+      return entries.map((entry) => toProgressEntity(entry));
     },
   });
 }
 
+engine = buildEngine(outbox);
+
 /**
- * Retries any progress pushes left queued in the persisted outbox — entries
- * left over from a previous session's failed push, or from a previous failed
- * flush this session. Notifies flush listeners whenever an entry was
- * attempted, mirroring `flushPending`'s "notify on any attempt" semantics.
+ * Initializes persisted progress sync for a user. A changed user gets a clean
+ * in-memory view, while the first initialization preserves any cache loaded by
+ * the app before the platform adapter became available.
  */
-async function drainQueuedRetries(): Promise<void> {
-  const { succeeded, failed } = await drainOutbox(outbox, (entry) =>
-    pushUpdate(entry.payload as PendingUpdate),
-  );
-  if (succeeded + failed > 0) {
-    for (const listener of flushListeners) listener();
+export async function initProgressSync(adapter: StorageAdapter, userId: string): Promise<void> {
+  engine.dispose();
+  if (activeUserId && activeUserId !== userId) {
+    useProgressStore.setState({ progressMap: {} });
   }
+  activeUserId = userId;
+  useProgressStore.setState({ lastSyncedAt: null });
+  delegateAdapter = adapter;
+  outbox = createOutboxStore(proxyAdapter, `progress:${userId}`);
+  engine = buildEngine(outbox);
+  await outbox.hydrate();
 }
 
-/**
- * Retries any progress pushes left queued from a previous session (or a
- * previous failed flush). Safe to call independently of `flushPendingProgress`
- * — e.g. from a network-reconnect listener with nothing currently debounced.
- */
-export function drainPendingProgress(): Promise<void> {
-  return drainQueuedRetries();
-}
-
-async function flushPending(): Promise<void> {
-  const updates = Array.from(pendingUpdates.values());
-  pendingUpdates.clear();
-
-  // Retry anything left over from a previous failed flush first, so a failure
-  // is picked up again on the very next flush — same as the pre-outbox
-  // behavior, just now surviving an app restart in between.
-  await drainQueuedRetries();
-
-  if (updates.length === 0) return;
-
-  await Promise.all(
-    updates.map((update) =>
-      pushUpdate(update).catch(() => {
-        // Persisted (not just in-memory) so this survives an app restart/crash —
-        // recovered on the next flush, or by `drainPendingProgress` on reconnect.
-        outbox.useOutboxStore.getState().actions.enqueue("progress-update", update);
-      }),
-    ),
-  );
-
-  for (const listener of flushListeners) listener();
-}
-
-/**
- * Enqueue a progress update for debounced sync to backend.
- * Multiple calls for the same listingId within the debounce window
- * are collapsed into a single request.
- */
+/** Enqueues a progress update for shared debounced synchronization. */
 export function syncProgressToBackend(update: {
-  listingId: string;
+  /** Client-facing Listing identity used by the progress endpoint. */
+  listingSlug: string;
   positionSeconds: number;
+  /** Track duration in seconds sent with the progress update. */
   durationSeconds: number;
-}) {
-  pendingUpdates.set(update.listingId, update);
-
-  if (syncTimeout) clearTimeout(syncTimeout);
-  syncTimeout = setTimeout(() => {
-    void flushPending();
-  }, SYNC_DEBOUNCE_MS);
+}): void {
+  const current = useProgressStore.getState().actions.getProgress(update.listingSlug);
+  const entry: ProgressSyncEntity = {
+    id: update.listingSlug,
+    listingSlug: update.listingSlug,
+    positionSeconds: update.positionSeconds,
+    durationSeconds: update.durationSeconds,
+    completedAt: current?.completedAt,
+    updatedAt: current?.updatedAt ?? new Date().toISOString(),
+  };
+  engine.scheduleSync(entry);
 }
 
-/**
- * Immediately flushes any pending debounced progress updates, bypassing the
- * debounce timer. Intended for app-background/tab-close hooks, wired at the
- * app layer (this package has no lifecycle-event access of its own).
- */
+/** Immediately flushes debounced progress and retries persisted failures. */
 export function flushPendingProgress(): Promise<void> {
-  if (syncTimeout) {
-    clearTimeout(syncTimeout);
-    syncTimeout = null;
-  }
-  return flushPending();
+  return engine.flush();
 }
 
-/**
- * Fetches the user's progress from the server and merges it into
- * `useProgressStore`. Uses the store's own `lastSyncedAt` as a delta cursor
- * after the first call, so repeated calls within a session only pull changes.
- */
+/** Retries progress entries left by a previous failed flush or session. */
+export function drainPendingProgress(): Promise<void> {
+  return engine.drainPending();
+}
+
+/** Subscribes to successful or attempted flush notifications. */
+export function onProgressFlushed(listener: () => void): () => void {
+  return engine.onFlushed(listener);
+}
+
+/** Pulls the next progress delta and reconciles it through the shared engine. */
 export async function hydrateProgressFromServer(): Promise<void> {
-  const since = useProgressStore.getState().lastSyncedAt ?? undefined;
-
-  const entries = await httpClient<AudioProgressDto[]>({
-    url: endpoints.audio.progress.get,
-    method: "GET",
-    params: since ? { since } : undefined,
-  });
-
-  useProgressStore.getState().actions.loadProgress(entries);
-  useProgressStore.getState().actions.setLastSyncedAt(new Date().toISOString());
+  await engine.hydrate();
+  useProgressStore
+    .getState()
+    .actions.setLastSyncedAt(engine.getLastSyncedAt() ?? new Date().toISOString());
 }
 
-/** Bulk-syncs a batch of progress entries to the server in one request. */
+/** Bulk-syncs a batch of progress entries to the server. */
 export async function bulkSyncProgress(items: ProgressSyncItemDto[]): Promise<void> {
   if (items.length === 0) return;
 

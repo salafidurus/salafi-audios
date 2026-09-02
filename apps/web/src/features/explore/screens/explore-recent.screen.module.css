@@ -4,6 +4,27 @@
   width: 100%;
 }
 
+.topicSteering {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-sm, 8px);
+  padding-block: var(--space-scale-sm, 8px);
+  overflow: hidden;
+}
+
+.topicLabel {
+  flex: 0 0 auto;
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: var(--font-weight-medium, 500);
+}
+
+.topicGroup {
+  justify-content: flex-start;
+  overflow-x: auto;
+  padding-block: 2px;
+}
+
 .hero {
   margin-bottom: var(--space-component-gap-lg);
 }
@@ -60,31 +81,6 @@
   margin: 0 0 var(--space-component-gap-md);
   font-size: var(--typo-body-sm-font-size);
   color: var(--content-muted);
-}
-
-.loading {
-  padding: var(--space-component-gap-xl) var(--space-component-gap-md);
-  text-align: center;
-  color: var(--content-muted);
-}
-
-.empty {
-  padding: var(--space-component-gap-xl) var(--space-component-gap-md);
-  text-align: center;
-  color: var(--content-muted);
-}
-
-.searchContainer {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-component-gap-sm, 12px);
-  margin-bottom: var(--space-component-gap-md, 16px);
-}
-
-.filterBar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-component-gap-sm, 12px);
 }
 
 .grid {

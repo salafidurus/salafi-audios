@@ -19,10 +19,55 @@
   min-height: 0;
 }
 
+.content :global([data-slot="sticky-header"]) {
+  gap: var(--space-scale-xs);
+  padding-block: var(--space-scale-sm);
+}
+
+.content :global([data-slot="page-header"]) {
+  margin-bottom: var(--space-scale-md);
+}
+
+.content :global([data-slot="page-header"] h1) {
+  font-size: var(--typo-title-lg-font-size);
+}
+
 .searchRow {
   display: flex;
   gap: var(--space-scale-sm);
   align-items: center;
+}
+
+.filterToolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-sm);
+  margin-bottom: var(--space-scale-md);
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+}
+
+.filterLabel {
+  color: var(--content-muted);
+  font-family: var(--font-sans);
+  font-size: var(--typo-caption-font-size);
+  font-weight: 600;
+}
+
+.filterChips {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.sortButton {
+  min-height: var(--space-scale-lg);
+  padding-inline: var(--space-scale-xs);
+  font-size: var(--typo-caption-font-size);
+  font-weight: 600;
 }
 
 .toolbar {
@@ -52,10 +97,6 @@
 @media (max-width: 640px) {
   .searchRow {
     margin-bottom: 0;
-  }
-
-  .resultCount {
-    margin: 0 0 var(--space-scale-md);
   }
 
   .pageTitle {

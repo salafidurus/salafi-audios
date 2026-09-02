@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { queryKeys } from "@sd/core-contracts";
@@ -15,16 +16,78 @@ import {
   translationTargetKey,
   type ClientTranslationTarget,
 } from "@/features/admin/components/Translation";
-import { Button } from "@/shared/components/Button";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { Search } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { Button } from "@/shared/components/ui/button";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 
 import styles from "./admin-scholars.screen.module.css";
+
+function getScholarScreenCopy(
+  isDesktop: boolean,
+  searchQuery: string,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  return {
+    title: isDesktop
+      ? t("admin.scholars.manageTitle", "Manage Scholars")
+      : t("navigation.admin.scholars", "Scholars"),
+    addLabel: isDesktop ? t("admin.scholars.addScholar", "Add Scholar") : t("common.add", "Add"),
+    searchPlaceholder: isDesktop
+      ? t("admin.scholars.searchPlaceholderDesktop", "Search scholars by name or slug...")
+      : t("scholarContent.searchScholars", "Search scholars..."),
+    emptyMessage: searchQuery
+      ? t("scholarContent.searchNoMatch", "No scholars match your search.")
+      : t("scholarContent.noScholarsFound", "No scholars found."),
+  };
+}
+
+function AdminScholarsHeader({
+  copy,
+  isDesktop,
+  canCreate,
+  searchQuery,
+  onSearchChange,
+  onAdd,
+}: {
+  copy: ReturnType<typeof getScholarScreenCopy>;
+  isDesktop: boolean;
+  canCreate: boolean;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  onAdd: () => void;
+}) {
+  return (
+    <>
+      <PageHeader
+        title={copy.title}
+        actions={
+          canCreate && (
+            <Button
+              variant="primary"
+              size={isDesktop ? "md" : "sm"}
+              icon={<Plus size={isDesktop ? 18 : 16} />}
+              onClick={onAdd}
+            >
+              {copy.addLabel}
+            </Button>
+          )
+        }
+      />
+      <div className={styles.toolbar}>
+        <Search.Bar
+          value={searchQuery}
+          onChange={onSearchChange}
+          placeholder={copy.searchPlaceholder}
+        />
+      </div>
+    </>
+  );
+}
 
 export function AdminScholarsScreen() {
   const isDesktop = useIsDesktop();
@@ -43,6 +106,7 @@ export function AdminScholarsScreen() {
     });
 
   const allItems = data?.pages.flatMap((page) => page.items) ?? [];
+  const copy = getScholarScreenCopy(isDesktop, searchQuery, t);
 
   const handleOpenAdd = () => {
     setEditingScholarId(null);
@@ -68,42 +132,14 @@ export function AdminScholarsScreen() {
       <div className={styles.container}>
         <StickyHeaderLayout>
           <StickyHeaderLayout.Header>
-            <PageHeader
-              title={
-                isDesktop
-                  ? t("admin.scholars.manageTitle", "Manage Scholars")
-                  : t("navigation.admin.scholars", "Scholars")
-              }
-              actions={
-                ability.can("create", "Scholar") && (
-                  <Button
-                    variant="primary"
-                    size={isDesktop ? "md" : "sm"}
-                    icon={<Plus size={isDesktop ? 18 : 16} />}
-                    onClick={handleOpenAdd}
-                  >
-                    {isDesktop
-                      ? t("admin.scholars.addScholar", "Add Scholar")
-                      : t("common.add", "Add")}
-                  </Button>
-                )
-              }
+            <AdminScholarsHeader
+              copy={copy}
+              isDesktop={isDesktop}
+              canCreate={ability.can("create", "Scholar")}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onAdd={handleOpenAdd}
             />
-
-            <div className={styles.toolbar}>
-              <Search.Bar
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder={
-                  isDesktop
-                    ? t(
-                        "admin.scholars.searchPlaceholderDesktop",
-                        "Search scholars by name or slug...",
-                      )
-                    : t("scholarContent.searchScholars", "Search scholars...")
-                }
-              />
-            </div>
           </StickyHeaderLayout.Header>
 
           <StickyHeaderLayout.Content>
@@ -124,11 +160,7 @@ export function AdminScholarsScreen() {
                   }
                 />
               )}
-              emptyMessage={
-                searchQuery
-                  ? t("scholarContent.searchNoMatch", "No scholars match your search.")
-                  : t("scholarContent.noScholarsFound", "No scholars found.")
-              }
+              emptyMessage={copy.emptyMessage}
             />
           </StickyHeaderLayout.Content>
         </StickyHeaderLayout>

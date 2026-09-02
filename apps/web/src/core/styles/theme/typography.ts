@@ -1,5 +1,6 @@
 import { typographyBase, type TypographyVariant } from "@sd/design-tokens";
 
+/** Documents this module's responsibility and public boundary. */
 const webFontFamily = {
   display: "var(--font-display), serif",
   body: "var(--font-body), sans-serif",
@@ -20,6 +21,8 @@ const getWebFontFamily = (role: "display" | "body" | "mono"): string => {
 };
 
 export const createTypographyWeb = () => {
+  // SAFETY: `typographyBase` already covers every `TypographyVariant`; this mapping preserves
+  // the same keys while converting token values into concrete web typography primitives.
   return Object.fromEntries(
     Object.entries(typographyBase).map(([variant, token]) => [
       variant,

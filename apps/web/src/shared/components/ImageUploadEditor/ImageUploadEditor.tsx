@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { Edit2, AlertCircle } from "lucide-react";
@@ -20,6 +21,65 @@ interface ImageUploadEditorProps {
   altText?: string;
 }
 
+function getImageValidationError(file: File, t: ReturnType<typeof useTranslation>["t"]) {
+  const ext = file.name.split(".").pop()?.toLowerCase() || "";
+  if (!ALLOWED_FORMATS.includes(ext)) {
+    return t("imageUpload.errorFileExt", "Only PNG, JPG, and JPEG images are allowed");
+  }
+
+  const sizeMB = file.size / (1024 * 1024);
+  if (sizeMB > MAX_SIZE_MB) {
+    return t("imageUpload.errorFileSize", {
+      defaultValue: `Image must be less than ${MAX_SIZE_MB}MB (current: ${sizeMB.toFixed(1)}MB)`,
+      maxSizeMB: MAX_SIZE_MB,
+      current: sizeMB.toFixed(1),
+    });
+  }
+
+  return null;
+}
+
+function ImagePreview({
+  preview,
+  altText,
+  changeLabel,
+  selectLabel,
+  uploadLabel,
+  onClick,
+}: {
+  preview: string | null;
+  altText: string;
+  changeLabel: string;
+  selectLabel: string;
+  uploadLabel: string;
+  onClick: () => void;
+}) {
+  if (preview) {
+    return (
+      <div className={styles.imageContainer}>
+        <Image src={preview} alt={altText} width={120} height={120} className={styles.image} />
+        <button
+          type="button"
+          className={styles.editOverlay}
+          onClick={onClick}
+          aria-label={changeLabel}
+        >
+          <Edit2 size={20} />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button type="button" className={styles.placeholder} onClick={onClick} aria-label={selectLabel}>
+      <div className={styles.placeholderContent}>
+        <Edit2 size={24} />
+        <span className={styles.placeholderText}>{uploadLabel}</span>
+      </div>
+    </button>
+  );
+}
+
 export function ImageUploadEditor({
   imageUrl,
   onImageStaged,
@@ -39,23 +99,9 @@ export function ImageUploadEditor({
 
     setError(null);
 
-    // Validate file type
-    const ext = file.name.split(".").pop()?.toLowerCase() || "";
-    if (!ALLOWED_FORMATS.includes(ext)) {
-      setError(t("imageUpload.errorFileExt", "Only PNG, JPG, and JPEG images are allowed"));
-      return;
-    }
-
-    // Validate file size
-    const sizeMB = file.size / (1024 * 1024);
-    if (sizeMB > MAX_SIZE_MB) {
-      setError(
-        t("imageUpload.errorFileSize", {
-          defaultValue: `Image must be less than ${MAX_SIZE_MB}MB (current: ${sizeMB.toFixed(1)}MB)`,
-          maxSizeMB: MAX_SIZE_MB,
-          current: sizeMB.toFixed(1),
-        }),
-      );
+    const validationError = getImageValidationError(file, t);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -72,31 +118,14 @@ export function ImageUploadEditor({
   return (
     <div className={styles.container}>
       <div className={styles.imageWrapper}>
-        {preview ? (
-          <div className={styles.imageContainer}>
-            <Image src={preview} alt={altText} width={120} height={120} className={styles.image} />
-            <button
-              type="button"
-              className={styles.editOverlay}
-              onClick={handleClick}
-              aria-label={changeLabel}
-            >
-              <Edit2 size={20} />
-            </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            className={styles.placeholder}
-            onClick={handleClick}
-            aria-label={selectLabel}
-          >
-            <div className={styles.placeholderContent}>
-              <Edit2 size={24} />
-              <span className={styles.placeholderText}>{uploadLabel}</span>
-            </div>
-          </button>
-        )}
+        <ImagePreview
+          preview={preview}
+          altText={altText}
+          changeLabel={changeLabel}
+          selectLabel={selectLabel}
+          uploadLabel={uploadLabel}
+          onClick={handleClick}
+        />
       </div>
 
       <input

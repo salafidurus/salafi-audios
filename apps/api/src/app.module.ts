@@ -21,7 +21,7 @@ import { SitemapModule } from './core/sitemap/sitemap.module';
 import { SearchModule } from './modules/search/search.module';
 import { TopicsModule } from './modules/topics/topics.module';
 import { ScholarsModule } from './modules/scholars/scholars.module';
-import { LibraryModule } from './modules/library/library.module';
+import { MyLibraryModule } from './modules/my-library/my-library.module';
 import { AudioModule } from './modules/audio/audio.module';
 import { MediaModule } from './modules/media/media.module';
 import { ListingModule } from './modules/listing/listing.module';
@@ -29,8 +29,9 @@ import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
 import { LocaleMiddleware } from './shared/i18n/locale.middleware';
 import { CacheInvalidationInterceptor } from './shared/interceptors/cache-invalidation.interceptor';
 
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { RateLimitGuard } from './core/security/rate-limit.guard';
 
+/** Root NestJS module composing the API application and its infrastructure dependencies. */
 @Module({
   imports: [
     ConfigModule,
@@ -54,20 +55,21 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     SearchModule,
     TopicsModule,
     ScholarsModule,
-    LibraryModule,
+    MyLibraryModule,
     AudioModule,
     MediaModule,
     ListingModule,
   ],
   providers: [
-    ThrottlerGuard,
     { provide: APP_INTERCEPTOR, useClass: CacheInvalidationInterceptor },
-    { provide: APP_GUARD, useExisting: ThrottlerGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_GUARD, useExisting: RateLimitGuard },
     { provide: APP_GUARD, useClass: PolicyGuard },
     { provide: APP_INTERCEPTOR, useClass: LocaleInterceptor },
   ],
 })
+/** NestJS app module service or controller coordinating the API boundary for this responsibility. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer.apply(LocaleMiddleware).forRoutes('*');

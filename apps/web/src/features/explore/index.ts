@@ -1,4 +1,5 @@
 // Components
+/** Documents this module's responsibility and public boundary. */
 export { FeedListRow, type FeedListRowProps } from "./components/explore-list-row/explore-list-row";
 export {
   FeedScholarRow,
@@ -15,7 +16,6 @@ export {
 } from "./components/scholar-grid-skeleton/scholar-grid-skeleton";
 
 // Screens
-export { FeedScreen, type FeedScreenProps } from "./screens/feed.screen";
 export { FeedRecentScreen, type FeedRecentScreenProps } from "./screens/explore-recent.screen";
 export {
   ExploreScholarScreen,

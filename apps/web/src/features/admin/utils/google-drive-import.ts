@@ -1,4 +1,17 @@
-export type GoogleDriveLink = { kind: "file"; fileId: string } | { kind: "unsupported-folder" };
+/** Parses Google Drive links and builds anonymous download URLs for supported files. */
+
+/** Identifies a supported Drive file link or a recognized unsupported folder link. */
+export type GoogleDriveLink =
+  | {
+      /** Distinguishes a downloadable Drive file from an unsupported folder. */
+      kind: "file";
+      /** Opaque Drive identifier used to construct the download endpoint. */
+      fileId: string;
+    }
+  | {
+      /** Distinguishes a recognized folder URL that cannot be imported as a file. */
+      kind: "unsupported-folder";
+    };
 
 /**
  * Recognizes Google Drive file/folder links. Folders are flagged distinctly (rather than
@@ -13,10 +26,16 @@ export function parseGoogleDriveLink(input: string): GoogleDriveLink | null {
     return null;
   }
 
-  const isDriveHost =
-    url.hostname === "drive.google.com" || url.hostname === "drive.usercontent.google.com";
-  if (!isDriveHost) return null;
+  if (!isDriveHost(url)) return null;
 
+  return parseDrivePath(url);
+}
+
+function isDriveHost(url: URL): boolean {
+  return url.hostname === "drive.google.com" || url.hostname === "drive.usercontent.google.com";
+}
+
+function parseDrivePath(url: URL): GoogleDriveLink | null {
   if (url.pathname.startsWith("/drive/folders/")) {
     return { kind: "unsupported-folder" };
   }

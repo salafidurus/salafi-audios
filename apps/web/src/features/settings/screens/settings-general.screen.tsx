@@ -1,24 +1,22 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { routes } from "@sd/core-contracts";
+import { useSearchParams } from "next/navigation";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { z } from "zod";
 
 import type { ThemePreference } from "@/core/styles/ThemeSync";
-import type { AccentThemePickerValue } from "@/features/settings/components/accent-theme-picker/AccentThemePicker";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import {
-  getDefaultAccentTheme,
-  isAccentThemeId,
-  setAccentThemePreference,
-} from "@/core/styles/theme/accent-theme";
 import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
-import { DownloadAppCard } from "@/features/home/components/download-app-card/download-app-card";
-import { AccentThemePicker } from "@/features/settings/components/accent-theme-picker/AccentThemePicker";
 import { SegmentedControl } from "@/features/settings/components/SegmentedControl/SegmentedControl";
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { Toggle } from "@/shared/components/Toggle";
+import { Switch as Toggle } from "@/shared/components/ui/switch";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { hasWindow } from "@/shared/lib/runtime-guards";
 
 import styles from "./settings-general.screen.module.css";
 import { SettingsProfileScreen } from "./settings-profile.screen";
@@ -30,15 +28,20 @@ interface NotificationState {
 }
 
 const NOTIF_KEY = "notification-settings:v1";
+const NotificationStateSchema = z.object({
+  master: z.boolean(),
+  scholars: z.boolean(),
+  lectures: z.boolean(),
+});
 
 function loadNotifState(): NotificationState {
-  if (typeof window === "undefined") {
+  if (!hasWindow()) {
     return { master: true, scholars: true, lectures: true };
   }
   try {
-    const raw = localStorage.getItem(NOTIF_KEY);
+    const raw = window.localStorage.getItem(NOTIF_KEY);
     if (raw) {
-      return JSON.parse(raw) as NotificationState;
+      return NotificationStateSchema.parse(JSON.parse(raw));
     }
   } catch {
     // ignore parse errors
@@ -47,10 +50,10 @@ function loadNotifState(): NotificationState {
 }
 
 function loadThemePreference(): ThemePreference {
-  if (typeof window === "undefined") {
+  if (!hasWindow()) {
     return "system";
   }
-  const stored = localStorage.getItem(THEME_KEY);
+  const stored = window.localStorage.getItem(THEME_KEY);
   if (stored === "light" || stored === "dark") {
     return stored;
   }
@@ -59,15 +62,19 @@ function loadThemePreference(): ThemePreference {
 
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<"General" | "Profile">("General");
+  const searchParams = useSearchParams();
+  const queryTab = searchParams.get("tab") === "profile" ? "profile" : "general";
+  const [activeTab, setActiveTab] = useState<"general" | "profile">(queryTab);
+  const lastQueryTab = useRef(queryTab);
   const [themePreference, setThemePreference] = useState<ThemePreference>(loadThemePreference);
-  const [accentTheme, setAccentTheme] = useState<AccentThemePickerValue>(() => {
-    const stored =
-      typeof window !== "undefined" ? window.localStorage.getItem("accent-theme:v1") : null;
-    if (stored && isAccentThemeId(stored)) return stored;
-    return "system";
-  });
   const [notif, setNotif] = useState<NotificationState>(loadNotifState);
+
+  useEffect(() => {
+    if (queryTab !== lastQueryTab.current) {
+      lastQueryTab.current = queryTab;
+      setActiveTab(queryTab);
+    }
+  }, [queryTab]);
 
   const themeOptions: { value: ThemePreference; label: string }[] = [
     { value: "system", label: t("settings.general.themeOptions.system", "System") },
@@ -80,21 +87,6 @@ export function SettingsGeneralScreen() {
     localStorage.setItem(THEME_KEY, value);
     window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }, []);
-
-  const handleAccentThemeChange = useCallback((value: AccentThemePickerValue) => {
-    setAccentTheme(value);
-    if (value === "system") {
-      window.localStorage.removeItem("accent-theme:v1");
-      void getDefaultAccentTheme();
-      window.dispatchEvent(new Event("accent-theme-change"));
-    } else {
-      setAccentThemePreference(value);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(NOTIF_KEY, JSON.stringify(notif));
-  }, [notif]);
 
   const handleNotifChange = useCallback(
     (key: keyof NotificationState) => (checked: boolean) => {
@@ -110,27 +102,49 @@ export function SettingsGeneralScreen() {
 
   return (
     <ScreenView>
-      <h1 className={styles.settingsTitle}>{t("settings.general.title", "Settings")}</h1>
-
-      {/* Sub-navigation tabs bar matching prototype ScreenSettings */}
-      <div className={styles.tabBar}>
-        <button
-          type="button"
-          className={`${styles.tabButton} ${activeTab === "General" ? styles.tabButtonActive : ""}`}
-          onClick={() => setActiveTab("General")}
-        >
-          {t("settings.tabs.general", "General")}
-        </button>
-        <button
-          type="button"
-          className={`${styles.tabButton} ${activeTab === "Profile" ? styles.tabButtonActive : ""}`}
-          onClick={() => setActiveTab("Profile")}
-        >
-          {t("settings.tabs.profile", "Profile")}
-        </button>
+      <div className={styles.settingsIntro}>
+        <p className={styles.eyebrow}>{t("settings.general.eyebrow")}</p>
+        <h1 className={styles.settingsTitle}>{t("settings.general.title", "Settings")}</h1>
+        <p className={styles.settingsDescription}>{t("settings.general.description")}</p>
       </div>
 
-      {activeTab === "General" ? (
+      <div className={styles.tabsViewport}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => {
+            // SAFETY: only the two values declared by this TabsList can be emitted by Radix Tabs.
+            const nextTab = value as "general" | "profile";
+            setActiveTab(nextTab);
+            const url = new URL(window.location.href);
+            if (nextTab === "profile") {
+              url.searchParams.set("tab", "profile");
+            } else {
+              url.searchParams.delete("tab");
+            }
+            window.history.replaceState(
+              window.history.state,
+              "",
+              `${routes.settings.index}${url.search}`,
+            );
+          }}
+          className={styles.tabs}
+        >
+          <TabsList
+            variant="line"
+            className={styles.tabList}
+            aria-label={t("settings.tabs.label", "Settings sections")}
+          >
+            <TabsTrigger value="general" className={styles.tabTrigger}>
+              {t("settings.tabs.general", "General")}
+            </TabsTrigger>
+            <TabsTrigger value="profile" className={styles.tabTrigger}>
+              {t("settings.tabs.profile", "Profile")}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
+      {activeTab === "general" ? (
         <div className={styles.sectionWrap}>
           <p className={styles.sectionLabel}>{t("settings.general.languageSection", "LANGUAGE")}</p>
           <SettingsRow
@@ -155,27 +169,17 @@ export function SettingsGeneralScreen() {
               "Try each theme and keep whichever feels most comfortable — this updates the whole app live.",
             )}
           </p>
-          {accentTheme === "system" && (
-            <SettingsRow
-              label={t("settings.general.theme", "Theme")}
-              sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
-            >
-              <SegmentedControl
-                options={themeOptions}
-                value={themePreference}
-                onChange={handleThemeChange}
-                ariaLabel={t("settings.general.themeAria", "Theme preference")}
-              />
-            </SettingsRow>
-          )}
-          <div style={{ margin: "10px 0 16px" }}>
-            <AccentThemePicker value={accentTheme} onChange={handleAccentThemeChange} />
-          </div>
-
-          <p className={styles.sectionLabel}>{t("settings.general.mobileSection", "MOBILE")}</p>
-          <div style={{ margin: "8px 0 16px" }}>
-            <DownloadAppCard />
-          </div>
+          <SettingsRow
+            label={t("settings.general.theme", "Theme")}
+            sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
+          >
+            <SegmentedControl
+              options={themeOptions}
+              value={themePreference}
+              onChange={handleThemeChange}
+              ariaLabel={t("settings.general.themeAria", "Theme preference")}
+            />
+          </SettingsRow>
 
           <p className={styles.sectionLabel}>
             {t("settings.general.notifSection", "NOTIFICATIONS")}

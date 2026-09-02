@@ -1,26 +1,224 @@
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, TextInput as RNTextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog/ConfirmDialog";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { AppText, ScreenView } from "@/shared/ui";
 
+import { RootScreenHeader } from "../../navigation/components/RootScreenHeader/RootScreenHeader";
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 import { getRtlAwareTextAlign } from "../utils/rtl-text-align";
 
+/** Provides native account, preference, support, and settings workflows. */
+/** Describes the inputs, callbacks, and optional state accepted by Settings Profile Screen. */
 export type SettingsProfileScreenProps = {
   onSignOut?: () => void;
   onSignIn?: () => void;
+  onBack?: () => void;
 };
+
+/** Contains the account roles used to decide which profile or administrative controls are visible. */
+function getVisibleRoles(profile: {
+  /** Contains the account roles used to decide which profile or administrative controls are visible. */
+  roles?: string[];
+}): string[] {
+  return profile.roles?.filter((role) => role !== "listener") ?? [];
+}
+
+type ProfileEditControlsProps = {
+  isEditing: boolean;
+  isDirty: boolean;
+  isPending: boolean;
+  onEdit: () => void;
+  onCancel: () => void;
+  onSave: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function ProfileEditControls({
+  isEditing,
+  isDirty,
+  isPending,
+  onEdit,
+  onCancel,
+  onSave,
+  t,
+}: ProfileEditControlsProps) {
+  if (!isEditing)
+    return (
+      <Pressable onPress={onEdit} style={styles.editButton}>
+        <AppText variant="bodySm" style={styles.editButtonText}>
+          {t("account.profile.edit", "Edit")}
+        </AppText>
+      </Pressable>
+    );
+  return (
+    <View style={styles.editActions}>
+      <Pressable
+        onPress={onCancel}
+        disabled={isPending}
+        style={[styles.editButton, styles.editButtonOutline]}
+      >
+        <AppText variant="bodySm" style={styles.editButtonOutlineText}>
+          {t("account.profile.cancel", "Cancel")}
+        </AppText>
+      </Pressable>
+      <Pressable
+        onPress={onSave}
+        disabled={!isDirty || isPending}
+        style={[styles.editButton, (!isDirty || isPending) && styles.editButtonDisabled]}
+      >
+        <AppText variant="bodySm" style={styles.editButtonText}>
+          {isPending ? t("account.profile.saving", "Saving…") : t("account.profile.save", "Save")}
+        </AppText>
+      </Pressable>
+    </View>
+  );
+}
+
+function ProfileRoles({
+  roles,
+  theme,
+  t,
+}: {
+  /** Contains the account roles used to decide which profile or administrative controls are visible. */
+  roles: string[];
+  theme: ReturnType<typeof useUnistyles>["theme"];
+  t: ProfileEditControlsProps["t"];
+}) {
+  if (roles.length === 0) return null;
+  return (
+    <SettingsRow label={t("account.profile.roles", "Roles")} hideBorder>
+      <View style={styles.rolesRow}>
+        {roles.map((role) => (
+          <View
+            key={role}
+            style={[styles.roleBadge, { backgroundColor: theme.colors.surface.hover }]}
+          >
+            <AppText variant="caption" style={{ color: theme.colors.content.strong }}>
+              {role}
+            </AppText>
+          </View>
+        ))}
+      </View>
+    </SettingsRow>
+  );
+}
+
+function ProfileUpdateStatus({
+  isSuccess,
+  isError,
+  theme,
+  t,
+}: {
+  isSuccess: boolean;
+  /** Indicates that the associated request or operation failed and should render its error state. */
+  isError: boolean;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+  t: ProfileEditControlsProps["t"];
+}) {
+  if (!isSuccess && !isError) return null;
+  return (
+    <AppText
+      variant="caption"
+      style={{
+        color: isSuccess ? theme.colors.state.successContent : theme.colors.state.dangerContent,
+        marginBottom: theme.spacing.scale.sm,
+      }}
+    >
+      {isSuccess
+        ? t("account.profile.displayNameSaved", "Display name saved.")
+        : t("account.profile.displayNameSaveFailed", "Failed to save. Please try again.")}
+    </AppText>
+  );
+}
+
+type ProfileData = NonNullable<ReturnType<typeof useAccountProfile>["data"]>;
+
+function isProfileInputDisabled(isEditing: boolean) {
+  return !isEditing;
+}
+
+function getProfileInputStyles(isEditing: boolean) {
+  return isProfileInputDisabled(isEditing) ? [styles.input, styles.inputDisabled] : [styles.input];
+}
+
+function shouldHideEmailBorder(roles: string[]) {
+  return roles.length === 0;
+}
+
+function syncProfileDisplayName(
+  displayName: string | null | undefined,
+  isEditing: boolean,
+  setDisplayName: (value: string) => void,
+) {
+  if (!isEditing) setDisplayName(displayName ?? "");
+}
+
+function notifySignOut(onSignOut: (() => void) | undefined) {
+  onSignOut?.();
+}
+
+function ProfileIdentity({ profile }: { profile: ProfileData }) {
+  return (
+    <View style={styles.avatarRow}>
+      <UserAvatar
+        image={profile.avatarUrl ?? null}
+        name={profile.displayName || profile.email}
+        size={56}
+      />
+      <View>
+        <AppText variant="bodyLg" style={styles.profileName}>
+          {profile.displayName}
+        </AppText>
+        <AppText variant="bodySm" style={styles.profileEmail}>
+          {profile.email}
+        </AppText>
+      </View>
+    </View>
+  );
+}
+
+function ProfileActions({
+  isDeletingAccount,
+  onSignOut,
+  onDelete,
+  t,
+}: {
+  isDeletingAccount: boolean;
+  onSignOut: () => void;
+  onDelete: () => void;
+  t: ProfileEditControlsProps["t"];
+}) {
+  return (
+    <View style={styles.actionRow}>
+      <Pressable onPress={onSignOut} style={styles.actionButton}>
+        <AppText variant="bodyMd" style={styles.signOutText}>
+          {t("account.signOut", "Sign Out")}
+        </AppText>
+      </Pressable>
+      <Pressable
+        onPress={onDelete}
+        disabled={isDeletingAccount}
+        style={[styles.actionButton, styles.dangerButton]}
+      >
+        <AppText variant="bodyMd" style={styles.deleteText}>
+          {isDeletingAccount
+            ? t("account.profile.deleting", "Deleting…")
+            : t("account.profile.deleteAccount", "Delete Account")}
+        </AppText>
+      </Pressable>
+    </View>
+  );
+}
 
 function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   const { t } = useTranslation();
@@ -34,7 +232,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   const [isDeleteAccountDialogVisible, setIsDeleteAccountDialogVisible] = useState(false);
 
   useEffect(() => {
-    if (!isEditing) setDisplayName(profile?.displayName ?? "");
+    syncProfileDisplayName(profile?.displayName, isEditing, setDisplayName);
   }, [profile?.displayName, isEditing]);
 
   if (isFetching) {
@@ -57,7 +255,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   }
 
   const isDirty = displayName !== (profile.displayName ?? "");
-  const nonListenerRoles = (profile as any).roles?.filter((r: string) => r !== "listener") ?? [];
+  const nonListenerRoles = getVisibleRoles(profile);
 
   const handleSave = () => {
     updateProfile({ displayName });
@@ -79,18 +277,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      {/* Avatar row */}
-      <View style={styles.avatarRow}>
-        <UserAvatar name={profile.displayName || profile.email} size={56} />
-        <View>
-          <AppText variant="bodyLg" style={styles.profileName}>
-            {profile.displayName}
-          </AppText>
-          <AppText variant="bodySm" style={styles.profileEmail}>
-            {profile.email}
-          </AppText>
-        </View>
-      </View>
+      <ProfileIdentity profile={profile} />
 
       {/* Account section — display name + email */}
       <SettingsSection title={t("account.title", "Account")}>
@@ -100,112 +287,51 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
           stacked
         >
           <View style={styles.editableField}>
-            <TextInput
+            <RNTextInput
               value={displayName}
               onChangeText={setDisplayName}
               placeholder={t("account.profile.displayNamePlaceholder", "Your display name")}
               placeholderTextColor={theme.colors.content.muted}
               editable={isEditing}
-              style={[styles.input, !isEditing && styles.inputDisabled]}
+              style={getProfileInputStyles(isEditing)}
             />
-            {!isEditing ? (
-              <Pressable onPress={() => setIsEditing(true)} style={styles.editButton}>
-                <AppText variant="bodySm" style={styles.editButtonText}>
-                  {t("account.profile.edit", "Edit")}
-                </AppText>
-              </Pressable>
-            ) : (
-              <View style={styles.editActions}>
-                <Pressable
-                  onPress={handleCancel}
-                  disabled={isPending}
-                  style={[styles.editButton, styles.editButtonOutline]}
-                >
-                  <AppText variant="bodySm" style={styles.editButtonOutlineText}>
-                    {t("account.profile.cancel", "Cancel")}
-                  </AppText>
-                </Pressable>
-                <Pressable
-                  onPress={handleSave}
-                  disabled={!isDirty || isPending}
-                  style={[styles.editButton, (!isDirty || isPending) && styles.editButtonDisabled]}
-                >
-                  <AppText variant="bodySm" style={styles.editButtonText}>
-                    {isPending
-                      ? t("account.profile.saving", "Saving…")
-                      : t("account.profile.save", "Save")}
-                  </AppText>
-                </Pressable>
-              </View>
-            )}
+            <ProfileEditControls
+              isEditing={isEditing}
+              isDirty={isDirty}
+              isPending={isPending}
+              onEdit={() => setIsEditing(true)}
+              onCancel={handleCancel}
+              onSave={handleSave}
+              t={t}
+            />
           </View>
         </SettingsRow>
         <SettingsRow
           label={t("account.profile.email", "Email")}
-          hideBorder={nonListenerRoles.length === 0}
+          hideBorder={shouldHideEmailBorder(nonListenerRoles)}
         >
           <AppText variant="bodySm" style={styles.readOnly}>
             {profile.email}
           </AppText>
         </SettingsRow>
-        {nonListenerRoles.length > 0 && (
-          <SettingsRow label={t("account.profile.roles", "Roles")} hideBorder>
-            <View style={styles.rolesRow}>
-              {nonListenerRoles.map((r: string) => (
-                <View
-                  key={r}
-                  style={[styles.roleBadge, { backgroundColor: theme.colors.surface.hover }]}
-                >
-                  <AppText variant="caption" style={{ color: theme.colors.content.strong }}>
-                    {r}
-                  </AppText>
-                </View>
-              ))}
-            </View>
-          </SettingsRow>
-        )}
+        <ProfileRoles roles={nonListenerRoles} theme={theme} t={t} />
       </SettingsSection>
 
-      {(isSuccess || isError) && (
-        <AppText
-          variant="caption"
-          style={{
-            color: isSuccess ? theme.colors.state.successContent : theme.colors.state.dangerContent,
-            marginBottom: theme.spacing.scale.sm,
-          }}
-        >
-          {isSuccess
-            ? t("account.profile.displayNameSaved", "Display name saved.")
-            : t("account.profile.displayNameSaveFailed", "Failed to save. Please try again.")}
-        </AppText>
-      )}
+      <ProfileUpdateStatus isSuccess={isSuccess} isError={isError} theme={theme} t={t} />
 
-      {/* Actions */}
-      <View style={styles.actionRow}>
-        <Pressable onPress={handleSignOut} style={styles.actionButton}>
-          <AppText variant="bodyMd" style={styles.signOutText}>
-            {t("account.signOut", "Sign Out")}
-          </AppText>
-        </Pressable>
-        <Pressable
-          onPress={handleDeleteAccount}
-          disabled={isDeletingAccount}
-          style={[styles.actionButton, styles.dangerButton]}
-        >
-          <AppText variant="bodyMd" style={styles.deleteText}>
-            {isDeletingAccount
-              ? t("account.profile.deleting", "Deleting…")
-              : t("account.profile.deleteAccount", "Delete Account")}
-          </AppText>
-        </Pressable>
-      </View>
+      <ProfileActions
+        isDeletingAccount={isDeletingAccount}
+        onSignOut={handleSignOut}
+        onDelete={handleDeleteAccount}
+        t={t}
+      />
 
       <ConfirmDialog
         visible={isSignOutDialogVisible}
         onDismiss={() => setIsSignOutDialogVisible(false)}
         onConfirm={() => {
           setIsSignOutDialogVisible(false);
-          onSignOut?.();
+          notifySignOut(onSignOut);
         }}
         title={t("account.profile.signOutTitle", "Sign Out?")}
         message={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
@@ -219,7 +345,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
         onDismiss={() => setIsDeleteAccountDialogVisible(false)}
         onConfirm={() => {
           setIsDeleteAccountDialogVisible(false);
-          deleteAccount(undefined, { onSuccess: () => onSignOut?.() });
+          deleteAccount(undefined, { onSuccess: () => notifySignOut(onSignOut) });
         }}
         title={t("account.profile.deleteAccount", "Delete Account")}
         message={t(
@@ -234,36 +360,53 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   );
 }
 
-export function SettingsProfileScreen({ onSignOut, onSignIn }: SettingsProfileScreenProps) {
+/** Renders the native settings profile screen surface and coordinates its user-facing state. */
+export function SettingsProfileScreen({ onSignOut, onSignIn, onBack }: SettingsProfileScreenProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const { theme } = useUnistyles();
 
-  if (isLoading) {
-    return (
-      <ScreenView center>
-        <EmptyState message={t("account.profile.loading", "Loading profile…")} variant="loading" />
-      </ScreenView>
-    );
-  }
+  const content = isLoading ? (
+    <ScreenView center>
+      <EmptyState message={t("account.profile.loading", "Loading profile…")} variant="loading" />
+    </ScreenView>
+  ) : !isAuthenticated ? (
+    <AuthRequiredState
+      title={t("account.profile.signInTitle", "Sign in to view your profile")}
+      description={t(
+        "account.profile.signInDesc",
+        "Create an account or sign in to manage your profile and roles.",
+      )}
+      actionLabel={t("account.profile.signIn", "Sign In")}
+      onPress={() => onSignIn?.()}
+    />
+  ) : (
+    <ProfileContent onSignOut={onSignOut} />
+  );
 
-  if (!isAuthenticated) {
-    return (
-      <AuthRequiredState
-        title={t("account.profile.signInTitle", "Sign in to view your profile")}
-        description={t(
-          "account.profile.signInDesc",
-          "Create an account or sign in to manage your profile and roles.",
-        )}
-        actionLabel={t("account.profile.signIn", "Sign In")}
-        onPress={() => onSignIn?.()}
-      />
-    );
-  }
-
-  return <ProfileContent onSignOut={onSignOut} />;
+  return (
+    <View style={styles.shell}>
+      <View style={{ paddingTop: insets.top, paddingHorizontal: theme.spacing.layout.pageX }}>
+        <RootScreenHeader
+          title={t("account.profile.title", "Profile")}
+          showSearch={false}
+          onBack={onBack}
+        />
+      </View>
+      <View style={styles.body}>{content}</View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create((theme) => ({
+  shell: {
+    flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
+  },
+  body: {
+    flex: 1,
+  },
   centered: {
     flex: 1,
     justifyContent: "center",

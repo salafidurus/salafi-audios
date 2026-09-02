@@ -4,25 +4,27 @@ import { downloadLecture, removeLecture } from "@/features/downloads/engine/down
 import { useDownloadsStore } from "@/features/downloads/store/downloads.store";
 
 /** UI-only status — "idle" means no registry row exists yet for this listing. */
+/** Enumerates the lifecycle values used by the native ui download workflow. */
 export type UiDownloadStatus = "idle" | "pending" | "downloading" | "paused" | "complete" | "error";
 
-export function useDownload(lectureId: string, audioUrl?: string) {
-  const row = useDownloadsStore((s) => s.downloads[lectureId]);
+/** Exposes download state and actions to native consumers. */
+export function useDownload(listingSlug: string, audioUrl?: string) {
+  const row = useDownloadsStore((s) => s.downloads[listingSlug]);
 
-  const status: UiDownloadStatus = row?.status ?? "idle";
-  const progress = row && row.bytesTotal > 0 ? (row.bytesDownloaded / row.bytesTotal) * 100 : 0;
+  const status = getDownloadStatus(row);
+  const progress = getDownloadProgress(row);
   const localUri = row?.localUri ?? undefined;
   const isDownloaded = status === "complete";
   const isDownloading = status === "downloading" || status === "pending";
 
   const startDownload = useCallback(() => {
     if (!audioUrl) return;
-    void downloadLecture(lectureId, audioUrl);
-  }, [lectureId, audioUrl]);
+    void downloadLecture(listingSlug, audioUrl);
+  }, [listingSlug, audioUrl]);
 
   const removeDownload = useCallback(() => {
-    void removeLecture(lectureId);
-  }, [lectureId]);
+    void removeLecture(listingSlug);
+  }, [listingSlug]);
 
   return useMemo(
     () => ({
@@ -36,4 +38,16 @@ export function useDownload(lectureId: string, audioUrl?: string) {
     }),
     [status, progress, localUri, isDownloaded, isDownloading, startDownload, removeDownload],
   );
+}
+
+function getDownloadStatus(
+  row: ReturnType<typeof useDownloadsStore.getState>["downloads"][string] | undefined,
+): UiDownloadStatus {
+  return row?.status ?? "idle";
+}
+
+function getDownloadProgress(
+  row: ReturnType<typeof useDownloadsStore.getState>["downloads"][string] | undefined,
+): number {
+  return row && row.bytesTotal > 0 ? (row.bytesDownloaded / row.bytesTotal) * 100 : 0;
 }

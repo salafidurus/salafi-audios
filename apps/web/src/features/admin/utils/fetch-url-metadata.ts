@@ -4,6 +4,8 @@ import {
   resolveContentType,
 } from "./fetch-remote-file";
 
+/** Extracts lightweight audio-link metadata for import previews without downloading bodies. */
+/** Describes metadata obtained without downloading an audio response body. */
 export interface UrlMetadata {
   filename: string;
   contentType: string;
@@ -31,6 +33,13 @@ function parseContentRangeTotal(headers: Headers): number | null {
 
 /** Reads filename/content-type/size without downloading the file body — HEAD first, falling back to a 1-byte ranged GET for hosts that reject HEAD. */
 export async function fetchUrlMetadata(url: string): Promise<UrlMetadata> {
+  const response = await fetchMetadataResponse(url);
+  validateMetadataResponse(response);
+
+  return buildUrlMetadata(url, response);
+}
+
+async function fetchMetadataResponse(url: string): Promise<Response> {
   let response: Response;
   try {
     response = await fetch(url, { method: "HEAD" });
@@ -38,24 +47,30 @@ export async function fetchUrlMetadata(url: string): Promise<UrlMetadata> {
     throw friendlyCorsError();
   }
 
-  if (!response.ok) {
-    try {
-      response = await fetch(url, { headers: { Range: "bytes=0-0" } });
-    } catch {
-      throw friendlyCorsError();
-    }
-    if (!response.ok) {
-      throw new Error(`Couldn't read this link's metadata (HTTP ${response.status}).`);
-    }
-  }
+  if (response.ok) return response;
 
+  try {
+    response = await fetch(url, { headers: { Range: "bytes=0-0" } });
+  } catch {
+    throw friendlyCorsError();
+  }
+  if (!response.ok) {
+    throw new Error(`Couldn't read this link's metadata (HTTP ${response.status}).`);
+  }
+  return response;
+}
+
+function validateMetadataResponse(response: Response): void {
   const contentType = response.headers.get("content-type") ?? "";
   if (contentType.startsWith("text/html")) {
     throw new Error(
       "This link points to a web page, not a direct audio file. Find the direct download link instead.",
     );
   }
+}
 
+function buildUrlMetadata(url: string, response: Response): UrlMetadata {
+  const contentType = response.headers.get("content-type") ?? "";
   const filename =
     filenameFromContentDisposition(response.headers.get("content-disposition")) ??
     filenameFromUrl(url);

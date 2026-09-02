@@ -4,11 +4,13 @@
     "profileDesc": "إدارة معلومات ملفك الشخصي.",
     "saved": "تم الحفظ.",
     "signInToAccess": "سجّل الدخول للوصول إلى ملفك الشخصي",
+    "clickToSignIn": "اضغط لتسجيل الدخول",
     "profile": {
       "signInTitle": "سجّل الدخول لعرض ملفك الشخصي"
     }
   },
   "admin": {
+    "title": "الإدارة",
     "manageAudios": "إدارة المحتوى الصوتي",
     "manageSeries": "إدارة الشيوخ والسلاسل",
     "scholarDetail": "تفاصيل الشيخ",
@@ -51,18 +53,53 @@
     }
   },
   "explore": {
-    "searchRecent": "البحث في الصوتيات الأخيرة..."
+    "searchRecent": "البحث في الصوتيات الأخيرة...",
+    "title": "استكشاف",
+    "exploreByTopic": "استكشف حسب الموضوع",
+    "exploreByTopicDescription": "اختر موضوعًا لتشكيل موجز دراستك."
   },
-  "navigation": {
-    "show_miniplayer": "إظهار المشغل المصغر",
-    "show_subroutes": "إظهار أقسام القسم الفرعي"
+  "home": {
+    "description": "ابدأ رحلتك في طلب العلم.",
+    "eyebrow": "مساحتك العلمية",
+    "title": "ابنِ مسارًا ثابتًا للاستماع",
+    "intro": "عد إلى درس أو اختر بداية نافعة لليوم.",
+    "loading": "جارٍ تحميل مساحتك العلمية…",
+    "error": "تعذر تحميل الصفحة الرئيسية.",
+    "continue": { "title": "متابعة الاستماع" },
+    "discovery": { "title": "استكشاف", "empty": "لا توجد دروس متاحة بعد." },
+    "scholars": { "title": "العلماء" },
+    "recent": { "title": "أضيف حديثًا", "empty": "ستظهر الدروس الجديدة هنا بعد نشرها." },
+    "curated": { "title": "مختارات للدراسة", "empty": "ستظهر الدروس المختارة هنا قريبًا." },
+    "mobile": {
+      "title": "خذ علمك معك",
+      "description": "يبقى الصوت المُنزّل والتقدم المحلي متاحين للاستمرارية على الهاتف."
+    }
   },
   "scholarContent": {
+    "description": "استكشف علماءنا.",
     "filterPlaceholder": "تصفية المحتوى…",
     "searchNoMatch": "لا يوجد شيوخ يطابقون بحثك.",
-    "searchScholars": "البحث عن الشيوخ..."
+    "searchScholars": "البحث عن الشيوخ...",
+    "searchDescription": "تصفح العلماء واعثر على أحدث دروسهم."
+  },
+  "common": { "loadMore": "تحميل المزيد", "navigateUp": "العودة" },
+  "legal": { "lastUpdated": "آخر تحديث" },
+  "search": {
+    "label": "بحث",
+    "description": "البحث في الفهرس",
+    "open": "بحث",
+    "popularSearches": "عمليات البحث الشائعة",
+    "popularTafsir": "التفسير",
+    "popularFiqh": "فقه العبادات",
+    "popularAqeedah": "نواقض الإسلام",
+    "popularNahw": "النحو"
   },
   "settings": {
-    "support": "الدعم"
+    "support": "الدعم",
+    "accountSection": "الحساب",
+    "supportSection": "الدعم",
+    "contactSupport": "تواصل مع الدعم",
+    "legalTermsLabel": "الشروط والأحكام",
+    "legalPrivacyLabel": "سياسة الخصوصية"
   }
 }

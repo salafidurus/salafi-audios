@@ -1,7 +1,29 @@
 import {
+  ArrangeCommitDtoSchema,
+  BulkActionDtoSchema,
+  CreateListingDtoSchema,
+  UpdateListingDetailsDtoSchema,
+  UpdateListingMediaDtoSchema,
+  type ArrangeCommitDto,
+  type BulkActionDto,
+  type CreateListingDto,
+  type UpdateListingDetailsDto,
+  type UpdateListingMediaDto,
+  type AdminListingActionDto,
+  type AdminListingListDto,
+  type AdminListingDetailDto,
+  type AdminListingMediaDetailDto,
+  type AdminArrangeDataDto,
+  type ArrangeCommitResultDto,
+  type BulkActionResultDto,
+  type ListingRefDto,
+  type HomePromotionsDto,
+} from '@sd/core-contracts';
+import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Param,
@@ -11,16 +33,6 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import type {
-  AdminListingActionDto,
-  AdminListingListDto,
-  AdminListingDetailDto,
-  AdminListingMediaDetailDto,
-  AdminArrangeDataDto,
-  ArrangeCommitResultDto,
-  BulkActionResultDto,
-  ListingRefDto,
-} from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../../core/auth/decorators/check-policy.decorator';
 import { CurrentUser } from '../../core/auth/decorators';
@@ -33,18 +45,19 @@ import type { AbilityInput } from '../../core/auth/ability/ability.types';
 import { subject } from '@casl/ability';
 import { PrismaService } from '../../core/db/prisma.service';
 import { ListingService } from './listing.service';
-import { CreateListingDto } from './dto/create-listing.dto';
-import { UpdateListingDetailsDto } from './dto/update-listing-details.dto';
-import { UpdateListingMediaDto } from './dto/update-listing-media.dto';
-import { ArrangeCommitDto } from './dto/arrange-commit.dto';
-import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
+import { ListingEditorialService } from './listing-editorial.service';
+import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 
+/** NestJS admin listings controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Listings')
 @ApiCommonErrors()
 @Controller('admin/listings')
+/** listing application module responsible for admin listings.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AdminListingsController {
   constructor(
     private readonly service: ListingService,
+    private readonly editorial: ListingEditorialService,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -52,11 +65,12 @@ export class AdminListingsController {
   @CheckPolicy('write', 'Listing')
   @ApiOperation({ summary: 'Get current home promotions (admin)' })
   @ApiOkResponse({ description: 'Current promotions metadata' })
-  async getPromotions(): Promise<any> {
+  async getPromotions(): Promise<HomePromotionsDto> {
     return this.service.getPromotions();
   }
 
   @Post('promotions')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Listing')
   @ApiOperation({ summary: 'Update home promotions' })
   @ApiOkResponse({ description: 'Success status' })
@@ -118,21 +132,23 @@ export class AdminListingsController {
   }
 
   @Post(':id/arrange-commit')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Transactionally create/update modules and lessons with audio' })
   arrangeCommit(
     @Param('id') id: string,
-    @Body() dto: ArrangeCommitDto,
+    @Body({ schema: ArrangeCommitDtoSchema }) dto: ArrangeCommitDto,
     @Req() req: { user?: { id: string } },
   ): Promise<ArrangeCommitResultDto> {
-    return this.service.arrangeCommit(id, dto, req.user?.id);
+    return this.editorial.arrange(id, dto, req.user?.id);
   }
 
   @Post()
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Listing', resolveScholarIdFromBody())
   @ApiOperation({ summary: 'Create a listing after R2 upload' })
   createListing(
-    @Body() dto: CreateListingDto,
+    @Body({ schema: CreateListingDtoSchema }) dto: CreateListingDto,
     @Req() req: { user?: { id: string } },
   ): Promise<{ id: string; title: string }> {
     const publicUrl = dto.audioKey
@@ -142,11 +158,13 @@ export class AdminListingsController {
   }
 
   @Post('bulk')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('publish', 'Listing')
   @ApiOperation({ summary: 'Bulk publish or archive listings' })
   async bulkAction(
-    @Body() dto: BulkActionDto,
+    @Body({ schema: BulkActionDtoSchema }) dto: BulkActionDto,
     @CurrentUser() user: AbilityInput,
+    @Req() req: { user?: { id: string } },
   ): Promise<BulkActionResultDto> {
     // The decorator above only confirms the caller has SOME publish/archive
     // capability. Bulk targets multiple listings that may belong to
@@ -160,22 +178,25 @@ export class AdminListingsController {
     });
     const action = dto.action === 'archive' ? 'archive' : 'publish';
     for (const row of rows) {
+      // SAFETY: `subject()` needs a concrete resource instance so CASL evaluates
+      // scholar-scoped conditions; the object literal exactly matches that shape.
       if (!ability.can(action, subject('Listing', { scholarSlug: row.scholar.slug } as never))) {
         throw new ForbiddenException(
           `Missing capability: ${action} Listing (scholarSlug: ${row.scholar.slug})`,
         );
       }
     }
-    return this.service.bulkAction(dto);
+    return this.editorial.bulkStatus(dto, req.user?.id);
   }
 
   @Put(':id/details')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Update listing details (title, description, status, topics, etc.)' })
   @ApiOkResponse({ description: 'Listing details updated successfully' })
   async updateListingDetails(
     @Param('id') id: string,
-    @Body() updateDto: UpdateListingDetailsDto,
+    @Body({ schema: UpdateListingDetailsDtoSchema }) updateDto: UpdateListingDetailsDto,
     @Req() req: { user?: { id: string } },
   ): Promise<AdminListingActionDto> {
     const res = await this.service.updateListingDetails(id, updateDto, req.user?.id);
@@ -183,33 +204,55 @@ export class AdminListingsController {
   }
 
   @Put(':id/media')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('write', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Update listing media (audio file, duration, etc.)' })
   @ApiOkResponse({ description: 'Listing media updated successfully' })
   async updateListingMedia(
     @Param('id') id: string,
-    @Body() updateDto: UpdateListingMediaDto,
+    @Body({ schema: UpdateListingMediaDtoSchema }) updateDto: UpdateListingMediaDto,
     @Req() req: { user?: { id: string } },
   ): Promise<AdminListingActionDto> {
-    const res = await this.service.updateListingMedia(id, updateDto, req.user?.id);
+    const res = await this.editorial.replace(id, updateDto, req.user?.id);
     return { ...res, message: 'Listing media updated successfully' };
   }
 
   @Post(':id/publish')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('publish', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Publish a listing' })
   @ApiOkResponse({ description: 'Listing published successfully' })
-  async publishListing(@Param('id') id: string): Promise<AdminListingActionDto> {
-    const res = await this.service.publishListing(id);
+  async publishListing(
+    @Param('id') id: string,
+    @Req() req: { user?: { id: string } },
+  ): Promise<AdminListingActionDto> {
+    const res = await this.editorial.publish(id, req.user?.id);
     return { ...res, message: 'Listing published successfully' };
   }
 
   @Post(':id/archive')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('delete', 'Listing', resolveListingScholarId())
   @ApiOperation({ summary: 'Archive a listing' })
   @ApiOkResponse({ description: 'Listing archived successfully' })
-  async archiveListing(@Param('id') id: string): Promise<AdminListingActionDto> {
-    const res = await this.service.archiveListing(id);
+  async archiveListing(
+    @Param('id') id: string,
+    @Req() req: { user?: { id: string } },
+  ): Promise<AdminListingActionDto> {
+    const res = await this.editorial.archive(id, req.user?.id);
     return { ...res, message: 'Listing archived successfully' };
+  }
+
+  @Delete(':id')
+  @RateLimitPolicy('admin-write')
+  @CheckPolicy('delete', 'Listing', resolveListingScholarId())
+  @ApiOperation({ summary: 'Delete a listing' })
+  @ApiOkResponse({ description: 'Listing deleted successfully' })
+  async deleteListing(
+    @Param('id') id: string,
+    @Req() req: { user?: { id: string } },
+  ): Promise<AdminListingActionDto> {
+    const res = await this.editorial.remove(id, req.user?.id);
+    return { ...res, message: 'Listing deleted successfully' };
   }
 }

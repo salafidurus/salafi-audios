@@ -1,8 +1,9 @@
 import { Host, Switch } from "@expo/ui";
 import { Text, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { createUniversalHostProps } from "@/core/styles/expo-ui";
 import {
   setShowOriginalContent,
   useShowOriginalContent,
@@ -10,17 +11,21 @@ import {
 
 /** Settings toggle that switches catalogue content (lectures, series,
  * collections) between the selected language and its original language. */
+/** Toggles whether native content prefers the original source language. */
 export function ContentLanguageToggle() {
   const { t } = useTranslation();
-  const { theme } = useUnistyles();
+  const { theme, rt } = useUnistyles();
   const showOriginal = useShowOriginalContent();
-
   return (
-    <View style={styles.row}>
-      <Text style={styles.label}>
-        {t("account.showOriginalContent", "Show content in its original language")}
-      </Text>
-      <Host matchContents seedColor={theme.colors.action.primary}>
+    <View
+      style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.component.gapMd }}
+    >
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: 14, lineHeight: 20, color: theme.colors.content.strong }}>
+          {t("account.showOriginalContent", "Show content in its original language")}
+        </Text>
+      </View>
+      <Host matchContents {...createUniversalHostProps(theme, rt.themeName)}>
         <Switch
           value={showOriginal}
           onValueChange={setShowOriginalContent}
@@ -30,17 +35,3 @@ export function ContentLanguageToggle() {
     </View>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: theme.spacing.component.gapMd,
-  },
-  label: {
-    flex: 1,
-    ...theme.typography.bodySm,
-    color: theme.colors.content.strong,
-  },
-}));

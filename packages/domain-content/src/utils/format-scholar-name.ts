@@ -7,9 +7,18 @@ import { useTranslation } from "react-i18next";
 
 import { useScholarsList } from "../scholar.api";
 
+/** Formats scholar names with locale-aware honorifics and stable slug matching. */
+/** Scholar display data accepted by the low-level formatter. */
 export interface ScholarWithNameAndTitle {
   name: string;
+  /** Optional honorific represented using the shared translation vocabulary. */
   title?: ScholarTitle | string | null;
+}
+
+type ScholarInput = ScholarWithNameAndTitle | string | null | undefined;
+
+function isStringScholar(scholar: ScholarInput): scholar is string {
+  return Object.prototype.toString.call(scholar) === "[object String]";
 }
 
 const fallbackQueryClient = new QueryClient({
@@ -32,23 +41,27 @@ const fallbackQueryClient = new QueryClient({
  * - formatScholarName("Muhammad Nasiruddin al-Albani", "allamah", t) => "Shaykh Allamah Muhammad Nasiruddin al-Albani"
  */
 export function formatScholarName(
-  scholar: ScholarWithNameAndTitle | string | null | undefined,
+  scholar: ScholarInput,
   titleParam: ScholarTitle | string | null | undefined,
   t: TranslateFn,
 ): string {
   if (!scholar) return "";
 
-  const name = typeof scholar === "string" ? scholar : scholar.name;
-  const title = typeof scholar === "string" ? titleParam : scholar.title;
+  const name = isStringScholar(scholar) ? scholar : scholar.name;
+  const title = isStringScholar(scholar) ? titleParam : scholar.title;
 
   if (!name) return "";
+  return formatNamedScholar(name, title, t);
+}
+
+function formatNamedScholar(
+  name: string,
+  title: ScholarTitle | string | null | undefined,
+  t: TranslateFn,
+): string {
   if (!title) return name;
-
   const prefix = getScholarTitleLabel(title, t);
-  if (!prefix) return name;
-
-  if (name.startsWith(prefix)) return name;
-
+  if (!prefix || name.startsWith(prefix)) return name;
   return `${prefix} ${name}`;
 }
 
@@ -84,8 +97,7 @@ export function useFormattedScholarName(
 ): string {
   const { t } = useTranslation();
   const contextClient = React.useContext(QueryClientContext);
-  const hasQueryClient = Boolean(contextClient);
-  const shouldFetch = hasQueryClient && Boolean(scholarName) && Boolean(scholarSlug);
+  const shouldFetch = Boolean(contextClient && scholarName && scholarSlug);
 
   const scholarsQuery = useScholarsList(
     { enabled: shouldFetch },
@@ -93,15 +105,22 @@ export function useFormattedScholarName(
   );
   const data = shouldFetch ? scholarsQuery.data : undefined;
 
+  return resolveFormattedScholarName(scholarName, scholarSlug, data?.scholars, t);
+}
+
+function resolveFormattedScholarName(
+  scholarName: string | null | undefined,
+  scholarSlug: string | null | undefined,
+  scholars:
+    | Array<{
+        /** Locale-independent scholar identity used for matching. */
+        slug: string;
+        title?: ScholarTitle | string | null;
+      }>
+    | undefined,
+  t: TranslateFn,
+): string {
   if (!scholarName) return "";
-
-  const foundScholar = scholarSlug
-    ? data?.scholars?.find((s) => s.slug === scholarSlug)
-    : undefined;
-
-  if (foundScholar?.title) {
-    return formatScholarName(scholarName, foundScholar.title, t);
-  }
-
-  return scholarName;
+  const title = scholars?.find((scholar) => scholar.slug === scholarSlug)?.title;
+  return title ? formatScholarName(scholarName, title, t) : scholarName;
 }

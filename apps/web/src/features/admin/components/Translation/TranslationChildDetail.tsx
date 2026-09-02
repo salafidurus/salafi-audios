@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { Locale } from "@sd/core-contracts";
@@ -7,10 +8,14 @@ import { ArrowLeft } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useTranslationForm } from "@/features/admin/hooks/Translation/useTranslationForm";
+import {
+  useTranslationForm,
+  type TranslationFormAction,
+  type TranslationFormState,
+} from "@/features/admin/hooks/Translation/useTranslationForm";
 import { getSecondaryLocales, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { computeLocalesToSave } from "@/features/admin/utils/translation-save";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 
 import type { TranslationEntityConfig } from "./translation-entities";
 
@@ -23,6 +28,174 @@ export interface TranslationChildDetailProps {
   onBack: () => void;
   /** Called after a successful save — the parent returns to the sub-listings list. */
   onSaved: () => void;
+}
+
+interface TranslationChildDetailViewProps {
+  config: TranslationEntityConfig;
+  childId: string;
+  state: TranslationFormState;
+  dispatch: React.Dispatch<TranslationFormAction>;
+  locale: Locale | null;
+  secondaryLocales: Locale[];
+  onBack: () => void;
+  onSave: () => void;
+  onPublishToggle: (locale: Locale) => Promise<void>;
+  onLocaleChange: (locale: Locale) => void;
+}
+
+interface TranslationChildReadyViewProps {
+  config: TranslationEntityConfig;
+  childId: string;
+  state: TranslationFormState;
+  dispatch: React.Dispatch<TranslationFormAction>;
+  locale: Locale;
+  secondaryLocales: Locale[];
+  onSave: () => void;
+  onPublishToggle: (locale: Locale) => Promise<void>;
+  onLocaleChange: (locale: Locale) => void;
+}
+
+function TranslationChildReadyView({
+  config,
+  childId,
+  state,
+  dispatch,
+  locale,
+  secondaryLocales,
+  onSave,
+  onPublishToggle,
+  onLocaleChange,
+}: TranslationChildReadyViewProps) {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      {state.error && <div className={styles.error}>{state.error}</div>}
+
+      {secondaryLocales.length > 1 && (
+        <div className={styles.childLocaleTabs}>
+          {secondaryLocales.map((loc) => (
+            <Button
+              key={loc}
+              type="button"
+              variant={locale === loc ? "secondary" : "ghost"}
+              size="sm"
+              className={styles.childLocaleTabButton}
+              onClick={() => onLocaleChange(loc)}
+            >
+              {getLocaleLabel(loc)}
+            </Button>
+          ))}
+        </div>
+      )}
+
+      <TranslationLocaleFields
+        config={config}
+        state={state}
+        dispatch={dispatch}
+        locale={locale}
+        idPrefix={`translation-child-${childId}`}
+        onPublishToggle={onPublishToggle}
+      />
+
+      <div className={styles.childDetailActions}>
+        <Button
+          type="button"
+          variant="primary"
+          size="sm"
+          loading={state.saving}
+          disabled={state.saving}
+          onClick={onSave}
+        >
+          {state.saving ? t("admin.access.saving", "Saving…") : t("common.save", "Save")}
+        </Button>
+      </div>
+    </>
+  );
+}
+
+function TranslationChildStatus({
+  config,
+  childId,
+  state,
+  dispatch,
+  locale,
+  secondaryLocales,
+  onSave,
+  onPublishToggle,
+  onLocaleChange,
+}: Omit<TranslationChildDetailViewProps, "onBack">) {
+  const { t } = useTranslation();
+  if (state.status === "loading") {
+    return <div className={styles.loading}>{t("common.loading", "Loading...")}</div>;
+  }
+  if (state.status === "error" && !state.entityId) {
+    return (
+      <div className={styles.error}>
+        {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
+      </div>
+    );
+  }
+  if (state.status !== "ready" || !locale) return null;
+  return (
+    <TranslationChildReadyView
+      config={config}
+      childId={childId}
+      state={state}
+      dispatch={dispatch}
+      locale={locale}
+      secondaryLocales={secondaryLocales}
+      onSave={onSave}
+      onPublishToggle={onPublishToggle}
+      onLocaleChange={onLocaleChange}
+    />
+  );
+}
+
+function TranslationChildDetailView({
+  config,
+  childId,
+  state,
+  dispatch,
+  locale,
+  secondaryLocales,
+  onBack,
+  onSave,
+  onPublishToggle,
+  onLocaleChange,
+}: TranslationChildDetailViewProps) {
+  const { t } = useTranslation();
+  const titleField = config.fields[0];
+  const sourceTitle = titleField ? state.source[titleField.key] : undefined;
+
+  return (
+    <div className={styles.childDetail}>
+      <div className={styles.backRow}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          icon={<ArrowLeft size={16} />}
+          onClick={onBack}
+        >
+          {t("common.back", "Back")}
+        </Button>
+        {sourceTitle && <span className={styles.childDetailTitle}>{sourceTitle}</span>}
+      </div>
+
+      <TranslationChildStatus
+        config={config}
+        childId={childId}
+        state={state}
+        dispatch={dispatch}
+        locale={locale}
+        secondaryLocales={secondaryLocales}
+        onSave={onSave}
+        onPublishToggle={onPublishToggle}
+        onLocaleChange={onLocaleChange}
+      />
+    </div>
+  );
 }
 
 /**
@@ -66,20 +239,25 @@ export function TranslationChildDetail({
   const secondaryLocales = getSecondaryLocales(state.mainLocale);
   const locale = activeLocale ?? secondaryLocales[0] ?? null;
 
-  async function handlePublishToggle(targetLocale: Locale) {
-    if (!config.supportsPublish || !state.entityId) return;
+  function getPublishOperation(targetLocale: Locale) {
+    if (!config.supportsPublish || !state.entityId) return null;
     const currentlyPublished = state.translationStatus[targetLocale] === "published";
     const action = currentlyPublished ? config.unpublish : config.publish;
-    if (!action) return;
+    return action ? { action, currentlyPublished } : null;
+  }
+
+  async function handlePublishToggle(targetLocale: Locale) {
+    const operation = getPublishOperation(targetLocale);
+    if (!operation || !state.entityId) return;
 
     dispatch({ type: "SET_SAVING", saving: true });
     dispatch({ type: "SET_ERROR", error: null });
     try {
-      const result = await action(state.entityId, targetLocale);
+      const result = await operation.action(state.entityId, targetLocale);
       dispatch({
         type: "SET_STATUS",
         locale: targetLocale,
-        status: result.status ?? (currentlyPublished ? "draft" : "published"),
+        status: result.status ?? (operation.currentlyPublished ? "draft" : "published"),
       });
     } catch (err) {
       dispatch({ type: "SET_ERROR", error: sanitizeError(err) });
@@ -128,78 +306,18 @@ export function TranslationChildDetail({
     }
   }
 
-  const titleField = config.fields[0];
-  const sourceTitle = titleField ? state.source[titleField.key] : undefined;
-
   return (
-    <div className={styles.childDetail}>
-      <div className={styles.backRow}>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          icon={<ArrowLeft size={16} />}
-          onClick={onBack}
-        >
-          {t("common.back", "Back")}
-        </Button>
-        {sourceTitle && <span className={styles.childDetailTitle}>{sourceTitle}</span>}
-      </div>
-
-      {state.status === "loading" && (
-        <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
-      )}
-
-      {state.status === "error" && !state.entityId && (
-        <div className={styles.error}>
-          {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
-        </div>
-      )}
-
-      {state.status === "ready" && locale && (
-        <>
-          {state.error && <div className={styles.error}>{state.error}</div>}
-
-          {secondaryLocales.length > 1 && (
-            <div className={styles.childLocaleTabs}>
-              {secondaryLocales.map((loc) => (
-                <Button
-                  key={loc}
-                  type="button"
-                  variant={locale === loc ? "secondary" : "ghost"}
-                  size="sm"
-                  className={styles.childLocaleTabButton}
-                  onClick={() => setActiveLocale(loc)}
-                >
-                  {getLocaleLabel(loc)}
-                </Button>
-              ))}
-            </div>
-          )}
-
-          <TranslationLocaleFields
-            config={config}
-            state={state}
-            dispatch={dispatch}
-            locale={locale}
-            idPrefix={`translation-child-${childId}`}
-            onPublishToggle={handlePublishToggle}
-          />
-
-          <div className={styles.childDetailActions}>
-            <Button
-              type="button"
-              variant="primary"
-              size="sm"
-              loading={state.saving}
-              disabled={state.saving}
-              onClick={handleSave}
-            >
-              {state.saving ? t("admin.access.saving", "Saving…") : t("common.save", "Save")}
-            </Button>
-          </div>
-        </>
-      )}
-    </div>
+    <TranslationChildDetailView
+      config={config}
+      childId={childId}
+      state={state}
+      dispatch={dispatch}
+      locale={locale}
+      secondaryLocales={secondaryLocales}
+      onBack={onBack}
+      onSave={handleSave}
+      onPublishToggle={handlePublishToggle}
+      onLocaleChange={setActiveLocale}
+    />
   );
 }

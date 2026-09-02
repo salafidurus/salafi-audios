@@ -4,149 +4,198 @@ import type { Track } from "@sd/domain-audio";
 
 import { httpClient, endpoints } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
-import { useAudio, useListingProgress, buildTrackQueue } from "@sd/domain-audio";
+import {
+  isTrackActiveForListing,
+  isListingFormat,
+  useAudio,
+  useListingProgress,
+  buildTrackQueue,
+} from "@sd/domain-audio";
 import { useFormattedScholarName, useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { audioService } from "@/features/audio";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { AppText, List } from "@/shared/ui";
 
+/** Describes the inputs and callbacks accepted by Explore Podcast Row. */
+/** Describes the inputs, callbacks, and optional state accepted by Explore Podcast Row. */
 export type ExplorePodcastRowProps = {
   item: FeedContentItemDto;
   onPress?: () => void;
   onNavigateToListing?: (slug: string) => void;
-  hideBorder?: boolean;
 };
 
-export function ExplorePodcastRow({
-  item,
-  onPress,
-  onNavigateToListing,
-  hideBorder = false,
-}: ExplorePodcastRowProps) {
+async function toggleActiveTrack(isCurrentTrack: boolean, isPlaying: boolean) {
+  if (!isCurrentTrack) return false;
+  if (isPlaying) await audioService.pause();
+  else await audioService.resume();
+  return true;
+}
+
+async function tryPlayExploreQueue(
+  item: FeedContentItemDto,
+  title: string,
+  scholarName: string,
+): Promise<boolean> {
+  try {
+    const contents = await httpClient<ListingContentsDto>({
+      url: endpoints.listings.contents(item.slug),
+      method: "GET",
+    });
+    const queue = buildTrackQueue(
+      {
+        id: item.id,
+        title,
+        format: item.kind,
+        scholarName,
+        scholarSlug: item.scholarSlug,
+        artworkUrl: item.thumbnailUrl ?? undefined,
+      },
+      contents,
+    );
+    const firstTrack = queue[0];
+    if (!firstTrack) return false;
+    await audioService.playListing(firstTrack, queue);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function playExploreItem(
+  item: FeedContentItemDto,
+  title: string,
+  scholarName: string,
+  isCurrentTrack: boolean,
+  isPlaying: boolean,
+) {
+  if (await toggleActiveTrack(isCurrentTrack, isPlaying)) return;
+
+  if (item.kind !== "single") {
+    if (await tryPlayExploreQueue(item, title, scholarName)) return;
+  }
+
+  const track: Track = {
+    id: item.id,
+    slug: item.slug,
+    title,
+    artist: scholarName,
+    scholarSlug: item.scholarSlug,
+    url: "",
+    durationSeconds: item.durationSeconds ?? 0,
+    artworkUrl: item.thumbnailUrl ?? undefined,
+    seriesId: null,
+    seriesTitle: null,
+  };
+
+  await audioService.playListing(track, [track]);
+}
+
+function showExploreDetails(
+  slug: string,
+  onPress?: () => void,
+  onNavigateToListing?: (slug: string) => void,
+) {
+  if (onPress) onPress();
+  else if (onNavigateToListing) onNavigateToListing(slug);
+}
+
+function toggleExploreSave(item: FeedContentItemDto, isSaved: boolean) {
+  if (isSaved) markUnsaved(item.id, item.slug);
+  else markSaved(item.id, item.slug);
+}
+
+function handleExploreAction(
+  id: string,
+  item: FeedContentItemDto,
+  isSaved: boolean,
+  onPress?: () => void,
+  onNavigateToListing?: (slug: string) => void,
+) {
+  if (id === "details") showExploreDetails(item.slug, onPress, onNavigateToListing);
+  if (id === "save") toggleExploreSave(item, isSaved);
+}
+
+function renderProgressBar(progressPercent: number) {
+  if (progressPercent <= 0 || progressPercent >= 100) return null;
+
+  return (
+    <View style={styles.progressTrack} testID="progress-bar-track">
+      <View style={[styles.progressBar, { width: `${Math.round(progressPercent)}%` }]} />
+    </View>
+  );
+}
+
+function getIsCurrentTrack(item: FeedContentItemDto, currentTrack: Track | null) {
+  if (!isListingFormat(item.kind)) return false;
+  return isTrackActiveForListing({ id: item.id, slug: item.slug, format: item.kind }, currentTrack);
+}
+
+function getDurationText(seconds?: number | null) {
+  return seconds ? `${Math.round(seconds / 60)} min` : "";
+}
+
+function getPublishedDateText(publishedAt?: string | null) {
+  return publishedAt ? new Date(publishedAt).toLocaleDateString() : "";
+}
+
+/**
+ * Renders the explore podcast row while retaining an RN fallback for its
+ * progress bar, remote artwork, marquee text, and long-press action menu.
+ */
+export function ExplorePodcastRow({ item, onPress, onNavigateToListing }: ExplorePodcastRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const scholarName = item.scholarName;
   const displayScholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
-  const { progressPercent } = useListingProgress(item.id);
+  const { progressPercent } = useListingProgress(item.slug);
 
   const { isPlaying, currentTrack } = useAudio();
-  const isCurrentTrack =
-    currentTrack?.id === item.id ||
-    currentTrack?.seriesId === item.id ||
-    currentTrack?.collectionId === item.id;
+  const isCurrentTrack = getIsCurrentTrack(item, currentTrack);
 
   const isSaved = useIsSaved(item.id);
 
-  const handlePlay = async () => {
-    if (isCurrentTrack) {
-      if (isPlaying) {
-        await audioService.pause();
-      } else {
-        await audioService.resume();
-      }
-      return;
-    }
+  const handlePlay = () => playExploreItem(item, title, scholarName, isCurrentTrack, isPlaying);
 
-    // A Series/Collection row has no audio asset of its own — fetch its
-    // contents on tap and play the full ordered queue starting at the first
-    // lesson, instead of mis-tracking progress against the row's own id.
-    if (item.kind !== "single") {
-      try {
-        const contents = await httpClient<ListingContentsDto>({
-          url: endpoints.listings.contents(item.slug),
-          method: "GET",
-        });
-        const queue = buildTrackQueue(
-          {
-            id: item.id,
-            title,
-            format: item.kind,
-            scholarName,
-            scholarSlug: item.scholarSlug,
-            artworkUrl: item.thumbnailUrl ?? undefined,
-          },
-          contents,
-        );
-        const firstTrack = queue[0];
-        if (firstTrack) {
-          await audioService.playListing(firstTrack, queue);
-          return;
-        }
-      } catch {
-        // Fall through to the single-track fallback below.
-      }
-    }
-
-    const track: Track = {
-      id: item.id,
-      slug: item.slug,
-      title,
-      artist: scholarName,
-      scholarSlug: item.scholarSlug,
-      url: "",
-      durationSeconds: item.durationSeconds ?? 0,
-      artworkUrl: item.thumbnailUrl ?? undefined,
-      seriesId: null,
-      seriesTitle: null,
-    };
-
-    await audioService.playListing(track, [track]);
-  };
-
-  const handleDetails = () => {
-    if (onPress) {
-      onPress();
-    } else if (onNavigateToListing) {
-      onNavigateToListing(item.slug);
-    }
-  };
-
-  const handleSave = () => {
-    if (isSaved) {
-      markUnsaved(item.id, item.slug);
-    } else {
-      markSaved(item.id, item.slug);
-    }
-  };
-
-  const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";
-  const publishedDateText = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : "";
+  const durationText = getDurationText(item.durationSeconds);
+  const publishedDateText = getPublishedDateText(item.publishedAt);
 
   const actions: MenuAction[] = [
     { id: "details", title: "Details" },
     { id: "save", title: "Save", state: isSaved ? "on" : "off" },
   ];
 
-  const handleAction = (id: string) => {
-    if (id === "details") handleDetails();
-    if (id === "save") handleSave();
-  };
+  const handleAction = (id: string) =>
+    handleExploreAction(id, item, isSaved, onPress, onNavigateToListing);
 
   return (
-    <List.Item onPress={handlePlay} hideBorder={hideBorder} testID="podcast-row-item">
+    <List.Item onPress={handlePlay} testID="podcast-row-item">
       <View style={styles.rowContent} testID="podcast-row">
-        <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
-        <View style={styles.content}>
-          <MarqueeText text={title} variant="titleMd" />
-          <MarqueeText text={displayScholarName} variant="bodySm" />
-          <View style={styles.details}>
-            <AppText variant="xs" style={styles.metaText}>
-              {durationText}
-              {durationText && publishedDateText && " · "}
-              {publishedDateText}
-            </AppText>
-          </View>
-          {progressPercent > 0 && progressPercent < 100 ? (
-            <View style={styles.progressTrack} testID="progress-bar-track">
-              <View style={[styles.progressBar, { width: `${Math.round(progressPercent)}%` }]} />
+        <View style={styles.rowLayout}>
+          <UserAvatar
+            image={item.thumbnailUrl ?? item.scholarImageUrl}
+            name={title}
+            size={64}
+            testID="explore-listing-avatar"
+          />
+          <View style={styles.content}>
+            <View style={styles.columnLayout}>
+              <MarqueeText text={title} variant="titleMd" />
+              <MarqueeText text={displayScholarName} variant="bodySm" />
+              <View style={styles.details}>
+                <AppText variant="xs" style={styles.metaText}>
+                  {durationText}
+                  {durationText && publishedDateText && " · "}
+                  {publishedDateText}
+                </AppText>
+              </View>
+              {renderProgressBar(progressPercent)}
             </View>
-          ) : null}
+          </View>
         </View>
       </View>
 
@@ -160,6 +209,15 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     gap: theme.spacing.scale.sm,
     flex: 1,
+  },
+  rowLayout: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.sm,
+    flex: 1,
+  },
+  columnLayout: {
+    gap: theme.spacing.scale.xs,
   },
   content: {
     flex: 1,

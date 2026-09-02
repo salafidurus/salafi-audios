@@ -1,49 +1,77 @@
-import { View, Pressable, Text, ActivityIndicator } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Host, Row } from "@expo/ui";
+import { StyleSheet } from "react-native-unistyles";
 
+import { toUniversalStyleFromRN } from "@/core/styles/expo-ui";
 import { useDownload } from "@/features/downloads/hooks/use-download";
+import { NativeButton, NativeProgress, NativeText } from "@/shared/ui";
 
-type DownloadButtonProps = {
-  lectureId: string;
+/** Renders native download actions while the download hook owns lifecycle state. */
+/**
+ * Carries the stable lecture identity and source URL into the download button.
+ * The component uses these values to start, retry, or remove the device-local
+ * artifact while the download hook remains the owner of lifecycle state.
+ */
+export type DownloadButtonProps = {
+  /** Identifies the lecture and its remote audio source for the download lifecycle. */
+  listingSlug: string;
   audioUrl: string;
 };
 
-export function DownloadButton({ lectureId, audioUrl }: DownloadButtonProps) {
+/**
+ * Renders device-local download actions.
+ *
+ * The hook remains authoritative for lifecycle status; this component only
+ * maps idle/error, active, and complete states to native presentation and
+ * forwards start/remove side effects to the hook.
+ */
+export function DownloadButton({ listingSlug, audioUrl }: DownloadButtonProps) {
   const { status, isDownloaded, isDownloading, startDownload, removeDownload } = useDownload(
-    lectureId,
+    listingSlug,
     audioUrl,
   );
-  const { theme } = useUnistyles();
-
   if (isDownloaded) {
     return (
-      <Pressable
-        onPress={removeDownload}
-        style={[styles.pill, styles.downloadedPill]}
-        accessibilityLabel="Remove download"
-      >
-        <Text style={styles.downloadedLabel}>✓ Downloaded</Text>
-      </Pressable>
+      <Host>
+        <NativeButton
+          label="✓ Downloaded"
+          variant="surface"
+          onPress={removeDownload}
+          accessibilityLabel="Remove download"
+          style={toUniversalStyleFromRN([styles.pill, styles.downloadedPill])}
+          testID="remove-download"
+        />
+      </Host>
     );
   }
 
   if (isDownloading) {
     return (
-      <View style={[styles.pill, styles.downloadingPill]}>
-        <ActivityIndicator size="small" color={theme.colors.action.primary} />
-        <Text style={styles.downloadingLabel}>Downloading</Text>
-      </View>
+      <Host>
+        <Row
+          alignment="center"
+          spacing={6}
+          style={toUniversalStyleFromRN([styles.pill, styles.downloadingPill])}
+        >
+          <NativeProgress variant="circular" value={0.5} testID="download-progress-spinner" />
+          <NativeText variant="caption" colorRole="primary">
+            Downloading
+          </NativeText>
+        </Row>
+      </Host>
     );
   }
 
   return (
-    <Pressable
-      onPress={startDownload}
-      style={[styles.pill, styles.downloadPill]}
-      accessibilityLabel="Download lecture"
-    >
-      <Text style={styles.downloadLabel}>{status === "error" ? "⚠ Retry" : "↓ Download"}</Text>
-    </Pressable>
+    <Host>
+      <NativeButton
+        label={status === "error" ? "⚠ Retry" : "↓ Download"}
+        variant="outline"
+        onPress={startDownload}
+        accessibilityLabel="Download lecture"
+        style={toUniversalStyleFromRN([styles.pill, styles.downloadPill])}
+        testID="download-lecture"
+      />
+    </Host>
   );
 }
 
@@ -56,20 +84,8 @@ const styles = StyleSheet.create((theme) => ({
   downloadedPill: {
     backgroundColor: theme.colors.state.successSurface,
   },
-  downloadedLabel: {
-    fontSize: 13,
-    color: theme.colors.state.success,
-    fontWeight: "600",
-  },
   downloadingPill: {
     backgroundColor: theme.colors.surface.primarySubtle,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  downloadingLabel: {
-    fontSize: 13,
-    color: theme.colors.action.primary,
   },
   downloadPill: {
     borderWidth: 1,

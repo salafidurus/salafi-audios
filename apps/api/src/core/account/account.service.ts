@@ -5,19 +5,24 @@ import { PrismaService } from '../db/prisma.service';
 import { defineAbilityFor } from '../auth/ability/ability.factory';
 import type { AccessGrantAttribute } from '../auth/ability/ability.types';
 
+/** Core API account.service module providing shared backend infrastructure and authority-boundary services. */
 type AuthenticatedUser = {
   id: string;
   email: string;
   name: string;
   image?: string | null;
   emailVerified: boolean;
+  /** Documents the roles field's API projection semantics and lifecycle meaning. */
   roles?: string[];
   accessGrants?: AccessGrantAttribute[];
+  /** Documents the createdAt field's API projection semantics and lifecycle meaning. */
   createdAt: Date;
+  /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */
   updatedAt: Date;
 };
 
 @Injectable()
+/** NestJS account service service or controller coordinating the API boundary for this responsibility. */
 export class AccountService {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -76,14 +81,24 @@ export class AccountService {
 }
 
 function deriveAccessRoles(systemRoles: string[], grants: AccessGrantAttribute[]): string[] {
-  const roles = new Set<string>();
-  if (systemRoles.includes('superadmin')) roles.add('Superadmin');
-  if (grants.some((grant) => grant.capability === 'write')) roles.add('Editor');
-  if (grants.some((grant) => grant.capability === 'translate')) roles.add('Translator');
-  if (grants.some((grant) => grant.capability === 'publish')) roles.add('Publisher');
-  if (grants.some((grant) => grant.capability === 'delete')) roles.add('Deleter');
-  if (grants.some((grant) => grant.target === 'user' && grant.capability === 'manage')) {
-    roles.add('User manager');
-  }
-  return roles.size ? [...roles].sort() : ['Listener'];
+  const roleChecks = [
+    ['Superadmin', systemRoles.includes('superadmin')],
+    ['Editor', hasCapability(grants, 'write')],
+    ['Translator', hasCapability(grants, 'translate')],
+    ['Publisher', hasCapability(grants, 'publish')],
+    ['Deleter', hasCapability(grants, 'delete')],
+    [
+      'User manager',
+      grants.some((grant) => grant.target === 'user' && grant.capability === 'manage'),
+    ],
+  ] as const;
+  const roles = roleChecks.reduce<string[]>((result, [role, enabled]) => {
+    if (enabled) result.push(role);
+    return result;
+  }, []);
+  return roles.length ? roles.sort() : ['Listener'];
+}
+
+function hasCapability(grants: AccessGrantAttribute[], capability: string): boolean {
+  return grants.some((grant) => grant.capability === capability);
 }

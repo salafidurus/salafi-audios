@@ -1,0 +1,68 @@
+import { Icon } from "@expo/ui";
+
+/** Maps semantic icon names to platform-native Expo UI icon sources. */
+/** The only source of platform-specific icon identifiers for NativeIcon. */
+export const nativeIconSources = {
+  add: Icon.select({ ios: "plus", android: import("@expo/material-symbols/add.xml") }),
+  back: Icon.select({
+    ios: "chevron.backward",
+    android: import("@expo/material-symbols/arrow_back.xml"),
+  }),
+  check: Icon.select({ ios: "checkmark", android: import("@expo/material-symbols/check.xml") }),
+  close: Icon.select({ ios: "xmark", android: import("@expo/material-symbols/close.xml") }),
+  chevronDown: Icon.select({
+    ios: "chevron.down",
+    android: import("@expo/material-symbols/keyboard_arrow_down.xml"),
+  }),
+  delete: Icon.select({ ios: "trash", android: import("@expo/material-symbols/delete.xml") }),
+  download: Icon.select({
+    ios: "arrow.down.circle",
+    android: import("@expo/material-symbols/download.xml"),
+  }),
+  edit: Icon.select({ ios: "pencil", android: import("@expo/material-symbols/edit.xml") }),
+  error: Icon.select({
+    ios: "exclamationmark.triangle",
+    android: import("@expo/material-symbols/error.xml"),
+  }),
+  more: Icon.select({ ios: "ellipsis", android: import("@expo/material-symbols/more_horiz.xml") }),
+  music: Icon.select({
+    ios: "music.note",
+    android: import("@expo/material-symbols/music_note.xml"),
+  }),
+  pause: Icon.select({ ios: "pause.fill", android: import("@expo/material-symbols/pause.xml") }),
+  play: Icon.select({
+    ios: "play.fill",
+    android: import("@expo/material-symbols/arrow_right.xml"),
+  }),
+  search: Icon.select({
+    ios: "magnifyingglass",
+    android: import("@expo/material-symbols/search.xml"),
+  }),
+  skipBack: Icon.select({
+    ios: "backward.end",
+    android: import("@expo/material-symbols/skip_previous.xml"),
+  }),
+  skipForward: Icon.select({
+    ios: "forward.end",
+    android: import("@expo/material-symbols/skip_next.xml"),
+  }),
+  replay: Icon.select({
+    ios: "gobackward.30",
+    android: import("@expo/material-symbols/replay_30.xml"),
+  }),
+  forward: Icon.select({
+    ios: "goforward.30",
+    android: import("@expo/material-symbols/forward_30.xml"),
+  }),
+  settings: Icon.select({
+    ios: "gearshape",
+    android: import("@expo/material-symbols/settings.xml"),
+  }),
+  success: Icon.select({
+    ios: "checkmark.circle.fill",
+    android: import("@expo/material-symbols/check_circle.xml"),
+  }),
+} as const;
+
+/** Names callers may use without depending on platform icon identifiers. */
+export type NativeIconName = keyof typeof nativeIconSources;

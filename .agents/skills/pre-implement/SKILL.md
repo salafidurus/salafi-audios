@@ -1,0 +1,123 @@
+---
+name: pre-implement
+description: "Investigate one implementation ticket and produce an execution-ready plan."
+disable-model-invocation: true
+---
+
+# Pre-Implementation
+
+Prepare one implementation ticket for execution. This skill is planning-only:
+do not edit production code, create branches, commit, push, or open a PR.
+
+## Scope
+
+The input must be an implementation ticket, not a specification umbrella. If a
+ticket belongs to a specification, study the parent specification and its
+relevant ticket/dependency graph first, then plan only the selected ticket.
+
+## Investigation
+
+Read [READINESS.md](READINESS.md) before evaluating the ticket lifecycle
+precondition.
+
+### Triage precondition
+
+Before planning, verify the implementation issue has exactly one category role
+and one state role, and that its state is `ready-for-agent`. This verification
+is read-only: do not change labels, close issues, or otherwise invoke a
+mutating triage transition from this planning-only skill. If the issue is
+untriaged, has conflicting state labels, or is not ready for an agent, stop
+planning and hand the issue back to `triage` for resolution. If no issue is
+available, record that the triage precondition was not applicable.
+
+When planning isolated work, recommend a worktree under the repository-root
+`.worktree/`, based on `origin/main`. Choose a concise slug: prefer one word
+and never use more than two words. Use the same slug in the worktree path and
+branch name. Apply the appropriate prefix:
+
+- Chore or CI: `.worktree/c-<slug>`, branch `c/<slug>`
+- Feature: `.worktree/f-<slug>`, branch `f/<slug>`
+- Bug fix or hotfix: `.worktree/fix-<slug>`, branch `fix/<slug>`
+
+For example, use the slug `audio-improve` to recommend
+`.worktree/c-audio-improve` with branch `c/audio-improve`.
+
+For a specification ticket, resolve the parent specification but do not seek a
+specification integration branch. For standalone bug, research, maintenance,
+or other non-specification work, explicitly record that no parent
+specification applies. Branch and pull-request routing are defined in
+[issue-tracker.md](../../../docs/agents/issue-tracker.md); implementation uses
+`origin/main → main`, while finalization is verification-only on current
+`main`.
+
+Every plan records this routing context:
+
+| Ticket context                               | Branch base                 | Pull-request target            |
+| -------------------------------------------- | --------------------------- | ------------------------------ |
+| Specification ticket                         | `origin/main`              | `main`                         |
+| Standalone ticket                            | `origin/main`               | `main`                         |
+
+For the final spec-finalization ticket, use this classification instead of
+the ordinary specification-ticket row:
+
+| Ticket context      | Branch base                                      | Pull-request target |
+| ------------------- | ------------------------------------------------ | ------------------- |
+| Finalization ticket | current `origin/main`                            | none                |
+
+No ordinary feature work is expected for this ticket. The plan must identify
+the parent specification, confirm that every implementation ticket is merged
+into current `main`, and run the acceptance matrix without creating a branch or
+pull request.
+
+Read and cross-reference:
+
+1. The ticket, comments, labels, dependencies, and acceptance criteria.
+2. The parent specification, when one exists.
+3. Root and nearest workspace [AGENT.md](../../../AGENT.md) files.
+4. Relevant `CONTEXT.md`, architecture documents, and ADRs.
+5. The current implementation, tests, public seams, package boundaries, and
+   affected scripts.
+6. Platform-specific constraints, including whether the change touches
+   `apps/native`.
+7. [tsdoc-policy.md](tsdoc-policy.md) when the ticket changes code,
+   contracts, or agent-facing implementation guidance.
+
+Resolve facts by inspecting the repository and issue tracker. Surface only
+decisions, assumptions, risks, and ambiguities that require human judgment.
+
+## Documentation impact
+
+For every affected public seam, read the implementation and tests and record
+the documentation contract in the plan. Identify routes, API clients, hooks,
+components, types, adapters, state machines, and meaningful semantic fields.
+Explain the behavior, invariant, side effect, and failure mode that callers
+need to preserve. Use [tsdoc-policy.md](tsdoc-policy.md) for
+planning examples; do not plan generic comments or documentation for trivial
+locals.
+
+## Output
+
+Produce a clear implementation plan in the conversation with:
+
+- Ticket and specification scope.
+- Current behavior and desired behavior.
+- Domain terms and relevant architectural constraints.
+- Exact files/modules likely to change and why.
+- Test seams and a red → green vertical-slice sequence.
+- Native/worktree classification and platform validation.
+- Proposed worktree name and branch name when isolation is required.
+- Required environment-file copy, dependency-install, and pre-work verification
+  steps for the selected checkout.
+- Ordered implementation stages and completion criteria.
+- Documentation seams, TSDoc requirements, examples, and validation steps.
+- Risks, migrations, follow-up work, and unresolved decisions.
+
+The default output is conversation-only. Add the plan as a GitHub issue
+comment only when the user explicitly requests publication there.
+
+## Completion
+
+Stop when every acceptance criterion maps to an implementation or test step,
+the checkout mode, worktree/branch, setup, and validation steps are classified,
+and no material scope decision remains hidden.
+Wait for the user's approval before implementation begins. Once the plan is approved, hand off to `implement`.

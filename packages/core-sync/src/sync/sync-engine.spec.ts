@@ -11,6 +11,10 @@ function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function createTestOutbox() {
+  return createOutboxStore<TestEntity>(createFakeStorageAdapter(), "test");
+}
+
 describe("createSyncEngine", () => {
   const useTestStore = createEntityStore<TestEntity>();
 
@@ -19,7 +23,7 @@ describe("createSyncEngine", () => {
   });
 
   it("scheduleSync writes the entity into the local store immediately (optimistic)", () => {
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -37,7 +41,7 @@ describe("createSyncEngine", () => {
   it("debounces multiple scheduleSync calls for the same id into a single push", async () => {
     let pushCalls = 0;
     let lastPushed: TestEntity | undefined;
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -62,7 +66,7 @@ describe("createSyncEngine", () => {
 
   it("flush() bypasses the debounce timer and pushes immediately", async () => {
     let pushCalls = 0;
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -80,9 +84,30 @@ describe("createSyncEngine", () => {
     expect(pushCalls).toBe(1);
   });
 
+  it("dispose() cancels pending debounced work", async () => {
+    let pushCalls = 0;
+    const outbox = createTestOutbox();
+    const engine = createSyncEngine<TestEntity>({
+      store: useTestStore,
+      outbox,
+      entryType: "test-update",
+      debounceMs: 20,
+      pushOne: async () => {
+        pushCalls++;
+      },
+      pullSince: async () => [],
+    });
+
+    engine.scheduleSync({ id: "a", updatedAt: "2026-01-01T00:00:00.000Z", value: 1 });
+    engine.dispose();
+    await wait(60);
+
+    expect(pushCalls).toBe(0);
+  });
+
   it("flush() with nothing pending does not call pushOne", async () => {
     let pushCalls = 0;
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -99,7 +124,7 @@ describe("createSyncEngine", () => {
   });
 
   it("notifies onFlushed listeners after a successful flush", async () => {
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -119,7 +144,7 @@ describe("createSyncEngine", () => {
   });
 
   it("does not notify onFlushed listeners when there was nothing to flush", async () => {
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -137,7 +162,7 @@ describe("createSyncEngine", () => {
 
   it("queues the entity in the persisted outbox when a flush push fails, instead of throwing", async () => {
     const adapter = createFakeStorageAdapter();
-    const outbox = createOutboxStore(adapter, "test");
+    const outbox = createOutboxStore<TestEntity>(adapter, "test");
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -154,11 +179,11 @@ describe("createSyncEngine", () => {
     const entries = outbox.useOutboxStore.getState().entries;
     expect(entries).toHaveLength(1);
     expect(entries[0]?.type).toBe("test-update");
-    expect((entries[0]?.payload as TestEntity | undefined)?.id).toBe("a");
+    expect(entries[0]?.payload.id).toBe("a");
   });
 
   it("retries an entry queued by a previous failed flush on the very next flush call", async () => {
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     let pushCalls = 0;
     let shouldFail = true;
     const engine = createSyncEngine<TestEntity>({
@@ -185,7 +210,7 @@ describe("createSyncEngine", () => {
   });
 
   it("notifies onFlushed when a flush only retries queued outbox entries with nothing newly pending", async () => {
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -206,7 +231,7 @@ describe("createSyncEngine", () => {
   });
 
   it("hydrate pulls entities since the given cursor and merges them into the store via LWW", async () => {
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     let requestedSince: string | undefined;
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
@@ -231,7 +256,7 @@ describe("createSyncEngine", () => {
       .getState()
       .actions.upsert({ id: "a", updatedAt: "2026-01-03T00:00:00.000Z", value: 99 });
 
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -247,7 +272,7 @@ describe("createSyncEngine", () => {
 
   it("bulkSync calls pushBulk with the full batch when provided", async () => {
     let bulkCalledWith: TestEntity[] | undefined;
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -269,7 +294,7 @@ describe("createSyncEngine", () => {
 
   it("bulkSync falls back to per-entity pushOne when pushBulk is not provided", async () => {
     const pushed: string[] = [];
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -290,7 +315,7 @@ describe("createSyncEngine", () => {
 
   it("bulkSync is a no-op on an empty batch", async () => {
     let called = false;
-    const outbox = createOutboxStore(createFakeStorageAdapter(), "test");
+    const outbox = createTestOutbox();
     const engine = createSyncEngine<TestEntity>({
       store: useTestStore,
       outbox,
@@ -308,7 +333,7 @@ describe("createSyncEngine", () => {
 
   it("drainPending retries queued outbox entries via pushOne and removes them on success", async () => {
     const adapter = createFakeStorageAdapter();
-    const outbox = createOutboxStore(adapter, "test");
+    const outbox = createOutboxStore<TestEntity>(adapter, "test");
     outbox.useOutboxStore
       .getState()
       .actions.enqueue("test-update", { id: "a", updatedAt: "2026-01-01T00:00:00.000Z", value: 1 });

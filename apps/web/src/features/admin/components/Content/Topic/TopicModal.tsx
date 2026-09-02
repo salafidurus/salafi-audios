@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type {
@@ -15,9 +16,9 @@ import {
   updateTopicWithTranslations,
 } from "@/features/admin/api/admin.api";
 import { slugify } from "@/features/admin/utils/slugify";
-import { Button } from "@/shared/components/Button";
-import { InputField } from "@/shared/components/InputField";
-import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/components/ui/button";
+import { InputField } from "@/shared/components/ui/input-field";
+import { Modal } from "@/shared/components/ui/modal";
 
 import styles from "./topic-modal.module.css";
 

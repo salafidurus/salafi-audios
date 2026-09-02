@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { X } from "lucide-react";
@@ -6,6 +7,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 
 import styles from "./Search.module.css";
 
+/** Describes one selectable filter rendered by `Search.Filter`. */
 export interface FilterChip {
   /** Unique identifier for the chip */
   id: string;
@@ -13,6 +15,7 @@ export interface FilterChip {
   label: string;
 }
 
+/** Controlled selection state and behavior for the filter chip group. */
 export interface SearchFilterProps {
   /** Array of available filter chips */
   chips: FilterChip[];

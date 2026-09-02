@@ -2,7 +2,7 @@
 
 # react-doctor hook start
 react_doctor_scan_staged_files() {
-  bunx react-doctor@latest --staged --blocking warning --max-duration 120
+  bunx --no-install react-doctor --staged --blocking warning --max-duration 120
 }
 
 react_doctor_output=$(mktemp "${TMPDIR:-/tmp}/react-doctor-hook.XXXXXX")
@@ -40,21 +40,20 @@ else
   printf '%s\n' "Semgrep check failed. Commit blocked." >&2
   exit 1
 fi
-# catalog fix start
-printf "pre-commit: running catalog auto-fixer...\n"
-bun run catalog fix
+# dependency alignment start
+printf "pre-commit: running Dependabot Helper alignment...\n"
+bun run --filter dependabot-helper align
 
 # Stage any package.json files modified by the fixer
 git diff --name-only | grep 'package.json' | while read -r file; do
   git add "$file"
 done
 
-# Run check to verify no outstanding blocking issues remain
-if ! bun run catalog; then
-  printf "\x1b[31mCatalog validation failed. Commit blocked.\x1b[0m\n" >&2
+# Run policy checks to verify no outstanding dependency issues remain
+if ! bun run --filter dependabot-helper check; then
+  printf "\x1b[31mDependabot Helper validation failed. Commit blocked.\x1b[0m\n" >&2
   exit 1
 fi
-# catalog fix end
+# dependency alignment end
 
 bun run lint:staged
-

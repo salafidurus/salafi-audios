@@ -10,7 +10,7 @@ jest.mock("@sd/domain-content", () => ({
   useScholarTopics: jest.fn(),
 }));
 
-jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
+jest.mock("@/shared/ui/native-screen-view", () => ({
   ScreenView: ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
@@ -20,8 +20,8 @@ jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
   },
 }));
 
-jest.mock("@/shared/components/AppText/AppText", () => ({
-  AppText: ({ children }: { children: React.ReactNode }) => {
+jest.mock("@/shared/ui/native-text", () => ({
+  NativeText: ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
     // eslint-disable-next-line @typescript-eslint/no-require-imports

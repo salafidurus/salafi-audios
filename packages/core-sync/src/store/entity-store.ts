@@ -2,6 +2,7 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import { resolveLastWriteWins } from "../conflict/last-write-wins";
 
+/** Entity-store contract for local optimistic state and server reconciliation. */
 /**
  * Minimum shape every entity managed by `createEntityStore` must have: an id to
  * key on, an `updatedAt` for LWW conflict resolution, and an optional `deletedAt`
@@ -9,12 +10,17 @@ import { resolveLastWriteWins } from "../conflict/last-write-wins";
  * vanishing (see `FavoriteListing`'s planned `deletedAt` column).
  */
 export type SyncableEntity = {
+  /** Stable client identity used to merge representations of the same entity. */
   id: string;
+  /** ISO timestamp used by reconciliation to choose the newer representation. */
   updatedAt: string;
+  /** Sync-visible removal marker; unlike `remove`, it can propagate through a delta. */
   deletedAt?: string;
 };
 
+/** Local entity-store state and mutation seams used by the sync engine. */
 export type EntityStoreState<T extends SyncableEntity> = {
+  /** Entities retained locally, including tombstoned entities. */
   entities: Record<string, T>;
   actions: {
     /** Unconditional overwrite — used for known-fresh local writes. */
@@ -33,6 +39,7 @@ export type EntityStoreState<T extends SyncableEntity> = {
   };
 };
 
+/** Creates an optimistic local store with explicit merge and tombstone semantics. */
 export function createEntityStore<T extends SyncableEntity>(): UseBoundStore<
   StoreApi<EntityStoreState<T>>
 > {

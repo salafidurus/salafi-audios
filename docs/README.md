@@ -1,37 +1,36 @@
-# Salafi Durus Documentation
+# Documentation
 
-This directory contains the standard, top-level documentation for Salafi Durus. It is intentionally compact: the docs here define product intent, architecture, and system rules, while workspace `AGENT.md` files hold package- or app-specific implementation guidance.
+This directory is the repository’s durable documentation. Put new material in
+the closest existing category; do not add loose files at the `docs/` root
+without updating this index.
 
-## Standard Set
+## Categories
 
-- **[AGENT.md](./AGENT.md)**: Current implementation status, phase summary, and quick navigation.
-- **[prd.md](./prd.md)**: Product vision, principles, user roles, trust model, and non-goals.
-- **[architecture.md](./architecture.md)**: System architecture, monorepo boundaries, and platform responsibilities.
-- **[api.md](./api.md)**: Backend architecture, API contract rules, auth/authz, and media/API boundaries.
-- **[auth.md](./auth.md)**: End-to-end authentication mechanism across api, web, and native (bearer tokens, cross-site OAuth handoff).
-- **[database.md](./database.md)**: Data ownership, relational modeling, media references, and migration rules.
-- **[nomenclature.md](./nomenclature.md)**: Canonical content vocabulary — the two-axis model and the Collection / Series / Module / Single / Lesson names, plus the Listing umbrella term.
-- **[mobile.md](./mobile.md)**: Mobile structure, current capabilities, and target offline/sync architecture.
-- **[web.md](./web.md)**: Web structure, SEO/discovery responsibilities, and admin/public boundaries.
-- **[dev-ops.md](./dev-ops.md)**: Environment model, configuration rules, and branch-deploy workflow.
+- [`product/`](product/): product requirements and non-goals
+- [`architecture.md`](architecture.md): complete platform map
+- [`adr/`](adr/): durable architectural decisions
+- [`clients/`](clients/): web and mobile architecture
+- [`backend/`](backend/): API boundaries and contracts
+- [`data/`](data/): database, storage, and synchronization
+- [`security/`](security/): authentication and session boundaries
+- [`administration/`](administration/): roles, grants, and break-glass access
+- [`content/`](content/): canonical content vocabulary
+- [`policies/`](policies/): rules that govern development and delivery
+- [`runbooks/`](runbooks/): repeatable operational procedures
 
-## Reading Order
+Key policies:
 
-1. [Root AGENT.md](../AGENT.md)
-2. [docs/AGENT.md](./AGENT.md)
-3. [prd.md](./prd.md)
-4. [architecture.md](./architecture.md)
-5. The relevant technical document in this folder
-6. The target workspace `AGENT.md` such as `apps/api/AGENT.md` or `apps/web/AGENT.md`
+- [`Dependency automation`](policies/dependency-automation.md): ownership
+  boundaries for Dependabot, Dependabot Helper, and catalog alignment
 
-## How These Docs Work
+## Reading order
 
-- These files capture cross-cutting rules and durable architectural intent.
-- Workspace `AGENT.md` files capture operational detail, local conventions, and package-specific commands.
-- If a detail is only relevant to one app or package, prefer the workspace `AGENT.md` over expanding this folder.
+1. [`../AGENT.md`](../AGENT.md)
+2. [`AGENT.md`](AGENT.md)
+3. [`product/requirements.md`](product/requirements.md)
+4. [`architecture.md`](architecture.md)
+5. The document for the area being changed
+6. The target workspace `AGENT.md`
 
-## Documentation as Enforcement
-
-- Architectural changes require documentation updates.
-- Undocumented behavior is considered incomplete.
-- If code and docs diverge, reconcile them intentionally.
+`AGENT.md` files contain agent and contributor guidance. The other documents
+describe the product and system. Keep those responsibilities separate.

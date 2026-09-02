@@ -1,22 +1,23 @@
 import { httpClient, endpoints, queryKeys, type AdminUserListDto } from "@sd/core-contracts";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
+/** Provides paginated admin-user discovery for authorized administration surfaces. */
+/** Filters and controls the admin-user listing query. */
 export interface UseInfiniteAdminUsersOptions {
   search?: string;
+  /** Narrows users by their effective role or access category. */
   role?: string;
   enabled?: boolean;
 }
 
+/** Fetches admin users in API-defined pages without granting client authority. */
 export function useInfiniteAdminUsers(options?: UseInfiniteAdminUsersOptions) {
+  const initialPageParam: string | undefined = undefined;
+
   return useInfiniteQuery({
     queryKey: queryKeys.admin.users.infinite(options?.search, options?.role),
-    queryFn: async ({ pageParam }) => {
-      const params = new URLSearchParams();
-      if (options?.search) params.append("q", options.search);
-      if (options?.role) params.append("role", options.role);
-      if (pageParam) params.append("cursor", pageParam);
-
-      const url = `${endpoints.admin.users.list}${params.size > 0 ? `?${params}` : ""}`;
+    queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
+      const url = buildAdminUsersUrl(options, pageParam);
       const response = await httpClient<AdminUserListDto>({ url, method: "GET" });
 
       return {
@@ -25,8 +26,23 @@ export function useInfiniteAdminUsers(options?: UseInfiniteAdminUsersOptions) {
         hasMore: response.hasMore ?? false,
       };
     },
-    initialPageParam: undefined as string | undefined,
+    initialPageParam,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: options?.enabled !== false,
   });
+}
+
+function buildAdminUsersUrl(
+  options: UseInfiniteAdminUsersOptions | undefined,
+  pageParam: string | undefined,
+): string {
+  const params = new URLSearchParams();
+  appendParam(params, "q", options?.search);
+  appendParam(params, "role", options?.role);
+  appendParam(params, "cursor", pageParam);
+  return `${endpoints.admin.users.list}${params.size > 0 ? `?${params}` : ""}`;
+}
+
+function appendParam(params: URLSearchParams, key: string, value: string | undefined): void {
+  if (value) params.append(key, value);
 }

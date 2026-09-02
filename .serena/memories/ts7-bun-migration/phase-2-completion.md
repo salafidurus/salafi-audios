@@ -27,7 +27,7 @@
 
 **Dependencies Kept:**
 
-- `vitest`, `@swc/cli`, `@swc/core` (tests still use Vitest)
+- `@swc/cli`, `@swc/core` (retained for the API toolchain)
 - `@nestjs/cli`, `@nestjs/schematics` (kept for potential future generator use)
 
 ### Verification
@@ -40,34 +40,22 @@
 - Test prepush: PASS (14 API tests on changed files)
 - Full build: PASS (all apps + packages)
 
-### Phase 3: bun:test Migration — Deferred
+### Phase 3: bun:test Migration — Complete
 
-Attempted to migrate tests from Vitest to bun:test, but discovered:
-
-- Tests use `vi.mock()` (module-level mocking) — Vitest-specific, no direct bun:test equivalent
-- Would require refactoring all ~33+ unit test files + 7 E2E tests
-- Substantial scope change beyond Phase 2
-
-**Decision:** Keep Vitest for test stability. bun:test migration deferred for future optimization pass.
+The repository test suite now uses Bun's native test runner. Existing `vi.mock()` seams
+are provided by `bun:test`; no separate test runner configuration is required.
 
 ### What's Ready for Production
 
 - ✅ API runs from .ts source — faster startup, no build step
-- ✅ All tests pass with Vitest
+- ✅ Tests run with Bun's native test runner
 - ✅ Type safety with TypeScript 5.9.3 (strict mode)
 - ✅ No changes to test suite or behavior
 - ✅ Backward compatible with existing CI/CD
 
 ### Next Steps (Future)
 
-1. **Phase 3 (Future):** Migrate API tests to bun:test
-   - Requires refactoring test patterns (vi.mock → dependency injection)
-   - Would provide: faster test execution, one test framework across stack
-
-2. **Phase 4 (Future):** Migrate package tests to bun:test
-   - Similar scope: refactor all package tests
-
-3. **TypeScript 7 Upgrade (Future):**
+1. **TypeScript 7 Upgrade (Future):**
    - Separate from Bun migration
    - Requires verification of rollup-plugin-dts and other build tools
 
@@ -87,7 +75,7 @@ bun run --filter api dev
 # Production
 NODE_ENV=production bun run --filter api start:prod
 
-# Tests (Vitest, on changed files only)
+# Tests (on changed files only)
 bun run --filter api test:prepush
 
 # All tests

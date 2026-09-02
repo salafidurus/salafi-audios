@@ -23,12 +23,17 @@ import type {
   AdminArrangeDataDto,
   ArrangeCommitDto,
   ArrangeCommitResultDto,
+  HomePromotionsDto,
+  Locale,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ListingRepository } from './listing.repo';
 import { RecentListingsRepo } from './listing-recent.repo';
 
+/** NestJS listing service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** listing application module responsible for listing.service behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ListingService {
   constructor(
     private readonly repo: ListingRepository,
@@ -36,21 +41,25 @@ export class ListingService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async getById(id: string): Promise<ListingDetailDto> {
-    const listing = await this.repo.findDetailById(id);
-    if (!listing) throw new NotFoundException(`Listing "${id}" not found`);
+  async getBySlug(slug: string): Promise<ListingDetailDto> {
+    const listing = await this.repo.findDetailBySlug(slug);
+    if (!listing) throw new NotFoundException(`Listing "${slug}" not found`);
     return listing;
   }
 
-  async getRelated(id: string): Promise<RelatedListingDto[]> {
-    return this.repo.findRelated(id);
+  async getRelated(slug: string): Promise<RelatedListingDto[]> {
+    return this.repo.findRelated(slug);
   }
 
-  async getRecentListings(cursor?: string, limit?: number): Promise<FeedPageDto> {
-    return this.recentRepo.getRecentListings(cursor, limit);
+  async getRecentListings(
+    cursor?: string,
+    limit?: number,
+    topicSlug?: string,
+  ): Promise<FeedPageDto> {
+    return this.recentRepo.getRecentListings(cursor, limit, topicSlug);
   }
 
-  async getPromotions(): Promise<any> {
+  async getPromotions(): Promise<HomePromotionsDto> {
     return this.repo.findPromotions();
   }
 
@@ -58,23 +67,27 @@ export class ListingService {
     return this.repo.updatePromotions(body);
   }
 
-  async getContents(id: string): Promise<ListingContentsDto> {
-    const contents = await this.repo.findContentsById(id);
-    if (!contents) throw new NotFoundException(`Listing "${id}" not found`);
+  async getContents(slug: string): Promise<ListingContentsDto> {
+    const contents = await this.repo.findContentsBySlug(slug);
+    if (!contents) throw new NotFoundException(`Listing "${slug}" not found`);
     return contents;
   }
 
-  async getLastPlayedLesson(id: string, userId: string): Promise<LastPlayedLessonDto | null> {
-    return this.repo.findLastPlayedLesson(id, userId);
+  async getLastPlayedLesson(slug: string, userId: string): Promise<LastPlayedLessonDto | null> {
+    return this.repo.findLastPlayedLesson(slug, userId);
   }
 
-  async getProgressSummary(id: string, userId: string): Promise<ListingProgressSummaryDto | null> {
-    return this.repo.getProgressSummary(id, userId);
+  async getProgressSummary(
+    slug: string,
+    userId: string,
+  ): Promise<ListingProgressSummaryDto | null> {
+    return this.repo.getProgressSummary(slug, userId);
   }
 
   listAdmin(params: {
     cursor?: string;
     scholarId?: string;
+    /** Publication or lifecycle meaning carried by the status projection field. */
     status?: string;
     search?: string;
     accessibleScholarIds?: string[];
@@ -205,7 +218,7 @@ export class ListingService {
 
   async updateTranslation(
     listingSlug: string,
-    locale: string,
+    locale: Locale,
     fields: Partial<{ title: string; description: string | null }>,
   ): Promise<TranslationViewDto> {
     const listingId = await this.repo.findIdBySlug(listingSlug);
@@ -215,7 +228,7 @@ export class ListingService {
     return result;
   }
 
-  async publishTranslation(listingSlug: string, locale: string): Promise<TranslationViewDto> {
+  async publishTranslation(listingSlug: string, locale: Locale): Promise<TranslationViewDto> {
     const listingId = await this.repo.findIdBySlug(listingSlug);
     if (!listingId) throw new NotFoundException('Listing not found');
     const result = await this.repo.publishListingTranslation(listingId, locale);
@@ -223,7 +236,7 @@ export class ListingService {
     return result;
   }
 
-  async unpublishTranslation(listingSlug: string, locale: string): Promise<TranslationViewDto> {
+  async unpublishTranslation(listingSlug: string, locale: Locale): Promise<TranslationViewDto> {
     const listingId = await this.repo.findIdBySlug(listingSlug);
     if (!listingId) throw new NotFoundException('Listing not found');
     const result = await this.repo.unpublishListingTranslation(listingId, locale);

@@ -1,0 +1,164 @@
+.root {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-scale-lg);
+  padding: var(--space-component-gap-md);
+  border-radius: var(--radius-component-panel);
+  background: linear-gradient(120deg, var(--surface-subtle) 0%, var(--surface-default) 70%);
+  border: 1px solid var(--border-default);
+}
+
+.avatarSection {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 92px;
+  height: 92px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 3px solid var(--border-secondary);
+  box-shadow: 0 4px 24px color-mix(in srgb, var(--accent-primary-subtle-surface) 70%, transparent);
+}
+
+.avatarFallback {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 25%,
+    var(--border-primary-strong),
+    var(--surface-subtle)
+  );
+  color: var(--content-primary-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 32px;
+  font-weight: 600;
+  flex-shrink: 0;
+  border: 2px solid var(--action-primary);
+  box-shadow:
+    0 0 0 3px var(--surface-canvas),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.infoColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-scale-xs);
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  margin: 0 0 6px 0;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--content-strong);
+}
+
+.scholarTitle {
+  color: var(--content-primary-strong);
+  font-size: var(--typo-label-md-font-size);
+  font-weight: var(--typo-label-md-font-weight);
+  letter-spacing: var(--typo-label-md-letter-spacing);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.stats {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-secondary);
+  font-weight: 600;
+}
+
+.bioDisclosure {
+  display: block;
+  position: relative;
+}
+
+.bio {
+  font-size: var(--typo-body-md-font-size);
+  color: var(--content-muted);
+  line-height: 1.6;
+  max-width: 560px;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.bioExpanded {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+.bioToggle {
+  position: absolute;
+  inset-inline-end: 0;
+  bottom: 0;
+  border: 0;
+  color: var(--content-primary-strong);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  padding: 0 0 0 var(--space-scale-sm);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: var(--surface-default);
+}
+
+.bioToggle:hover {
+  color: var(--action-primary-hover);
+}
+
+.followButton {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.sidebar {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.sidebar .infoColumn {
+  width: 100%;
+}
+
+.sidebar .bio {
+  max-width: none;
+}
+
+.sidebar .followButton {
+  align-self: stretch;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .root {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .avatar,
+  .avatarFallback {
+    width: 80px;
+    height: 80px;
+    font-size: 28px;
+  }
+
+  .followButton {
+    align-self: auto;
+    width: 100%;
+  }
+}

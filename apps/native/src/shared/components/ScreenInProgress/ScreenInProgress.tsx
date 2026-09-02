@@ -1,41 +1,45 @@
-import { Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Column, Host, Text as ExpoText } from "@expo/ui";
+import { useUnistyles } from "react-native-unistyles";
 
-import { ScreenView } from "../ScreenView/ScreenView";
+import { ScreenView } from "@/shared/ui";
 
+import { toUniversalTextStyle } from "../../../core/styles/expo-ui";
+
+/** Provides a reusable native UI primitive with a focused rendering contract. */
 type ScreenInProgressProps = {
   title?: string;
   description?: string;
 };
 
+/** Defines the native screen in progress contract used by this module. */
 export function ScreenInProgress({
   title = "Coming Soon",
   description = "This feature is under development",
 }: ScreenInProgressProps) {
+  const { theme } = useUnistyles();
+
   return (
     <ScreenView center>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{description}</Text>
+      <Host matchContents>
+        <Column spacing={theme.spacing.component.gapSm}>
+          <ExpoText
+            textStyle={{
+              ...toUniversalTextStyle(theme, "titleLg", theme.colors.content.primary),
+              textAlign: "center",
+            }}
+          >
+            {title}
+          </ExpoText>
+          <ExpoText
+            textStyle={{
+              ...toUniversalTextStyle(theme, "bodySm", theme.colors.content.default),
+              textAlign: "center",
+            }}
+          >
+            {description}
+          </ExpoText>
+        </Column>
+      </Host>
     </ScreenView>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  title: {
-    fontFamily: theme.typography.titleLg.fontFamily,
-    fontSize: theme.typography.titleLg.fontSize,
-    lineHeight: theme.typography.titleLg.lineHeight,
-    letterSpacing: theme.typography.titleLg.letterSpacing,
-    color: theme.colors.content.primary,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontFamily: theme.typography.bodySm.fontFamily,
-    fontSize: theme.typography.bodySm.fontSize,
-    lineHeight: theme.typography.bodySm.lineHeight,
-    letterSpacing: theme.typography.bodySm.letterSpacing,
-    color: theme.colors.content.default,
-    textAlign: "center",
-    marginTop: theme.spacing.component.gapSm,
-  },
-}));

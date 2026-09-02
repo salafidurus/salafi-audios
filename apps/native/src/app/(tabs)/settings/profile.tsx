@@ -1,24 +1,32 @@
 import { routes } from "@sd/core-contracts";
-import { type Href, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 import { authClient } from "@/core/auth/auth-client";
 import { queryClient } from "@/core/query-client";
 import { SettingsProfileScreen } from "@/features/settings/screens/settings-profile.screen";
 
+/** Defines the Expo Router entrypoint for the native (tabs)/settings/profile route and delegates behavior to the feature layer. */
+/** Renders the native settings profile route surface and coordinates its user-facing state. */
 export default function SettingsProfileRoute() {
   const router = useRouter();
 
   const handleSignOut = async () => {
     await authClient.signOut();
     queryClient.clear();
-    router.replace(routes.home as Href);
+    router.replace(routes.home);
   };
 
   return (
     <SettingsProfileScreen
       onSignOut={handleSignOut}
+      // Profile is always entered from the Settings root; replace avoids falling through to Home
+      // when authentication has replaced the sign-in sheet in the nested stack.
+      onBack={() => router.replace(routes.settings.index)}
       onSignIn={() =>
-        router.push({ pathname: routes.signIn, params: { from: routes.settings.profile } })
+        router.push({
+          pathname: routes.signIn,
+          params: { from: routes.settings.profile },
+        })
       }
     />
   );

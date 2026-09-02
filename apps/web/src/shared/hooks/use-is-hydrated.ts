@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 
 // No-op subscription — hydration state only changes once and needs no listener.
+/** Documents this module's responsibility and public boundary. */
 const subscribe = () => () => {};
 
 /**

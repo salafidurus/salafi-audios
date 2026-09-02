@@ -1,9 +1,15 @@
 import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
 
+import { getLocalizedName } from "@sd/core-i18n";
 import { useMemo } from "react";
-import { Pressable, ScrollView, Text } from "react-native";
+import { Pressable, ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText } from "@/shared/ui";
+
+/** Implements native search input, filtering, results, and empty states. */
+/** Defines the native search filter value contract shared by its consumers. */
 export type SearchFilterValue = TopicSlug[];
 
 type FilterOption = {
@@ -11,20 +17,34 @@ type FilterOption = {
   label: string;
 };
 
+/** Describes the inputs, callbacks, and optional state accepted by Search Filter. */
 export type SearchFilterProps = {
   value: SearchFilterValue;
   onChange: (value: SearchFilterValue) => void;
   topics: TopicDetailDto[];
 };
 
+/**
+ * Defines the native search filter contract used by this module.
+ * Horizontal scrolling remains an RN infrastructure fallback because Expo UI
+ * 57's universal ScrollView does not expose the required horizontal prop.
+ */
 export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
+  const { i18n, t } = useTranslation();
   const options = useMemo<FilterOption[]>(() => {
-    const sortedTopics = [...topics].sort((a, b) => a.name.ar.localeCompare(b.name.ar));
+    const sortedTopics = [...topics].sort((a, b) =>
+      getLocalizedName(a.name, i18n.language).localeCompare(
+        getLocalizedName(b.name, i18n.language),
+      ),
+    );
     return [
-      { id: "all", label: "All" },
-      ...sortedTopics.map((topic) => ({ id: topic.slug, label: topic.name.ar })),
+      { id: "all", label: t("search.filterAll", "All") },
+      ...sortedTopics.map((topic) => ({
+        id: topic.slug,
+        label: getLocalizedName(topic.name, i18n.language),
+      })),
     ];
-  }, [topics]);
+  }, [i18n.language, t, topics]);
 
   const selected = useMemo(() => new Set(value), [value]);
 
@@ -40,26 +60,22 @@ export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
         return (
           <Pressable
             key={option.id}
+            accessibilityRole="button"
+            accessibilityState={{ selected: isActive }}
+            testID={`native-search-filter-${option.id}`}
             onPress={() => {
               if (option.id === "all") {
                 onChange([]);
                 return;
               }
 
-              const next = new Set(value);
-              if (next.has(option.id)) next.delete(option.id);
-              else next.add(option.id);
-              onChange(Array.from(next));
+              onChange(selected.has(option.id) ? [] : [option.id]);
             }}
-            style={({ pressed }) => [
-              styles.chip,
-              isActive && styles.chipActive,
-              pressed && styles.chipPressed,
-            ]}
+            style={[styles.chip, isActive && styles.activeChip]}
           >
-            <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
+            <AppText variant="bodySm" colorRole={isActive ? "onAction" : "default"}>
               {option.label}
-            </Text>
+            </AppText>
           </Pressable>
         );
       })}
@@ -74,25 +90,17 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing.component.gapSm,
   },
   chip: {
-    borderWidth: 1,
-    borderColor: theme.colors.border.subtle,
+    minHeight: theme.spacing.scale["4xl"],
+    paddingHorizontal: theme.spacing.scale.md,
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: theme.radius.component.chip,
-    backgroundColor: theme.colors.surface.subtle,
-    paddingHorizontal: theme.spacing.component.chipX,
-    paddingVertical: theme.spacing.component.chipY,
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.border.default,
+    backgroundColor: theme.colors.surface.default,
   },
-  chipActive: {
-    backgroundColor: theme.recipes.primarySubtleSurface.backgroundColor,
-    borderColor: theme.recipes.primarySubtleSurface.borderColor,
-  },
-  chipPressed: {
-    opacity: 0.9,
-  },
-  chipLabel: {
-    color: theme.colors.content.muted,
-    ...theme.typography.labelMd,
-  },
-  chipLabelActive: {
-    color: theme.recipes.primarySubtleSurface.textColor,
+  activeChip: {
+    borderColor: theme.colors.action.primary,
+    backgroundColor: theme.colors.action.primary,
   },
 }));

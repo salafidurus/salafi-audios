@@ -2,6 +2,7 @@ import { useId } from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
 type AccentGradientFillProps = {
   borderRadius: number | string;
   linearColors: [string, string];
@@ -13,6 +14,7 @@ type AccentGradientFillProps = {
   radialEdgeColor: string;
 };
 
+/** Defines the native accent gradient fill contract used by this module. */
 export function AccentGradientFill({
   borderRadius,
   linearColors,
@@ -33,7 +35,6 @@ export function AccentGradientFill({
       style={[StyleSheet.absoluteFill, styles.container, { borderRadius }]}
     >
       <Svg width="100%" height="100%">
-        {/* @ts-expect-error react-native-svg accepts children for Defs at runtime */}
         <Defs>
           <LinearGradient
             id={linearId}

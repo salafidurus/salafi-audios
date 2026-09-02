@@ -1,3 +1,4 @@
+/** Provides browser playback orchestration for listing references and their content queues. */
 "use client";
 
 import type { ListingContentsDto, ListingFormat } from "@sd/core-contracts";
@@ -9,16 +10,20 @@ import { useCallback, useState } from "react";
 
 import { audioService } from "../audio-service";
 
+/** Identifies a listing and supplies the scholar metadata needed to build its playback track. */
 export type PlayListingRef = {
   id: string;
+  /** Stable public route identity used to fetch the listing's playable contents. */
   slug: string;
   title: string;
   format: ListingFormat;
   scholarName: string;
+  /** Optional public scholar identity retained for track navigation and display. */
   scholarSlug?: string;
   artworkUrl?: string;
 };
 
+/** Configures optional error delivery for the listing playback hook. */
 export type UsePlayListingOptions = {
   /**
    * Optional callback to handle errors. If provided, errors will be passed here
@@ -26,6 +31,22 @@ export type UsePlayListingOptions = {
    */
   onError?: (message: string) => void;
 };
+
+async function playFirstTrack(
+  queue: ReturnType<typeof buildTrackQueue>,
+  onError: ((message: string) => void) | undefined,
+  setError: (message: string) => void,
+) {
+  const [firstTrack] = queue;
+  if (!firstTrack) {
+    const errorMsg = "No audio available for this lecture.";
+    setError(errorMsg);
+    onError?.(errorMsg);
+    return;
+  }
+
+  await audioService.playListing(firstTrack, queue);
+}
 
 /**
  * Hook to play a listing by ref (id/slug/format).
@@ -64,15 +85,7 @@ export function usePlayListing(ref: PlayListingRef | null, options?: UsePlayList
         contents,
       );
 
-      const [firstTrack] = queue;
-      if (!firstTrack) {
-        const errorMsg = "No audio available for this lecture.";
-        setError(errorMsg);
-        options?.onError?.(errorMsg);
-        return;
-      }
-
-      await audioService.playListing(firstTrack, queue);
+      await playFirstTrack(queue, options?.onError, setError);
     } catch (err) {
       const sanitized = sanitizeError(err);
       setError(sanitized);

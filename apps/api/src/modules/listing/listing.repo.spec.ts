@@ -10,6 +10,12 @@ describe('ListingRepository — getProgressSummary', () => {
       listing: {
         findFirst: vi.fn<any>(),
       },
+      recommendationHero: {
+        findFirst: vi.fn<any>(),
+      },
+      curationMetadata: {
+        findMany: vi.fn<any>(),
+      },
       userListingProgress: {
         findUnique: vi.fn<any>(),
       },
@@ -17,6 +23,55 @@ describe('ListingRepository — getProgressSummary', () => {
     };
 
     repo = new ListingRepository(prisma);
+  });
+
+  it('includes scholar artwork in curated promotion listings', async () => {
+    prisma.recommendationHero.findFirst.mockResolvedValue(null);
+    prisma.curationMetadata.findMany.mockResolvedValue([
+      {
+        id: 'pick-1',
+        listingId: 'listing-1',
+        listing: {
+          format: 'series',
+          id: 'listing-1',
+          title: 'A lesson in patience',
+          slug: 'patience',
+          language: 'en',
+          coverImageUrl: null,
+          durationSeconds: 600,
+          publishedDurationSeconds: 600,
+          publishedLectureCount: 1,
+          publishedAt: new Date('2026-01-01T00:00:00.000Z'),
+          createdAt: new Date('2026-01-01T00:00:00.000Z'),
+          translations: [],
+          scholar: {
+            name: 'Scholar',
+            slug: 'scholar',
+            title: null,
+            imageUrl: 'scholar.jpg',
+            mainLanguage: 'en',
+            translations: [],
+          },
+        },
+      },
+    ]);
+
+    const result = await repo.findPromotions();
+
+    expect(result.editorsPicks[0]?.listing.scholarImageUrl).toBe('scholar.jpg');
+    expect(prisma.curationMetadata.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        include: expect.objectContaining({
+          listing: expect.objectContaining({
+            include: expect.objectContaining({
+              scholar: expect.objectContaining({
+                select: expect.objectContaining({ imageUrl: true }),
+              }),
+            }),
+          }),
+        }),
+      }),
+    );
   });
 
   it('returns null when the listing cannot be found', async () => {

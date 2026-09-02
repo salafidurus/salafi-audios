@@ -1,10 +1,13 @@
 import { Pressable, View, type TextStyle } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { NativeText as AppText } from "@/shared/ui";
 
+/** Renders the native empty state variant surface and coordinates its user-facing state. */
+/** Defines the native empty state variant contract shared by its consumers. */
 export type EmptyStateVariant = "empty" | "loading" | "error";
 
+/** Describes the inputs and callbacks accepted by Empty State. */
 export type EmptyStateProps = {
   message: string;
   variant?: EmptyStateVariant;
@@ -12,14 +15,7 @@ export type EmptyStateProps = {
   retryLabel?: string;
 };
 
-function getTextStyleMap(): Record<EmptyStateVariant, TextStyle> {
-  return {
-    empty: styles.text_empty,
-    loading: styles.text_loading,
-    error: styles.text_error,
-  };
-}
-
+/** Enumerates the lifecycle values used by the native empty workflow. */
 export function EmptyState({
   message,
   variant = "empty",
@@ -28,7 +24,7 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <View style={[styles.emptyState, styles[variant]]}>
-      <AppText variant="bodyMd" style={getTextStyleMap()[variant]}>
+      <AppText variant="bodyMd" style={TEXT_STYLE_BY_VARIANT[variant]}>
         {message}
       </AppText>
       {onRetry ? (
@@ -87,3 +83,9 @@ const styles = StyleSheet.create((theme) => ({
     fontWeight: "600",
   },
 }));
+
+const TEXT_STYLE_BY_VARIANT = {
+  empty: styles.text_empty,
+  loading: styles.text_loading,
+  error: styles.text_error,
+} satisfies Record<EmptyStateVariant, TextStyle>;

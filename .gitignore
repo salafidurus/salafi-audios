@@ -3,12 +3,14 @@ node_modules/
 .turbo/
 **/.turbo/
 **/.playwright-mcp/
+.playwright-cli/
 **/node_modules/
 coverage/
 **/coverage/
 dist/
 **/dist/
 .worktrees/
+.worktree/
 .superpowers/
 
 .antigravitycli/
@@ -49,11 +51,13 @@ infra/envs/.env.*
 infra/envs/*.env
 
 # temp files
+.research/
 .deploy_tmp/
 .local-expo-mcp/
 
 # generated DB artifacts (derived, never committed)
 packages/db/src/generated/
+/packages/core-db/.generated-prisma.lock
 
 # Python cache files
 __pycache__/
@@ -86,4 +90,3 @@ apps/web/src/app/api/
 
 # Reference files (prototypes, design docs — never commit)
 _reference/
-

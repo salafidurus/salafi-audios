@@ -230,6 +230,3 @@ export const getThemeProperties = (theme: AppThemeWeb): string =>
 
 export const createThemeCssBlock = (selector: string, theme: AppThemeWeb): string =>
   `${selector} {${getThemeProperties(theme)}}`;
-
-export const createAccentThemeCssBlock = (selector: string, theme: AppThemeWeb): string =>
-  `${selector} {${getColorThemeProperties(theme)}}`;

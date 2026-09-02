@@ -3,10 +3,15 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CheckPolicy } from '../auth/decorators/check-policy.decorator';
 import { UserDirectoryService } from './user-directory.service';
-import type { AdminUserListDto, UserAccessSnapshot } from '@sd/core-contracts';
+import {
+  ReplaceUserAccessRequestSchema,
+  type ReplaceUserAccessRequest as ReplaceUserAccessDto,
+  type AdminUserListDto,
+  type UserAccessSnapshot,
+} from '@sd/core-contracts';
 import { CurrentUser } from '../auth/decorators';
 import { AccessService } from './access.service';
-import { ReplaceUserAccessDto } from './dto/replace-user-access.dto';
+import { RateLimitPolicy } from '../security/rate-limit.decorator';
 
 /**
  * AdminUsersController
@@ -14,9 +19,12 @@ import { ReplaceUserAccessDto } from './dto/replace-user-access.dto';
  * Handles user listing and aggregate access management.
  * User administration is global and requires the UserAccess capability.
  */
+/** NestJS admin users controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Users')
 @ApiCommonErrors()
 @Controller('admin/users')
+/** Core API admin users.controller module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AdminUsersController {
   constructor(
     private readonly userDirectoryService: UserDirectoryService,
@@ -44,11 +52,12 @@ export class AdminUsersController {
   }
 
   @Put(':userId/access')
+  @RateLimitPolicy('admin-write')
   @CheckPolicy('manage', 'UserAccess')
   @ApiOperation({ summary: 'Replace a user access snapshot atomically' })
   replaceAccess(
     @Param('userId') userId: string,
-    @Body() body: ReplaceUserAccessDto,
+    @Body({ schema: ReplaceUserAccessRequestSchema }) body: ReplaceUserAccessDto,
     @CurrentUser() user: { id: string },
   ): Promise<UserAccessSnapshot> {
     return this.accessService.replace(userId, body, user.id);

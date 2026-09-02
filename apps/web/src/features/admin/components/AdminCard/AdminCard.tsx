@@ -1,8 +1,10 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { z } from "zod";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 
@@ -36,6 +38,80 @@ export interface AdminCardProps {
   className?: string;
 }
 
+const ThumbnailImageSchema = z.object({
+  src: z.string(),
+  alt: z.string(),
+});
+
+function isThumbnailImage(
+  thumbnail: AdminCardProps["thumbnail"],
+): thumbnail is { src: string; alt: string } {
+  return ThumbnailImageSchema.safeParse(thumbnail).success;
+}
+
+function AdminCardThumbnail({ thumbnail }: { thumbnail: AdminCardProps["thumbnail"] }) {
+  if (!thumbnail) return null;
+  return (
+    <div className={styles.thumbnail}>
+      {isThumbnailImage(thumbnail) ? (
+        <Image
+          src={thumbnail.src}
+          alt={thumbnail.alt}
+          className={styles.image}
+          width={64}
+          height={64}
+        />
+      ) : (
+        thumbnail
+      )}
+    </div>
+  );
+}
+
+function AdminCardMetadata({ metadata }: { metadata: AdminCardMetadataItem[] }) {
+  return (
+    <div className={styles.metadata}>
+      {metadata.map((item) => (
+        <AdminCardMetadataItemView key={item.label} item={item} />
+      ))}
+    </div>
+  );
+}
+
+function AdminCardMetadataItemView({ item }: { item: AdminCardMetadataItem }) {
+  const { t } = useTranslation();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const shouldTruncate = item.truncate && !isExpanded;
+  return (
+    <div className={styles.metadataItem}>
+      <span className={styles.metadataLabel}>{item.label}:</span>
+      <span className={shouldTruncate ? styles.metadataValueTruncated : styles.metadataValue}>
+        {item.value}
+      </span>
+      {item.expandable && (
+        <button
+          type="button"
+          className={styles.expandButton}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsExpanded((expanded) => !expanded);
+          }}
+        >
+          {isExpanded ? (
+            <>
+              <ChevronUp size={14} /> {t("common.hide", "Hide")}
+            </>
+          ) : (
+            <>
+              <ChevronDown size={14} /> {t("common.viewAll", "View all")}
+            </>
+          )}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function AdminCard({
   thumbnail,
   title,
@@ -45,24 +121,6 @@ export function AdminCard({
   onClick,
   className,
 }: AdminCardProps) {
-  const { t } = useTranslation();
-  // Track which expandable items are expanded by label
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-
-  const toggleExpand = (label: string) => {
-    setExpandedItems((prev) => {
-      const next = new Set(prev);
-      if (next.has(label)) {
-        next.delete(label);
-      } else {
-        next.add(label);
-      }
-      return next;
-    });
-  };
-
-  const isThumbnailImage = thumbnail && typeof thumbnail === "object" && "src" in thumbnail;
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if ((e.key === "Enter" || e.key === " ") && onClick) {
       e.preventDefault();
@@ -78,21 +136,7 @@ export function AdminCard({
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
-      {thumbnail && (
-        <div className={styles.thumbnail}>
-          {isThumbnailImage ? (
-            <Image
-              src={thumbnail.src}
-              alt={thumbnail.alt}
-              className={styles.image}
-              width={64}
-              height={64}
-            />
-          ) : (
-            thumbnail
-          )}
-        </div>
-      )}
+      <AdminCardThumbnail thumbnail={thumbnail} />
 
       <div className={styles.content}>
         <div className={styles.header}>
@@ -100,43 +144,7 @@ export function AdminCard({
           {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         </div>
 
-        <div className={styles.metadata}>
-          {metadata.map((item) => {
-            const isExpanded = expandedItems.has(item.label);
-            const shouldTruncate = item.truncate && !isExpanded;
-
-            return (
-              <div key={item.label} className={styles.metadataItem}>
-                <span className={styles.metadataLabel}>{item.label}:</span>
-                <span
-                  className={shouldTruncate ? styles.metadataValueTruncated : styles.metadataValue}
-                >
-                  {item.value}
-                </span>
-                {item.expandable && (
-                  <button
-                    type="button"
-                    className={styles.expandButton}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleExpand(item.label);
-                    }}
-                  >
-                    {isExpanded ? (
-                      <>
-                        <ChevronUp size={14} /> {t("common.hide", "Hide")}
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown size={14} /> {t("common.viewAll", "View all")}
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <AdminCardMetadata metadata={metadata} />
       </div>
 
       <div className={styles.actions} onClick={(e) => e.stopPropagation()}>

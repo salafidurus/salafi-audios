@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { sanitizeError } from "@sd/utils-error";
@@ -11,8 +12,8 @@ import {
   fetchListingFormData,
   updateListingDetails,
 } from "@/features/admin/api/admin-lectures.api";
-import { Button } from "@/shared/components/Button";
-import { InputField } from "@/shared/components/InputField";
+import { Button } from "@/shared/components/ui/button";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import styles from "./listing-modal.module.css";
 import { ListingStatusOrderFields } from "./ListingStatusOrderFields";
@@ -69,6 +70,8 @@ export function ListingSublistingDetail({
           status: "ready",
           title: data.listing.title,
           description: data.listing.description ?? "",
+          // SAFETY: `fetchListingFormData` returns listing statuses from the same admin
+          // contract used by the form, so this value is already constrained to `LectureStatus`.
           lectureStatus: (data.listing.status as LectureStatus) ?? "draft",
           orderIndex: data.listing.orderIndex ?? 0,
         }));

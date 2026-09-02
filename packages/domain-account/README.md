@@ -48,5 +48,5 @@ src/
 
 ## Related Docs
 
-- `docs/api.md` — backend auth architecture and endpoint contract
+- `docs/backend/api.md` — backend auth architecture and endpoint contract
 - `docs/architecture.md` — monorepo package boundaries

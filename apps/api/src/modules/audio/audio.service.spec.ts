@@ -13,13 +13,13 @@ describe('AudioService', () => {
 
   const mockProgress: AudioProgressDto[] = [
     {
-      listingId: 'l1',
+      listingSlug: 'l1',
       positionSeconds: 900,
       durationSeconds: 1800,
       updatedAt: new Date('2024-01-01T00:00:00.000Z').toISOString(),
     },
     {
-      listingId: 'l2',
+      listingSlug: 'l2',
       positionSeconds: 1800,
       durationSeconds: 1800,
       completedAt: new Date('2024-01-01T00:00:00.000Z').toISOString(),
@@ -46,7 +46,7 @@ describe('AudioService', () => {
                 ) => Promise<boolean>
               >(),
             bulkSync: vi.fn<(userId: string, items: any[]) => Promise<void>>(),
-            findListingById: vi.fn<(id: string) => Promise<any>>(),
+            findListingBySlug: vi.fn<(slug: string) => Promise<any>>(),
             findPrimaryAsset: vi.fn<(listingId: string) => Promise<any>>(),
             findFirstAsset: vi.fn<(listingId: string) => Promise<any>>(),
           } satisfies Partial<Mocked<AudioRepository>>,
@@ -105,7 +105,7 @@ describe('AudioService', () => {
     it('should sync multiple progress items for user', async () => {
       const items: ProgressSyncItemDto[] = [
         {
-          listingId: 'l1',
+          listingSlug: 'l1',
           positionSeconds: 300,
           durationSeconds: 1800,
           updatedAt: new Date().toISOString(),
@@ -123,13 +123,13 @@ describe('AudioService', () => {
     const mockListing = { id: 'l1', durationSeconds: 1200 } as any;
 
     it('should throw NotFoundException when listing does not exist', async () => {
-      repo.findListingById.mockResolvedValue(null);
+      repo.findListingBySlug.mockResolvedValue(null);
 
       await expect(service.resolveStreamUrl('l1')).rejects.toThrow(NotFoundException);
     });
 
     it('should return the primary audio asset if available', async () => {
-      repo.findListingById.mockResolvedValue(mockListing);
+      repo.findListingBySlug.mockResolvedValue(mockListing);
       repo.findPrimaryAsset.mockResolvedValue({
         url: 'https://primary.mp3',
         durationSeconds: 1200,
@@ -144,12 +144,12 @@ describe('AudioService', () => {
         durationSeconds: 1200,
         format: 'mp3',
       });
-      expect(repo.findListingById).toHaveBeenCalledWith('l1');
+      expect(repo.findListingBySlug).toHaveBeenCalledWith('l1');
       expect(repo.findPrimaryAsset).toHaveBeenCalledWith('l1');
     });
 
     it('should fallback to the first audio asset if no primary asset exists', async () => {
-      repo.findListingById.mockResolvedValue(mockListing);
+      repo.findListingBySlug.mockResolvedValue(mockListing);
       repo.findPrimaryAsset.mockResolvedValue(null);
       repo.findFirstAsset.mockResolvedValue({
         url: 'https://fallback.mp3',
@@ -165,13 +165,13 @@ describe('AudioService', () => {
         durationSeconds: 1200,
         format: 'mp3',
       });
-      expect(repo.findListingById).toHaveBeenCalledWith('l1');
+      expect(repo.findListingBySlug).toHaveBeenCalledWith('l1');
       expect(repo.findPrimaryAsset).toHaveBeenCalledWith('l1');
       expect(repo.findFirstAsset).toHaveBeenCalledWith('l1');
     });
 
     it('should throw NotFoundException if no audio assets exist at all', async () => {
-      repo.findListingById.mockResolvedValue(mockListing);
+      repo.findListingBySlug.mockResolvedValue(mockListing);
       repo.findPrimaryAsset.mockResolvedValue(null);
       repo.findFirstAsset.mockResolvedValue(null);
 
@@ -179,7 +179,7 @@ describe('AudioService', () => {
     });
 
     it('should look up assets by the resolved listing id, not the raw slug param', async () => {
-      repo.findListingById.mockResolvedValue({ id: 'l1', durationSeconds: 1200 } as any);
+      repo.findListingBySlug.mockResolvedValue({ id: 'l1', durationSeconds: 1200 } as any);
       repo.findPrimaryAsset.mockResolvedValue({
         url: 'https://primary.mp3',
         durationSeconds: 1200,
@@ -189,7 +189,7 @@ describe('AudioService', () => {
 
       await service.resolveStreamUrl('tafsir-al-fatiha');
 
-      expect(repo.findListingById).toHaveBeenCalledWith('tafsir-al-fatiha');
+      expect(repo.findListingBySlug).toHaveBeenCalledWith('tafsir-al-fatiha');
       expect(repo.findPrimaryAsset).toHaveBeenCalledWith('l1');
     });
   });

@@ -13,8 +13,10 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { AppText, type AppTextProps } from "@/shared/components/AppText/AppText";
+import { NativeText as AppText, type NativeTextProps as AppTextProps } from "@/shared/ui";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Describes the inputs, callbacks, and optional state accepted by Marquee Text. */
 export type MarqueeTextProps = {
   text: string;
   variant?: AppTextProps["variant"];
@@ -23,6 +25,7 @@ export type MarqueeTextProps = {
   delayMs?: number;
 };
 
+/** Defines the native marquee text contract used by this module. */
 export function MarqueeText({
   text,
   variant = "bodyMd",
@@ -69,7 +72,7 @@ export function MarqueeText({
       onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
       style={{ overflow: "hidden", minWidth: 0, width: "100%" }}
     >
-      <View style={{ opacity: textWidth === 0 ? 0 : 1 }}>
+      <View>
         <Animated.View style={animatedStyle}>
           <AppText
             variant={variant}

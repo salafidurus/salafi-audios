@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+/** Shared API error response.dto utilities and boundary definitions used by backend modules. */
+/** NestJS error response dto service or controller coordinating the API boundary for this responsibility. */
 export class ErrorResponseDto {
   @ApiProperty({ type: Number, example: 400 })
   statusCode!: number;
@@ -11,7 +13,7 @@ export class ErrorResponseDto {
     type: 'object',
     additionalProperties: true,
   })
-  details?: Record<string, unknown>;
+  details?: object;
 
   @ApiProperty({
     type: String,

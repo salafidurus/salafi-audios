@@ -10,6 +10,8 @@
     "and": "and",
     "comingSoon": "Coming soon",
     "cancel": "Cancel",
+    "typeToConfirm": "Type {{word}} to confirm",
+    "confirmationPlaceholder": "Type \"{{word}}\" to confirm",
     "save": "Save",
     "add": "Add",
     "english": "English",
@@ -29,7 +31,9 @@
       "noAccount": "Don't have an account? Create one",
       "noAccountSplit": "Don't have an account?",
       "noAccountLink": "Create one",
-      "failed": "Sign in failed"
+      "failed": "Sign in failed",
+      "privacyNote": "By continuing, you agree to our",
+      "and": "and"
     }
   },
   "validation": {
@@ -37,6 +41,7 @@
   },
   "account": {
     "title": "Account",
+    "guest": "Guest",
     "defaultUser": "User",
     "editProfile": "Edit Profile",
     "legal": "Legal",
@@ -67,6 +72,7 @@
       "signOutTitle": "Sign Out?",
       "signOutConfirm": "Sign Out",
       "signOutPrompt": "Are you sure you want to sign out?",
+      "signOutError": "Sign out failed. Please try again.",
       "deleteAccountConfirm": "Delete Account",
       "deleteAccountPrompt": "This action is permanent and cannot be undone. All your data will be deleted.",
       "deleteConfirmWord": "DELETE",
@@ -79,22 +85,40 @@
   "tabs": {
     "search": "Search",
     "feed": "Feed",
-    "library": "Library",
+    "myLibrary": "My Library",
     "account": "Account"
   },
   "navigation": {
     "explore": "Explore",
     "home": "Home",
     "scholars": "Scholars",
-    "library": "Library",
+    "myLibrary": "My Library",
     "account": "Account",
     "siteTitle": "Salafi Durus",
     "primarySidebar": "Primary sidebar",
     "mainNav": "Main",
+    "searchAnything": "Search anything",
+    "searchCatalog": "Search catalog",
+    "searchCatalogDescription": "Find topics, scholars, and listings.",
+    "searchCatalogPlaceholder": "Search topics, scholars, or listings",
+    "searchCatalogLoading": "Loading catalog",
+    "searchCatalogEmpty": "No catalog results",
+    "searchCatalogHint": "Type to search public catalog content",
+    "searchCatalogScholarMetadata": "{{count}} listings",
+    "searchCatalogType": {
+      "topic": "Topic",
+      "scholar": "Scholar",
+      "listing": "Listing"
+    },
+    "backToApp": "Back to App",
+    "adminDashboard": "Admin Dashboard",
+    "adminWorkspace": "Admin workspace",
     "expandSidebar": "Expand sidebar",
     "collapseSidebar": "Collapse sidebar",
     "siteFooter": "Site footer",
     "languageSwitch": "Language switch",
+    "switchToDark": "Switch to dark mode",
+    "switchToLight": "Switch to light mode",
     "settings": "Settings",
     "keepYourPlace": "Keep your place",
     "keepYourPlaceDesc": "Sign in to sync progress and saved durus across your devices.",
@@ -112,7 +136,7 @@
         "scholar": "Scholars",
         "curation": "Curation"
       },
-      "library": {
+      "myLibrary": {
         "started": "Started",
         "saved": "Saved",
         "completed": "Completed"
@@ -134,6 +158,8 @@
   "settings": {
     "general": {
       "title": "Settings",
+      "eyebrow": "Personal space",
+      "description": "Shape your reading experience, notifications, and account preferences.",
       "languageSection": "Language",
       "languageDesc": "Configure app and content language.",
       "appLanguage": "App Language",
@@ -149,7 +175,9 @@
         "system": "System",
         "systemDesc": "Follow OS",
         "light": "Light",
+        "lightDesc": "Use light colors",
         "dark": "Dark",
+        "darkDesc": "Use dark colors",
         "parchment": "Parchment",
         "parchmentDesc": "Ivory & gold",
         "manuscript": "Manuscript",
@@ -167,12 +195,40 @@
       "followedScholarsDesc": "Notify when a followed scholar posts",
       "newLectures": "New Lectures",
       "newLecturesDesc": "Notify when new lectures are published"
+    },
+    "tabs": {
+      "label": "Settings sections",
+      "general": "General",
+      "profile": "Profile"
     }
   },
   "support": {
     "title": "Support",
+    "subtitle": "Find answers and reach the team when you need help.",
+    "faqEyebrow": "Answers",
+    "contactEyebrow": "Talk to us",
+    "faqDescription": "Quick answers to common listening questions.",
+    "contactCopy": "We aim to respond within 48 hours.",
+    "legalPrompt": "You can also review:",
     "faqSection": "Frequently Asked Questions",
     "contactSection": "Contact Us",
+    "formEyebrow": "Send a message",
+    "formSection": "Report an issue",
+    "formDescription": "Tell the maintainers what happened and we will review your message.",
+    "form": {
+      "name": "Your name",
+      "email": "Email address",
+      "category": "What can we help with?",
+      "technical": "Technical issue",
+      "content": "Content issue",
+      "account": "Account or access",
+      "other": "Something else",
+      "subject": "Subject",
+      "message": "What happened?",
+      "messageHint": "Please include the page, device, and steps to reproduce if relevant.",
+      "submit": "Send to maintainers",
+      "comingSoon": "Submitting reports will be available when the support service is connected."
+    },
     "faq": {
       "whatIs": {
         "q": "What is Salafi Durus?",
@@ -228,14 +284,20 @@
     "filterAllAria": "Show all items",
     "filterByAria": "Filter by {{label}}",
     "filterRemoveAria": "Remove {{label}} filter",
-    "enterQuery": "Enter a search query to begin"
+    "enterQuery": "Enter a search query to begin",
+    "title": "Search",
+    "lectureCount": "{{count}} lectures",
+    "durationHours": "{{hours}}hr {{minutes}}m",
+    "durationMinutes": "{{minutes}}m"
   },
-  "library": {
+  "myLibrary": {
     "title": "My Library",
+    "started": "Started",
     "inProgress": "In Progress",
     "saved": "Saved",
     "completed": "Completed",
     "loadingSection": "Loading {{section}}…",
+    "error": "My Library could not be loaded.",
     "emptyProgress": "No lectures started yet. Browse the catalog to begin listening.",
     "emptySaved": "No saved lectures yet. Save lectures to keep track of them.",
     "emptyCompleted": "No completed lectures yet. Finish lectures to track your learning.",
@@ -274,9 +336,24 @@
     "lectureCount": "{{count}} lectures",
     "showLess": "Show less",
     "showMore": "Show more",
+    "readLess": "Read less",
+    "readMore": "Read more",
     "statLectures": "Lectures",
     "statSeries": "Series",
-    "statTotal": "Total"
+    "statTotal": "Total",
+    "catalogLabel": "Scholar catalog",
+    "publishedContent": "Published content",
+    "item": "item",
+    "items": "items"
+  },
+  "listing": {
+    "listenNow": "Listen now",
+    "lessons": "Lessons",
+    "collectionContent": "Collection content",
+    "item": "item",
+    "items": "items",
+    "module": "module",
+    "modules": "modules"
   },
   "feed": {
     "newInTopic": "New in {{topic}}",
@@ -351,6 +428,9 @@
     "completingSignIn": "Completing sign-in..."
   },
   "legal": {
+    "contents": "Legal document contents",
+    "contentsTitle": "On this page",
+    "skipToDocument": "Skip to document",
     "privacy": {
       "title": "Privacy Policy",
       "sections": {
@@ -416,8 +496,9 @@
     }
   },
   "cookieConsent": {
-    "message": "We use cookies to track site traffic and performance. We do not collect personal data, do not personalize content from cookies, and do not use cookies for marketing or advertisements. By continuing, you accept our use of tracking cookies.",
-    "accept": "Accept",
+    "title": "Cookies and analytics",
+    "message": "We use cookies to understand site traffic and performance. Continuing to use the website indicates your acceptance of these tracking technologies.",
+    "close": "Close",
     "policyLink": "Cookie Policy"
   },
   "role": {
@@ -445,7 +526,10 @@
     "dashboard": {
       "title": "Admin Dashboard",
       "titleMobile": "Admin",
+      "subtitle": "A focused view of the work and resources available to your role.",
       "loading": "Loading…",
+      "error": "The dashboard is unavailable right now. Try again later.",
+      "empty": "No dashboard data is available.",
       "noAccess": "You don't have any admin access.",
       "noAccessMobile": "No admin access.",
       "scholarsDesc": "Manage scholars, their profiles and visibility",
@@ -457,7 +541,27 @@
     },
     "stats": {
       "title": "Admin Stats",
-      "desc": "Platform statistics and analytics will appear here."
+      "desc": "Operational data available to your account.",
+      "loadingLabel": "Loading admin statistics",
+      "loading": "Loading available statistics…",
+      "unavailable": "No authorized statistics are available.",
+      "summary": "Available data summary",
+      "scholars": "Scholars",
+      "listings": "Listings",
+      "users": "Users",
+      "contentHeading": "Accessible content",
+      "contentDescription": "Showing content returned for your current access.",
+      "content": "Content",
+      "scholar": "Scholar",
+      "format": "Format",
+      "status": "Status",
+      "created": "Created",
+      "filterStatus": "Filter status",
+      "allStatuses": "All statuses",
+      "contentTable": "Accessible content data",
+      "empty": "No accessible content matches this filter.",
+      "error": "Unable to load available statistics.",
+      "partialError": "Some available data could not be refreshed."
     },
     "scholars": {
       "manageTitle": "Manage Scholars",
@@ -497,9 +601,37 @@
     "users": {
       "title": "Manage Users",
       "titleMobile": "Users",
+      "description": "Review people and control who can manage the learning library.",
+      "filtersTitle": "Find users",
+      "filtersDescription": "Search by identity or narrow the list by role and access.",
+      "roleLabel": "Role",
+      "visibleUsers": "Visible users",
+      "adminAccess": "With admin access",
+      "directoryTitle": "User directory",
       "searchPlaceholder": "Search users by name or email...",
       "searchNoMatch": "No users match your search.",
-      "noUsersFound": "No users found."
+      "noUsersFound": "No users found.",
+      "noAccessGrants": "No access grants",
+      "unnamed": "Unnamed user",
+      "moreActions": "More actions for {{name}}",
+      "copyEmail": "Copy email",
+      "copyEmailFor": "Copy email for {{name}}",
+      "statusLabel": "Access status",
+      "status": {
+        "active": "Active access",
+        "none": "No admin access",
+        "activeFilter": "Has admin access",
+        "noneFilter": "No admin access"
+      },
+      "resultSummary": "{{shown}} shown · {{active}} with admin access",
+      "columnsLabel": "User management columns",
+      "columns": {
+        "user": "User",
+        "joined": "Date joined",
+        "status": "Access status",
+        "roles": "Roles",
+        "actions": "Actions"
+      }
     },
     "access": {
       "title": "Manage Access",
@@ -551,6 +683,10 @@
       "deleteWarning": "This action cannot be undone.",
       "title": "Content Management",
       "titleMobile": "Content",
+      "sectionsLabel": "Content sections",
+      "tabListings": "Listings",
+      "tabTopics": "Topics",
+      "tabPromotions": "Promotions",
       "topicManagement": "Topic Management",
       "listingManagement": "Listing Management",
       "addTopic": "Add Topic",
@@ -559,6 +695,13 @@
       "addListingMobile": "Listing",
       "searchPlaceholderTopics": "Search topics...",
       "searchPlaceholderListings": "Search listings...",
+      "topicColumn": "Topic",
+      "slugColumn": "Slug",
+      "orderColumn": "Order",
+      "listingColumn": "Listing",
+      "scholarColumn": "Scholar",
+      "statusColumn": "Status",
+      "actionsColumn": "Actions",
       "searchNoMatchTopics": "No topics match your search.",
       "noTopicsFound": "No topics yet.",
       "searchNoMatchListings": "No listings match your search.",
@@ -696,5 +839,29 @@
       "childrenTab": "Sub-listings",
       "childrenEmpty": "No sub-listings yet"
     }
+  },
+  "promotions": {
+    "featuredHeroTitle": "Featured Hero Curation",
+    "featuredHeroDesc": "Select the main listing highlighted at the top of the homepage hero banner.",
+    "heroSearch": "Search & Select Listing",
+    "searchPlaceholder": "Search lectures by title or scholar...",
+    "selectMatch": "Select matching listing",
+    "currentlySelected": "Active Hero Selection",
+    "heroHeadline": "Featured Headline/Text",
+    "headlinePlaceholder": "e.g. Featured Lecture",
+    "editorsPicksTitle": "Editors' Picks Curation",
+    "editorsPicksDesc": "Manage the listings highlighted inside the Editors' Picks feed widget on the homepage.",
+    "addPickLabel": "Add Listing to Picks",
+    "emptyPicks": "No Editors' Picks selected yet.",
+    "removePick": "Remove Pick",
+    "listingColumn": "Listing",
+    "scholarColumn": "Scholar",
+    "actionsColumn": "Actions",
+    "alreadyAdded": "This listing is already in Editors' Picks.",
+    "success": "Promotions updated successfully.",
+    "error": "Promotions could not be saved.",
+    "errorDetails": "Please try again or contact an administrator.",
+    "loadError": "Unable to load promotions.",
+    "retry": "Retry"
   }
 }

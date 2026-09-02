@@ -1,0 +1,116 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.container:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-xs);
+}
+
+.highlighted {
+  animation: highlightFade 2s ease-out;
+}
+
+@keyframes highlightFade {
+  0% {
+    background-color: var(--surface-selected);
+  }
+  100% {
+    background-color: var(--surface-default);
+  }
+}
+
+.leftGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  flex: 1;
+}
+
+.statusCircle {
+  position: relative;
+  z-index: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--surface-default);
+}
+
+.completedCircle {
+  background: var(--action-primary);
+  border-color: var(--action-primary);
+  color: var(--content-on-primary);
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.itemTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--content-strong);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemDuration {
+  font-size: 12px;
+  color: var(--content-muted);
+  margin: 0;
+}
+
+.progressBarContainer {
+  margin-top: 4px;
+  height: 3px;
+  background-color: var(--border-subtle);
+  border-radius: 999px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.progressBarFill {
+  height: 100%;
+  background-color: var(--action-primary);
+}
+
+.playCircleBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--action-primary) 15%, transparent);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--action-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 150ms ease, background-color 150ms ease;
+}
+
+.playCircleBtn:hover {
+  background: color-mix(in srgb, var(--action-primary) 25%, transparent);
+  transform: scale(1.05);
+}

@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["import", "typescript", "unicorn", "oxc", "eslint", "promise"],
+  "plugins": ["import", "typescript", "unicorn", "oxc", "eslint", "promise", "jsdoc"],
+  "jsPlugins": [{ "name": "anti-slop", "specifier": "./tools/oxlint/anti-slop/index.ts" }],
   "ignorePatterns": [
     "**/node_modules/**",
     "**/dist/**",
@@ -10,14 +11,83 @@
     "**/.opencode/**",
     "**/coverage/**",
     "**/generated/**",
-    ".agents/**"
+    ".agents/**",
+    ".claude/**",
+    ".cursor/**",
+    "apps/native/jest.setup.js",
+    "tools/**"
   ],
   "rules": {
+    "anti-slop/no-chained-type-assertions": "error",
+    "anti-slop/no-conditional-empty-object-spread": "error",
+    "anti-slop/no-known-value-widening": "error",
+    "anti-slop/no-module-mocking": "error",
+    "anti-slop/no-object-parameters": "error",
+    "anti-slop/no-reflect-apply": "error",
+    "anti-slop/no-reflect-get": "error",
+    "anti-slop/no-runtime-typeof": "error",
+    "anti-slop/no-shape-in-symbol-names": "error",
+    "anti-slop/no-unknown-parameters": "error",
+    "anti-slop/no-unknown-returns": "error",
+    "anti-slop/no-unknown-type-aliases": "error",
+    "anti-slop/no-unsafe-dictionary-type": "error",
+    "anti-slop/no-widen-then-assert": "error",
+    "anti-slop/require-safety-comment-for-type-assertion": "error",
+    "anti-slop/require-tsdoc": ["error", { "mode": "final" }],
+    "jsdoc/no-blank-blocks": "error",
     "import/no-duplicates": "error",
     "import/first": "error",
     "import/newline-after-import": "error",
     "import/no-cycle": "error",
     "no-unused-vars": "error",
-    "unicorn/no-empty-file": "error"
-  }
+    "unicorn/no-empty-file": "error",
+    "eslint/complexity": ["error", { "max": 7, "variant": "modified" }]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.spec.{ts,tsx}", "**/*.test.{ts,tsx}", "**/__tests__/**/*.{ts,tsx}"],
+      "rules": {
+        "anti-slop/no-chained-type-assertions": "off",
+        "anti-slop/no-conditional-empty-object-spread": "off",
+        "anti-slop/no-known-value-widening": "off",
+        "anti-slop/no-module-mocking": "off",
+        "anti-slop/no-object-parameters": "off",
+        "anti-slop/no-reflect-apply": "off",
+        "anti-slop/no-reflect-get": "off",
+        "anti-slop/no-runtime-typeof": "off",
+        "anti-slop/no-shape-in-symbol-names": "off",
+        "anti-slop/no-unknown-parameters": "off",
+        "anti-slop/no-unknown-returns": "off",
+        "anti-slop/no-unknown-type-aliases": "off",
+        "anti-slop/no-unsafe-dictionary-type": "off",
+        "anti-slop/no-widen-then-assert": "off",
+        "anti-slop/require-safety-comment-for-type-assertion": "off",
+        "anti-slop/require-tsdoc": "off",
+        "eslint/complexity": "off"
+      }
+    },
+    {
+      "files": [
+        "**/*.spec-e2e.{js,jsx,ts,tsx}",
+        "**/*.spec.{js,jsx,ts,tsx}",
+        "**/*.test.{js,jsx,ts,tsx}",
+        "**/__tests__/**/*.{js,jsx,ts,tsx}",
+        "**/e2e/**/*.{js,jsx,ts,tsx}",
+        "scripts/**/*.{js,jsx,ts,tsx,mjs,cjs}",
+        "**/*.config.{js,jsx,ts,tsx,mjs,cjs}",
+        "**/next.config.*",
+        "**/vite.config.*",
+        "**/vitest.config.*",
+        "**/jest.config.*",
+        "**/metro.config.*",
+        "**/babel.config.*",
+        "**/postcss.config.*",
+        "**/app.config.*",
+        "infra/**/*.{js,jsx,ts,tsx}"
+      ],
+      "rules": {
+        "eslint/complexity": "off"
+      }
+    }
+  ]
 }

@@ -6,10 +6,12 @@ import { useMemo, useRef } from "react";
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { AppText } from "@/shared/ui";
 
 import { LessonRow } from "../lesson-row/lesson-row";
 
+/** Describes the inputs and callbacks accepted by Listing Content View. */
+/** Describes the inputs, callbacks, and optional state accepted by Listing Content View. */
 export type ListingContentViewProps = {
   contents: ListingContentsDto;
   listingRef: QueueListingRef;

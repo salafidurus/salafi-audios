@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -13,7 +14,11 @@ export function AdminAccessState({ status }: AdminAccessStateProps) {
   const isLoading = status === "loading";
 
   return (
-    <section className={styles.state} aria-live={isLoading ? "polite" : undefined}>
+    <section
+      className={styles.state}
+      aria-live={isLoading ? "polite" : "assertive"}
+      role={isLoading ? undefined : "alert"}
+    >
       {isLoading ? (
         <p>{t("admin.checkingAccess", "Checking access…")}</p>
       ) : (

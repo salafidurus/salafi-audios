@@ -5,6 +5,23 @@ on:
     types: [opened, reopened, synchronize]
     branches:
       - main
+      - spec/**
+    paths:
+      - "apps/web/**"
+      - "apps/native/**"
+      - "packages/core-api/**"
+      - "packages/core-contracts/**"
+      - "packages/core-i18n/**"
+      - "packages/core-sync/**"
+      - "packages/design-tokens/**"
+      - "packages/domain-account/**"
+      - "packages/domain-audio/**"
+      - "packages/domain-content/**"
+      - "packages/domain-search/**"
+      - "packages/utils-error/**"
+      - "package.json"
+      - "bun.lock"
+      - ".github/workflows/react-doctor.yml"
 
 permissions:
   contents: read
@@ -21,4 +38,5 @@ jobs:
           fetch-depth: 0
 
       - uses: millionco/react-doctor@v2
-        continue-on-error: true
+        with:
+          blocking: warning

@@ -34,5 +34,5 @@
 .section {
   display: flex;
   flex-direction: column;
-  scroll-margin-top: calc(var(--sticky-header-height, 240px) + 32px);
+  scroll-margin-top: var(--space-component-gap-md, 16px);
 }

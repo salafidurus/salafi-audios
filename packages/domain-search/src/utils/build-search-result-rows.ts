@@ -6,18 +6,24 @@ import type {
 
 import { pickContentField } from "@sd/core-i18n";
 
+/** Converts API search groups into the flat rows consumed by discovery views. */
+/** A display-ready row representing one public Listing search result. */
 export type SearchResultRow = {
   id: string;
+  /** Public Listing identity used for navigation and cache keys. */
   slug: string;
   title: string;
   format: ListingFormat;
   scholarName: string;
+  /** Public scholar identity used for stable matching across locales. */
   scholarSlug: string;
   imageUrl?: string;
   lectureCount: number;
+  /** Total playable duration when the API provides it. */
   durationSeconds?: number;
 };
 
+/** Flattens collection, series, and single result groups without changing identity. */
 export function buildSearchResultRows(
   data: SearchCatalogResultsDto | undefined,
   showOriginal = false,

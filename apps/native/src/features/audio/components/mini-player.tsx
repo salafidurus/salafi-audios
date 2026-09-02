@@ -1,134 +1,233 @@
+import { BottomSheet, Button, Column, Host, Row, Spacer } from "@expo/ui";
 import { useAudio } from "@sd/domain-audio";
 import { useFormattedScholarName } from "@sd/domain-content";
-import { Image } from "expo-image";
-import { Play, Pause, ChevronDown, Music } from "lucide-react-native";
 import React, { useState } from "react";
-import { View, Pressable, Text, Modal, ActivityIndicator } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { toUniversalStyleFromRN } from "@/core/styles/expo-ui";
+import { NativeIcon, NativeImage, NativeProgress, NativeText } from "@/shared/ui";
 
 import { audioService } from "../audio-service";
 import { PlaybackControls } from "./playback-controls";
 import { ProgressBar } from "./progress-bar";
 
+/** Renders the compact accessory player and full now-playing sheet. */
+/** Describes the optional embedded layout accepted by the mini-player surface. */
 export type MiniPlayerProps = {
   embedded?: boolean;
 };
 
+/**
+ * Renders the compact player and now-playing sheet.
+ *
+ * The title/artwork action and playback action are sibling native buttons so
+ * opening the sheet never creates a nested interactive target around play/pause.
+ * Playback state and side effects remain owned by `audioService`.
+ */
 export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
-  const { currentTrack, isPlaying, isLoading, progressPercent, positionSeconds } = useAudio();
+  const { currentTrack, isPlaying, progressPercent, positionSeconds } = useAudio();
   const { theme } = useUnistyles();
   const { t } = useTranslation();
-  const [modalVisible, setModalVisible] = useState(false);
+  const [sheetVisible, setSheetVisible] = useState(false);
   const insets = useSafeAreaInsets();
   const displayArtist = useFormattedScholarName(currentTrack?.artist, currentTrack?.scholarSlug);
+  const compactArtist = truncateCompactArtist(displayArtist);
 
   if (!currentTrack) return null;
 
-  const handlePlayPause = () => {
-    if (isPlaying) {
-      audioService.pause();
-    } else {
-      audioService.resume();
-    }
-  };
-
-  const strong = theme.colors.content.strong;
-  const PauseIcon = <Pause size={20} color={strong} fill={strong} />;
-  const PlayIcon = <Play size={20} color={strong} fill={strong} />;
-  const ChevronDownIcon = <ChevronDown size={28} color={strong} />;
-
   return (
     <>
-      <Pressable
-        onPress={() => setModalVisible(true)}
-        style={[
-          embedded ? styles.containerEmbedded : styles.container,
-          !embedded && { bottom: insets.bottom + 8 },
-        ]}
-      >
-        {/* Progress Bar underlaid at the very top of mini-player */}
-        <View style={styles.miniProgressTrack}>
-          <View style={[styles.miniProgressFill, { width: `${progressPercent}%` }]} />
-        </View>
-
-        <View style={styles.content}>
-          {currentTrack.artworkUrl ? (
-            <Image source={{ uri: currentTrack.artworkUrl }} style={styles.artwork} />
-          ) : (
-            <View style={[styles.artwork, styles.artworkPlaceholder]}>
-              <Music size={20} color={theme.colors.content.muted} />
-            </View>
-          )}
-
-          <View style={styles.textContainer}>
-            <Text style={styles.title} numberOfLines={1}>
-              {currentTrack.title}
-            </Text>
-            <Text style={styles.artist} numberOfLines={1}>
-              {displayArtist}
-            </Text>
-          </View>
-
-          <Pressable onPress={handlePlayPause} style={styles.playButton} testID="play-button">
-            {isLoading ? (
-              <ActivityIndicator size="small" color={theme.colors.content.strong} />
-            ) : isPlaying ? (
-              PauseIcon
-            ) : (
-              <View style={{ marginStart: 2 }}>{PlayIcon}</View>
-            )}
-          </Pressable>
-        </View>
-      </Pressable>
-
-      {/* Full Screen Player Modal */}
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Pressable onPress={() => setModalVisible(false)} style={styles.closeButton}>
-              {ChevronDownIcon}
-            </Pressable>
-            <Text style={styles.modalHeaderTitle}>{t("audio.now_playing", "Now Playing")}</Text>
-            <View style={styles.placeholder} />
-          </View>
-
-          <View style={styles.modalBody}>
-            {currentTrack.artworkUrl ? (
-              <Image source={{ uri: currentTrack.artworkUrl }} style={styles.modalArtwork} />
-            ) : (
-              <View style={[styles.modalArtwork, styles.modalArtworkPlaceholder]}>
-                <Music size={80} color={theme.colors.content.muted} />
-              </View>
-            )}
-
-            <View style={styles.modalTextContainer}>
-              <Text style={styles.modalTitle} numberOfLines={2}>
-                {currentTrack.title}
-              </Text>
-              <Text style={styles.modalArtist}>{displayArtist}</Text>
-            </View>
-
-            <View style={styles.progressSection}>
-              <ProgressBar />
-              <View style={styles.timeLabels}>
-                <Text style={styles.timeText}>{formatTime(positionSeconds)}</Text>
-                <Text style={styles.timeText}>{formatTime(currentTrack.durationSeconds)}</Text>
-              </View>
-            </View>
-
-            <PlaybackControls />
-          </View>
-        </SafeAreaView>
-      </Modal>
+      <MiniPlayerBar
+        currentTrack={currentTrack}
+        compactArtist={compactArtist}
+        embedded={embedded}
+        insetsBottom={insets.bottom}
+        isPlaying={isPlaying}
+        onOpen={() => setSheetVisible(true)}
+        progressPercent={progressPercent}
+        mutedColor={theme.colors.content.muted}
+      />
+      <NowPlayingSheet
+        currentTrack={currentTrack}
+        displayArtist={displayArtist}
+        isPresented={sheetVisible}
+        onDismiss={() => setSheetVisible(false)}
+        positionSeconds={positionSeconds}
+        theme={theme}
+        title={t("audio.now_playing", "Now Playing")}
+      />
     </>
+  );
+}
+
+function MiniPlayerBar({
+  currentTrack,
+  compactArtist,
+  embedded,
+  insetsBottom,
+  isPlaying,
+  mutedColor,
+  onOpen,
+  progressPercent,
+}: {
+  currentTrack: NonNullable<ReturnType<typeof useAudio>["currentTrack"]>;
+  compactArtist: string;
+  embedded: boolean;
+  insetsBottom: number;
+  isPlaying: boolean;
+  mutedColor: string;
+  onOpen: () => void;
+  progressPercent: number;
+}) {
+  const handlePlayPause = () => {
+    if (isPlaying) audioService.pause();
+    else audioService.resume();
+  };
+
+  return (
+    <Host
+      style={[
+        embedded ? styles.containerEmbedded : styles.container,
+        !embedded && { bottom: insetsBottom + 8 },
+      ]}
+    >
+      <Column>
+        <NativeProgress
+          variant="linear"
+          value={progressPercent / 100}
+          testID="mini-progress-fill"
+        />
+        <Row alignment="center" style={styles.content}>
+          <Button
+            onPress={onOpen}
+            variant="text"
+            testID="open-now-playing"
+            style={toUniversalStyleFromRN(styles.openButton)}
+          >
+            <Row alignment="center">
+              <PlayerArtwork
+                uri={currentTrack.artworkUrl}
+                size={styles.artwork}
+                placeholderSize={20}
+                color={mutedColor}
+              />
+              <Column style={toUniversalStyleFromRN(styles.textContainer)}>
+                <NativeText variant="labelMd" colorRole="strong" numberOfLines={1}>
+                  {currentTrack.title}
+                </NativeText>
+                <NativeText variant="caption" colorRole="muted" numberOfLines={1}>
+                  {compactArtist}
+                </NativeText>
+              </Column>
+            </Row>
+          </Button>
+          <Button
+            onPress={handlePlayPause}
+            variant="text"
+            testID="play-button"
+            style={toUniversalStyleFromRN(styles.playButton)}
+          >
+            <Column alignment="center">
+              <NativeIcon name={isPlaying ? "pause" : "play"} size={24} colorRole="strong" />
+            </Column>
+          </Button>
+        </Row>
+      </Column>
+    </Host>
+  );
+}
+
+function NowPlayingSheet({
+  currentTrack,
+  displayArtist,
+  isPresented,
+  onDismiss,
+  positionSeconds,
+  theme,
+  title,
+}: {
+  currentTrack: NonNullable<ReturnType<typeof useAudio>["currentTrack"]>;
+  displayArtist: string;
+  isPresented: boolean;
+  onDismiss: () => void;
+  positionSeconds: number;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+  title: string;
+}) {
+  return (
+    <BottomSheet
+      isPresented={isPresented}
+      onDismiss={onDismiss}
+      snapPoints={["full"]}
+      testID="now-playing-sheet"
+    >
+      <Column alignment="center" style={toUniversalStyleFromRN(styles.modalContainer)}>
+        <Row alignment="center" style={styles.modalHeader}>
+          <Button
+            onPress={onDismiss}
+            variant="text"
+            testID="close-now-playing"
+            style={toUniversalStyleFromRN(styles.closeButton)}
+          >
+            <NativeIcon name="chevronDown" size={28} colorRole="strong" />
+          </Button>
+          <NativeText variant="titleMd" colorRole="strong">
+            {title}
+          </NativeText>
+          <Spacer flexible />
+        </Row>
+        <Column alignment="center" style={styles.modalBody}>
+          <PlayerArtwork
+            uri={currentTrack.artworkUrl}
+            size={styles.modalArtwork}
+            placeholderSize={80}
+            color={theme.colors.content.muted}
+          />
+          <Column alignment="center" style={toUniversalStyleFromRN(styles.modalTextContainer)}>
+            <NativeText variant="titleLg" colorRole="strong" numberOfLines={2}>
+              {currentTrack.title}
+            </NativeText>
+            <NativeText variant="bodyMd" colorRole="primary">
+              {displayArtist}
+            </NativeText>
+          </Column>
+          <Column style={styles.progressSection}>
+            <ProgressBar />
+            <Row alignment="center" style={toUniversalStyleFromRN(styles.timeLabels)}>
+              <NativeText variant="caption" colorRole="muted">
+                {formatTime(positionSeconds)}
+              </NativeText>
+              <Spacer flexible />
+              <NativeText variant="caption" colorRole="muted">
+                {formatTime(currentTrack.durationSeconds)}
+              </NativeText>
+            </Row>
+          </Column>
+          <PlaybackControls />
+        </Column>
+      </Column>
+    </BottomSheet>
+  );
+}
+
+function PlayerArtwork({
+  uri,
+  size,
+  placeholderSize,
+  color,
+}: {
+  uri?: string | null;
+  size: object;
+  placeholderSize: number;
+  color: string;
+}) {
+  if (uri) return <NativeImage source={{ uri }} bridgeStyle={size} />;
+  return (
+    <Column alignment="center" style={toUniversalStyleFromRN([size, styles.artworkPlaceholder])}>
+      <NativeIcon name="music" size={placeholderSize} color={color} />
+    </Column>
   );
 }
 
@@ -138,6 +237,14 @@ function formatTime(seconds: number): string {
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
 }
+
+function truncateCompactArtist(artist: string): string {
+  return artist.length > COMPACT_ARTIST_MAX_LENGTH
+    ? `${artist.slice(0, COMPACT_ARTIST_MAX_LENGTH - 1)}…`
+    : artist;
+}
+
+const COMPACT_ARTIST_MAX_LENGTH = 32;
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -165,9 +272,12 @@ const styles = StyleSheet.create((theme) => ({
   },
   content: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: theme.spacing.scale.md,
+    paddingHorizontal: 0,
+  },
+  openButton: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 0,
   },
   artwork: {
     width: 40,
@@ -177,118 +287,66 @@ const styles = StyleSheet.create((theme) => ({
   },
   artworkPlaceholder: {
     justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: theme.colors.surface.subtle,
   },
   textContainer: {
-    flex: 1,
+    width: 190,
     marginStart: theme.spacing.scale.md,
     marginEnd: theme.spacing.scale.sm,
   },
-  title: {
-    ...theme.typography.labelMd,
-    color: theme.colors.content.strong,
-  },
-  artist: {
-    ...theme.typography.caption,
-    color: theme.colors.content.muted,
-    marginTop: theme.spacing.scale.xs,
-  },
   playButton: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     borderRadius: theme.radius.scale.full,
     backgroundColor: theme.colors.surface.subtle,
     justifyContent: "center",
-    alignItems: "center",
+    alignment: "center",
     marginEnd: theme.spacing.scale.sm,
   },
-  miniProgressTrack: {
-    height: 2,
-    width: "100%",
-    backgroundColor: theme.colors.surface.subtle,
-  },
-  miniProgressFill: {
-    height: "100%",
-    backgroundColor: theme.colors.action.primary,
-  },
-  // Fullscreen Modal Styles.
-  // RN's <Modal> mounts its own render root (AppContainer/Surface), which
-  // always derives ITS OWN root layout direction from the native
-  // I18nManager flag — it does not inherit `direction` from the app's main
-  // root. Setting it explicitly here gives this subtree its own resolved
-  // direction (Yoga honors a per-node override regardless of the owning
-  // surface's direction), so this mirrors correctly without a restart.
   modalContainer: {
     flex: 1,
-    direction: theme.direction,
+    width: 360,
     backgroundColor: theme.colors.surface.default,
   },
   modalHeader: {
-    flexDirection: "row",
-    alignItems: "center",
+    alignSelf: "stretch",
+    width: 360,
     justifyContent: "space-between",
     paddingHorizontal: theme.spacing.scale.lg,
     height: 56,
   },
-  modalHeaderTitle: {
-    ...theme.typography.titleMd,
-    color: theme.colors.content.strong,
-  },
   closeButton: {
     padding: theme.spacing.scale.xs,
   },
-  placeholder: {
-    width: 36,
-  },
   modalBody: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignSelf: "stretch",
+    width: 360,
     paddingHorizontal: theme.spacing.scale["2xl"],
     paddingBottom: theme.spacing.scale["4xl"],
+    marginTop: theme.spacing.scale.xl,
   },
   modalArtwork: {
-    width: 280,
-    height: 280,
+    width: 240,
+    height: 240,
     borderRadius: theme.radius.scale.lg,
     backgroundColor: theme.colors.surface.subtle,
     ...theme.shadows.lg,
   },
-  modalArtworkPlaceholder: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
   modalTextContainer: {
-    alignItems: "center",
+    alignSelf: "stretch",
     marginTop: theme.spacing.scale["3xl"],
     marginBottom: theme.spacing.scale["2xl"],
-    width: "100%",
-  },
-  modalTitle: {
-    ...theme.typography.titleLg,
-    color: theme.colors.content.strong,
-    textAlign: "center",
-    paddingHorizontal: theme.spacing.scale.md,
-  },
-  modalArtist: {
-    ...theme.typography.bodyMd,
-    color: theme.colors.action.primary,
-    fontWeight: "600",
-    marginTop: theme.spacing.scale.sm,
   },
   progressSection: {
-    width: "100%",
+    alignSelf: "stretch",
     paddingHorizontal: theme.spacing.scale.sm,
     marginBottom: theme.spacing.scale.lg,
   },
   timeLabels: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
+    alignSelf: "stretch",
     marginTop: theme.spacing.scale.xs,
   },
-  timeText: {
-    ...theme.typography.caption,
-    color: theme.colors.content.muted,
+  timeSpacer: {
+    flex: 1,
   },
 }));

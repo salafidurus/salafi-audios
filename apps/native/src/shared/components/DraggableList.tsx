@@ -4,6 +4,8 @@ import React, { useState, useCallback, useRef } from "react";
 import { View, FlatList, Pressable, StyleSheet } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
+/** Defines the native shape consumed by render item params integrations. */
 export interface RenderItemParams<T> {
   item: T;
   index: number;
@@ -73,6 +75,7 @@ const draggableStyles = StyleSheet.create({
   },
 });
 
+/** Renders the native draggable list surface and coordinates its user-facing state. */
 export function DraggableList<T>({
   data,
   renderItem,

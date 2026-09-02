@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { useCallback } from "react";
@@ -20,6 +21,10 @@ import {
 } from "./useUploadArrangeState";
 
 const UPLOAD_CONCURRENCY = 3;
+
+function getErrorMessage(error: Error | null, fallback: string): string {
+  return error?.message ?? fallback;
+}
 
 /** Local files are already in memory; url-sourced items are only fetched here — at the
  *  moment the admin actually confirms the upload, not when the link was first added. */
@@ -76,7 +81,7 @@ async function uploadWithConcurrency(
         dispatch({
           type: "UPLOAD_ERROR",
           itemId: id,
-          error: (err as Error)?.message ?? "Upload failed",
+          error: getErrorMessage(err instanceof Error ? err : null, "Upload failed"),
         });
       }
     }
@@ -84,6 +89,75 @@ async function uploadWithConcurrency(
 
   await Promise.all(Array.from({ length: UPLOAD_CONCURRENCY }, worker));
   return allOk;
+}
+
+async function presignPendingItems(
+  state: UploadArrangeState,
+  needsPresign: UploadItem[],
+  dispatch: React.Dispatch<UploadArrangeAction>,
+): Promise<UploadItem[]> {
+  dispatch({ type: "SET_PHASE", phase: "presigning" });
+  const request = buildPresignRequest(state);
+  const presign = await getBatchPresignedUrls({
+    ...request,
+    files: request.files.filter((file) => needsPresign.some((item) => item.id === file.clientId)),
+  });
+  dispatch({ type: "PRESIGNED", urls: presign.files });
+  const urlById = new Map(presign.files.map((file) => [file.clientId, file]));
+  return needsPresign.map((item) => {
+    const presigned = urlById.get(item.id);
+    return presigned
+      ? {
+          ...item,
+          upload: {
+            ...item.upload,
+            uploadUrl: presigned.uploadUrl,
+            objectKey: presigned.objectKey,
+          },
+        }
+      : item;
+  });
+}
+
+async function commitUploadedItems(
+  existing: NonNullable<UploadArrangeState["existing"]>,
+  stateWithKeys: UploadArrangeState,
+): Promise<void> {
+  if (existing.format === "single") {
+    const item = stateWithKeys.items[0];
+    if (!item?.upload.objectKey) throw new Error("Upload did not produce a storage key");
+    await updateListingMedia(existing.id, {
+      audioKey: item.upload.objectKey,
+      durationSeconds: Math.round(item.durationSeconds ?? 0),
+      sizeBytes: item.sizeBytes,
+    });
+    return;
+  }
+  await commitArrange(existing.id, buildCommitDto(stateWithKeys));
+}
+
+async function prepareItemsToUpload(
+  state: UploadArrangeState,
+  dispatch: React.Dispatch<UploadArrangeAction>,
+): Promise<UploadItem[]> {
+  const pending = state.items.filter((item) => item.upload.status !== "done");
+  return pending.length > 0 ? presignPendingItems(state, pending, dispatch) : pending;
+}
+
+async function uploadPendingItems(
+  items: UploadItem[],
+  dispatch: React.Dispatch<UploadArrangeAction>,
+): Promise<boolean> {
+  if (items.length === 0) return true;
+  dispatch({ type: "SET_PHASE", phase: "uploading" });
+  const ok = await uploadWithConcurrency(items, dispatch);
+  if (!ok) {
+    dispatch({
+      type: "SET_ERROR",
+      error: "Some files failed to upload. Fix the errors and try again.",
+    });
+  }
+  return ok;
 }
 
 /**
@@ -101,44 +175,10 @@ export function useUploadArrangeCommit(
 
     try {
       // 1. Presign any item that doesn't already hold an objectKey (retry-safe).
-      const needsPresign = state.items.filter((item) => item.upload.status !== "done");
-      let itemsToUpload = needsPresign;
-      if (needsPresign.length > 0) {
-        dispatch({ type: "SET_PHASE", phase: "presigning" });
-        const request = buildPresignRequest(state);
-        const presign = await getBatchPresignedUrls({
-          ...request,
-          files: request.files.filter((f) => needsPresign.some((item) => item.id === f.clientId)),
-        });
-        dispatch({ type: "PRESIGNED", urls: presign.files });
-        const urlById = new Map(presign.files.map((f) => [f.clientId, f]));
-        itemsToUpload = needsPresign.map((item) => {
-          const presigned = urlById.get(item.id);
-          return presigned
-            ? {
-                ...item,
-                upload: {
-                  ...item.upload,
-                  uploadUrl: presigned.uploadUrl,
-                  objectKey: presigned.objectKey,
-                },
-              }
-            : item;
-        });
-      }
+      const itemsToUpload = await prepareItemsToUpload(state, dispatch);
 
       // 2. Upload in parallel with per-item progress.
-      if (itemsToUpload.length > 0) {
-        dispatch({ type: "SET_PHASE", phase: "uploading" });
-        const ok = await uploadWithConcurrency(itemsToUpload, dispatch);
-        if (!ok) {
-          dispatch({
-            type: "SET_ERROR",
-            error: "Some files failed to upload. Fix the errors and try again.",
-          });
-          return;
-        }
-      }
+      if (!(await uploadPendingItems(itemsToUpload, dispatch))) return;
 
       // 3. Commit — one transactional call (or the media endpoint for singles).
       dispatch({ type: "SET_PHASE", phase: "committing" });
@@ -150,17 +190,7 @@ export function useUploadArrangeCommit(
         }),
       };
 
-      if (existing.format === "single") {
-        const item = stateWithKeys.items[0];
-        if (!item?.upload.objectKey) throw new Error("Upload did not produce a storage key");
-        await updateListingMedia(existing.id, {
-          audioKey: item.upload.objectKey,
-          durationSeconds: Math.round(item.durationSeconds ?? 0),
-          sizeBytes: item.sizeBytes,
-        });
-      } else {
-        await commitArrange(existing.id, buildCommitDto(stateWithKeys));
-      }
+      await commitUploadedItems(existing, stateWithKeys);
 
       dispatch({ type: "SET_PHASE", phase: "done" });
       await onSuccess();
@@ -171,7 +201,10 @@ export function useUploadArrangeCommit(
       }
       dispatch({
         type: "SET_ERROR",
-        error: (err as Error)?.message ?? "Failed to save the arrangement.",
+        error: getErrorMessage(
+          err instanceof Error ? err : null,
+          "Failed to save the arrangement.",
+        ),
       });
     }
   }, [state, dispatch, onSuccess]);

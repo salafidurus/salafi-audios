@@ -1,3 +1,4 @@
+/** Public entrypoint for the platform-agnostic API client configuration helpers. */
 export {
   initApiClient,
   setUnauthorizedHandler,

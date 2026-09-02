@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { AdminArrangeLessonDto, StatusValue } from "@sd/core-contracts";
@@ -18,20 +19,20 @@ import {
   type UploadItem,
 } from "@/features/admin/hooks/Content/useUploadArrangeState";
 import { deriveChildSlug } from "@/features/admin/utils/upload-filename";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
-} from "@/shared/components/Dropdown";
-import { InputField } from "@/shared/components/InputField";
+} from "@/shared/components/ui/dropdown";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import modalStyles from "../listing-modal.module.css";
 import styles from "./upload-arrange.module.css";
 
 interface UploadArrangeArrangeTabProps {
-  state: UploadArrangeState;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
   dispatch: React.Dispatch<UploadArrangeAction>;
 }
 
@@ -61,7 +62,7 @@ function PrefixedSlugField({
 }: {
   id: string;
   prefix: string;
-  slug: string;
+  /** Documents the intent and contract of this field. */ slug: string;
   onChange: (nextSlug: string) => void;
   hasConflict: boolean;
 }) {
@@ -88,6 +89,183 @@ function PrefixedSlugField({
   );
 }
 
+function updateAssignment(
+  value: string,
+  item: UploadItem,
+  assignment: UploadItem["assignment"],
+  slug: string | null,
+  dispatch: React.Dispatch<UploadArrangeAction>,
+) {
+  if (value === "new") {
+    dispatch({
+      type: "SET_ASSIGNMENT",
+      itemId: item.id,
+      assignment: {
+        kind: "new-lesson",
+        moduleKey: assignment.kind === "new-lesson" ? assignment.moduleKey : ROOT_MODULE_KEY,
+        slug: slug ?? "",
+        slugEdited: assignment.kind === "new-lesson" ? assignment.slugEdited : false,
+        description: "",
+        status: "draft",
+        orderIndex: item.numericPrefix,
+      },
+    });
+  } else if (value.startsWith("replace:")) {
+    dispatch({
+      type: "SET_ASSIGNMENT",
+      itemId: item.id,
+      assignment: { kind: "replace-audio", lessonId: value.slice("replace:".length) },
+    });
+  }
+}
+
+function NewLessonFields({
+  item,
+  state,
+  assignment,
+  dispatch,
+  conflictSlugs,
+  moduleOptions,
+}: {
+  item: UploadItem;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
+  assignment: Extract<
+    UploadItem["assignment"],
+    { /** Documents the intent and contract of this field. */ kind: "new-lesson" }
+  >;
+  dispatch: React.Dispatch<UploadArrangeAction>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
+  moduleOptions: { key: ModuleKey; title: string }[] | null;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className={styles.fieldGrid}>
+      {moduleOptions && (
+        <div className={modalStyles.formGroup}>
+          <span className={modalStyles.label}>
+            {t("admin.contents.listing.moduleLabel", "Module")}
+          </span>
+          <Dropdown
+            value={assignment.moduleKey}
+            onValueChange={(value) =>
+              dispatch({
+                type: "SET_ASSIGNMENT",
+                itemId: item.id,
+                assignment: { ...assignment, moduleKey: value },
+              })
+            }
+          >
+            <DropdownTrigger
+              placeholder={t("admin.contents.listing.selectModule", "Select module")}
+            />
+            <DropdownContent>
+              {moduleOptions.map((mod) => (
+                <DropdownItem key={mod.key} value={mod.key}>
+                  {mod.title}
+                </DropdownItem>
+              ))}
+            </DropdownContent>
+          </Dropdown>
+        </div>
+      )}
+      <PrefixedSlugField
+        id={`item-${item.id}-slug`}
+        prefix={resolveParentSlug(state, assignment.moduleKey)}
+        slug={assignment.slug}
+        onChange={(value) =>
+          dispatch({ type: "SET_LESSON_FIELD", itemId: item.id, field: "slug", value })
+        }
+        hasConflict={conflictSlugs.has(assignment.slug)}
+      />
+      <div className={modalStyles.formGroup}>
+        <span className={modalStyles.label}>
+          {t("admin.contents.listing.statusLabel", "Status")}
+        </span>
+        <Dropdown
+          value={assignment.status}
+          onValueChange={(value) =>
+            dispatch({ type: "SET_LESSON_FIELD", itemId: item.id, field: "status", value })
+          }
+        >
+          <DropdownTrigger
+            placeholder={t("admin.contents.listing.statusPlaceholder", "Select Status")}
+          />
+          <DropdownContent>
+            {STATUS_OPTIONS.map((option) => (
+              <DropdownItem key={option.value} value={option.value}>
+                {t(option.label, option.fallback)}
+              </DropdownItem>
+            ))}
+          </DropdownContent>
+        </Dropdown>
+      </div>
+      <div className={modalStyles.formGroup}>
+        <span className={modalStyles.label}>
+          {t("admin.contents.listing.orderIndexLabel", "Order")}
+        </span>
+        <InputField
+          type="number"
+          value={assignment.orderIndex === null ? "" : String(assignment.orderIndex)}
+          onChange={(value) =>
+            dispatch({
+              type: "SET_LESSON_FIELD",
+              itemId: item.id,
+              field: "orderIndex",
+              value: value === "" ? null : Number(value),
+            })
+          }
+        />
+      </div>
+      <div className={modalStyles.formGroup}>
+        <span className={modalStyles.label}>
+          {t("admin.contents.listing.descriptionLabel", "Description")}
+        </span>
+        <InputField
+          value={assignment.description}
+          onChange={(value) =>
+            dispatch({ type: "SET_LESSON_FIELD", itemId: item.id, field: "description", value })
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
+function SuggestionChip({
+  suggestion,
+  itemId,
+  dispatch,
+}: {
+  suggestion: NonNullable<UploadItem["suggestion"]>;
+  itemId: string;
+  dispatch: React.Dispatch<UploadArrangeAction>;
+}) {
+  const { t } = useTranslation();
+  if (suggestion.dismissed) return null;
+  return (
+    <div className={styles.suggestionChip}>
+      <span>
+        {t("admin.contents.listing.slugMatchSuggestion", "Filename matches existing lesson")}{" "}
+        &ldquo;{suggestion.lessonTitle}&rdquo;
+      </span>
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={() => dispatch({ type: "ACCEPT_SUGGESTION", itemId })}
+      >
+        {t("admin.contents.listing.replaceItsAudio", "Replace its audio")}
+      </Button>
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={() => dispatch({ type: "DISMISS_SUGGESTION", itemId })}
+      >
+        {t("admin.contents.listing.keepAsNew", "Keep as new lesson")}
+      </Button>
+    </div>
+  );
+}
+
 function StagedItemCard({
   item,
   state,
@@ -97,10 +275,10 @@ function StagedItemCard({
   moduleOptions,
 }: {
   item: UploadItem;
-  state: UploadArrangeState;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
   dispatch: React.Dispatch<UploadArrangeAction>;
   lessonsInScope: AdminArrangeLessonDto[];
-  conflictSlugs: Set<string>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
   moduleOptions: { key: ModuleKey; title: string }[] | null;
 }) {
   const { t } = useTranslation();
@@ -116,32 +294,7 @@ function StagedItemCard({
 
         <Dropdown
           value={assignment.kind === "replace-audio" ? `replace:${assignment.lessonId}` : "new"}
-          onValueChange={(value) => {
-            if (value === "new") {
-              dispatch({
-                type: "SET_ASSIGNMENT",
-                itemId: item.id,
-                assignment: {
-                  kind: "new-lesson",
-                  moduleKey:
-                    item.assignment.kind === "new-lesson"
-                      ? item.assignment.moduleKey
-                      : ROOT_MODULE_KEY,
-                  slug: slug ?? "",
-                  slugEdited: assignment.kind === "new-lesson" ? assignment.slugEdited : false,
-                  description: "",
-                  status: "draft",
-                  orderIndex: item.numericPrefix,
-                },
-              });
-            } else if (value.startsWith("replace:")) {
-              dispatch({
-                type: "SET_ASSIGNMENT",
-                itemId: item.id,
-                assignment: { kind: "replace-audio", lessonId: value.slice("replace:".length) },
-              });
-            }
-          }}
+          onValueChange={(value) => updateAssignment(value, item, assignment, slug, dispatch)}
         >
           <DropdownTrigger
             placeholder={t("admin.contents.listing.assignmentPlaceholder", "Assignment")}
@@ -159,7 +312,10 @@ function StagedItemCard({
         </Dropdown>
       </div>
 
-      {item.suggestion && !item.suggestion.dismissed && (
+      {item.suggestion && (
+        <SuggestionChip suggestion={item.suggestion} itemId={item.id} dispatch={dispatch} />
+      )}
+      {/*
         <div className={styles.suggestionChip}>
           <span>
             {t("admin.contents.listing.slugMatchSuggestion", "Filename matches existing lesson")}{" "}
@@ -180,98 +336,17 @@ function StagedItemCard({
             {t("admin.contents.listing.keepAsNew", "Keep as new lesson")}
           </Button>
         </div>
-      )}
+      )} */}
 
       {assignment.kind === "new-lesson" && (
-        <div className={styles.fieldGrid}>
-          {moduleOptions && (
-            <div className={modalStyles.formGroup}>
-              <span className={modalStyles.label}>
-                {t("admin.contents.listing.moduleLabel", "Module")}
-              </span>
-              <Dropdown
-                value={assignment.moduleKey}
-                onValueChange={(value) =>
-                  dispatch({
-                    type: "SET_ASSIGNMENT",
-                    itemId: item.id,
-                    assignment: { ...assignment, moduleKey: value },
-                  })
-                }
-              >
-                <DropdownTrigger
-                  placeholder={t("admin.contents.listing.selectModule", "Select module")}
-                />
-                <DropdownContent>
-                  {moduleOptions.map((mod) => (
-                    <DropdownItem key={mod.key} value={mod.key}>
-                      {mod.title}
-                    </DropdownItem>
-                  ))}
-                </DropdownContent>
-              </Dropdown>
-            </div>
-          )}
-          <PrefixedSlugField
-            id={`item-${item.id}-slug`}
-            prefix={resolveParentSlug(state, assignment.moduleKey)}
-            slug={assignment.slug}
-            onChange={(value) =>
-              dispatch({ type: "SET_LESSON_FIELD", itemId: item.id, field: "slug", value })
-            }
-            hasConflict={hasConflict}
-          />
-          <div className={modalStyles.formGroup}>
-            <span className={modalStyles.label}>
-              {t("admin.contents.listing.statusLabel", "Status")}
-            </span>
-            <Dropdown
-              value={assignment.status}
-              onValueChange={(value) =>
-                dispatch({ type: "SET_LESSON_FIELD", itemId: item.id, field: "status", value })
-              }
-            >
-              <DropdownTrigger
-                placeholder={t("admin.contents.listing.statusPlaceholder", "Select Status")}
-              />
-              <DropdownContent>
-                {STATUS_OPTIONS.map((option) => (
-                  <DropdownItem key={option.value} value={option.value}>
-                    {t(option.label, option.fallback)}
-                  </DropdownItem>
-                ))}
-              </DropdownContent>
-            </Dropdown>
-          </div>
-          <div className={modalStyles.formGroup}>
-            <span className={modalStyles.label}>
-              {t("admin.contents.listing.orderIndexLabel", "Order")}
-            </span>
-            <InputField
-              type="number"
-              value={assignment.orderIndex === null ? "" : String(assignment.orderIndex)}
-              onChange={(value) =>
-                dispatch({
-                  type: "SET_LESSON_FIELD",
-                  itemId: item.id,
-                  field: "orderIndex",
-                  value: value === "" ? null : Number(value),
-                })
-              }
-            />
-          </div>
-          <div className={modalStyles.formGroup}>
-            <span className={modalStyles.label}>
-              {t("admin.contents.listing.descriptionLabel", "Description")}
-            </span>
-            <InputField
-              value={assignment.description}
-              onChange={(value) =>
-                dispatch({ type: "SET_LESSON_FIELD", itemId: item.id, field: "description", value })
-              }
-            />
-          </div>
-        </div>
+        <NewLessonFields
+          item={item}
+          state={state}
+          assignment={assignment}
+          dispatch={dispatch}
+          conflictSlugs={conflictSlugs}
+          moduleOptions={moduleOptions}
+        />
       )}
     </div>
   );
@@ -286,10 +361,10 @@ function StagedList({
   moduleOptions,
 }: {
   moduleKey: ModuleKey;
-  state: UploadArrangeState;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
   dispatch: React.Dispatch<UploadArrangeAction>;
   lessonsInScope: AdminArrangeLessonDto[];
-  conflictSlugs: Set<string>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
   moduleOptions: { key: ModuleKey; title: string }[] | null;
 }) {
   const staged = state.items.filter(
@@ -337,9 +412,9 @@ function NewModuleCard({
   conflictSlugs,
 }: {
   mod: NewModule;
-  rootSlug: string;
+  /** Documents the intent and contract of this field. */ rootSlug: string;
   dispatch: React.Dispatch<UploadArrangeAction>;
-  conflictSlugs: Set<string>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
 }) {
   const { t } = useTranslation();
   const hasConflict = conflictSlugs.has(mod.slug);
@@ -424,9 +499,9 @@ function CollectionView({
   onToggleModuleKey,
   onToggleDetailsKey,
 }: {
-  state: UploadArrangeState;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
   dispatch: React.Dispatch<UploadArrangeAction>;
-  conflictSlugs: Set<string>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
   openModuleKey: ModuleKey | null;
   openDetailsKey: string | null;
   newModuleTitle: string;
@@ -618,10 +693,148 @@ function CollectionView({
   );
 }
 
+function SingleFormatView({
+  state,
+}: {
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
+}) {
+  const { t } = useTranslation();
+  const existing = state.existing;
+  if (!existing) return null;
+
+  return (
+    <div className={styles.arrangeStack}>
+      {existing.audioUrl && (
+        <div className={styles.existingLesson}>
+          {t("admin.contents.listing.currentAudio", "Current audio:")} {existing.audioUrl}
+        </div>
+      )}
+      {state.items.map((item) => (
+        <div key={item.id} className={styles.stagedItem}>
+          <div className={styles.stagedItemHeader}>
+            <span className={styles.stagedItemTitle}>{item.filename}</span>
+            <span className={styles.fileMeta}>
+              {t("admin.contents.listing.replacesPrimaryAudio", "Replaces the primary audio")}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SeriesFormatView({
+  state,
+  dispatch,
+  conflictSlugs,
+}: {
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
+  dispatch: React.Dispatch<UploadArrangeAction>;
+  /** Documents the intent and contract of this field. */ conflictSlugs: Set<string>;
+}) {
+  const { t } = useTranslation();
+  const existing = state.existing;
+  if (!existing) return null;
+  const hasNewLessons = state.items.some((i) => i.assignment.kind === "new-lesson");
+
+  return (
+    <div className={styles.arrangeStack}>
+      {hasNewLessons && (
+        <div className={styles.bulkActions}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "published" })}
+          >
+            {t("admin.contents.listing.publishAll", "Publish All")}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "draft" })}
+          >
+            {t("admin.contents.listing.draftAll", "Draft All")}
+          </Button>
+        </div>
+      )}
+      {existing.lessons.length > 0 && (
+        <div className={styles.moduleSection}>
+          <span className={styles.moduleSlug}>
+            {t("admin.contents.listing.existingLessons", "Existing lessons")}
+          </span>
+          {existing.lessons.map((lesson) => (
+            <div key={lesson.id} className={styles.existingLesson}>
+              <span className={styles.orderBadge}>{lesson.orderIndex ?? "—"}</span>
+              {lesson.title}
+            </div>
+          ))}
+        </div>
+      )}
+      <StagedList
+        moduleKey={ROOT_MODULE_KEY}
+        state={state}
+        dispatch={dispatch}
+        lessonsInScope={existing.lessons}
+        conflictSlugs={conflictSlugs}
+        moduleOptions={null}
+      />
+    </div>
+  );
+}
+
+function ArrangeFormatContent({
+  state,
+  dispatch,
+  openModuleKey,
+  openDetailsKey,
+  newModuleTitle,
+  setNewModuleTitle,
+  onToggleModuleKey,
+  onToggleDetailsKey,
+  t,
+}: UploadArrangeArrangeTabProps & {
+  openModuleKey: ModuleKey | null;
+  openDetailsKey: string | null;
+  newModuleTitle: string;
+  setNewModuleTitle: (value: string) => void;
+  onToggleModuleKey: (key: ModuleKey) => void;
+  onToggleDetailsKey: (tempId: string) => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  const { existing } = state;
+  if (!existing) return null;
+  if (state.items.length === 0 && state.newModules.length === 0) {
+    return (
+      <div className={styles.emptyHint}>
+        {t("admin.contents.listing.arrangeEmpty", "Add audio files in the Upload tab first.")}
+      </div>
+    );
+  }
+
+  const conflictSlugs = new Set([...localSlugConflicts(state), ...state.conflictSlugs]);
+  if (existing.format === "single") return <SingleFormatView state={state} />;
+  if (existing.format === "series") {
+    return <SeriesFormatView state={state} dispatch={dispatch} conflictSlugs={conflictSlugs} />;
+  }
+  return (
+    <CollectionView
+      state={state}
+      dispatch={dispatch}
+      conflictSlugs={conflictSlugs}
+      openModuleKey={openModuleKey}
+      openDetailsKey={openDetailsKey}
+      newModuleTitle={newModuleTitle}
+      setNewModuleTitle={setNewModuleTitle}
+      onToggleModuleKey={onToggleModuleKey}
+      onToggleDetailsKey={onToggleDetailsKey}
+    />
+  );
+}
+
+/** Documents the intent and contract of this declaration. */
 export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrangeTabProps) {
   const { t } = useTranslation();
   const [newModuleTitle, setNewModuleTitle] = useState("");
-  const { existing } = state;
 
   const defaultOpenModuleKey = (() => {
     for (const item of state.items) {
@@ -645,92 +858,10 @@ export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrang
     prevNewModulesLengthRef.current = curr;
   }, [state.newModules]);
 
-  if (!existing) return null;
-
-  if (state.items.length === 0 && state.newModules.length === 0) {
-    return (
-      <div className={styles.emptyHint}>
-        {t("admin.contents.listing.arrangeEmpty", "Add audio files in the Upload tab first.")}
-      </div>
-    );
-  }
-
-  const conflictSlugs = new Set([...localSlugConflicts(state), ...state.conflictSlugs]);
-
-  if (existing.format === "single") {
-    return (
-      <div className={styles.arrangeStack}>
-        {existing.audioUrl && (
-          <div className={styles.existingLesson}>
-            {t("admin.contents.listing.currentAudio", "Current audio:")} {existing.audioUrl}
-          </div>
-        )}
-        {state.items.map((item) => (
-          <div key={item.id} className={styles.stagedItem}>
-            <div className={styles.stagedItemHeader}>
-              <span className={styles.stagedItemTitle}>{item.filename}</span>
-              <span className={styles.fileMeta}>
-                {t("admin.contents.listing.replacesPrimaryAudio", "Replaces the primary audio")}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (existing.format === "series") {
-    const hasNewLessons = state.items.some((i) => i.assignment.kind === "new-lesson");
-    return (
-      <div className={styles.arrangeStack}>
-        {hasNewLessons && (
-          <div className={styles.bulkActions}>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "published" })}
-            >
-              {t("admin.contents.listing.publishAll", "Publish All")}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "draft" })}
-            >
-              {t("admin.contents.listing.draftAll", "Draft All")}
-            </Button>
-          </div>
-        )}
-        {existing.lessons.length > 0 && (
-          <div className={styles.moduleSection}>
-            <span className={styles.moduleSlug}>
-              {t("admin.contents.listing.existingLessons", "Existing lessons")}
-            </span>
-            {existing.lessons.map((lesson) => (
-              <div key={lesson.id} className={styles.existingLesson}>
-                <span className={styles.orderBadge}>{lesson.orderIndex ?? "—"}</span>
-                {lesson.title}
-              </div>
-            ))}
-          </div>
-        )}
-        <StagedList
-          moduleKey={ROOT_MODULE_KEY}
-          state={state}
-          dispatch={dispatch}
-          lessonsInScope={existing.lessons}
-          conflictSlugs={conflictSlugs}
-          moduleOptions={null}
-        />
-      </div>
-    );
-  }
-
   return (
-    <CollectionView
+    <ArrangeFormatContent
       state={state}
       dispatch={dispatch}
-      conflictSlugs={conflictSlugs}
       openModuleKey={openModuleKey}
       openDetailsKey={openDetailsKey}
       newModuleTitle={newModuleTitle}
@@ -739,6 +870,7 @@ export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrang
       onToggleDetailsKey={(tempId) =>
         setOpenDetailsKey((prev) => (prev === tempId ? null : tempId))
       }
+      t={t}
     />
   );
 }

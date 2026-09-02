@@ -7,11 +7,13 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { ScholarContentList } from "@/features/listing/components/scholar-content-list/scholar-content-list";
 import { ScholarHeader } from "@/features/listing/components/scholar-header/scholar-header";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText, ScreenView } from "@/shared/ui";
 
+/** Describes the inputs and callbacks accepted by Scholar Detail Screen. */
+/** Describes the inputs, callbacks, and optional state accepted by Scholar Detail Screen. */
 export type ScholarDetailScreenProps = {
+  /** Carries the canonical route identity used to load the selected content. */
   slug: string;
 };
 
@@ -59,6 +61,32 @@ function TopicItem({ title, subtitle }: TopicItemProps) {
   );
 }
 
+function TopicSections({
+  topics,
+}: {
+  topics:
+    | { topicId: string; topicName: string; items: { id: string; title: string; type: string }[] }[]
+    | undefined;
+}) {
+  if (!topics || topics.length === 0) return null;
+  return (
+    <View style={styles.topicsContainer}>
+      {topics.map((topic) => (
+        <TopicSection key={topic.topicId} topicName={topic.topicName}>
+          {topic.items.map((item) => (
+            <TopicItem
+              key={item.id}
+              title={item.title}
+              subtitle={item.type === "single" ? undefined : item.type}
+            />
+          ))}
+        </TopicSection>
+      ))}
+    </View>
+  );
+}
+
+/** Renders the native scholar detail screen surface and coordinates its user-facing state. */
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { data: scholar, isFetching: isScholarFetching } = useScholarDetail(slug);
   const { data: content, isFetching: isContentFetching } = useScholarContent(slug);
@@ -88,21 +116,7 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
         <View style={{ marginTop: 24 }}>
           <ScholarContentList items={content?.items ?? []} />
         </View>
-        {topicsData?.topics && topicsData.topics.length > 0 ? (
-          <View style={styles.topicsContainer}>
-            {topicsData.topics.map((topic) => (
-              <TopicSection key={topic.topicId} topicName={topic.topicName}>
-                {topic.items.map((item) => (
-                  <TopicItem
-                    key={item.id}
-                    title={item.title}
-                    subtitle={item.type === "single" ? undefined : item.type}
-                  />
-                ))}
-              </TopicSection>
-            ))}
-          </View>
-        ) : null}
+        <TopicSections topics={topicsData?.topics} />
       </ScrollView>
     </ScreenView>
   );

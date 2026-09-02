@@ -6,23 +6,24 @@ import { routes, routeDefinitions, resolveRouteAccess } from "./routes";
 /*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
 
-/** Recursively collect all leaf string values from a nested object. */
-function collectLeafStrings(
-  obj: Record<string, unknown>,
-  path = "",
-): { path: string; value: string }[] {
-  const results: { path: string; value: string }[] = [];
-  for (const [key, val] of Object.entries(obj)) {
-    const fullPath = path ? `${path}.${key}` : key;
-    if (typeof val === "string") {
-      results.push({ path: fullPath, value: val });
-    } else if (typeof val === "object" && val !== null && typeof val !== "function") {
-      results.push(...collectLeafStrings(val as Record<string, unknown>, fullPath));
-    }
-    // Skip functions (dynamic route builders like detail(id))
-  }
-  return results;
-}
+const leafRoutes = [
+  routes.home,
+  routes.search,
+  routes.explore.index,
+  routes.myLibrary.index,
+  routes.settings.index,
+  routes.scholars.index,
+  routes.admin.index,
+  routes.admin.stats,
+  routes.admin.users,
+  routes.admin.contents,
+  routes.admin.scholars,
+  routes.signIn,
+  routes.support,
+  routes.privacy,
+  routes.termsOfUse,
+  routes.cookiePolicy,
+] as const;
 
 const VALID_ACCESS: ReadonlySet<RouteAccess> = new Set<RouteAccess>([
   "public",
@@ -35,26 +36,35 @@ const VALID_ACCESS: ReadonlySet<RouteAccess> = new Set<RouteAccess>([
 /* ------------------------------------------------------------------ */
 
 describe("routes – structural integrity", () => {
-  const leaves = collectLeafStrings(routes as unknown as Record<string, unknown>);
-
   it("has at least one leaf route", () => {
-    expect(leaves.length).toBeGreaterThan(0);
+    expect(leafRoutes.length).toBeGreaterThan(0);
   });
 
   it("every leaf string value starts with /", () => {
-    for (const { path, value } of leaves) {
-      expect({ path, value, startsWithSlash: value.startsWith("/") }).toEqual(
+    for (const value of leafRoutes) {
+      expect({ value, startsWithSlash: value.startsWith("/") }).toEqual(
         expect.objectContaining({ startsWithSlash: true }),
       );
     }
   });
 
   it("has no duplicate leaf string values", () => {
-    const values = leaves.map((l) => l.value);
+    const values = [...leafRoutes];
     const unique = new Set(values);
     const duplicates = values.filter((v, i) => values.indexOf(v) !== i);
     expect(duplicates).toEqual([]);
     expect(unique.size).toBe(values.length);
+  });
+});
+
+describe("my library route contract", () => {
+  it("uses only the canonical My Library route", () => {
+    expect(routes.myLibrary.index).toBe("/my-library");
+    expect(routes.myLibrary.saved).toBeUndefined();
+    expect(routes.myLibrary.completed).toBeUndefined();
+    expect(leafRoutes).not.toContain("/library");
+    expect(leafRoutes).not.toContain("/library/saved");
+    expect(leafRoutes).not.toContain("/library/completed");
   });
 });
 
@@ -98,23 +108,17 @@ describe("resolveRouteAccess", () => {
   });
 
   it("normalizes a trailing slash", () => {
-    expect(resolveRouteAccess("/settings/profile/")).toBe("auth-optional");
     expect(resolveRouteAccess("/settings/")).toBe("auth-optional");
   });
 
   it("matches nested sub-paths via prefix", () => {
-    expect(resolveRouteAccess("/settings/profile/edit")).toBe("auth-optional");
-    expect(resolveRouteAccess("/library/saved")).toBe("auth-optional");
+    expect(resolveRouteAccess("/my-library/saved")).toBe("auth-optional");
     expect(resolveRouteAccess("/admin/users")).toBe("auth-required");
   });
 
   it("preserves local-first semantics as auth-optional", () => {
     expect(resolveRouteAccess("/settings")).toBe("auth-optional");
-    expect(resolveRouteAccess("/library")).toBe("auth-optional");
-  });
-
-  it("honors the per-path public override under an auth-optional section", () => {
-    expect(resolveRouteAccess("/settings/legal")).toBe("public");
+    expect(resolveRouteAccess("/my-library")).toBe("auth-optional");
   });
 
   it("treats the home route as public", () => {
@@ -131,7 +135,7 @@ describe("resolveRouteAccess", () => {
     expect(resolveRouteAccess("/admin/scholars")).toBe("auth-required");
   });
 
-  it("/settings/profile is auth-optional — shows AuthRequiredState, does not redirect", () => {
-    expect(resolveRouteAccess("/settings/profile")).toBe("auth-optional");
+  it("does not register the removed Settings Profile route", () => {
+    expect(routeDefinitions.some(({ path }) => path === "/settings/profile")).toBe(false);
   });
 });

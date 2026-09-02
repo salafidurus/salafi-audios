@@ -1,5 +1,5 @@
 .pageHeader {
-  padding: var(--space-layout-page-x) var(--space-layout-page-x) 0;
+  padding-block-start: 0;
 }
 
 .pageTitle {
@@ -21,20 +21,19 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: var(--space-component-gap-md);
-  padding: 0 var(--space-layout-page-x);
 }
 
 .empty {
   text-align: center;
   color: var(--content-muted);
-  padding: var(--space-scale-xl) var(--space-layout-page-x);
+  padding: var(--space-scale-xl) 0;
   font-size: var(--typo-body-md-font-size);
 }
 
 .loadMoreWrapper {
   display: flex;
   justify-content: center;
-  padding: var(--space-component-gap-lg) var(--space-layout-page-x);
+  padding-block: var(--space-component-gap-lg);
 }
 
 .loadMoreButton {

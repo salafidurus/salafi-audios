@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import {
@@ -11,12 +12,14 @@ import {
   endpoints,
 } from "@sd/core-contracts";
 import { useAccountProfile } from "@sd/domain-account";
-import { useEffect, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 
 import { fetchUserAccess, replaceUserAccess } from "@/features/admin/api/admin.api";
-import { Button } from "@/shared/components/Button";
-import { Modal } from "@/shared/components/Modal/Modal";
-import { Toggle } from "@/shared/components/Toggle";
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import { Button } from "@/shared/components/ui/button";
+import { Modal } from "@/shared/components/ui/modal";
+import { Separator } from "@/shared/components/ui/separator";
+import { Switch as Toggle } from "@/shared/components/ui/switch";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./AccessDialog.module.css";
@@ -55,28 +58,58 @@ const capabilitiesList = (target: AccessTarget): AccessCapability[] =>
       ? ["manage"]
       : ["write", "publish", "delete"];
 
-function getPreviewRoles(uiState: UiState, isSuperadmin: boolean): string[] {
-  const roles = new Set<string>();
+function getTargetRoles(target: AccessTarget, item: TargetState): string[] {
+  if (!item.enabled) return [];
 
-  if (isSuperadmin) {
-    roles.add("Superadmin");
+  const roleChecks: Array<[boolean | undefined, string]> = [
+    [item.capabilities.write, "Editor"],
+    [item.capabilities.translate, "Translator"],
+    [item.capabilities.publish, "Publisher"],
+    [item.capabilities.delete, "Deleter"],
+    [target === "user" && item.capabilities.manage, "User manager"],
+  ];
+
+  const roles: string[] = [];
+  for (const [enabled, role] of roleChecks) {
+    if (enabled) roles.push(role);
   }
+  return roles;
+}
 
-  Object.keys(uiState).forEach((key) => {
-    const target = key as AccessTarget;
-    const item = uiState[target];
-    if (item.enabled) {
-      if (item.capabilities.write) roles.add("Editor");
-      if (item.capabilities.translate) roles.add("Translator");
-      if (item.capabilities.publish) roles.add("Publisher");
-      if (item.capabilities.delete) roles.add("Deleter");
-      if (target === "user" && item.capabilities.manage) {
-        roles.add("User manager");
-      }
-    }
+function getPreviewRoles(uiState: UiState, isSuperadmin: boolean): string[] {
+  const roles = new Set(isSuperadmin ? ["Superadmin"] : []);
+  Object.entries(uiState).forEach(([target, item]) => {
+    // SAFETY: `uiState` is a full `UiState` record keyed only by `AccessTarget`.
+    getTargetRoles(target as AccessTarget, item).forEach((role) => roles.add(role));
   });
-
   return Array.from(roles).sort();
+}
+
+function buildAccessGrants(uiState: UiState): AccessGrantRequest[] {
+  const grants: AccessGrantRequest[] = [];
+  targetRowConfigs.forEach(({ target }) => {
+    const item = uiState[target];
+    if (!item.enabled) return;
+
+    // SAFETY: `item.capabilities` is only mutated through AccessCapability-driven UI
+    // toggles above, so its enumerable keys are the same AccessCapability domain.
+    const enabledCaps = Object.keys(item.capabilities).filter(
+      // SAFETY: see note above — each enumerable key originated from an AccessCapability toggle.
+      (c) => item.capabilities[c as AccessCapability],
+      // SAFETY: see note above — after filtering, the remaining keys are still AccessCapability values.
+    ) as AccessCapability[];
+
+    enabledCaps.forEach((capability) => {
+      grants.push({
+        target,
+        capability,
+        scholarSlugs: item.scholarSlugs,
+        // SAFETY: locale selections come only from SUPPORTED_LOCALES-backed UI chips.
+        locales: item.locales as ("en" | "ar")[],
+      });
+    });
+  });
+  return grants;
 }
 
 interface TargetRowConfig {
@@ -117,6 +150,140 @@ const targetRowConfigs: TargetRowConfig[] = [
     description: "Permissions to edit other administrative users and manage custom grants.",
   },
 ];
+
+interface AccessDialogBodyProps {
+  snapshot?: UserAccessSnapshot;
+  error?: string;
+  saving: boolean;
+  targetIsSuperadmin: boolean;
+  currentUserIsSuperadmin?: boolean;
+  uiState: UiState;
+  scholarOptions: { slug: string; name: string }[];
+  onToggleTarget: (target: AccessTarget, enabled: boolean) => void;
+  onToggleCapability: (
+    target: AccessTarget,
+    capability: AccessCapability,
+    checked: boolean,
+  ) => void;
+  onUpdateScope: (
+    target: AccessTarget,
+    field: "scholarSlugs" | "locales",
+    values: string[],
+  ) => void;
+  onToggleSuperadmin: (enabled: boolean) => void;
+}
+
+function SuperadminAccessSection({
+  visible,
+  enabled,
+  saving,
+  onToggle,
+}: {
+  visible?: boolean;
+  enabled: boolean;
+  saving: boolean;
+  onToggle: (enabled: boolean) => void;
+}) {
+  if (!visible) return null;
+
+  return (
+    <>
+      <div className={styles.row}>
+        <div className={styles.rowHeader}>
+          <div className={styles.rowMeta}>
+            <div className={styles.rowLabelSection}>
+              <span className={styles.rowTitle}>Super Admin (Full Access)</span>
+              <span className={styles.rowDesc}>
+                Grants unrestricted administrative access to the entire platform. Superadmins can
+                modify other administrators and manage global system settings.
+              </span>
+            </div>
+          </div>
+          <Toggle
+            checked={enabled}
+            onChange={onToggle}
+            disabled={saving}
+            aria-label="Toggle super admin access"
+          />
+        </div>
+      </div>
+      <Separator />
+    </>
+  );
+}
+
+function AccessDialogBody({
+  snapshot,
+  error,
+  saving,
+  targetIsSuperadmin,
+  currentUserIsSuperadmin,
+  uiState,
+  scholarOptions,
+  onToggleTarget,
+  onToggleCapability,
+  onUpdateScope,
+  onToggleSuperadmin,
+}: AccessDialogBodyProps) {
+  const showProtectedWarning = snapshot?.isSuperadmin && !currentUserIsSuperadmin;
+
+  return (
+    <Modal.Body className={styles.body}>
+      {error && (
+        <Alert variant="destructive" className={styles.error}>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      {!snapshot ? (
+        <p className={styles.loading}>Loading access…</p>
+      ) : showProtectedWarning ? (
+        <p className={styles.emptyText}>
+          Superadmin access is protected and cannot be edited here.
+        </p>
+      ) : (
+        <div className={styles.container}>
+          <RolesBanner roles={getPreviewRoles(uiState, targetIsSuperadmin)} />
+
+          <SuperadminAccessSection
+            visible={currentUserIsSuperadmin}
+            enabled={targetIsSuperadmin}
+            saving={saving}
+            onToggle={onToggleSuperadmin}
+          />
+
+          {targetRowConfigs.map((config, index) => {
+            const targetState = uiState[config.target];
+            return (
+              <Fragment key={config.target}>
+                <PermissionRow
+                  key={`${config.target}-${targetState.enabled}`}
+                  title={config.title}
+                  description={config.description}
+                  target={config.target}
+                  enabled={targetState.enabled}
+                  capabilities={capabilitiesList(config.target)}
+                  selectedCapabilities={targetState.capabilities}
+                  scholarOptions={scholarOptions}
+                  selectedScholars={targetState.scholarSlugs}
+                  localeOptions={SUPPORTED_LOCALES}
+                  selectedLocales={targetState.locales}
+                  saving={saving}
+                  onToggleTarget={(checked) => onToggleTarget(config.target, checked)}
+                  onToggleCapability={(cap, checked) =>
+                    onToggleCapability(config.target, cap, checked)
+                  }
+                  onUpdateScholars={(slugs) => onUpdateScope(config.target, "scholarSlugs", slugs)}
+                  onUpdateLocales={(locales) => onUpdateScope(config.target, "locales", locales)}
+                />
+                {index < targetRowConfigs.length - 1 && <Separator />}
+              </Fragment>
+            );
+          })}
+        </div>
+      )}
+    </Modal.Body>
+  );
+}
 
 export function AccessDialog({
   userId,
@@ -178,6 +345,8 @@ export function AccessDialog({
       nextState.enabled = enabled;
       if (enabled) {
         const defaultCap = capabilitiesList(target)[0];
+        // SAFETY: `defaultCap` comes directly from `capabilitiesList(target)`, so the
+        // computed key is always a valid `AccessCapability` for this target.
         nextState.capabilities = { [defaultCap as string]: true };
       } else {
         nextState.capabilities = {};
@@ -202,8 +371,8 @@ export function AccessDialog({
         delete nextCaps[cap];
       }
       const hasCaps = Object.keys(nextCaps).length > 0;
+      nextState.enabled = hasCaps;
       if (!hasCaps) {
-        nextState.enabled = false;
         nextState.scholarSlugs = [];
         nextState.locales = [];
       }
@@ -228,24 +397,7 @@ export function AccessDialog({
     setSaving(true);
     setError(undefined);
 
-    const grants: AccessGrantRequest[] = [];
-    targetRowConfigs.forEach(({ target }) => {
-      const item = uiState[target];
-      if (item.enabled) {
-        const enabledCaps = Object.keys(item.capabilities).filter(
-          (c) => item.capabilities[c as AccessCapability],
-        ) as AccessCapability[];
-
-        enabledCaps.forEach((capability) => {
-          grants.push({
-            target,
-            capability,
-            scholarSlugs: item.scholarSlugs,
-            locales: item.locales as ("en" | "ar")[],
-          });
-        });
-      }
-    });
+    const grants = buildAccessGrants(uiState);
 
     try {
       await replaceUserAccess(userId, {
@@ -262,8 +414,6 @@ export function AccessDialog({
     }
   };
 
-  const showProtectedWarning = snapshot?.isSuperadmin && !currentUserIsSuperadmin;
-
   const scholarOptions = allScholars.map((s) => ({
     slug: s.slug,
     name: formatScholarName(s),
@@ -274,7 +424,8 @@ export function AccessDialog({
       isOpen
       onClose={onClose}
       title={`Manage access — ${userName}`}
-      width="standard"
+      width="wide"
+      contentClassName={styles.dialog}
       footer={
         <div className={styles.footerActions}>
           <Button variant="ghost" onClick={onClose} disabled={saving}>
@@ -286,73 +437,19 @@ export function AccessDialog({
         </div>
       }
     >
-      {error && (
-        <p className={styles.error} role="alert">
-          {error}
-        </p>
-      )}
-      {!snapshot ? (
-        <p className={styles.loading}>Loading access…</p>
-      ) : showProtectedWarning ? (
-        <p className={styles.emptyText}>
-          Superadmin access is protected and cannot be edited here.
-        </p>
-      ) : (
-        <div className={styles.container}>
-          <RolesBanner roles={getPreviewRoles(uiState, targetIsSuperadmin)} />
-
-          {/* Superadmin toggle row */}
-          {currentUserIsSuperadmin && (
-            <div className={styles.row}>
-              <div className={styles.rowHeader}>
-                <div className={styles.rowMeta}>
-                  <div className={styles.rowLabelSection}>
-                    <span className={styles.rowTitle}>Super Admin (Full Access)</span>
-                    <span className={styles.rowDesc}>
-                      Grants unrestricted administrative access to the entire platform. Superadmins
-                      can modify other administrators and manage global system settings.
-                    </span>
-                  </div>
-                </div>
-                <Toggle
-                  checked={targetIsSuperadmin}
-                  onChange={setTargetIsSuperadmin}
-                  disabled={saving}
-                  aria-label="Toggle super admin access"
-                />
-              </div>
-            </div>
-          )}
-
-          {targetRowConfigs.map((config) => {
-            const targetState = uiState[config.target];
-            return (
-              <PermissionRow
-                key={config.target}
-                title={config.title}
-                description={config.description}
-                target={config.target}
-                enabled={targetState.enabled}
-                capabilities={capabilitiesList(config.target)}
-                selectedCapabilities={targetState.capabilities}
-                scholarOptions={scholarOptions}
-                selectedScholars={targetState.scholarSlugs}
-                localeOptions={SUPPORTED_LOCALES}
-                selectedLocales={targetState.locales}
-                saving={saving}
-                onToggleTarget={(checked) => handleToggleTarget(config.target, checked)}
-                onToggleCapability={(cap, checked) =>
-                  handleToggleCapability(config.target, cap, checked)
-                }
-                onUpdateScholars={(slugs) =>
-                  handleUpdateScope(config.target, "scholarSlugs", slugs)
-                }
-                onUpdateLocales={(locales) => handleUpdateScope(config.target, "locales", locales)}
-              />
-            );
-          })}
-        </div>
-      )}
+      <AccessDialogBody
+        snapshot={snapshot}
+        error={error}
+        saving={saving}
+        targetIsSuperadmin={targetIsSuperadmin}
+        currentUserIsSuperadmin={currentUserIsSuperadmin}
+        uiState={uiState}
+        scholarOptions={scholarOptions}
+        onToggleTarget={handleToggleTarget}
+        onToggleCapability={handleToggleCapability}
+        onUpdateScope={handleUpdateScope}
+        onToggleSuperadmin={setTargetIsSuperadmin}
+      />
     </Modal>
   );
 }

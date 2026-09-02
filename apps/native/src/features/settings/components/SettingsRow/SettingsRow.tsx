@@ -3,8 +3,10 @@ import type { ReactNode } from "react";
 import { View, Pressable } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { AppText } from "@/shared/ui";
 
+/** Provides native account, preference, support, and settings workflows. */
+/** Describes the inputs, callbacks, and optional state accepted by Settings Row. */
 export interface SettingsRowProps {
   label?: string;
   sublabel?: string;
@@ -16,17 +18,13 @@ export interface SettingsRowProps {
   hideBorder?: boolean;
 }
 
-export function SettingsRow({
+function SettingsRowContent({
   label,
   sublabel,
   children,
-  fullWidth = false,
-  stacked = false,
-  onPress,
-  hideBorder = false,
-}: SettingsRowProps) {
-  const isClickable = Boolean(onPress);
-
+  fullWidth,
+  stacked,
+}: Pick<SettingsRowProps, "label" | "sublabel" | "children" | "fullWidth" | "stacked">) {
   const labelGroup = (
     <View style={styles.labelGroup}>
       {label && (
@@ -42,28 +40,52 @@ export function SettingsRow({
     </View>
   );
 
-  const content = fullWidth ? (
-    <View style={styles.fullWidthContent}>{children}</View>
-  ) : stacked ? (
-    <View style={styles.stackedContent} testID="settings-row-stacked-content">
-      {labelGroup}
-      {children && <View style={styles.stackedControl}>{children}</View>}
-    </View>
-  ) : (
+  if (fullWidth) return <View style={styles.fullWidthContent}>{children}</View>;
+  if (stacked) {
+    return (
+      <View style={styles.stackedContent} testID="settings-row-stacked-content">
+        {labelGroup}
+        {children && <View style={styles.stackedControl}>{children}</View>}
+      </View>
+    );
+  }
+  return (
     <>
       {labelGroup}
       {children && <View style={styles.control}>{children}</View>}
     </>
   );
+}
+
+/** Renders the native settings row surface and coordinates its user-facing state. */
+export function SettingsRow({
+  label,
+  sublabel,
+  children,
+  fullWidth = false,
+  stacked = false,
+  onPress,
+  hideBorder = false,
+}: SettingsRowProps) {
+  const isClickable = Boolean(onPress);
+
+  const content = (
+    <SettingsRowContent label={label} sublabel={sublabel} fullWidth={fullWidth} stacked={stacked}>
+      {children}
+    </SettingsRowContent>
+  );
+
+  if (!isClickable) {
+    return <View style={[styles.row, hideBorder && styles.noBorder]}>{content}</View>;
+  }
 
   return (
     <Pressable
       onPress={onPress}
-      disabled={!isClickable}
       style={({ pressed }) => [
         styles.row,
         hideBorder && styles.noBorder,
-        pressed && isClickable && styles.pressed,
+        pressed && styles.pressed,
       ]}
     >
       {content}

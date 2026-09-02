@@ -1,7 +1,11 @@
 import type { ReactNode, MouseEvent, KeyboardEvent } from "react";
 
+import { isHtmlElement } from "@/shared/lib/runtime-guards";
+
 import styles from "./list-item.module.css";
 
+/** Provides a responsive list-row primitive. */
+/** Props for a responsive row that may be activated as a keyboard-accessible button. */
 export type ListItemProps = {
   children: ReactNode;
   onClick?: () => void;
@@ -35,42 +39,71 @@ export function ListItem({
 }: ListItemProps) {
   const isClickable = Boolean(onClick);
   const showHoverStates = isClickable || interactive;
+  const attributes = getListItemAttributes({
+    id,
+    highlighted,
+    isClickable,
+    showHoverStates,
+    className,
+  });
 
   const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     // Don't trigger onClick if the click came from a nested interactive element
-    const target = e.target as HTMLElement;
-    if (
-      target.tagName === "BUTTON" ||
-      target.closest("button") ||
-      target.closest("[data-testid='list-item-actions']")
-    ) {
-      return;
-    }
-
-    if (onClick) {
-      onClick();
-    }
+    const target = e.target;
+    if (isIgnoredClickTarget(target)) return;
+    onClick?.();
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (onClick && (e.key === "Enter" || e.key === " ")) {
-      e.preventDefault();
-      onClick();
-    }
+    handleListItemKeyDown(e, onClick);
   };
 
   return (
     <div
-      id={id}
-      data-highlighted={highlighted ? "true" : undefined}
-      role={isClickable ? "button" : undefined}
-      tabIndex={isClickable ? 0 : undefined}
+      {...attributes}
+      role={attributes.role}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      className={`${styles.item} ${showHoverStates ? styles.interactive : ""} ${className ?? ""}`}
-      style={{ cursor: isClickable ? "pointer" : "default" }}
+      style={{ cursor: attributes.role ? "pointer" : "default" }}
     >
       {children}
     </div>
   );
+}
+
+function getListItemAttributes({
+  id,
+  highlighted,
+  isClickable,
+  showHoverStates,
+  className,
+}: Pick<ListItemProps, "id" | "highlighted" | "className"> & {
+  isClickable: boolean;
+  /** Enables visual affordances for rows with nested actions but no row click. */ showHoverStates: boolean;
+}) {
+  return {
+    id,
+    "data-highlighted": highlighted ? "true" : undefined,
+    role: isClickable ? ("button" as const) : undefined,
+    tabIndex: isClickable ? 0 : undefined,
+    className: `${styles.item} ${showHoverStates ? styles.interactive : ""} ${className ?? ""}`,
+  };
+}
+
+function isIgnoredClickTarget(target: EventTarget | null): boolean {
+  if (!isHtmlElement(target)) return true;
+  return Boolean(
+    target.tagName === "BUTTON" ||
+    target.closest("button") ||
+    target.closest("[data-testid='list-item-actions']"),
+  );
+}
+
+function handleListItemKeyDown(
+  event: KeyboardEvent<HTMLDivElement>,
+  onClick: (() => void) | undefined,
+): void {
+  if (!onClick || (event.key !== "Enter" && event.key !== " ")) return;
+  event.preventDefault();
+  onClick();
 }

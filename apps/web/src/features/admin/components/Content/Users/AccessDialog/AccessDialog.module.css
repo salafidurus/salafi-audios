@@ -1,9 +1,22 @@
+.dialog {
+  height: min(42rem, calc(100dvh - var(--space-scale-lg)));
+  overflow: hidden;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+
+.body {
+  max-height: none;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.body::-webkit-scrollbar {
+  display: none;
+}
+
 .rolesBanner {
-  background: var(--surface-subtle);
-  border: var(--border-width-default) solid var(--border-subtle);
-  border-radius: var(--radius-scale-sm);
-  padding: var(--space-scale-md) var(--space-scale-lg);
-  margin-bottom: var(--space-scale-2xl);
+  padding: 0 0 var(--space-scale-md);
   display: flex;
   align-items: center;
   gap: var(--space-scale-md);
@@ -22,9 +35,6 @@
   display: inline-flex;
   align-items: center;
   padding: 2px var(--space-scale-xs);
-  border-radius: var(--radius-scale-sm);
-  background: var(--surface-subtle);
-  border: 1px solid var(--border-subtle);
   font-size: var(--typo-xs-font-size);
   font-weight: 600;
   color: var(--content-strong); /* High contrast dark text */
@@ -33,22 +43,36 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-scale-2xl); /* Significant gap between target sections */
+  gap: var(--space-scale-lg);
   margin-top: var(--space-scale-md);
 }
 
 .row {
-  background: var(--surface-default);
-  padding-bottom: var(--space-scale-2xl); /* Spacious padding before border divider */
-  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   gap: var(--space-scale-lg);
 }
 
-.row:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
+.permissionAccordion {
+  width: 100%;
+}
+
+.permissionItem {
+  border: 0;
+}
+
+.permissionTrigger {
+  align-items: center;
+  padding: var(--space-scale-xs) 0;
+  text-decoration: none;
+}
+
+.permissionTrigger:hover {
+  text-decoration: none;
+}
+
+.permissionTrigger :global([data-slot="accordion-trigger-icon"]) {
+  display: none;
 }
 
 .rowHeader {
@@ -88,7 +112,7 @@
   padding-top: var(--space-scale-md);
   display: flex;
   flex-direction: column;
-  gap: var(--space-scale-xl); /* Big gap between capability toggle section and scope selector */
+  gap: var(--space-scale-lg);
 }
 
 .subSection {
@@ -121,7 +145,8 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--space-scale-xl); /* Large space between capability toggle items */
+  gap: var(--space-scale-md);
+  flex-wrap: wrap;
 }
 
 .capabilityToggleRow {
@@ -186,7 +211,9 @@
   border-radius: var(--radius-full);
   width: 16px;
   height: 16px;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 }
 
 .chipRemoveButton:hover {
@@ -204,13 +231,6 @@
 }
 
 .error {
-  background-color: var(--state-danger-surface);
-  border: 1px solid var(--state-danger-border);
-  color: var(--state-danger-content);
-  padding: var(--space-scale-md);
-  border-radius: var(--radius-scale-sm);
-  font-family: var(--typo-body-sm-font-family);
-  font-size: var(--typo-body-sm-font-size);
   margin-bottom: var(--space-scale-md);
 }
 
@@ -232,4 +252,60 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--space-scale-sm);
+}
+
+@media (max-width: 640px) {
+  .dialog {
+    height: calc(100dvh - var(--space-scale-sm));
+  }
+
+  .rolesBanner {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-scale-xs);
+    padding: var(--space-scale-sm) var(--space-scale-md);
+  }
+
+  .container {
+    gap: var(--space-scale-md);
+  }
+
+  .row {
+    gap: var(--space-scale-md);
+  }
+
+  .rowDesc {
+    display: none;
+  }
+
+  .subPanel {
+    gap: var(--space-scale-md);
+    padding-top: var(--space-scale-sm);
+  }
+
+  .subSectionRow,
+  .scopeHeaderRow {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-scale-sm);
+  }
+
+  .scopeDropdownWrapper {
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .capabilitiesRow {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .footerActions {
+    width: 100%;
+  }
+
+  .footerActions > * {
+    flex: 1;
+  }
 }

@@ -1,6 +1,12 @@
+import { z } from "zod";
+
 import { AUDIO_EXTENSIONS } from "./fetch-remote-file";
 
+/** Documents this module's responsibility and public boundary. */
 const IDENTIFIER_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+const ArchiveMetadataSchema = z.object({
+  files: z.array(z.object({ name: z.string() })).optional(),
+});
 
 /** Extracts an archive.org item identifier from /details/, /download/, /compress/ links, or a bare identifier. */
 export function parseArchiveOrgIdentifier(input: string): string | null {
@@ -8,19 +14,19 @@ export function parseArchiveOrgIdentifier(input: string): string | null {
 
   try {
     const url = new URL(trimmed);
-    const host = url.hostname.toLowerCase();
-    if (host !== "archive.org" && !host.endsWith(".archive.org")) return null;
-
-    const segments = url.pathname.split("/").filter(Boolean);
-    const kind = segments[0];
-    if ((kind === "details" || kind === "download" || kind === "compress") && segments[1]) {
-      return segments[1];
-    }
-    return null;
+    return parseArchiveUrl(url);
   } catch {
     // Not a URL — treat as a bare identifier if it looks like one.
     return IDENTIFIER_PATTERN.test(trimmed) ? trimmed : null;
   }
+}
+
+function parseArchiveUrl(url: URL): string | null {
+  const host = url.hostname.toLowerCase();
+  if (host !== "archive.org" && !host.endsWith(".archive.org")) return null;
+  const [kind, identifier] = url.pathname.split("/").filter(Boolean);
+  const supportedKind = kind === "details" || kind === "download" || kind === "compress";
+  return supportedKind ? (identifier ?? null) : null;
 }
 
 function extensionOf(filename: string): string {
@@ -37,7 +43,7 @@ export async function resolveArchiveOrgFiles(
     throw new Error(`Couldn't load this archive.org item (HTTP ${response.status}).`);
   }
 
-  const data = (await response.json()) as { files?: { name: string }[] };
+  const data = ArchiveMetadataSchema.parse(await response.json());
   const files = data.files ?? [];
 
   const audioFiles: { url: string; filename: string }[] = [];

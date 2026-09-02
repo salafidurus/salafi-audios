@@ -17,6 +17,37 @@ vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
   ),
 }));
 
+const mockSearchParams = vi.fn(() => new URLSearchParams());
+
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => mockSearchParams(),
+}));
+
+vi.mock("./settings-profile.screen", () => ({
+  SettingsProfileScreen: () => <div data-testid="profile-panel">Profile panel</div>,
+}));
+
+const TabsChangeContext = React.createContext<(value: string) => void>(() => {});
+
+vi.mock("@/shared/components/ui/tabs", () => ({
+  Tabs: ({
+    onValueChange,
+    children,
+  }: {
+    onValueChange: (value: string) => void;
+    children: React.ReactNode;
+  }) => <TabsChangeContext.Provider value={onValueChange}>{children}</TabsChangeContext.Provider>,
+  TabsList: ({ children }: { children: React.ReactNode }) => <div role="tablist">{children}</div>,
+  TabsTrigger: ({ value, children }: { value: string; children: React.ReactNode }) => {
+    const onValueChange = React.useContext(TabsChangeContext);
+    return (
+      <button role="tab" type="button" onClick={() => onValueChange(value)}>
+        {children}
+      </button>
+    );
+  },
+}));
+
 vi.mock("@/features/settings/components/SettingsSection/SettingsSection", () => ({
   SettingsSection: ({ title, children }: { title: string; children: React.ReactNode }) => (
     <section>
@@ -60,17 +91,6 @@ vi.mock("@/features/settings/components/SegmentedControl/SegmentedControl", () =
   ),
 }));
 
-vi.mock("@/features/settings/components/accent-theme-picker/AccentThemePicker", () => ({
-  AccentThemePicker: ({ value, onChange }: { value: string; onChange: (id: string) => void }) => (
-    <div>
-      <span data-testid="accent-picker-value">{value}</span>
-      <button type="button" onClick={() => onChange("ember")}>
-        choose-ember
-      </button>
-    </div>
-  ),
-}));
-
 describe("SettingsGeneralScreen", () => {
   const localStorageMock = (() => {
     let store: Record<string, string> = {};
@@ -90,6 +110,7 @@ describe("SettingsGeneralScreen", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSearchParams.mockReturnValue(new URLSearchParams());
     localStorageMock.clear();
     Object.defineProperty(window, "localStorage", {
       value: localStorageMock,
@@ -115,6 +136,12 @@ describe("SettingsGeneralScreen", () => {
   it("renders Notifications section", () => {
     render(<SettingsGeneralScreen />);
     expect(screen.getByText("Notifications")).toBeInTheDocument();
+  });
+
+  it("does not render the mobile section", () => {
+    render(<SettingsGeneralScreen />);
+    expect(screen.queryByText("MOBILE")).not.toBeInTheDocument();
+    expect(screen.queryByText("Download the app")).not.toBeInTheDocument();
   });
 
   it("renders LanguageSwitch and ContentLanguageToggle", () => {
@@ -156,31 +183,32 @@ describe("SettingsGeneralScreen", () => {
     expect(screen.queryByText("New Lectures")).not.toBeInTheDocument();
   });
 
-  it("renders the accent theme picker with system as default", () => {
-    render(<SettingsGeneralScreen />);
-    expect(screen.getByTestId("accent-picker-value")).toHaveTextContent("system");
-  });
-
-  it("shows the mode control while the accent theme is system", () => {
+  it("keeps the mode control available", () => {
     render(<SettingsGeneralScreen />);
     expect(screen.getByRole("button", { name: "Dark" })).toBeInTheDocument();
   });
 
-  it("hides the mode control once a named accent is selected", async () => {
+  it("renders Profile when the URL selects the profile tab", () => {
+    mockSearchParams.mockReturnValue(new URLSearchParams("tab=profile"));
     render(<SettingsGeneralScreen />);
-    await act(async () => {});
 
-    fireEvent.click(screen.getByRole("button", { name: "choose-ember" }));
-
-    expect(screen.queryByRole("button", { name: "Dark" })).not.toBeInTheDocument();
+    expect(screen.getByTestId("profile-panel")).toBeInTheDocument();
+    expect(screen.queryByText("Language")).not.toBeInTheDocument();
   });
 
-  it("persists the selected accent theme", async () => {
+  it.each(["", "invalid", "general"])('renders General for tab value "%s"', (tab) => {
+    mockSearchParams.mockReturnValue(new URLSearchParams(tab ? `tab=${tab}` : ""));
     render(<SettingsGeneralScreen />);
-    await act(async () => {});
 
-    fireEvent.click(screen.getByRole("button", { name: "choose-ember" }));
+    expect(screen.getByText("Language")).toBeInTheDocument();
+  });
 
-    expect(localStorageMock.getItem("accent-theme:v1")).toBe("ember");
+  it("updates the URL when the Profile tab is selected", () => {
+    render(<SettingsGeneralScreen />);
+
+    const replaceStateSpy = vi.spyOn(window.history, "replaceState");
+    fireEvent.click(screen.getByRole("tab", { name: "Profile" }));
+
+    expect(replaceStateSpy).toHaveBeenCalledWith(window.history.state, "", "/settings?tab=profile");
   });
 });

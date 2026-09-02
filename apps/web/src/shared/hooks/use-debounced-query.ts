@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 
+/** Provides immediate input state and delayed values for network-backed search. */
+/** Configures the delay and initial value for a debounced search query. */
 export interface UseDebouncedSearchOptions {
+  /** Delay before the debounced value follows the current query. */
   delay?: number;
+  /** Initial controlled value shown before the first edit. */
   initialValue?: string;
 }
 
+/** Immediate input state together with its delayed API-facing value. */
 export interface UseDebouncedSearchResult {
+  /** Current input value, updated on every setter call. */
   query: string;
+  /** Updates the immediate input value. */
   setQuery: (value: string) => void;
+  /** Query value updated after the configured delay. */
   debouncedQuery: string;
 }
 

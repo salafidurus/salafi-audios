@@ -3,12 +3,35 @@ import type { AudioPlayer, AudioStatus } from "expo-audio";
 
 import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
 
+/** Adapts the platform audio engine to the native playback contract and lifecycle. */
+/** Adapts expo audio adapter to the native application contract while preserving its lifecycle. */
 export class ExpoAudioAdapter implements PlaybackEngine {
   private player: AudioPlayer | null = null;
   private events: PlaybackEngineEvents = {};
   private listeners: { remove: () => void }[] = [];
   private hasEnded = false;
   private audioModeConfigured = false;
+
+  private handleStatusUpdate(status: AudioStatus): void {
+    const mappedStatus = this.mapStatus(status);
+    this.events.onStatusChange?.(mappedStatus);
+    this.events.onPositionChange?.(status.currentTime);
+    this.notifyDuration(status.duration);
+    this.notifyTrackEnd(status.didJustFinish);
+  }
+
+  private notifyDuration(duration: number): void {
+    if (this.events.onDurationChange && duration > 0) {
+      this.events.onDurationChange(duration);
+    }
+  }
+
+  private notifyTrackEnd(didJustFinish: boolean): void {
+    if (didJustFinish && !this.hasEnded) {
+      this.hasEnded = true;
+      this.events.onTrackEnd?.();
+    }
+  }
 
   async setup(): Promise<void> {
     if (this.audioModeConfigured) return;
@@ -39,31 +62,9 @@ export class ExpoAudioAdapter implements PlaybackEngine {
     );
 
     // Bind event listeners
-    const statusListener = player.addListener("playbackStatusUpdate", (status: AudioStatus) => {
-      // 1. Map and trigger status change
-      const mappedStatus = this.mapStatus(status);
-      if (this.events.onStatusChange) {
-        this.events.onStatusChange(mappedStatus);
-      }
-
-      // 2. Trigger position change — currentTime is already in seconds
-      if (this.events.onPositionChange) {
-        this.events.onPositionChange(status.currentTime);
-      }
-
-      // 3. Trigger duration change — duration is already in seconds
-      if (this.events.onDurationChange && status.duration > 0) {
-        this.events.onDurationChange(status.duration);
-      }
-
-      // 4. Trigger completion via didJustFinish
-      if (status.didJustFinish && !this.hasEnded) {
-        this.hasEnded = true;
-        if (this.events.onTrackEnd) {
-          this.events.onTrackEnd();
-        }
-      }
-    });
+    const statusListener = player.addListener("playbackStatusUpdate", (status: AudioStatus) =>
+      this.handleStatusUpdate(status),
+    );
 
     this.listeners.push(statusListener);
 

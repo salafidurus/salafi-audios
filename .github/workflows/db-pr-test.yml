@@ -4,7 +4,8 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, closed]
     branches:
-      - main # Only PRs targeting main branch
+      - main # Default integration and final validation PRs
+      - spec/** # Specification integration PRs require schema feedback
     paths:
       - packages/core-db/prisma/**
       - packages/core-db/prisma.config.ts
@@ -42,7 +43,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.3.14"
+          bun-version: "1.4.0"
 
       - name: Set branch expiration (14 days)
         run: echo "EXPIRES_AT=$(date -u --date '+14 days' +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
@@ -75,7 +76,7 @@ jobs:
         run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Build deps needed for typecheck
-        run: bun run build --filter=@sd/core-db^...
+        run: bun run build:all --filter=@sd/core-db^...
 
       - name: Validate Prisma schema
         env:
@@ -108,7 +109,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.3.14"
+          bun-version: "1.4.0"
 
       - name: Install dependencies (scripts disabled)
         run: bun install --frozen-lockfile --ignore-scripts

@@ -1,18 +1,40 @@
-import type { AppAbility, AppActions, AppSubjectType } from "@sd/core-contracts";
+import type {
+  AppAbility,
+  AppActions,
+  AppSubjectType,
+  ListingSubject,
+  MediaSubject,
+  ScholarSubject,
+  TranslationSubject,
+} from "@sd/core-contracts";
 
-import { createMongoAbility, subject } from "@casl/ability";
-import { unpackRules } from "@casl/ability/extra";
+import { createMongoAbility, subject, type RawRuleOf } from "@casl/ability";
+import { unpackRules, type PackRule } from "@casl/ability/extra";
 
 import { useAccountProfile } from "../../account.api";
 
+/** Builds convenience-only client abilities from backend-issued account rules. */
+/** Controls whether the profile query used to build an ability is enabled. */
 export interface UseAbilityOptions {
   isAuthenticated?: boolean;
   enabled?: boolean;
 }
 
+type UseAbilityResult = {
+  ability: AppAbility;
+  isLoading: boolean;
+};
+
+type ConditionSubject = ListingSubject | MediaSubject | ScholarSubject | TranslationSubject;
+
 /** Rebuilds a CASL ability from a packed rules array (see UserProfileDto.rules). */
-export function buildAbilityFromRules(rules: unknown[] | undefined): AppAbility {
-  return createMongoAbility(unpackRules((rules ?? []) as never)) as AppAbility;
+export function buildAbilityFromRules(
+  rules: PackRule<RawRuleOf<AppAbility>>[] | undefined,
+): AppAbility {
+  const ability = createMongoAbility(unpackRules<RawRuleOf<AppAbility>>(rules ?? []));
+  // SAFETY: packed rules are produced by the backend's packRules pipeline and
+  // unpackRules reconstructs the same CASL rule shape for client-side use.
+  return ability as AppAbility;
 }
 
 /**
@@ -34,13 +56,9 @@ export function hasAnyAdminAccess(ability: AppAbility): boolean {
  * convenience-only UI gating; the backend PolicyGuard re-checks every
  * request regardless of what this hook returns.
  */
-export function useAbility(options?: UseAbilityOptions): {
-  ability: AppAbility;
-  isLoading: boolean;
-} {
+export function useAbility(options?: UseAbilityOptions): UseAbilityResult {
   const { isAuthenticated, enabled } = options ?? {};
   const queryEnabled = enabled ?? (isAuthenticated !== undefined ? isAuthenticated : true);
-
   const { data: profile, isLoading } = useAccountProfile({ enabled: queryEnabled });
 
   return {
@@ -56,7 +74,7 @@ export function useAbility(options?: UseAbilityOptions): {
 export function useCan(
   action: AppActions,
   subjectType: AppSubjectType,
-  conditions?: Record<string, unknown>,
+  conditions?: ConditionSubject,
   options?: UseAbilityOptions,
 ): boolean {
   const { ability } = useAbility(options);
@@ -64,6 +82,6 @@ export function useCan(
   // this generic hook — same dynamic-dispatch boundary as the backend's
   // PolicyGuard; correctness is verified by ability.factory/use-ability specs.
   return conditions
-    ? ability.can(action, subject(subjectType, conditions as never))
+    ? ability.can(action, subject(subjectType, conditions))
     : ability.can(action, subjectType);
 }

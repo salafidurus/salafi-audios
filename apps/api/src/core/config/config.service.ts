@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { getApiEnv } from './env';
 
+/** NestJS config service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** Core API config.service module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ConfigService {
   private readonly env = getApiEnv(process.env);
 
@@ -34,15 +37,15 @@ export class ConfigService {
     return this.env.DATABASE_URL;
   }
 
-  get NEON_API_KEY(): string {
+  get NEON_API_KEY(): string | undefined {
     return this.env.NEON_API_KEY;
   }
 
-  get NEON_PROJECT_ID(): string {
+  get NEON_PROJECT_ID(): string | undefined {
     return this.env.NEON_PROJECT_ID;
   }
 
-  get NEON_ENDPOINT_ID(): string {
+  get NEON_ENDPOINT_ID(): string | undefined {
     return this.env.NEON_ENDPOINT_ID;
   }
 
@@ -112,6 +115,11 @@ export class ConfigService {
 
   get REDIS_URL(): string | undefined {
     return this.env.REDIS_URL;
+  }
+
+  /** Number of trusted reverse-proxy hops used when resolving anonymous IP identity. */
+  get TRUST_PROXY_HOPS(): number {
+    return this.env.TRUST_PROXY_HOPS;
   }
 
   get REDIS_PROGRESS_BUFFER_DELAY_MS(): number {

@@ -10,6 +10,7 @@ import {
 } from "@sd/core-contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+/** Reads and mutates Catalog translations while preserving content identity. */
 function translationQueryKey(target: TranslationTarget) {
   return ["translations", target.entity, target] as const;
 }
@@ -21,18 +22,20 @@ function resolveTranslationEndpoint(
 ): string {
   switch (target.entity) {
     case "scholar":
-      if (action === "list") return endpoints.translations.scholars.list(target.scholarId);
-      if (action === "save") return endpoints.translations.scholars.save(target.scholarId);
-      if (action === "publish")
-        return endpoints.translations.scholars.publish(target.scholarId, locale!);
-      return endpoints.translations.scholars.unpublish(target.scholarId, locale!);
+      return resolveEntityTranslationEndpoint(
+        endpoints.translations.scholars,
+        target.scholarId,
+        action,
+        locale,
+      );
 
     case "listing":
-      if (action === "list") return endpoints.translations.listings.list(target.listingId);
-      if (action === "save") return endpoints.translations.listings.save(target.listingId);
-      if (action === "publish")
-        return endpoints.translations.listings.publish(target.listingId, locale!);
-      return endpoints.translations.listings.unpublish(target.listingId, locale!);
+      return resolveEntityTranslationEndpoint(
+        endpoints.translations.listings,
+        target.listingId,
+        action,
+        locale,
+      );
 
     case "topic":
       if (action === "list") return endpoints.translations.topics.list(target.topicId);
@@ -42,6 +45,19 @@ function resolveTranslationEndpoint(
   }
 }
 
+function resolveEntityTranslationEndpoint(
+  endpointsForEntity: typeof endpoints.translations.scholars,
+  id: string,
+  action: "list" | "save" | "publish" | "unpublish",
+  locale?: string,
+): string {
+  if (action === "list") return endpointsForEntity.list(id);
+  if (action === "save") return endpointsForEntity.save(id);
+  if (action === "publish") return endpointsForEntity.publish(id, locale!);
+  return endpointsForEntity.unpublish(id, locale!);
+}
+
+/** Reads translations for a scholar, Listing, or topic target. */
 export function useContentTranslations(target: TranslationTarget) {
   return useApiQuery(
     translationQueryKey(target),
@@ -54,6 +70,7 @@ export function useContentTranslations(target: TranslationTarget) {
   );
 }
 
+/** Saves a translation draft through the backend translation authority. */
 export function useSaveTranslation(target: TranslationTarget) {
   const qc = useQueryClient();
   return useMutation({
@@ -67,6 +84,7 @@ export function useSaveTranslation(target: TranslationTarget) {
   });
 }
 
+/** Requests publication of one locale's translation for a supported target. */
 export function usePublishTranslation(target: TranslationTarget) {
   const qc = useQueryClient();
   return useMutation({
@@ -79,6 +97,7 @@ export function usePublishTranslation(target: TranslationTarget) {
   });
 }
 
+/** Requests removal of one locale's published translation. */
 export function useUnpublishTranslation(target: TranslationTarget) {
   const qc = useQueryClient();
   return useMutation({

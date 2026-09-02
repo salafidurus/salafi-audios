@@ -1,34 +1,23 @@
-import { routes } from "@sd/core-contracts";
 import { getLocalizedName } from "@sd/core-i18n";
 import { useTopicsList } from "@sd/domain-search";
-import {
-  BookOpen,
-  type LucideIcon,
-  Footprints,
-  GraduationCap,
-  MessageSquareText,
-  Scale,
-  Shield,
-  SpellCheck2,
-} from "lucide-react";
-import Link from "next/link";
 import { useMemo } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 
 import styles from "./category-chips.module.css";
 
-const TOPIC_ICONS: Record<string, LucideIcon> = {
-  aqeedah: Shield,
-  fiqh: Scale,
-  hadith: MessageSquareText,
-  nahw: SpellCheck2,
-  seerah: Footprints,
-  tafsir: BookOpen,
-  "da'wah": GraduationCap,
+/** Provides localized topic navigation for the public home screen. */
+/** Optional controlled topic selection for the home-page category tabs. */
+export type CategoryChipsProps = {
+  /** Currently selected topic slug; omission leaves the tabs uncontrolled. */
+  value?: string;
+  /** Receives the selected topic slug when a tab changes. */
+  onValueChange?: (value: string) => void;
 };
 
-export function CategoryChips() {
+/** Renders localized topic tabs, including loading placeholders while topics load. */
+export function CategoryChips({ value, onValueChange }: CategoryChipsProps = {}) {
   const { i18n, t } = useTranslation();
   const { data: topics = [], isLoading } = useTopicsList();
 
@@ -42,52 +31,50 @@ export function CategoryChips() {
       .map((topic) => ({
         slug: topic.slug,
         label: getLocalizedName(topic.name, i18n.language),
-        Icon: TOPIC_ICONS[topic.slug],
       }));
   }, [topics, i18n.language]);
 
   if (isLoading && topics.length === 0) {
     return (
-      <nav className={styles.chipsRow} aria-label={t("home.categories.label", "Browse by topic")}>
-        <Link
-          href={routes.search}
-          className={`${styles.chip} ${styles.chipAllActive}`}
-          data-testid="category-chip-all"
-        >
-          <BookOpen size={15} strokeWidth={2} className={styles.chipIconActive} />
-          {t("home.categories.all", "All")}
-        </Link>
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={`chip-skeleton-${i}`} className={`${styles.skeletonLine} ${styles.skeletonChip}`} />
-        ))}
-      </nav>
+      <Tabs
+        defaultValue="all"
+        className={styles.chipsRow}
+        aria-label={t("home.categories.label", "Browse by topic")}
+      >
+        <TabsList aria-label={t("home.categories.label", "Browse by topic")}>
+          <TabsTrigger value="all" data-testid="category-chip-all">
+            {t("home.categories.all", "All")}
+          </TabsTrigger>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={`chip-skeleton-${i}`}
+              className={`${styles.skeletonLine} ${styles.skeletonChip}`}
+              aria-hidden="true"
+            />
+          ))}
+        </TabsList>
+      </Tabs>
     );
   }
 
   return (
-    <nav className={styles.chipsRow} aria-label={t("home.categories.label", "Browse by topic")}>
-      <Link
-        href={routes.search}
-        className={`${styles.chip} ${styles.chipAllActive}`}
-        data-testid="category-chip-all"
-      >
-        <BookOpen size={15} strokeWidth={2} className={styles.chipIconActive} />
-        {t("home.categories.all", "All")}
-      </Link>
-      {chips.map((chip) => {
-        const Icon = chip.Icon;
-        return (
-          <Link
-            key={chip.slug}
-            href={`${routes.search}?topic=${chip.slug}`}
-            className={styles.chip}
-            data-testid="category-chip"
-          >
-            {Icon && <Icon size={15} strokeWidth={2} className={styles.chipIcon} />}
+    <Tabs
+      defaultValue="all"
+      value={value}
+      onValueChange={onValueChange}
+      className={styles.chipsRow}
+      aria-label={t("home.categories.label", "Browse by topic")}
+    >
+      <TabsList aria-label={t("home.categories.label", "Browse by topic")}>
+        <TabsTrigger value="all" data-testid="category-chip-all">
+          {t("home.categories.all", "All")}
+        </TabsTrigger>
+        {chips.map((chip) => (
+          <TabsTrigger key={chip.slug} value={chip.slug} data-testid="category-chip">
             {chip.label}
-          </Link>
-        );
-      })}
-    </nav>
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   );
 }

@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export { Listing } from "./Listing";
 export { ListingModal } from "./ListingModal";
 export { ListingUploadArrangeModal } from "./ListingUploadArrangeModal";

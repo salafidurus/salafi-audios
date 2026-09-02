@@ -1,9 +1,10 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { FormSection } from "@/features/admin/components/FormSection";
-import { InputField } from "@/shared/components/InputField";
-import { Toggle } from "@/shared/components/Toggle";
+import { InputField } from "@/shared/components/ui/input-field";
+import { Switch as Toggle } from "@/shared/components/ui/switch";
 
 import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
 

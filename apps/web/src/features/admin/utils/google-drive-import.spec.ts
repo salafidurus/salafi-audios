@@ -11,7 +11,7 @@ describe("parseGoogleDriveLink", () => {
     ).toEqual({ kind: "file", fileId: "18lIEO3tRKO7CGfF5kZ3dGFDHeLMStkZm" });
   });
 
-  it("extracts the file id from a legacy uc?id= link", () => {
+  it("extracts the file id from a compatibility uc?id= link", () => {
     expect(
       parseGoogleDriveLink("https://drive.google.com/uc?export=download&id=abc123XYZ"),
     ).toEqual({ kind: "file", fileId: "abc123XYZ" });

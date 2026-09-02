@@ -1,10 +1,12 @@
 import { Text, View } from "react-native";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
 type Props = {
   description: string;
   title: string;
 };
 
+/** Renders the native placeholder route screen surface and coordinates its user-facing state. */
 export function PlaceholderRouteScreen({ description, title }: Props) {
   return (
     <View

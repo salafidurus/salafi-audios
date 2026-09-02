@@ -12,6 +12,7 @@ import {
 
 import type { FormAction, FormState } from "./useListingForm";
 
+/** Documents this module's responsibility and public boundary. */
 async function uploadStagedCoverImage(
   state: FormState,
 ): Promise<{ url: string | undefined; key: string | undefined }> {
@@ -30,6 +31,68 @@ async function uploadStagedCoverImage(
   return { url: presignedResponse.publicUrl, key: presignedResponse.objectKey };
 }
 
+function getRequiredFieldErrorTabs(state: FormState): string[] {
+  const hasGeneralFields = [state.scholarId, state.language, state.selectedTopics?.length].every(
+    Boolean,
+  );
+  const hasMainFields = [state.title, state.slug].every((value) => Boolean(value?.trim()));
+
+  return collectMissingTabs([
+    ["general", !hasGeneralFields],
+    ["main", !hasMainFields],
+    ["general", !state.isEditing && state.scholarId && !state.slugSuffix?.trim()],
+  ]);
+}
+
+function collectMissingTabs(checks: readonly (readonly [string, unknown])[]): string[] {
+  return checks.reduce<string[]>((tabs, [tab, missing]) => {
+    if (missing) tabs.push(tab);
+    return tabs;
+  }, []);
+}
+
+async function updateExistingListing(state: FormState): Promise<void> {
+  if (!state.id) throw new Error("Listing ID required for update");
+
+  const coverImage = await uploadStagedCoverImage(state);
+  const payload: UpdateListingDetailsDto = {
+    title: state.title,
+    description: state.description,
+    language: state.language,
+    status: state.status,
+    orderIndex: state.orderIndex,
+    parentId: undefined,
+    topics: state.selectedTopics,
+    coverImageUrl: coverImage.url,
+    coverImageKey: coverImage.key,
+  };
+
+  await updateListingDetails(state.id, payload);
+}
+
+async function createNewListing(state: FormState): Promise<void> {
+  const coverImage = await uploadStagedCoverImage(state);
+  await createLecture({
+    title: state.title,
+    slug: state.slug,
+    scholarId: state.scholarId,
+    format: state.format,
+    language: state.language,
+    status: state.status,
+    topics: state.selectedTopics,
+    coverImageUrl: coverImage.url,
+    coverImageKey: coverImage.key,
+  });
+}
+
+async function saveListing(state: FormState): Promise<void> {
+  if (state.isEditing) {
+    await updateExistingListing(state);
+    return;
+  }
+  await createNewListing(state);
+}
+
 export function useSaveListing(
   state: FormState,
   dispatch: (action: FormAction) => void,
@@ -41,22 +104,7 @@ export function useSaveListing(
 
   return async (e: React.FormEvent) => {
     e.preventDefault();
-    const errTabs: string[] = [];
-
-    if (
-      !state.scholarId ||
-      !state.language ||
-      !state.selectedTopics ||
-      state.selectedTopics.length === 0
-    ) {
-      errTabs.push("general");
-    }
-    if (!(state.title ?? "").trim() || !state.slug?.trim()) {
-      errTabs.push("main");
-    }
-    if (!state.isEditing && state.scholarId && !state.slugSuffix?.trim()) {
-      errTabs.push("general");
-    }
+    const errTabs = getRequiredFieldErrorTabs(state);
 
     if (errTabs.length > 0) {
       setErrorTabs(errTabs);
@@ -75,37 +123,7 @@ export function useSaveListing(
     dispatch({ type: "SET_ERROR", error: null });
 
     try {
-      if (state.isEditing) {
-        if (!state.id) throw new Error("Listing ID required for update");
-
-        const coverImage = await uploadStagedCoverImage(state);
-        const payload: UpdateListingDetailsDto = {
-          title: state.title,
-          description: state.description,
-          language: state.language,
-          status: state.status,
-          orderIndex: state.orderIndex,
-          parentId: undefined,
-          topics: state.selectedTopics,
-          coverImageUrl: coverImage.url,
-          coverImageKey: coverImage.key,
-        };
-
-        await updateListingDetails(state.id, payload);
-      } else {
-        const coverImage = await uploadStagedCoverImage(state);
-        await createLecture({
-          title: state.title,
-          slug: state.slug,
-          scholarId: state.scholarId,
-          format: state.format,
-          language: state.language,
-          status: state.status,
-          topics: state.selectedTopics,
-          coverImageUrl: coverImage.url,
-          coverImageKey: coverImage.key,
-        });
-      }
+      await saveListing(state);
 
       await onSuccess();
       onClose();
