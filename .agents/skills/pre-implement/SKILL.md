@@ -43,10 +43,12 @@ For example, use the slug `audio-improve` to recommend
 `.worktree/c-audio-improve` with branch `c/audio-improve`.
 
 For a specification ticket, resolve the parent specification but do not seek a
-specification integration branch. Use `origin/main` as the ticket base and
-`main` as the pull-request target. For standalone bug, research, maintenance,
+specification integration branch. For standalone bug, research, maintenance,
 or other non-specification work, explicitly record that no parent
-specification applies and retain the same `origin/main` to `main` routing.
+specification applies. Branch and pull-request routing are defined in
+[issue-tracker.md](../../../docs/agents/issue-tracker.md); implementation uses
+`origin/main → main`, while finalization is verification-only on current
+`main`.
 
 Every plan records this routing context:
 

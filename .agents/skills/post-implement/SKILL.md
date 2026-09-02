@@ -113,25 +113,14 @@ that are explicitly confirmed safe to delete.
 Standalone and specification tickets use the same `main`-based integration and
 cleanup. Specifications have no implementation branch to preserve.
 
-## Finalization or abandonment
+## Finalization boundary
 
-Finalization is a verification-only terminal path for a specification. It is
-executed after every implementation ticket has merged into `main`. Run the
-complete specification acceptance matrix against current `main`, record the
-evidence on the parent issue, and close the specification. Do not create a
-branch or pull request for finalization.
-
-After acceptance evidence is recorded and the parent is closed, remove only
-confirmed specification resources. Preserve unrelated dirty state, worktrees,
-branches, and active specifications.
-
-If the specification is abandoned, record the reason and distinct abandoned
-outcome on the parent and child issues according to tracker policy. Verify each
-ticket branch and worktree identity and state before deletion. Stop on
-uncertainty and preserve unrelated dirty state, branches, worktrees, and active
-specifications.
+`implement-spec` owns specification finalization and abandonment. Do not invoke
+this skill for the finalization ticket; it has no implementation branch, code
+change, or pull request.
 
 ## Completion
 
-Report the PR, final commit, issue states, cleanup actions, and final Git state.
+For an ordinary implementation ticket, report the PR, final commit, issue
+states, cleanup actions, and final Git state.
 Do not claim delivery complete until each applicable verification has evidence.

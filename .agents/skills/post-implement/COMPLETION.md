@@ -15,11 +15,10 @@ Use this case guide after PR preparation.
 Verify the PR targeted `main`. Remove only the completed ticket resources and
 preserve sibling tickets, sibling worktrees, and unrelated dirty state.
 
-## Final validation ticket
+## Finalization boundary
 
-Use current `main` as the only integration input. Run the complete acceptance
-matrix and record its evidence on the specification issue. No validation PR is
-required; close the parent only after acceptance succeeds.
+`implement-spec` owns verification-only finalization. This skill does not run
+the finalization procedure or create a validation PR.
 
 ## Abandonment
 

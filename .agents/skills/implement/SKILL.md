@@ -38,9 +38,8 @@ not applicable.
 
 ## Checkout selection
 
-For the finalization ticket, use current `origin/main` as the only integration
-input and perform verification without creating a checkout. Do not apply the
-ordinary native/non-native feature classification to this ticket.
+The finalization ticket is not executed by this skill; `implement-spec` owns
+its verification-only procedure.
 
 For an ordinary ticket, determine whether the approved scope includes committed files under
 `apps/native`:
@@ -109,9 +108,8 @@ write red, confirm red, implement minimally, confirm green, and run the
 applicable full suite. Run typechecking and single-test commands regularly.
 Apply the nearest workspace rules and keep shared package boundaries intact.
 
-For the finalization ticket, no new feature slice is expected. Run the
-complete specification acceptance matrix, applicable repository checks, and
-any conflict-resolution verification required by the approved plan.
+Finalization is outside this skill's completion path. Do not use this skill to
+create a finalization branch, code change, or pull request.
 
 ## Documentation requirements
 

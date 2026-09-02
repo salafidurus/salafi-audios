@@ -75,8 +75,8 @@ duplicating their contents.
 
 ## Completion
 
-Every implementation ticket and the finalization ticket have completed their
-own pre-implementation, implementation, and post-implementation lifecycle, and
-the specification's acceptance criteria have been verified. The specification
-umbrella is not itself treated as an executable ticket unless it explicitly has
+Every implementation ticket has completed its own pre-implementation,
+implementation, and post-implementation lifecycle, and finalization has
+verified the specification's acceptance criteria. The specification umbrella
+is not itself treated as an executable ticket unless it explicitly has
 implementation scope.
