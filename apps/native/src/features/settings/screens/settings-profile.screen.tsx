@@ -12,7 +12,7 @@ import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 import { AppText, ScreenView } from "@/shared/ui";
 
-import { RootScreenHeader } from "../../navigation";
+import { RootScreenHeader } from "../../navigation/components/RootScreenHeader/RootScreenHeader";
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 import { getRtlAwareTextAlign } from "../utils/rtl-text-align";

@@ -44,10 +44,12 @@ export function SupportScreen({
       <NativeBridgeHost testID="support-screen-host" matchContents={false}>
         <ScrollView
           showsVerticalScrollIndicator={false}
+          contentInset={{
+            bottom: theme.spacing.layout.pageY + insets.bottom + theme.spacing.scale["4xl"],
+          }}
           contentContainerStyle={{
             gap: theme.spacing.layout.sectionY,
             padding: theme.spacing.layout.pageX,
-            paddingBottom: theme.spacing.layout.pageY + insets.bottom + theme.spacing.scale["4xl"],
           }}
         >
           <SupportForm />

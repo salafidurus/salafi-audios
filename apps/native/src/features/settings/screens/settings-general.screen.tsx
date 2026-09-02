@@ -75,9 +75,9 @@ export function SettingsGeneralScreen(props: SettingsAccountActionsProps = {}) {
           </View>
           <ScrollView
             showsVerticalScrollIndicator={false}
+            contentInset={{ bottom: theme.spacing.layout.pageY + insets.bottom + 96 }}
             contentContainerStyle={{
               padding: theme.spacing.layout.pageX,
-              paddingBottom: theme.spacing.layout.pageY + insets.bottom + 96,
               gap: theme.spacing.layout.sectionY,
             }}
           >
