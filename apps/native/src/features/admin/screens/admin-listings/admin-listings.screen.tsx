@@ -10,10 +10,9 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { AppText, List, NativeBridgeHost } from "@/shared/ui";
 
 import { bulkListingAction } from "../../api/admin-listings.api";
 import { AudioUploaderSheet } from "../../components/AudioUploaderSheet/AudioUploaderSheet";
@@ -22,10 +21,10 @@ import { ListingEditSheet } from "../../components/ListingEditSheet/ListingEditS
 import { useAdminListings } from "../../hooks/use-admin-listings";
 import { filterListings } from "./filter-listings";
 
+/** Provides authenticated native administration workflows and their data boundaries. */
 type AdminListingRowProps = {
   item: AdminListingListItemDto;
   isSelected: boolean;
-  hideBorder: boolean;
   actions: MenuAction[];
   onPress: () => void;
   onAction: (action: string) => void;
@@ -45,24 +44,12 @@ function getVisibleRowActions(ability: AppAbility): MenuAction[] {
   return actions;
 }
 
-function AdminListingRow({
-  item,
-  isSelected,
-  hideBorder,
-  actions,
-  onPress,
-  onAction,
-}: AdminListingRowProps) {
+function AdminListingRow({ item, isSelected, actions, onPress, onAction }: AdminListingRowProps) {
   const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
 
   return (
-    <List.Item
-      testID={`admin-listing-row-${item.id}`}
-      onPress={onPress}
-      hideBorder={hideBorder}
-      style={isSelected ? styles.rowSelected : undefined}
-    >
-      <View style={styles.rowContent}>
+    <List.Item testID={`admin-listing-row-${item.id}`} onPress={onPress}>
+      <View style={[styles.rowContent, isSelected && styles.rowSelected]}>
         <MarqueeText text={item.title} variant="bodyMd" style={styles.rowTitle} />
         <AppText variant="caption" style={styles.rowMeta}>
           {scholarName} · {item.status}
@@ -73,6 +60,7 @@ function AdminListingRow({
   );
 }
 
+/** Renders the native admin listings screen surface and coordinates its user-facing state. */
 export function AdminListingsScreen() {
   const { theme } = useUnistyles();
   const { isAuthenticated } = useAuth();
@@ -149,68 +137,68 @@ export function AdminListingsScreen() {
   };
 
   return (
-    <View style={styles.screen}>
-      <Stack.Screen options={headerSearchOptions} />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <AppText variant="titleLg">Listings</AppText>
-          {canUpload ? (
-            <Pressable onPress={() => setShowUploader(true)} style={styles.uploadBtn}>
-              <AppText variant="labelMd" style={styles.uploadBtnText}>
-                + Upload
-              </AppText>
-            </Pressable>
-          ) : null}
-        </View>
+    <NativeBridgeHost testID="admin-listings-host" matchContents={false}>
+      <View style={styles.screen}>
+        <Stack.Screen options={headerSearchOptions} />
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.header}>
+            {canUpload ? (
+              <Pressable onPress={() => setShowUploader(true)} style={styles.uploadBtn}>
+                <AppText variant="labelMd" style={styles.uploadBtnText}>
+                  + Upload
+                </AppText>
+              </Pressable>
+            ) : null}
+          </View>
 
-        {isLoading ? (
-          <EmptyState message="Loading…" variant="loading" />
-        ) : listings.length === 0 ? (
-          <EmptyState message="No listings found." variant="empty" />
-        ) : (
-          <List>
-            {listings.map((item, index) => (
-              <AdminListingRow
-                key={item.id}
-                item={item}
-                isSelected={selectedIds.has(item.id)}
-                hideBorder={index === listings.length - 1}
-                actions={rowActions}
-                onPress={() => handleRowPress(item.id)}
-                onAction={(action) => void handleRowAction(item.id, action)}
-              />
-            ))}
-          </List>
-        )}
-      </ScrollView>
+          {isLoading ? (
+            <EmptyState message="Loading…" variant="loading" />
+          ) : listings.length === 0 ? (
+            <EmptyState message="No listings found." variant="empty" />
+          ) : (
+            <View>
+              {listings.map((item) => (
+                <AdminListingRow
+                  key={item.id}
+                  item={item}
+                  isSelected={selectedIds.has(item.id)}
+                  actions={rowActions}
+                  onPress={() => handleRowPress(item.id)}
+                  onAction={(action) => void handleRowAction(item.id, action)}
+                />
+              ))}
+            </View>
+          )}
+        </ScrollView>
 
-      <BulkActionBar
-        selectedCount={selectedIds.size}
-        onPublish={() => handleBulkAction("publish")}
-        onArchive={() => handleBulkAction("archive")}
-        canPublish={canPublish}
-        canArchive={canArchive}
-        isLoading={isBulkLoading}
-      />
+        <BulkActionBar
+          selectedCount={selectedIds.size}
+          onPublish={() => handleBulkAction("publish")}
+          onArchive={() => handleBulkAction("archive")}
+          canPublish={canPublish}
+          canArchive={canArchive}
+          isLoading={isBulkLoading}
+        />
 
-      <AudioUploaderSheet
-        isOpen={showUploader}
-        onClose={() => setShowUploader(false)}
-        onUploadComplete={() => {
-          setShowUploader(false);
-          refetch();
-        }}
-      />
+        <AudioUploaderSheet
+          isOpen={showUploader}
+          onClose={() => setShowUploader(false)}
+          onUploadComplete={() => {
+            setShowUploader(false);
+            refetch();
+          }}
+        />
 
-      <ListingEditSheet
-        listingId={editingListingId}
-        onClose={() => setEditingListingId(null)}
-        onSaved={() => {
-          setEditingListingId(null);
-          refetch();
-        }}
-      />
-    </View>
+        <ListingEditSheet
+          listingId={editingListingId}
+          onClose={() => setEditingListingId(null)}
+          onSaved={() => {
+            setEditingListingId(null);
+            refetch();
+          }}
+        />
+      </View>
+    </NativeBridgeHost>
   );
 }
 
@@ -226,7 +214,7 @@ const styles = StyleSheet.create((theme) => ({
   header: {
     paddingVertical: theme.spacing.scale.md,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
   },
   uploadBtn: {

@@ -1,4 +1,5 @@
 // API hooks
+/** Public Discovery package surface for search, browse, and quick-browse hooks. */
 export { useSearchCatalog, useTopicsList } from "./api/search.api";
 
 // Domain hooks
@@ -14,4 +15,4 @@ export { useInfiniteSearch, type UseInfiniteSearchOptions } from "./hooks";
 export { buildSearchResultRows, type SearchResultRow } from "./utils/build-search-result-rows";
 
 // Quick browse
-export { useContinueListening } from "./use-continue-listening";
+export { useContinueListening, type UseContinueListeningOptions } from "./use-continue-listening";

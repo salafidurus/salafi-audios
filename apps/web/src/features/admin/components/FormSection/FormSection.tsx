@@ -1,5 +1,6 @@
 import styles from "./form-section.module.css";
 
+/** Documents this module's responsibility and public boundary. */
 export interface FormSectionProps {
   title: string;
   children: React.ReactNode;

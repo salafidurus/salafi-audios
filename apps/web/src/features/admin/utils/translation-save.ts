@@ -8,11 +8,29 @@ import {
   type TranslationFormState,
 } from "@/features/admin/hooks/Translation/useTranslationForm";
 
+/** Documents this module's responsibility and public boundary. */
 export interface LocalesToSaveResult {
   /** Locales that are dirty and safe to persist, with their merged field values. */
   toSave: Map<Locale, Record<string, string>>;
   /** Dirty locales missing a required field that still has other content — block the save. */
   errorLocales: Locale[];
+}
+
+function collectLocaleFields(
+  config: TranslationEntityConfig,
+  state: TranslationFormState,
+  locale: Locale,
+) {
+  const merged: Record<string, string> = {};
+  let hasContent = false;
+  let missingRequired = false;
+  for (const field of config.fields) {
+    const value = getFieldValue(state, locale, field.key);
+    merged[field.key] = value;
+    if (value.trim()) hasContent = true;
+    if (field.required && !value.trim()) missingRequired = true;
+  }
+  return { merged, hasContent, missingRequired };
 }
 
 /**
@@ -31,15 +49,7 @@ export function computeLocalesToSave(
   for (const locale of secondaryLocales) {
     if (!isLocaleDirty(state, locale)) continue;
 
-    const merged: Record<string, string> = {};
-    let hasContent = false;
-    let missingRequired = false;
-    for (const field of config.fields) {
-      const value = getFieldValue(state, locale, field.key);
-      merged[field.key] = value;
-      if (value.trim()) hasContent = true;
-      if (field.required && !value.trim()) missingRequired = true;
-    }
+    const { merged, hasContent, missingRequired } = collectLocaleFields(config, state, locale);
 
     if (missingRequired && hasContent) {
       errorLocales.push(locale);

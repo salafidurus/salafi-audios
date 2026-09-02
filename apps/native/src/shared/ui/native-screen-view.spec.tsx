@@ -1,0 +1,77 @@
+import { render, screen } from "@testing-library/react-native";
+import React from "react";
+import { View } from "react-native";
+
+import { ScreenView } from "./native-screen-view";
+
+jest.mock("react-native-safe-area-context", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require("react");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { View } = require("react-native");
+  return {
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+    SafeAreaView: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(View, null, children),
+  };
+});
+
+describe("ScreenView", () => {
+  it("renders children", async () => {
+    await render(
+      <ScreenView>
+        <View testID="child" />
+      </ScreenView>,
+    );
+    expect(screen.getByTestId("child")).toBeTruthy();
+  });
+
+  it("centers content when center is true", async () => {
+    await render(
+      <ScreenView center>
+        <View testID="child" />
+      </ScreenView>,
+    );
+    expect(screen.getByTestId("child")).toBeTruthy();
+  });
+
+  it("accepts custom style", async () => {
+    await render(
+      <ScreenView style={{ marginTop: 10 }}>
+        <View testID="child" />
+      </ScreenView>,
+    );
+    expect(screen.getByTestId("child")).toBeTruthy();
+  });
+
+  it("renders with canvas background by default", async () => {
+    await render(
+      <ScreenView>
+        <View testID="child" />
+      </ScreenView>,
+    );
+    expect(screen.getByTestId("child")).toBeTruthy();
+  });
+
+  it("renders with primaryWash background", async () => {
+    await render(
+      <ScreenView backgroundVariant="primaryWash">
+        <View testID="child" />
+      </ScreenView>,
+    );
+    expect(screen.getByTestId("child")).toBeTruthy();
+  });
+
+  it("wraps its existing layout in a flex Host without adding another safe area", async () => {
+    const result = await render(
+      <ScreenView>
+        <View testID="child" />
+      </ScreenView>,
+    );
+
+    const host = result.toJSON() as { props: Record<string, unknown> };
+    expect(host.props.style).toEqual(expect.objectContaining({ flex: 1 }));
+    expect(host.props.ignoreSafeArea).toBe("all");
+    expect(host.props.layoutDirection).toBe("leftToRight");
+  });
+});

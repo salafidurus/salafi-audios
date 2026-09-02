@@ -1,17 +1,18 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { ScholarTitle } from "@sd/core-contracts";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { FormSection } from "@/features/admin/components/FormSection";
+import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
-} from "@/shared/components/Dropdown";
-import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
-import { InputField } from "@/shared/components/InputField";
+} from "@/shared/components/ui/dropdown";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
 
@@ -69,6 +70,7 @@ export function GeneralDataSection({
             <Dropdown
               value={formData.title ?? ""}
               onValueChange={(value) =>
+                // SAFETY: the title dropdown renders only ScholarTitle entries from SCHOLAR_TITLES_ARRAY.
                 dispatch({
                   type: "UPDATE_FIELD",
                   field: "title",

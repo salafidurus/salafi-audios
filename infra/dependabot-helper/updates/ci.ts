@@ -1,0 +1,714 @@
+import { spawnSync } from "child_process";
+import { existsSync, mkdirSync, rmSync } from "fs";
+import { resolve } from "path";
+
+import type { CatalogRepairReport } from "../catalog/types";
+import type { UpdateCandidate } from "./utils/ui";
+
+import { runCatalogAlignment } from "../catalog-alignment";
+import { applyUpdate } from "./apply";
+import { checkAll } from "./check";
+import { config } from "./update.config";
+import {
+  readCache,
+  writeCache,
+  updateCacheFromBatch,
+  areAllCandidatesCached,
+  cachePath,
+} from "./utils/cache";
+import { buildChangelogSection } from "./utils/changelog";
+import { retry, type RetryOptions } from "./utils/retry";
+import { categorizeBump, isNewer } from "./utils/semver";
+
+const __ciMain = import.meta.path.replace(/\\/g, "/") === process.argv[1]?.replace(/\\/g, "/");
+
+export interface CiOptions {
+  dryRun?: boolean;
+  reportOnly?: boolean;
+  gitHubRunId?: string;
+  gitHubSha?: string;
+  patToken?: string;
+  retry?: RetryOptions;
+}
+
+export interface CiSummary {
+  groupName: string;
+  branch: string;
+  prNumber: number | null;
+  skipped: boolean;
+  error?: string;
+  repairReport?: CatalogRepairReport;
+}
+
+interface GroupBatch {
+  groupName: string;
+  candidates: UpdateCandidate[];
+}
+
+interface ExecResult {
+  stdout: string;
+  stderr: string;
+  status: number | null;
+}
+
+function exec(cmd: string, args: string[], opts?: { cwd?: string }): ExecResult {
+  // nosemgrep
+  const result = spawnSync(cmd, args, {
+    encoding: "utf-8",
+    cwd: opts?.cwd,
+  });
+  return {
+    stdout: result.stdout?.trim() ?? "",
+    stderr: result.stderr?.trim() ?? "",
+    status: result.status,
+  };
+}
+
+type ExecFn = (cmd: string, args: string[], opts?: { cwd?: string }) => ReturnType<typeof exec>;
+
+interface HeldProposal {
+  closedPr: number;
+  versions: Record<string, string>;
+}
+
+export interface HeldGroup {
+  group: string;
+  pr: number;
+  packages: string[];
+}
+
+async function hasOpenPr(branch: string, execFn: ExecFn = exec): Promise<boolean> {
+  const result = execFn("gh", [
+    "pr",
+    "list",
+    "--head",
+    branch,
+    "--state",
+    "open",
+    "--json",
+    "number",
+    "-q",
+    ".[0].number",
+  ]);
+  return result.stdout.length > 0;
+}
+
+async function latestClosedPr(branch: string, execFn: ExecFn = exec): Promise<number | null> {
+  const result = execFn("gh", [
+    "pr",
+    "list",
+    "--head",
+    branch,
+    "--state",
+    "closed",
+    "--json",
+    "number,state,closedAt",
+  ]);
+  if (!result.stdout) return null;
+  // SAFETY: gh is asked for exactly these fields through --json, and stdout is checked above.
+  const prs = JSON.parse(result.stdout) as {
+    number: number;
+    state: string;
+    closedAt: string | null;
+  }[];
+  const closed = prs
+    .filter((p) => p.state === "CLOSED")
+    .sort((a, b) => (b.closedAt ?? "").localeCompare(a.closedAt ?? ""));
+  return closed[0]?.number ?? null;
+}
+
+export async function getHeldProposal(
+  branch: string,
+  execFn: ExecFn = exec,
+): Promise<HeldProposal | null> {
+  if (await hasOpenPr(branch, execFn)) return null;
+  const closedPr = await latestClosedPr(branch, execFn);
+  if (closedPr === null) return null;
+  if (!(await remoteBranchExists(branch, execFn))) return null;
+
+  const fetchResult = execFn("git", ["fetch", "origin", branch]);
+  if (fetchResult.status !== 0) return null;
+  const show = execFn("git", ["show", "FETCH_HEAD:package.json"]);
+  if (show.status !== 0 || !show.stdout) return null;
+
+  let pkg: { workspaces?: { catalog?: Record<string, string> } };
+  try {
+    pkg = JSON.parse(show.stdout);
+  } catch {
+    return null;
+  }
+  const versions: Record<string, string> = {};
+  for (const [name, v] of Object.entries(pkg.workspaces?.catalog ?? {})) {
+    versions[name] = v.replace(/^[\^~>=<]+\s*/, "");
+  }
+  return { closedPr, versions };
+}
+
+function getHeldGroupVersion(proposal: HeldProposal, list: UpdateCandidate[]): string | null {
+  const proposed = list
+    .map((c) => proposal.versions[c.packageName])
+    .filter((v): v is string => v !== undefined);
+  if (proposed.length === 0) return null;
+  return proposed.reduce((a, b) => (isNewer(a, b) ? a : b));
+}
+
+export async function suppressHeldCandidates(
+  candidates: UpdateCandidate[],
+  execFn: ExecFn = exec,
+): Promise<{ remaining: UpdateCandidate[]; held: HeldGroup[] }> {
+  const byGroup = new Map<string, UpdateCandidate[]>();
+  for (const c of candidates) {
+    const group = c.group ?? "ungrouped";
+    byGroup.set(group, [...(byGroup.get(group) ?? []), c]);
+  }
+
+  const remaining: UpdateCandidate[] = [];
+  const held: HeldGroup[] = [];
+  const versionLocked = new Set(config.versionLocked);
+
+  const groupsIter = Array.from(byGroup.entries());
+  const proposals = await Promise.all(
+    groupsIter.map(([group]) => getHeldProposal(branchName(group), execFn)),
+  );
+
+  for (let i = 0; i < groupsIter.length; i++) {
+    const [group, list] = groupsIter[i]!;
+    const proposal = proposals[i];
+
+    if (!proposal) {
+      remaining.push(...list);
+      continue;
+    }
+
+    const heldVersion = getHeldGroupVersion(proposal, list);
+    if (heldVersion === null) {
+      remaining.push(...list);
+      continue;
+    }
+
+    const target = list.reduce(
+      (best, c) => (isNewer(c.latestVersion, best) ? c.latestVersion : best),
+      heldVersion,
+    );
+
+    if (versionLocked.has(group)) {
+      if (!isNewer(target, heldVersion)) {
+        console.log(
+          `[${group}] held by closed PR #${proposal.closedPr} (version-locked; awaiting newer than ${heldVersion})`,
+        );
+        held.push({ group, pr: proposal.closedPr, packages: list.map((c) => c.packageName) });
+        continue;
+      }
+      remaining.push(...list);
+      continue;
+    }
+
+    const kept: UpdateCandidate[] = [];
+    const dropped: string[] = [];
+    for (const c of list) {
+      const proposed = proposal.versions[c.packageName];
+      if (proposed !== undefined && !isNewer(c.latestVersion, proposed)) {
+        dropped.push(c.packageName);
+      } else {
+        kept.push(c);
+      }
+    }
+    if (dropped.length > 0) {
+      console.log(
+        `[${group}] held by closed PR #${proposal.closedPr} (proposed ${dropped.join(", ")})`,
+      );
+      held.push({ group, pr: proposal.closedPr, packages: dropped });
+    }
+    remaining.push(...kept);
+  }
+
+  return { remaining, held };
+}
+
+export function getGroupOrder(): string[] {
+  const names = Object.keys(config.groups).filter((g) => g !== "expo");
+  names.sort();
+  return ["bun", "expo", ...names, "ungrouped"];
+}
+
+export function groupCandidates(candidates: UpdateCandidate[]): GroupBatch[] {
+  const groups = new Map<string, UpdateCandidate[]>();
+
+  for (const c of candidates) {
+    const groupName = c.group ?? "ungrouped";
+    const list = groups.get(groupName) ?? [];
+    list.push(c);
+    groups.set(groupName, list);
+  }
+
+  const ordered: GroupBatch[] = [];
+  const seen = new Set<string>();
+  for (const name of getGroupOrder()) {
+    const list = groups.get(name);
+    if (list) {
+      ordered.push({ groupName: name, candidates: list });
+      seen.add(name);
+    }
+  }
+
+  for (const [name, list] of groups.entries()) {
+    if (!seen.has(name)) {
+      ordered.push({ groupName: name, candidates: list });
+    }
+  }
+
+  return ordered;
+}
+
+export function highestBump(candidates: UpdateCandidate[]): "major" | "minor" | "patch" | null {
+  let result: "major" | "minor" | "patch" | null = null;
+  for (const c of candidates) {
+    const bump = categorizeBump(c.currentVersion, c.latestVersion);
+    if (bump === "major") return "major";
+    if (bump === "minor") result = "minor";
+    else if (bump === "patch" && result === null) result = "patch";
+  }
+  return result;
+}
+
+export function sanitizeBranchName(name: string): string {
+  return name.replace(/[@/]/g, "-").replace(/^-+/, "");
+}
+
+export function branchName(group: string): string {
+  return `deps/${sanitizeBranchName(group)}`;
+}
+
+export function worktreeDir(rootDir: string, group: string): string {
+  return resolve(rootDir, ".worktree", `deps-${sanitizeBranchName(group)}`); // nosemgrep
+}
+
+async function isPrMergeable(prNumber: number): Promise<boolean> {
+  const result = exec("gh", [
+    "pr",
+    "view",
+    String(prNumber),
+    "--json",
+    "mergeable",
+    "-q",
+    ".mergeable",
+  ]);
+  return result.stdout === "MERGEABLE";
+}
+
+async function remoteBranchExists(
+  branch: string,
+  execFn: (cmd: string, args: string[], opts?: { cwd?: string }) => ReturnType<typeof exec> = exec,
+): Promise<boolean> {
+  const result = execFn("git", ["ls-remote", "--heads", "origin", branch]);
+  return result.stdout.length > 0;
+}
+
+async function isPrMerged(branch: string): Promise<boolean> {
+  const result = exec("gh", [
+    "pr",
+    "list",
+    "--head",
+    branch,
+    "--state",
+    "merged",
+    "--json",
+    "number",
+    "-q",
+    ".[0].number",
+  ]);
+  return result.stdout.length > 0;
+}
+
+async function ensureBranchCleanup(
+  branch: string,
+  dryRun: boolean,
+): Promise<"new" | "existing" | "recreate"> {
+  const exists = await remoteBranchExists(branch);
+  if (!exists) return "new";
+
+  const merged = await isPrMerged(branch);
+  if (merged) {
+    if (!dryRun) {
+      exec("git", ["push", "origin", "--delete", branch]);
+    }
+    return "recreate";
+  }
+
+  return "existing";
+}
+
+function lockfileUpdated(cwd: string): boolean {
+  const result = exec("git", ["diff", "--name-only"], { cwd });
+  const files = result.stdout
+    .split("\n")
+    .map((f) => f.trim())
+    .filter(Boolean);
+  return files.includes("bun.lock");
+}
+
+export async function buildPrBody(
+  candidates: UpdateCandidate[],
+  options: CiOptions,
+): Promise<string> {
+  const sections: string[] = [];
+
+  const results = await Promise.all(
+    candidates.map((c) =>
+      buildChangelogSection(
+        c.packageName,
+        c.currentVersion.replace(/^[\^~>=<]+\s*/, ""),
+        c.latestVersion.replace(/^[\^~>=<]+\s*/, ""),
+        options.patToken,
+      ),
+    ),
+  );
+  sections.push(...results);
+
+  sections.push("");
+  sections.push("---");
+  sections.push(
+    `_Generated at ${new Date().toISOString()} · Workflow #${options.gitHubRunId ?? "local"} · Commit ${options.gitHubSha?.slice(0, 7) ?? "unknown"}_`,
+  );
+
+  return sections.join("\n\n");
+}
+
+async function createOrUpdatePr(
+  group: string,
+  branch: string,
+  body: string,
+  bump: "major" | "minor" | "patch" | null,
+  dryRun: boolean,
+): Promise<number | null> {
+  const title = `chore(deps): update ${group}`;
+  const labels = ["dependencies"];
+  const autoMerge = bump === "minor" || bump === "patch";
+
+  if (dryRun) {
+    return 0;
+  }
+
+  const existingPr = exec("gh", [
+    "pr",
+    "list",
+    "--head",
+    branch,
+    "--state",
+    "open",
+    "--json",
+    "number",
+    "-q",
+    ".[0].number",
+  ]);
+
+  let prNumber: number | null = null;
+
+  if (existingPr.stdout) {
+    const updateResult = exec("gh", [
+      "pr",
+      "edit",
+      existingPr.stdout,
+      "--title",
+      title,
+      "--body",
+      body,
+      "--add-label",
+      labels.join(","),
+    ]);
+    if (updateResult.status === 0) {
+      prNumber = Number(existingPr.stdout);
+    } else {
+      console.log(`[${group}] PR update failed: ${updateResult.stderr}`);
+    }
+  } else {
+    const createResult = exec("gh", [
+      "pr",
+      "create",
+      "--title",
+      title,
+      "--body",
+      body,
+      "--label",
+      labels.join(","),
+      "--head",
+      branch,
+    ]);
+    if (createResult.status === 0 && createResult.stdout) {
+      const match = createResult.stdout.match(/#(\d+)/);
+      prNumber = match ? Number(match[1]) : null;
+    } else {
+      console.log(`[${group}] PR create failed: ${createResult.stderr}`);
+    }
+  }
+
+  if (prNumber && autoMerge) {
+    const mergeable = await isPrMergeable(prNumber);
+    if (mergeable) {
+      exec("gh", ["pr", "merge", String(prNumber), "--auto", "--squash"]);
+    } else {
+      console.log(`[${group}] PR #${prNumber} has conflicts — auto-merge disabled`);
+    }
+  }
+
+  return prNumber;
+}
+
+function applyUpdatesToWorktree(candidates: UpdateCandidate[], wtDir: string): Promise<boolean> {
+  let chain = Promise.resolve(true);
+  candidates.forEach((c) => {
+    chain = chain.then((ok) => (ok ? applyUpdate(c, wtDir, config) : false));
+  });
+  return chain;
+}
+
+async function processBatch(
+  batch: GroupBatch,
+  rootDir: string,
+  options: CiOptions,
+  retryOpts: RetryOptions,
+): Promise<CiSummary> {
+  const branch = branchName(batch.groupName);
+  const wtDir = worktreeDir(rootDir, batch.groupName);
+
+  try {
+    const branchStatus = await ensureBranchCleanup(branch, options.dryRun ?? false);
+
+    if (branchStatus === "existing") {
+      const fetchResult = exec("git", ["fetch", "origin", branch]);
+      if (fetchResult.status === 0) {
+        const diffResult = exec("git", ["diff", "--quiet", `origin/${branch}`, "--", ":!bun.lock"]);
+        if (diffResult.status === 0) {
+          return {
+            groupName: batch.groupName,
+            branch,
+            prNumber: null,
+            skipped: true,
+          };
+        }
+      }
+    }
+
+    if (options.dryRun || options.reportOnly) {
+      return {
+        groupName: batch.groupName,
+        branch,
+        prNumber: null,
+        skipped: false,
+      };
+    }
+
+    if (existsSync(wtDir)) {
+      rmSync(wtDir, { recursive: true, force: true });
+    }
+    mkdirSync(wtDir, { recursive: true });
+    const addResult = exec("git", ["worktree", "add", wtDir, "origin/main"]);
+    if (addResult.status !== 0) {
+      throw new Error(`worktree add failed: ${addResult.stderr}`);
+    }
+    console.log(`[${batch.groupName}] Worktree created at ${wtDir}`);
+
+    const baseInstallResult = exec("bun", ["install", "--frozen-lockfile"], { cwd: wtDir });
+    if (baseInstallResult.status !== 0) {
+      throw new Error(
+        `worktree base install failed: ${baseInstallResult.stderr || baseInstallResult.stdout}`,
+      );
+    }
+    console.log(`[${batch.groupName}] Baseline dependencies installed`);
+
+    console.log(`[${batch.groupName}] Applying updates for ${batch.candidates.length} packages...`);
+    const applyOk = await applyUpdatesToWorktree(batch.candidates, wtDir);
+    if (!applyOk) {
+      throw new Error("applyUpdate failed for one or more packages");
+    }
+    console.log(`[${batch.groupName}] Package updates applied`);
+
+    console.log(`[${batch.groupName}] Running catalog alignment fix...`);
+    let repairReport: CatalogRepairReport | undefined;
+    try {
+      const fixResult = runCatalogAlignment({
+        rootDir: wtDir,
+        authorizedDependencies: batch.candidates.map((candidate) => candidate.packageName),
+      });
+      repairReport = fixResult.report;
+      console.log(`[${batch.groupName}] Catalog repair report: ${JSON.stringify(repairReport)}`);
+      if (repairReport.status === "rejected" || repairReport.status === "invalid") {
+        throw new Error(repairReport.reason ?? "Catalog repair rejected by policy");
+      }
+      if (fixResult.report.updatedFiles.length > 0) {
+        console.log(
+          `[${batch.groupName}] Catalog fix updated: ${fixResult.report.updatedFiles.join(", ")}`,
+        );
+      } else {
+        console.log(`[${batch.groupName}] Catalog already aligned`);
+      }
+    } catch (fixErr) {
+      throw new Error(`Catalog repair failed: ${fixErr}`);
+    }
+
+    console.log(`[${batch.groupName}] Installing updated dependencies...`);
+    const verifyResult = exec("bun", ["install"], { cwd: wtDir });
+    if (verifyResult.status !== 0) {
+      throw new Error(`bun install failed: ${verifyResult.stderr || verifyResult.stdout}`);
+    }
+    console.log(`[${batch.groupName}] Updated dependencies installed`);
+
+    if (!lockfileUpdated(wtDir)) {
+      throw new Error("Lockfile verification failed: bun.lock was not updated by bun install");
+    }
+    console.log(`[${batch.groupName}] Lockfile updated`);
+
+    exec("git", ["config", "user.email", "github-actions[bot]@users.noreply.github.com"], {
+      cwd: wtDir,
+    });
+    exec("git", ["config", "user.name", "github-actions[bot]"], { cwd: wtDir });
+
+    const baseMsg =
+      batch.groupName === "ungrouped"
+        ? "chore(deps): update ungrouped packages"
+        : `chore(deps): update ${batch.groupName}`;
+    exec("git", ["add", "-A"], { cwd: wtDir });
+    console.log(`[${batch.groupName}] Committing changes...`);
+    const commitResult = exec("git", ["commit", "-m", baseMsg], {
+      cwd: wtDir,
+    });
+    if (commitResult.status !== 0) {
+      throw new Error(`git commit failed: ${commitResult.stderr}`);
+    }
+    console.log(`[${batch.groupName}] Changes committed`);
+
+    console.log(`[${batch.groupName}] Pushing to origin/${branch}...`);
+    const pushResult = exec(
+      "git",
+      [
+        "push",
+        "--no-verify",
+        ...(branchStatus === "existing" ? ["--force"] : []),
+        "origin",
+        `HEAD:refs/heads/${branch}`,
+      ],
+      { cwd: wtDir },
+    );
+    if (pushResult.status !== 0) {
+      throw new Error(`git push failed: ${pushResult.stderr}`);
+    }
+    console.log(`[${batch.groupName}] Push succeeded`);
+
+    const bump = highestBump(batch.candidates);
+    const body = await retry(() => buildPrBody(batch.candidates, options), retryOpts);
+    const prNumber = await createOrUpdatePr(batch.groupName, branch, body, bump, false);
+
+    return {
+      groupName: batch.groupName,
+      branch,
+      prNumber,
+      skipped: false,
+      repairReport,
+    };
+  } finally {
+    if (existsSync(wtDir)) {
+      exec("git", ["worktree", "remove", "--force", wtDir], {
+        cwd: rootDir,
+      });
+      rmSync(wtDir, { recursive: true, force: true });
+    }
+  }
+}
+
+function scheduleBatches(
+  batches: GroupBatch[],
+  rootDir: string,
+  options: CiOptions,
+  retryOpts: RetryOptions,
+  summaries: CiSummary[],
+): Promise<void> {
+  let chain = Promise.resolve();
+  batches.forEach((batch) => {
+    chain = chain.then(() =>
+      processBatch(batch, rootDir, options, retryOpts).then((s) => {
+        summaries.push(s);
+      }),
+    );
+  });
+  return chain;
+}
+
+export async function runCi(rootDir: string, options: CiOptions = {}): Promise<CiSummary[]> {
+  const summaries: CiSummary[] = [];
+  const retryOpts = options.retry ?? { retries: 3, minTimeout: 1000 };
+
+  const cache = readCache(rootDir);
+  const all = await retry(() => checkAll(rootDir, config), retryOpts);
+  const { remaining, held } = await suppressHeldCandidates(all);
+  const allBatches = groupCandidates(remaining);
+
+  const batchesToProcess: GroupBatch[] = [];
+  for (const batch of allBatches) {
+    if (areAllCandidatesCached(batch.candidates, cache)) {
+      console.log(`[${batch.groupName}] All candidates already cached — skipping batch`);
+      summaries.push({
+        groupName: batch.groupName,
+        branch: branchName(batch.groupName),
+        prNumber: null,
+        skipped: true,
+      });
+    } else {
+      batchesToProcess.push(batch);
+    }
+  }
+
+  for (const h of held) {
+    summaries.push({
+      groupName: h.group,
+      branch: branchName(h.group),
+      prNumber: null,
+      skipped: true,
+    });
+  }
+
+  if (batchesToProcess.length > 0) {
+    await scheduleBatches(batchesToProcess, rootDir, options, retryOpts, summaries);
+
+    const batchByGroup = new Map(batchesToProcess.map((b) => [b.groupName, b]));
+    for (const s of summaries) {
+      if (!s.skipped && !s.error) {
+        const batch = batchByGroup.get(s.groupName);
+        if (batch) {
+          updateCacheFromBatch(cache, batch.candidates, batch.groupName, s.prNumber);
+        }
+      }
+    }
+  }
+
+  writeCache(rootDir, cache);
+  console.log(
+    `Cache written to ${cachePath(rootDir)} with ${Object.keys(cache.packages).length} packages`,
+  );
+  return summaries;
+}
+
+if (__ciMain) {
+  const { findMonorepoRoot } = await import("../../../scripts/utils/paths.mjs");
+  const rootDir = findMonorepoRoot();
+  const options: CiOptions = {};
+  if (process.argv.includes("--dry-run") || process.argv.includes("--report-only")) {
+    options.dryRun = true;
+    options.reportOnly = true;
+  }
+  if (process.env.GITHUB_RUN_ID) options.gitHubRunId = process.env.GITHUB_RUN_ID;
+  if (process.env.GITHUB_SHA) options.gitHubSha = process.env.GITHUB_SHA;
+  if (process.env.PAT_TOKEN) options.patToken = process.env.PAT_TOKEN;
+  else if (process.env.GH_TOKEN) options.patToken = process.env.GH_TOKEN;
+
+  const summaries = await runCi(rootDir, options);
+
+  for (const s of summaries) {
+    if (s.skipped) {
+      console.log(`${s.groupName}: skipped`);
+    } else if (s.error) {
+      console.log(`${s.groupName}: error (${s.error})`);
+    } else {
+      console.log(`${s.groupName}: success${s.prNumber ? ` (PR #${s.prNumber})` : ""}`);
+    }
+  }
+}

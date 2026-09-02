@@ -93,3 +93,18 @@
   font-size: var(--typo-body-sm-font-size);
   color: var(--content-default);
 }
+
+@media (max-width: 640px) {
+  .mediaCover {
+    display: none;
+  }
+
+  .mobileActions {
+    justify-content: space-between;
+    gap: var(--space-scale-sm, 0.5rem);
+  }
+
+  .mobileActions > button {
+    flex: 1 1 0;
+  }
+}

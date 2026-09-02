@@ -1,6 +1,7 @@
 import { resolveLocale, type Locale } from "@sd/core-i18n";
 import * as SecureStore from "expo-secure-store";
 
+/** Initializes native localization, locale persistence, and translated message lookup. */
 const KEY = "locale";
 
 function getDeviceLocale(): string | null {
@@ -11,6 +12,7 @@ function getDeviceLocale(): string | null {
   }
 }
 
+/** Returns the the stored locale used by native consumers. */
 export async function getStoredLocale(): Promise<Locale> {
   try {
     const stored = await SecureStore.getItemAsync(KEY);
@@ -24,6 +26,7 @@ export async function getStoredLocale(): Promise<Locale> {
   return resolveLocale(getDeviceLocale());
 }
 
+/** Defines the native store locale contract used by this module. */
 export async function storeLocale(locale: Locale): Promise<void> {
   try {
     await SecureStore.setItemAsync(KEY, locale);

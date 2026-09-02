@@ -20,7 +20,11 @@ jest.mock("@/core/auth/use-auth", () => ({
   useAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false, user: undefined })),
 }));
 
-jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
+}));
+
+jest.mock("@/shared/ui/native-screen-view", () => ({
   ScreenView: ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");

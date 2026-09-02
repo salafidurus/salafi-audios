@@ -1,6 +1,9 @@
 import type { Matchers } from "bun:test";
 
+/** Extends Bun's matcher types with the DOM assertions used by web tests. */
 declare global {
+  type DomMatcherValue = string | number | boolean | null | undefined;
+
   namespace BunTestMatchers {
     interface DOMMatchers<R> {
       toBeInTheDocument(): R;
@@ -12,11 +15,11 @@ declare global {
       toHaveTextContent(text: string | RegExp): R;
       toContainElement(element: Element | null): R;
       toBePartiallyChecked(): R;
-      toHaveFormValues(values: Record<string, any>): R;
+      toHaveFormValues(values: Record<string, DomMatcherValue>): R;
       toBeInvalid(): R;
       toBeValid(): R;
       toHaveErrorMessage(message: string): R;
-      toHaveStyle(style: string | Record<string, any>): R;
+      toHaveStyle(style: string | Record<string, DomMatcherValue>): R;
       toHaveDisplayValue(value: string | number | string[] | number[]): R;
       toBeEmptyDOMElement(): R;
       toBeInTheDOM(): R;

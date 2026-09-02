@@ -1,10 +1,11 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import Image from "next/image";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { FormSection } from "@/features/admin/components/FormSection";
-import { InputField } from "@/shared/components/InputField";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
 
@@ -82,6 +83,7 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
     <FormSection title={t("admin.scholars.socialMedia", "Social Media")}>
       <div className={styles.fieldsGrid}>
         {SOCIAL_FIELDS.map((field) => {
+          // SAFETY: SOCIAL_FIELDS only enumerates social URL fields that exist on FormState.
           const fieldKey = field.key as keyof Pick<
             FormState,
             "socialTwitter" | "socialTelegram" | "socialYoutube" | "socialWebsite"

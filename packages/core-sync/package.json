@@ -17,6 +17,7 @@
     "test:prepush": "bun test"
   },
   "dependencies": {
+    "zod": "catalog:",
     "zustand": "catalog:"
   },
   "devDependencies": {}

@@ -1,29 +1,36 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
-import type { Locale, SearchCatalogItemDto } from '@sd/core-contracts';
+import type { Locale, SearchCatalogItemDto, SearchQueryDto } from '@sd/core-contracts';
 import { ConfigService } from '../../core/config/config.service';
 import { PrismaService } from '../../core/db/prisma.service';
-import type { SearchQueryDto } from './dto/search-query.dto';
 import { isTrigramSearchFailure } from './search-error.utils';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
+import { AppLoggerService } from '../../core/logger/app-logger.service';
 
+/** search application module responsible for search.repo behavior at the backend boundary. */
 const SIMILARITY_THRESHOLD = 0.12;
 
 type SearchRow = SearchCatalogItemDto & {
+  /** Documents the originalLanguage field's API projection semantics and lifecycle meaning. */
   originalLanguage: Locale | null;
   scholarId: string;
+  /** Documents the scholarOriginalLanguage field's API projection semantics and lifecycle meaning. */
   scholarOriginalLanguage: Locale | null;
 };
 
-@Injectable()
-export class SearchRepository {
-  private readonly logger = new Logger(SearchRepository.name);
+type SearchQueryRow = SearchRow & { format: string };
 
+@Injectable()
+/** NestJS search repository service or controller coordinating the API boundary for this responsibility. */
+export class SearchRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
-  ) {}
+    private readonly logger: AppLoggerService,
+  ) {
+    this.logger.setContext(SearchRepository.name);
+  }
 
   async searchListings(
     query: SearchQueryDto,
@@ -55,6 +62,7 @@ export class SearchRepository {
             s."id" AS "scholarId",
             s."name" AS "scholarName",
             s."slug" AS "scholarSlug",
+            s."title" AS "scholarTitle",
             s."mainLanguage" AS "scholarOriginalLanguage",
             CASE WHEN lst."format" = 'single' THEN NULL ELSE lst."coverImageUrl" END AS "coverImageUrl",
             s."imageUrl" AS "scholarImageUrl",
@@ -89,6 +97,7 @@ export class SearchRepository {
           "scholarId",
           "scholarName",
           "scholarSlug",
+          "scholarTitle",
           "scholarOriginalLanguage",
           "coverImageUrl",
           "scholarImageUrl",
@@ -108,6 +117,7 @@ export class SearchRepository {
             s."id" AS "scholarId",
             s."name" AS "scholarName",
             s."slug" AS "scholarSlug",
+            s."title" AS "scholarTitle",
             s."mainLanguage" AS "scholarOriginalLanguage",
             CASE WHEN lst."format" = 'single' THEN NULL ELSE lst."coverImageUrl" END AS "coverImageUrl",
             s."imageUrl" AS "scholarImageUrl",
@@ -142,6 +152,7 @@ export class SearchRepository {
           "scholarId",
           "scholarName",
           "scholarSlug",
+          "scholarTitle",
           "scholarOriginalLanguage",
           "coverImageUrl",
           "scholarImageUrl",
@@ -152,6 +163,17 @@ export class SearchRepository {
       `),
     );
 
+    return this.normalizeSearchRows(rows, locale);
+  }
+
+  private async normalizeSearchRows(
+    rows: SearchQueryRow[],
+    locale: Locale,
+  ): Promise<{
+    collections: SearchCatalogItemDto[];
+    series: SearchCatalogItemDto[];
+    singles: SearchCatalogItemDto[];
+  }> {
     // Batch fetch all translations at once (no per-format loop)
     const ids = rows.map((row) => row.id);
     const scholarIds = [...new Set(rows.map((row) => row.scholarId))];
@@ -187,13 +209,7 @@ export class SearchRepository {
         original: resolved.original ? { title: resolved.original.title } : undefined,
       });
 
-      if (format === 'collection') {
-        collections.push(normalized);
-      } else if (format === 'series') {
-        series.push(normalized);
-      } else if (format === 'single') {
-        singles.push(normalized);
-      }
+      pushSearchItem({ collections, series, singles }, format, normalized);
     }
 
     return { collections, series, singles };
@@ -206,7 +222,7 @@ export class SearchRepository {
     try {
       return await primary();
     } catch (error) {
-      if (!isTrigramSearchFailure(error)) {
+      if (!(error instanceof Error) || !isTrigramSearchFailure(error)) {
         throw error;
       }
 
@@ -482,4 +498,13 @@ export class SearchRepository {
     if (!value) return undefined;
     return this.toPublicUrl(value);
   }
+}
+
+function pushSearchItem(
+  buckets: Record<string, SearchCatalogItemDto[]>,
+  format: string,
+  item: SearchCatalogItemDto,
+): void {
+  const bucket = buckets[`${format}s`];
+  bucket?.push(item);
 }

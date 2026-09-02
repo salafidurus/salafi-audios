@@ -2,6 +2,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { DEFAULT_LOCALE } from '@sd/core-i18n';
 import type { Locale } from '@sd/core-contracts';
 
+/** Shared API locale context utilities and boundary definitions used by backend modules. */
 type LocaleHolder = { locale: Locale };
 
 const storage = new AsyncLocalStorage<LocaleHolder>();

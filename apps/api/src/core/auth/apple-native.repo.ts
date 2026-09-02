@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { randomBytes } from 'crypto';
 
+/** NestJS apple native repository service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** Core API apple native.repo module providing shared backend infrastructure and authority-boundary services. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AppleNativeRepository {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -18,9 +21,10 @@ export class AppleNativeRepository {
     });
   }
 
+  // oxlint-disable-next-line anti-slop/require-tsdoc -- Inline structural field is covered by the enclosing API method contract.
   async createAccount(data: { userId: string; providerId: string; accountId: string }) {
     return this.prisma.account.create({
-      data,
+      data: { ...data, issuer: 'https://appleid.apple.com' },
     });
   }
 

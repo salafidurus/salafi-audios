@@ -48,6 +48,7 @@ describe('AudioRepository', () => {
       },
       userListingProgress: {
         findUnique: vi.fn<any>(),
+        findMany: vi.fn<any>(),
         upsert: vi.fn<any>().mockResolvedValue(undefined),
       },
       $executeRaw: vi.fn<any>(),
@@ -202,22 +203,46 @@ describe('AudioRepository', () => {
     });
   });
 
+  describe('getUserProgress', () => {
+    it('returns public listing slugs without internal listing IDs', async () => {
+      prisma.userListingProgress.findMany.mockResolvedValue([
+        {
+          listingId: 'listing1',
+          positionSeconds: 10,
+          isCompleted: false,
+          updatedAt: new Date('2026-08-26T00:00:00.000Z'),
+          listing: { slug: 'tafsir-al-fatiha', durationSeconds: 100 },
+        },
+      ]);
+
+      await expect(repo.getUserProgress('user1')).resolves.toEqual([
+        {
+          listingSlug: 'tafsir-al-fatiha',
+          positionSeconds: 10,
+          durationSeconds: 100,
+          completedAt: undefined,
+          updatedAt: '2026-08-26T00:00:00.000Z',
+        },
+      ]);
+    });
+  });
+
   describe('bulkSync', () => {
     it("fetches canonical durations for all items' listings in one batched query", async () => {
       prisma.listing.findMany.mockResolvedValue([
-        { id: 'l1', durationSeconds: 100 },
-        { id: 'l2', durationSeconds: 200 },
+        { id: 'l1', slug: 'l1-slug', durationSeconds: 100 },
+        { id: 'l2', slug: 'l2-slug', durationSeconds: 200 },
       ]);
 
       await repo.bulkSync('user1', [
         {
-          listingId: 'l1',
+          listingSlug: 'l1-slug',
           positionSeconds: 10,
           durationSeconds: 999,
           updatedAt: new Date().toISOString(),
         },
         {
-          listingId: 'l2',
+          listingSlug: 'l2-slug',
           positionSeconds: 20,
           durationSeconds: 999,
           updatedAt: new Date().toISOString(),
@@ -225,17 +250,42 @@ describe('AudioRepository', () => {
       ]);
 
       expect(prisma.listing.findMany).toHaveBeenCalledWith({
-        where: { id: { in: ['l1', 'l2'] } },
-        select: { id: true, durationSeconds: true },
+        where: { slug: { in: ['l1-slug', 'l2-slug'] } },
+        select: { id: true, slug: true, durationSeconds: true },
       });
     });
 
-    it('derives isCompleted from the canonical duration, not the client-supplied one, when completedAt is absent', async () => {
-      prisma.listing.findMany.mockResolvedValue([{ id: 'l1', durationSeconds: 100 }]);
+    it('resolves slug-based sync items to canonical internal listings', async () => {
+      prisma.listing.findMany.mockResolvedValue([
+        { id: 'l1', slug: 'tafsir-al-fatiha', durationSeconds: 100 },
+      ]);
 
       await repo.bulkSync('user1', [
         {
-          listingId: 'l1',
+          listingSlug: 'tafsir-al-fatiha',
+          positionSeconds: 10,
+          durationSeconds: 999,
+          updatedAt: new Date().toISOString(),
+        },
+      ]);
+
+      expect(prisma.listing.findMany).toHaveBeenCalledWith({
+        where: { slug: { in: ['tafsir-al-fatiha'] } },
+        select: { id: true, slug: true, durationSeconds: true },
+      });
+      const [, ...values] = prisma.$executeRaw.mock.calls[0];
+      expect(values).toContain('l1');
+      expect(values).not.toContain('unresolved-listing-id');
+    });
+
+    it('derives isCompleted from the canonical duration, not the client-supplied one, when completedAt is absent', async () => {
+      prisma.listing.findMany.mockResolvedValue([
+        { id: 'l1', slug: 'l1-slug', durationSeconds: 100 },
+      ]);
+
+      await repo.bulkSync('user1', [
+        {
+          listingSlug: 'l1-slug',
           positionSeconds: 95, // 95% of the canonical 100s duration
           durationSeconds: 5, // client-reported duration is wildly different — must be ignored
           updatedAt: new Date().toISOString(),
@@ -247,11 +297,13 @@ describe('AudioRepository', () => {
     });
 
     it('includes a monotonic OR-guard around the isCompleted CASE so a stale sync cannot un-complete a lesson', async () => {
-      prisma.listing.findMany.mockResolvedValue([{ id: 'l1', durationSeconds: 100 }]);
+      prisma.listing.findMany.mockResolvedValue([
+        { id: 'l1', slug: 'l1-slug', durationSeconds: 100 },
+      ]);
 
       await repo.bulkSync('user1', [
         {
-          listingId: 'l1',
+          listingSlug: 'l1-slug',
           positionSeconds: 1,
           durationSeconds: 100,
           updatedAt: new Date().toISOString(),
@@ -264,14 +316,28 @@ describe('AudioRepository', () => {
     });
   });
 
-  describe('findListingById', () => {
-    it('resolves strictly by slug', async () => {
+  describe('findListingBySlug', () => {
+    it('resolves strictly by slug through the published-only seam', async () => {
       prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
 
-      await repo.findListingById('tafsir-al-fatiha');
+      await repo.findListingBySlug('tafsir-al-fatiha');
+
+      // The stream route is public discovery — a draft or archived Listing
+      // must resolve as not found, never by internal-ID compatibility.
+      expect(prisma.listing.findFirst).toHaveBeenCalledWith({
+        where: { slug: 'tafsir-al-fatiha', deletedAt: null, status: 'published' },
+        select: { id: true, durationSeconds: true },
+      });
+    });
+
+    it('treats an ID-shaped progress route value as an opaque slug', async () => {
+      const uuidShaped = 'a0000000-0000-0000-0000-000000000000';
+      prisma.listing.findFirst.mockResolvedValue(null);
+
+      await expect(repo.upsertProgress('user1', uuidShaped, 10)).resolves.toBe(false);
 
       expect(prisma.listing.findFirst).toHaveBeenCalledWith({
-        where: { slug: 'tafsir-al-fatiha' },
+        where: { slug: uuidShaped },
         select: { id: true, durationSeconds: true },
       });
     });
@@ -300,6 +366,30 @@ describe('AudioRepository', () => {
 
       expect(prisma.$transaction).toHaveBeenCalled();
       expect(redis.eval).toHaveBeenCalledTimes(2);
+    });
+
+    it('skips malformed due members without aborting the flush', async () => {
+      redis.enabled = true;
+      redis.set.mockResolvedValue('OK');
+      redis.zrangebyscore.mockResolvedValue([
+        JSON.stringify({ userId: 'user1', listingId: 'listing1' }),
+        'not-json',
+      ]);
+      redis.mget.mockResolvedValue([
+        JSON.stringify({
+          version: 'version-1',
+          userId: 'user1',
+          listingId: 'listing1',
+          positionSeconds: 120,
+          isCompleted: false,
+          updatedAt: '2026-08-10T10:00:00.000Z',
+        }),
+      ]);
+      prisma.listing.findMany.mockResolvedValue([{ id: 'listing1', durationSeconds: 300 }]);
+
+      await repo.flushBufferedProgress();
+
+      expect(prisma.$transaction).toHaveBeenCalledTimes(1);
     });
 
     it('retains pending Redis data when PostgreSQL fails', async () => {

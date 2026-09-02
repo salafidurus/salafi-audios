@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { getLocalizedName } from "@sd/core-i18n";
@@ -14,29 +15,99 @@ import { Search } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { useDebouncedSearch } from "@/shared/hooks";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
+import { formatDuration } from "@/shared/utils/format";
 
 import styles from "./search-processing.screen.module.css";
 
+/** Inputs for the client-side search screen and its initial topic filter. */
 export type SearchProcessingScreenProps = {
+  /** Initial free-text query, typically restored from the URL. */
   searchKey?: string;
+  /** Optional topic slug used to constrain the initial result set. */
   topicSlug?: string;
 };
 
-function formatDuration(durationSeconds?: number): string {
-  if (!durationSeconds || durationSeconds <= 0) {
-    return "";
-  }
-  const hours = Math.floor(durationSeconds / 3600);
-  const minutes = Math.round((durationSeconds % 3600) / 60);
-  if (hours > 0) {
-    return `${hours}h ${String(minutes).padStart(2, "0")}m`;
-  }
-  if (minutes <= 0) {
-    return "";
-  }
-  return `${minutes}m`;
+function PopularSearches({
+  searches,
+  onSelect,
+  t,
+}: {
+  searches: string[];
+  onSelect: (search: string) => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <div className={styles.popularSearches}>
+      <p className={styles.popularLabel}>{t("search.popularSearches", "POPULAR SEARCHES")}</p>
+      <div className={styles.popularChips}>
+        {searches.map((term) => (
+          <button
+            key={term}
+            type="button"
+            className={styles.popularChip}
+            onClick={() => onSelect(term)}
+          >
+            {term}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
 
+function SearchResults({
+  items,
+  isLoading,
+  hasMore,
+  fetchNextPage,
+  isFetchingNextPage,
+  renderItem,
+  emptyMessage,
+}: {
+  items: ReturnType<typeof useInfiniteSearch>["data"] extends infer Data
+    ? Data extends { pages: Array<{ items: infer Items }> }
+      ? Items extends Array<infer Item>
+        ? Item[]
+        : never
+      : never
+    : never;
+  isLoading: boolean;
+  hasMore: boolean;
+  fetchNextPage: () => void;
+  isFetchingNextPage: boolean;
+  renderItem: (item: (typeof items)[number]) => React.ReactNode;
+  emptyMessage: string;
+}) {
+  return (
+    <InfiniteScrollList
+      data={items}
+      isLoading={isLoading}
+      hasMore={hasMore}
+      onLoadMore={fetchNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      renderItem={renderItem}
+      emptyMessage={emptyMessage}
+    />
+  );
+}
+
+function toggleSingleFilter(selected: string[], chipId: string) {
+  return selected.includes(chipId) ? [] : [chipId];
+}
+
+function getTopicSlugs(filter: string[]) {
+  return filter.length ? filter : undefined;
+}
+
+function getSearchItems(data: ReturnType<typeof useInfiniteSearch>["data"]) {
+  return data?.pages.flatMap((page) => page.items) ?? [];
+}
+
+/**
+ * Renders debounced lecture search with localized topic filters and paginated
+ * results. The URL-provided values seed local state; subsequent input remains
+ * controlled by the screen until navigation changes the page.
+ */
 export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessingScreenProps) {
   const showOriginal = useShowOriginalContent();
   const { i18n, t } = useTranslation();
@@ -70,10 +141,10 @@ export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessin
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteSearch({
     query: debouncedQuery,
     showOriginal,
-    topicSlugs: filter.length ? filter : undefined,
+    topicSlugs: getTopicSlugs(filter),
   });
 
-  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
+  const allItems = getSearchItems(data);
 
   const handleItemPress = (slug: string) => {
     navigateToListing(slug);
@@ -106,43 +177,25 @@ export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessin
             chips={filterChips}
             selected={filter}
             onChipChange={(chipId: string) => {
-              setFilter(filter.includes(chipId) ? [] : [chipId]);
+              setFilter(toggleSingleFilter(filter, chipId));
             }}
           />
         </StickyHeaderLayout.Header>
 
         <StickyHeaderLayout.Content>
           {!debouncedQuery.trim() ? (
-            <div className={styles.popularSearches}>
-              <p className={styles.popularLabel}>
-                {t("search.popularSearches", "POPULAR SEARCHES")}
-              </p>
-              <div className={styles.popularChips}>
-                {popularSearches.map((term) => (
-                  <button
-                    key={term}
-                    type="button"
-                    className={styles.popularChip}
-                    onClick={() => setQuery(term)}
-                  >
-                    {term}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <PopularSearches searches={popularSearches} onSelect={setQuery} t={t} />
           ) : (
-            <InfiniteScrollList
-              data={allItems}
+            <SearchResults
+              items={allItems}
               isLoading={isLoading}
               hasMore={hasNextPage ?? false}
-              onLoadMore={() => fetchNextPage()}
+              fetchNextPage={() => {
+                void fetchNextPage();
+              }}
               isFetchingNextPage={isFetchingNextPage}
               renderItem={renderItem}
-              emptyMessage={
-                debouncedQuery.trim()
-                  ? t("search.noResults", "No results found for your search")
-                  : t("search.enterQuery", "Enter a search query to begin")
-              }
+              emptyMessage={t("search.noResults", "No results found for your search")}
             />
           )}
         </StickyHeaderLayout.Content>

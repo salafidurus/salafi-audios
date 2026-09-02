@@ -24,4 +24,5 @@ snip -- codegraph sync
 
 - One `codegraph_explore` call usually answers the question. Do not grep + read when codegraph already indexed it.
 - After editing files, run `codegraph sync` (or wait ~1s for the file watcher) before querying for updated symbols.
-- For fuzzy or semantic search when you don't know the exact symbol name, use `ccc` (see ccc-rules.md).
+- For fuzzy or semantic search when you don't know the exact symbol name, use
+  the repository's available search tooling after checking the codegraph index.

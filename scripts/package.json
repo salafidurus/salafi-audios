@@ -1,0 +1,16 @@
+{
+  "name": "@sd/scripts",
+  "private": true,
+  "scripts": {
+    "sync-agents": "bun sync-agents.mjs",
+    "dead-code-audit": "bun dead-code-audit/cli.mjs --root ..",
+    "test:dead-code-audit": "bun test dead-code-audit/*.spec.mjs",
+    "verify-build-configs": "bun verify-build-configs.mjs",
+    "test:deploy": "bun test deploy/install.spec.mjs",
+    "deploy:install": "bun deploy/install.mjs",
+    "deploy:build": "bun deploy/build.mjs",
+    "lint": "oxlint . && oxfmt --check .",
+    "test": "bun test",
+    "test:prepush": "bun test"
+  }
+}

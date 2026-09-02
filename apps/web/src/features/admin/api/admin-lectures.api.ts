@@ -3,7 +3,6 @@ import type {
   PresignedUrlResponseDto,
   CreateListingDto,
   UpdateListingDetailsDto,
-  AdminListingMediaDetailDto,
   UpdateListingMediaDto,
   AdminListingListDto,
   AdminListingDetailDto,
@@ -16,7 +15,10 @@ import type {
 } from "@sd/core-contracts";
 
 import { httpClient, endpoints } from "@sd/core-contracts";
+import { z } from "zod";
 
+/** Exposes listing administration, media upload, and arrange API operations. */
+/** Fetches a short-lived object-storage URL authorized for one audio upload. */
 export function getPresignedUrl(data: PresignedUrlRequestDto) {
   return httpClient<PresignedUrlResponseDto>({
     url: endpoints.admin.media.presignedUrl,
@@ -25,6 +27,7 @@ export function getPresignedUrl(data: PresignedUrlRequestDto) {
   });
 }
 
+/** Uploads audio directly to object storage after the API has authorized the URL. */
 export async function uploadToR2(
   uploadUrl: string,
   file: Blob,
@@ -42,6 +45,7 @@ export async function uploadToR2(
   }
 }
 
+/** Requests object-storage URLs for a batch of staged audio items. */
 export function getBatchPresignedUrls(data: BatchPresignAudioRequestDto) {
   return httpClient<BatchPresignAudioResponseDto>({
     url: endpoints.admin.media.presignBatch,
@@ -79,6 +83,7 @@ export function uploadToR2WithProgress(
   });
 }
 
+/** Loads the existing lessons and modules needed to arrange a listing. */
 export function fetchArrangeData(id: string) {
   return httpClient<AdminArrangeDataDto>({
     url: endpoints.admin.listings.arrangeData(id),
@@ -86,6 +91,7 @@ export function fetchArrangeData(id: string) {
   });
 }
 
+/** Identifies a commit conflict so the editor can mark the conflicting slugs. */
 export class ArrangeConflictError extends Error {
   constructor(public readonly conflictingSlugs: string[]) {
     super("Some slugs are already in use");
@@ -93,6 +99,25 @@ export class ArrangeConflictError extends Error {
   }
 }
 
+const ArrangeConflictBodySchema = z.object({
+  conflictingSlugs: z.array(z.string()).optional(),
+});
+
+function raiseArrangeConflict(message: string): void {
+  if (!message.startsWith("API 409")) return;
+  const jsonStart = message.indexOf("{");
+  if (jsonStart === -1) return;
+  try {
+    const body = ArrangeConflictBodySchema.parse(JSON.parse(message.slice(jsonStart)));
+    if (body.conflictingSlugs?.length) {
+      throw new ArrangeConflictError(body.conflictingSlugs);
+    }
+  } catch (parseErr) {
+    if (parseErr instanceof ArrangeConflictError) throw parseErr;
+  }
+}
+
+/** Commits staged lesson, module, ordering, and media changes atomically. */
 export async function commitArrange(id: string, data: ArrangeCommitDto) {
   try {
     return await httpClient<ArrangeCommitResultDto>({
@@ -103,24 +128,13 @@ export async function commitArrange(id: string, data: ArrangeCommitDto) {
   } catch (err) {
     // httpClient flattens non-2xx bodies into the error message — recover the
     // structured conflictingSlugs payload from a 409 so the UI can highlight rows.
-    const message = (err as Error)?.message ?? "";
-    if (message.startsWith("API 409")) {
-      const jsonStart = message.indexOf("{");
-      if (jsonStart !== -1) {
-        try {
-          const body = JSON.parse(message.slice(jsonStart)) as { conflictingSlugs?: string[] };
-          if (body.conflictingSlugs?.length) {
-            throw new ArrangeConflictError(body.conflictingSlugs);
-          }
-        } catch (parseErr) {
-          if (parseErr instanceof ArrangeConflictError) throw parseErr;
-        }
-      }
-    }
+    const message = err instanceof Error ? err.message : "";
+    raiseArrangeConflict(message);
     throw err;
   }
 }
 
+/** Creates a listing and returns its administrative detail representation. */
 export function createLecture(data: CreateListingDto) {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.create,
@@ -129,6 +143,7 @@ export function createLecture(data: CreateListingDto) {
   });
 }
 
+/** Updates metadata fields without changing the listing's uploaded media. */
 export function updateListingDetails(id: string, data: UpdateListingDetailsDto) {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.updateDetails(id),
@@ -137,6 +152,7 @@ export function updateListingDetails(id: string, data: UpdateListingDetailsDto) 
   });
 }
 
+/** Updates the media references associated with an existing listing. */
 export function updateListingMedia(id: string, data: UpdateListingMediaDto) {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.updateMedia(id),
@@ -145,47 +161,27 @@ export function updateListingMedia(id: string, data: UpdateListingMediaDto) {
   });
 }
 
-export function fetchListingMediaData(id: string) {
-  return httpClient<AdminListingMediaDetailDto>({
-    url: endpoints.admin.listings.mediaData(id),
-    method: "GET",
-  });
-}
-
-export function publishLecture(id: string) {
-  return httpClient<AdminListingDetailDto>({
-    url: endpoints.admin.listings.publish(id),
-    method: "POST",
-  });
-}
-
-export function archiveLecture(id: string) {
-  return httpClient<AdminListingDetailDto>({
-    url: endpoints.admin.listings.archive(id),
-    method: "POST",
-  });
-}
-
-export function fetchAdminLectures(params?: {
+function buildLectureListQuery(params?: {
   cursor?: string;
   search?: string;
-  status?: string;
+  /** Filters by the server's listing publication status. */ status?: string;
   scholarId?: string;
 }) {
   const query = new URLSearchParams();
-  if (params?.cursor) {
-    query.append("cursor", params.cursor);
+  for (const [key, value] of Object.entries(params ?? {})) {
+    if (value) query.append(key, value);
   }
-  if (params?.search) {
-    query.append("search", params.search);
-  }
-  if (params?.status) {
-    query.append("status", params.status);
-  }
-  if (params?.scholarId) {
-    query.append("scholarId", params.scholarId);
-  }
-  const queryString = query.toString();
+  return query.toString();
+}
+
+/** Fetches the filtered, cursor-paginated listing inventory for administrators. */
+export function fetchAdminLectures(params?: {
+  cursor?: string;
+  search?: string;
+  /** Filters by the server's listing publication status. */ status?: string;
+  scholarId?: string;
+}) {
+  const queryString = buildLectureListQuery(params);
   const url = queryString
     ? `${endpoints.admin.listings.list}?${queryString}`
     : endpoints.admin.listings.list;
@@ -196,13 +192,7 @@ export function fetchAdminLectures(params?: {
   });
 }
 
-export function fetchAdminLectureDetail(id: string) {
-  return httpClient<AdminListingDetailDto>({
-    url: endpoints.admin.listings.detail(id),
-    method: "GET",
-  });
-}
-
+/** Loads the normalized form options and current values for a listing editor. */
 export function fetchListingFormData(id: string) {
   return httpClient<ListingFormDataDto>({
     url: endpoints.admin.listings.formData(id),
@@ -210,6 +200,7 @@ export function fetchListingFormData(id: string) {
   });
 }
 
+/** Loads promotion settings used by the administrative listing tools. */
 export function getAdminPromotions() {
   return httpClient<any>({
     url: endpoints.admin.listings.promotions,
@@ -217,6 +208,7 @@ export function getAdminPromotions() {
   });
 }
 
+/** Persists promotion settings through the administrative API. */
 export function updateAdminPromotions(body: any) {
   return httpClient<any>({
     url: endpoints.admin.listings.promotions,

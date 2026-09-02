@@ -27,13 +27,6 @@ vi.mock("@/shared/hooks/use-formatted-scholar-name", () => ({
   useFormattedScholarName: vi.fn().mockReturnValue("Scholar Name"),
 }));
 
-vi.mock("../../hooks/use-home-promotions", () => ({
-  useHomePromotions: () => ({
-    data: { hero: null, editorsPicks: [] },
-    isLoading: false,
-  }),
-}));
-
 const mockUseExploreRecentScreen = useExploreRecentScreen as unknown as ReturnType<typeof vi.fn>;
 
 const mockContentItems = Array.from({ length: 14 }, (_, index) => ({
@@ -76,8 +69,8 @@ describe("RecentlyAddedSection", () => {
     render(<RecentlyAddedSection />);
 
     expect(screen.getByText("Recently Added")).toBeTruthy();
-    const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBe(14);
+    expect(screen.getAllByText(/Recent Lecture/)).toHaveLength(14);
+    expect(screen.getByRole("button", { name: "Play Recent Lecture 0" })).toBeTruthy();
   });
 
   it("renders a featured card plus rows", () => {
@@ -86,11 +79,12 @@ describe("RecentlyAddedSection", () => {
     expect(screen.getByText("Recently Added")).toBeTruthy();
   });
 
-  it("renders nothing when there is no data", () => {
+  it("renders an intentional empty state when there is no data", () => {
     mockUseExploreRecentScreen.mockReturnValue({ data: undefined });
 
     render(<RecentlyAddedSection />);
 
-    expect(screen.queryByText("Recently Added")).toBeNull();
+    expect(screen.getByText("Recently Added")).toBeTruthy();
+    expect(screen.getByTestId("home-recent-empty")).toBeTruthy();
   });
 });

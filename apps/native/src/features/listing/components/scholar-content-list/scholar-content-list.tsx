@@ -1,5 +1,6 @@
 import type { ScholarContentItemDto } from "@sd/core-contracts";
 
+import { Host } from "@expo/ui";
 import { pickContentField } from "@sd/core-i18n";
 import { useState, useCallback } from "react";
 import { FlatList, Pressable, View } from "react-native";
@@ -7,17 +8,17 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { AppText } from "@/shared/components/AppText/AppText";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
-import { List } from "@/shared/components/List";
-import { MarqueeText } from "@/shared/components/MarqueeText";
-import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
+import { AppText, List, TextInput } from "@/shared/ui";
 
+/** Describes the inputs and callbacks accepted by Scholar Content List. */
+/** Describes the inputs, callbacks, and optional state accepted by Scholar Content List. */
 export type ScholarContentListProps = {
   items: ScholarContentItemDto[];
 };
 
+/** Renders the native scholar content list surface and coordinates its user-facing state. */
 export function ScholarContentList({ items }: ScholarContentListProps) {
   const { theme } = useUnistyles();
   const { navigateToListing } = useListingNavigation();
@@ -105,22 +106,22 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
             value={filter}
             onChangeText={setFilter}
           />
-          <List>
-            {filteredBrowse.map((item, index) => {
+          <View>
+            {filteredBrowse.map((item) => {
               const title = pickContentField(item.title, item.original?.title, showOriginal);
               return (
-                <List.Item
-                  key={item.id}
-                  onPress={() => navigateToListing(item.slug)}
-                  hideBorder={index === filteredBrowse.length - 1}
-                >
-                  <View style={styles.rowContent}>
-                    <MarqueeText text={title} variant="titleMd" />
-                  </View>
-                </List.Item>
+                <Host key={item.id} matchContents>
+                  <List.Item
+                    title={title}
+                    onPress={() => navigateToListing(item.slug)}
+                    testID={`scholar-content-row-${item.slug}`}
+                  >
+                    {null}
+                  </List.Item>
+                </Host>
               );
             })}
-          </List>
+          </View>
         </View>
       )}
     </View>
@@ -167,13 +168,5 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.scale.sm,
     color: theme.colors.content.default,
     marginBottom: theme.spacing.scale.sm,
-  },
-  rowContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.scale.sm,
-  },
-  titleText: {
-    flex: 1,
   },
 }));

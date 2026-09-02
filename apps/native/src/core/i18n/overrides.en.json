@@ -4,11 +4,13 @@
     "profileDesc": "Manage your personal profile information.",
     "saved": "Saved.",
     "signInToAccess": "Sign in to access your profile",
+    "clickToSignIn": "Click to sign in",
     "profile": {
       "signInTitle": "Sign in to view your profile"
     }
   },
   "admin": {
+    "title": "Admin",
     "manageAudios": "Manage audio content",
     "manageSeries": "Manage scholars & series",
     "scholarDetail": "Scholar Detail",
@@ -51,18 +53,56 @@
     }
   },
   "explore": {
-    "searchRecent": "Search recent audios..."
+    "searchRecent": "Search recent audios...",
+    "title": "Explore",
+    "exploreByTopic": "Explore by topic",
+    "exploreByTopicDescription": "Choose a topic to shape your study feed."
   },
-  "navigation": {
-    "show_miniplayer": "Show mini player",
-    "show_subroutes": "Show section subroutes"
+  "home": {
+    "description": "Begin your study journey.",
+    "eyebrow": "YOUR STUDY SPACE",
+    "title": "Build a steady listening path",
+    "intro": "Return to a lesson or find a thoughtful place to begin today.",
+    "loading": "Loading your study space…",
+    "error": "Home could not be loaded.",
+    "continue": { "title": "Continue Listening" },
+    "discovery": { "title": "FEATURED FOR STUDY", "empty": "No lessons are available yet." },
+    "scholars": { "title": "Scholars" },
+    "recent": {
+      "title": "Recently Added",
+      "empty": "New lessons will appear here as they are published."
+    },
+    "curated": { "title": "Curated for Study", "empty": "Curated lessons will appear here soon." },
+    "mobile": {
+      "title": "Keep your study close",
+      "description": "Downloaded audio and local progress remain available for mobile continuity."
+    }
   },
   "scholarContent": {
+    "description": "Explore our scholars.",
     "filterPlaceholder": "Filter content…",
     "searchNoMatch": "No scholars match your search.",
-    "searchScholars": "Search scholars..."
+    "searchScholars": "Search scholars...",
+    "searchDescription": "Browse scholars and find their latest lessons."
+  },
+  "common": { "loadMore": "Load more", "navigateUp": "Navigate up" },
+  "legal": { "lastUpdated": "Last updated" },
+  "search": {
+    "label": "Search",
+    "description": "Search the catalog",
+    "open": "Search",
+    "popularSearches": "POPULAR SEARCHES",
+    "popularTafsir": "Tafsir",
+    "popularFiqh": "Fiqh of Worship",
+    "popularAqeedah": "Nullifiers of Islam",
+    "popularNahw": "Nahw"
   },
   "settings": {
-    "support": "Support"
+    "support": "Support",
+    "accountSection": "Account",
+    "supportSection": "Support",
+    "contactSupport": "Contact support",
+    "legalTermsLabel": "Terms and Conditions",
+    "legalPrivacyLabel": "Privacy Policy"
   }
 }

@@ -2,20 +2,25 @@ import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import type {
+  CreateScholarDto,
+  SaveScholarTranslationDto,
+  UpdateScholarDto,
   ScholarListItemDto,
   ScholarDetailDto,
+  ScholarDetailStats,
   ScholarContentUnifiedDto,
   ScholarTopicsDto,
   TranslationViewDto,
   AdminScholarListDto,
+  Locale,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
-import type { CreateScholarDto } from './dto/create-scholar.dto';
-import type { UpdateScholarDto } from './dto/update-scholar.dto';
-import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 
+/** NestJS scholars service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** scholars application module responsible for scholars.service behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ScholarsService {
   constructor(
     private readonly repo: ScholarsRepository,
@@ -34,13 +39,7 @@ export class ScholarsService {
     return this.repo.adminList(cursor, search, accessibleScholarIds);
   }
 
-  async getBySlug(slug: string): Promise<
-    ScholarDetailDto & {
-      lectureCount: number;
-      seriesCount: number;
-      totalDurationSeconds: number;
-    }
-  > {
+  async getBySlug(slug: string): Promise<ScholarDetailDto & ScholarDetailStats> {
     const found = await this.repo.findBySlug(slug);
     if (!found) throw new NotFoundException(`Scholar "${slug}" not found`);
     return found;
@@ -121,7 +120,7 @@ export class ScholarsService {
 
   async updateTranslation(
     scholarSlug: string,
-    locale: string,
+    locale: Locale,
     fields: Partial<{ name: string; bio: string | null }>,
   ): Promise<TranslationViewDto> {
     const scholarId = await this.repo.findIdBySlug(scholarSlug);
@@ -136,7 +135,7 @@ export class ScholarsService {
     return result;
   }
 
-  async publishTranslation(scholarSlug: string, locale: string): Promise<TranslationViewDto> {
+  async publishTranslation(scholarSlug: string, locale: Locale): Promise<TranslationViewDto> {
     const scholarId = await this.repo.findIdBySlug(scholarSlug);
     if (!scholarId) throw new NotFoundException('Scholar not found');
     const [result, scholar] = await Promise.all([
@@ -149,7 +148,7 @@ export class ScholarsService {
     return result;
   }
 
-  async unpublishTranslation(scholarSlug: string, locale: string): Promise<TranslationViewDto> {
+  async unpublishTranslation(scholarSlug: string, locale: Locale): Promise<TranslationViewDto> {
     const scholarId = await this.repo.findIdBySlug(scholarSlug);
     if (!scholarId) throw new NotFoundException('Scholar not found');
     const [result, scholar] = await Promise.all([

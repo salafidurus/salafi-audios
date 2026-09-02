@@ -10,92 +10,97 @@ import type {
   LastPlayedLessonDto,
   ListingProgressSummaryDto,
   FeedPageDto,
+  HomePromotionsDto,
 } from '@sd/core-contracts';
-import { SkipThrottle } from '@nestjs/throttler';
+import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 import { CacheTTL } from '@nestjs/cache-manager';
 import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
 import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
 
-@SkipThrottle()
+/** NestJS listing controller service or controller coordinating the API boundary for this responsibility. */
+@RateLimitPolicy('public-read')
 @ApiTags('Listings')
 @ApiCommonErrors()
 @Public()
 @Controller('listings')
 @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
 @CacheTTL(24 * 60 * 60 * 1000) // 24 hours; successful mutations clear the cache
+/** listing application module responsible for listing.controller behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ListingController {
   constructor(private readonly service: ListingService) {}
 
   @Get('recent')
   @CacheTTL(3 * 60 * 60 * 1000) // Recent feed changes more often than catalog details
-  @ApiOperation({ summary: 'Get recent top-level listings' })
-  @ApiOkResponse({ description: 'Paginated recent listings feed (single, series, collection)' })
+  @ApiOperation({ summary: 'Get the Explore discovery feed' })
+  @ApiOkResponse({ description: 'Cursor-paginated mixed discovery feed' })
   async getRecentListings(
     @Query('cursor') cursor?: string,
     @Query('limit') limitStr?: string,
+    @Query('topic') topicSlug?: string,
   ): Promise<FeedPageDto> {
     const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
-    return this.service.getRecentListings(cursor, limit);
+    return this.service.getRecentListings(cursor, limit, topicSlug);
   }
 
   @Get('promotions')
   @CacheTTL(24 * 60 * 60 * 1000)
   @ApiOperation({ summary: 'Get home promotions (featured hero and editors picks)' })
   @ApiOkResponse({ description: 'Promotional metadata for home screen' })
-  async getPromotions(): Promise<any> {
+  async getPromotions(): Promise<HomePromotionsDto> {
     return this.service.getPromotions();
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get listing detail by ID or slug' })
+  @Get(':slug')
+  @ApiOperation({ summary: 'Get listing detail by public slug' })
   @ApiOkResponse({
     description: 'Listing detail with scholar, topics, audio, and series context',
   })
-  getById(@Param('id') id: string): Promise<ListingDetailDto> {
-    return this.service.getById(id);
+  getBySlug(@Param('slug') slug: string): Promise<ListingDetailDto> {
+    return this.service.getBySlug(slug);
   }
 
-  @Get(':id/contents')
-  @ApiOperation({ summary: 'Get contents tree for a listing' })
+  @Get(':slug/contents')
+  @ApiOperation({ summary: 'Get contents tree for a listing by public slug' })
   @ApiOkResponse({
     description: 'Flat or sectioned content tree for single, series, or collection',
   })
-  getContents(@Param('id') id: string): Promise<ListingContentsDto> {
-    return this.service.getContents(id);
+  getContents(@Param('slug') slug: string): Promise<ListingContentsDto> {
+    return this.service.getContents(slug);
   }
 
-  @Get(':id/last-played')
+  @Get(':slug/last-played')
   @ApiOperation({ summary: 'Get last played lesson in series or collection for user' })
   @ApiOkResponse({
     description: 'Last played lesson progress or null',
   })
   getLastPlayedLesson(
-    @Param('id') id: string,
+    @Param('slug') slug: string,
     @CurrentUser() user?: { id: string },
   ): Promise<LastPlayedLessonDto | null> {
     if (!user?.id) return Promise.resolve(null);
-    return this.service.getLastPlayedLesson(id, user.id);
+    return this.service.getLastPlayedLesson(slug, user.id);
   }
 
-  @Get(':id/progress-summary')
+  @Get(':slug/progress-summary')
   @ApiOperation({ summary: "Get a user's progress rollup across a listing's playable leaves" })
   @ApiOkResponse({
     description: 'Total/completed leaf counts, percent complete, and completion state',
   })
   getProgressSummary(
-    @Param('id') id: string,
+    @Param('slug') slug: string,
     @CurrentUser() user?: { id: string },
   ): Promise<ListingProgressSummaryDto | null> {
     if (!user?.id) return Promise.resolve(null);
-    return this.service.getProgressSummary(id, user.id);
+    return this.service.getProgressSummary(slug, user.id);
   }
 
-  @Get(':id/related')
+  @Get(':slug/related')
   @ApiOperation({ summary: 'Get related listings' })
   @ApiOkResponse({
     description: 'Related listings based on scholar, topics, and series',
   })
-  getRelated(@Param('id') id: string): Promise<RelatedListingDto[]> {
-    return this.service.getRelated(id);
+  getRelated(@Param('slug') slug: string): Promise<RelatedListingDto[]> {
+    return this.service.getRelated(slug);
   }
 }

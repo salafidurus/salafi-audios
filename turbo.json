@@ -18,6 +18,12 @@
       "cache": false,
       "persistent": false
     },
+    // core-db's dev task regenerates Prisma and dist as part of its build. Those
+    // build-owned files must not retrigger the watcher that produced them.
+    "@sd/core-db#dev": {
+      "dependsOn": ["^dev"],
+      "inputs": ["$TURBO_DEFAULT$", "!src/generated/**", "!.generated-prisma.lock", "!dist/**"]
+    },
     "build": {
       // Topological: packages build before apps that depend on them
       "dependsOn": ["^build"],
@@ -26,9 +32,8 @@
       "outputs": ["dist/**", "build/**", ".next/**", "lib/**", "generated/**", "src/generated/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"],
       // Include ESLint configs (web/native still use ESLint) and oxlint config
-      "inputs": ["$TURBO_DEFAULT$", "eslint.config.*"],
+      "inputs": ["$TURBO_DEFAULT$", "oxlint.config.*", ".oxlintrc*"],
       "outputs": []
     },
     "typecheck": {
@@ -51,27 +56,27 @@
       "outputs": ["generated/**", "src/generated/**"]
     },
     "test": {
-      "dependsOn": ["^build", "^test"],
+      // Tests may need dependency build artifacts, but do not need dependency test suites.
+      "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "**/*.spec.*",
         "**/*.test.*",
         "jest.config.*",
-        "**/jest.config.*",
-        "vitest.config.*",
-        "**/vitest.config.*"
+        "**/jest.config.*"
       ],
       "outputs": []
     },
     "test:e2e": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", "e2e/**/*.ts"],
-      "outputs": ["playwright-report/**", "test-results/**"],
+      "outputs": ["test-results/bun-webview/**"],
       "cache": true,
-      "env": ["CI", "PW_SKIP_WEB_BUILD"]
+      "env": ["CI", "BUN_E2E_PORT", "BUN_E2E_API_ORIGIN", "BUN_E2E_READY_TIMEOUT_MS"]
     },
     "test:prepush": {
-      "dependsOn": ["^build", "^test:prepush"],
+      // Dependency test suites are not a prerequisite for validating this package.
+      "dependsOn": ["^build"],
       "cache": true
     },
     // Builds shared contract types (DTOs, response shapes) consumed by web and mobile

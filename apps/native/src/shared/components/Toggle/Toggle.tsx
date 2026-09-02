@@ -1,8 +1,11 @@
-import type { ReactNode } from "react";
+import { NativeSwitch } from "@/shared/ui/native-switch";
 
-import { Host, Switch } from "@expo/ui";
-import { useUnistyles } from "react-native-unistyles";
+/** Preserves the legacy toggle entry point while native settings migrate. */
 
+/**
+ * Compatibility props for boolean settings that still use the legacy
+ * `checked`/`onChange` vocabulary.
+ */
 export interface ToggleProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
@@ -10,17 +13,20 @@ export interface ToggleProps {
   "aria-label"?: string;
 }
 
+/** Delegates the legacy toggle API to the canonical controlled switch. */
 export function Toggle({
   checked,
   onChange,
   disabled = false,
   "aria-label": ariaLabel,
-}: ToggleProps): ReactNode {
-  const { theme } = useUnistyles();
-
+}: ToggleProps) {
   return (
-    <Host matchContents seedColor={theme.colors.action.primary} accessibilityLabel={ariaLabel}>
-      <Switch value={checked} onValueChange={onChange} disabled={disabled} testID="toggle-switch" />
-    </Host>
+    <NativeSwitch
+      value={checked}
+      onValueChange={onChange}
+      disabled={disabled}
+      label={ariaLabel}
+      testID="toggle-switch"
+    />
   );
 }

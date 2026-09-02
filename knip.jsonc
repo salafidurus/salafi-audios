@@ -1,0 +1,28 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "apps/api/src/main.ts",
+    "apps/native/src/app/**/*.{ts,tsx}",
+    "apps/web/src/app/**/*.{ts,tsx}",
+    "infra/**/*.{js,mjs,ts}",
+    "packages/*/src/index.ts",
+    "scripts/**/*.{js,mjs,ts}",
+    "tools/**/*.{js,mjs,ts}"
+  ],
+  "project": [
+    "**/*.{js,cjs,mjs,jsx,ts,tsx}"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "ignore": [
+    ".agents/**",
+    ".worktrees/**",
+    "**/dist/**",
+    "**/generated/**",
+    "**/.next/**",
+    "**/coverage/**"
+  ],
+  "exclude": [
+    "catalog",
+    "catalogReferences"
+  ]
+}

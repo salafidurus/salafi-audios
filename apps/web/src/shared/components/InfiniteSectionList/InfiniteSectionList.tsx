@@ -3,12 +3,15 @@ import React, { useEffect, useRef, type ReactNode } from "react";
 import { List } from "../List";
 import styles from "./InfiniteSectionList.module.css";
 
+/** Describes one keyed section and the items rendered within that section. */
+/** Associates a stable DOM key with its section value and ordered item data. */
 export type SectionData<TSection, TItem> = {
   key: string;
   section: TSection;
   data: TItem[];
 };
 
+/** Configures section rendering, empty/loading states, and viewport pagination. */
 export type InfiniteSectionListProps<TSection, TItem> = {
   /** Array of sections */
   sections: SectionData<TSection, TItem>[];
@@ -36,6 +39,7 @@ export type InfiniteSectionListProps<TSection, TItem> = {
   sectionRefs?: React.MutableRefObject<Record<string, HTMLElement | null>>;
 };
 
+/** Renders grouped items and requests another page when the list sentinel is visible. */
 export function InfiniteSectionList<TSection, TItem>({
   sections,
   renderSectionHeader,

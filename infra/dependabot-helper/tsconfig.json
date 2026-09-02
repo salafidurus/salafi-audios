@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // The CI wrapper dynamically imports a shared repository utility outside its package directory.
+    "rootDir": "../..",
+    "types": ["bun-types", "node"],
+    "outDir": "./dist",
+    "allowJs": true
+  },
+  "include": ["./**/*.ts"]
+}

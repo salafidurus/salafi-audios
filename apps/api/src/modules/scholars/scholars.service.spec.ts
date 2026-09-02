@@ -4,12 +4,12 @@ import { NotFoundException } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import type {
+  CreateScholarDto,
+  UpdateScholarDto,
   ScholarDetailDto,
   ScholarContentUnifiedDto,
   ScholarListItemDto,
 } from '@sd/core-contracts';
-import { CreateScholarDto } from './dto/create-scholar.dto';
-import { UpdateScholarDto } from './dto/update-scholar.dto';
 import { ScholarsRepository } from './scholars.repo';
 import { ScholarsService } from './scholars.service';
 
@@ -21,7 +21,9 @@ describe('ScholarsService', () => {
   const mockScholarDetail: ScholarDetailDto & {
     lectureCount: number;
     seriesCount: number;
+    collectionCount: number;
     totalDurationSeconds: number;
+    totalContentDurationSeconds: number;
   } = {
     id: 's1',
     slug: 'ibn-uthaymeen',
@@ -39,7 +41,9 @@ describe('ScholarsService', () => {
     updatedAt: new Date().toISOString(),
     lectureCount: 50,
     seriesCount: 5,
+    collectionCount: 2,
     totalDurationSeconds: 18000,
+    totalContentDurationSeconds: 54000,
   };
 
   const mockScholarContent: ScholarContentUnifiedDto = {
@@ -140,13 +144,6 @@ describe('ScholarsService', () => {
       await expect(service.getContent('unknown')).rejects.toThrow(
         new NotFoundException('Scholar "unknown" not found'),
       );
-    });
-  });
-
-  describe('getFormData', () => {
-    it('method exists and is callable', () => {
-      expect(service.getFormData).toBeDefined();
-      expect(typeof service.getFormData).toBe('function');
     });
   });
 

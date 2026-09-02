@@ -1,3 +1,4 @@
+/** Exposes Explore screens and reusable rows, skeletons, and status components. */
 // Components
 export {
   ExplorePodcastRow,
@@ -22,10 +23,7 @@ export {
 } from "./components/explore-status/explore-status";
 
 // Screens
-export {
-  ExploreRecentScreen,
-  type ExploreRecentScreenProps,
-} from "./screens/explore-recent.screen";
+export { ExploreScreen, type ExploreScreenProps } from "./screens/explore-recent.screen";
 export {
   ExploreScholarScreen,
   type ExploreScholarScreenProps,

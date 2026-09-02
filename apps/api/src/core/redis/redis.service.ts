@@ -1,19 +1,59 @@
-import type { ThrottlerStorage } from '@nestjs/throttler';
 import type { KeyvStoreAdapter } from 'keyv';
 
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
-import { PinoLogger } from 'nestjs-pino';
+import { AppLoggerService } from '../logger/app-logger.service';
+import { z } from 'zod';
 
 import { ConfigService } from '../config/config.service';
 
+/** Core API redis.service module providing shared backend infrastructure and authority-boundary services. */
+const jsonValueSchema = z.unknown();
+
+type RedisSetOptions = {
+  mode?: 'EX' | 'PX';
+  /** Documents the duration field's API projection semantics and lifecycle meaning. */
+  duration?: number;
+  condition?: 'NX' | 'XX';
+};
+
+function setWithExpiration(client: Redis, key: string, value: string, options: RedisSetOptions) {
+  if (!options.mode || options.duration === undefined) return undefined;
+  return setWithMode(client, key, value, options.mode, options.duration, options.condition);
+}
+
+function setWithMode(
+  client: Redis,
+  key: string,
+  value: string,
+  mode: 'EX' | 'PX',
+  duration: number,
+  condition?: 'NX' | 'XX',
+) {
+  if (mode === 'EX') {
+    if (condition === 'NX') return client.set(key, value, 'EX', duration, 'NX');
+    if (condition === 'XX') return client.set(key, value, 'EX', duration, 'XX');
+    return client.set(key, value, 'EX', duration);
+  }
+  if (condition === 'NX') return client.set(key, value, 'PX', duration, 'NX');
+  if (condition === 'XX') return client.set(key, value, 'PX', duration, 'XX');
+  return client.set(key, value, 'PX', duration);
+}
+
+function setWithCondition(client: Redis, key: string, value: string, condition?: 'NX' | 'XX') {
+  if (condition === 'NX') return client.set(key, value, 'NX');
+  if (condition === 'XX') return client.set(key, value, 'XX');
+  return client.set(key, value);
+}
+
 @Injectable()
+/** NestJS redis service service or controller coordinating the API boundary for this responsibility. */
 export class RedisService implements OnModuleDestroy {
   private readonly client: Redis | undefined;
 
   constructor(
     private readonly config: ConfigService,
-    private readonly logger: PinoLogger,
+    private readonly logger: AppLoggerService,
   ) {
     this.logger.setContext(RedisService.name);
     if (!config.REDIS_URL) {
@@ -60,12 +100,11 @@ export class RedisService implements OnModuleDestroy {
     duration?: number,
     condition?: 'NX' | 'XX',
   ): Promise<string | null> {
-    const args: (string | number)[] = [key, value];
-    if (mode && duration !== undefined) args.push(mode, duration);
-    if (condition) args.push(condition);
-    return Reflect.apply(this.requireClient().set, this.requireClient(), args) as Promise<
-      string | null
-    >;
+    const client = this.requireClient();
+    return (
+      setWithExpiration(client, key, value, { mode, duration, condition }) ??
+      setWithCondition(client, key, value, condition)
+    );
   }
 
   async del(...keys: string[]): Promise<number> {
@@ -99,6 +138,8 @@ export class RedisService implements OnModuleDestroy {
   }
 
   async eval<T = unknown>(script: string, numberOfKeys: number, ...args: string[]): Promise<T> {
+    // SAFETY: callers choose `T` to match the Redis script contract they invoke,
+    // and ioredis exposes `eval` with a wider return type than those call sites.
     return this.requireClient().eval(script, numberOfKeys, ...args) as Promise<T>;
   }
 
@@ -115,9 +156,12 @@ export class RedisService implements OnModuleDestroy {
       get: async <Value>(key: string) => {
         const value = await this.get(`${namespace}${key}`);
         if (value === null) return undefined;
+        // SAFETY: values stored in this namespace are serialized by the paired
+        // `set` function below, so a successful parse reconstructs that payload.
         return JSON.parse(value) as Value;
       },
-      set: async (key: string, value: unknown, ttl?: number) => {
+      set: async <Value>(key: string, value: Value, ttl?: number) => {
+        jsonValueSchema.parse(value);
         await this.set(`${namespace}${key}`, JSON.stringify(value), 'PX', ttl ?? 300_000);
       },
       delete: async (key: string) => (await this.del(`${namespace}${key}`)) > 0,
@@ -137,23 +181,6 @@ export class RedisService implements OnModuleDestroy {
     };
   }
 
-  createThrottlerStorage(): ThrottlerStorage {
-    return {
-      increment: async (key, ttl) => {
-        const redisKey = `${this.namespace}throttle:${key}`;
-        const totalHits = await this.incr(redisKey);
-        if (totalHits === 1) await this.pexpire(redisKey, ttl);
-        const remaining = await this.pttl(redisKey);
-        return {
-          totalHits,
-          timeToExpire: Math.max(remaining, 0),
-          isBlocked: false,
-          timeToBlockExpire: 0,
-        };
-      },
-    } satisfies ThrottlerStorage;
-  }
-
   async quit(): Promise<void> {
     if (this.client) await this.client.quit();
   }
@@ -168,6 +195,7 @@ export class RedisService implements OnModuleDestroy {
   }
 }
 
+/** NestJS redis unavailable error service or controller coordinating the API boundary for this responsibility. */
 export class RedisUnavailableError extends Error {
   constructor() {
     super('Redis is not configured or unavailable');

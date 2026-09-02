@@ -1,3 +1,4 @@
+/** Keeps the active track playable while the user navigates between routes. */
 "use client";
 
 import { useAudio, useQueue } from "@sd/domain-audio";
@@ -20,10 +21,13 @@ import { audioService } from "../audio-service";
 import styles from "./mini-player.module.css";
 import { ProgressBar } from "./progress-bar";
 
+/** Keeps the active track playable while the user navigates between routes. */
+/** Route-persistent player surface for the active track, queue, seeking, and playback speed. */
 function handleClose() {
   audioService.stop();
 }
 
+/** Keeps the active track playable from every route, including seek and queue navigation. */
 export function MiniPlayer() {
   const {
     currentTrack,

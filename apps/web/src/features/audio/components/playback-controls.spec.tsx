@@ -21,8 +21,22 @@ vi.mock("../audio-service", () => ({
   },
 }));
 
-const trackA: Track = { id: "a", title: "A", artist: "Scholar", url: "", durationSeconds: 100 };
-const trackB: Track = { id: "b", title: "B", artist: "Scholar", url: "", durationSeconds: 100 };
+const trackA: Track = {
+  id: "a",
+  slug: "a-slug",
+  title: "A",
+  artist: "Scholar",
+  url: "",
+  durationSeconds: 100,
+};
+const trackB: Track = {
+  id: "b",
+  slug: "b-slug",
+  title: "B",
+  artist: "Scholar",
+  url: "",
+  durationSeconds: 100,
+};
 
 beforeEach(() => {
   vi.clearAllMocks();

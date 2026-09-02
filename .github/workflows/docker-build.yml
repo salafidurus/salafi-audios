@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - preview
+      - spec/**
     paths:
       - "docker/**"
       - "apps/api/**"
@@ -17,7 +18,6 @@ on:
       - "turbo.json"
       - "tsconfig*.json"
       - ".github/workflows/docker-build.yml"
-      - ".github/workflows/docker-deploy.yml"
 
 concurrency:
   group: docker-build-${{ github.event.pull_request.number }}
@@ -101,7 +101,7 @@ jobs:
 
       - name: Log in to GHCR for trusted preview PRs
         if: github.base_ref == 'preview' && github.event.pull_request.head.repo.full_name == github.repository
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}

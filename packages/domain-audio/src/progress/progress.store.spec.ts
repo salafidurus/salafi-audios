@@ -10,7 +10,7 @@ describe("useProgressStore.actions.loadProgress", () => {
   it("inserts entries that have no local counterpart", () => {
     useProgressStore.getState().actions.loadProgress([
       {
-        listingId: "l1",
+        listingSlug: "l1",
         positionSeconds: 10,
         durationSeconds: 100,
         updatedAt: "2026-01-01T00:00:00.000Z",
@@ -23,7 +23,7 @@ describe("useProgressStore.actions.loadProgress", () => {
   it("applies last-write-wins: a newer incoming entry replaces the local one", () => {
     useProgressStore.getState().actions.loadProgress([
       {
-        listingId: "l1",
+        listingSlug: "l1",
         positionSeconds: 10,
         durationSeconds: 100,
         updatedAt: "2026-01-01T00:00:00.000Z",
@@ -32,7 +32,7 @@ describe("useProgressStore.actions.loadProgress", () => {
 
     useProgressStore.getState().actions.loadProgress([
       {
-        listingId: "l1",
+        listingSlug: "l1",
         positionSeconds: 50,
         durationSeconds: 100,
         updatedAt: "2026-01-02T00:00:00.000Z",
@@ -51,7 +51,7 @@ describe("useProgressStore.actions.loadProgress", () => {
 
     useProgressStore.getState().actions.loadProgress([
       {
-        listingId: "l1",
+        listingSlug: "l1",
         positionSeconds: 5,
         durationSeconds: 100,
         updatedAt: "2020-01-01T00:00:00.000Z", // deliberately far in the past
@@ -60,5 +60,32 @@ describe("useProgressStore.actions.loadProgress", () => {
 
     expect(useProgressStore.getState().progressMap.l1?.positionSeconds).toBe(90);
     expect(useProgressStore.getState().progressMap.l1?.updatedAt).toBe(localUpdatedAt!);
+  });
+
+  it("preserves completion when a newer incomplete pull arrives", () => {
+    useProgressStore.getState().actions.loadProgress([
+      {
+        listingSlug: "l1",
+        positionSeconds: 100,
+        durationSeconds: 100,
+        completedAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-01-01T00:00:00.000Z",
+      },
+    ]);
+
+    useProgressStore.getState().actions.loadProgress([
+      {
+        listingSlug: "l1",
+        positionSeconds: 40,
+        durationSeconds: 100,
+        updatedAt: "2026-01-02T00:00:00.000Z",
+      },
+    ]);
+
+    expect(useProgressStore.getState().progressMap.l1).toMatchObject({
+      positionSeconds: 40,
+      completedAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-02T00:00:00.000Z",
+    });
   });
 });

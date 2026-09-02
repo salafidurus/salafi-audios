@@ -7,8 +7,10 @@ import {
   type DownloadRow,
 } from "@/features/downloads/registry/downloads.registry";
 
-type UpsertInput = Partial<Omit<DownloadRow, "listingId" | "createdAt" | "updatedAt">> & {
-  listingId: string;
+/** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
+type UpsertInput = Partial<Omit<DownloadRow, "listingSlug" | "createdAt" | "updatedAt">> & {
+  /** Carries the canonical lecture identity used to reconcile local and remote state. */
+  listingSlug: string;
 };
 
 type DownloadsState = {
@@ -18,8 +20,8 @@ type DownloadsState = {
     hydrate: () => Promise<void>;
     /** Writes through to the registry, then updates this read-cache reactively. */
     upsert: (row: UpsertInput) => Promise<void>;
-    remove: (listingId: string) => Promise<void>;
-    getDownload: (listingId: string) => DownloadRow | undefined;
+    remove: (listingSlug: string) => Promise<void>;
+    getDownload: (listingSlug: string) => DownloadRow | undefined;
   };
 };
 
@@ -35,7 +37,7 @@ export const useDownloadsStore = create<DownloadsState>((set, get) => ({
   actions: {
     hydrate: async () => {
       const rows = await getAllDownloads();
-      set({ downloads: Object.fromEntries(rows.map((row) => [row.listingId, row])) });
+      set({ downloads: Object.fromEntries(rows.map((row) => [row.listingSlug, row])) });
     },
 
     upsert: async (row) => {
@@ -43,19 +45,21 @@ export const useDownloadsStore = create<DownloadsState>((set, get) => ({
       set((state) => ({
         downloads: {
           ...state.downloads,
-          [row.listingId]: { ...state.downloads[row.listingId], ...row } as DownloadRow,
+          // SAFETY: merging a partial write-through row onto an existing
+          // DownloadRow preserves the persisted registry shape for that id.
+          [row.listingSlug]: { ...state.downloads[row.listingSlug], ...row } as DownloadRow,
         },
       }));
     },
 
-    remove: async (listingId) => {
-      await removeDownloadRow(listingId);
+    remove: async (listingSlug) => {
+      await removeDownloadRow(listingSlug);
       set((state) => {
-        const { [listingId]: _removed, ...rest } = state.downloads;
+        const { [listingSlug]: _removed, ...rest } = state.downloads;
         return { downloads: rest };
       });
     },
 
-    getDownload: (listingId) => get().downloads[listingId],
+    getDownload: (listingSlug) => get().downloads[listingSlug],
   },
 }));

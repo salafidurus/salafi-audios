@@ -6,15 +6,12 @@ on:
       - "apps/**"
       - "packages/**"
       - "scripts/**"
+      - ".bun-version"
       - "tsconfig*.json"
-      - "**/tsconfig*.json"
-      - "**/eslint.config.*"
+      - ".oxlintrc*"
       - "jest.config.*"
-      - "**/jest.config.*"
-      - "packages/core-db/prisma/**"
       - "bun.lock"
       - "package.json"
-      - "**/package.json"
       - "turbo.json"
       - ".github/workflows/ci.yml"
       - "!**/*.md"
@@ -26,10 +23,6 @@ concurrency:
 
 permissions:
   contents: read
-
-env:
-  # Custom Playwright path enables GitHub Actions caching (default path is not cacheable)
-  PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
 
 jobs:
   verify:
@@ -43,7 +36,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.3.14"
+          bun-version: "1.4.0"
 
       # Install without running lifecycle scripts to avoid exposing secrets
       # to untrusted package install code.

@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export const shadowsShared = {
   focus: {
     light: "0 0 0 3px rgb(20 184 166 / 0.28)",
@@ -43,15 +44,17 @@ export type ShadowsWebTheme = {
 };
 
 export const createShadowsWeb = (mode: "light" | "dark"): ShadowsWebTheme => {
-  const isLight = mode === "light";
-
   return {
-    focus: isLight ? shadowsShared.focus.light : shadowsShared.focus.dark,
-    xs: isLight ? shadowsWeb.xs.light : shadowsWeb.xs.dark,
-    sm: isLight ? shadowsWeb.sm.light : shadowsWeb.sm.dark,
-    md: isLight ? shadowsWeb.md.light : shadowsWeb.md.dark,
-    lg: isLight ? shadowsWeb.lg.light : shadowsWeb.lg.dark,
-    elevated: isLight ? shadowsWeb.elevated.light : shadowsWeb.elevated.dark,
-    top: isLight ? shadowsWeb.top.light : shadowsWeb.top.dark,
+    focus: selectShadow(mode, shadowsShared.focus),
+    xs: selectShadow(mode, shadowsWeb.xs),
+    sm: selectShadow(mode, shadowsWeb.sm),
+    md: selectShadow(mode, shadowsWeb.md),
+    lg: selectShadow(mode, shadowsWeb.lg),
+    elevated: selectShadow(mode, shadowsWeb.elevated),
+    top: selectShadow(mode, shadowsWeb.top),
   };
 };
+
+function selectShadow(mode: "light" | "dark", shadow: { light: string; dark: string }): string {
+  return mode === "light" ? shadow.light : shadow.dark;
+}

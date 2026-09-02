@@ -81,6 +81,82 @@
   gap: var(--space-xs);
 }
 
+.desktopContentTable {
+  display: block;
+  width: 100%;
+}
+
+.mobileContentList {
+  display: none;
+}
+
+.tablePrimaryCell {
+  color: var(--content-strong);
+  font-weight: 600;
+}
+
+.desktopContentTable th {
+  font-size: var(--typo-caption-font-size);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tableSortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 2rem;
+  padding-inline: 0;
+  font-size: inherit;
+  font-weight: 700;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.tableListingCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm, 0.5rem);
+  min-width: 0;
+}
+
+.tableAvatar {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: 0 0 auto;
+  border-radius: var(--radius-component-control);
+}
+
+.tableListingCell > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tableMutedCell {
+  color: var(--content-muted);
+}
+
+.tableActionsColumn {
+  width: 1%;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.tableActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.tableLoadMore {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-scale-md);
+}
+
 /* Mobile overrides */
 @media (max-width: 640px) {
   .topicItem {
@@ -104,29 +180,45 @@
   }
 }
 
-.tabBar {
-  display: flex;
-  align-items: center;
-  gap: 24px;
+.tabViewport {
+  min-width: 0;
+  max-width: 100%;
   margin-bottom: 24px;
-  border-bottom: 1px solid var(--border-default);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.tabViewport::-webkit-scrollbar {
+  display: none;
+}
+
+.tabBar {
+  max-width: none;
+  overflow: visible;
+  flex-shrink: 0;
 }
 
 .tabButton {
-  background: transparent;
-  border: none;
-  padding: 10px 2px;
-  margin-bottom: -1px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--content-muted);
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  transition: color 150ms ease, border-color 150ms ease;
+  min-width: 6rem;
+  flex: 0 0 auto;
+  padding-inline: var(--space-component-gap-md, 1rem);
 }
 
-.tabButtonActive {
-  color: var(--content-primary-strong);
-  font-weight: 600;
-  border-bottom: 2px solid var(--action-primary);
+@media (max-width: 900px) {
+  .tabViewport {
+    width: 100%;
+  }
+
+  .tabBar {
+    min-width: 100%;
+  }
+
+  .desktopContentTable {
+    display: none;
+  }
+
+  .mobileContentList {
+    display: block;
+  }
 }

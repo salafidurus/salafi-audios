@@ -1,3 +1,4 @@
+/** Public, framework-neutral localization primitives shared by every application. */
 export { SUPPORTED_LOCALES, DEFAULT_LOCALE, RTL_LOCALES, type Locale } from "./supported-locales";
 export { isRtl, localeToDir, resolveLocale } from "./locale-utils";
 export { initI18nOptions, type I18nConfig } from "./i18n";
@@ -8,9 +9,7 @@ export {
   type ContentPreferenceStore,
 } from "./content-preference";
 export {
-  SUBNAV_KEYS,
   SCHOLAR_TITLE_KEYS,
-  getSubnavLabel,
   getEmptyStateText,
   getErrorStateText,
   getLocalizedName,

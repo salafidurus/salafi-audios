@@ -1,49 +1,32 @@
-import {
-  type HttpClientConfig,
-  httpClient,
-  initApiClient as initContractsApiClient,
-} from "@sd/core-contracts";
+import { type HttpClientConfig, initApiClient as initContractsApiClient } from "@sd/core-contracts";
 
-export type ApiRequestOptions = Parameters<typeof httpClient>[0];
-
-export type ApiInterceptor = {
-  onRequest?: (options: ApiRequestOptions) => ApiRequestOptions;
-  onResponse?: <T>(data: T, options: ApiRequestOptions) => T;
-  onError?: (error: unknown, options: ApiRequestOptions) => void;
-};
-
-const interceptors: ApiInterceptor[] = [];
+/** Adapts application-specific authentication and locale providers to the shared HTTP client. */
 let accessTokenProvider: HttpClientConfig["getAccessToken"];
 let cookieProvider: HttpClientConfig["getCookie"];
 let localeProvider: HttpClientConfig["getLocale"];
 let unauthorizedHandler: (() => void) | undefined;
 
+/** Registers the callback invoked when the shared client receives an unauthorized response. */
 export function setUnauthorizedHandler(handler: () => void) {
   unauthorizedHandler = handler;
 }
 
-export function registerApiInterceptor(interceptor: ApiInterceptor) {
-  interceptors.push(interceptor);
-  return () => {
-    const index = interceptors.indexOf(interceptor);
-    if (index >= 0) {
-      interceptors.splice(index, 1);
-    }
-  };
-}
-
+/** Supplies the optional legacy bearer-token source to the shared client. */
 export function setAccessTokenProvider(provider: HttpClientConfig["getAccessToken"]) {
   accessTokenProvider = provider;
 }
 
+/** Supplies the native session-cookie source to the shared client. */
 export function setCookieProvider(provider: HttpClientConfig["getCookie"]) {
   cookieProvider = provider;
 }
 
+/** Supplies the active content-locale source to the shared client. */
 export function setLocaleProvider(provider: HttpClientConfig["getLocale"]) {
   localeProvider = provider;
 }
 
+/** Initializes the shared client and reports missing application API configuration. */
 export function initApiClient(config?: Pick<HttpClientConfig, "baseUrl">) {
   const baseUrl = config?.baseUrl;
   if (!baseUrl) {
@@ -62,28 +45,4 @@ export function initApiClient(config?: Pick<HttpClientConfig, "baseUrl">) {
       if (status === 401) unauthorizedHandler?.();
     },
   });
-}
-
-export async function apiRequest<T>(options: ApiRequestOptions): Promise<T> {
-  let nextOptions = options;
-  for (const interceptor of interceptors) {
-    if (interceptor.onRequest) {
-      nextOptions = interceptor.onRequest(nextOptions);
-    }
-  }
-
-  try {
-    let response = await httpClient<T>(nextOptions);
-    for (const interceptor of interceptors) {
-      if (interceptor.onResponse) {
-        response = interceptor.onResponse(response, nextOptions);
-      }
-    }
-    return response;
-  } catch (error) {
-    for (const interceptor of interceptors) {
-      interceptor.onError?.(error, nextOptions);
-    }
-    throw error;
-  }
 }

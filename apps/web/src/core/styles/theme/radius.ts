@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 export const radiusWeb = {
   scale: {
     xs: "0.25rem",

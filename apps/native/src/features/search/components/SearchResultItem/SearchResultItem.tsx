@@ -1,21 +1,31 @@
-import type { ComponentType } from "react";
+import { Host } from "@expo/ui";
+import { useCallback } from "react";
+import { StyleSheet } from "react-native-unistyles";
 
-import { Image } from "expo-image";
-import { Clock3, Headphones } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useTranslation } from "@/core/i18n/use-translation";
+import { List, NativeIcon, NativeImage } from "@/shared/ui";
 
-import { MarqueeText } from "@/shared/components/MarqueeText";
-
+/** Implements native search input, filtering, results, and empty states. */
+/** Describes the inputs, callbacks, and optional state accepted by Search Result Item. */
 export type SearchResultItemProps = {
   title: string;
   scholarName: string;
   imageUrl?: string;
   lectureCount: number;
+  /** Stores the media duration used by playback and progress presentation. */
   durationSeconds?: number;
   onPress?: () => void;
+  /** Identifies the listing passed to the stable navigation callback on activation. */
+  listingSlug?: string;
+  onNavigateToListing?: (slug: string) => void;
 };
 
+/**
+ * Renders one search result through the native list-row contract.
+ * Remote artwork remains an explicit RN image bridge because Expo UI has no
+ * universal remote-image primitive; result identity and activation remain
+ * owned by the caller through the existing title and press props.
+ */
 export function SearchResultItem({
   title,
   scholarName,
@@ -23,118 +33,78 @@ export function SearchResultItem({
   lectureCount,
   durationSeconds,
   onPress,
+  listingSlug,
+  onNavigateToListing,
 }: SearchResultItemProps) {
-  const { theme } = useUnistyles();
-  const durationLabel = formatDuration(durationSeconds);
-  const HeadphonesIcon = Headphones as ComponentType<{
-    size?: number;
-    strokeWidth?: number;
-    color?: string;
-  }>;
-  const ClockIcon = Clock3 as ComponentType<{
-    size?: number;
-    strokeWidth?: number;
-    color?: string;
-  }>;
+  const { t } = useTranslation();
+  const handlePress = useCallback(() => {
+    if (listingSlug && onNavigateToListing) {
+      onNavigateToListing(listingSlug);
+      return;
+    }
+    onPress?.();
+  }, [listingSlug, onNavigateToListing, onPress]);
+  const durationLabel = formatDuration(durationSeconds, t);
+  const supportingText = [scholarName, formatLectureCount(lectureCount, t), durationLabel]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
-      <View style={styles.media}>
-        {imageUrl ? (
-          <Image source={{ uri: imageUrl }} style={styles.cover} contentFit="cover" />
-        ) : (
-          <View style={styles.coverFallback}>
-            <HeadphonesIcon size={20} color={theme.colors.content.subtle} />
-          </View>
-        )}
-      </View>
-      <View style={styles.body}>
-        <MarqueeText text={title} variant="titleMd" style={styles.title} />
-        <MarqueeText text={scholarName} variant="bodySm" style={styles.scholarName} />
-        <View style={styles.metaRow}>
-          <HeadphonesIcon size={11} color={theme.colors.content.muted} />
-          <Text style={styles.metaText}>{formatLectureCount(lectureCount)}</Text>
-          {durationLabel ? (
-            <>
-              <Text style={styles.metaText}> · </Text>
-              <ClockIcon size={11} color={theme.colors.content.muted} />
-              <Text style={styles.metaText}>{durationLabel}</Text>
-            </>
-          ) : null}
-        </View>
-      </View>
-    </Pressable>
+    <Host matchContents>
+      <List.Item
+        title={title}
+        supportingText={supportingText}
+        leading={
+          imageUrl ? (
+            <NativeImage
+              source={{ uri: imageUrl }}
+              style={styles.cover}
+              bridgeStyle={styles.media}
+              contentFit="cover"
+            />
+          ) : (
+            <NativeIcon name="music" colorRole="muted" />
+          )
+        }
+        onPress={handlePress}
+        testID="native-list-item"
+      >
+        {null}
+      </List.Item>
+    </Host>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  card: {
-    borderWidth: 1,
-    borderColor: theme.colors.border.subtle,
-    borderRadius: theme.radius.component.card,
-    backgroundColor: theme.colors.surface.default,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.component.gapMd,
-    padding: theme.spacing.component.cardPadding,
-  },
-  pressed: {
-    backgroundColor: theme.colors.surface.hover,
-  },
   media: {
-    width: "20%",
-    aspectRatio: 4 / 5,
+    width: 48,
+    height: 60,
     borderRadius: theme.radius.component.panelSm,
     overflow: "hidden",
     backgroundColor: theme.colors.surface.subtle,
-    alignItems: "center",
-    justifyContent: "center",
   },
   cover: {
     width: "100%",
     height: "100%",
   },
-  coverFallback: {
-    flex: 1,
-    width: "100%",
-    backgroundColor: theme.colors.surface.subtle,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  body: {
-    flex: 1,
-    gap: theme.spacing.scale.xs,
-    overflow: "hidden",
-  },
-  title: {
-    color: theme.colors.content.strong,
-    ...theme.typography.titleMd,
-  },
-  scholarName: {
-    color: theme.colors.content.muted,
-    ...theme.typography.bodySm,
-  },
-  metaRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.scale.xs,
-  },
-  metaText: {
-    color: theme.colors.content.muted,
-    ...theme.typography.caption,
-  },
 }));
 
-function formatLectureCount(count: number): string {
-  if (count === 1) return "1 lecture";
-  return `${count} lectures`;
+function formatLectureCount(count: number, t: ReturnType<typeof useTranslation>["t"]): string {
+  return t("search.lectureCount", "{{count}} lectures", { count });
 }
 
-function formatDuration(durationSeconds?: number): string {
+function formatDuration(
+  durationSeconds: number | undefined,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
   if (!durationSeconds || durationSeconds <= 0) return "";
   const hours = Math.floor(durationSeconds / 3600);
   const minutes = Math.floor((durationSeconds % 3600) / 60);
-  if (hours > 0) return `${hours}hr ${String(minutes).padStart(2, "0")}m`;
-  if (minutes <= 0) return "";
-  return `${minutes}m`;
+  if (hours > 0) {
+    return t("search.durationHours", "{{hours}}hr {{minutes}}m", {
+      hours,
+      minutes: String(minutes).padStart(2, "0"),
+    });
+  }
+  return minutes > 0 ? t("search.durationMinutes", "{{minutes}}m", { minutes }) : "";
 }

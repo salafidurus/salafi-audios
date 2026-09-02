@@ -2,15 +2,19 @@ import type { ListingContentItemDto, ListingContentsDto, ListingFormat } from "@
 
 import type { Track } from "../types/track.types";
 
+/** Queue-construction module translating ordered catalog content into Tracks. */
+/** Listing identity and presentation context used to build a playback queue. */
 export type QueueListingRef = {
   id: string;
   title: string;
   format: ListingFormat;
   scholarName: string;
+  /** Scholar identity retained for display and navigation context. */
   scholarSlug?: string;
   artworkUrl?: string;
 };
 
+/** Optional starting-position selection for queue construction. */
 export type BuildTrackQueueOptions = {
   /** The lesson/single id playback should start at. Defaults to the first track. */
   startAtId?: string;

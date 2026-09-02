@@ -9,7 +9,7 @@ describe('Scholar/Topic order-by (e2e)', () => {
   let prisma: PrismaService;
 
   beforeAll(async () => {
-    ({ app } = await createE2eApp());
+    ({ app } = await createE2eApp({ disableThrottler: true }));
     prisma = app.get(PrismaService);
     await seedTestData(prisma);
   });

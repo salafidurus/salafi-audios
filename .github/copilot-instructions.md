@@ -5,7 +5,7 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 ## Quick orientation ✅
 
 - Monorepo layout: `apps/` (api/web/mobile) + `packages/` (shared libraries) + `docs/` (source of truth).
-- Canonical docs: the standard top-level docs in `docs/*.md` and the `AGENT.md` files at repo root and in each package/app (e.g. `apps/api/AGENT.md`). Start with `docs/README.md`.
+- Canonical docs: `docs/README.md`, `docs/architecture.md`, the responsibility-based folders under `docs/`, and the `AGENT.md` files at repo root and in each package/app. Start with `docs/README.md`.
 
 ## Non-negotiable guardrails 🛡️
 
@@ -27,9 +27,9 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 - Install: `bun install`
 - Run all in dev: `bun run dev`
 - Run single app: `bun run dev:api`, `bun run dev:web`, `bun run dev:native`
-- Build / Test / Lint / Typecheck: `bun run build`, `bun run test`, `bun run lint`, `bun run typecheck` (use Turbo filters to scope)
+- Build / Test / Lint / Typecheck: `bun run build`, `bun run test`, `bun run lint`, `bun run typecheck` (affected workspaces; use the `:all` variants for the full repository)
 - API-only tests: `bun run --filter api test`
-- E2E (Playwright): `bun run test:e2e`
+- Web E2E (Bun.WebView): `bun run test:e2e`
 - Shared contract updates: edit `packages/core-contracts` manually when backend response shapes change, then build/typecheck the package.
 
 ## Codegen & generated artifacts ⚠️
@@ -58,7 +58,7 @@ Bug fixes start with a failing test that reproduces the bug.
 | Domain store actions (Zustand)     | Unit — reset store state each test | `packages/domain-*/src/**/*.spec.ts`               |
 | Pure utilities / helpers           | Unit                               | Co-located `.spec.ts` next to source file          |
 | Route constant smoke tests         | Unit                               | `packages/core-contracts/src/routes.spec.ts`       |
-| Critical user flows                | E2E (Playwright)                   | `apps/web/e2e/`                                    |
+| Critical user flows                | E2E (Bun.WebView)                  | `apps/web/e2e/journeys/`                           |
 
 ### What NOT to test
 
@@ -75,9 +75,9 @@ Bug fixes start with a failing test that reproduces the bug.
 - Every auth boundary (public vs. auth vs. admin permission) must have an integration test that verifies the correct HTTP status without a session vs. with one.
 - Use `@nestjs/testing` + mocked repositories. Never connect to a real database in unit tests.
 
-**Domain packages (`domain-progress`, `domain-playback`):**
+**Domain packages (`@sd/domain-audio`, `@sd/domain-content`, `@sd/domain-account`, `@sd/domain-search`):**
 
-- Zustand store actions are pure state machines — test every action with before/after state assertions.
+- State/store actions are pure state machines — test every action with before/after state assertions.
 - Reset the store between tests: `useStore.setState(initialState)`.
 
 **Feature packages:**
@@ -85,7 +85,7 @@ Bug fixes start with a failing test that reproduces the bug.
 - Only test exported utility functions and hooks that contain real logic.
 - Do not test components purely for rendering; test behavior (e.g., a hook that computes a derived value).
 
-**Web E2E (Playwright):**
+**Web E2E (Bun.WebView):**
 
 - Cover: public pages load without errors, auth redirect fires for protected routes, sidebar navigates correctly.
 - Do not cover: visual layout, font rendering, or UI polish.
@@ -93,11 +93,13 @@ Bug fixes start with a failing test that reproduces the bug.
 ### Test commands
 
 ```bash
-bun run test                                                  # all
+bun run test                                                  # affected only
+bun run test:all                                              # all workspaces
 bun run --filter api test                                     # API only
 bun run --filter api test -- src/modules/scholars/scholars.service.spec.ts
 bun run --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts
-bun run test:e2e                                              # Playwright
+bun run test:e2e                                              # affected E2E workspaces
+bun run test:e2e:all                                          # all E2E workspaces
 bun run test:prepush                                          # CI gate (changed files only)
 ```
 
@@ -111,7 +113,9 @@ bun run test:prepush                                          # CI gate (changed
 ## Repo & CI conventions 🔁
 
 - Commits: Conventional Commits enforced via commitlint + Husky.
-- Branches/Deploys: protected branches map to deployment environments (`main` -> development, `preview` -> preview, `production` -> production); deployments are branch-based via PR merges (see `README.md` and `docs/dev-ops.md`).
+- Branches/Deploys: `main` is the default integration branch, while
+  `preview` and `production` drive backend deployment promotion through PR
+  merges (see `README.md` and `docs/policies/deployment.md`).
 
 ## Safety & non-goals ⚠️
 
@@ -121,21 +125,22 @@ bun run test:prepush                                          # CI gate (changed
 
 ## Common change workflow (example) 💡
 
-Add `POST /lectures/:id/publish` →
+Add `POST /admin/listings/:id/publish` →
 
-1. **Write the failing test first** — `lectures.service.spec.ts`: `publish throws NotFoundException when lecture missing`, `publish throws BadRequestException when already published`.
+1. **Write the failing test first** — `listing.service.spec.ts`: `publish throws NotFoundException when listing missing`, `publish throws BadRequestException when already published`.
 2. Implement domain + application logic in `apps/api/src` to make the tests pass.
 3. Add or update the API interface in `apps/api/src` and keep request/response DTOs explicit.
 4. Update `packages/core-contracts` to keep shared response types in sync.
-5. Add an integration test that verifies `POST /lectures/:id/publish` returns 401 without auth.
-6. Run `bun run test` — all tests pass, commit.
+5. Add an integration test that verifies `POST /admin/listings/:id/publish` returns 401 without auth.
+6. Run `bun run test` for affected tests; use `bun run test:all` for a full
+   repository validation before committing when the change requires it.
 
 ---
 
 **Where to look for examples** 📁
 
 - Backend layering & rules: `apps/api/AGENT.md`, `apps/api/src`
-- Mobile offline/outbox: `apps/native/AGENT.md`, `docs/mobile.md`
+- Mobile offline/outbox: `apps/native/AGENT.md`, `docs/clients/mobile.md`
 - Web structure: `apps/web/AGENT.md` (`app/`, `core/`, `features/`, `shared/`)
 - DB modeling & migrations: `packages/core-db/AGENT.md`, `packages/core-db/prisma`
 

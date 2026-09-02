@@ -1,20 +1,15 @@
 import { adminClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
+/** Exposes the browser authentication boundary. */
+/** Sends browser auth requests to the API with credentials so its session cookie is included. */
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_API_URL!,
   plugins: [adminClient()],
   fetchOptions: {
     credentials: "include",
-    onSuccess: (ctx) => {
-      if (String(ctx.request.url).endsWith("/sign-out")) {
-        // Full navigation to "/" reloads the JS bundle, so the in-memory
-        // (no longer persisted) query client is recreated fresh anyway.
-        window.location.href = "/";
-      }
-    },
   },
 });
 
-export type Session = typeof authClient.$Infer.Session;
+/** Mirrors the authenticated user shape inferred from the configured Better Auth client. */
 export type User = typeof authClient.$Infer.Session.user;

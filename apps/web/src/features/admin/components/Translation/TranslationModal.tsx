@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { Locale } from "@sd/core-contracts";
@@ -6,14 +7,28 @@ import { sanitizeError } from "@sd/utils-error";
 import { useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useTranslationForm } from "@/features/admin/hooks/Translation/useTranslationForm";
+import {
+  useTranslationForm,
+  type TranslationFormAction,
+  type TranslationFormState,
+} from "@/features/admin/hooks/Translation/useTranslationForm";
 import { getSecondaryLocales, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { computeLocalesToSave } from "@/features/admin/utils/translation-save";
-import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 
 import {
   translationEntities,
   type ClientTranslationTarget,
+  type TranslationEntityConfig,
   type TranslationChildSummary,
 } from "./translation-entities";
 import styles from "./translation-modal.module.css";
@@ -25,6 +40,204 @@ export interface TranslationModalProps {
   isOpen: boolean;
   onClose: () => void;
   target: ClientTranslationTarget | null;
+}
+
+function getPublishAction(
+  config: TranslationEntityConfig | null,
+  state: TranslationFormState,
+  locale: Locale,
+) {
+  if (!config || !config.supportsPublish || !state.entityId) return null;
+  const currentlyPublished = state.translationStatus[locale] === "published";
+  return {
+    action: currentlyPublished ? config.unpublish : config.publish,
+    currentlyPublished,
+    entityId: state.entityId,
+  };
+}
+
+function TranslationStatusNotices({
+  status,
+  entityId,
+  error,
+  t,
+}: {
+  status: string;
+  entityId?: string | null;
+  error: string | null;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <>
+      {status === "loading" && (
+        <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
+      )}
+      {status === "error" && !entityId && (
+        <div className={styles.error}>
+          {error ?? t("admin.contents.failedToLoad", "Failed to load")}
+        </div>
+      )}
+      {error && status === "ready" && <div className={styles.error}>{error}</div>}
+    </>
+  );
+}
+
+function TranslationModalFooter({
+  activeTab,
+  saving,
+  onClose,
+  onReview,
+  t,
+}: {
+  activeTab: string;
+  saving: boolean;
+  onClose: () => void;
+  onReview: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <DialogFooter>
+      <Button variant="outline" size="sm" onClick={onClose} disabled={saving}>
+        {t("common.cancel", "Cancel")}
+      </Button>
+      {activeTab === "review" ? (
+        <Button type="submit" form="translation-form" variant="primary" loading={saving}>
+          {saving ? t("admin.access.saving", "Saving…") : t("common.save", "Save")}
+        </Button>
+      ) : (
+        <Button type="button" variant="primary" onClick={onReview}>
+          {t("admin.modal.reviewTab", "Review")}
+        </Button>
+      )}
+    </DialogFooter>
+  );
+}
+
+function getTranslationModalTitle(
+  sourceTitle: string | null | undefined,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  const title = t("admin.translations.title", "Translations");
+  return sourceTitle ? `${title} — ${sourceTitle}` : title;
+}
+
+function shouldShowChildrenTab(
+  config: TranslationEntityConfig | null,
+  rootFormat: string | undefined,
+  entityId: string | null,
+): boolean {
+  return Boolean(config?.supportsChildren && rootFormat && rootFormat !== "single" && entityId);
+}
+
+type TranslationModalTabsProps = {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  config: TranslationEntityConfig;
+  targetEntity: ClientTranslationTarget["entity"];
+  state: TranslationFormState;
+  dispatch: React.Dispatch<TranslationFormAction>;
+  secondaryLocales: Locale[];
+  showChildrenTab: boolean;
+  errorTabs: string[];
+  childrenStatus: "idle" | "loading" | "ready" | "error";
+  childrenError: string | null;
+  childItems: TranslationChildSummary[] | null;
+  selectedChildId: string | null;
+  onSelectChild: (id: string | null) => void;
+  onPublishToggle: (locale: Locale) => Promise<void>;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function TranslationModalTabs({
+  activeTab,
+  onTabChange,
+  config,
+  targetEntity,
+  state,
+  dispatch,
+  secondaryLocales,
+  showChildrenTab,
+  errorTabs,
+  childrenStatus,
+  childrenError,
+  childItems,
+  selectedChildId,
+  onSelectChild,
+  onPublishToggle,
+  t,
+}: TranslationModalTabsProps) {
+  const tabs = showChildrenTab
+    ? [...secondaryLocales, "children", "review"]
+    : [...secondaryLocales, "review"];
+  const errorTabSet = new Set(errorTabs);
+
+  return (
+    <Tabs value={activeTab} onValueChange={onTabChange} className="min-h-0">
+      <TabsList
+        className="no-scrollbar w-full justify-start overflow-x-auto overflow-y-hidden"
+        aria-label={t("admin.modal.tabsLabel", "Form sections")}
+      >
+        {tabs.map((tab) => (
+          <TabsTrigger
+            key={tab}
+            value={tab}
+            aria-invalid={errorTabSet.has(tab) || undefined}
+            onClick={() => onTabChange(tab)}
+          >
+            {tab === "children"
+              ? t("admin.translations.childrenTab", "Sub-listings")
+              : tab === "review"
+                ? t("admin.modal.reviewTab", "Review")
+                : getLocaleLabel(secondaryLocales.find((locale) => locale === tab) ?? "ar")}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      <TranslationStatusNotices
+        status={state.status}
+        entityId={state.entityId}
+        error={state.error}
+        t={t}
+      />
+
+      {secondaryLocales.map((locale) => (
+        <TabsContent key={locale} value={locale}>
+          {state.status === "ready" && (
+            <TranslationLocaleFields
+              config={config}
+              state={state}
+              dispatch={dispatch}
+              locale={locale}
+              idPrefix={`translation-${targetEntity}`}
+              onPublishToggle={onPublishToggle}
+            />
+          )}
+        </TabsContent>
+      ))}
+
+      {showChildrenTab && (
+        <TabsContent value="children">
+          {state.status === "ready" && (
+            <TranslationChildrenTab
+              config={config}
+              status={childrenStatus}
+              error={childrenError}
+              items={childItems}
+              selectedChildId={selectedChildId}
+              onSelectChild={onSelectChild}
+              onBack={() => onSelectChild(null)}
+              onChildSaved={() => onSelectChild(null)}
+            />
+          )}
+        </TabsContent>
+      )}
+
+      <TabsContent value="review">
+        {state.status === "ready" && (
+          <TranslationReviewTab config={config} state={state} secondaryLocales={secondaryLocales} />
+        )}
+      </TabsContent>
+    </Tabs>
+  );
 }
 
 export function TranslationModal({ isOpen, onClose, target }: TranslationModalProps) {
@@ -72,8 +285,7 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target, dispatch]);
 
-  const showChildrenTab =
-    !!config?.supportsChildren && !!rootFormat && rootFormat !== "single" && !!state.entityId;
+  const showChildrenTab = shouldShowChildrenTab(config, rootFormat, state.entityId);
 
   useEffect(() => {
     const loadChildren = config?.loadChildren;
@@ -99,7 +311,6 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
 
   const secondaryLocales = getSecondaryLocales(state.mainLocale);
   const activeTab = activeTabOverride || secondaryLocales[0] || "review";
-
   const handleClose = () => {
     setErrorTabs([]);
     setActiveTabOverride("");
@@ -108,17 +319,15 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
   };
 
   async function handlePublishToggle(locale: Locale) {
-    // Closures defined after the early return above don't retain TypeScript's
-    // null-narrowing of `config`, so it's re-checked here.
-    if (!config || !config.supportsPublish || !state.entityId) return;
-    const currentlyPublished = state.translationStatus[locale] === "published";
-    const action = currentlyPublished ? config.unpublish : config.publish;
+    const request = getPublishAction(config, state, locale);
+    if (!request) return;
+    const { action, currentlyPublished, entityId } = request;
     if (!action) return;
 
     dispatch({ type: "SET_SAVING", saving: true });
     dispatch({ type: "SET_ERROR", error: null });
     try {
-      const result = await action(state.entityId, locale);
+      const result = await action(entityId, locale);
       dispatch({
         type: "SET_STATUS",
         locale,
@@ -181,94 +390,51 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
 
   const titleField = config.fields[0];
   const sourceTitle = titleField ? state.source[titleField.key] : undefined;
-  const modalTitle = sourceTitle
-    ? `${t("admin.translations.title", "Translations")} — ${sourceTitle}`
-    : t("admin.translations.title", "Translations");
+  const modalTitle = getTranslationModalTitle(sourceTitle, t);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      title={modalTitle}
-      size="xl"
-      width="wide"
-      height="long"
-      multiTab
-      requireReview
-      errorTabs={errorTabs}
-      activeTab={activeTab}
-      onActiveTabChange={setActiveTabOverride}
-      saveFormId="translation-form"
-      saving={state.saving}
-      reviewTabId="review"
-    >
-      <form id="translation-form" onSubmit={handleSave} className={styles.form}>
-        <Modal.Tabs errorTabs={errorTabs}>
-          {secondaryLocales.map((locale) => (
-            <Modal.TabItem key={locale} id={locale}>
-              {getLocaleLabel(locale)}
-            </Modal.TabItem>
-          ))}
-          {showChildrenTab && (
-            <Modal.TabItem id="children">
-              {t("admin.translations.childrenTab", "Sub-listings")}
-            </Modal.TabItem>
-          )}
-          <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
-        </Modal.Tabs>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && !state.saving && handleClose()}>
+      <DialogContent className="max-h-[calc(100vh-2rem)] overflow-hidden sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>{modalTitle}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("admin.modal.formDescription", "Complete each tab before saving.")}
+          </DialogDescription>
+        </DialogHeader>
 
-        {state.status === "loading" && (
-          <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
-        )}
+        <form
+          id="translation-form"
+          onSubmit={handleSave}
+          className={`${styles.form} min-h-0 flex-1`}
+        >
+          <TranslationModalTabs
+            activeTab={activeTab}
+            onTabChange={setActiveTabOverride}
+            config={config}
+            targetEntity={target.entity}
+            state={state}
+            dispatch={dispatch}
+            secondaryLocales={secondaryLocales}
+            showChildrenTab={showChildrenTab}
+            errorTabs={errorTabs}
+            childrenStatus={childrenStatus}
+            childrenError={childrenError}
+            childItems={children}
+            selectedChildId={selectedChildId}
+            onSelectChild={setSelectedChildId}
+            onPublishToggle={handlePublishToggle}
+            t={t}
+          />
 
-        {state.status === "error" && !state.entityId && (
-          <div className={styles.error}>
-            {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
-          </div>
-        )}
-
-        {state.status === "ready" && (
-          <>
-            {state.error && <div className={styles.error}>{state.error}</div>}
-
-            {secondaryLocales.map((locale) => {
-              if (activeTab !== locale) return null;
-              return (
-                <TranslationLocaleFields
-                  key={locale}
-                  config={config}
-                  state={state}
-                  dispatch={dispatch}
-                  locale={locale}
-                  idPrefix={`translation-${target.entity}`}
-                  onPublishToggle={handlePublishToggle}
-                />
-              );
-            })}
-
-            {showChildrenTab && activeTab === "children" && (
-              <TranslationChildrenTab
-                config={config}
-                status={childrenStatus}
-                error={childrenError}
-                items={children}
-                selectedChildId={selectedChildId}
-                onSelectChild={setSelectedChildId}
-                onBack={() => setSelectedChildId(null)}
-                onChildSaved={() => setSelectedChildId(null)}
-              />
-            )}
-
-            {activeTab === "review" && (
-              <TranslationReviewTab
-                config={config}
-                state={state}
-                secondaryLocales={secondaryLocales}
-              />
-            )}
-          </>
-        )}
-      </form>
-    </Modal>
+          <TranslationModalFooter
+            activeTab={activeTab}
+            saving={state.saving}
+            onClose={handleClose}
+            onReview={() => setActiveTabOverride("review")}
+            t={t}
+          />
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

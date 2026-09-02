@@ -28,34 +28,34 @@ describe('Core User Flows (e2e)', () => {
     await app.close();
   });
 
-  describe('Library Operations', () => {
-    it('POST /me/library/save/:listingId -> 201 (idempotent)', async () => {
+  describe('MyLibrary Operations', () => {
+    it('POST /me/my-library/save/:listingId -> 201 (idempotent)', async () => {
       const auth = await authFactory.createUser();
       // First save
       await request(app.getHttpServer())
-        .post(`/me/library/save/${TEST_LISTING_SLUG}`)
+        .post(`/me/my-library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
 
       // Second save (should be idempotent, i.e., return 201/200 and not error)
       await request(app.getHttpServer())
-        .post(`/me/library/save/${TEST_LISTING_SLUG}`)
+        .post(`/me/my-library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
     });
 
-    it('GET /me/library/saved -> listing appears', async () => {
+    it('GET /me/my-library/saved -> listing appears', async () => {
       const auth = await authFactory.createUser();
 
       // Save it first
       await request(app.getHttpServer())
-        .post(`/me/library/save/${TEST_LISTING_SLUG}`)
+        .post(`/me/my-library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
 
       // Fetch saved
       const res = await request(app.getHttpServer())
-        .get('/me/library/saved')
+        .get('/me/my-library/saved')
         .set(auth.headers)
         .expect(200);
 
@@ -64,24 +64,24 @@ describe('Core User Flows (e2e)', () => {
       expect(listingIds).toContain(TEST_LISTING_ID);
     });
 
-    it('DELETE /me/library/save/:listingId -> 200, listing removed', async () => {
+    it('DELETE /me/my-library/save/:listingId -> 200, listing removed', async () => {
       const auth = await authFactory.createUser();
 
       // Save it first
       await request(app.getHttpServer())
-        .post(`/me/library/save/${TEST_LISTING_SLUG}`)
+        .post(`/me/my-library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
 
       // Unsave it
       await request(app.getHttpServer())
-        .delete(`/me/library/save/${TEST_LISTING_SLUG}`)
+        .delete(`/me/my-library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(200);
 
       // Fetch saved again, should not contain it
       const res = await request(app.getHttpServer())
-        .get('/me/library/saved')
+        .get('/me/my-library/saved')
         .set(auth.headers)
         .expect(200);
 
@@ -135,7 +135,7 @@ describe('Core User Flows (e2e)', () => {
         .expect(200);
 
       expect(res.body).toBeInstanceOf(Array);
-      const matched = res.body.find((p: any) => p.listingId === TEST_LISTING_ID);
+      const matched = res.body.find((p: any) => p.listingSlug === TEST_LISTING_SLUG);
       expect(matched).toBeDefined();
       expect(matched.positionSeconds).toBe(50);
 
@@ -146,7 +146,7 @@ describe('Core User Flows (e2e)', () => {
         .set(auth.headers)
         .expect(200);
       expect(resFuture.body).toBeInstanceOf(Array);
-      expect(resFuture.body.find((p: any) => p.listingId === TEST_LISTING_ID)).toBeUndefined();
+      expect(resFuture.body.find((p: any) => p.listingSlug === TEST_LISTING_SLUG)).toBeUndefined();
     });
 
     it('PUT /audio/progress/:listingId with isCompleted: true -> marks done', async () => {
@@ -171,7 +171,7 @@ describe('Core User Flows (e2e)', () => {
       expect(progress?.isCompleted).toBe(true);
     });
 
-    it('GET /me/library/completed -> completed listing appears', async () => {
+    it('GET /me/my-library/completed -> completed listing appears', async () => {
       const auth = await authFactory.createUser();
 
       // Mark completed
@@ -187,7 +187,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Get completed listings
       const res = await request(app.getHttpServer())
-        .get('/me/library/completed')
+        .get('/me/my-library/completed')
         .set(auth.headers)
         .expect(200);
 
@@ -196,7 +196,7 @@ describe('Core User Flows (e2e)', () => {
       expect(listingIds).toContain(TEST_LISTING_ID);
     });
 
-    it('GET /me/library/progress -> in-progress listing appears', async () => {
+    it('GET /me/my-library/progress -> in-progress listing appears', async () => {
       const auth = await authFactory.createUser();
 
       // Update progress, but not completed
@@ -212,7 +212,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Get progress library list
       const res = await request(app.getHttpServer())
-        .get('/me/library/progress')
+        .get('/me/my-library/progress')
         .set(auth.headers)
         .expect(200);
 

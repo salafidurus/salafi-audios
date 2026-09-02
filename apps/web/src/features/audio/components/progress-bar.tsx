@@ -1,4 +1,7 @@
+/** Renders the audio position and optionally exposes a seekable range control. */
 "use client";
+
+import type { CSSProperties } from "react";
 
 import React from "react";
 
@@ -9,6 +12,11 @@ type ProgressBarProps = {
   onSeek?: (percent: number) => void;
 };
 
+type ProgressBarStyleVars = CSSProperties & {
+  "--progress-percent": string;
+};
+
+/** Displays playback progress and forwards range changes when seeking is enabled. */
 export function ProgressBar({ progressPercent, onSeek }: ProgressBarProps) {
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (onSeek) {
@@ -28,7 +36,13 @@ export function ProgressBar({ progressPercent, onSeek }: ProgressBarProps) {
         aria-label="Audio progress"
         disabled={!onSeek}
         className={`${styles.range} ${onSeek ? styles.rangeSeekable : styles.rangeDisabled}`}
-        style={{ "--progress-percent": `${progressPercent}%` } as React.CSSProperties}
+        style={
+          // SAFETY: React accepts CSS custom properties at runtime; this narrows the style
+          // object to the single progress variable consumed by progress-bar.module.css.
+          {
+            "--progress-percent": `${progressPercent}%`,
+          } as ProgressBarStyleVars
+        }
       />
     </div>
   );

@@ -1,8 +1,18 @@
-import { useEffect, useRef, Fragment, type ReactNode } from "react";
+import { BookOpen, CircleAlert } from "lucide-react";
+import { Fragment, useEffect, useRef, type ReactNode } from "react";
+import { z } from "zod";
+
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import { Button } from "@/shared/components/ui/button";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from "@/shared/components/ui/empty";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { Table, TableBody, TableHeader } from "@/shared/components/ui/table";
 
 import { List } from "../List";
 import styles from "./InfiniteScrollList.module.css";
 
+/** Provides append-on-intersection list rendering with accessible feedback states. */
+/** Props for a paginated list that appends pages and observes its loading sentinel. */
 export interface InfiniteScrollListProps<TData> {
   /** Flattened array of all loaded items */
   data: TData[];
@@ -10,7 +20,7 @@ export interface InfiniteScrollListProps<TData> {
   renderItem: (item: TData, index: number) => ReactNode;
   /** Whether data is loading */
   isLoading?: boolean;
-  /** Whether an error occurred */
+  /** Whether the current page request failed. */
   isError?: boolean;
   /** Callback to retry loading on error */
   onRetry?: () => void;
@@ -24,24 +34,176 @@ export interface InfiniteScrollListProps<TData> {
   emptyMessage?: string;
   /** Message when an error occurs */
   errorMessage?: string;
+  /** Optional table layout for tabular data. */
+  layout?: "list" | "table";
+  /** Header row rendered when using the table layout. */
+  tableHeader?: ReactNode;
 }
 
-// react-doctor-disable-next-line react-doctor/no-many-boolean-props
-export function InfiniteScrollList<TData>({
+const ItemWithIdSchema = z.object({
+  id: z.union([z.string(), z.number()]),
+});
+
+function itemKey<TData>(item: TData, index: number): string {
+  const parsed = ItemWithIdSchema.safeParse(item);
+  return parsed.success ? String(parsed.data.id) : String(index);
+}
+
+function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
+  return (
+    <Alert variant="destructive" className={styles.error}>
+      <CircleAlert aria-hidden="true" />
+      <AlertDescription>{message}</AlertDescription>
+      {onRetry && (
+        <Button type="button" variant="outline" size="sm" onClick={onRetry}>
+          Try again
+        </Button>
+      )}
+    </Alert>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className={styles.skeletonContainer} role="status" aria-label="Loading content">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Skeleton key={`list-skeleton-${i}`} className={styles.skeletonRow} />
+      ))}
+    </div>
+  );
+}
+
+function EmptyState({
+  message,
+  hasMore,
+  isFetchingNextPage,
+  observerTarget,
+}: {
+  message: string;
+  hasMore: boolean;
+  isFetchingNextPage?: boolean;
+  observerTarget: React.RefObject<HTMLDivElement | null>;
+}) {
+  return (
+    <>
+      <Empty className={styles.empty}>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <BookOpen aria-hidden="true" />
+          </EmptyMedia>
+          <EmptyDescription>{message}</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+      {hasMore && (
+        <div
+          ref={observerTarget}
+          className={styles.sentinel}
+          data-testid="infinite-scroll-sentinel"
+        />
+      )}
+      {hasMore && isFetchingNextPage && <div className={styles.loadingMore}>Loading more…</div>}
+    </>
+  );
+}
+
+function ListItems<TData>({
   data,
   renderItem,
-  isLoading,
-  isError,
-  onRetry,
-  hasMore,
-  onLoadMore,
+}: Pick<InfiniteScrollListProps<TData>, "data" | "renderItem">) {
+  return (
+    <>
+      {data.map((item, index) => (
+        <Fragment key={itemKey(item, index)}>{renderItem(item, index)}</Fragment>
+      ))}
+    </>
+  );
+}
+
+function LoadedState<TData>({
+  data,
+  renderItem,
+  layout,
+  tableHeader,
+  observerTarget,
   isFetchingNextPage,
-  emptyMessage = "No items found",
-  errorMessage = "Failed to load content. Please try again.",
-}: InfiniteScrollListProps<TData>): ReactNode {
+}: Pick<InfiniteScrollListProps<TData>, "data" | "renderItem" | "layout" | "tableHeader"> & {
+  observerTarget: React.RefObject<HTMLDivElement | null>;
+  isFetchingNextPage?: boolean;
+}) {
+  const loadingMore = isFetchingNextPage ? (
+    <div className={styles.loadingMore}>Loading more…</div>
+  ) : null;
+  const sentinel = (
+    <div ref={observerTarget} className={styles.sentinel} data-testid="infinite-scroll-sentinel" />
+  );
+
+  if (layout === "table") {
+    return (
+      <>
+        <Table>
+          {tableHeader && <TableHeader>{tableHeader}</TableHeader>}
+          <TableBody>
+            <ListItems data={data} renderItem={renderItem} />
+          </TableBody>
+        </Table>
+        {sentinel}
+        {loadingMore}
+      </>
+    );
+  }
+
+  return (
+    <List>
+      <ListItems data={data} renderItem={renderItem} />
+      {sentinel}
+      {loadingMore}
+    </List>
+  );
+}
+
+function renderEmptyState<TData>({
+  data,
+  isError,
+  errorMessage,
+  onRetry,
+  isLoading,
+  emptyMessage,
+  hasMore,
+  isFetchingNextPage,
+  observerTarget,
+}: {
+  data: TData[];
+  /** Whether the current page request failed. */ isError?: boolean;
+  /** Accessible message shown with the retry action. */ errorMessage: string;
+  onRetry?: () => void;
+  isLoading?: boolean;
+  emptyMessage: string;
+  hasMore: boolean;
+  isFetchingNextPage?: boolean;
+  observerTarget: React.RefObject<HTMLDivElement | null>;
+}): ReactNode | null {
+  if (isError && data.length === 0) return <ErrorState message={errorMessage} onRetry={onRetry} />;
+  if (isLoading && data.length === 0) return <LoadingState />;
+  if (data.length === 0) {
+    return (
+      <EmptyState
+        message={emptyMessage}
+        hasMore={hasMore}
+        isFetchingNextPage={isFetchingNextPage}
+        observerTarget={observerTarget}
+      />
+    );
+  }
+  return null;
+}
+
+function useInfiniteScrollObserver(
+  hasMore: boolean,
+  onLoadMore: () => void,
+  isFetchingNextPage: boolean,
+) {
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  // Setup intersection observer for infinite scroll
   useEffect(() => {
     if (!observerTarget.current) return;
 
@@ -58,48 +220,61 @@ export function InfiniteScrollList<TData>({
     return () => observer.disconnect();
   }, [hasMore, onLoadMore, isFetchingNextPage]);
 
-  if (isError && data.length === 0) {
-    return (
-      <div className={styles.error} role="alert">
-        <span>{errorMessage}</span>
-        {onRetry && (
-          <button type="button" className={styles.retryButton} onClick={onRetry}>
-            Try again
-          </button>
-        )}
-      </div>
-    );
-  }
+  return observerTarget;
+}
 
-  if (isLoading && data.length === 0) {
-    return (
-      <div className={styles.skeletonContainer} aria-hidden="true">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={`list-skeleton-${i}`}
-            className={`${styles.skeletonLine} ${styles.skeletonRow}`}
-          />
-        ))}
-      </div>
-    );
-  }
+function normalizeListFlags(
+  isLoading: boolean | undefined,
+  isError: boolean | undefined,
+  isFetchingNextPage: boolean | undefined,
+) {
+  return {
+    isLoading: isLoading ?? false,
+    isError: isError ?? false,
+    isFetchingNextPage: isFetchingNextPage ?? false,
+  };
+}
 
-  if (data.length === 0) {
-    return <div className={styles.empty}>{emptyMessage}</div>;
-  }
+/** Appends pages when its sentinel enters view and keeps feedback states accessible. */
+// react-doctor-disable-next-line react-doctor/no-many-boolean-props -- state flags are intentionally unified for list consumers
+export function InfiniteScrollList<TData>({
+  data,
+  renderItem,
+  isLoading,
+  isError,
+  onRetry,
+  hasMore,
+  onLoadMore,
+  isFetchingNextPage,
+  emptyMessage = "No items found",
+  errorMessage = "Failed to load content. Please try again.",
+  layout = "list",
+  tableHeader,
+}: InfiniteScrollListProps<TData>): ReactNode {
+  const flags = normalizeListFlags(isLoading, isError, isFetchingNextPage);
+  const observerTarget = useInfiniteScrollObserver(hasMore, onLoadMore, flags.isFetchingNextPage);
 
-  // Render all items in a List with intersection observer for loading more
+  const emptyState = renderEmptyState({
+    data,
+    isError: flags.isError,
+    errorMessage,
+    onRetry,
+    isLoading: flags.isLoading,
+    emptyMessage,
+    hasMore,
+    isFetchingNextPage: flags.isFetchingNextPage,
+    observerTarget,
+  });
+  if (emptyState) return emptyState;
+
   return (
-    <List>
-      {data.map((item, itemIndex) => (
-        <Fragment key={String((item as Record<string, unknown>)?.id ?? itemIndex)}>
-          {renderItem(item, itemIndex)}
-        </Fragment>
-      ))}
-
-      {/* Intersection observer target for loading more */}
-      <div ref={observerTarget} className={styles.sentinel} />
-      {isFetchingNextPage && <div className={styles.loadingMore}>Loading more…</div>}
-    </List>
+    <LoadedState
+      data={data}
+      renderItem={renderItem}
+      layout={layout}
+      tableHeader={tableHeader}
+      observerTarget={observerTarget}
+      isFetchingNextPage={flags.isFetchingNextPage}
+    />
   );
 }

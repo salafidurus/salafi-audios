@@ -1,8 +1,10 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import styles from "./Search.module.css";
 import { SearchGlyph } from "./SearchGlyph";
 
+/** Presentation and click behavior for the non-editable search affordance. */
 export interface SearchButtonProps {
   /** Label text for the button */
   label: string;

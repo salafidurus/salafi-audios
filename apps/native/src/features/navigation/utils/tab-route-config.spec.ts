@@ -1,4 +1,4 @@
-import { getRootTabFromPathname, getActiveSubsection } from "./tab-route-config";
+import { getRootTabFromPathname, isTabRoute } from "./tab-route-config";
 
 jest.mock("lucide-react-native", () => ({
   BookOpen: "BookOpen",
@@ -8,49 +8,49 @@ jest.mock("lucide-react-native", () => ({
 }));
 
 describe("getRootTabFromPathname", () => {
-  it("returns explore for root path /", () => {
-    expect(getRootTabFromPathname("/")).toBe("explore");
-  });
-  it("returns search for /search", () => {
-    expect(getRootTabFromPathname("/search")).toBe("search");
+  it("returns home for root path /", () => {
+    expect(getRootTabFromPathname("/")).toBe("home");
   });
   it("returns explore for /explore", () => {
     expect(getRootTabFromPathname("/explore")).toBe("explore");
   });
-  it("returns explore for /explore/recent", () => {
-    expect(getRootTabFromPathname("/explore/recent")).toBe("explore");
+  it("returns scholars for /scholars", () => {
+    expect(getRootTabFromPathname("/scholars")).toBe("scholars");
   });
-  it("returns library for /library", () => {
-    expect(getRootTabFromPathname("/library")).toBe("library");
-  });
-  it("returns library for /library/saved", () => {
-    expect(getRootTabFromPathname("/library/saved")).toBe("library");
+  it("returns my library for /my-library", () => {
+    expect(getRootTabFromPathname("/my-library")).toBe("myLibrary");
   });
   it("returns settings for /settings", () => {
     expect(getRootTabFromPathname("/settings")).toBe("settings");
   });
-  it("returns explore for unknown paths", () => {
-    expect(getRootTabFromPathname("/unknown")).toBe("explore");
-  });
+
+  it.each(["/search", "/listings/example", "/admin", "/unknown"])(
+    "does not treat %s as a persistent root",
+    (pathname) => {
+      expect(getRootTabFromPathname(pathname)).toBeNull();
+    },
+  );
 });
 
-describe("getActiveSubsection", () => {
-  it("returns default tab when no subsection", () => {
-    expect(getActiveSubsection("/", "explore")).toBe("recent");
-  });
-  it("returns matched subsection", () => {
-    expect(getActiveSubsection("/recent", "explore")).toBe("recent");
-  });
-  it("returns default tab for unrecognized subsection", () => {
-    expect(getActiveSubsection("/unknown", "explore")).toBe("recent");
-  });
-  it("returns matched library subsection", () => {
-    expect(getActiveSubsection("/library/saved", "library")).toBe("saved");
-  });
-  it("returns default library tab for bare path", () => {
-    expect(getActiveSubsection("/library", "library")).toBe("started");
-  });
-  it("strips trailing slash", () => {
-    expect(getActiveSubsection("/recent/", "explore")).toBe("recent");
+describe("isTabRoute", () => {
+  it.each(["/", "/explore", "/scholars", "/my-library", "/settings"])(
+    "recognizes %s as a root route",
+    (pathname) => {
+      expect(isTabRoute(pathname)).toBe(true);
+    },
+  );
+
+  it.each(["/recent", "/scholar", "/curation", "/my-library/saved", "/my-library/completed"])(
+    "rejects obsolete native sub-route %s",
+    (pathname) => {
+      expect(isTabRoute(pathname)).toBe(false);
+    },
+  );
+});
+
+/* Legacy subsection helpers intentionally no longer exist. */
+describe("removed subsection navigation", () => {
+  it("does not expose subsection route behavior through the root contract", () => {
+    expect(getRootTabFromPathname("/my-library/saved")).toBeNull();
   });
 });

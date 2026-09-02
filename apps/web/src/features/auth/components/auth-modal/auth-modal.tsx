@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { LazyMotion, AnimatePresence, m, domAnimation } from "framer-motion";
@@ -13,14 +14,14 @@ import { AppleSignInButton, GoogleSignInButton } from "../social-buttons";
 import styles from "./auth-modal.module.css";
 
 function getPortalRoot(): HTMLElement | null {
-  if (typeof document === "undefined") return null;
-  return document.body;
+  return globalThis.document?.body ?? null;
 }
 
 function subscribePortalRoot(): () => void {
   return () => {};
 }
 
+/** Controls the portal-rendered social sign-in dialog and its dismissal behavior. */
 export type AuthModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -28,7 +29,7 @@ export type AuthModalProps = {
 };
 
 const getRedirectTo = () => {
-  if (typeof window !== "undefined") {
+  if (globalThis.window) {
     return window.location.pathname + window.location.search;
   }
   return "/";
@@ -42,6 +43,7 @@ const handleSignIn = (provider: "google" | "apple") => {
   });
 };
 
+/** Renders an accessible sign-in dialog while trapping page scroll and handling Escape. */
 export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
   const { t } = useTranslation();
   const portalRoot = useSyncExternalStore(subscribePortalRoot, getPortalRoot, () => null);
@@ -154,6 +156,6 @@ export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
         )}
       </AnimatePresence>
     </LazyMotion>,
-    portalRoot!,
+    portalRoot,
   );
 }

@@ -1,25 +1,34 @@
+/** Public Content Catalog package surface for Listings, scholars, topics, and My Library. */
 // Infinite scroll hooks
 export {
   useInfiniteScholarsList,
-  useInfiniteLibrarySaved,
-  useInfiniteLibraryCompleted,
-  useInfiniteLibraryProgress,
+  useInfiniteMyLibrarySaved,
+  useInfiniteMyLibraryCompleted,
+  useInfiniteMyLibraryProgress,
   useInfiniteAdminScholars,
   useInfiniteAdminListings,
   useAdminListingSeriesByScholar,
   useAdminTopicsList,
   type UseInfiniteScholarsListOptions,
-  type UseInfiniteLibrarySavedOptions,
-  type UseInfiniteLibraryCompletedOptions,
-  type UseInfiniteLibraryProgressOptions,
+  type UseInfiniteMyLibrarySavedOptions,
+  type UseInfiniteMyLibraryCompletedOptions,
+  type UseInfiniteMyLibraryProgressOptions,
   type UseInfiniteAdminScholarsOptions,
   type UseInfiniteAdminListingsOptions,
 } from "./hooks";
 
 export { useExploreRecentScreen } from "./use-explore-recent";
-export { useLibrarySavedScreen } from "./use-library-saved";
-export { useLibraryCompletedScreen } from "./use-library-completed";
-export { useLibraryProgressScreen } from "./use-library-progress";
+export { useHomePromotions } from "./home.api";
+export { useMyLibrarySavedScreen } from "./use-my-library-saved";
+export { useMyLibraryCompletedScreen } from "./use-my-library-completed";
+export { useMyLibraryProgressScreen } from "./use-my-library-progress";
+export {
+  useMyLibrarySections,
+  type MyLibrarySection,
+  type MyLibrarySectionResult,
+  type MyLibrarySectionsResult,
+  type UseMyLibrarySectionsOptions,
+} from "./use-my-library-sections";
 export {
   useSavedStore,
   useIsSaved,
@@ -55,5 +64,6 @@ export {
   useFormattedScholarName,
   type ScholarWithNameAndTitle,
 } from "./utils/format-scholar-name";
-export { getLibraryItemPercent } from "./utils/library-item-progress";
+export { getMyLibraryItemPercent } from "./utils/my-library-item-progress";
 export { mergeLiveProgress } from "./utils/merge-live-progress";
+export { useEnrichedLocalLibraryItems } from "./my-library.catalog";

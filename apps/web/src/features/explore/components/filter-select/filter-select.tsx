@@ -1,21 +1,20 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
-import { useTranslation } from "@/core/i18n/use-translation";
-import {
-  Dropdown,
-  DropdownContent,
-  DropdownItem,
-  DropdownTrigger,
-} from "@/shared/components/Dropdown";
+import { ExploreFilterField } from "../explore-filter-field/explore-filter-field";
 
-import styles from "./filter-select.module.css";
-
+/** One option exposed by the explore filter control. */
 export interface FilterOption {
+  /** Stable option identifier passed back through `onChange`. */
   id: string;
+  /** Localized label rendered in the option list. */
   label: string;
 }
 
+/** Controlled configuration for the explore filter field. */
 export interface FilterSelectProps {
+  /** Stable DOM id for the field */
+  id?: string;
   /** Label rendered before the dropdown trigger */
   label: string;
   /** Available options; id "" represents the "All" reset state */
@@ -30,7 +29,9 @@ export interface FilterSelectProps {
   allLabel?: string;
 }
 
+/** Renders the explore filter as a select or searchable combobox. */
 export function FilterSelect({
+  id = "explore-filter",
   label,
   options,
   value,
@@ -38,28 +39,17 @@ export function FilterSelect({
   searchable = false,
   allLabel,
 }: FilterSelectProps) {
-  const { t } = useTranslation();
-  const resolvedAllLabel = allLabel ?? t("search.filterAll", "All");
-  const selectedLabel = options.find((option) => option.id === value)?.label ?? resolvedAllLabel;
-
   return (
-    <div className={styles.group}>
-      <span className={styles.label}>{label}</span>
-      <Dropdown value={value} onValueChange={onChange} className={styles.dropdown}>
-        <DropdownTrigger
-          placeholder={resolvedAllLabel}
-          ariaLabel={`${label} ${selectedLabel}`}
-          className={styles.trigger}
-        />
-        <DropdownContent searchable={searchable}>
-          <DropdownItem value="">{resolvedAllLabel}</DropdownItem>
-          {options.map((option) => (
-            <DropdownItem key={option.id} value={option.id}>
-              {option.label}
-            </DropdownItem>
-          ))}
-        </DropdownContent>
-      </Dropdown>
-    </div>
+    <ExploreFilterField
+      id={id}
+      label={label}
+      options={options}
+      value={value}
+      mode={searchable ? "combobox" : "select"}
+      allLabel={allLabel ?? "All"}
+      searchPlaceholder="Search"
+      emptyLabel="No options found"
+      onChange={onChange}
+    />
   );
 }

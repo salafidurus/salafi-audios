@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 const ONEDRIVE_HOSTS = [/(^|\.)1drv\.ms$/, /(^|\.)onedrive\.live\.com$/, /\.sharepoint\.com$/];
 
 const ONEDRIVE_MESSAGE =

@@ -1,16 +1,21 @@
 import type { PlaybackEngine, PlaybackEngineEvents, Track } from "@sd/domain-audio";
 
+import { hasMediaMetadataConstructor, hasNavigator, hasWindow } from "@/shared/lib/runtime-guards";
+
+/** Reports whether this browser exposes Media Session controls for lock-screen playback. */
 function hasMediaSession(): boolean {
-  return typeof navigator !== "undefined" && "mediaSession" in navigator;
+  return hasNavigator() && "mediaSession" in navigator;
 }
 
+/** Provides the browser media-element adapter. */
+/** Adapts the browser media element to the domain audio engine contract. */
 export class HTMLAudioAdapter implements PlaybackEngine {
   private audio: HTMLAudioElement | null = null;
   private events: PlaybackEngineEvents = {};
   private activeListeners: { [K in string]?: (e: Event) => void } = {};
 
   async setup(): Promise<void> {
-    if (typeof window === "undefined") {
+    if (!hasWindow()) {
       return;
     }
     if (!this.audio) {
@@ -100,7 +105,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   }
 
   private updateMediaSessionMetadata(track: Track) {
-    if (!hasMediaSession() || typeof MediaMetadata === "undefined") return;
+    if (!hasMediaSession() || !hasMediaMetadataConstructor()) return;
 
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.title,
@@ -130,7 +135,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
       this.events.onSkipNext?.();
     });
     navigator.mediaSession.setActionHandler("seekto", (details) => {
-      if (typeof details.seekTime === "number") {
+      if (details.seekTime !== undefined) {
         void this.seek(details.seekTime);
       }
     });

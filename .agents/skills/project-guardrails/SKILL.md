@@ -18,28 +18,28 @@ These rules are NON-NEGOTIABLE. Violations will be rejected.
 
 ## Documentation Quick Reference
 
-| If working on...                                  | Read this file first   |
-| ------------------------------------------------- | ---------------------- |
-| Getting started / overall system                  | `docs/README.md`       |
-| Product vision, philosophy, and guardrails        | `docs/prd.md`          |
-| Monorepo layout, dependencies, package boundaries | `docs/architecture.md` |
-| Backend architecture, API design, and auth        | `docs/api.md`          |
-| Database schemas, Prisma, and media management    | `docs/database.md`     |
-| Mobile app structure and offline synchronization  | `docs/mobile.md`       |
-| Web app structure and SEO strategy                | `docs/web.md`          |
-| Environments, configuration, and CI/CD            | `docs/dev-ops.md`      |
-| Current roadmap and phase progress                | `docs/AGENT.md`        |
+| If working on...                                  | Read this file first                                        |
+| ------------------------------------------------- | ----------------------------------------------------------- |
+| Getting started / overall system                  | `docs/README.md`                                            |
+| Product vision, philosophy, and guardrails        | `docs/product/requirements.md`                              |
+| Monorepo layout, dependencies, package boundaries | `docs/architecture.md`                                      |
+| Backend architecture, API design, and auth        | `docs/backend/api.md` and `docs/security/authentication.md` |
+| Database schemas, Prisma, and media management    | `docs/data/database.md`                                     |
+| Mobile app structure and offline synchronization  | `docs/clients/mobile.md`                                    |
+| Web app structure and SEO strategy                | `docs/clients/web.md`                                       |
+| Admin roles and scoped grants                     | `docs/administration/access-management.md`                  |
+| Environments, configuration, and CI/CD            | `docs/policies/deployment.md`                               |
+| Operational procedures                            | `docs/runbooks/README.md`                                   |
+| Current roadmap and phase progress                | `docs/AGENT.md`                                             |
 
 ## Referenced Rules
 
 These `.agents/rules/` files contain always-on behavioral rules that complement these guardrails:
 
-| Rule file            | What it covers                                                  |
-| -------------------- | --------------------------------------------------------------- |
-| `worktree-rules.md`  | Git worktree creation, env copy, pre-work verification, cleanup |
-| `tdd-rules.md`       | Strict TDD workflow: red → green → commit                       |
-| `rtk-rules.md`       | CLI token optimization via RTK                                  |
-| `codegraph-rules.md` | Structural code search via CodeGraph                            |
+| Rule file            | What it covers                       |
+| -------------------- | ------------------------------------ |
+| `rtk-rules.md`       | CLI token optimization via RTK       |
+| `codegraph-rules.md` | Structural code search via CodeGraph |
 
 ## Git Discipline
 
@@ -63,12 +63,12 @@ docs/      → authoritative documentation
 ### Package Map
 
 - **`@sd/core-*`**: Foundational infrastructure (auth, api, config, styles, i18n, env, db, contracts).
-- **`@sd/domain-content`**: Data hooks for lectures, scholars, series, feed, library.
+- **`@sd/domain-content`**: Data hooks for listings, scholars, topics, feed, and library.
+- **`@sd/domain-audio`**: Shared playback, track resolution, and progress behavior.
 - **`@sd/domain-account`**: Data hooks for user profile and auth state.
-- **`@sd/domain-playback`**: Playback engine and player state (Zustand + hooks).
-- **`@sd/domain-progress`**: Progress tracking state (Zustand + hooks).
 - **`@sd/domain-search`**: Search and quick-browse hooks.
 - **`@sd/design-tokens`**: Design tokens — authoritative source.
+- **`@sd/utils-error`**: Shared error utilities.
 
 **Dependency rules:**
 
@@ -125,12 +125,15 @@ Use tokens by **semantic role** from `packages/design-tokens`. Full reference in
 
 ## TDD
 
-Strict TDD is required. See `.agents/rules/tdd-rules.md` for the full workflow.
+Strict TDD is required. See `.agents/skills/tdd/SKILL.md` for the full workflow.
 
 ## Agent Worktree Enforcement
 
-- All AI agents must work inside a git worktree. See `.agents/rules/worktree-rules.md`.
-- Agents must either create a new worktree in the `.worktrees` folder, or ask the user if they should use one of the available worktrees or create a new one.
+The implementation lifecycle owns checkout policy: `pre-implement` classifies
+the required mode, `implement` selects and prepares the checkout, and
+`post-implement` performs merge-gated cleanup. Follow those skills for worktree
+creation, environment copying, dependency installation, verification, and
+resource deletion.
 
 ## Quick Commands
 
@@ -139,9 +142,13 @@ bun run dev              # All apps (api, web, native)
 bun run dev:api          # Backend only
 bun run dev:web          # Web only
 bun run dev:native       # Native only
-bun run build            # Build all
-bun run lint             # Lint all
-bun run typecheck        # Typecheck all
-bun run test             # Test all
+bun run build            # Build affected workspaces
+bun run lint             # Lint affected workspaces
+bun run typecheck        # Typecheck affected workspaces
+bun run test             # Test affected workspaces
+bun run build:all        # Build all workspaces
+bun run lint:all         # Lint all workspaces
+bun run typecheck:all    # Typecheck all workspaces
+bun run test:all         # Test all workspaces
 bun run format           # Format codebase
 ```

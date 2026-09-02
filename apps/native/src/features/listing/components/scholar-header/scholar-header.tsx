@@ -4,13 +4,16 @@ import { useFormatScholarName } from "@sd/domain-content";
 import { Linking, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+import { AppText } from "@/shared/ui";
 
+/** Describes the inputs and callbacks accepted by Scholar Header. */
+/** Describes the inputs, callbacks, and optional state accepted by Scholar Header. */
 export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {
     lectureCount: number;
     seriesCount: number;
+    /** Renders the native total duration seconds surface and coordinates its user-facing state. */
     totalDurationSeconds: number;
   };
 };
@@ -19,6 +22,48 @@ function openLink(url: string) {
   Linking.openURL(url).catch(() => undefined);
 }
 
+function renderStats(scholar: ScholarHeaderProps["scholar"], totalHours: number) {
+  const stats = [
+    { value: scholar.lectureCount, label: "Lectures" },
+    { value: scholar.seriesCount, label: "Series" },
+    ...(totalHours > 0 ? [{ value: `${totalHours}h`, label: "Total" }] : []),
+  ];
+
+  return (
+    <View style={styles.statsRow}>
+      {stats.map((stat) => (
+        <View style={styles.statItem} key={stat.label}>
+          <AppText variant="titleMd">{stat.value}</AppText>
+          <AppText variant="caption" style={styles.statLabel}>
+            {stat.label}
+          </AppText>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function renderSocialLinks(scholar: ScholarHeaderProps["scholar"]) {
+  const links = [
+    ["Website", scholar.socialWebsite],
+    ["YouTube", scholar.socialYoutube],
+    ["Twitter", scholar.socialTwitter],
+    ["Telegram", scholar.socialTelegram],
+  ].filter((link): link is [string, string] => Boolean(link[1]));
+
+  if (links.length === 0) return null;
+  return (
+    <View style={styles.socialRow}>
+      {links.map(([label, url]) => (
+        <Pressable key={label} onPress={() => openLink(url)}>
+          <AppText variant="labelMd">{label}</AppText>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+/** Renders the native scholar header surface and coordinates its user-facing state. */
 export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   const formatScholarName = useFormatScholarName();
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
@@ -42,56 +87,8 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
         </AppText>
       ) : null}
 
-      <View style={styles.statsRow}>
-        <View style={styles.statItem}>
-          <AppText variant="titleMd">{scholar.lectureCount}</AppText>
-          <AppText variant="caption" style={styles.statLabel}>
-            Lectures
-          </AppText>
-        </View>
-        <View style={styles.statItem}>
-          <AppText variant="titleMd">{scholar.seriesCount}</AppText>
-          <AppText variant="caption" style={styles.statLabel}>
-            Series
-          </AppText>
-        </View>
-        {totalHours > 0 ? (
-          <View style={styles.statItem}>
-            <AppText variant="titleMd">{totalHours}h</AppText>
-            <AppText variant="caption" style={styles.statLabel}>
-              Total
-            </AppText>
-          </View>
-        ) : null}
-      </View>
-
-      {scholar.socialWebsite ||
-      scholar.socialYoutube ||
-      scholar.socialTwitter ||
-      scholar.socialTelegram ? (
-        <View style={styles.socialRow}>
-          {scholar.socialWebsite ? (
-            <Pressable onPress={() => openLink(scholar.socialWebsite!)}>
-              <AppText variant="labelMd">Website</AppText>
-            </Pressable>
-          ) : null}
-          {scholar.socialYoutube ? (
-            <Pressable onPress={() => openLink(scholar.socialYoutube!)}>
-              <AppText variant="labelMd">YouTube</AppText>
-            </Pressable>
-          ) : null}
-          {scholar.socialTwitter ? (
-            <Pressable onPress={() => openLink(scholar.socialTwitter!)}>
-              <AppText variant="labelMd">Twitter</AppText>
-            </Pressable>
-          ) : null}
-          {scholar.socialTelegram ? (
-            <Pressable onPress={() => openLink(scholar.socialTelegram!)}>
-              <AppText variant="labelMd">Telegram</AppText>
-            </Pressable>
-          ) : null}
-        </View>
-      ) : null}
+      {renderStats(scholar, totalHours)}
+      {renderSocialLinks(scholar)}
     </View>
   );
 }

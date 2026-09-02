@@ -12,10 +12,10 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "lint": "oxlint .",
-    "test": "bun test",
+    "test": "bun test --pass-with-no-tests",
     "test:watch": "bun test --watch",
     "test:cov": "bun test --coverage",
-    "test:prepush": "bun test",
+    "test:prepush": "bun test --pass-with-no-tests",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

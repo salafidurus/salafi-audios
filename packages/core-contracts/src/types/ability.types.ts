@@ -7,6 +7,7 @@ import type { MongoAbility } from "@casl/ability";
  * string unions for the packed rules shipped via UserProfileDto's `rules`
  * field to reconstruct into an equivalent client-side ability.
  */
+/** Defines the contract type for app actions. */
 export type AppActions =
   | "manage"
   | "read"
@@ -20,6 +21,7 @@ export type AppActions =
   | "upload"
   | "grant";
 
+/** Defines the contract type for app subject type. */
 export type AppSubjectType =
   | "Scholar"
   | "Listing"
@@ -32,11 +34,29 @@ export type AppSubjectType =
 // Minimal shapes for subjects that are ever checked with resource conditions
 // (scholarSlug/locale). Plain data shapes, not real domain classes — CASL only
 // needs these to type the `conditions` argument passed alongside a subject().
-export type ScholarSubject = { slug: string };
-export type ListingSubject = { scholarSlug: string };
-export type TranslationSubject = { scholarSlug?: string; locale: string };
-export type MediaSubject = { scholarSlug: string };
+/** Defines the contract type for scholar subject. */
+export type ScholarSubject = {
+  /** Public scholar slug used to scope resource permissions. */
+  slug: string;
+};
+/** Defines the contract type for listing subject. */
+export type ListingSubject = {
+  /** Public slug of the scholar who owns the listing. */
+  scholarSlug: string;
+};
+/** Defines the contract type for translation subject. */
+export type TranslationSubject = {
+  /** Optional public scholar slug used to scope translation permissions. */
+  scholarSlug?: string;
+  locale: string;
+};
+/** Defines the contract type for media subject. */
+export type MediaSubject = {
+  /** Public slug of the scholar who owns the media resource. */
+  scholarSlug: string;
+};
 
+/** Defines the contract type for app subjects. */
 export type AppSubjects =
   | "all"
   | AppSubjectType
@@ -45,4 +65,5 @@ export type AppSubjects =
   | TranslationSubject
   | MediaSubject;
 
+/** Defines the contract type for app ability. */
 export type AppAbility = MongoAbility<[AppActions, AppSubjects]>;

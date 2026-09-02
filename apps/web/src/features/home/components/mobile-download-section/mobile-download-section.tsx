@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import {
@@ -8,10 +9,12 @@ import {
 import { StoreDownloadBadge } from "../store-download-badge/store-download-badge";
 import styles from "./mobile-download-section.module.css";
 
+/** Documents the intent and contract of this declaration. */
 export type MobileDownloadSectionProps = {
   availability: MobileAvailability;
 };
 
+/** Documents the intent and contract of this declaration. */
 export function MobileDownloadSection({ availability }: MobileDownloadSectionProps) {
   const iosAvailable = availability === "ios" || availability === "both";
   const androidAvailable = availability === "android" || availability === "both";

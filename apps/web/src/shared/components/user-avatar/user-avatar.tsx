@@ -1,9 +1,8 @@
 import type { ReactNode } from "react";
 
-import Image from "next/image";
+import { AppAvatar } from "@/shared/components/app-avatar";
 
-import styles from "./user-avatar.module.css";
-
+/** Documents this module's responsibility and public boundary. */
 type UserAvatarProps = {
   image: string | null;
   name: string | null;
@@ -19,48 +18,5 @@ export function UserAvatar({
   className,
   fill = false,
 }: UserAvatarProps): ReactNode {
-  if (fill) {
-    if (image) {
-      return (
-        <Image
-          src={image}
-          alt=""
-          fill
-          sizes="(max-width: 640px) 20vw, 14vw"
-          className={`${styles.avatar} ${className ?? ""}`}
-          unoptimized
-        />
-      );
-    }
-
-    return (
-      <div className={`${styles.fallbackFill} ${className ?? ""}`} aria-hidden="true">
-        {name?.charAt(0)?.toUpperCase() ?? "?"}
-      </div>
-    );
-  }
-
-  const avatarSize = size ?? 48;
-  if (image) {
-    return (
-      <Image
-        src={image}
-        alt=""
-        className={`${styles.avatar} ${className ?? ""}`}
-        width={avatarSize}
-        height={avatarSize}
-        unoptimized
-      />
-    );
-  }
-
-  return (
-    <div
-      className={`${styles.fallback} ${className ?? ""}`}
-      style={{ width: avatarSize, height: avatarSize, fontSize: avatarSize * 0.4 }}
-      aria-hidden="true"
-    >
-      {name?.charAt(0)?.toUpperCase() ?? "?"}
-    </div>
-  );
+  return <AppAvatar image={image} name={name} size={size} className={className} fill={fill} />;
 }

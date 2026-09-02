@@ -4,8 +4,9 @@ import { Image } from "expo-image";
 import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { AppText } from "@/shared/components/AppText/AppText";
+import { NativeText as AppText } from "@/shared/ui";
 
+/** Provides a reusable native UI primitive with a focused rendering contract. */
 type UserAvatarProps = {
   image?: string | null;
   name?: string | null;
@@ -14,6 +15,74 @@ type UserAvatarProps = {
   testID?: string;
 };
 
+type AvatarTheme = ReturnType<typeof useUnistyles>["theme"];
+
+function renderImage(
+  size: number,
+  fill: boolean,
+  borderRadius: number,
+  image: string,
+  testID?: string,
+): ReactNode {
+  return (
+    <Image
+      source={{ uri: image }}
+      style={
+        fill ? [styles.fillImage, { borderRadius }] : { width: size, height: size, borderRadius }
+      }
+      contentFit="cover"
+      testID={testID}
+    />
+  );
+}
+
+function renderFallback(
+  name: string | null | undefined,
+  size: number,
+  fill: boolean,
+  borderRadius: number,
+  theme: AvatarTheme,
+  testID?: string,
+): ReactNode {
+  const fallbackStyle = fill
+    ? [styles.fillFallback, { backgroundColor: theme.colors.surface.subtle, borderRadius }]
+    : [
+        styles.fallback,
+        {
+          width: size,
+          height: size,
+          borderRadius,
+          backgroundColor: theme.colors.surface.subtle,
+        },
+      ];
+  const textStyle = fill
+    ? { color: theme.colors.content.muted }
+    : { color: theme.colors.content.muted, fontSize: size * 0.4 };
+
+  return (
+    <View testID={testID} style={fallbackStyle}>
+      <AppText variant={fill ? "titleMd" : "bodyLg"} style={textStyle}>
+        {name?.charAt(0)?.toUpperCase() ?? "?"}
+      </AppText>
+    </View>
+  );
+}
+
+function renderAvatar(
+  image: string | null | undefined,
+  name: string | null | undefined,
+  size: number,
+  fill: boolean,
+  borderRadius: number,
+  theme: AvatarTheme,
+  testID?: string,
+): ReactNode {
+  return image
+    ? renderImage(size, fill, borderRadius, image, testID)
+    : renderFallback(name, size, fill, borderRadius, theme, testID);
+}
+
+/** Renders the native user avatar surface and coordinates its user-facing state. */
 export function UserAvatar({
   image,
   name,
@@ -24,66 +93,7 @@ export function UserAvatar({
   const { theme } = useUnistyles();
   const borderRadius = theme.radius.component.panelSm ?? theme.radius.scale.sm ?? 8;
 
-  if (fill) {
-    if (image) {
-      return (
-        <Image
-          source={{ uri: image }}
-          style={[styles.fillImage, { borderRadius }]}
-          contentFit="cover"
-          testID={testID}
-        />
-      );
-    }
-    return (
-      <View
-        style={[
-          styles.fillFallback,
-          { backgroundColor: theme.colors.surface.subtle, borderRadius },
-        ]}
-        testID={testID}
-      >
-        <AppText variant="titleMd" style={{ color: theme.colors.content.muted }}>
-          {name?.charAt(0)?.toUpperCase() ?? "?"}
-        </AppText>
-      </View>
-    );
-  }
-
-  const avatarSize = size;
-
-  if (image) {
-    return (
-      <Image
-        source={{ uri: image }}
-        style={{ width: avatarSize, height: avatarSize, borderRadius }}
-        contentFit="cover"
-        testID={testID}
-      />
-    );
-  }
-
-  return (
-    <View
-      testID={testID}
-      style={[
-        styles.fallback,
-        {
-          width: avatarSize,
-          height: avatarSize,
-          borderRadius,
-          backgroundColor: theme.colors.surface.subtle,
-        },
-      ]}
-    >
-      <AppText
-        variant="bodyLg"
-        style={{ color: theme.colors.content.muted, fontSize: avatarSize * 0.4 }}
-      >
-        {name?.charAt(0)?.toUpperCase() ?? "?"}
-      </AppText>
-    </View>
-  );
+  return renderAvatar(image, name, size, fill, borderRadius, theme, testID);
 }
 
 const styles = StyleSheet.create(() => ({

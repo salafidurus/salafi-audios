@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+/** Provides the production sitemap boundary. */
+/** Produces the indexable public route map only for production deployments. */
 export default function sitemap(): MetadataRoute.Sitemap {
   if (process.env.NODE_ENV !== "production") {
     return [];

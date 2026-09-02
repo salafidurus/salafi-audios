@@ -38,8 +38,8 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "tsup",
-    "lint": "oxlint .",
+    "build": "tsup && tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "lint": "oxlint . --ignore-pattern 'tsup.config.bundled_*.mjs'",
     "test": "bun test",
     "test:prepush": "bun test",
     "typecheck": "tsc -p tsconfig.json --noEmit",

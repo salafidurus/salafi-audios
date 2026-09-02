@@ -1,5 +1,6 @@
 import { usePlaybackStore } from "../store/playback.store";
 
+/** Playback-queue module consumed by navigation and track-position controls. */
 /** Reactive view of the current playback queue, for Next/Prev controls and "Lesson X of Y" UI. */
 export function useQueue() {
   const queue = usePlaybackStore((s) => s.queue);

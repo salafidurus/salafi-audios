@@ -2,6 +2,14 @@ import { createOutboxStore, type Outbox } from "@sd/core-sync";
 
 import { createSqliteKvAdapter } from "@/core/sync/sqlite-kv-adapter";
 
+/** Implements the native offline-download lifecycle, persistence, and synchronization boundary. */
+/** Defines the native download outbox payload contract shared by its consumers. */
+export type DownloadOutboxPayload = {
+  /** Carries the canonical lecture identity used to reconcile local and remote state. */
+  listingSlug: string;
+  audioUrl: string;
+};
+
 /**
  * Downloads outbox: queues offline-initiated download intent (start a
  * download while offline, actually fetch when connectivity returns) and
@@ -9,4 +17,7 @@ import { createSqliteKvAdapter } from "@/core/sync/sqlite-kv-adapter";
  * progress/saved's outboxes — the local download registry itself isn't
  * user-scoped either, so there's no cross-user leakage concern here.
  */
-export const downloadsOutbox: Outbox = createOutboxStore(createSqliteKvAdapter(), "downloads");
+export const downloadsOutbox: Outbox<DownloadOutboxPayload> = createOutboxStore(
+  createSqliteKvAdapter(),
+  "downloads",
+);

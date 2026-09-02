@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { Upload, X, Link2, Plus } from "lucide-react";
@@ -11,13 +12,13 @@ import type {
 import { useTranslation } from "@/core/i18n/use-translation";
 import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
 import { resolveLinksToMetadata } from "@/features/admin/utils/resolve-import-urls";
-import { Button } from "@/shared/components/Button";
-import { InputField } from "@/shared/components/InputField";
+import { Button } from "@/shared/components/ui/button";
+import { InputField } from "@/shared/components/ui/input-field";
 
 import styles from "./upload-arrange.module.css";
 
 interface UploadArrangeUploadTabProps {
-  state: UploadArrangeState;
+  /** Documents the intent and contract of this field. */ state: UploadArrangeState;
   dispatch: React.Dispatch<UploadArrangeAction>;
 }
 
@@ -42,6 +43,7 @@ function newLinkRow(): LinkRow {
   return { id: crypto.randomUUID(), value: "" };
 }
 
+/** Documents the intent and contract of this declaration. */
 export function UploadArrangeUploadTab({ state, dispatch }: UploadArrangeUploadTabProps) {
   const { t } = useTranslation();
   const [dragActive, setDragActive] = useState(false);

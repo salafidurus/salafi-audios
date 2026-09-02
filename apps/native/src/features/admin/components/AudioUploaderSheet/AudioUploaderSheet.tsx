@@ -5,14 +5,16 @@ import { useAbility } from "@sd/domain-account";
 import { useScholarsList } from "@sd/domain-content";
 import * as DocumentPicker from "expo-document-picker";
 import { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, type ViewStyle, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText, Button } from "@/shared/ui";
 
 import { getPresignedUrl, uploadToR2, createListing } from "../../api/admin-listings.api";
 
+/** Provides authenticated native administration workflows and their data boundaries. */
 async function getNativeAudioDuration(uri: string): Promise<number | undefined> {
   try {
     const { createAudioPlayer } = await import("expo-audio");
@@ -48,7 +50,9 @@ type UploadItem = {
   uri: string;
   mimeType: string;
   progress: number;
+  /** Records the lifecycle state used to decide which transition or UI state is valid. */
   status: "pending" | "uploading" | "done" | "error";
+  /** Stores the user-facing or diagnostic failure associated with the current operation. */
   error?: string;
 };
 
@@ -66,14 +70,13 @@ type ScholarChipProps = {
 
 function ScholarChip({ scholar, isSelected, onPress }: ScholarChipProps) {
   return (
-    <Pressable
+    <Button
+      label={scholar.name}
       onPress={() => onPress(scholar.id)}
-      style={[styles.scholarChip, isSelected && styles.scholarChipSelected]}
-    >
-      <Text style={[styles.scholarChipText, isSelected && styles.scholarChipTextSelected]}>
-        {scholar.name}
-      </Text>
-    </Pressable>
+      variant={isSelected ? "primary" : "outline"}
+      size="sm"
+      style={styles.scholarChip}
+    />
   );
 }
 
@@ -81,13 +84,21 @@ type QueueItemProps = {
   item: UploadItem;
 };
 
+function getErrorMessage(cause: unknown): string {
+  return cause instanceof Error ? cause.message : "Upload failed";
+}
+
+function getProgressFillWidth(progress: number): ViewStyle["width"] {
+  return `${Math.round(progress * 100)}%`;
+}
+
 function QueueItem({ item }: QueueItemProps) {
   const { theme } = useUnistyles();
   const fillStyle = useMemo(
     () => [
       styles.progressFill,
       {
-        width: `${Math.round(item.progress * 100)}%` as unknown as number,
+        width: getProgressFillWidth(item.progress),
         backgroundColor:
           item.status === "error"
             ? theme.colors.state.danger
@@ -101,19 +112,90 @@ function QueueItem({ item }: QueueItemProps) {
 
   return (
     <View style={styles.queueItem}>
-      <Text numberOfLines={1} style={styles.queueItemName}>
+      <AppText variant="bodySm" numberOfLines={1} style={styles.queueItemName}>
         {item.name}
-      </Text>
+      </AppText>
       <View style={styles.progressTrack}>
         <View style={fillStyle} />
       </View>
-      {item.status === "error" && <Text style={styles.queueItemError}>{item.error}</Text>}
+      {item.status === "error" && (
+        <AppText variant="bodySm" style={styles.queueItemError}>
+          {item.error}
+        </AppText>
+      )}
     </View>
   );
 }
 
+async function uploadSingleItem(
+  item: UploadItem,
+  index: number,
+  scholarId: string,
+  setItemState: (index: number, update: Partial<UploadItem>) => void,
+): Promise<boolean> {
+  try {
+    setItemState(index, { progress: 0, status: "uploading" });
+    // react-doctor-disable-next-line react/async-await-in-loop, react/async-parallel
+    const [{ uploadUrl, objectKey }, durationSeconds] = await Promise.all([
+      getPresignedUrl({ filename: item.name, contentType: item.mimeType, purpose: "audio" }),
+      getNativeAudioDuration(item.uri),
+    ]);
+    await uploadToR2(uploadUrl, item.uri, item.mimeType, (progress) =>
+      setItemState(index, { progress, status: "uploading" }),
+    );
+    await createListing({
+      title: item.name.replace(/\.[^.]+$/, ""),
+      audioKey: objectKey,
+      scholarId,
+      format: "single",
+      durationSeconds: durationSeconds ?? undefined,
+    });
+    setItemState(index, { progress: 1, status: "done" });
+    return true;
+  } catch (error) {
+    setItemState(index, { status: "error", error: getErrorMessage(error) });
+    return false;
+  }
+}
+
+async function uploadAllItems(
+  queue: UploadItem[],
+  scholarId: string,
+  setItemState: (index: number, update: Partial<UploadItem>) => void,
+): Promise<boolean> {
+  let anySuccess = false;
+  for (let i = 0; i < queue.length; i++) {
+    const item = queue[i]!;
+    if (item.status === "done") continue;
+    // react-doctor-disable-next-line react/async-await-in-loop, react-doctor/async-await-in-loop
+    anySuccess = (await uploadSingleItem(item, i, scholarId, setItemState)) || anySuccess;
+  }
+  return anySuccess;
+}
+
+async function pickAudioFiles(setQueue: (items: UploadItem[]) => void): Promise<void> {
+  const result = await DocumentPicker.getDocumentAsync({
+    type: ["audio/mpeg", "audio/mp4", "audio/x-m4a"],
+    multiple: true,
+  });
+  if (result.canceled) return;
+  setQueue(
+    result.assets.map((asset) => ({
+      name: asset.name,
+      uri: asset.uri,
+      mimeType: asset.mimeType ?? "audio/mpeg",
+      progress: 0,
+      status: "pending" as const,
+    })),
+  );
+}
+
+function isUploadDisabled(queueLength: number, isUploading: boolean, scholarId: string | null) {
+  return queueLength === 0 || isUploading || !scholarId;
+}
+
+/** Renders the native audio uploader sheet surface and coordinates its user-facing state. */
 export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioUploaderSheetProps) {
-  const { theme } = useUnistyles();
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
@@ -130,64 +212,21 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
   }, []);
 
   const handlePick = useCallback(async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: ["audio/mpeg", "audio/mp4", "audio/x-m4a"],
-      multiple: true,
-    });
-    if (result.canceled) return;
-    setQueue(
-      result.assets.map((a) => ({
-        name: a.name,
-        uri: a.uri,
-        mimeType: a.mimeType ?? "audio/mpeg",
-        progress: 0,
-        status: "pending" as const,
-      })),
-    );
+    await pickAudioFiles(setQueue);
   }, []);
 
   const handleUploadAll = useCallback(async () => {
     if (!selectedScholarId) return;
     setIsUploading(true);
-    let anySuccess = false;
     try {
-      for (let i = 0; i < queue.length; i++) {
-        const item = queue[i]!;
-        if (item.status === "done") continue;
-        try {
-          setItemState(i, { progress: 0, status: "uploading" });
-          // react-doctor-disable-next-line react-doctor/async-await-in-loop, react-doctor/async-parallel
-          const [{ uploadUrl, objectKey }, durationSeconds] = await Promise.all([
-            getPresignedUrl({
-              filename: item.name,
-              contentType: item.mimeType,
-              purpose: "audio",
-            }),
-            getNativeAudioDuration(item.uri),
-          ]);
-          await uploadToR2(uploadUrl, item.uri, item.mimeType, (p) =>
-            setItemState(i, { progress: p, status: "uploading" }),
-          );
-          await createListing({
-            title: item.name.replace(/\.[^.]+$/, ""),
-            audioKey: objectKey,
-            scholarId: selectedScholarId,
-            format: "single",
-            ...(durationSeconds != null ? { durationSeconds } : {}),
-          });
-          setItemState(i, { progress: 1, status: "done" });
-          anySuccess = true;
-        } catch (err) {
-          setItemState(i, { status: "error", error: (err as Error).message });
-        }
-      }
+      const anySuccess = await uploadAllItems(queue, selectedScholarId, setItemState);
+      if (anySuccess) onUploadComplete();
     } finally {
       setIsUploading(false);
-      if (anySuccess) onUploadComplete();
     }
   }, [selectedScholarId, queue, setItemState, onUploadComplete]);
 
-  const isUploadDisabled = queue.length === 0 || isUploading || !selectedScholarId;
+  const uploadDisabled = isUploadDisabled(queue.length, isUploading, selectedScholarId);
 
   const renderScholarItem = useCallback(
     ({ item: scholar }: { item: ScholarListItemDto }) => (
@@ -209,11 +248,13 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t("admin.audioUploader.title", "Upload Audio")}</Text>
+      <AppText variant="titleLg" style={styles.title}>
+        {t("admin.audioUploader.title", "Upload Audio")}
+      </AppText>
 
-      <Text style={styles.label}>
+      <AppText variant="labelMd" style={styles.label}>
         {t("admin.audioUploader.assignScholar", "Assign to Scholar")}
-      </Text>
+      </AppText>
       <FlatList
         data={scholars}
         horizontal
@@ -223,11 +264,12 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
         renderItem={renderScholarItem}
       />
 
-      <Pressable onPress={handlePick} style={styles.pickBtn}>
-        <Text style={styles.pickBtnText}>
-          {t("admin.audioUploader.selectFiles", "Select Audio Files")}
-        </Text>
-      </Pressable>
+      <Button
+        label={t("admin.audioUploader.selectFiles", "Select Audio Files")}
+        onPress={handlePick}
+        variant="outline"
+        style={styles.pickBtn}
+      />
 
       <FlatList
         data={queue}
@@ -237,22 +279,19 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
       />
 
       <View style={styles.buttonRow}>
-        <Pressable
+        <Button
+          label={t("admin.audioUploader.uploadAll", "Upload All")}
           onPress={handleUploadAll}
-          disabled={isUploadDisabled}
-          style={[styles.uploadBtn, isUploadDisabled && styles.uploadBtnDisabled]}
-        >
-          {isUploading ? (
-            <ActivityIndicator color={theme.colors.content.onPrimary} />
-          ) : (
-            <Text style={styles.uploadBtnText}>
-              {t("admin.audioUploader.uploadAll", "Upload All")}
-            </Text>
-          )}
-        </Pressable>
-        <Pressable onPress={onClose} style={styles.cancelBtn}>
-          <Text style={styles.cancelBtnText}>{t("common.cancel", "Cancel")}</Text>
-        </Pressable>
+          loading={isUploading}
+          disabled={uploadDisabled}
+          style={styles.uploadBtn}
+        />
+        <Button
+          label={t("common.cancel", "Cancel")}
+          onPress={onClose}
+          variant="ghost"
+          style={styles.cancelBtn}
+        />
       </View>
     </View>
   );

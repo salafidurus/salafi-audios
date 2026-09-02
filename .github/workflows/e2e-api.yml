@@ -7,11 +7,17 @@ on:
       - "packages/core-db/prisma/**"
       - "packages/core-db/package.json"
       - "packages/core-contracts/**"
+      - "packages/core-i18n/**"
+      - "tsconfig*.json"
+      - ".bun-version"
+      - "bunfig.toml"
+      - "package.json"
       - "bun.lock"
       - "turbo.json"
       - ".github/workflows/e2e-api.yml"
     branches:
       - main
+      - spec/**
 
 concurrency:
   group: e2e-api-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -43,7 +49,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.3.14"
+          bun-version: "1.4.0"
 
       - name: Set branch expiration (2 hours)
         run: echo "EXPIRES_AT=$(date -u --date '+2 hours' +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
@@ -72,7 +78,7 @@ jobs:
         env:
           DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
           DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
-        run: bun run turbo run build --filter=api...
+        run: bun run build:all --filter=api...
 
       - name: Run Prisma migrations
         env:

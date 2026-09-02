@@ -1,5 +1,4 @@
 import type {
-  AdminUserListDto,
   AdminTopicDetailDto,
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
@@ -11,6 +10,8 @@ import type {
 
 import { httpClient, endpoints } from "@sd/core-contracts";
 
+/** Exposes administrative access, scholar, and topic API operations. */
+/** Reads the user's current access assignments for the admin access editor. */
 export function fetchUserAccess(userId: string) {
   return httpClient<UserAccessSnapshot>({
     url: endpoints.admin.users.access(userId),
@@ -18,6 +19,7 @@ export function fetchUserAccess(userId: string) {
   });
 }
 
+/** Replaces all access assignments for a user with the supplied snapshot. */
 export function replaceUserAccess(userId: string, body: ReplaceUserAccessRequest) {
   return httpClient<UserAccessSnapshot>({
     url: endpoints.admin.users.access(userId),
@@ -28,13 +30,16 @@ export function replaceUserAccess(userId: string, body: ReplaceUserAccessRequest
 
 // --- Scholars ---
 
+/** Fields accepted when creating or partially updating a scholar. */
 export type AdminScholarInput = {
   name: string;
+  /** Stable URL identity used by public scholar routes. */
   slug: string;
   bio?: string;
   imageUrl?: string;
   isActive?: boolean;
   country?: string;
+  /** Primary language used when presenting the scholar's content. */
   mainLanguage?: "en" | "ar";
   title?: ScholarTitle;
   orderIndex?: number;
@@ -44,6 +49,7 @@ export type AdminScholarInput = {
   socialWebsite?: string;
 };
 
+/** Creates a scholar record from the admin form payload. */
 export function createScholar(data: AdminScholarInput) {
   return httpClient<unknown>({
     url: endpoints.admin.scholars.create,
@@ -52,6 +58,7 @@ export function createScholar(data: AdminScholarInput) {
   });
 }
 
+/** Patches only supplied scholar fields; blank and undefined values are omitted. */
 export function updateScholar(id: string, data: Partial<AdminScholarInput>) {
   const body = Object.fromEntries(
     Object.entries(data).filter(([, v]) => v !== undefined && v !== ""),
@@ -63,6 +70,7 @@ export function updateScholar(id: string, data: Partial<AdminScholarInput>) {
   });
 }
 
+/** Loads scholar values and select options needed by the editor. */
 export function fetchScholarFormData(id: string) {
   return httpClient<ScholarFormDataDto>({
     url: endpoints.admin.scholars.formData(id),
@@ -72,27 +80,7 @@ export function fetchScholarFormData(id: string) {
 
 // --- Topics ---
 
-export type AdminTopicInput = {
-  slug: string;
-  name: { en: string; ar?: string };
-};
-
-export function createTopic(data: AdminTopicInput) {
-  return httpClient<unknown>({
-    url: endpoints.admin.topics.create,
-    method: "POST",
-    body: data,
-  });
-}
-
-export function updateTopic(slug: string, data: AdminTopicInput) {
-  return httpClient<unknown>({
-    url: endpoints.admin.topics.update(slug),
-    method: "PATCH",
-    body: data,
-  });
-}
-
+/** Deletes a topic identified by its stable slug. */
 export function deleteTopic(slug: string) {
   return httpClient<unknown>({
     url: endpoints.admin.topics.delete(slug),
@@ -102,6 +90,7 @@ export function deleteTopic(slug: string) {
 
 // --- Topics — combined with translations ---
 
+/** Loads topic content together with its translation state for administrators. */
 export function fetchAdminTopic(slug: string) {
   return httpClient<AdminTopicDetailDto>({
     url: endpoints.admin.topics.detail(slug),
@@ -109,6 +98,7 @@ export function fetchAdminTopic(slug: string) {
   });
 }
 
+/** Creates a topic and its submitted translations in one API operation. */
 export function createTopicWithTranslations(data: CreateTopicWithTranslationsDto) {
   return httpClient<AdminTopicDetailDto>({
     url: endpoints.admin.topics.create,
@@ -117,6 +107,7 @@ export function createTopicWithTranslations(data: CreateTopicWithTranslationsDto
   });
 }
 
+/** Updates a topic and its submitted translations using the existing slug as identity. */
 export function updateTopicWithTranslations(slug: string, data: UpdateTopicWithTranslationsDto) {
   return httpClient<AdminTopicDetailDto>({
     url: endpoints.admin.topics.update(slug),
@@ -126,19 +117,3 @@ export function updateTopicWithTranslations(slug: string, data: UpdateTopicWithT
 }
 
 // --- Users ---
-
-export function fetchAdminUsers(params?: { q?: string; role?: string }) {
-  const url = endpoints.admin.users.list;
-  const query = new URLSearchParams();
-  if (params?.q) {
-    query.append("q", params.q);
-  }
-  if (params?.role) {
-    query.append("role", params.role);
-  }
-  const queryString = query.toString();
-  return httpClient<AdminUserListDto>({
-    url: queryString ? `${url}?${queryString}` : url,
-    method: "GET",
-  });
-}

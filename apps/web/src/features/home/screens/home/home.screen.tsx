@@ -1,28 +1,28 @@
+/** Provides the web Home study surface and composes shared Catalog data capabilities. */
 "use client";
 
 import type { FeedContentItemDto, FeedItemDto } from "@sd/core-contracts";
 
-import { useExploreRecentScreen } from "@sd/domain-content";
+import { useProgressStore } from "@sd/domain-audio";
+import { useExploreRecentScreen, useHomePromotions } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
-import { User } from "lucide-react";
 
+import { useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { Search } from "@/shared/components/Search";
 
-import { CategoryChips } from "../../components/category-chips/category-chips";
 import { ContinueListeningCard } from "../../components/continue-listening-card/continue-listening-card";
-import { HeroSection } from "../../components/hero-section/hero-section";
+import { CuratedExplorationSection } from "../../components/curated-exploration-section/curated-exploration-section";
 import { MobileDownloadSection } from "../../components/mobile-download-section/mobile-download-section";
-import { RecentlyAddedSection } from "../../components/recently-added-section/recently-added-section";
+import { RecentlyAddedSectionContent } from "../../components/recently-added-section/recently-added-section";
 import { ScholarMedallions } from "../../components/scholar-medallions/scholar-medallions";
-import { useHomePromotions } from "../../hooks/use-home-promotions";
-import { MOBILE_APP_AVAILABILITY } from "./home.constants";
+import { TopicDiscoverySection } from "../../components/topic-discovery-section/topic-discovery-section";
+import { FEATURED_SENIOR_SCHOLAR_SLUG, MOBILE_APP_AVAILABILITY } from "./home.constants";
 import styles from "./home.screen.module.css";
 
+/** Describes navigation callbacks supplied by the web Home route. */
 export type HomeScreenProps = {
-  onOpenSearch?: () => void;
-  onContinueListening?: (lectureId: string) => void;
+  onContinueListening?: (listingSlug: string) => void;
 };
 
 const MAX_RECENT_ITEMS = 10;
@@ -31,27 +31,103 @@ function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
   return item.kind !== "scholar_row" && item.kind !== "topic_row";
 }
 
-export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProps) {
-  const { recentProgress, isLoading: isProgressLoading } = useContinueListening();
-  const { data: promoData, isLoading: isPromosLoading } = useHomePromotions();
-  const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen({
-    limit: MAX_RECENT_ITEMS,
-  });
-  const { t } = useTranslation();
-
+function getContentItems(exploreData: { pages?: { items: FeedItemDto[] }[] } | undefined) {
   const items: FeedContentItemDto[] = [];
   for (const page of exploreData?.pages ?? []) {
     for (const item of page.items) {
-      if (isContentItem(item)) {
-        items.push(item);
-      }
+      if (isContentItem(item)) items.push(item);
     }
   }
+  return items;
+}
 
-  const featuredContent = promoData?.hero?.listing ?? items[0] ?? null;
-  const hasHistory = Boolean(recentProgress);
-  const isHeroLoading =
-    !hasHistory && !featuredContent && (isProgressLoading || isExploreLoading || isPromosLoading);
+function getLiveRecentProgress(
+  recentProgress: ReturnType<typeof useContinueListening>["recentProgress"],
+  localProgress:
+    | {
+        completedAt?: string | null;
+        positionSeconds?: number;
+        /** Duration used to reconcile local playback progress with the server projection. */
+        durationSeconds?: number;
+      }
+    | undefined,
+) {
+  if (!recentProgress || localProgress?.completedAt) return null;
+  return {
+    ...recentProgress,
+    ...mergeLocalProgress(recentProgress, localProgress),
+  };
+}
+
+function mergeLocalProgress(
+  recentProgress: NonNullable<ReturnType<typeof useContinueListening>["recentProgress"]>,
+  localProgress: Parameters<typeof getLiveRecentProgress>[1],
+) {
+  return {
+    positionSeconds: localProgress?.positionSeconds ?? recentProgress.positionSeconds,
+    durationSeconds: localProgress?.durationSeconds ?? recentProgress.durationSeconds,
+  };
+}
+
+function getHomeContentData(
+  promoData:
+    | {
+        hero?: { listing: FeedContentItemDto } | null;
+        editorsPicks?: { listing: FeedContentItemDto }[];
+      }
+    | undefined,
+  exploreData: { pages?: { items: FeedItemDto[] }[] } | undefined,
+  recentProgress: Parameters<typeof getLiveRecentProgress>[0],
+  localProgress: Parameters<typeof getLiveRecentProgress>[1],
+) {
+  const items = getContentItems(exploreData);
+  const featuredContent = getFeaturedContent(promoData, items);
+  return {
+    featuredContent,
+    recentItems: getRecentItems(items, featuredContent),
+    curatedItems: getCuratedItems(promoData),
+    liveRecentProgress: getLiveRecentProgress(recentProgress, localProgress),
+  };
+}
+
+function getFeaturedContent(
+  promoData: Parameters<typeof getHomeContentData>[0],
+  items: FeedContentItemDto[],
+): FeedContentItemDto | null {
+  return promoData?.hero?.listing ?? items[0] ?? null;
+}
+
+function getRecentItems(items: FeedContentItemDto[], featuredContent: FeedContentItemDto | null) {
+  return featuredContent ? items.filter((item) => item.id !== featuredContent.id) : items;
+}
+
+function getCuratedItems(promoData: Parameters<typeof getHomeContentData>[0]) {
+  return promoData?.editorsPicks?.map((pick) => pick.listing) ?? [];
+}
+
+type HomeContentProps = {
+  featuredContent: FeedContentItemDto | null;
+  recentItems: FeedContentItemDto[];
+  curatedItems: FeedContentItemDto[];
+  liveRecentProgress: ReturnType<typeof getLiveRecentProgress>;
+  isHeroLoading: boolean;
+  isExploreLoading: boolean;
+  isPromosLoading: boolean;
+  onContinueListening?: (listingSlug: string) => void;
+};
+
+function HomeContent({
+  featuredContent,
+  recentItems,
+  curatedItems,
+  liveRecentProgress,
+  isHeroLoading,
+  isExploreLoading,
+  isPromosLoading,
+  onContinueListening,
+}: HomeContentProps) {
+  const { t } = useTranslation();
+  const hasHistory = Boolean(liveRecentProgress);
 
   return (
     <ScreenView
@@ -60,45 +136,101 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
         display: "flex",
         flexDirection: "column",
         width: "100%",
-        gap: "2.5rem",
+        gap: "0",
         padding: "2rem 0",
       }}
       data-testid="home-screen-container"
     >
-      <div className={styles.topBar} data-testid="home-top-bar">
-        <Search.Button
-          label={t("home.searchLabel", "What do you want to listen to?")}
-          onClick={onOpenSearch}
-          inputWrapperClassName={styles.searchInputWrapper}
-          placeholderClassName={styles.searchPlaceholder}
-        />
-        <button
-          type="button"
-          className={styles.userButton}
-          aria-label={t("account.profile.title", "Account")}
-        >
-          <User size={16} />
-        </button>
-      </div>
+      <div className={styles.homeLayout}>
+        <header className={styles.homeHeader} data-testid="home-study-header">
+          <div className={styles.welcomeCopy}>
+            <p className={styles.eyebrow}>{t("home.eyebrow", "YOUR STUDY SPACE")}</p>
+            <h1>
+              {hasHistory
+                ? t("home.welcomeBack", "Welcome back to your study")
+                : t("home.beginStudy", "Build a steady listening path")}
+            </h1>
+            <p>
+              {t("home.intro", "Return to a lesson or find a thoughtful place to begin today.")}
+            </p>
+          </div>
+        </header>
 
-      <HeroSection
-        recentProgress={recentProgress}
-        featuredContent={featuredContent}
-        headline={promoData?.hero?.headline}
-        isLoading={isHeroLoading}
-        onResume={onContinueListening}
-        hasHistory={hasHistory}
-      />
-      <CategoryChips />
-      <ScholarMedallions />
-      <RecentlyAddedSection />
-      {recentProgress && (
-        <ContinueListeningCard
-          recentProgress={recentProgress}
-          onContinueListening={onContinueListening}
-        />
-      )}
-      <MobileDownloadSection availability={MOBILE_APP_AVAILABILITY} />
+        {liveRecentProgress && (
+          <section
+            className={styles.continuitySection}
+            data-testid="home-continue-listening-section"
+          >
+            <ContinueListeningCard
+              recentProgress={liveRecentProgress}
+              onContinueListening={onContinueListening}
+            />
+          </section>
+        )}
+
+        <section className={styles.discoverySection} data-testid="home-discovery-section">
+          <TopicDiscoverySection
+            featuredContent={featuredContent}
+            isFeaturedLoading={isHeroLoading}
+            onResume={onContinueListening}
+          />
+        </section>
+
+        <section className={styles.scholarsSection} data-testid="home-scholars-section">
+          <ScholarMedallions featuredScholarSlug={FEATURED_SENIOR_SCHOLAR_SLUG} />
+        </section>
+
+        <section data-testid="home-recent-section">
+          <RecentlyAddedSectionContent items={recentItems} isLoading={isExploreLoading} />
+        </section>
+
+        <section data-testid="home-curated-section">
+          <CuratedExplorationSection items={curatedItems} isLoading={isPromosLoading} />
+        </section>
+
+        <section className={styles.mobileSection} data-testid="home-mobile-section">
+          <div className={styles.sectionIntro}>
+            <p className={styles.eyebrow}>{t("home.mobile.eyebrow", "TAKE IT WITH YOU")}</p>
+            <h2>{t("home.mobile.title", "Keep your study close")}</h2>
+          </div>
+          <MobileDownloadSection availability={MOBILE_APP_AVAILABILITY} />
+        </section>
+      </div>
     </ScreenView>
+  );
+}
+
+/** Renders public Home content and overlays authenticated local-first listening continuity. */
+export function HomeScreen({ onContinueListening }: HomeScreenProps) {
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { recentProgress } = useContinueListening({
+    enabled: !isAuthLoading && isAuthenticated,
+  });
+  const localProgress = useProgressStore((state) =>
+    recentProgress ? state.progressMap[recentProgress.listingSlug] : undefined,
+  );
+  const { data: promoData, isLoading: isPromosLoading } = useHomePromotions();
+  const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen({
+    limit: MAX_RECENT_ITEMS,
+  });
+  const { featuredContent, recentItems, curatedItems, liveRecentProgress } = getHomeContentData(
+    promoData,
+    exploreData,
+    recentProgress,
+    localProgress,
+  );
+  const isHeroLoading = isExploreLoading || isPromosLoading;
+
+  return (
+    <HomeContent
+      featuredContent={featuredContent}
+      recentItems={recentItems}
+      curatedItems={curatedItems}
+      liveRecentProgress={liveRecentProgress}
+      isHeroLoading={isHeroLoading}
+      isExploreLoading={isExploreLoading}
+      isPromosLoading={isPromosLoading}
+      onContinueListening={onContinueListening}
+    />
   );
 }

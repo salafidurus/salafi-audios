@@ -28,6 +28,7 @@ const seriesContext: SeriesContextDto = {
 
 const trackA: Track = {
   id: "lec-a",
+  slug: "lec-a-slug",
   title: "Lesson A",
   artist: "Scholar",
   url: "",
@@ -35,6 +36,7 @@ const trackA: Track = {
 };
 const trackB: Track = {
   id: "lec-b",
+  slug: "lec-b-slug",
   title: "Lesson B",
   artist: "Scholar",
   url: "",
@@ -42,6 +44,7 @@ const trackB: Track = {
 };
 const trackC: Track = {
   id: "lec-c",
+  slug: "lec-c-slug",
   title: "Lesson C",
   artist: "Scholar",
   url: "",
@@ -62,7 +65,7 @@ describe("SeriesContextBar", () => {
       hasPrevious: false,
     });
 
-    await render(<SeriesContextBar seriesContext={seriesContext} lectureId="lec-b" />);
+    await render(<SeriesContextBar seriesContext={seriesContext} listingSlug="lec-b-slug" />);
 
     expect(screen.getByText("Islamic Jurisprudence")).toBeTruthy();
   });
@@ -76,7 +79,7 @@ describe("SeriesContextBar", () => {
       hasPrevious: true,
     });
 
-    await render(<SeriesContextBar seriesContext={seriesContext} lectureId="lec-b" />);
+    await render(<SeriesContextBar seriesContext={seriesContext} listingSlug="lec-b-slug" />);
 
     expect(screen.queryByText(/Lesson A/)).toBeNull();
     expect(screen.queryByText(/Lesson C/)).toBeNull();
@@ -91,7 +94,7 @@ describe("SeriesContextBar", () => {
       hasPrevious: true,
     });
 
-    await render(<SeriesContextBar seriesContext={seriesContext} lectureId="lec-b" />);
+    await render(<SeriesContextBar seriesContext={seriesContext} listingSlug="lec-b-slug" />);
 
     await fireEvent.press(screen.getByText(/Lesson A/));
     expect(audioService.skipToPrevious).toHaveBeenCalled();

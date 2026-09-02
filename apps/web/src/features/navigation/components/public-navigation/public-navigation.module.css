@@ -1,0 +1,631 @@
+.header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 20;
+  flex: 0 0 auto;
+  width: 100%;
+  border-block-end: 1px solid var(--border-subtle);
+  background: var(--chrome-surface-strong);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: max-content minmax(16rem, 20rem) minmax(0, 1fr) auto;
+  grid-template-areas: "brand search nav utilities";
+  align-items: center;
+  width: min(
+    calc(var(--space-layout-content-max) + (2 * var(--space-layout-page-x))),
+    100%
+  );
+  min-height: 4.5rem;
+  margin-inline: auto;
+  gap: var(--space-component-gap-xl);
+  padding: var(--space-sm) var(--space-layout-page-x);
+}
+
+.adminInner {
+  grid-template-columns: max-content minmax(14rem, 16rem) minmax(28rem, 1fr) auto;
+  gap: var(--space-component-gap-xl);
+}
+
+.adminInner .nav {
+  justify-content: flex-start;
+}
+
+.adminInner .brandName {
+  display: none;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: var(--space-component-gap-md);
+  grid-area: brand;
+  overflow: hidden;
+  color: var(--content-strong);
+  font-family: var(--font-display), serif;
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brandMark {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--action-primary) 28%, var(--border-subtle));
+  border-radius: var(--radius-component-panel);
+  background: color-mix(in srgb, var(--action-primary) 8%, var(--surface-subtle));
+}
+
+.brandMark img {
+  object-fit: contain;
+}
+
+.brandName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.workspaceBadge {
+  padding: var(--space-component-gap-sm) var(--space-component-gap-lg);
+  border: 1px solid color-mix(in srgb, var(--action-primary) 35%, var(--border-subtle));
+  border-radius: var(--radius-component-chip);
+  color: var(--action-primary);
+  font-family: var(--font-body), sans-serif;
+  font-size: var(--typo-caption-font-size);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.actions {
+  display: contents;
+}
+
+.searchSlot {
+  grid-area: search;
+  min-width: 0;
+}
+
+.rightActions {
+  grid-area: utilities;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  gap: var(--space-component-gap-sm);
+  justify-self: end;
+}
+
+.nav {
+  grid-area: nav;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 1 auto;
+  min-width: 0;
+  gap: var(--space-component-gap-sm);
+  width: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+
+.nav::-webkit-scrollbar {
+  display: none;
+}
+
+.navLink,
+.accountPopover a,
+.accountPopover button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-component-chip);
+  color: var(--content-subtle);
+  background: transparent;
+  font: inherit;
+  text-decoration: none;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.accountPopover .workspaceSwitch {
+  justify-content: flex-start;
+  min-height: 2.5rem;
+  border: 0;
+  border-radius: var(--radius-component-chip);
+  color: var(--content-default);
+  background: transparent;
+}
+
+.navLink {
+  position: relative;
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  padding: var(--space-component-gap-sm) var(--space-component-gap-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-scale-sm);
+  font-family: var(--font-body), sans-serif;
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-font-weight);
+  letter-spacing: var(--typo-body-md-letter-spacing);
+  line-height: var(--typo-body-md-line-height);
+  white-space: nowrap;
+}
+
+.navLink:hover,
+.navLink:focus-visible,
+.accountPopover a:hover,
+.accountPopover button:hover {
+  color: var(--content-strong);
+  background: var(--surface-hover);
+}
+
+.active {
+  position: relative;
+  color: var(--action-primary);
+  font-weight: 600;
+  background: transparent;
+}
+
+.active::after {
+  position: absolute;
+  inset-block-end: -1px;
+  inset-inline: var(--space-component-gap-md);
+  height: 2px;
+  border-radius: var(--radius-scale-full);
+  background: var(--action-primary);
+  content: "";
+}
+
+.navLink > svg {
+  display: none;
+}
+
+.menuTrigger {
+  min-width: 2.75rem;
+  border: 0;
+  border-radius: 0;
+  color: var(--content-default);
+  background: transparent;
+}
+
+.menuTrigger:hover,
+.menuTrigger:focus-visible {
+  background: transparent;
+}
+
+.accountControl,
+.workspaceSwitch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  gap: var(--space-component-gap-md);
+  min-height: 2.75rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-component-chip);
+  color: var(--content-muted);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.accountMenu .accountControl:active,
+.workspaceSwitch:active,
+.navLink:active {
+  background: var(--surface-subtle);
+}
+
+.accountMenu .accountControl {
+  gap: var(--space-component-gap-md);
+  max-width: 13rem;
+  border-color: transparent;
+  background: transparent;
+}
+
+.utilityControls {
+  display: flex;
+  align-items: center;
+  flex: 0 1 auto;
+  gap: var(--space-component-gap-md);
+  min-width: max-content;
+}
+
+.workspaceSwitch {
+  gap: var(--space-component-gap-md);
+  padding-inline: var(--space-component-gap-md);
+}
+
+.accountMenu .accountControl:hover,
+.accountMenu .accountControl:focus-visible,
+.accountMenu .accountControl[aria-expanded="true"] {
+  border-color: var(--border-subtle);
+  color: var(--content-strong);
+  background: var(--surface-hover);
+}
+
+.accountTrigger > svg {
+  transition: transform 150ms ease;
+}
+
+.accountTrigger[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+
+.workspaceSwitch {
+  border-color: var(--border-default);
+  color: var(--content-default);
+  background: transparent;
+  white-space: nowrap;
+}
+
+.workspaceSwitch:hover,
+.workspaceSwitch:focus-visible {
+  border-color: var(--border-hover);
+  color: var(--content-strong);
+  background: var(--surface-hover);
+}
+
+.accountMenu .accountControl:focus-visible,
+.workspaceSwitch:focus-visible,
+.navLink:focus-visible {
+  outline: 2px solid var(--accent-focus-ring);
+  outline-offset: 2px;
+}
+
+.accountMenu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.accountName {
+  overflow: hidden;
+  max-width: 8rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compactAccountLabel {
+  display: inline;
+}
+
+.compactAccount {
+  min-width: 2.75rem;
+  padding-inline: var(--space-sm);
+}
+
+.accountPopover {
+  position: absolute;
+  inset-block-start: calc(100% + var(--space-sm));
+  inset-inline-end: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 13rem;
+  padding: var(--space-sm);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-panel);
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-lg);
+}
+
+.accountPopover a,
+.accountPopover button {
+  width: 100%;
+  padding: var(--space-component-gap-sm) var(--space-component-gap-md);
+  cursor: pointer;
+  text-align: start;
+}
+
+.accountIdentity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-component-gap-sm) var(--space-component-gap-md);
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--content-muted);
+  font-size: var(--typo-caption-font-size);
+}
+
+.accountIdentity strong {
+  color: var(--content-strong);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.accountLoading {
+  width: var(--space-4xl);
+  height: var(--space-xl);
+  border-radius: var(--radius-component-chip);
+  background: var(--surface-subtle);
+}
+
+.mobileActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-sm);
+  margin-inline-start: auto;
+}
+
+.mobileActions > :global(button),
+.mobileActions > :global(a) {
+  min-height: 2.75rem;
+}
+
+.sheet .nav {
+  grid-area: auto;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: var(--space-component-gap-sm);
+  padding: 0;
+}
+
+.sheetNavigation {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+  padding: var(--space-component-gap-md) var(--space-scale-lg) 0;
+  overflow-y: auto;
+}
+
+.sheetBrand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: var(--space-component-gap-md);
+}
+
+.sheetBrandMark {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--action-primary) 28%, var(--border-subtle));
+  border-radius: var(--radius-component-panel);
+  background: color-mix(in srgb, var(--action-primary) 8%, var(--surface-subtle));
+}
+
+.sheetBrandMark img {
+  object-fit: contain;
+}
+
+.sheetHeading {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-component-gap-xs);
+}
+
+.sheetHeading :global([data-slot="sheet-title"]) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sheetHeading :global([data-slot="sheet-description"]) {
+  color: var(--content-muted);
+  font-size: var(--typo-caption-font-size);
+}
+
+.sheet .navLink {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: var(--space-component-gap-md) var(--space-scale-lg);
+  border-radius: var(--radius-component-panel);
+}
+
+.sheet .navLink + .navLink {
+  border-block-start: 1px solid transparent;
+}
+
+.sheet .navLink > svg {
+  display: none;
+}
+
+.sheet .workspaceSwitch {
+  width: 100%;
+  margin: 0;
+  justify-content: flex-start;
+}
+
+.sheet {
+  width: min(22rem, calc(100vw - var(--space-layout-page-x)));
+  border-color: var(--border-subtle);
+  background: var(--surface-elevated);
+}
+
+.sheetHeader {
+  gap: var(--space-component-gap-md);
+  padding: var(--space-scale-xl) var(--space-scale-lg) var(--space-scale-lg);
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.sheetLanguage {
+  width: auto;
+  margin-block-start: auto;
+  padding: var(--space-scale-lg);
+  border-block-start: 1px solid var(--border-subtle);
+}
+
+.sheetLanguage :global(button) {
+  width: 100%;
+  justify-content: space-between;
+}
+
+@media (max-width: 1600px) and (min-width: 641px) {
+  .header {
+    padding-block-start: var(--space-sm);
+  }
+
+  .inner {
+    grid-template-columns: max-content 2.75rem minmax(0, 1fr) auto;
+    gap: var(--space-component-gap-md);
+    min-height: 4rem;
+    padding: var(--space-scale-sm) var(--space-layout-page-x);
+  }
+  .brand {
+    min-width: 0;
+    gap: var(--space-sm);
+    overflow: hidden;
+    font-size: var(--typo-body-md-font-size);
+  }
+
+  .nav {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .navLink {
+    padding-inline: var(--space-sm);
+    font-size: var(--typo-body-sm-font-size);
+  }
+
+  .rightActions {
+    gap: var(--space-component-gap-sm);
+  }
+
+  .accountName {
+    max-width: 7rem;
+  }
+
+  .searchControl {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    flex: 0 0 2.75rem;
+    border-radius: var(--radius-component-chip);
+    padding-inline: 0;
+  }
+
+  .searchControl span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .searchControl kbd {
+    display: none;
+  }
+}
+
+@media (max-width: 1600px) and (min-width: 641px) {
+  .searchSlot :global([data-slot="button"]) {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    flex: 0 0 2.75rem;
+    justify-content: center;
+    padding-inline: 0;
+    border-radius: var(--radius-component-chip);
+  }
+
+  .searchSlot :global([data-slot="button"] span),
+  .searchSlot :global([data-slot="button"] kbd) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand mobileActions";
+    min-height: 3.5rem;
+    padding-inline: var(--space-layout-page-x);
+  }
+
+  .mobileActions {
+    grid-area: mobileActions;
+  }
+
+  .brand {
+    max-width: 3rem;
+    font-size: var(--typo-body-md-font-size);
+  }
+
+  .brandName {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .brandMark {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .workspaceBadge {
+    display: none;
+  }
+
+  .compactAccountLabel,
+  .compactAccount .accountName,
+  .compactAccount > svg:last-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .searchControl {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    flex: 0 0 2.75rem;
+    border-radius: var(--radius-component-chip);
+    padding-inline: 0;
+  }
+
+  .searchControl span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .searchControl kbd {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navLink,
+  .searchControl,
+  .accountControl,
+  .workspaceSwitch {
+    transition: none;
+  }
+
+  .accountTrigger > svg {
+    transition: none;
+  }
+}

@@ -30,8 +30,22 @@ jest.mock("../audio-service", () => ({
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { audioService } = require("../audio-service");
 
-const trackA: Track = { id: "a", title: "A", artist: "Scholar", url: "", durationSeconds: 100 };
-const trackB: Track = { id: "b", title: "B", artist: "Scholar", url: "", durationSeconds: 100 };
+const trackA: Track = {
+  id: "a",
+  slug: "a-slug",
+  title: "A",
+  artist: "Scholar",
+  url: "",
+  durationSeconds: 100,
+};
+const trackB: Track = {
+  id: "b",
+  slug: "b-slug",
+  title: "B",
+  artist: "Scholar",
+  url: "",
+  durationSeconds: 100,
+};
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -48,7 +62,7 @@ describe("PlaybackControls", () => {
     usePlaybackStore.getState().actions.setCurrentTrack(trackA);
 
     await render(<PlaybackControls />);
-    await fireEvent.press(screen.getByLabelText("Previous track"));
+    await fireEvent.press(screen.getByTestId("previous-track"));
 
     expect(audioService.skipToPrevious).toHaveBeenCalled();
   });
@@ -57,7 +71,7 @@ describe("PlaybackControls", () => {
     usePlaybackStore.getState().actions.setCurrentTrack(trackA);
 
     await render(<PlaybackControls />);
-    await fireEvent.press(screen.getByLabelText("Next track"));
+    await fireEvent.press(screen.getByTestId("next-track"));
 
     expect(audioService.skipToNext).not.toHaveBeenCalled();
   });
@@ -67,7 +81,7 @@ describe("PlaybackControls", () => {
     usePlaybackStore.getState().actions.setQueueState([trackA, trackB], 0);
 
     await render(<PlaybackControls />);
-    await fireEvent.press(screen.getByLabelText("Next track"));
+    await fireEvent.press(screen.getByTestId("next-track"));
 
     expect(audioService.skipToNext).toHaveBeenCalled();
   });

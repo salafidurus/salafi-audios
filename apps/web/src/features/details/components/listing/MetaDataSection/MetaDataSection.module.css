@@ -1,0 +1,136 @@
+.container {
+  display: flex;
+  gap: var(--space-component-gap-lg, 24px);
+  align-items: flex-start;
+  width: 100%;
+}
+
+.artworkContainer {
+  width: 128px;
+  height: 128px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--surface-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.bookmarkRibbon {
+  position: absolute;
+  top: -1px;
+  right: 18px;
+  width: 26px;
+  height: 40px;
+  background: linear-gradient(180deg, var(--content-primary-strong), var(--action-primary));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  z-index: 2;
+}
+
+.artworkAvatar {
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+.titleText {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--content-strong);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.textColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm, 8px);
+  min-width: 0;
+  flex: 1;
+}
+
+.scholarLink {
+  color: var(--content-strong);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-component-gap-xs, 8px);
+  width: fit-content;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.scholarTitle {
+  color: var(--content-primary-strong);
+  font-size: var(--typo-label-sm-font-size);
+  font-weight: var(--typo-label-sm-font-weight);
+  letter-spacing: var(--typo-label-sm-letter-spacing);
+  line-height: 1;
+}
+
+.scholarLink:hover {
+  color: var(--content-primary-strong);
+  text-decoration: underline;
+}
+
+.scholarAvatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-component-gap-sm, 12px);
+  color: var(--content-muted);
+  margin-top: calc(var(--space-component-gap-xs, 4px));
+}
+
+.description {
+  margin: 0;
+  color: var(--content-secondary);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+
+.dot {
+  color: var(--content-muted);
+  font-size: 0.85rem;
+}
+
+.sidebar {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-component-gap-md, 16px);
+}
+
+.sidebar .artworkContainer {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.sidebar .titleText {
+  font-size: 23px;
+}
+
+@media (max-width: 640px) {
+  .container {
+    gap: var(--space-component-gap-md, 16px);
+  }
+
+  .artworkContainer {
+    width: 96px;
+    height: 96px;
+  }
+}

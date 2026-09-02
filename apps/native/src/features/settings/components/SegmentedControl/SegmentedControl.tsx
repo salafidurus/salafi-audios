@@ -1,29 +1,31 @@
+/** Provides a controlled, direction-aware native segmented control. */
+import { Host } from "@expo/ui";
 import { SegmentedControl as NativeSegmentedControl } from "@expo/ui/community/segmented-control";
-import { I18nManager, View, type ViewStyle } from "react-native";
+import { I18nManager } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
-const base = {
-  container: { width: "100%" } as ViewStyle,
-  control: { width: "100%" } as ViewStyle,
-};
-
+/** Describes one selectable native segmented-control option. */
+/** Defines one selectable option in the segmented control. */
 export interface SegmentedControlOption<T extends string> {
   value: T;
   label: string;
 }
 
+/** Describes the controlled value and callback contract for the segmented control. */
 export interface SegmentedControlProps<T extends string> {
   options: SegmentedControlOption<T>[];
   value: T;
   onChange: (value: T) => void;
   ariaLabel?: string;
+  testID?: string;
 }
 
+/** Renders a direction-aware native segmented control. */
 export function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
-  ariaLabel,
+  testID,
 }: SegmentedControlProps<T>) {
   const { theme, rt } = useUnistyles();
   const isNativeRTL = I18nManager.isRTL;
@@ -34,14 +36,9 @@ export function SegmentedControl<T extends string>({
   const effectiveIndex = effectiveOptions.findIndex((opt) => opt.value === value);
 
   return (
-    // NativeSegmentedControl wraps itself in its own @expo/ui Host internally —
-    // nesting another Host around it breaks touch dispatch, so this is a plain
-    // RN View purely for the accessibility label, not a second native boundary.
-    // NativeSegmentedControl's internal Host only matches content *height*
-    // (`matchContents: { vertical: true }`), so width comes entirely from
-    // external layout — without an explicit width here it collapses to ~0.
-    <View accessible accessibilityLabel={ariaLabel} style={base.container}>
+    <Host matchContents={false} style={{ width: "100%", height: 60 }}>
       <NativeSegmentedControl
+        testID={testID}
         values={effectiveOptions.map((opt) => opt.label)}
         selectedIndex={effectiveIndex === -1 ? undefined : effectiveIndex}
         onChange={(event) => {
@@ -49,15 +46,9 @@ export function SegmentedControl<T extends string>({
           if (opt) onChange(opt.value);
         }}
         tintColor={theme.colors.action.primary}
-        appearance={
-          rt.themeName === "midnight" ||
-          rt.themeName === "ember" ||
-          (rt.themeName === "system" && rt.colorScheme === "dark")
-            ? "dark"
-            : "light"
-        }
-        style={base.control}
+        appearance={rt.themeName === "dark" ? "dark" : "light"}
+        style={{ alignSelf: "stretch" }}
       />
-    </View>
+    </Host>
   );
 }

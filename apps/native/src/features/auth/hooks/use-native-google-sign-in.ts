@@ -1,5 +1,10 @@
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import {
+  GoogleSignin,
+  type SignInResponse,
+  type User,
+} from "@react-native-google-signin/google-signin";
 import { useCallback, useState } from "react";
+import { z } from "zod";
 
 import { authClient, refreshSession } from "@/core/auth";
 import { getGoogleWebClientId } from "@/core/config/runtime-env";
@@ -9,10 +14,34 @@ import { getGoogleWebClientId } from "@/core/config/runtime-env";
 // types `signIn()` as `Promise<User>` instead of the real native
 // `SignInResponse` union. Metro still bundles the real native implementation;
 // this local type just corrects what TS sees it returning.
+/** Encapsulates a user-facing native feature and its local integration boundaries. */
 type NativeGoogleSignInResponse =
   | { type: "success"; data: { idToken: string | null } }
   | { type: "cancelled"; data: null };
 
+type NativeGoogleSignInResponseCandidate =
+  | SignInResponse
+  | User
+  | { type?: string; data?: { idToken?: string | null } | null };
+
+const NativeGoogleSignInResponseSchema = z.union([
+  z.object({
+    type: z.literal("success"),
+    data: z.object({ idToken: z.string().nullable() }),
+  }),
+  z.object({
+    type: z.literal("cancelled"),
+    data: z.null(),
+  }),
+]);
+
+function parseNativeGoogleSignInResponse(
+  candidate: NativeGoogleSignInResponseCandidate,
+): NativeGoogleSignInResponse {
+  return NativeGoogleSignInResponseSchema.parse(candidate);
+}
+
+/** Provides native google sign in state and behavior to native consumers. */
 export function useNativeGoogleSignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +54,7 @@ export function useNativeGoogleSignIn() {
       GoogleSignin.configure({ webClientId: getGoogleWebClientId() });
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
 
-      const response = (await GoogleSignin.signIn()) as unknown as NativeGoogleSignInResponse;
+      const response = parseNativeGoogleSignInResponse(await GoogleSignin.signIn());
       if (response.type === "cancelled") {
         return;
       }

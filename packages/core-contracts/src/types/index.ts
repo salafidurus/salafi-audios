@@ -1,3 +1,4 @@
+/** Re-exports the complete shared DTO and schema vocabulary for package consumers. */
 export {
   AccessTargetEnum,
   type AccessTarget,
@@ -131,6 +132,8 @@ export {
   ScholarViewDtoSchema,
   type ScholarDetailDto,
   ScholarDetailDtoSchema,
+  type ScholarDetailStats,
+  ScholarDetailStatsSchema,
   type ScholarStatsDto,
   ScholarStatsDtoSchema,
   type ScholarListItemDto,
@@ -204,17 +207,17 @@ export {
   FeedPageDtoSchema,
 } from "../types/feed.types";
 export {
-  type LibraryItemDto,
-  LibraryItemDtoSchema,
-  type LibraryPageDto,
-  LibraryPageDtoSchema,
+  type MyLibraryItemDto,
+  MyLibraryItemDtoSchema,
+  type MyLibraryPageDto,
+  MyLibraryPageDtoSchema,
   type SavedSyncItemDto,
   SavedSyncItemDtoSchema,
   type SavedSyncDto,
   SavedSyncDtoSchema,
   type SavedDeltaItemDto,
   SavedDeltaItemDtoSchema,
-} from "../types/library.types";
+} from "../types/my-library.types";
 export {
   type UserProfileDto,
   UserProfileDtoSchema,
@@ -238,10 +241,25 @@ export {
   AdminUserListDtoSchema,
 } from "./admin.types";
 export {
+  type AdminDashboardDto,
+  AdminDashboardDtoSchema,
+  AdminDashboardMetricSchema,
+  AdminDashboardActivitySchema,
+  AdminDashboardPendingWorkSchema,
+} from "./admin-dashboard.types";
+export {
   type ScholarChipDto,
   ScholarChipDtoSchema,
   type ContentSuggestionDto,
   ContentSuggestionDtoSchema,
+  type HomePromotionListingDto,
+  HomePromotionListingDtoSchema,
+  type HomePromotionHeroDto,
+  HomePromotionHeroDtoSchema,
+  type HomePromotionPickDto,
+  HomePromotionPickDtoSchema,
+  type HomePromotionsDto,
+  HomePromotionsDtoSchema,
   type RecentProgressDto,
   RecentProgressDtoSchema,
   type QuickBrowseDto,

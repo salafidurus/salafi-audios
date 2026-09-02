@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ListingProgressDtoSchema } from "@sd/core-contracts";
 import {
   drainPendingProgress,
   flushPendingProgress,
@@ -19,6 +20,7 @@ import { AppState, type AppStateStatus } from "react-native";
 
 import { createSqliteKvAdapter } from "../sync/sqlite-kv-adapter";
 
+/** Coordinates native playback progress and persistence around the audio engine. */
 const STORAGE_KEY_PREFIX = "sd:progress-cache:v1:";
 const DEFAULT_PERSIST_THROTTLE_MS = 5000;
 
@@ -31,7 +33,12 @@ async function readCachedProgress(userId: string): Promise<ListingProgress[]> {
     const raw = await AsyncStorage.getItem(storageKey(userId));
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed)
+      ? parsed.flatMap((entry) => {
+          const result = ListingProgressDtoSchema.safeParse(entry);
+          return result.success ? [result.data] : [];
+        })
+      : [];
   } catch {
     return [];
   }
@@ -47,7 +54,7 @@ async function writeCachedProgress(userId: string, entries: ListingProgress[]): 
 
 /**
  * Wires local, per-user local-first sync for the current app session — both
- * progress and saved/library state: hydrates progress from the local cache
+ * progress and saved/my-library state: hydrates progress from the local cache
  * immediately (before the network round-trip resolves), then both from the
  * server; persists progress store changes back to the cache (throttled); and
  * flushes any pending debounced sync (both progress and saved) when the app

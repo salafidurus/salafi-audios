@@ -10,10 +10,12 @@ import type {
 } from '@sd/core-contracts';
 import { ConfigService } from '../../core/config/config.service';
 
+/** media application module responsible for media.service behavior at the backend boundary. */
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const AUDIO_EXTENSIONS = ['mp3', 'm4a', 'aac', 'ogg', 'opus', 'wav'];
 
 @Injectable()
+/** NestJS media service service or controller coordinating the API boundary for this responsibility. */
 export class MediaService {
   private readonly s3: S3Client;
   private readonly publicBaseUrl: string;

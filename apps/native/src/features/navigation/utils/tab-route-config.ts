@@ -1,126 +1,20 @@
-import type { ComponentType } from "react";
-
 import { routes } from "@sd/core-contracts";
-import { BookOpen, Cloud, Search, Settings } from "lucide-react-native";
 
-import { DEFAULT_TABS, SECTION_TABS, type Section } from "../types";
+/** Defines the native root-tab contract used for route ownership and accessory visibility. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- the finite union contract is documented above.
+export type RootTab = "home" | "explore" | "scholars" | "myLibrary" | "settings";
 
-export type RootTab = Section | "search";
-
-export type RootTabConfig = {
-  id: RootTab;
-  routeName: "explore" | "(search)" | "library" | "settings";
-  /** English fallback label. */
-  label: string;
-  /** i18n key (under the `tabs` namespace) resolved at render time. */
-  labelKey: string;
-  Icon: ComponentType<{ color?: string; size?: number; strokeWidth?: number }>;
-};
-
-export const ROOT_TABS: RootTabConfig[] = [
-  { id: "explore", routeName: "explore", label: "Explore", labelKey: "tabs.explore", Icon: Cloud },
-  { id: "search", routeName: "(search)", label: "Search", labelKey: "tabs.search", Icon: Search },
-  {
-    id: "library",
-    routeName: "library",
-    label: "Library",
-    labelKey: "tabs.library",
-    Icon: BookOpen,
-  },
-  {
-    id: "settings",
-    routeName: "settings",
-    label: "Settings",
-    labelKey: "tabs.settings",
-    Icon: Settings,
-  },
-];
-
-const GROUP_NAME_TO_TAB: Record<RootTabConfig["routeName"], RootTab> = {
-  explore: "explore",
-  "(search)": "search",
-  library: "library",
-  settings: "settings",
-};
-
-export function getRootTabByRouteName(routeName: string): RootTabConfig | undefined {
-  const tabId = GROUP_NAME_TO_TAB[routeName as RootTabConfig["routeName"]];
-  return ROOT_TABS.find((tab) => tab.id === tabId);
+/** Maps a canonical native pathname to its owning persistent root destination. */
+export function getRootTabFromPathname(pathname: string): RootTab | null {
+  if (pathname === routes.home) return "home";
+  if (pathname === routes.explore.index) return "explore";
+  if (pathname === routes.scholars.index) return "scholars";
+  if (pathname === routes.myLibrary.index) return "myLibrary";
+  if (pathname === routes.settings.index) return "settings";
+  return null;
 }
 
-export function getRootTabFromPathname(pathname: string): RootTab {
-  if (pathname.startsWith("/search")) {
-    return "search";
-  }
-
-  if (
-    pathname === "/" ||
-    pathname.startsWith("/scholar") ||
-    pathname.startsWith("/curation") ||
-    pathname.startsWith("/recent")
-  ) {
-    return "explore";
-  }
-
-  if (pathname.startsWith(routes.library.index)) {
-    return "library";
-  }
-
-  if (pathname.startsWith(routes.settings.index)) {
-    return "settings";
-  }
-
-  return "explore";
-}
-
+/** Returns whether a pathname belongs to one of the five persistent native roots. */
 export function isTabRoute(pathname: string): boolean {
-  if (
-    pathname === "/" ||
-    pathname === "/recent" ||
-    pathname === "/scholar" ||
-    pathname === "/curation" ||
-    pathname.startsWith("/search") ||
-    pathname.startsWith("/library") ||
-    pathname.startsWith("/settings")
-  ) {
-    return true;
-  }
-  return false;
-}
-
-export function getActiveSubsection(pathname: string, section: Section): string {
-  const normalizedPath =
-    pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
-  const parts = normalizedPath.split("/").filter(Boolean);
-
-  if (section === "explore") {
-    const candidate = parts[0] || "recent";
-    if (candidate === "scholar" || candidate === "curation" || candidate === "recent") {
-      return candidate;
-    }
-    return "recent";
-  }
-
-  const candidate = parts[1];
-  return SECTION_TABS[section].some((tab) => tab.id === candidate)
-    ? candidate!
-    : DEFAULT_TABS[section];
-}
-
-export function buildSectionPath(section: Section, tabId?: string): string {
-  const activeTab =
-    tabId && SECTION_TABS[section].some((tab) => tab.id === tabId) ? tabId : DEFAULT_TABS[section];
-
-  if (section === "explore") {
-    if (activeTab === "recent") {
-      return "/";
-    }
-    return `/${activeTab}`;
-  }
-
-  if (activeTab === DEFAULT_TABS[section]) {
-    return `/${section}`;
-  }
-
-  return `/${section}/${activeTab}`;
+  return getRootTabFromPathname(pathname) !== null;
 }

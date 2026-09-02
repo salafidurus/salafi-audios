@@ -1,263 +1,224 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useState, useCallback, useEffect } from "react";
-import { ScrollView, View, Pressable } from "react-native";
-import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
+import { useCallback, useState } from "react";
+import { ScrollView, Switch, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { UnistylesRuntime, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { Toggle } from "@/shared/components/Toggle/Toggle";
+import {
+  applyThemePreference,
+  setStoredThemePreference,
+  type ThemePreference,
+} from "@/core/styles/theme/theme-preference";
+import { RootScreenHeader } from "@/features/navigation";
+import { NativeBridgeHost } from "@/shared/ui";
 
 import { ContentLanguageToggle } from "../components/content-language-toggle/content-language-toggle";
 import { LanguageSwitch } from "../components/language-switch/language-switch";
-import { SettingsRow } from "../components/SettingsRow/SettingsRow";
-import { SettingsSection } from "../components/SettingsSection/SettingsSection";
+import { SegmentedControl } from "../components/SegmentedControl/SegmentedControl";
+import {
+  SettingsAccountActions,
+  SettingsSupportLegalActions,
+  type SettingsAccountActionsProps,
+} from "./settings-account-actions.screen";
 
-type ThemePreference = "system" | "parchment" | "manuscript" | "midnight" | "ember";
-
+/** Renders the general settings form with RN layout and isolated Expo UI controls. */
 interface NotificationState {
   master: boolean;
   scholars: boolean;
   lectures: boolean;
 }
 
-export function SettingsGeneralScreen() {
+function getInitialTheme(): ThemePreference {
+  if (UnistylesRuntime.hasAdaptiveThemes) return "system";
+  return UnistylesRuntime.themeName === "dark" ? "dark" : "light";
+}
+
+/** Owns theme, language, and notification preferences for the Settings tab. */
+export function SettingsGeneralScreen(props: SettingsAccountActionsProps = {}) {
   const { t } = useTranslation();
-  const [themePreference, setThemePreference] = useState<ThemePreference>("system");
+  const { theme } = useUnistyles();
+  const insets = useSafeAreaInsets();
+  const [themePreference, setThemePreference] = useState<ThemePreference>(getInitialTheme);
   const [notif, setNotif] = useState<NotificationState>({
     master: true,
     scholars: true,
     lectures: true,
   });
 
-  useEffect(() => {
-    const activeTheme = UnistylesRuntime.themeName as ThemePreference;
-    if (activeTheme) {
-      setThemePreference(activeTheme);
-    }
+  const handleThemeChange = useCallback((value: ThemePreference) => {
+    setThemePreference(value);
+    applyThemePreference(value);
+    void setStoredThemePreference(value);
   }, []);
-
-  const handleThemeChange = useCallback((val: ThemePreference) => {
-    setThemePreference(val);
-    UnistylesRuntime.setTheme(val);
-  }, []);
-
   const handleNotifChange = useCallback(
-    (key: keyof NotificationState) => (checked: boolean) => {
-      setNotif((prev) => ({ ...prev, [key]: checked }));
-    },
+    (key: keyof NotificationState) => (checked: boolean) =>
+      setNotif((prev) => ({ ...prev, [key]: checked })),
     [],
   );
-
-  interface ThemeOption {
-    value: ThemePreference;
-    label: string;
-    description: string;
-    canvas: string;
-    accent: string;
-    text: string;
-  }
-
-  const themeOptions: ThemeOption[] = [
-    {
-      value: "system",
-      label: t("settings.general.themeOptions.system", "System"),
-      description: t("settings.general.themeOptions.systemDesc", "Follow OS"),
-      canvas: "#FAF9F6",
-      accent: "#B8860B",
-      text: "#111111",
-    },
-    {
-      value: "parchment",
-      label: t("settings.general.themeOptions.parchment", "Parchment"),
-      description: t("settings.general.themeOptions.parchmentDesc", "Ivory & gold"),
-      canvas: "#F7F2E7",
-      accent: "#B8872E",
-      text: "#241C10",
-    },
-    {
-      value: "manuscript",
-      label: t("settings.general.themeOptions.manuscript", "Manuscript"),
-      description: t("settings.general.themeOptions.manuscriptDesc", "Sepia & dark gold"),
-      canvas: "#1C160E",
-      accent: "#B58742",
-      text: "#E5D9C5",
-    },
-    {
-      value: "midnight",
-      label: t("settings.general.themeOptions.midnight", "Midnight"),
-      description: t("settings.general.themeOptions.midnightDesc", "Deep black & gold"),
-      canvas: "#080808",
-      accent: "#E0AE43",
-      text: "#F5F5F5",
-    },
-    {
-      value: "ember",
-      label: t("settings.general.themeOptions.ember", "Ember"),
-      description: t("settings.general.themeOptions.emberDesc", "Charcoal & gold"),
-      canvas: "#141210",
-      accent: "#D99B26",
-      text: "#E6D9C5",
-    },
+  const options = [
+    { value: "system" as const, label: t("settings.general.themeOptions.system", "System") },
+    { value: "light" as const, label: t("settings.general.themeOptions.light", "Light") },
+    { value: "dark" as const, label: t("settings.general.themeOptions.dark", "Dark") },
   ];
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      {/* Language Section */}
-      <SettingsSection
-        title={t("settings.general.languageSection", "Language")}
-        description={t("settings.general.languageDesc", "Configure app and content language.")}
-      >
-        <SettingsRow
-          label={t("settings.general.appLanguage", "App Language")}
-          sublabel={t("settings.general.appLanguageDesc", "Interface language for the app")}
-        >
-          <LanguageSwitch />
-        </SettingsRow>
-        <SettingsRow fullWidth hideBorder>
-          <ContentLanguageToggle />
-        </SettingsRow>
-      </SettingsSection>
-
-      {/* Display Section */}
-      <SettingsSection
-        title={t("settings.general.displaySection", "Display")}
-        description={t("settings.general.displayDesc", "Choose a theme for the interface.")}
-      >
-        <SettingsRow
-          label={t("settings.general.theme", "Theme")}
-          sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
-          stacked
-        >
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.themeScroll}
-            contentContainerStyle={styles.themeScrollContent}
+    <View style={{ flex: 1, backgroundColor: theme.colors.surface.canvas }}>
+      <NativeBridgeHost testID="settings-general-host" matchContents={false}>
+        <View style={{ flex: 1 }}>
+          <View
+            style={{
+              paddingTop: insets.top,
+              paddingHorizontal: theme.spacing.layout.pageX,
+            }}
           >
-            {themeOptions.map((opt) => {
-              const isActive = themePreference === opt.value;
-              return (
-                <Pressable
-                  key={opt.value}
-                  onPress={() => handleThemeChange(opt.value)}
-                  style={[styles.themeCard, isActive && styles.themeCardActive]}
-                >
-                  <View style={styles.cardHeader}>
-                    <View style={styles.swatchRow}>
-                      <View style={[styles.swatchDot, { backgroundColor: opt.canvas }]} />
-                      <View style={[styles.swatchDot, { backgroundColor: opt.accent }]} />
-                      <View style={[styles.swatchDot, { backgroundColor: opt.text }]} />
-                    </View>
-                    {isActive && <Ionicons name="checkmark-circle" size={16} color={opt.accent} />}
-                  </View>
-                  <View style={styles.cardFooter}>
-                    <AppText variant="bodySm" style={styles.cardLabel}>
-                      {opt.label}
-                    </AppText>
-                    <AppText variant="caption" style={styles.cardDesc} numberOfLines={1}>
-                      {opt.description}
-                    </AppText>
-                  </View>
-                </Pressable>
-              );
-            })}
+            <RootScreenHeader title={t("navigation.settings", "Settings")} />
+          </View>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentInset={{ bottom: theme.spacing.layout.pageY + insets.bottom + 96 }}
+            contentContainerStyle={{
+              padding: theme.spacing.layout.pageX,
+              gap: theme.spacing.layout.sectionY,
+            }}
+          >
+            <SettingsAccountActions {...props} />
+            <SettingsSection
+              title={t("settings.general.languageSection", "Language")}
+              theme={theme}
+            >
+              <View style={{ gap: theme.spacing.component.gapSm }}>
+                <View style={{ gap: theme.spacing.scale.xs }}>
+                  <Text
+                    style={{ fontSize: 16, lineHeight: 24, color: theme.colors.content.strong }}
+                  >
+                    {t("settings.general.appLanguage", "App Language")}
+                  </Text>
+                  <Text style={{ fontSize: 14, lineHeight: 20, color: theme.colors.content.muted }}>
+                    {t("settings.general.appLanguageDesc", "Interface language for the app")}
+                  </Text>
+                </View>
+                <LanguageSwitch />
+              </View>
+              <ContentLanguageToggle />
+            </SettingsSection>
+            <SettingsSection title={t("settings.general.displaySection", "Display")} theme={theme}>
+              <Text style={{ fontSize: 14, lineHeight: 20, color: theme.colors.content.muted }}>
+                {t("settings.general.displayDesc", "Choose a theme for the interface.")}
+              </Text>
+              <SegmentedControl
+                options={options}
+                value={themePreference}
+                onChange={handleThemeChange}
+                ariaLabel={t("settings.general.themeAria", "Theme preference")}
+              />
+            </SettingsSection>
+            <SettingsSection
+              title={t("settings.general.notifSection", "Notifications")}
+              theme={theme}
+            >
+              <PreferenceSwitch
+                label={t("settings.general.enableNotif", "Enable Notifications")}
+                detail={t(
+                  "settings.general.enableNotifDesc",
+                  "Master toggle for all notifications",
+                )}
+                value={notif.master}
+                onValueChange={handleNotifChange("master")}
+              />
+              {notif.master ? (
+                <>
+                  <PreferenceSwitch
+                    label={t("settings.general.followedScholars", "Followed Scholars")}
+                    detail={t(
+                      "settings.general.followedScholarsDesc",
+                      "Notify when a followed scholar posts",
+                    )}
+                    value={notif.scholars}
+                    onValueChange={handleNotifChange("scholars")}
+                  />
+                  <PreferenceSwitch
+                    label={t("settings.general.newLectures", "New Lectures")}
+                    detail={t(
+                      "settings.general.newLecturesDesc",
+                      "Notify when new lectures are published",
+                    )}
+                    value={notif.lectures}
+                    onValueChange={handleNotifChange("lectures")}
+                  />
+                </>
+              ) : null}
+            </SettingsSection>
+            <SettingsSupportLegalActions {...props} />
           </ScrollView>
-        </SettingsRow>
-      </SettingsSection>
-
-      {/* Notifications Section */}
-      <SettingsSection
-        title={t("settings.general.notifSection", "Notifications")}
-        description={t("settings.general.notifDesc", "Manage what notifications you receive.")}
-      >
-        <SettingsRow
-          label={t("settings.general.enableNotif", "Enable Notifications")}
-          sublabel={t("settings.general.enableNotifDesc", "Master toggle for all notifications")}
-        >
-          <Toggle checked={notif.master} onChange={handleNotifChange("master")} />
-        </SettingsRow>
-        {notif.master && (
-          <>
-            <SettingsRow
-              label={t("settings.general.followedScholars", "Followed Scholars")}
-              sublabel={t(
-                "settings.general.followedScholarsDesc",
-                "Notify when a followed scholar posts",
-              )}
-            >
-              <Toggle checked={notif.scholars} onChange={handleNotifChange("scholars")} />
-            </SettingsRow>
-            <SettingsRow
-              label={t("settings.general.newLectures", "New Lectures")}
-              sublabel={t(
-                "settings.general.newLecturesDesc",
-                "Notify when new lectures are published",
-              )}
-              hideBorder
-            >
-              <Toggle checked={notif.lectures} onChange={handleNotifChange("lectures")} />
-            </SettingsRow>
-          </>
-        )}
-      </SettingsSection>
-    </ScrollView>
+        </View>
+      </NativeBridgeHost>
+    </View>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
-  screen: {
-    flex: 1,
-    backgroundColor: theme.colors.surface.canvas,
-  },
-  content: {
-    paddingHorizontal: theme.spacing.layout.pageX,
-    paddingVertical: theme.spacing.layout.pageY,
-  },
-  themeScroll: {
-    marginTop: theme.spacing.scale.xs,
-    width: "100%",
-  },
-  themeScrollContent: {
-    paddingRight: theme.spacing.scale.xl,
-  },
-  themeCard: {
-    width: 140,
-    height: 100,
-    marginRight: theme.spacing.scale.md,
-    padding: theme.spacing.scale.md,
-    borderRadius: theme.radius.scale.md,
-    borderWidth: 2,
-    borderColor: theme.colors.border.subtle,
-    backgroundColor: theme.colors.surface.subtle,
-    justifyContent: "space-between",
-  },
-  themeCardActive: {
-    borderColor: theme.colors.action.primary,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  swatchRow: {
-    flexDirection: "row",
-    gap: theme.spacing.scale.xs,
-  },
-  swatchDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: theme.colors.border.subtle,
-  },
-  cardFooter: {
-    gap: 2,
-  },
-  cardLabel: {
-    fontWeight: "600",
-    color: theme.colors.content.strong,
-  },
-  cardDesc: {
-    color: theme.colors.content.subtle,
-  },
-}));
+function PreferenceSwitch({
+  label,
+  detail,
+  value,
+  onValueChange,
+}: {
+  label: string;
+  detail: string;
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+}) {
+  const { theme } = useUnistyles();
+  return (
+    <View
+      style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.component.gapMd }}
+    >
+      <View style={{ flex: 1, gap: theme.spacing.scale.xs }}>
+        <Text style={{ fontSize: 16, lineHeight: 24, color: theme.colors.content.strong }}>
+          {label}
+        </Text>
+        <Text style={{ fontSize: 14, lineHeight: 20, color: theme.colors.content.muted }}>
+          {detail}
+        </Text>
+      </View>
+      <Switch value={value} onValueChange={onValueChange} />
+    </View>
+  );
+}
+
+function SettingsSection({
+  title,
+  children,
+  theme,
+}: {
+  title: string;
+  children: React.ReactNode;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+}) {
+  return (
+    <View style={{ gap: theme.spacing.component.gapSm }}>
+      <Text
+        style={{
+          fontSize: 18,
+          lineHeight: 24,
+          fontWeight: "600",
+          color: theme.colors.content.strong,
+        }}
+      >
+        {title}
+      </Text>
+      <View
+        style={{
+          width: "100%",
+          gap: theme.spacing.component.gapMd,
+          backgroundColor: theme.colors.surface.default,
+          borderColor: theme.colors.border.subtle,
+          borderRadius: theme.radius.component.card,
+          borderWidth: 1,
+          padding: theme.spacing.component.cardPadding,
+        }}
+      >
+        {children}
+      </View>
+    </View>
+  );
+}

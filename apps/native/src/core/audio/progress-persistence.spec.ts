@@ -11,7 +11,7 @@ import { initProgressPersistence } from "./progress-persistence";
 // effects (e.g. a fallback QueryClient instantiation) that don't play well
 // with this file's minimal jest environment — same convention already used
 // by other native specs that touch @sd/domain-content (e.g.
-// library-saved.screen.spec.tsx). Saved-sync's real behavior is covered by
+// my-library-saved.screen.spec.tsx). Saved-sync's real behavior is covered by
 // @sd/domain-content's own saved.sync.spec.ts.
 jest.mock("@sd/domain-content", () => ({
   initSavedSync: jest.fn(async () => {}),
@@ -22,13 +22,14 @@ jest.mock("@sd/domain-content", () => ({
 }));
 
 jest.mock("@sd/core-contracts", () => ({
+  ...jest.requireActual("@sd/core-contracts"),
   httpClient: jest.fn(),
   endpoints: {
     audio: {
       progress: {
         get: "/audio/progress",
         sync: "/audio/progress/sync",
-        update: (listingId: string) => `/audio/progress/${listingId}`,
+        update: (listingSlug: string) => `/audio/progress/${listingSlug}`,
       },
     },
   },
@@ -77,7 +78,7 @@ describe("initProgressPersistence", () => {
       storageKey(USER_ID),
       JSON.stringify([
         {
-          listingId: "l1",
+          listingSlug: "l1",
           positionSeconds: 42,
           durationSeconds: 100,
           updatedAt: "2026-01-01T00:00:00.000Z",
@@ -97,7 +98,7 @@ describe("initProgressPersistence", () => {
       storageKey("other-user"),
       JSON.stringify([
         {
-          listingId: "l1",
+          listingSlug: "l1",
           positionSeconds: 42,
           durationSeconds: 100,
           updatedAt: "2026-01-01T00:00:00.000Z",
@@ -123,7 +124,7 @@ describe("initProgressPersistence", () => {
     cleanup();
   });
 
-  it("hydrates saved/library state from the server once on init", () => {
+  it("hydrates saved/my-library state from the server once on init", () => {
     const cleanup = initProgressPersistence(USER_ID);
 
     expect(hydrateSavedFromServer).toHaveBeenCalledTimes(1);
@@ -138,7 +139,7 @@ describe("initProgressPersistence", () => {
         {
           id: "outbox-1",
           type: "progress-update",
-          payload: { listingId: "l9", positionSeconds: 30, durationSeconds: 200 },
+          payload: { listingSlug: "l9", positionSeconds: 30, durationSeconds: 200 },
           createdAt: Date.now(),
           retries: 0,
         },
@@ -164,7 +165,7 @@ describe("initProgressPersistence", () => {
         {
           id: "outbox-1",
           type: "progress-update",
-          payload: { listingId: "l9", positionSeconds: 30, durationSeconds: 200 },
+          payload: { listingSlug: "l9", positionSeconds: 30, durationSeconds: 200 },
           createdAt: Date.now(),
           retries: 0,
         },
@@ -191,7 +192,7 @@ describe("initProgressPersistence", () => {
     const raw = await AsyncStorage.getItem(storageKey(USER_ID));
     expect(raw).not.toBeNull();
     const parsed = JSON.parse(raw!);
-    expect(parsed.find((e: any) => e.listingId === "l2")?.positionSeconds).toBe(5);
+    expect(parsed.find((e: any) => e.listingSlug === "l2")?.positionSeconds).toBe(5);
 
     cleanup();
   });
@@ -199,7 +200,7 @@ describe("initProgressPersistence", () => {
   it("flushes a pending debounced update immediately when the app backgrounds", async () => {
     const addListenerSpy = jest.spyOn(AppState, "addEventListener");
     const cleanup = initProgressPersistence(USER_ID);
-    syncProgressToBackend({ listingId: "l3", positionSeconds: 1, durationSeconds: 100 });
+    syncProgressToBackend({ listingSlug: "l3", positionSeconds: 1, durationSeconds: 100 });
     mockedHttpClient.mockClear();
 
     const onChange = addListenerSpy.mock.calls.find((call) => call[0] === "change")?.[1];
@@ -231,7 +232,7 @@ describe("initProgressPersistence", () => {
     const onFlushed = jest.fn();
     const cleanup = initProgressPersistence(USER_ID, { onFlushed });
 
-    syncProgressToBackend({ listingId: "l5", positionSeconds: 3, durationSeconds: 100 });
+    syncProgressToBackend({ listingSlug: "l5", positionSeconds: 3, durationSeconds: 100 });
     const onChange = addListenerSpy.mock.calls.find((call) => call[0] === "change")?.[1];
     onChange?.("background");
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -247,7 +248,7 @@ describe("initProgressPersistence", () => {
     const cleanup = initProgressPersistence(USER_ID, { onFlushed });
     cleanup();
 
-    syncProgressToBackend({ listingId: "l6", positionSeconds: 3, durationSeconds: 100 });
+    syncProgressToBackend({ listingSlug: "l6", positionSeconds: 3, durationSeconds: 100 });
     await flushPendingProgress();
 
     expect(onFlushed).not.toHaveBeenCalled();

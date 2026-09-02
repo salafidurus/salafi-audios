@@ -16,10 +16,10 @@ import {
 vi.mock("@sd/core-contracts", () => ({
   httpClient: vi.fn<() => Promise<any>>(),
   endpoints: {
-    library: {
-      saveListing: (listingId: string) => `/me/library/save/${listingId}`,
-      savedSync: "/me/library/saved/sync",
-      savedDelta: "/me/library/saved/delta",
+    myLibrary: {
+      saveListing: (listingId: string) => `/me/my-library/save/${listingId}`,
+      savedSync: "/me/my-library/saved/sync",
+      savedDelta: "/me/my-library/saved/delta",
     },
   },
 }));
@@ -42,7 +42,7 @@ describe("saved.sync", () => {
       await flushPendingSaved();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/library/save/l1",
+        url: "/me/my-library/save/l1",
         method: "POST",
       });
     });
@@ -58,7 +58,7 @@ describe("saved.sync", () => {
       await flushPendingSaved();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/library/save/l1",
+        url: "/me/my-library/save/l1",
         method: "DELETE",
       });
     });
@@ -69,7 +69,7 @@ describe("saved.sync", () => {
       await flushPendingSaved();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/library/save/tafsir-al-fatiha",
+        url: "/me/my-library/save/tafsir-al-fatiha",
         method: "POST",
       });
     });
@@ -80,7 +80,7 @@ describe("saved.sync", () => {
       await flushPendingSaved();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/library/save/l1",
+        url: "/me/my-library/save/l1",
         method: "POST",
       });
     });
@@ -124,7 +124,7 @@ describe("saved.sync", () => {
       await hydrateSavedFromServer();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/library/saved/delta",
+        url: "/me/my-library/saved/delta",
         method: "GET",
         params: undefined,
       });
@@ -160,10 +160,21 @@ describe("saved.sync", () => {
       await hydrateSavedFromServer();
 
       expect(httpClient).toHaveBeenNthCalledWith(2, {
-        url: "/me/library/saved/delta",
+        url: "/me/my-library/saved/delta",
         method: "GET",
         params: { since: "2026-01-01T00:00:00.000Z" },
       });
+    });
+
+    it("clears the previous user's in-memory saved state when the account changes", async () => {
+      await initSavedSync(createFakeStorageAdapter(), "user-1");
+      markSaved("l1");
+
+      await initSavedSync(createFakeStorageAdapter(), "user-2");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(isSaved("l1")).toBe(false);
+      expect(httpClient).not.toHaveBeenCalled();
     });
   });
 
@@ -178,7 +189,7 @@ describe("saved.sync", () => {
       await drainPendingSaved();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/library/save/l1",
+        url: "/me/my-library/save/l1",
         method: "POST",
       });
     });

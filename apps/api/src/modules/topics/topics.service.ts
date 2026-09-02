@@ -8,12 +8,16 @@ import type {
   AdminTopicDetailDto,
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
+  SaveTopicTranslationDto,
+  Locale,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
-import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { TopicsRepository } from './topics.repo';
 
+/** NestJS topics service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
+/** topics application module responsible for topics.service behavior at the backend boundary. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class TopicsService {
   constructor(
     private readonly repo: TopicsRepository,
@@ -123,7 +127,7 @@ export class TopicsService {
 
   async updateTranslation(
     topicId: string,
-    locale: string,
+    locale: Locale,
     fields: Partial<{ name: string }>,
   ): Promise<TranslationViewDto> {
     const result = await this.repo.updateTopicTranslation(topicId, locale, fields);

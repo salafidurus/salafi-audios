@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { sanitizeError } from "@sd/utils-error";
@@ -6,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { fetchArrangeData, updateListingDetails } from "@/features/admin/api/admin-lectures.api";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 
 import styles from "./listing-modal.module.css";
 import { ListingSublistingDetail } from "./ListingSublistingDetail";
@@ -40,6 +41,35 @@ interface TabState {
 }
 
 const EMPTY_DATA: TabData = { modules: [], topLevelLessons: [], allChildIds: [] };
+
+function hasChildren(data: TabData) {
+  return data.modules.length > 0 || data.topLevelLessons.length > 0;
+}
+
+function renderTabStatus(
+  state: TabState,
+  containsChildren: boolean,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  if (state.status === "loading") {
+    return <div className={styles.loading}>{t("common.loading", "Loading...")}</div>;
+  }
+  if (state.status === "error") {
+    return (
+      <div className={styles.error}>
+        {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
+      </div>
+    );
+  }
+  if (!containsChildren) {
+    return (
+      <div className={styles.emptyState}>
+        {t("admin.translations.childrenEmpty", "No sub-listings yet")}
+      </div>
+    );
+  }
+  return null;
+}
 
 /**
  * The listing modal's "Sub-listings" tab: lists modules + lessons with an
@@ -122,24 +152,12 @@ export function ListingSublistingsTab({ rootListingId }: ListingSublistingsTabPr
   }
 
   const { data } = state;
-  const hasChildren = data.modules.length > 0 || data.topLevelLessons.length > 0;
+  const containsChildren = hasChildren(data);
 
   return (
     <div className={styles.childrenTab}>
-      {state.status === "loading" && (
-        <div className={styles.loading}>{t("common.loading", "Loading...")}</div>
-      )}
-      {state.status === "error" && (
-        <div className={styles.error}>
-          {state.error ?? t("admin.contents.failedToLoad", "Failed to load")}
-        </div>
-      )}
-      {state.status === "ready" && !hasChildren && (
-        <div className={styles.emptyState}>
-          {t("admin.translations.childrenEmpty", "No sub-listings yet")}
-        </div>
-      )}
-      {state.status === "ready" && hasChildren && (
+      {renderTabStatus(state, containsChildren, t)}
+      {state.status === "ready" && containsChildren && (
         <>
           {/* Bulk actions */}
           <div className={styles.bulkActions}>

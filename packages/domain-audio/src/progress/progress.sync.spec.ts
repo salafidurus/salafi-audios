@@ -18,7 +18,7 @@ vi.mock("@sd/core-contracts", () => ({
   endpoints: {
     audio: {
       progress: {
-        update: (listingId: string) => `/audio/progress/${listingId}`,
+        update: (listingSlug: string) => `/audio/progress/${listingSlug}`,
         get: "/audio/progress",
         sync: "/audio/progress/sync",
       },
@@ -38,7 +38,7 @@ describe("progress.sync", () => {
 
   describe("syncProgressToBackend + flushPendingProgress", () => {
     it("immediately flushes a pending update, bypassing the debounce timer", async () => {
-      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
+      syncProgressToBackend({ listingSlug: "l1", positionSeconds: 90, durationSeconds: 1800 });
 
       await flushPendingProgress();
 
@@ -57,7 +57,7 @@ describe("progress.sync", () => {
 
     it("re-queues a failed update so the next flush retries it", async () => {
       (httpClient as any).mockRejectedValueOnce(new Error("network down"));
-      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
+      syncProgressToBackend({ listingSlug: "l1", positionSeconds: 90, durationSeconds: 1800 });
       await flushPendingProgress();
       expect(httpClient).toHaveBeenCalledTimes(1);
 
@@ -72,7 +72,7 @@ describe("progress.sync", () => {
     it("fetches without a since param on first hydration and loads results into the store", async () => {
       (httpClient as any).mockResolvedValue([
         {
-          listingId: "l1",
+          listingSlug: "l1",
           positionSeconds: 100,
           durationSeconds: 200,
           updatedAt: "2026-01-01T00:00:00.000Z",
@@ -87,7 +87,7 @@ describe("progress.sync", () => {
         params: undefined,
       });
       expect(useProgressStore.getState().progressMap.l1).toEqual({
-        listingId: "l1",
+        listingSlug: "l1",
         positionSeconds: 100,
         durationSeconds: 200,
         updatedAt: "2026-01-01T00:00:00.000Z",
@@ -114,7 +114,7 @@ describe("progress.sync", () => {
       const listener = vi.fn();
       const unsubscribe = onProgressFlushed(listener);
 
-      syncProgressToBackend({ listingId: "l1", positionSeconds: 1, durationSeconds: 100 });
+      syncProgressToBackend({ listingSlug: "l1", positionSeconds: 1, durationSeconds: 100 });
       await flushPendingProgress();
 
       expect(listener).toHaveBeenCalledTimes(1);
@@ -126,7 +126,7 @@ describe("progress.sync", () => {
       const unsubscribe = onProgressFlushed(listener);
       unsubscribe();
 
-      syncProgressToBackend({ listingId: "l1", positionSeconds: 1, durationSeconds: 100 });
+      syncProgressToBackend({ listingSlug: "l1", positionSeconds: 1, durationSeconds: 100 });
       await flushPendingProgress();
 
       expect(listener).not.toHaveBeenCalled();
@@ -147,7 +147,7 @@ describe("progress.sync", () => {
     it("posts the given items to the sync endpoint", async () => {
       const items = [
         {
-          listingId: "l1",
+          listingSlug: "l1",
           positionSeconds: 10,
           durationSeconds: 100,
           updatedAt: "2026-01-01T00:00:00.000Z",
@@ -176,7 +176,7 @@ describe("progress.sync", () => {
       await initProgressSync(adapter, "user-1");
 
       (httpClient as any).mockRejectedValueOnce(new Error("network down"));
-      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
+      syncProgressToBackend({ listingSlug: "l1", positionSeconds: 90, durationSeconds: 1800 });
       await flushPendingProgress();
 
       const persisted = await adapter.getItem("sd:outbox:progress:user-1");
@@ -189,7 +189,7 @@ describe("progress.sync", () => {
       await initProgressSync(adapter, "user-1");
 
       (httpClient as any).mockRejectedValueOnce(new Error("network down"));
-      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
+      syncProgressToBackend({ listingSlug: "l1", positionSeconds: 90, durationSeconds: 1800 });
       await flushPendingProgress();
       (httpClient as any).mockClear();
 
@@ -212,7 +212,7 @@ describe("progress.sync", () => {
       const adapter = createFakeStorageAdapter();
       await initProgressSync(adapter, "user-1");
       (httpClient as any).mockRejectedValueOnce(new Error("network down"));
-      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
+      syncProgressToBackend({ listingSlug: "l1", positionSeconds: 90, durationSeconds: 1800 });
       await flushPendingProgress();
       (httpClient as any).mockClear();
 
@@ -226,11 +226,23 @@ describe("progress.sync", () => {
       expect(JSON.parse((await adapter.getItem("sd:outbox:progress:user-1"))!)).toHaveLength(1);
     });
 
+    it("clears the previous user's in-memory progress when the account changes", async () => {
+      const adapter = createFakeStorageAdapter();
+      await initProgressSync(adapter, "user-1");
+      syncProgressToBackend({ listingSlug: "l1", positionSeconds: 90, durationSeconds: 1800 });
+
+      await initProgressSync(adapter, "user-2");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(useProgressStore.getState().actions.getProgress("l1")).toBeUndefined();
+      expect(httpClient).not.toHaveBeenCalled();
+    });
+
     it("notifies onProgressFlushed listeners when drainPendingProgress successfully retries an entry", async () => {
       const adapter = createFakeStorageAdapter();
       await initProgressSync(adapter, "user-1");
       (httpClient as any).mockRejectedValueOnce(new Error("network down"));
-      syncProgressToBackend({ listingId: "l1", positionSeconds: 90, durationSeconds: 1800 });
+      syncProgressToBackend({ listingSlug: "l1", positionSeconds: 90, durationSeconds: 1800 });
       await flushPendingProgress();
 
       const listener = vi.fn();

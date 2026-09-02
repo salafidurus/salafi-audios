@@ -1,3 +1,4 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -9,10 +10,22 @@ import {
   ROOT_MODULE_KEY,
   localSlugConflicts,
   useUploadArrangeState,
+  type UploadArrangeAction,
+  type UploadArrangeState,
 } from "@/features/admin/hooks/Content/useUploadArrangeState";
-import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 
+import { FormErrorBanner } from "./FormErrorBanner";
 import styles from "./listing-modal.module.css";
 import {
   UploadArrangeArrangeTab,
@@ -27,6 +40,132 @@ interface ListingUploadArrangeModalProps {
   listingId?: string | null;
 }
 
+function getErrorMessage(error: Error | null, fallback: string): string {
+  return error?.message ?? fallback;
+}
+
+function isUploadArrangeTabId(id: string): id is "upload" | "arrange" | "review" {
+  return id === "upload" || id === "arrange" || id === "review";
+}
+
+type ArrangeFooterProps = {
+  activeTab: "upload" | "arrange" | "review";
+  busy: boolean;
+  savingLabel: string;
+  onClose: () => void;
+  onReview: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+};
+
+function ArrangeFooter({ activeTab, busy, savingLabel, onClose, onReview, t }: ArrangeFooterProps) {
+  return (
+    <DialogFooter>
+      <Button variant="outline" size="sm" onClick={onClose} disabled={busy}>
+        {t("common.cancel", "Cancel")}
+      </Button>
+      {activeTab === "review" ? (
+        <Button type="submit" form="listing-upload-arrange-form" variant="primary" loading={busy}>
+          {busy ? savingLabel : t("admin.contents.listing.uploadAction", "Upload")}
+        </Button>
+      ) : (
+        <Button type="button" variant="primary" onClick={onReview}>
+          {t("admin.modal.reviewTab", "Review")}
+        </Button>
+      )}
+    </DialogFooter>
+  );
+}
+
+function handleArrangeSubmit(
+  event: React.FormEvent,
+  state: UploadArrangeState,
+  busy: boolean,
+  conflicts: string[],
+  unassignedCount: number,
+  dispatch: React.Dispatch<UploadArrangeAction>,
+  setActiveTab: (tab: "upload" | "arrange" | "review") => void,
+  runCommit: () => Promise<void> | void,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  event.preventDefault();
+  if (busy || !state.existing) return;
+  if (state.items.length === 0) {
+    dispatch({
+      type: "SET_ERROR",
+      error: t("admin.contents.listing.noFilesStaged", "Add at least one audio file first."),
+    });
+    setActiveTab("upload");
+    return;
+  }
+  if (conflicts.length > 0) {
+    dispatch({
+      type: "SET_ERROR",
+      error: t(
+        "admin.contents.listing.resolveConflicts",
+        "Resolve the slug conflicts in the Arrange tab first.",
+      ),
+    });
+    setActiveTab("arrange");
+    return;
+  }
+  if (unassignedCount > 0) {
+    dispatch({
+      type: "SET_ERROR",
+      error: t(
+        "admin.contents.listing.resolveUnassigned",
+        "Assign every file to a module in the Arrange tab first.",
+      ),
+    });
+    setActiveTab("arrange");
+    return;
+  }
+  void runCommit();
+}
+
+function getUnassignedCount(state: UploadArrangeState): number {
+  if (state.existing?.format !== "collection") return 0;
+  return state.items.filter(
+    (item) =>
+      item.assignment.kind === "new-lesson" && item.assignment.moduleKey === ROOT_MODULE_KEY,
+  ).length;
+}
+
+function getArrangeTitle(
+  state: UploadArrangeState,
+  isDesktop: boolean,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  const title = t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange");
+  return state.existing && isDesktop ? `${title} (${state.existing.title})` : title;
+}
+
+function isArrangeBusy(phase: UploadArrangeState["phase"]): boolean {
+  return phase === "presigning" || phase === "uploading" || phase === "committing";
+}
+
+function getSavingLabel(
+  phase: UploadArrangeState["phase"],
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  return phase === "committing"
+    ? t("admin.contents.listing.saving", "Saving…")
+    : t("admin.contents.listing.uploading", "Uploading…");
+}
+
+function getErrorTabs(
+  conflicts: string[],
+  conflictSlugs: string[],
+  unassignedCount: number,
+): string[] {
+  return conflicts.length > 0 || conflictSlugs.length > 0 || unassignedCount > 0 ? ["arrange"] : [];
+}
+
+/**
+ * Coordinates the upload, arrangement, review, and commit steps for a
+ * listing's audio items. It loads existing listing data when opened, keeps
+ * close actions disabled during active work, and reports a successful commit
+ * through `onSuccess`.
+ */
 export function ListingUploadArrangeModal({
   isOpen,
   onClose,
@@ -47,9 +186,10 @@ export function ListingUploadArrangeModal({
       .catch((err) =>
         dispatch({
           type: "SET_ERROR",
-          error:
-            (err as Error)?.message ||
+          error: getErrorMessage(
+            err instanceof Error ? err : null,
             t("admin.contents.listing.failedToLoadArrange", "Failed to load listing data."),
+          ),
         }),
       );
   }, [isOpen, listingId, dispatch, t]);
@@ -57,115 +197,87 @@ export function ListingUploadArrangeModal({
   const runCommit = useUploadArrangeCommit(state, dispatch, onSuccess);
 
   const conflicts = localSlugConflicts(state);
-  const unassignedCount =
-    state.existing?.format === "collection"
-      ? state.items.filter(
-          (item) =>
-            item.assignment.kind === "new-lesson" && item.assignment.moduleKey === ROOT_MODULE_KEY,
-        ).length
-      : 0;
+  const unassignedCount = getUnassignedCount(state);
 
-  const busy =
-    state.phase === "presigning" || state.phase === "uploading" || state.phase === "committing";
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (busy || !state.existing) return;
-    if (state.items.length === 0) {
-      dispatch({
-        type: "SET_ERROR",
-        error: t("admin.contents.listing.noFilesStaged", "Add at least one audio file first."),
-      });
-      setActiveTab("upload");
-      return;
-    }
-    if (conflicts.length > 0) {
-      dispatch({
-        type: "SET_ERROR",
-        error: t(
-          "admin.contents.listing.resolveConflicts",
-          "Resolve the slug conflicts in the Arrange tab first.",
-        ),
-      });
-      setActiveTab("arrange");
-      return;
-    }
-    if (unassignedCount > 0) {
-      dispatch({
-        type: "SET_ERROR",
-        error: t(
-          "admin.contents.listing.resolveUnassigned",
-          "Assign every file to a module in the Arrange tab first.",
-        ),
-      });
-      setActiveTab("arrange");
-      return;
-    }
-    void runCommit();
-  };
-
-  const savingLabel =
-    state.phase === "committing"
-      ? t("admin.contents.listing.saving", "Saving…")
-      : t("admin.contents.listing.uploading", "Uploading…");
-
-  const errorTabs =
-    conflicts.length > 0 || state.conflictSlugs.length > 0 || unassignedCount > 0
-      ? ["arrange"]
-      : [];
+  const busy = isArrangeBusy(state.phase);
+  const savingLabel = getSavingLabel(state.phase, t);
+  const errorTabs = getErrorTabs(conflicts, state.conflictSlugs, unassignedCount);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={
-        state.existing && isDesktop
-          ? `${t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange")} (${state.existing.title})`
-          : t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange")
-      }
-      size="xl"
-      width="wide"
-      height="long"
-      multiTab
-      requireReview
-      activeTab={activeTab}
-      onActiveTabChange={(id) => setActiveTab(id as typeof activeTab)}
-      defaultActiveTab="upload"
-      saveFormId="listing-upload-arrange-form"
-      saving={busy}
-      saveLabel={t("admin.contents.listing.uploadAction", "Upload")}
-      savingLabel={savingLabel}
-      reviewTabId="review"
-      errorTabs={errorTabs}
-    >
-      <form id="listing-upload-arrange-form" onSubmit={handleSubmit} className={styles.form}>
-        <Modal.Tabs>
-          <Modal.TabItem id="upload">
-            {t("admin.contents.listing.uploadTab", "Upload Audio")}
-          </Modal.TabItem>
-          <Modal.TabItem id="arrange">
-            {t("admin.contents.listing.arrangeTab", "Arrange")}
-          </Modal.TabItem>
-          <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
-        </Modal.Tabs>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && !busy && onClose()}>
+      <DialogContent className="max-h-[calc(100vh-2rem)] overflow-hidden sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>{getArrangeTitle(state, isDesktop, t)}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("admin.modal.formDescription", "Complete each tab before saving.")}
+          </DialogDescription>
+        </DialogHeader>
 
-        <Modal.Content>
-          <Modal.ContentItem id="upload">
-            {state.error && <div className={styles.errorBanner}>{state.error}</div>}
-            <UploadArrangeUploadTab state={state} dispatch={dispatch} />
-          </Modal.ContentItem>
+        <form
+          id="listing-upload-arrange-form"
+          onSubmit={(event) =>
+            handleArrangeSubmit(
+              event,
+              state,
+              busy,
+              conflicts,
+              unassignedCount,
+              dispatch,
+              setActiveTab,
+              runCommit,
+              t,
+            )
+          }
+          className={`${styles.form} min-h-0 flex-1`}
+        >
+          <Tabs
+            value={activeTab}
+            onValueChange={(id) => {
+              if (isUploadArrangeTabId(id)) setActiveTab(id);
+            }}
+            className="min-h-0"
+          >
+            <TabsList
+              className="no-scrollbar w-full justify-start overflow-x-auto overflow-y-hidden"
+              aria-label={t("admin.modal.tabsLabel", "Form sections")}
+            >
+              <TabsTrigger value="upload">
+                {t("admin.contents.listing.uploadTab", "Upload Audio")}
+              </TabsTrigger>
+              <TabsTrigger
+                value="arrange"
+                aria-invalid={errorTabs.includes("arrange") || undefined}
+              >
+                {t("admin.contents.listing.arrangeTab", "Arrange")}
+              </TabsTrigger>
+              <TabsTrigger value="review">{t("admin.modal.reviewTab", "Review")}</TabsTrigger>
+            </TabsList>
+            <TabsContent value="upload">
+              <FormErrorBanner error={state.error} />
+              <UploadArrangeUploadTab state={state} dispatch={dispatch} />
+            </TabsContent>
 
-          <Modal.ContentItem id="arrange">
-            {state.error && <div className={styles.errorBanner}>{state.error}</div>}
-            <UploadArrangeArrangeTab state={state} dispatch={dispatch} />
-          </Modal.ContentItem>
+            <TabsContent value="arrange">
+              <FormErrorBanner error={state.error} />
+              <UploadArrangeArrangeTab state={state} dispatch={dispatch} />
+            </TabsContent>
 
-          <Modal.ContentItem id="review">
-            {state.error && <div className={styles.errorBanner}>{state.error}</div>}
-            <UploadArrangeReviewTab state={state} dispatch={dispatch} />
-          </Modal.ContentItem>
-        </Modal.Content>
-      </form>
-    </Modal>
+            <TabsContent value="review">
+              <FormErrorBanner error={state.error} />
+              <UploadArrangeReviewTab state={state} dispatch={dispatch} />
+            </TabsContent>
+          </Tabs>
+
+          <ArrangeFooter
+            activeTab={activeTab}
+            busy={busy}
+            savingLabel={savingLabel}
+            onClose={onClose}
+            onReview={() => setActiveTab("review")}
+            t={t}
+          />
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

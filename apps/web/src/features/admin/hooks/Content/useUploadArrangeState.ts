@@ -1,3 +1,4 @@
+/** Owns the reducer-backed client state for staging, arranging, uploading, and committing audio. */
 "use client";
 
 import type {
@@ -21,41 +22,57 @@ import {
 /** Existing module id, `new:${tempId}` for a staged module, or "root" (series/single). */
 export type ModuleKey = string;
 
+/** Identifies the synthetic root module used for series and single-listing uploads. */
 export const ROOT_MODULE_KEY = "root";
 
+/** Describes where a staged audio item will be committed in the listing tree. */
 export type UploadItemAssignment =
   | {
-      kind: "new-lesson";
+      /** A new lesson is created under this existing or staged module. */ kind: "new-lesson";
       moduleKey: ModuleKey;
-      slug: string;
-      slugEdited: boolean;
+      /** The proposed lesson slug, including any user edits. */ slug: string;
+      /** Prevents filename-derived suggestions from overwriting a user edit. */ slugEdited: boolean;
       description: string;
-      status: StatusValue;
+      /** Publication status assigned when the lesson is committed. */ status: StatusValue;
       orderIndex: number | null;
     }
-  | { kind: "replace-audio"; lessonId: string }
-  | { kind: "replace-root-audio" };
+  | {
+      /** Replaces media for an existing lesson without creating a new lesson. */ kind: "replace-audio";
+      lessonId: string;
+    }
+  | { /** Replaces the audio attached directly to the root listing. */ kind: "replace-root-audio" };
 
+/** Tracks each item's transfer state and storage metadata across the upload pipeline. */
 export interface UploadItemProgress {
-  status: "pending" | "downloading" | "uploading" | "done" | "error";
+  /** Tracks the current transfer stage; `percent` applies to the active stage. */ status:
+    | "pending"
+    | "downloading"
+    | "uploading"
+    | "done"
+    | "error";
   percent: number;
   loadedBytes?: number;
   totalBytes?: number;
   objectKey?: string;
   uploadUrl?: string;
-  error?: string;
+  /** User-facing failure detail retained for retry or inline error rendering. */ error?: string;
 }
 
 /** Where an item's bytes come from: already-picked local File, or a URL fetched at upload time. */
-export type UploadItemSource = { kind: "local"; file: File } | { kind: "url"; url: string };
+export type UploadItemSource =
+  | { /** Bytes already available in the browser. */ kind: "local"; file: File }
+  | { /** Bytes fetched just before upload begins. */ kind: "url"; url: string };
 
+/** Complete client-side representation of one audio item before arrange commit. */
 export interface UploadItem {
   id: string;
-  source: UploadItemSource;
+  /** Original bytes or remote source used by the upload pipeline. */ source: UploadItemSource;
   filename: string;
   title: string;
   numericPrefix: number | null;
-  durationSeconds: number | null;
+  /** Duration discovered from metadata; null when the browser could not determine it. */ durationSeconds:
+    | number
+    | null;
   sizeBytes: number;
   contentType: string;
   ext: string;
@@ -64,30 +81,42 @@ export interface UploadItem {
   upload: UploadItemProgress;
 }
 
+/** Client-only module draft that becomes persisted during commit. */
 export interface NewModule {
   tempId: string;
-  slug: string;
-  slugEdited: boolean;
+  /** Proposed child-prefix slug used to derive lesson slugs. */ slug: string;
+  /** Keeps automatic slug derivation from replacing an explicit edit. */ slugEdited: boolean;
   title: string;
   description: string;
-  status: StatusValue;
+  /** Publication status sent for the newly created module. */ status: StatusValue;
   orderIndex: number | null;
 }
 
+/** Phase of the arrange workflow, from local editing through server commit. */
 export type UploadArrangePhase = "editing" | "presigning" | "uploading" | "committing" | "done";
 
+/** Reducer state for staged files, module drafts, transfer progress, and conflicts. */
 export interface UploadArrangeState {
   existing: AdminArrangeDataDto | null;
   items: UploadItem[];
   newModules: NewModule[];
   phase: UploadArrangePhase;
-  error: string | null;
-  conflictSlugs: string[];
+  /** Last workflow error, cleared when a new operation begins. */ error: string | null;
+  /** Slugs rejected by the server during commit and shown for correction. */ conflictSlugs: string[];
 }
 
+/** Events accepted by the arrange reducer; actions preserve immutable staged state. */
 export type UploadArrangeAction =
   | { type: "INIT_EXISTING"; data: AdminArrangeDataDto }
-  | { type: "ADD_FILES"; files: { file: File; durationSeconds: number | null }[] }
+  | {
+      type: "ADD_FILES";
+      files: {
+        file: File;
+        /** Duration discovered for the local file before it enters the queue. */ durationSeconds:
+          | number
+          | null;
+      }[];
+    }
   | {
       type: "ADD_URL_ITEMS";
       items: {
@@ -95,7 +124,9 @@ export type UploadArrangeAction =
         filename: string;
         contentType: string;
         sizeBytes: number;
-        durationSeconds: number | null;
+        /** Duration retained for a remote item before its bytes are downloaded. */ durationSeconds:
+          | number
+          | null;
       }[];
     }
   | { type: "RENAME_ITEM"; itemId: string; title: string }
@@ -123,16 +154,31 @@ export type UploadArrangeAction =
   | {
       type: "UPLOAD_PROGRESS";
       itemId: string;
-      status: "downloading" | "uploading";
+      /** Identifies whether progress is downloading a URL source or uploading bytes. */ status:
+        | "downloading"
+        | "uploading";
       percent: number;
       loadedBytes?: number;
       totalBytes?: number;
     }
   | { type: "UPLOAD_DONE"; itemId: string }
-  | { type: "UPLOAD_ERROR"; itemId: string; error: string }
-  | { type: "COMMIT_CONFLICT"; conflictSlugs: string[] }
-  | { type: "SET_ERROR"; error: string | null }
-  | { type: "SET_ALL_LESSON_STATUS"; status: StatusValue };
+  | {
+      type: "UPLOAD_ERROR";
+      itemId: string;
+      /** Failure detail associated with the item transfer. */ error: string;
+    }
+  | {
+      type: "COMMIT_CONFLICT";
+      /** Slugs rejected by the server's uniqueness checks. */ conflictSlugs: string[];
+    }
+  | {
+      type: "SET_ERROR";
+      /** Sets or clears the workflow-level error. */ error: string | null;
+    }
+  | {
+      type: "SET_ALL_LESSON_STATUS";
+      /** Applies a publication status to every staged new lesson. */ status: StatusValue;
+    };
 
 const INITIAL_STATE: UploadArrangeState = {
   existing: null,
@@ -165,15 +211,29 @@ function nextOrderIndex(state: UploadArrangeState, moduleKey: ModuleKey): number
 }
 
 /** The slug an item/module must be prefixed by, given its immediate parent container. */
-export function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
-  if (moduleKey === ROOT_MODULE_KEY) return state.existing?.slug ?? "";
-  if (moduleKey.startsWith("new:")) {
-    const tempId = moduleKey.slice("new:".length);
-    return state.newModules.find((m) => m.tempId === tempId)?.slug ?? state.existing?.slug ?? "";
-  }
+function existingRootSlug(state: UploadArrangeState): string {
+  return state.existing?.slug ?? "";
+}
+
+function newModuleParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+  const tempId = moduleKey.slice("new:".length);
   return (
-    state.existing?.modules.find((m) => m.id === moduleKey)?.slug ?? state.existing?.slug ?? ""
+    state.newModules.find((module) => module.tempId === tempId)?.slug ?? existingRootSlug(state)
   );
+}
+
+function existingModuleParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+  return (
+    state.existing?.modules.find((module) => module.id === moduleKey)?.slug ??
+    existingRootSlug(state)
+  );
+}
+
+/** Resolves the slug prefix inherited by a root, existing, or staged module. */
+export function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+  if (moduleKey === ROOT_MODULE_KEY) return existingRootSlug(state);
+  if (moduleKey.startsWith("new:")) return newModuleParentSlug(state, moduleKey);
+  return existingModuleParentSlug(state, moduleKey);
 }
 
 function updateItem(
@@ -223,11 +283,11 @@ function sortItemsByOrderIndex(items: UploadItem[]): UploadItem[] {
 }
 
 interface StagedItemInput {
-  source: UploadItemSource;
+  /** Source retained until the transfer worker consumes the item. */ source: UploadItemSource;
   filename: string;
   contentType: string;
   sizeBytes: number;
-  durationSeconds: number | null;
+  /** Audio duration discovered before staging, when available. */ durationSeconds: number | null;
 }
 
 /** Shared by ADD_FILES and ADD_URL_ITEMS — identical sorting/slug-derivation/order-cursor
@@ -282,6 +342,99 @@ function buildStagedItems(state: UploadArrangeState, inputs: StagedItemInput[]):
   });
 }
 
+type EditModuleAction = Extract<UploadArrangeAction, { type: "EDIT_MODULE" }>;
+
+function editModuleTitle(mod: NewModule, action: EditModuleAction, rootSlug: string): NewModule {
+  const title = String(action.value ?? "");
+  return mod.slugEdited
+    ? { ...mod, title }
+    : { ...mod, title, slug: deriveChildSlug(rootSlug, title) };
+}
+
+function editModuleOrder(mod: NewModule, action: EditModuleAction): NewModule {
+  const orderIndex = action.value === null ? null : Number(action.value);
+  return { ...mod, orderIndex };
+}
+
+function editModule(mod: NewModule, action: EditModuleAction, rootSlug: string): NewModule {
+  if (action.field === "slug") {
+    return { ...mod, slug: String(action.value ?? ""), slugEdited: true };
+  }
+  if (action.field === "title") {
+    return editModuleTitle(mod, action, rootSlug);
+  }
+  if (action.field === "orderIndex") return editModuleOrder(mod, action);
+  return { ...mod, [action.field]: action.value };
+}
+
+type SetLessonFieldAction = Extract<UploadArrangeAction, { type: "SET_LESSON_FIELD" }>;
+
+function normalizeOrderIndex(value: SetLessonFieldAction["value"]): number | null {
+  return value === null ? null : Number(value);
+}
+
+function updateLessonField(item: UploadItem, action: SetLessonFieldAction): UploadItem {
+  if (item.assignment.kind !== "new-lesson") return item;
+  const assignment = { ...item.assignment };
+  if (action.field === "slug") {
+    assignment.slug = String(action.value ?? "");
+    assignment.slugEdited = true;
+  } else if (action.field === "description") {
+    assignment.description = String(action.value ?? "");
+  } else if (action.field === "status") {
+    // SAFETY: the status editor dispatches only domain `StatusValue` options for the
+    // `"status"` field branch of this reducer action.
+    assignment.status = action.value as StatusValue;
+  } else {
+    assignment.orderIndex = normalizeOrderIndex(action.value);
+  }
+  return { ...item, assignment };
+}
+
+function appendStagedItems(
+  state: UploadArrangeState,
+  inputs: StagedItemInput[],
+): UploadArrangeState {
+  if (!state.existing) return state;
+  if (state.existing.format === "single" && (state.items.length > 0 || inputs.length > 1)) {
+    return { ...state, error: "This listing holds a single audio file." };
+  }
+  const newItems = buildStagedItems(state, inputs);
+  return { ...state, items: [...state.items, ...newItems], error: null };
+}
+
+function addFiles(
+  state: UploadArrangeState,
+  action: Extract<UploadArrangeAction, { type: "ADD_FILES" }>,
+): UploadArrangeState {
+  return appendStagedItems(
+    state,
+    action.files.map(({ file, durationSeconds }) => ({
+      source: { kind: "local", file },
+      filename: file.name,
+      contentType: file.type,
+      sizeBytes: file.size,
+      durationSeconds,
+    })),
+  );
+}
+
+function addUrlItems(
+  state: UploadArrangeState,
+  action: Extract<UploadArrangeAction, { type: "ADD_URL_ITEMS" }>,
+): UploadArrangeState {
+  return appendStagedItems(
+    state,
+    action.items.map((entry) => ({
+      source: { kind: "url", url: entry.url },
+      filename: entry.filename,
+      contentType: entry.contentType,
+      sizeBytes: entry.sizeBytes,
+      durationSeconds: entry.durationSeconds,
+    })),
+  );
+}
+
 function reducer(state: UploadArrangeState, action: UploadArrangeAction): UploadArrangeState {
   switch (action.type) {
     case "INIT_EXISTING":
@@ -290,52 +443,11 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
       // spread INITIAL_STATE here too.
       return { ...state, existing: action.data };
 
-    case "ADD_FILES": {
-      if (!state.existing) return state;
-      // Single-format roots hold exactly one staged file.
-      if (
-        state.existing.format === "single" &&
-        (state.items.length > 0 || action.files.length > 1)
-      ) {
-        return { ...state, error: "This listing holds a single audio file." };
-      }
+    case "ADD_FILES":
+      return addFiles(state, action);
 
-      const newItems = buildStagedItems(
-        state,
-        action.files.map(({ file, durationSeconds }) => ({
-          source: { kind: "local", file },
-          filename: file.name,
-          contentType: file.type,
-          sizeBytes: file.size,
-          durationSeconds,
-        })),
-      );
-
-      return { ...state, items: [...state.items, ...newItems], error: null };
-    }
-
-    case "ADD_URL_ITEMS": {
-      if (!state.existing) return state;
-      if (
-        state.existing.format === "single" &&
-        (state.items.length > 0 || action.items.length > 1)
-      ) {
-        return { ...state, error: "This listing holds a single audio file." };
-      }
-
-      const newItems = buildStagedItems(
-        state,
-        action.items.map((entry) => ({
-          source: { kind: "url", url: entry.url },
-          filename: entry.filename,
-          contentType: entry.contentType,
-          sizeBytes: entry.sizeBytes,
-          durationSeconds: entry.durationSeconds,
-        })),
-      );
-
-      return { ...state, items: [...state.items, ...newItems], error: null };
-    }
+    case "ADD_URL_ITEMS":
+      return addUrlItems(state, action);
 
     case "RENAME_ITEM":
       return updateItem(state, action.itemId, (item) => {
@@ -374,21 +486,7 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
       });
 
     case "SET_LESSON_FIELD": {
-      const updated = updateItem(state, action.itemId, (item) => {
-        if (item.assignment.kind !== "new-lesson") return item;
-        const assignment = { ...item.assignment };
-        if (action.field === "slug") {
-          assignment.slug = String(action.value ?? "");
-          assignment.slugEdited = true;
-        } else if (action.field === "description") {
-          assignment.description = String(action.value ?? "");
-        } else if (action.field === "status") {
-          assignment.status = action.value as StatusValue;
-        } else {
-          assignment.orderIndex = action.value === null ? null : Number(action.value);
-        }
-        return { ...item, assignment };
-      });
+      const updated = updateItem(state, action.itemId, (item) => updateLessonField(item, action));
       // Re-sort within each module group when the orderIndex field changes.
       if (action.field === "orderIndex") {
         return { ...updated, items: sortItemsByOrderIndex(updated.items) };
@@ -447,26 +545,9 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
     }
 
     case "EDIT_MODULE": {
-      const newModules = state.newModules.map((mod) => {
-        if (mod.tempId !== action.tempId) return mod;
-        if (action.field === "slug") {
-          return { ...mod, slug: String(action.value ?? ""), slugEdited: true };
-        }
-        if (action.field === "title") {
-          const title = String(action.value ?? "");
-          if (mod.slugEdited) return { ...mod, title };
-          return { ...mod, title, slug: deriveChildSlug(state.existing?.slug ?? "", title) };
-        }
-        return {
-          ...mod,
-          [action.field]:
-            action.field === "orderIndex"
-              ? action.value === null
-                ? null
-                : Number(action.value)
-              : action.value,
-        };
-      });
+      const newModules = state.newModules.map((mod) =>
+        mod.tempId === action.tempId ? editModule(mod, action, state.existing?.slug ?? "") : mod,
+      );
 
       const editedModule = newModules.find((m) => m.tempId === action.tempId);
       const moduleKey = `new:${action.tempId}`;
@@ -600,6 +681,7 @@ function itemAudioRef(item: UploadItem) {
   };
 }
 
+/** Converts staged items into the batch request used to obtain upload URLs. */
 export function buildPresignRequest(state: UploadArrangeState): BatchPresignAudioRequestDto {
   const rootSlug = state.existing?.slug ?? "";
   return {
@@ -625,40 +707,63 @@ export function itemTargetSlug(state: UploadArrangeState, item: UploadItem): str
   return state.existing?.slug ?? "";
 }
 
-export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
-  const { existing } = state;
-  if (!existing) return { lessons: [] };
-
-  const lessonOpsFor = (moduleKey: ModuleKey): ArrangeLessonOp[] => {
-    const ops: ArrangeLessonOp[] = [];
-    for (const item of state.items) {
-      const assignment = item.assignment;
-      if (assignment.kind === "new-lesson" && assignment.moduleKey === moduleKey) {
-        ops.push({
-          op: "create",
-          slug: assignment.slug,
-          title: item.title,
-          description: assignment.description || undefined,
-          status: assignment.status,
-          orderIndex: assignment.orderIndex ?? undefined,
-          audio: itemAudioRef(item),
-        });
-      } else if (assignment.kind === "replace-audio") {
-        const parentKey =
-          existing.modules.find((m) => m.lessons.some((l) => l.id === assignment.lessonId))?.id ??
-          ROOT_MODULE_KEY;
-        if (parentKey === moduleKey) {
-          ops.push({ op: "update", id: assignment.lessonId, audio: itemAudioRef(item) });
-        }
-      }
-    }
-    return ops;
+function createLessonOp(
+  item: UploadItem,
+  assignment: Extract<
+    UploadItem["assignment"],
+    { /** Narrows the assignment to a lesson creation operation. */ kind: "new-lesson" }
+  >,
+): ArrangeLessonOp {
+  return {
+    op: "create",
+    slug: assignment.slug,
+    title: item.title,
+    description: assignment.description || undefined,
+    status: assignment.status,
+    orderIndex: assignment.orderIndex ?? undefined,
+    audio: itemAudioRef(item),
   };
+}
 
-  if (existing.format === "series") {
-    return { lessons: lessonOpsFor(ROOT_MODULE_KEY) };
+function getReplaceLessonOp(
+  item: UploadItem,
+  assignment: Extract<
+    UploadItem["assignment"],
+    { /** Narrows the assignment to an existing lesson media replacement. */ kind: "replace-audio" }
+  >,
+  existing: NonNullable<UploadArrangeState["existing"]>,
+  moduleKey: ModuleKey,
+): ArrangeLessonOp | null {
+  const parentKey =
+    existing.modules.find((m) => m.lessons.some((l) => l.id === assignment.lessonId))?.id ??
+    ROOT_MODULE_KEY;
+  return parentKey === moduleKey
+    ? { op: "update", id: assignment.lessonId, audio: itemAudioRef(item) }
+    : null;
+}
+
+function buildLessonOps(
+  state: UploadArrangeState,
+  existing: NonNullable<UploadArrangeState["existing"]>,
+  moduleKey: ModuleKey,
+): ArrangeLessonOp[] {
+  const ops: ArrangeLessonOp[] = [];
+  for (const item of state.items) {
+    const assignment = item.assignment;
+    if (assignment.kind === "new-lesson" && assignment.moduleKey === moduleKey) {
+      ops.push(createLessonOp(item, assignment));
+    } else if (assignment.kind === "replace-audio") {
+      const operation = getReplaceLessonOp(item, assignment, existing, moduleKey);
+      if (operation) ops.push(operation);
+    }
   }
+  return ops;
+}
 
+function buildCollectionCommitDto(
+  state: UploadArrangeState,
+  existing: NonNullable<UploadArrangeState["existing"]>,
+): ArrangeCommitDto {
   const modules: ArrangeModuleOp[] = [];
   for (const mod of state.newModules) {
     modules.push({
@@ -668,24 +773,37 @@ export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
       description: mod.description || undefined,
       status: mod.status,
       orderIndex: mod.orderIndex ?? undefined,
-      lessons: lessonOpsFor(`new:${mod.tempId}`),
+      lessons: buildLessonOps(state, existing, `new:${mod.tempId}`),
     });
   }
   for (const mod of existing.modules) {
-    const lessons = lessonOpsFor(mod.id);
-    if (lessons.length > 0) {
-      modules.push({ op: "update", id: mod.id, lessons });
-    }
+    const lessons = buildLessonOps(state, existing, mod.id);
+    if (lessons.length > 0) modules.push({ op: "update", id: mod.id, lessons });
   }
   return { modules };
 }
 
+/** Converts the staged tree into the atomic arrange payload sent to the API. */
+export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
+  const { existing } = state;
+  if (!existing) return { lessons: [] };
+
+  if (existing.format === "series") {
+    return { lessons: buildLessonOps(state, existing, ROOT_MODULE_KEY) };
+  }
+
+  return buildCollectionCommitDto(state, existing);
+}
+
 /** Slugs staged more than once, or colliding with existing children. */
-export function localSlugConflicts(state: UploadArrangeState): string[] {
-  const existingSlugs = new Set([
+function getExistingSlugs(state: UploadArrangeState): Set<string> {
+  return new Set([
     ...allExistingLessons(state.existing).map((l) => l.slug),
     ...(state.existing?.modules.map((m) => m.slug) ?? []),
   ]);
+}
+
+function getStagedSlugs(state: UploadArrangeState): string[] {
   const staged: string[] = [];
   for (const item of state.items) {
     if (item.assignment.kind === "new-lesson") staged.push(item.assignment.slug);
@@ -693,6 +811,10 @@ export function localSlugConflicts(state: UploadArrangeState): string[] {
   for (const mod of state.newModules) {
     staged.push(mod.slug);
   }
+  return staged;
+}
+
+function findSlugConflicts(staged: string[], existingSlugs: Set<string>): string[] {
   const seen = new Set<string>();
   const conflicts = new Set<string>();
   for (const slug of staged) {
@@ -703,6 +825,12 @@ export function localSlugConflicts(state: UploadArrangeState): string[] {
   return [...conflicts];
 }
 
+/** Finds duplicate staged slugs and slugs already used by the listing. */
+export function localSlugConflicts(state: UploadArrangeState): string[] {
+  return findSlugConflicts(getStagedSlugs(state), getExistingSlugs(state));
+}
+
+/** Exposes arrange state and its reducer dispatcher to the upload editor. */
 export function useUploadArrangeState() {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   return { state, dispatch };

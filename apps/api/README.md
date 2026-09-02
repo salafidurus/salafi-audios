@@ -59,4 +59,4 @@ responses expose stable CDN URLs without storing CDN hostnames in DB.
 - Media in DB is references/metadata, not blobs.
 - Keep layering explicit: interface -> application -> domain -> infrastructure.
 
-See `apps/api/AGENT.md` and `docs/implementation-guide/02-backend-architecture.md` for implementation constraints.
+See `apps/api/AGENT.md`, `docs/architecture.md`, and `docs/backend/api.md` for implementation constraints.

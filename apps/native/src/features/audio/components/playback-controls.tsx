@@ -1,15 +1,20 @@
+import { Button, Column, Row } from "@expo/ui";
 import { useAudio, useQueue } from "@sd/domain-audio";
-import { Play, Pause, RotateCw, RotateCcw, SkipBack, SkipForward } from "lucide-react-native";
 import React from "react";
-import { View, Pressable, Text } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { toUniversalStyleFromRN } from "@/core/styles/expo-ui";
+import { NativeIcon, NativeText } from "@/shared/ui";
+
 import { audioService } from "../audio-service";
+
+/** Defines the native playback control contract used by this module. */
 
 function handlePrevious() {
   audioService.skipToPrevious();
 }
 
+/** Renders native playback actions while preserving the audio service contract. */
 export function PlaybackControls() {
   const { isPlaying, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
   const { hasNext } = useQueue();
@@ -45,72 +50,91 @@ export function PlaybackControls() {
     audioService.setSpeed(speeds[nextIndex]!);
   };
 
-  const onPrimary = theme.colors.content.onPrimary;
-  const strong = theme.colors.content.strong;
-  const muted = theme.colors.content.muted;
-  const RotateCcwIcon = <RotateCcw size={28} color={strong} />;
-  const PauseIcon = <Pause size={32} color={onPrimary} fill={onPrimary} />;
-  const PlayIcon = <Play size={32} color={onPrimary} fill={onPrimary} />;
-  const RotateCwIcon = <RotateCw size={28} color={strong} />;
-
   if (!hasTrack) return null;
 
   return (
-    <View style={styles.container}>
-      <Pressable onPress={handleCycleSpeed} style={styles.speedButton}>
-        <Text style={styles.speedText}>{speed.toFixed(2)}x</Text>
-      </Pressable>
+    <Column
+      alignment="center"
+      spacing={theme.spacing.scale.md}
+      style={toUniversalStyleFromRN(styles.container)}
+    >
+      <Button
+        onPress={handleCycleSpeed}
+        variant="text"
+        label={`${speed.toFixed(2)}x`}
+        testID="playback-speed"
+        style={toUniversalStyleFromRN(styles.speedButton)}
+      />
 
-      <View style={styles.centerControls}>
-        <Pressable
+      <Row alignment="center" spacing={theme.spacing.scale.sm}>
+        <Button
+          variant="text"
           onPress={handlePrevious}
-          style={styles.trackButton}
-          accessibilityLabel="Previous track"
+          testID="previous-track"
+          style={toUniversalStyleFromRN(styles.iconButton)}
         >
-          <SkipBack size={20} color={strong} fill={strong} />
-        </Pressable>
+          <NativeIcon name="skipBack" size={20} colorRole="strong" />
+        </Button>
 
-        <Pressable onPress={handleSkipBackward} style={styles.controlButton}>
-          {RotateCcwIcon}
-          <Text style={styles.skipLabel}>30</Text>
-        </Pressable>
+        <Button
+          variant="text"
+          onPress={handleSkipBackward}
+          testID="skip-backward"
+          style={toUniversalStyleFromRN(styles.iconButton)}
+        >
+          <Column alignment="center">
+            <NativeIcon name="replay" size={28} colorRole="strong" />
+            <NativeText variant="caption" colorRole="strong" textStyle={{ fontSize: 9 }}>
+              30
+            </NativeText>
+          </Column>
+        </Button>
 
-        <Pressable onPress={handlePlayPause} style={styles.playButton}>
-          {isPlaying ? PauseIcon : <View style={{ marginStart: 4 }}>{PlayIcon}</View>}
-        </Pressable>
+        <Button
+          variant="text"
+          onPress={handlePlayPause}
+          testID="play-pause"
+          style={toUniversalStyleFromRN(styles.playButton)}
+        >
+          <NativeIcon name={isPlaying ? "pause" : "play"} size={30} colorRole="onAction" />
+        </Button>
 
-        <Pressable onPress={handleSkipForward} style={styles.controlButton}>
-          {RotateCwIcon}
-          <Text style={styles.skipLabel}>30</Text>
-        </Pressable>
+        <Button
+          variant="text"
+          onPress={handleSkipForward}
+          testID="skip-forward"
+          style={toUniversalStyleFromRN(styles.iconButton)}
+        >
+          <Column alignment="center">
+            <NativeIcon name="forward" size={28} colorRole="strong" />
+            <NativeText variant="caption" colorRole="strong" textStyle={{ fontSize: 9 }}>
+              30
+            </NativeText>
+          </Column>
+        </Button>
 
-        <Pressable
+        <Button
+          variant="text"
           onPress={handleNext}
           disabled={!hasNext}
-          style={styles.trackButton}
-          accessibilityLabel="Next track"
+          testID="next-track"
+          style={toUniversalStyleFromRN(styles.iconButton)}
         >
-          <SkipForward size={20} color={hasNext ? strong : muted} fill={hasNext ? strong : muted} />
-        </Pressable>
-      </View>
-
-      <View style={styles.placeholder} />
-    </View>
+          <NativeIcon
+            name="skipForward"
+            size={20}
+            color={hasNext ? theme.colors.content.strong : theme.colors.content.muted}
+          />
+        </Button>
+      </Row>
+    </Column>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    paddingHorizontal: theme.spacing.scale.xl,
-    marginVertical: theme.spacing.scale.lg,
-  },
-  centerControls: {
-    flexDirection: "row",
-    alignItems: "center",
+    alignSelf: "stretch",
+    marginVertical: theme.spacing.scale.md,
   },
   playButton: {
     width: 64,
@@ -118,41 +142,20 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.scale.full,
     backgroundColor: theme.colors.action.primary,
     justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: theme.spacing.scale["2xl"],
-    boxShadow: "0 4px 6px rgba(59, 130, 246, 0.3)",
+    alignment: "center",
   },
-  controlButton: {
+  iconButton: {
+    width: 44,
+    height: 52,
     justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
-  },
-  trackButton: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  skipLabel: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: theme.colors.content.strong,
-    position: "absolute",
-    top: 9,
+    alignment: "center",
   },
   speedButton: {
-    paddingVertical: theme.spacing.component.chipY,
-    paddingHorizontal: theme.spacing.scale.md,
+    height: 40,
     borderRadius: theme.radius.scale.lg,
     backgroundColor: theme.colors.surface.subtle,
-    width: 60,
+    width: 76,
     justifyContent: "center",
-    alignItems: "center",
-  },
-  speedText: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: theme.colors.content.muted,
-  },
-  placeholder: {
-    width: 60,
+    alignment: "center",
   },
 }));

@@ -1,3 +1,4 @@
+/** Public barrel exposing the shared HTTP, navigation, route, query, and DTO contracts. */
 // Export HTTP client
 export { httpClient, getApiBaseUrl } from "./http";
 export type { HttpClientConfig } from "./http";
@@ -85,6 +86,8 @@ export {
   ScholarViewDtoSchema,
   type ScholarDetailDto,
   ScholarDetailDtoSchema,
+  type ScholarDetailStats,
+  ScholarDetailStatsSchema,
   type ScholarStatsDto,
   ScholarStatsDtoSchema,
   type ScholarListItemDto,
@@ -139,10 +142,10 @@ export {
   FeedItemDtoSchema,
   type FeedPageDto,
   FeedPageDtoSchema,
-  type LibraryItemDto,
-  LibraryItemDtoSchema,
-  type LibraryPageDto,
-  LibraryPageDtoSchema,
+  type MyLibraryItemDto,
+  MyLibraryItemDtoSchema,
+  type MyLibraryPageDto,
+  MyLibraryPageDtoSchema,
   type SavedSyncItemDto,
   SavedSyncItemDtoSchema,
   type SavedSyncDto,
@@ -163,10 +166,23 @@ export {
   AdminUserListItemDtoSchema,
   type AdminUserListDto,
   AdminUserListDtoSchema,
+  type AdminDashboardDto,
+  AdminDashboardDtoSchema,
+  AdminDashboardMetricSchema,
+  AdminDashboardActivitySchema,
+  AdminDashboardPendingWorkSchema,
   type ScholarChipDto,
   ScholarChipDtoSchema,
   type ContentSuggestionDto,
   ContentSuggestionDtoSchema,
+  type HomePromotionListingDto,
+  HomePromotionListingDtoSchema,
+  type HomePromotionHeroDto,
+  HomePromotionHeroDtoSchema,
+  type HomePromotionPickDto,
+  HomePromotionPickDtoSchema,
+  type HomePromotionsDto,
+  HomePromotionsDtoSchema,
   type RecentProgressDto,
   RecentProgressDtoSchema,
   type QuickBrowseDto,
@@ -261,16 +277,6 @@ export {
 // Export route constants
 export { routes, routeDefinitions, resolveRouteAccess } from "./routes";
 export type { RouteAccess, RouteDefinition } from "./routes";
-
-// Export shared navigation metadata
-export {
-  SECTION_TABS,
-  DEFAULT_TABS,
-  SECTION_LABELS,
-  SECTION_ROUTES,
-  type Section,
-  type TabConfig,
-} from "./navigation";
 
 // Export query utilities (client, keys, hooks)
 export { createQueryClient, queryKeys } from "./query";

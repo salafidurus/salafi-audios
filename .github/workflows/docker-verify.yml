@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - preview
+      - spec/**
     paths:
       - "docker/**"
       - "apps/api/**"
@@ -36,7 +37,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Lint Dockerfile (hadolint)
-        uses: hadolint/hadolint-action@v3.4.0
+        uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: docker/api/Dockerfile
           failure-threshold: error

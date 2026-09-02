@@ -86,7 +86,7 @@ jest.mock("@/features/downloads/components/download-progress/download-progress",
   },
 }));
 
-jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
+jest.mock("@/shared/ui/native-screen-view", () => ({
   ScreenView: ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
@@ -96,8 +96,8 @@ jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
   },
 }));
 
-jest.mock("@/shared/components/AppText/AppText", () => ({
-  AppText: ({ children }: { children: React.ReactNode }) => {
+jest.mock("@/shared/ui/native-text", () => ({
+  NativeText: ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -391,10 +391,10 @@ describe("LectureDetailScreen", () => {
     await render(<LectureDetailScreen slug="lecture-1" />);
 
     expect(mockDownloadButton).toHaveBeenCalledWith(
-      expect.objectContaining({ lectureId: "lecture-1", audioUrl: "https://s/lecture-1.mp3" }),
+      expect.objectContaining({ listingSlug: "lecture-1", audioUrl: "https://s/lecture-1.mp3" }),
     );
     expect(mockDownloadProgress).toHaveBeenCalledWith(
-      expect.objectContaining({ lectureId: "lecture-1" }),
+      expect.objectContaining({ listingSlug: "lecture-1" }),
     );
   });
 

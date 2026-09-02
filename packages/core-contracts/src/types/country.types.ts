@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+/** Supported country-code values and validation helpers used by profile and catalog contracts. */
+/** Defines the runtime contract value for country codes. */
 export const COUNTRY_CODES = [
   "SA",
   "AE",
@@ -24,20 +26,25 @@ export const COUNTRY_CODES = [
   "OTHER",
 ] as const;
 
+/** Union of country identifiers accepted by profile and catalog contracts. */
 export type CountryCode = (typeof COUNTRY_CODES)[number];
 
+/** Runtime validator for the supported country-code allowlist. */
 export const CountryCodeSchema = z.enum(COUNTRY_CODES);
 
-export function isCountryCode(val: unknown): val is CountryCode {
-  return CountryCodeSchema.safeParse(val).success;
+/** Reports whether a string is one of the supported country identifiers. */
+export function isCountryCode(code: string): code is CountryCode {
+  return CountryCodeSchema.safeParse(code).success;
 }
 
+/** Returns a supported country identifier, falling back when validation fails. */
 export function validateCountryCode(val: string, fallback: CountryCode = "SA"): CountryCode {
   const result = CountryCodeSchema.safeParse(val);
   return result.success ? result.data : fallback;
 }
 
-export const COUNTRY_NAMES: Record<CountryCode, string> = {
+/** Human-readable names for every supported country identifier. */
+export const COUNTRY_NAMES = {
   SA: "Saudi Arabia",
   AE: "United Arab Emirates",
   EG: "Egypt",
@@ -59,9 +66,10 @@ export const COUNTRY_NAMES: Record<CountryCode, string> = {
   US: "United States",
   GB: "United Kingdom",
   OTHER: "Other",
-};
+} satisfies Record<CountryCode, string>;
 
-export const COUNTRY_LIST = Object.entries(COUNTRY_NAMES).map(([code, name]) => ({
-  code: code as CountryCode,
-  name,
+/** Ordered country options for locale-independent selection controls. */
+export const COUNTRY_LIST = COUNTRY_CODES.map((code) => ({
+  code,
+  name: COUNTRY_NAMES[code],
 }));

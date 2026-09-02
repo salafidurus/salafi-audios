@@ -1,5 +1,9 @@
 import type { AppAbility, AppActions, AppSubjectType } from './ability.types';
 
+/** Core API accessible scope module providing shared backend infrastructure and authority-boundary services. */
+type ScopeConditionKey = 'slug' | 'scholarSlug';
+type ScopedRuleConditions = Partial<Record<ScopeConditionKey, string>>;
+
 /**
  * Hand-rolled scope-list helper for scope-aware list endpoints (the D4
  * fallback from the migration plan — @casl/prisma's typed `accessibleBy`
@@ -14,7 +18,7 @@ export function accessibleScopeIds(
   ability: AppAbility,
   action: AppActions,
   subjectType: AppSubjectType,
-  conditionKey: 'slug' | 'scholarSlug' = 'scholarSlug',
+  conditionKey: ScopeConditionKey = 'scholarSlug',
 ): string[] | undefined {
   const rules = ability.rulesFor(action, subjectType);
   const ids = new Set<string>();
@@ -22,8 +26,10 @@ export function accessibleScopeIds(
   for (const rule of rules) {
     if (rule.inverted) continue;
     if (!rule.conditions) return undefined; // unconditioned rule => global access
-    const value = (rule.conditions as Record<string, unknown>)[conditionKey];
-    if (typeof value === 'string') ids.add(value);
+    // SAFETY: this helper only reads the two string condition keys that
+    // `defineAbilityFor` writes for scoped CASL rules in this codebase.
+    const value = (rule.conditions as ScopedRuleConditions)[conditionKey];
+    if (value) ids.add(value);
   }
 
   return Array.from(ids);

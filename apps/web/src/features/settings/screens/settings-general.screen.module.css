@@ -1,36 +1,61 @@
+.settingsIntro {
+  margin-bottom: var(--space-component-gap-lg);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-scale-xs);
+  color: var(--action-primary);
+  font-size: var(--typo-caption-font-size);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .settingsTitle {
-  margin: 0 0 6px 0;
+  margin: 0;
   font-family: var(--font-display), "Fraunces", Georgia, serif;
   font-size: 26px;
   font-weight: 600;
   color: var(--content-strong);
 }
 
-.tabBar {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-bottom: 32px;
-  border-bottom: 1px solid var(--border-default);
-}
-
-.tabButton {
-  background: transparent;
-  border: none;
-  padding: 10px 2px;
-  margin-bottom: -1px;
-  font-size: 14px;
-  font-weight: 500;
+.settingsDescription {
+  max-width: 38rem;
+  margin: var(--space-scale-sm) 0 0;
   color: var(--content-muted);
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  transition: color 150ms ease, border-color 150ms ease;
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
 }
 
-.tabButtonActive {
-  color: var(--content-primary-strong);
-  font-weight: 600;
-  border-bottom: 2px solid var(--action-primary);
+.tabsViewport {
+  min-width: 0;
+  max-width: 100%;
+  margin-bottom: var(--space-component-gap-lg);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.tabsViewport::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs {
+  width: max-content;
+  min-width: max-content;
+  gap: 0;
+}
+
+.tabList {
+  max-width: none;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.tabTrigger {
+  min-width: 6rem;
+  flex: 0 0 auto;
+  padding-inline: var(--space-component-gap-md, 1rem);
 }
 
 .sectionLabel {
@@ -53,5 +78,16 @@
 }
 
 .sectionWrap {
-  max-width: 640px;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .tabsViewport {
+    width: 100%;
+  }
+
+  .tabs,
+  .tabList {
+    min-width: 100%;
+  }
 }

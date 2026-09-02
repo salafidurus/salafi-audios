@@ -1,60 +1,105 @@
-.grid {
+.metricsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-component-gap-md);
+}
+
+.metric {
+  display: block;
+  color: var(--content-strong);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.metricRow {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: 3rem;
+}
+
+.cardIcon,
+.cardLink {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 0.75rem;
+}
+
+.cardIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--action-primary);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+}
+
+.cardIcon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  stroke-width: 1.75;
+}
+
+.cardLink {
+  color: var(--content-muted);
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.cardLink svg {
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 .sectionCard {
   display: block;
-  padding: var(--space-component-card-padding);
-  border-radius: var(--radius-component-card);
-  border: 1px solid var(--border-default);
-  text-decoration: none;
+  border-radius: 0.75rem;
   color: inherit;
-  background-color: var(--surface-default);
+  text-decoration: none;
   transition:
-    border-color 0.2s,
-    background-color 0.2s;
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .sectionCard:hover {
-  border-color: var(--border-hover);
-  background-color: var(--surface-hover);
+  transform: translateY(-2px);
 }
 
-.sectionTitle {
-  font-size: var(--typo-title-md-font-size);
-  font-weight: 600;
-  margin-bottom: var(--space-sm);
+.sectionCard:hover .cardLink {
+  color: var(--action-primary);
+  transform: translate(2px, -2px);
 }
 
-.sectionDescription {
-  font-size: var(--typo-body-md-font-size);
-  color: var(--content-muted);
-  margin: 0;
+.sectionCard:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 4px;
 }
 
 @media (max-width: 640px) {
-  .grid {
-    display: flex;
-    flex-direction: column;
+  .metricsGrid {
+    grid-template-columns: 1fr;
     gap: var(--space-component-gap-sm);
   }
+}
 
-  .sectionCard {
+@media (min-width: 641px) and (max-width: 960px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sectionCard,
+  .cardLink {
     transition: none;
   }
 
-  .sectionCard:hover {
-    border-color: var(--border-default);
-    background-color: var(--surface-default);
-  }
-
-  .sectionTitle {
-    margin-bottom: var(--space-xs);
-  }
-
-  .sectionDescription {
-    font-size: var(--typo-body-sm-font-size);
+  .sectionCard:hover,
+  .sectionCard:hover .cardLink {
+    transform: none;
   }
 }

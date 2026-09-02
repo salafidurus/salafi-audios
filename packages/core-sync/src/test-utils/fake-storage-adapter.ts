@@ -1,5 +1,6 @@
 import type { StorageAdapter } from "../storage/storage-adapter";
 
+/** In-memory persistence support for synchronization unit tests. */
 /**
  * In-memory `StorageAdapter` backed by a `Map` that outlives any single store
  * instance — tests construct a fresh `createOutboxStore`/`createSyncEngine` against

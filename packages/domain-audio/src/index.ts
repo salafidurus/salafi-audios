@@ -1,3 +1,4 @@
+/** Public Listening domain exports for playback, queues, progress, and sessions. */
 export type { Track } from "./types/track.types";
 export type { PlaybackStatus } from "./types/state.types";
 export type { PlaybackEngineEvents, PlaybackEngine } from "./engine/playback.engine";
@@ -17,6 +18,14 @@ export {
 } from "./progress/progress.sync";
 export { usePlaybackStore } from "./store/playback.store";
 export { DurusAudioService } from "./service/audio.service";
+export { ListeningSession } from "./session/listening.session";
+export type { ListeningPlayOptions } from "./session/listening.session";
 export { useAudio } from "./hooks/use-audio";
 export { useListingProgress } from "./hooks/use-listing-progress";
 export { useQueue } from "./hooks/use-queue";
+export {
+  getProgressPercent,
+  isListingFormat,
+  isTrackActiveForListing,
+} from "./playback/playback.utils";
+export type { ListingPlaybackRef } from "./playback/playback.utils";

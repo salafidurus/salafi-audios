@@ -1,40 +1,49 @@
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "bun:test";
 
-import { ACCENT_THEME_CHANGE_EVENT, ACCENT_THEME_KEY } from "./theme/accent-theme";
 import { THEME_KEY, ThemeSync } from "./ThemeSync";
 
-const setAccent = (id: string) => window.localStorage.setItem(ACCENT_THEME_KEY, id);
 const setMode = (mode: string) => window.localStorage.setItem(THEME_KEY, mode);
 
 describe("ThemeSync", () => {
   beforeEach(() => {
     window.localStorage.clear();
     document.documentElement.removeAttribute("data-theme");
-    document.documentElement.removeAttribute("data-accent-theme");
-  });
-
-  it("applies the system-based default accent theme when none is stored", () => {
-    render(<ThemeSync />);
-    expect(document.documentElement).toHaveAttribute("data-accent-theme", "parchment");
-  });
-
-  it("applies a stored accent theme on mount", () => {
-    setAccent("midnight");
-    render(<ThemeSync />);
-    expect(document.documentElement).toHaveAttribute("data-accent-theme", "midnight");
+    document.documentElement.classList.remove("dark");
   });
 
   it("keeps applying the light/dark mode preference", () => {
     setMode("dark");
     render(<ThemeSync />);
     expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+    expect(document.documentElement).toHaveClass("dark");
   });
 
-  it("re-applies the accent theme when an accent-theme-change event fires", () => {
+  it("removes the dark variant class when light mode is selected", () => {
+    document.documentElement.classList.add("dark");
+    setMode("light");
     render(<ThemeSync />);
-    setAccent("ember");
-    window.dispatchEvent(new Event(ACCENT_THEME_CHANGE_EVENT));
-    expect(document.documentElement).toHaveAttribute("data-accent-theme", "ember");
+    expect(document.documentElement).toHaveAttribute("data-theme", "light");
+    expect(document.documentElement).not.toHaveClass("dark");
+  });
+
+  it("follows browser appearance changes while in system mode", () => {
+    let listener: (() => void) | undefined;
+    const mediaQuery = {
+      matches: false,
+      addEventListener: (_event: string, callback: () => void) => {
+        listener = callback;
+      },
+      removeEventListener: () => undefined,
+    };
+    window.matchMedia = (() => mediaQuery) as unknown as typeof window.matchMedia;
+
+    render(<ThemeSync />);
+    expect(document.documentElement).toHaveAttribute("data-theme", "light");
+
+    mediaQuery.matches = true;
+    listener?.();
+
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
   });
 });

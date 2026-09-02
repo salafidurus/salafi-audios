@@ -91,6 +91,7 @@ const listingConfig: TranslationEntityConfig = {
     const data = await fetchListingFormData(target.listingId);
     return {
       entityId: data.listing.id,
+      // SAFETY: listing form data exposes the same supported locale union consumed by the translation UI.
       mainLocale: (data.listing.language as Locale) ?? "ar",
       source: { title: data.listing.title, description: data.listing.description ?? null },
       translations: data.translations,
@@ -150,6 +151,7 @@ const scholarConfig: TranslationEntityConfig = {
     const data = await fetchScholarFormData(target.scholarId);
     return {
       entityId: data.scholar.id,
+      // SAFETY: scholar form data exposes the same supported locale union consumed by the translation UI.
       mainLocale: (data.scholar.mainLanguage as Locale) ?? "ar",
       source: { name: data.scholar.name, bio: data.scholar.bio ?? null },
       translations: data.translations,
@@ -196,14 +198,11 @@ const topicConfig: TranslationEntityConfig = {
   },
 };
 
-export const translationEntities: Record<
-  ClientTranslationTarget["entity"],
-  TranslationEntityConfig
-> = {
+export const translationEntities = {
   listing: listingConfig,
   scholar: scholarConfig,
   topic: topicConfig,
-};
+} satisfies Record<ClientTranslationTarget["entity"], TranslationEntityConfig>;
 
 /** Stable per-target identity for React `key`s — forces a remount (fresh load) per target. */
 export function translationTargetKey(target: ClientTranslationTarget | null): string {

@@ -90,6 +90,7 @@ describe("AdminListingsScreen", () => {
     });
 
     await render(<AdminListingsScreen />);
+    expect(screen.getByTestId("admin-listings-host")).toBeTruthy();
     expect(screen.getByText("Listing One")).toBeTruthy();
     expect(screen.getByText("Scholar A", { exact: false })).toBeTruthy();
   });

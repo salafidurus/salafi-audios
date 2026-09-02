@@ -29,41 +29,315 @@ import type {
   ArrangeCommitDto,
   ArrangeCommitResultDto,
   ArrangeLessonOp,
+  HomePromotionsDto,
+  ListingFormat,
 } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
+import { publishedListingSlugWhere } from '../../shared/utils/published-listing-slug-where';
+import {
+  assertListingTransition,
+  type ListingEditorialTransition,
+} from './listing-editorial.transitions';
+import { toOptional } from '../../shared/utils/to-optional';
+
+/** listing application module responsible for listing.repo behavior at the backend boundary. */
+type AdminListingFilterParams = {
+  cursor?: string;
+  scholarId?: string;
+  /** Documents the status field's API projection semantics and lifecycle meaning. */ status?: string;
+  search?: string;
+  accessibleScholarIds?: string[];
+};
+
+type CounterChild = {
+  format: string;
+  /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
+    | number
+    | null;
+  publishedLectureCount: number | null;
+  /** Documents the publishedDurationSeconds field's API projection semantics and lifecycle meaning. */ publishedDurationSeconds:
+    | number
+    | null;
+};
+
+function buildAdminListingWhere(params: AdminListingFilterParams): Prisma.ListingWhereInput {
+  const scholarId = params.accessibleScholarIds
+    ? params.scholarId && !params.accessibleScholarIds.includes(params.scholarId)
+      ? { in: [] }
+      : (params.scholarId ?? { in: params.accessibleScholarIds })
+    : params.scholarId;
+  const where: Prisma.ListingWhereInput = {
+    deletedAt: null,
+    parentId: null,
+    scholarId,
+    // SAFETY: status is validated by the admin route DTO before reaching this repository filter.
+    status: params.status as Status | undefined,
+  };
+  if (params.search) {
+    where.OR = [
+      { title: { contains: params.search, mode: 'insensitive' } },
+      { translations: { some: { title: { contains: params.search, mode: 'insensitive' } } } },
+      { scholar: { name: { contains: params.search, mode: 'insensitive' } } },
+      {
+        scholar: {
+          translations: { some: { name: { contains: params.search, mode: 'insensitive' } } },
+        },
+      },
+    ];
+  }
+  return where;
+}
+
+function sumListingCounters(children: CounterChild[]): {
+  totalCount: number;
+  /** Documents the totalDuration field's API projection semantics and lifecycle meaning. */ totalDuration: number;
+} {
+  return children.reduce(
+    (totals, child) =>
+      child.format === 'single'
+        ? {
+            totalCount: totals.totalCount + 1,
+            totalDuration: totals.totalDuration + (child.durationSeconds ?? 0),
+          }
+        : {
+            totalCount: totals.totalCount + (child.publishedLectureCount ?? 0),
+            totalDuration: totals.totalDuration + (child.publishedDurationSeconds ?? 0),
+          },
+    { totalCount: 0, totalDuration: 0 },
+  );
+}
+
+function hasTranslatableListingChange(dto: UpdateListingDetailsDto): boolean {
+  return [dto.title, dto.description, dto.language].some((value) => value !== undefined);
+}
+
+function setPublishedAtWhenPublishing(
+  updateData: Prisma.ListingUpdateInput,
+  nextStatus: Status | undefined,
+  currentStatus: Status,
+): void {
+  if (nextStatus === Status.published && currentStatus !== Status.published) {
+    updateData.publishedAt = new Date();
+  }
+}
+
+async function createListingTopics(
+  tx: Prisma.TransactionClient,
+  listingId: string,
+  topics: string[] | undefined,
+): Promise<void> {
+  if (!topics?.length) return;
+  await tx.listingTopic.createMany({ data: topics.map((topicId) => ({ listingId, topicId })) });
+}
+
+async function createListingAudioAsset(
+  tx: Prisma.TransactionClient,
+  listingId: string,
+  dto: CreateListingDto & { publicUrl?: string },
+): Promise<void> {
+  if (dto.format !== 'single' || !dto.publicUrl) return;
+  await tx.audioAsset.create({
+    data: {
+      listingId,
+      url: dto.publicUrl,
+      objectKey: dto.audioKey ?? undefined,
+      format: dto.publicUrl.endsWith('.mp3') ? 'mp3' : undefined,
+      sizeBytes: dto.sizeBytes ?? undefined,
+      durationSeconds: dto.durationSeconds ?? undefined,
+      isPrimary: true,
+      source: 'r2',
+    },
+  });
+}
+
+async function replaceListingTopics(
+  tx: Prisma.TransactionClient,
+  listingId: string,
+  topics: string[] | undefined,
+): Promise<void> {
+  if (topics === undefined) return;
+  await tx.listingTopic.deleteMany({ where: { listingId } });
+  await createListingTopics(tx, listingId, topics);
+}
+
+function buildListingMediaUpdateData(
+  dto: UpdateListingMediaDto,
+  updatedBy?: string,
+): Prisma.ListingUpdateInput {
+  const updateData: Prisma.ListingUpdateInput = {
+    updatedAt: new Date(),
+    updatedBy,
+  };
+  if (dto.durationSeconds !== undefined) updateData.durationSeconds = dto.durationSeconds;
+  if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
+  return updateData;
+}
+
+function mapListingTopic(topic: {
+  id: string;
+  /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
+  name: string;
+  translations: Array<{ name: string }>;
+}) {
+  return {
+    id: topic.id,
+    slug: topic.slug,
+    name: topic.translations[0]?.name || topic.name,
+  };
+}
+
+function mapPrimaryAudioAsset(
+  asset: {
+    id: string;
+    url: string;
+    format: string | null;
+    bitrateKbps: number | null;
+    /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
+      | number
+      | null;
+  } | null,
+) {
+  if (!asset) return null;
+  return {
+    id: asset.id,
+    url: asset.url,
+    format: toOptional(asset.format),
+    bitrateKbps: toOptional(asset.bitrateKbps),
+    durationSeconds: toOptional(asset.durationSeconds),
+  };
+}
+
+function mapOriginalListingTranslation(
+  original:
+    | {
+        title: string;
+        description: string | null;
+      }
+    | null
+    | undefined,
+) {
+  if (!original) return undefined;
+  return {
+    title: original.title,
+    description: toOptional(original.description),
+  };
+}
+
+function mapOriginalListingTitle(original: { title: string } | null | undefined) {
+  return original ? { title: original.title } : undefined;
+}
+
+function getAdminListingOptionalFields(listing: {
+  description: string | null;
+  /** Documents the language field's API projection semantics and lifecycle meaning. */ language: Locale | null;
+  orderIndex: number | null;
+  /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
+    | number
+    | null;
+  parentId: string | null;
+  coverImageUrl: string | null;
+  /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */ updatedAt: Date | null;
+}) {
+  return {
+    description: toOptional(listing.description),
+    language: toOptional(listing.language),
+    orderIndex: toOptional(listing.orderIndex),
+    durationSeconds: toOptional(listing.durationSeconds),
+    parentId: toOptional(listing.parentId),
+    coverImageUrl: toOptional(listing.coverImageUrl),
+    updatedAt: listing.updatedAt?.toISOString(),
+  };
+}
+
+function nullableValue<T>(value: T | null | undefined): T | null {
+  return value ?? null;
+}
+
+function buildCreateListingData(
+  dto: CreateListingDto & { publicUrl?: string },
+  slug: string,
+  createdBy?: string,
+): Prisma.ListingUncheckedCreateInput {
+  return {
+    title: dto.title,
+    slug,
+    format: dto.format,
+    status: dto.status ?? Status.draft,
+    language: dto.language ?? 'ar',
+    durationSeconds: dto.durationSeconds ?? undefined,
+    scholarId: dto.scholarId,
+    parentId: dto.parentId ?? undefined,
+    coverImageUrl: dto.coverImageUrl ?? undefined,
+    coverImageKey: dto.coverImageKey ?? undefined,
+    createdBy,
+  };
+}
+
+function buildArrangeLessonUpdateData(
+  op: Extract<ArrangeLessonOp, { op: 'update' }>,
+  existingStatus: Status | null | undefined,
+  userId?: string,
+): Prisma.ListingUpdateInput {
+  const data: Prisma.ListingUpdateInput = { updatedAt: new Date(), updatedBy: userId };
+  if (op.title !== undefined) data.title = op.title;
+  if (op.description !== undefined) data.description = op.description;
+  if (op.status !== undefined) {
+    data.status = op.status;
+    if (isNewlyPublished(op.status, existingStatus)) {
+      data.publishedAt = new Date();
+    }
+  }
+  if (op.orderIndex !== undefined) data.orderIndex = op.orderIndex;
+  if (op.audio) data.durationSeconds = op.audio.durationSeconds;
+  return data;
+}
+
+function isNewlyPublished(status: Status, existingStatus: Status | null | undefined): boolean {
+  return status === Status.published && existingStatus !== Status.published;
+}
 
 @Injectable()
+/** NestJS listing repository service or controller coordinating the API boundary for this responsibility. */
 export class ListingRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config?: ConfigService,
   ) {}
 
+  private toPublicAssetUrl(value?: string | null): string | undefined {
+    if (!value) return undefined;
+    if (/^[a-z]+:\/\//i.test(value)) return value;
+    const base = this.config?.ASSET_CDN_BASE_URL;
+    if (!base) return value;
+    return `${base.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
+  }
+
   async findIdBySlug(slug: string): Promise<string | null> {
     const listing = await this.prisma.listing.findUnique({ where: { slug }, select: { id: true } });
     return listing?.id ?? null;
   }
 
-  async findDetailById(id: string): Promise<ListingDetailDto | null> {
+  async findDetailBySlug(slug: string): Promise<ListingDetailDto | null> {
     const locale = getRequestLocale();
 
     const listing = await this.prisma.listing.findFirst({
       where: {
-        slug: id,
-        deletedAt: null,
-        status: Status.published,
+        ...publishedListingSlugWhere(slug),
         scholar: { isActive: true },
       },
       select: {
         id: true,
         slug: true,
         title: true,
+        coverImageUrl: true,
         description: true,
         format: true,
         language: true,
         durationSeconds: true,
+        publishedLectureCount: true,
+        publishedDurationSeconds: true,
         publishedAt: true,
         parentId: true,
         translations: {
@@ -76,6 +350,7 @@ export class ListingRepository {
             id: true,
             slug: true,
             name: true,
+            title: true,
             mainLanguage: true,
             imageUrl: true,
             translations: {
@@ -138,38 +413,25 @@ export class ListingRepository {
       id: listing.id,
       slug: listing.slug,
       title: resolved.fields.title,
-      description: resolved.fields.description ?? undefined,
+      description: toOptional(resolved.fields.description),
       format: listing.format,
-      language: listing.language ?? undefined,
+      coverImageUrl: this.toPublicAssetUrl(listing.coverImageUrl),
+      language: toOptional(listing.language),
       originalLanguage: resolved.originalLanguage,
-      original: resolved.original
-        ? {
-            title: resolved.original.title,
-            description: resolved.original.description ?? undefined,
-          }
-        : undefined,
-      durationSeconds: listing.durationSeconds ?? undefined,
+      original: mapOriginalListingTranslation(resolved.original),
+      durationSeconds: toOptional(listing.durationSeconds),
+      publishedLectureCount: toOptional(listing.publishedLectureCount),
+      publishedDurationSeconds: toOptional(listing.publishedDurationSeconds),
       publishedAt: listing.publishedAt?.toISOString(),
       scholar: {
         id: listing.scholar.id,
         slug: listing.scholar.slug,
         name: scholarName,
-        imageUrl: listing.scholar.imageUrl ?? undefined,
+        imageUrl: toOptional(listing.scholar.imageUrl),
+        title: toOptional(listing.scholar.title),
       },
-      topics: listing.topics.map((lt) => ({
-        id: lt.topic.id,
-        slug: lt.topic.slug,
-        name: lt.topic.translations?.[0]?.name || lt.topic.name,
-      })),
-      primaryAudioAsset: primaryAudio
-        ? {
-            id: primaryAudio.id,
-            url: primaryAudio.url,
-            format: primaryAudio.format ?? undefined,
-            bitrateKbps: primaryAudio.bitrateKbps ?? undefined,
-            durationSeconds: primaryAudio.durationSeconds ?? undefined,
-          }
-        : null,
+      topics: listing.topics.map((lt) => mapListingTopic(lt.topic)),
+      primaryAudioAsset: mapPrimaryAudioAsset(primaryAudio),
       seriesContext,
       rootListing,
     };
@@ -178,7 +440,7 @@ export class ListingRepository {
   private resolveTranslatedTitle(
     item: {
       title: string;
-      language: Locale | null;
+      /** Documents the language field's API projection semantics and lifecycle meaning. */ language: Locale | null;
       translations: { title: string }[];
     },
     locale: Locale,
@@ -202,7 +464,7 @@ export class ListingRepository {
    * about direct siblings, so it silently failed to cross Module boundaries
    * inside a Collection. Real prev/next playback navigation is derived
    * client-side from the full ordered play queue (built from
-   * `findContentsById`) instead.
+   * `findContentsBySlug`) instead.
    */
   private async resolveAncestry(
     parentId: string | null,
@@ -271,14 +533,12 @@ export class ListingRepository {
     };
   }
 
-  async findContentsById(id: string): Promise<ListingContentsDto | null> {
+  async findContentsBySlug(slug: string): Promise<ListingContentsDto | null> {
     const locale = getRequestLocale();
 
     const listing = await this.prisma.listing.findFirst({
       where: {
-        slug: id,
-        deletedAt: null,
-        status: Status.published,
+        ...publishedListingSlugWhere(slug),
         scholar: { isActive: true },
       },
       select: {
@@ -311,7 +571,7 @@ export class ListingRepository {
 
     const resolveTitle = (item: {
       title: string;
-      language?: Locale | null;
+      /** Documents the language field's API projection semantics and lifecycle meaning. */ language?: Locale | null;
       translations?: { title: string }[];
     }) =>
       resolveContentTranslation({
@@ -464,12 +724,9 @@ export class ListingRepository {
     return null;
   }
 
-  async findLastPlayedLesson(id: string, userId: string): Promise<LastPlayedLessonDto | null> {
+  async findLastPlayedLesson(slug: string, userId: string): Promise<LastPlayedLessonDto | null> {
     const targetListing = await this.prisma.listing.findFirst({
-      where: {
-        slug: id,
-        deletedAt: null,
-      },
+      where: publishedListingSlugWhere(slug),
       select: { id: true },
     });
 
@@ -480,12 +737,13 @@ export class ListingRepository {
     const progress = await this.prisma.$queryRaw<
       {
         listingId: string;
+        /** Documents the listingSlug field's API projection semantics and lifecycle meaning. */ listingSlug: string;
         positionSeconds: number;
         isCompleted: boolean;
-        updatedAt: Date;
+        /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */ updatedAt: Date;
       }[]
     >`
-      SELECT ulp."listingId", ulp."positionSeconds", ulp."isCompleted", ulp."updatedAt"
+      SELECT ulp."listingId", l."slug" AS "listingSlug", ulp."positionSeconds", ulp."isCompleted", ulp."updatedAt"
       FROM "UserListingProgress" ulp
       JOIN "Listing" l ON ulp."listingId" = l.id
       LEFT JOIN "Listing" m ON l."parentId" = m.id
@@ -499,31 +757,33 @@ export class ListingRepository {
     const p = progress[0];
     if (!p) return null;
 
-    return {
+    const result: LastPlayedLessonDto = {
       listingId: p.listingId,
       positionSeconds: p.positionSeconds,
       isCompleted: p.isCompleted,
       updatedAt: p.updatedAt.toISOString(),
     };
+    if (p.listingSlug) result.listingSlug = p.listingSlug;
+    return result;
   }
 
   /**
-   * Read-time aggregate of a user's progress across a Listing's playable leaves.
-   * Computed on demand from `UserListingProgress` — not separately stored, so it
-   * always reflects the current set of published children.
+   * Read-time aggregate of a user's progress across a Listing's playable
+   * leaves, computed on demand from `UserListingProgress` — not stored.
+   * Public/HTTP path — the client always supplies the public slug, resolved
+   * through the same published-only identity seam as every Catalog read.
    */
-  /** Public/HTTP path — client always supplies the slug. */
   async getProgressSummary(
     slug: string,
     userId: string,
   ): Promise<ListingProgressSummaryDto | null> {
     const listing = await this.prisma.listing.findFirst({
-      where: { slug, deletedAt: null },
-      select: { id: true, format: true },
+      where: publishedListingSlugWhere(slug),
+      select: { id: true, slug: true, format: true },
     });
     if (!listing) return null;
 
-    return this.computeProgressSummary(listing.id, listing.format, userId);
+    return this.computeProgressSummary(listing.id, listing.slug, listing.format, userId);
   }
 
   /**
@@ -538,59 +798,77 @@ export class ListingRepository {
   ): Promise<ListingProgressSummaryDto | null> {
     const listing = await this.prisma.listing.findFirst({
       where: { id, deletedAt: null },
-      select: { id: true, format: true },
+      select: { id: true, slug: true, format: true },
     });
     if (!listing) return null;
 
-    return this.computeProgressSummary(listing.id, listing.format, userId);
+    return this.computeProgressSummary(listing.id, listing.slug, listing.format, userId);
   }
 
   private async computeProgressSummary(
     actualId: string,
+    listingSlug: string,
     format: ListingProgressSummaryDto['format'],
     userId: string,
   ): Promise<ListingProgressSummaryDto> {
-    if (format === 'single') {
-      const progress = await this.prisma.userListingProgress.findUnique({
-        where: { userId_listingId: { userId, listingId: actualId } },
-        select: { isCompleted: true },
-      });
-      return this.toProgressSummary(actualId, format, 1, progress?.isCompleted ? 1 : 0);
-    }
+    const counts =
+      format === 'single'
+        ? await this.getSingleProgressCounts(actualId, userId)
+        : await this.getNestedProgressCounts(actualId, userId, format);
 
+    return this.toProgressSummary(actualId, listingSlug, format, counts.total, counts.completed);
+  }
+
+  private async getSingleProgressCounts(
+    listingId: string,
+    userId: string,
+  ): Promise<{ total: number; completed: number }> {
+    const progress = await this.prisma.userListingProgress.findUnique({
+      where: { userId_listingId: { userId, listingId } },
+      select: { isCompleted: true },
+    });
+    return { total: 1, completed: progress?.isCompleted ? 1 : 0 };
+  }
+
+  private async getNestedProgressCounts(
+    listingId: string,
+    userId: string,
+    format: ListingProgressSummaryDto['format'],
+  ): Promise<{ total: number; completed: number }> {
     const [row] =
       format === 'series'
         ? await this.prisma.$queryRaw<{ total: number; completed: number }[]>`
-            SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
-            FROM "Listing" l
-            LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
-            WHERE l."parentId" = ${actualId}::uuid
-              AND l."deletedAt" IS NULL
-              AND l."status" = 'published'
-          `
+          SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
+          FROM "Listing" l
+          LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
+          WHERE l."parentId" = ${listingId}::uuid
+            AND l."deletedAt" IS NULL
+            AND l."status" = 'published'
+        `
         : await this.prisma.$queryRaw<{ total: number; completed: number }[]>`
-            SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
-            FROM "Listing" l
-            JOIN "Listing" m ON l."parentId" = m.id
-            LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
-            WHERE m."parentId" = ${actualId}::uuid
-              AND l."deletedAt" IS NULL
-              AND l."status" = 'published'
-              AND m."deletedAt" IS NULL
-              AND m."status" = 'published'
-          `;
-
-    return this.toProgressSummary(actualId, format, row?.total ?? 0, row?.completed ?? 0);
+          SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
+          FROM "Listing" l
+          JOIN "Listing" m ON l."parentId" = m.id
+          LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
+          WHERE m."parentId" = ${listingId}::uuid
+            AND l."deletedAt" IS NULL
+            AND l."status" = 'published'
+            AND m."deletedAt" IS NULL
+            AND m."status" = 'published'
+        `;
+    return { total: row?.total ?? 0, completed: row?.completed ?? 0 };
   }
 
   private toProgressSummary(
     listingId: string,
+    listingSlug: string,
     format: ListingProgressSummaryDto['format'],
     totalCount: number,
     completedCount: number,
   ): ListingProgressSummaryDto {
     return {
       listingId,
+      listingSlug,
       format,
       totalCount,
       completedCount,
@@ -599,10 +877,12 @@ export class ListingRepository {
     };
   }
 
-  async findRelated(id: string, limit = 6): Promise<RelatedListingDto[]> {
+  async findRelated(slug: string, limit = 6): Promise<RelatedListingDto[]> {
     const locale = getRequestLocale();
+    // The related surface is discovery too — an unpublished or deleted target
+    // resolves as empty through the same identity seam, never by internal ID.
     const listing = await this.prisma.listing.findFirst({
-      where: { slug: id, deletedAt: null },
+      where: publishedListingSlugWhere(slug),
       select: {
         id: true,
         scholarId: true,
@@ -729,23 +1009,15 @@ export class ListingRepository {
         slug: r.slug,
         title: resolved.fields.title,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original ? { title: resolved.original.title } : undefined,
-        durationSeconds: r.durationSeconds ?? undefined,
+        original: mapOriginalListingTitle(resolved.original),
+        durationSeconds: toOptional(r.durationSeconds),
         scholar: {
           id: r.scholar.id,
           slug: r.scholar.slug,
           name: scholarName,
-          imageUrl: r.scholar.imageUrl ?? undefined,
+          imageUrl: toOptional(r.scholar.imageUrl),
         },
-        primaryAudioAsset: r.audioAssets[0]
-          ? {
-              id: r.audioAssets[0].id,
-              url: r.audioAssets[0].url,
-              format: r.audioAssets[0].format ?? undefined,
-              bitrateKbps: r.audioAssets[0].bitrateKbps ?? undefined,
-              durationSeconds: r.audioAssets[0].durationSeconds ?? undefined,
-            }
-          : null,
+        primaryAudioAsset: mapPrimaryAudioAsset(r.audioAssets[0] ?? null),
       };
     });
   }
@@ -757,32 +1029,8 @@ export class ListingRepository {
     tx: Prisma.TransactionClient,
     options?: { recurse?: boolean },
   ): Promise<void> {
-    const children = await tx.listing.findMany({
-      where: {
-        parentId: listingId,
-        status: Status.published,
-        deletedAt: null,
-      },
-      select: {
-        format: true,
-        durationSeconds: true,
-        publishedLectureCount: true,
-        publishedDurationSeconds: true,
-      },
-    });
-
-    let totalCount = 0;
-    let totalDuration = 0;
-
-    for (const child of children) {
-      if (child.format === 'single') {
-        totalCount += 1;
-        totalDuration += child.durationSeconds ?? 0;
-      } else {
-        totalCount += child.publishedLectureCount ?? 0;
-        totalDuration += child.publishedDurationSeconds ?? 0;
-      }
-    }
+    const children = await this.findPublishedChildren(tx, listingId);
+    const { totalCount, totalDuration } = sumListingCounters(children);
 
     await tx.listing.update({
       where: { id: listingId },
@@ -804,69 +1052,38 @@ export class ListingRepository {
     }
   }
 
+  private async findPublishedChildren(
+    tx: Prisma.TransactionClient,
+    listingId: string,
+  ): Promise<CounterChild[]> {
+    return tx.listing.findMany({
+      where: { parentId: listingId, status: Status.published, deletedAt: null },
+      select: {
+        format: true,
+        durationSeconds: true,
+        publishedLectureCount: true,
+        publishedDurationSeconds: true,
+      },
+    });
+  }
+
   // ─── Admin Listing Methods ────────────────────────────────────────────────
 
-  async listAdmin(params: {
-    cursor?: string;
-    scholarId?: string;
-    status?: string;
-    search?: string;
-    accessibleScholarIds?: string[];
-  }): Promise<AdminListingListDto> {
+  async listAdmin(params: AdminListingFilterParams): Promise<AdminListingListDto> {
     const locale = getRequestLocale();
     const pageSize = 50;
     const take = pageSize + 1;
 
-    // Intersect the caller-requested scholarId filter (if any) with what
-    // their ability actually allows (if scoped) — a scoped editor filtering
-    // by a scholarId outside their access sees no rows, not another
-    // scholar's rows.
-    let scholarIdFilter: Prisma.ListingWhereInput['scholarId'];
-    if (params.accessibleScholarIds) {
-      scholarIdFilter = params.scholarId
-        ? params.accessibleScholarIds.includes(params.scholarId)
-          ? params.scholarId
-          : { in: [] }
-        : { in: params.accessibleScholarIds };
-    } else if (params.scholarId) {
-      scholarIdFilter = params.scholarId;
-    }
+    const where = buildAdminListingWhere(params);
 
-    const where: Prisma.ListingWhereInput = {
-      deletedAt: null,
-      parentId: null,
-      ...(scholarIdFilter ? { scholarId: scholarIdFilter } : {}),
-      ...(params.status ? { status: params.status as Status } : {}),
-      ...(params.search
-        ? {
-            OR: [
-              { title: { contains: params.search, mode: 'insensitive' as const } },
-              {
-                translations: {
-                  some: { title: { contains: params.search, mode: 'insensitive' as const } },
-                },
-              },
-              { scholar: { name: { contains: params.search, mode: 'insensitive' as const } } },
-              {
-                scholar: {
-                  translations: {
-                    some: { name: { contains: params.search, mode: 'insensitive' as const } },
-                  },
-                },
-              },
-            ],
-          }
-        : {}),
-    };
-
-    const records = await this.prisma.listing.findMany({
+    const baseQueryArgs = {
       where,
       take,
-      ...(params.cursor ? { cursor: { id: params.cursor }, skip: 1 } : {}),
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
         title: true,
+        coverImageUrl: true,
         language: true,
         status: true,
         format: true,
@@ -891,7 +1108,11 @@ export class ListingRepository {
           },
         },
       },
-    });
+    } satisfies Prisma.ListingFindManyArgs;
+    const queryArgs = params.cursor
+      ? { ...baseQueryArgs, cursor: { id: params.cursor }, skip: 1 }
+      : baseQueryArgs;
+    const records = await this.prisma.listing.findMany(queryArgs);
 
     const hasMore = records.length > pageSize;
     const items = (hasMore ? records.slice(0, pageSize) : records).map((r) => {
@@ -912,6 +1133,7 @@ export class ListingRepository {
       return {
         id: r.id,
         title,
+        coverImageUrl: this.toPublicAssetUrl(r.coverImageUrl),
         scholarName,
         scholarSlug: r.scholar.slug,
         format: r.format,
@@ -963,21 +1185,15 @@ export class ListingRepository {
       id: listing.id,
       slug: listing.slug,
       title: listing.title,
-      description: listing.description ?? undefined,
+      ...getAdminListingOptionalFields(listing),
       format: listing.format,
-      language: listing.language ?? undefined,
       status: listing.status,
-      orderIndex: listing.orderIndex ?? undefined,
-      durationSeconds: listing.durationSeconds ?? undefined,
       scholarId: listing.scholarId,
       scholarSlug: listing.scholar.slug,
       scholarName: listing.scholar.name,
-      parentId: listing.parentId ?? undefined,
       topics: listing.topics.map((t) => t.topic.id),
       audioUrl: listing.audioAssets[0]?.url,
-      coverImageUrl: listing.coverImageUrl ?? undefined,
       createdAt: listing.createdAt.toISOString(),
-      updatedAt: listing.updatedAt?.toISOString(),
     };
   }
 
@@ -1035,28 +1251,22 @@ export class ListingRepository {
         id: listing.id,
         slug: listing.slug,
         title: listing.title,
-        description: listing.description ?? undefined,
+        ...getAdminListingOptionalFields(listing),
         format: listing.format,
-        language: listing.language ?? undefined,
         status: listing.status,
-        orderIndex: listing.orderIndex ?? undefined,
-        durationSeconds: listing.durationSeconds ?? undefined,
         scholarId: listing.scholarId,
         scholarSlug: listing.scholar.slug,
         scholarName: listing.scholar.name,
-        parentId: listing.parentId ?? undefined,
         topics: listing.topics.map((t) => t.topic.id),
         audioUrl: listing.audioAssets[0]?.url,
-        coverImageUrl: listing.coverImageUrl ?? undefined,
         createdAt: listing.createdAt.toISOString(),
-        updatedAt: listing.updatedAt?.toISOString(),
       },
       translations: listing.translations.map((t) => ({
         locale: t.locale,
         status: t.status,
         fields: {
           title: t.title,
-          description: t.description ?? null,
+          description: nullableValue(t.description),
         },
         createdAt: t.createdAt.toISOString(),
         updatedAt: t.updatedAt.toISOString(),
@@ -1072,45 +1282,12 @@ export class ListingRepository {
 
     return this.prisma.$transaction(async (tx) => {
       const listing = await tx.listing.create({
-        data: {
-          title: dto.title,
-          slug,
-          format: dto.format,
-          status: dto.status ?? Status.draft,
-          language: dto.language ?? 'ar',
-          durationSeconds: dto.durationSeconds ?? undefined,
-          scholarId: dto.scholarId,
-          parentId: dto.parentId ?? undefined,
-          coverImageUrl: dto.coverImageUrl ?? undefined,
-          coverImageKey: dto.coverImageKey ?? undefined,
-          createdBy,
-        },
+        data: buildCreateListingData(dto, slug, createdBy),
         select: { id: true, title: true, parentId: true },
       });
 
-      if (dto.topics?.length) {
-        await tx.listingTopic.createMany({
-          data: dto.topics.map((topicId: string) => ({
-            listingId: listing.id,
-            topicId,
-          })),
-        });
-      }
-
-      if (dto.format === 'single' && dto.publicUrl) {
-        await tx.audioAsset.create({
-          data: {
-            listingId: listing.id,
-            url: dto.publicUrl,
-            objectKey: dto.audioKey ?? undefined,
-            format: dto.publicUrl.endsWith('.mp3') ? 'mp3' : undefined,
-            sizeBytes: dto.sizeBytes ?? undefined,
-            durationSeconds: dto.durationSeconds ?? undefined,
-            isPrimary: true,
-            source: 'r2',
-          },
-        });
-      }
+      await createListingTopics(tx, listing.id, dto.topics);
+      await createListingAudioAsset(tx, listing.id, dto);
 
       if (listing.parentId) {
         await this.syncListingCounters(listing.parentId, tx);
@@ -1146,6 +1323,94 @@ export class ListingRepository {
     });
   }
 
+  private async syncUpdatedListingParents(
+    tx: Prisma.TransactionClient,
+    originalParentId: string | null,
+    nextParentId: string | null | undefined,
+  ): Promise<void> {
+    if (originalParentId) {
+      await this.syncListingCounters(originalParentId, tx);
+    }
+    if (nextParentId !== undefined && nextParentId !== originalParentId && nextParentId) {
+      await this.syncListingCounters(nextParentId, tx);
+    }
+  }
+
+  private async syncArrangeLessonAudio(
+    tx: Prisma.TransactionClient,
+    listingId: string,
+    audio: ArrangeAudioRef,
+  ): Promise<void> {
+    const primary = await tx.audioAsset.findFirst({
+      where: { listingId, isPrimary: true },
+      select: { id: true },
+    });
+    if (primary) {
+      await tx.audioAsset.update({
+        where: { id: primary.id },
+        data: this.arrangeAudioAssetData(audio),
+      });
+      return;
+    }
+    await tx.audioAsset.create({
+      data: {
+        listingId,
+        ...this.arrangeAudioAssetData(audio),
+        isPrimary: true,
+        source: 'r2',
+      },
+    });
+  }
+
+  private async createArrangeLesson(
+    tx: Prisma.TransactionClient,
+    op: Extract<ArrangeLessonOp, { op: 'create' }>,
+    parentId: string,
+    scholarId: string,
+    userId?: string,
+  ): Promise<string> {
+    const status = op.status ?? Status.draft;
+    const lesson = await tx.listing.create({
+      data: {
+        slug: op.slug,
+        title: op.title,
+        description: op.description ?? undefined,
+        format: 'single',
+        status,
+        publishedAt: status === Status.published ? new Date() : undefined,
+        orderIndex: op.orderIndex ?? undefined,
+        durationSeconds: op.audio.durationSeconds,
+        scholarId,
+        parentId,
+        createdBy: userId,
+      },
+      select: { id: true },
+    });
+    await tx.audioAsset.create({
+      data: {
+        listingId: lesson.id,
+        ...this.arrangeAudioAssetData(op.audio),
+        isPrimary: true,
+        source: 'r2',
+      },
+    });
+    return lesson.id;
+  }
+
+  private async updateArrangeLesson(
+    tx: Prisma.TransactionClient,
+    op: Extract<ArrangeLessonOp, { op: 'update' }>,
+    userId?: string,
+  ): Promise<void> {
+    const existing = await tx.listing.findUnique({
+      where: { id: op.id },
+      select: { status: true },
+    });
+    const data = buildArrangeLessonUpdateData(op, existing?.status, userId);
+    await tx.listing.update({ where: { id: op.id }, data });
+    if (op.audio) await this.syncArrangeLessonAudio(tx, op.id, op.audio);
+  }
+
   async updateListingDetails(
     id: string,
     dto: UpdateListingDetailsDto,
@@ -1166,8 +1431,7 @@ export class ListingRepository {
 
         if (!original) throw new Error('Not found');
 
-        const hasTranslatableChange =
-          dto.title !== undefined || dto.description !== undefined || dto.language !== undefined;
+        const hasTranslatableChange = hasTranslatableListingChange(dto);
 
         // Exclude topics from the main update data
         const { topics, ...dtoWithoutTopics } = dto;
@@ -1178,9 +1442,7 @@ export class ListingRepository {
           updatedBy,
         };
 
-        if (dto.status === Status.published && original.status !== Status.published) {
-          updateData.publishedAt = new Date();
-        }
+        setPublishedAtWhenPublishing(updateData, dto.status, original.status);
 
         await tx.listing.update({
           where: { id },
@@ -1200,35 +1462,9 @@ export class ListingRepository {
           });
         }
 
-        // If topics were provided in the DTO, update them
-        if (topics !== undefined) {
-          // Delete all existing topic associations
-          await tx.listingTopic.deleteMany({
-            where: { listingId: id },
-          });
+        await replaceListingTopics(tx, id, topics);
 
-          // Create new topic associations if provided
-          if (topics.length > 0) {
-            await tx.listingTopic.createMany({
-              data: topics.map((topicId: string) => ({
-                listingId: id,
-                topicId,
-              })),
-            });
-          }
-        }
-
-        // Sync old parent if it exists
-        if (original.parentId) {
-          await this.syncListingCounters(original.parentId, tx);
-        }
-
-        // Sync new parent if parentId is updated and different
-        if (dto.parentId !== undefined && dto.parentId !== original.parentId) {
-          if (dto.parentId) {
-            await this.syncListingCounters(dto.parentId, tx);
-          }
-        }
+        await this.syncUpdatedListingParents(tx, original.parentId, dto.parentId);
       });
       return true;
     } catch {
@@ -1250,13 +1486,7 @@ export class ListingRepository {
 
         if (!listing) throw new Error('Not found');
 
-        // Update listing fields (audioKey → handled via audioAsset, durationSeconds, orderIndex)
-        const updateData: Prisma.ListingUpdateInput = {
-          updatedAt: new Date(),
-          updatedBy,
-        };
-        if (dto.durationSeconds !== undefined) updateData.durationSeconds = dto.durationSeconds;
-        if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
+        const updateData = buildListingMediaUpdateData(dto, updatedBy);
 
         await tx.listing.update({
           where: { id },
@@ -1380,11 +1610,13 @@ export class ListingRepository {
 
     const mapLesson = (child: {
       id: string;
-      slug: string;
+      /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
       title: string;
-      status: Status;
+      /** Documents the status field's API projection semantics and lifecycle meaning. */ status: Status;
       orderIndex: number | null;
-      durationSeconds: number | null;
+      /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
+        | number
+        | null;
       audioAssets: { id: string }[];
     }): AdminArrangeLessonDto => ({
       id: child.id,
@@ -1412,131 +1644,304 @@ export class ListingRepository {
     };
   }
 
+  private validateArrangeRoot(root: { format: ListingFormat }, dto: ArrangeCommitDto): void {
+    if (root.format === 'single') {
+      throw new BadRequestException('Single listings update audio via the media endpoint');
+    }
+    if (root.format === 'series' && !dto.lessons) {
+      throw new BadRequestException('Series commits require lessons');
+    }
+    if (root.format === 'collection' && !dto.modules) {
+      throw new BadRequestException('Collection commits require modules');
+    }
+  }
+
+  private async getArrangeModuleSlugs(
+    tx: Prisma.TransactionClient,
+    rootId: string,
+    moduleOps: NonNullable<ArrangeCommitDto['modules']>,
+  ): Promise<Map<string, string>> {
+    const moduleUpdateIds = moduleOps.flatMap((moduleOp) =>
+      moduleOp.op === 'update' ? [moduleOp.id] : [],
+    );
+    if (moduleUpdateIds.length === 0) return new Map();
+
+    const found = await tx.listing.findMany({
+      where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
+      select: { id: true, slug: true },
+    });
+    if (found.length !== moduleUpdateIds.length) {
+      throw new BadRequestException('Module update target is not under this listing');
+    }
+    return new Map(found.map((module) => [module.id, module.slug]));
+  }
+
+  private async validateArrangeCommit(
+    tx: Prisma.TransactionClient,
+    rootId: string,
+    dto: ArrangeCommitDto,
+  ) {
+    const root = await tx.listing.findFirst({
+      where: { id: rootId, deletedAt: null },
+      select: { id: true, slug: true, scholarId: true, format: true },
+    });
+    if (!root) throw new NotFoundException('Listing not found');
+    this.validateArrangeRoot(root, dto);
+
+    const moduleOps = dto.modules ?? [];
+    const rootLessonOps = dto.lessons ?? [];
+    this.validateNewModuleLessons(moduleOps);
+    const existingModuleSlugById = await this.getArrangeModuleSlugs(tx, rootId, moduleOps);
+
+    await this.validateArrangeSlugs(
+      tx,
+      root.slug,
+      moduleOps,
+      rootLessonOps,
+      existingModuleSlugById,
+    );
+
+    await this.validateArrangeLessonTargets(tx, rootId, moduleOps, rootLessonOps);
+    return { root, moduleOps, rootLessonOps };
+  }
+
+  private validateNewModuleLessons(moduleOps: NonNullable<ArrangeCommitDto['modules']>): void {
+    for (const moduleOp of moduleOps) {
+      if (moduleOp.op === 'create' && moduleOp.lessons.some((lesson) => lesson.op === 'update')) {
+        throw new BadRequestException('New modules can only contain new lessons');
+      }
+    }
+  }
+
+  private buildArrangePrefixChecks(
+    rootSlug: string,
+    moduleOps: NonNullable<ArrangeCommitDto['modules']>,
+    rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
+    existingModuleSlugById: Map<string, string>,
+  ): Array<{
+    /** Listing or lesson slug whose hierarchy is being validated. */
+    slug: string;
+    expectedPrefix: string;
+  }> {
+    return [
+      ...this.buildArrangeModulePrefixChecks(rootSlug, moduleOps, existingModuleSlugById),
+      ...this.buildArrangeRootLessonPrefixChecks(rootSlug, rootLessonOps),
+    ];
+  }
+
+  private buildArrangeModulePrefixChecks(
+    rootSlug: string,
+    moduleOps: NonNullable<ArrangeCommitDto['modules']>,
+    existingModuleSlugById: Map<string, string>,
+  ): Array<{
+    /** Module slug whose hierarchy is being validated. */
+    slug: string;
+    expectedPrefix: string;
+  }> {
+    const checks: Array<{
+      /** Module slug whose hierarchy is being validated. */
+      slug: string;
+      expectedPrefix: string;
+    }> = [];
+    for (const moduleOp of moduleOps) {
+      const parentSlug =
+        moduleOp.op === 'create'
+          ? moduleOp.slug
+          : (existingModuleSlugById.get(moduleOp.id) ?? rootSlug);
+      if (moduleOp.op === 'create') {
+        checks.push({ slug: moduleOp.slug, expectedPrefix: rootSlug });
+      }
+      for (const lessonOp of moduleOp.lessons) {
+        if (lessonOp.op === 'create') {
+          checks.push({ slug: lessonOp.slug, expectedPrefix: parentSlug });
+        }
+      }
+    }
+    return checks;
+  }
+
+  private buildArrangeRootLessonPrefixChecks(
+    rootSlug: string,
+    rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
+  ): Array<{
+    /** Lesson slug whose hierarchy is being validated. */
+    slug: string;
+    expectedPrefix: string;
+  }> {
+    const checks: Array<{
+      /** Lesson slug whose hierarchy is being validated. */
+      slug: string;
+      expectedPrefix: string;
+    }> = [];
+    for (const lessonOp of rootLessonOps) {
+      if (lessonOp.op === 'create') {
+        checks.push({ slug: lessonOp.slug, expectedPrefix: rootSlug });
+      }
+    }
+    return checks;
+  }
+
+  private async validateArrangeSlugs(
+    tx: Prisma.TransactionClient,
+    rootSlug: string,
+    moduleOps: NonNullable<ArrangeCommitDto['modules']>,
+    rootLessonOps: NonNullable<ArrangeCommitDto['lessons']>,
+    existingModuleSlugById: Map<string, string>,
+  ): Promise<void> {
+    const prefixChecks = this.buildArrangePrefixChecks(
+      rootSlug,
+      moduleOps,
+      rootLessonOps,
+      existingModuleSlugById,
+    );
+
+    const createSlugs = prefixChecks.map((check) => check.slug);
+    const duplicates = createSlugs.filter((slug, index) => createSlugs.indexOf(slug) !== index);
+    if (duplicates.length) {
+      throw new BadRequestException(`Duplicate slugs in payload: ${duplicates.join(', ')}`);
+    }
+    const badPrefix = prefixChecks.filter(
+      (check) => !check.slug.startsWith(`${check.expectedPrefix}-`),
+    );
+    if (badPrefix.length) {
+      throw new BadRequestException(
+        `Slugs must be prefixed by their parent's slug: ${badPrefix
+          .map((check) => `${check.slug} (expected prefix: ${check.expectedPrefix}-)`)
+          .join(', ')}`,
+      );
+    }
+    if (!createSlugs.length) return;
+
+    const clashes = await tx.listing.findMany({
+      where: { slug: { in: createSlugs } },
+      select: { slug: true },
+    });
+    if (clashes.length) {
+      throw new ConflictException({
+        message: 'Slugs already in use',
+        conflictingSlugs: clashes.map((clash) => clash.slug),
+      });
+    }
+  }
+
+  private collectArrangeLessonUpdateTargets(
+    moduleOps: ArrangeCommitDto['modules'],
+    rootLessonOps: ArrangeCommitDto['lessons'],
+    rootId: string,
+  ): Array<{ id: string; parentId: string }> {
+    return [
+      ...this.collectRootLessonUpdateTargets(rootLessonOps, rootId),
+      ...this.collectModuleLessonUpdateTargets(moduleOps),
+    ];
+  }
+
+  private collectRootLessonUpdateTargets(
+    rootLessonOps: ArrangeCommitDto['lessons'],
+    rootId: string,
+  ): Array<{ id: string; parentId: string }> {
+    const targets: Array<{ id: string; parentId: string }> = [];
+    for (const lessonOp of rootLessonOps ?? []) {
+      if (lessonOp.op === 'update') targets.push({ id: lessonOp.id, parentId: rootId });
+    }
+    return targets;
+  }
+
+  private collectModuleLessonUpdateTargets(
+    moduleOps: ArrangeCommitDto['modules'],
+  ): Array<{ id: string; parentId: string }> {
+    const targets: Array<{ id: string; parentId: string }> = [];
+    for (const moduleOp of moduleOps ?? []) {
+      if (moduleOp.op !== 'update') continue;
+      for (const lessonOp of moduleOp.lessons) {
+        if (lessonOp.op === 'update') {
+          targets.push({ id: lessonOp.id, parentId: moduleOp.id });
+        }
+      }
+    }
+    return targets;
+  }
+
+  private assertArrangeLessonTargets(
+    targets: Array<{ id: string; parentId: string }>,
+    found: Array<{ id: string; parentId: string | null }>,
+  ): void {
+    const parentById = new Map(found.map((listing) => [listing.id, listing.parentId]));
+    for (const target of targets) {
+      if (parentById.get(target.id) !== target.parentId) {
+        throw new BadRequestException('Lesson update target is not under this listing');
+      }
+    }
+  }
+
+  private async validateArrangeLessonTargets(
+    tx: Prisma.TransactionClient,
+    rootId: string,
+    moduleOps: ArrangeCommitDto['modules'],
+    rootLessonOps: ArrangeCommitDto['lessons'],
+  ): Promise<void> {
+    const lessonUpdateTargets = this.collectArrangeLessonUpdateTargets(
+      moduleOps,
+      rootLessonOps,
+      rootId,
+    );
+    if (!lessonUpdateTargets.length) return;
+
+    const found = await tx.listing.findMany({
+      where: { id: { in: lessonUpdateTargets.map((target) => target.id) }, deletedAt: null },
+      select: { id: true, parentId: true },
+    });
+    this.assertArrangeLessonTargets(lessonUpdateTargets, found);
+  }
+
+  private async applyArrangeModule(
+    tx: Prisma.TransactionClient,
+    moduleOp: NonNullable<ArrangeCommitDto['modules']>[number],
+    rootId: string,
+    scholarId: string,
+    userId: string | undefined,
+    result: ArrangeCommitResultDto,
+    touchedParents: Set<string>,
+  ): Promise<string> {
+    if (moduleOp.op === 'create') {
+      const status = moduleOp.status ?? Status.draft;
+      const created = await tx.listing.create({
+        data: {
+          slug: moduleOp.slug,
+          title: moduleOp.title,
+          description: moduleOp.description ?? undefined,
+          format: 'series',
+          status,
+          publishedAt: status === Status.published ? new Date() : undefined,
+          orderIndex: moduleOp.orderIndex ?? undefined,
+          scholarId,
+          parentId: rootId,
+          createdBy: userId,
+        },
+        select: { id: true },
+      });
+      result.createdModules += 1;
+      touchedParents.add(rootId);
+      return created.id;
+    }
+
+    if (moduleOp.orderIndex !== undefined) {
+      await tx.listing.update({
+        where: { id: moduleOp.id },
+        data: { orderIndex: moduleOp.orderIndex, updatedAt: new Date(), updatedBy: userId },
+      });
+      touchedParents.add(rootId);
+    }
+    result.updatedModules += 1;
+    return moduleOp.id;
+  }
+
   async arrangeCommit(
     rootId: string,
     dto: ArrangeCommitDto,
     userId?: string,
   ): Promise<{ result: ArrangeCommitResultDto; affectedIds: string[] }> {
     return this.prisma.$transaction(async (tx) => {
-      const root = await tx.listing.findFirst({
-        where: { id: rootId, deletedAt: null },
-        select: { id: true, slug: true, scholarId: true, format: true },
-      });
-      if (!root) throw new NotFoundException('Listing not found');
-      if (root.format === 'single') {
-        throw new BadRequestException('Single listings update audio via the media endpoint');
-      }
-      if (root.format === 'series' && !dto.lessons) {
-        throw new BadRequestException('Series commits require lessons');
-      }
-      if (root.format === 'collection' && !dto.modules) {
-        throw new BadRequestException('Collection commits require modules');
-      }
-
-      const moduleOps = dto.modules ?? [];
-      const rootLessonOps = dto.lessons ?? [];
-
-      for (const moduleOp of moduleOps) {
-        if (moduleOp.op === 'create' && moduleOp.lessons.some((l) => l.op === 'update')) {
-          throw new BadRequestException('New modules can only contain new lessons');
-        }
-      }
-
-      const moduleUpdateIds: string[] = [];
-      for (const moduleOp of moduleOps) {
-        if (moduleOp.op === 'update') moduleUpdateIds.push(moduleOp.id);
-      }
-      const existingModuleSlugById = new Map<string, string>();
-      if (moduleUpdateIds.length) {
-        const found = await tx.listing.findMany({
-          where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
-          select: { id: true, slug: true },
-        });
-        if (found.length !== moduleUpdateIds.length) {
-          throw new BadRequestException('Module update target is not under this listing');
-        }
-        for (const m of found) existingModuleSlugById.set(m.id, m.slug);
-      }
-
-      // Each create-slug is checked against its own immediate parent's slug, not just
-      // the root's — a lesson nested under a module must be prefixed by that module's
-      // slug (which is itself prefixed by the root's), not merely share the root prefix.
-      const prefixChecks: { slug: string; expectedPrefix: string }[] = [];
-      for (const moduleOp of moduleOps) {
-        if (moduleOp.op === 'create') {
-          prefixChecks.push({ slug: moduleOp.slug, expectedPrefix: root.slug });
-          for (const lessonOp of moduleOp.lessons) {
-            if (lessonOp.op === 'create') {
-              prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: moduleOp.slug });
-            }
-          }
-        } else {
-          const parentSlug = existingModuleSlugById.get(moduleOp.id) ?? root.slug;
-          for (const lessonOp of moduleOp.lessons) {
-            if (lessonOp.op === 'create') {
-              prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: parentSlug });
-            }
-          }
-        }
-      }
-      for (const lessonOp of rootLessonOps) {
-        if (lessonOp.op === 'create') {
-          prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: root.slug });
-        }
-      }
-
-      const createSlugs = prefixChecks.map((c) => c.slug);
-      const duplicates = createSlugs.filter((slug, i) => createSlugs.indexOf(slug) !== i);
-      if (duplicates.length) {
-        throw new BadRequestException(`Duplicate slugs in payload: ${duplicates.join(', ')}`);
-      }
-      const badPrefix = prefixChecks.filter((c) => !c.slug.startsWith(`${c.expectedPrefix}-`));
-      if (badPrefix.length) {
-        throw new BadRequestException(
-          `Slugs must be prefixed by their parent's slug: ${badPrefix
-            .map((c) => `${c.slug} (expected prefix: ${c.expectedPrefix}-)`)
-            .join(', ')}`,
-        );
-      }
-      if (createSlugs.length) {
-        const clashes = await tx.listing.findMany({
-          where: { slug: { in: createSlugs } },
-          select: { slug: true },
-        });
-        if (clashes.length) {
-          throw new ConflictException({
-            message: 'Slugs already in use',
-            conflictingSlugs: clashes.map((c) => c.slug),
-          });
-        }
-      }
-
-      const lessonUpdateTargets: Array<{ id: string; parentId: string }> = [];
-      for (const lessonOp of rootLessonOps) {
-        if (lessonOp.op === 'update')
-          lessonUpdateTargets.push({ id: lessonOp.id, parentId: rootId });
-      }
-      for (const moduleOp of moduleOps) {
-        if (moduleOp.op !== 'update') continue;
-        for (const lessonOp of moduleOp.lessons) {
-          if (lessonOp.op === 'update') {
-            lessonUpdateTargets.push({ id: lessonOp.id, parentId: moduleOp.id });
-          }
-        }
-      }
-      if (lessonUpdateTargets.length) {
-        const found = await tx.listing.findMany({
-          where: { id: { in: lessonUpdateTargets.map((t) => t.id) }, deletedAt: null },
-          select: { id: true, parentId: true },
-        });
-        const parentById = new Map(found.map((f) => [f.id, f.parentId]));
-        for (const target of lessonUpdateTargets) {
-          if (parentById.get(target.id) !== target.parentId) {
-            throw new BadRequestException('Lesson update target is not under this listing');
-          }
-        }
-      }
-
+      const { root, moduleOps, rootLessonOps } = await this.validateArrangeCommit(tx, rootId, dto);
       const result: ArrangeCommitResultDto = {
         createdModules: 0,
         createdLessons: 0,
@@ -1548,72 +1953,11 @@ export class ListingRepository {
 
       const applyLessonOp = async (op: ArrangeLessonOp, parentId: string): Promise<void> => {
         if (op.op === 'create') {
-          const status = op.status ?? Status.draft;
-          const lesson = await tx.listing.create({
-            data: {
-              slug: op.slug,
-              title: op.title,
-              description: op.description ?? undefined,
-              format: 'single',
-              status,
-              publishedAt: status === Status.published ? new Date() : undefined,
-              orderIndex: op.orderIndex ?? undefined,
-              durationSeconds: op.audio.durationSeconds,
-              scholarId: root.scholarId,
-              parentId,
-              createdBy: userId,
-            },
-            select: { id: true },
-          });
-          await tx.audioAsset.create({
-            data: {
-              listingId: lesson.id,
-              ...this.arrangeAudioAssetData(op.audio),
-              isPrimary: true,
-              source: 'r2',
-            },
-          });
+          const lessonId = await this.createArrangeLesson(tx, op, parentId, root.scholarId, userId);
           result.createdLessons += 1;
-          affectedIds.push(lesson.id);
+          affectedIds.push(lessonId);
         } else {
-          const existing = await tx.listing.findUnique({
-            where: { id: op.id },
-            select: { status: true },
-          });
-          const data: Prisma.ListingUpdateInput = { updatedAt: new Date(), updatedBy: userId };
-          if (op.title !== undefined) data.title = op.title;
-          if (op.description !== undefined) data.description = op.description;
-          if (op.status !== undefined) {
-            data.status = op.status;
-            if (op.status === Status.published && existing?.status !== Status.published) {
-              data.publishedAt = new Date();
-            }
-          }
-          if (op.orderIndex !== undefined) data.orderIndex = op.orderIndex;
-          if (op.audio) data.durationSeconds = op.audio.durationSeconds;
-          await tx.listing.update({ where: { id: op.id }, data });
-
-          if (op.audio) {
-            const primary = await tx.audioAsset.findFirst({
-              where: { listingId: op.id, isPrimary: true },
-              select: { id: true },
-            });
-            if (primary) {
-              await tx.audioAsset.update({
-                where: { id: primary.id },
-                data: this.arrangeAudioAssetData(op.audio),
-              });
-            } else {
-              await tx.audioAsset.create({
-                data: {
-                  listingId: op.id,
-                  ...this.arrangeAudioAssetData(op.audio),
-                  isPrimary: true,
-                  source: 'r2',
-                },
-              });
-            }
-          }
+          await this.updateArrangeLesson(tx, op, userId);
           result.updatedLessons += 1;
           affectedIds.push(op.id);
         }
@@ -1623,38 +1967,15 @@ export class ListingRepository {
       await Promise.all(rootLessonOps.map((lessonOp) => applyLessonOp(lessonOp, rootId)));
 
       for (const moduleOp of moduleOps) {
-        let moduleId: string;
-        if (moduleOp.op === 'create') {
-          const status = moduleOp.status ?? Status.draft;
-          const created = await tx.listing.create({
-            data: {
-              slug: moduleOp.slug,
-              title: moduleOp.title,
-              description: moduleOp.description ?? undefined,
-              format: 'series',
-              status,
-              publishedAt: status === Status.published ? new Date() : undefined,
-              orderIndex: moduleOp.orderIndex ?? undefined,
-              scholarId: root.scholarId,
-              parentId: rootId,
-              createdBy: userId,
-            },
-            select: { id: true },
-          });
-          moduleId = created.id;
-          result.createdModules += 1;
-          touchedParents.add(rootId);
-        } else {
-          moduleId = moduleOp.id;
-          if (moduleOp.orderIndex !== undefined) {
-            await tx.listing.update({
-              where: { id: moduleId },
-              data: { orderIndex: moduleOp.orderIndex, updatedAt: new Date(), updatedBy: userId },
-            });
-            touchedParents.add(rootId);
-          }
-          result.updatedModules += 1;
-        }
+        const moduleId = await this.applyArrangeModule(
+          tx,
+          moduleOp,
+          rootId,
+          root.scholarId,
+          userId,
+          result,
+          touchedParents,
+        );
         affectedIds.push(moduleId);
         await Promise.all(moduleOp.lessons.map((lessonOp) => applyLessonOp(lessonOp, moduleId)));
       }
@@ -1718,13 +2039,46 @@ export class ListingRepository {
     }
   }
 
+  async transitionListingStatus(
+    id: string,
+    action: ListingEditorialTransition,
+    updatedBy?: string,
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      const listing = await tx.listing.findUnique({
+        where: { id },
+        select: { parentId: true, status: true, deletedAt: true },
+      });
+
+      if (!listing || listing.deletedAt) throw new NotFoundException(`Listing "${id}" not found`);
+
+      assertListingTransition(action, listing.status);
+      const status = action === 'publish' ? Status.published : Status.archived;
+      const updateData: Prisma.ListingUpdateInput = {
+        status,
+        updatedAt: new Date(),
+        updatedBy,
+      };
+      if (action === 'publish') updateData.publishedAt = new Date();
+
+      await tx.listing.update({
+        where: { id },
+        data: updateData,
+      });
+
+      if (listing.parentId) await this.syncListingCounters(listing.parentId, tx);
+    });
+  }
+
   async deleteListing(id: string, deletedBy?: string): Promise<boolean> {
     try {
       await this.prisma.$transaction(async (tx) => {
         const original = await tx.listing.findUnique({
           where: { id },
-          select: { parentId: true },
+          select: { parentId: true, deletedAt: true },
         });
+
+        if (!original || original.deletedAt) throw new Error('Not found');
 
         await tx.listing.update({
           where: { id },
@@ -1761,15 +2115,15 @@ export class ListingRepository {
   // ─── Translation Methods ──────────────────────────────────────────────────
 
   private mapListingTranslation(t: {
-    locale: string;
-    status: string;
+    locale: Locale;
+    /** Documents the status field's API projection semantics and lifecycle meaning. */ status: string;
     title: string;
     description: string | null;
-    createdAt: Date;
-    updatedAt: Date;
+    /** Documents the createdAt field's API projection semantics and lifecycle meaning. */ createdAt: Date;
+    /** Documents the updatedAt field's API projection semantics and lifecycle meaning. */ updatedAt: Date;
   }): TranslationViewDto {
     return {
-      locale: t.locale as Locale,
+      locale: t.locale,
       status: t.status === 'published' ? 'published' : 'draft',
       fields: { title: t.title, description: t.description },
       createdAt: t.createdAt.toISOString(),
@@ -1805,19 +2159,19 @@ export class ListingRepository {
 
   async updateListingTranslation(
     listingId: string,
-    locale: string,
+    locale: Locale,
     fields: Partial<{ title: string; description: string | null }>,
   ): Promise<TranslationViewDto> {
     const record = await this.prisma.listingTranslation.update({
-      where: { listingId_locale: { listingId, locale: locale as Locale } },
+      where: { listingId_locale: { listingId, locale } },
       data: { ...fields },
     });
     return this.mapListingTranslation(record);
   }
 
-  async publishListingTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
+  async publishListingTranslation(listingId: string, locale: Locale): Promise<TranslationViewDto> {
     const record = await this.prisma.listingTranslation.update({
-      where: { listingId_locale: { listingId, locale: locale as Locale } },
+      where: { listingId_locale: { listingId, locale } },
       data: { status: 'published' },
     });
     return this.mapListingTranslation(record);
@@ -1825,16 +2179,16 @@ export class ListingRepository {
 
   async unpublishListingTranslation(
     listingId: string,
-    locale: string,
+    locale: Locale,
   ): Promise<TranslationViewDto> {
     const record = await this.prisma.listingTranslation.update({
-      where: { listingId_locale: { listingId, locale: locale as Locale } },
+      where: { listingId_locale: { listingId, locale } },
       data: { status: 'draft' },
     });
     return this.mapListingTranslation(record);
   }
 
-  async findPromotions() {
+  async findPromotions(): Promise<HomePromotionsDto> {
     const locale = getRequestLocale();
 
     // 1. Get featured hero recommendation and curated editors' picks concurrently
@@ -1853,6 +2207,8 @@ export class ListingRepository {
                 select: {
                   name: true,
                   slug: true,
+                  title: true,
+                  imageUrl: true,
                   mainLanguage: true,
                   translations: {
                     where: { locale, status: 'published' },
@@ -1879,6 +2235,8 @@ export class ListingRepository {
                 select: {
                   name: true,
                   slug: true,
+                  title: true,
+                  imageUrl: true,
                   mainLanguage: true,
                   translations: {
                     where: { locale, status: 'published' },
@@ -1907,6 +2265,13 @@ export class ListingRepository {
       return toPublicUrl(value);
     };
 
+    const getListingMetrics = (l: any) => ({
+      durationSeconds:
+        l.format === 'single' ? (l.durationSeconds ?? 0) : (l.publishedDurationSeconds ?? 0),
+      thumbnailUrl: l.format === 'single' ? null : toOptionalPublicUrl(l.coverImageUrl),
+      publishedLectureCount: l.format === 'single' ? 1 : (l.publishedLectureCount ?? 1),
+    });
+
     const mapListing = (l: any) => {
       const resolved = resolveContentTranslation({
         base: { title: l.title },
@@ -1921,18 +2286,18 @@ export class ListingRepository {
         publishedTranslation: l.scholar!.translations[0] ?? null,
       }).fields.name;
 
-      const durationSeconds =
-        l.format === 'single' ? (l.durationSeconds ?? 0) : (l.publishedDurationSeconds ?? 0);
-      const thumbnailUrl = l.format === 'single' ? null : toOptionalPublicUrl(l.coverImageUrl);
-      const publishedLectureCount = l.format === 'single' ? 1 : (l.publishedLectureCount ?? 1);
+      const { durationSeconds, thumbnailUrl, publishedLectureCount } = getListingMetrics(l);
 
       return {
+        // SAFETY: listing formats are constrained by the shared listing schema to these three values.
         kind: l.format as 'collection' | 'series' | 'single',
         id: l.id,
         title: resolved.fields.title,
         slug: l.slug,
         scholarName,
         scholarSlug: l.scholar!.slug,
+        scholarTitle: toOptional(l.scholar!.title),
+        scholarImageUrl: toOptional(l.scholar!.imageUrl) ?? null,
         thumbnailUrl: thumbnailUrl ?? null,
         durationSeconds: durationSeconds ?? 0,
         publishedLectureCount,

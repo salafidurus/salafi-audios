@@ -2,6 +2,7 @@ import type { StorageAdapter } from "@sd/core-sync";
 
 import * as SQLite from "expo-sqlite";
 
+/** Provides shared native runtime infrastructure used by feature modules. */
 const DB_NAME = "sd-sync.db";
 const TABLE_NAME = "kv_store";
 
@@ -24,7 +25,7 @@ function getDb(): Promise<SQLite.SQLiteDatabase> {
  * `@sd/core-sync` `StorageAdapter` backed by a dedicated `expo-sqlite` key/value
  * table — separate from `apps/native/src/core/persister.ts`'s (removed) React
  * Query cache DB, since this stores small sync-critical blobs (progress retry
- * queue, saved/library outbox) that must survive an app restart/crash.
+ * queue, saved/my-library outbox) that must survive an app restart/crash.
  */
 export function createSqliteKvAdapter(): StorageAdapter {
   return {

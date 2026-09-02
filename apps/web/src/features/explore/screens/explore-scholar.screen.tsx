@@ -1,6 +1,7 @@
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
-import { routes } from "@sd/core-contracts";
+import { routes, type ScholarListItemDto } from "@sd/core-contracts";
 import { useInfiniteScholarsList } from "@sd/domain-content";
 import { useRouter } from "next/navigation";
 
@@ -17,6 +18,104 @@ import styles from "./explore-scholar.screen.module.css";
 export type ExploreScholarScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
+
+type ScholarResultsProps = {
+  scholars: ScholarListItemDto[];
+  isError: boolean;
+  isLoading: boolean;
+  isFetching: boolean;
+  debouncedSearch: string;
+  onRetry: () => void;
+  onNavigateToScholar: (slug: string) => void;
+};
+
+function ScholarResults({
+  scholars,
+  isError,
+  isLoading,
+  isFetching,
+  debouncedSearch,
+  onRetry,
+  onNavigateToScholar,
+}: ScholarResultsProps) {
+  const { t } = useTranslation();
+  const filteredScholars = filterScholars(scholars, debouncedSearch);
+
+  if (isError && scholars.length === 0) {
+    return (
+      <div className={styles.empty} role="alert">
+        <p style={{ margin: 0 }}>{t("scholars.error", "Failed to load scholars.")}</p>
+        <button
+          type="button"
+          className={styles.loadMoreButton}
+          onClick={onRetry}
+          style={{ marginTop: "12px" }}
+        >
+          {t("common.retry", "Try again")}
+        </button>
+      </div>
+    );
+  }
+
+  if (filteredScholars.length > 0) {
+    return (
+      <div className={styles.grid}>
+        {filteredScholars.map((scholar) => (
+          <ScholarGridCard key={scholar.id} scholar={scholar} onPress={onNavigateToScholar} />
+        ))}
+      </div>
+    );
+  }
+
+  if (isLoading || isFetching) {
+    return (
+      <div className={styles.grid}>
+        <ScholarGridSkeleton count={8} />
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.empty}>
+      {debouncedSearch
+        ? t("scholarContent.searchNoMatch", "No scholars match your search.")
+        : t("explore.noScholars", "No scholars available.")}
+    </div>
+  );
+}
+
+function filterScholars(scholars: ScholarListItemDto[], search: string): ScholarListItemDto[] {
+  const normalizedSearch = search.trim().toLowerCase();
+  if (!normalizedSearch) return scholars;
+  return scholars.filter(
+    (scholar) =>
+      scholar.name.toLowerCase().includes(normalizedSearch) ||
+      scholar.slug.toLowerCase().includes(normalizedSearch),
+  );
+}
+
+function LoadMoreButton({
+  isFetching,
+  onLoadMore,
+}: {
+  isFetching: boolean;
+  onLoadMore: () => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className={styles.loadMoreWrapper}>
+      <button
+        type="button"
+        className={styles.loadMoreButton}
+        onClick={onLoadMore}
+        disabled={isFetching}
+      >
+        {isFetching ? t("common.loading", "Loading...") : t("common.loadMore", "Load more")}
+      </button>
+    </div>
+  );
+}
 
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
@@ -35,14 +134,6 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
 
   const allScholars = data?.pages.flatMap((p) => p.items) ?? [];
 
-  const filteredScholars = debouncedSearch.trim()
-    ? allScholars.filter(
-        (scholar) =>
-          scholar.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          scholar.slug.toLowerCase().includes(debouncedSearch.toLowerCase()),
-      )
-    : allScholars;
-
   const title = t("explore.scholarsTitle", "Scholars");
 
   return (
@@ -58,48 +149,17 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
         </div>
       </div>
 
-      {isError && allScholars.length === 0 ? (
-        <div className={styles.empty} role="alert">
-          <p style={{ margin: 0 }}>{t("scholars.error", "Failed to load scholars.")}</p>
-          <button
-            type="button"
-            className={styles.loadMoreButton}
-            onClick={() => refetch()}
-            style={{ marginTop: "12px" }}
-          >
-            {t("common.retry", "Try again")}
-          </button>
-        </div>
-      ) : filteredScholars.length > 0 ? (
-        <div className={styles.grid}>
-          {filteredScholars.map((scholar) => (
-            <ScholarGridCard key={scholar.id} scholar={scholar} onPress={handleNavigateToScholar} />
-          ))}
-        </div>
-      ) : isLoading || isFetching ? (
-        <div className={styles.grid}>
-          <ScholarGridSkeleton count={8} />
-        </div>
-      ) : (
-        <div className={styles.empty}>
-          {debouncedSearch
-            ? t("scholarContent.searchNoMatch", "No scholars match your search.")
-            : t("explore.noScholars", "No scholars available.")}
-        </div>
-      )}
+      <ScholarResults
+        scholars={allScholars}
+        isError={isError}
+        isLoading={isLoading}
+        isFetching={isFetching}
+        debouncedSearch={debouncedSearch}
+        onRetry={refetch}
+        onNavigateToScholar={handleNavigateToScholar}
+      />
 
-      {hasNextPage && (
-        <div className={styles.loadMoreWrapper}>
-          <button
-            type="button"
-            className={styles.loadMoreButton}
-            onClick={() => fetchNextPage()}
-            disabled={isFetching}
-          >
-            {isFetching ? t("common.loading", "Loading...") : t("common.loadMore", "Load more")}
-          </button>
-        </div>
-      )}
+      {hasNextPage && <LoadMoreButton isFetching={isFetching} onLoadMore={fetchNextPage} />}
 
       <ScrollToTopButton />
     </ScreenView>

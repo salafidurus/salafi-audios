@@ -7,6 +7,7 @@
 #   - Keep major bumps ungrouped so each is individually reviewable
 #   - Explicitly ignore SDK-coupled and infrastructure-managed deps
 #   - Separate github-actions ecosystem entry
+# Ownership rationale: ../docs/policies/dependency-automation.md
 
 version: 2
 
@@ -31,6 +32,17 @@ updates:
       - dependency-name: "expo"
       - dependency-name: "expo-*"
       - dependency-name: "@expo/*"
+      # jest-expo is updated only through the Expo compatibility pipeline,
+      # which runs expo install --fix and expo-doctor.
+      - dependency-name: "jest-expo"
+      # Keep the exact Jest runtime/types review unit below its approved
+      # minor/patch ceiling; Dependabot ignore rules suppress only majors.
+      - dependency-name: "jest"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "@types/jest"
+        update-types:
+          - "version-update:semver-major"
       # eslint-config-expo — versioned in lockstep with the Expo SDK. A
       # standalone bump crashes the native flat ESLint config; upgrade it
       # only as part of a coordinated Expo SDK upgrade.
@@ -61,6 +73,10 @@ updates:
       # @react-native-async-storage/async-storage — tied to Expo SDK
       # managed workflow; independent bumps break native builds.
       - dependency-name: "@react-native-async-storage/*"
+      # FlashList follows the Expo SDK compatibility pipeline because Expo
+      # Doctor pins its preferred version, while the native app may carry a
+      # newer compatible minor release.
+      - dependency-name: "@shopify/flash-list"
 
     # ── Groups ───────────────────────────────────
     groups:
@@ -113,6 +129,8 @@ updates:
           - "source-map-support"
           - "pino-pretty"
           - "bun-types"
+        exclude-patterns:
+          - "@types/jest"
         update-types:
           - major
           - minor
@@ -139,26 +157,48 @@ updates:
           - minor
           - patch
 
-      # Unit test tooling (Jest + testing-library).
-      test-unit:
+      # Exact Jest runtime/types pair. Keep this boundary narrow: Jest major
+      # updates must be reviewed separately from the native Expo pipeline.
+      test-jest:
         applies-to: version-updates
         patterns:
           - "jest"
+          - "@types/jest"
+        update-types:
+          - minor
+          - patch
+
+      # Other Jest-family packages remain independently reviewable from the
+      # exact Jest runtime/types pair. jest-expo is ignored above because the
+      # Expo pipeline owns it.
+      test-jest-family:
+        applies-to: version-updates
+        patterns:
           - "jest-*"
           - "@jest/*"
           - "ts-jest"
-          - "@testing-library/*"
         update-types:
           - major
           - minor
           - patch
 
-      # E2E test tooling (Playwright + HTTP assertions).
+      # Web Testing Library packages. Native Testing Library remains outside
+      # this group and is reviewed independently.
+      test-testing-library-web:
+        applies-to: version-updates
+        patterns:
+          - "@testing-library/dom"
+          - "@testing-library/jest-dom"
+          - "@testing-library/react"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # E2E test tooling (HTTP assertions; web journeys use Bun.WebView).
       test-e2e:
         applies-to: version-updates
         patterns:
-          - "playwright"
-          - "@playwright/*"
           - "supertest"
           - "@types/supertest"
         update-types:
@@ -204,21 +244,6 @@ updates:
         patterns:
           - "prisma"
           - "@prisma/*"
-        update-types:
-          - major
-          - minor
-          - patch
-
-      # Vitest and its ecosystem.
-      vitest:
-        applies-to: version-updates
-        patterns:
-          - "vitest"
-          - "vitest-*"
-          - "@vitest/*"
-          - "@vitejs/*"
-          - "vite-tsconfig-paths"
-          - "unplugin-swc"
         update-types:
           - major
           - minor
