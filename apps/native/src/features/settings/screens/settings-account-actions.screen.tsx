@@ -1,6 +1,6 @@
 import { hasAnyAdminAccess, useAbility, useAccountProfile } from "@sd/domain-account";
 import { ChevronRight } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
@@ -15,7 +15,7 @@ import { SettingsRow } from "../components/SettingsRow/SettingsRow";
  * Profile, Support, Legal, and Admin callbacks are invoked only by their
  * corresponding rows. Admin visibility is derived from the server-backed
  * ability hook; callers must still enforce authorization on the destination.
- * Sign-out is exposed only when an account profile is available.
+ * Sign-out is intentionally not part of this section; it is owned by the profile screen.
  */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- the public callback contract is documented above.
 export type SettingsAccountActionsProps = {
@@ -24,7 +24,6 @@ export type SettingsAccountActionsProps = {
   onNavigateToPrivacy?: () => void;
   onNavigateToSupport?: () => void;
   onNavigateToAdmin?: () => void;
-  onSignOut?: () => void;
 };
 
 /**
@@ -36,7 +35,6 @@ export type SettingsAccountActionsProps = {
 export function SettingsAccountActions({
   onNavigateToProfile,
   onNavigateToAdmin,
-  onSignOut,
 }: SettingsAccountActionsProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
@@ -52,12 +50,10 @@ export function SettingsAccountActions({
         avatarUrl={identity.avatarUrl}
         displayName={identity.displayName}
         email={identity.email}
-        accessibilityLabel={identity.accessibilityLabel}
-        onPress={onNavigateToProfile}
         theme={theme}
       />
+      <AccountProfileRow onPress={onNavigateToProfile} theme={theme} />
       <AccountAdminRow visible={hasAdminAccess} onPress={onNavigateToAdmin} theme={theme} />
-      <AccountSignOutRow visible={Boolean(profile)} onPress={onSignOut} />
     </AccountSettingsSection>
   );
 }
@@ -71,14 +67,12 @@ function getIdentityCopy(
       avatarUrl: profile.avatarUrl,
       displayName: profile.displayName || t("account.defaultUser", "User"),
       email: profile.email,
-      accessibilityLabel: profile.displayName || t("account.defaultUser", "User"),
     };
   }
   return {
     avatarUrl: undefined,
     displayName: t("account.guest", "Guest"),
     email: t("account.clickToSignIn", "Click to sign in"),
-    accessibilityLabel: t("account.signInToAccess", "Click to sign in"),
   };
 }
 
@@ -86,22 +80,15 @@ function AccountIdentityRow({
   avatarUrl,
   displayName,
   email,
-  accessibilityLabel,
-  onPress,
   theme,
 }: {
   avatarUrl?: string | null;
   displayName: string;
   email: string;
-  accessibilityLabel: string;
-  onPress?: () => void;
   theme: ReturnType<typeof useUnistyles>["theme"];
 }) {
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      onPress={onPress}
+    <View
       style={{
         alignItems: "center",
         flexDirection: "row",
@@ -117,8 +104,21 @@ function AccountIdentityRow({
         </Text>
         <Text style={{ color: theme.colors.content.muted, fontSize: 14 }}>{email}</Text>
       </View>
+    </View>
+  );
+}
+
+function AccountProfileRow({
+  onPress,
+  theme,
+}: {
+  onPress?: () => void;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+}) {
+  return (
+    <SettingsRow label="Profile" onPress={onPress}>
       <ChevronRight color={theme.colors.content.muted} size={22} strokeWidth={2.25} />
-    </Pressable>
+    </SettingsRow>
   );
 }
 
@@ -133,15 +133,10 @@ function AccountAdminRow({
 }) {
   if (!visible) return null;
   return (
-    <SettingsRow label="Admin" onPress={onPress}>
+    <SettingsRow label="Admin" onPress={onPress} hideBorder>
       <ChevronRight color={theme.colors.content.muted} size={22} strokeWidth={2.25} />
     </SettingsRow>
   );
-}
-
-function AccountSignOutRow({ visible, onPress }: { visible: boolean; onPress?: () => void }) {
-  if (!visible) return null;
-  return <SettingsRow label="Sign Out" onPress={onPress} hideBorder />;
 }
 
 /** Renders the final Support and Legal destinations for the Settings screen. */

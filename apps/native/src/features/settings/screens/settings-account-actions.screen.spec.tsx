@@ -68,8 +68,10 @@ describe("SettingsAccountActions", () => {
 
     expect(getByText("Guest")).toBeTruthy();
     expect(getByText("Click to sign in")).toBeTruthy();
+    expect(getByText("Profile")).toBeTruthy();
     expect(getByTestId("settings-account-avatar")).toBeTruthy();
     expect(queryByText("Admin")).toBeNull();
+    expect(queryByText("Sign Out")).toBeNull();
   });
 
   it("keeps Support and Legal as the final secondary destinations", async () => {
@@ -109,6 +111,7 @@ describe("SettingsAccountActions", () => {
 
     expect(getByText("Test User")).toBeTruthy();
     expect(getByTestId("settings-account-avatar")).toBeTruthy();
+    expect(getByText("Profile")).toBeTruthy();
     expect(getByText("Admin")).toBeTruthy();
   });
 });
