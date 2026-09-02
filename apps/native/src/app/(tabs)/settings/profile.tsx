@@ -19,7 +19,9 @@ export default function SettingsProfileRoute() {
   return (
     <SettingsProfileScreen
       onSignOut={handleSignOut}
-      onBack={() => router.back()}
+      // Profile is always entered from the Settings root; replace avoids falling through to Home
+      // when authentication has replaced the sign-in sheet in the nested stack.
+      onBack={() => router.replace(routes.settings.index)}
       onSignIn={() =>
         router.push({
           pathname: routes.signIn,
