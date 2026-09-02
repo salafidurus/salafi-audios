@@ -1,10 +1,10 @@
 /** Groups related settings content into the native bordered section primitive. */
 import type { ReactNode } from "react";
 
-import { Column } from "@expo/ui";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 
-import { NativeText } from "@/shared/ui/native-text";
+import { AppText } from "@/shared/ui";
 
 /** Carries the visible heading and row subtree; rows stay grouped under one bordered panel. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- module/declaration comments are both present above.
@@ -16,30 +16,37 @@ export interface SettingsSectionProps {
 
 /** Groups related settings rows under a native heading and description. */
 export function SettingsSection({ title, description, children }: SettingsSectionProps) {
-  const { theme } = useUnistyles();
-
   return (
-    <Column spacing={theme.spacing.scale.md}>
-      <Column spacing={theme.spacing.scale.xs}>
-        <NativeText variant="labelMd" colorRole="muted" textStyle={styles.title}>
+    <View style={styles.section}>
+      <View style={styles.heading}>
+        <AppText variant="labelMd" style={styles.title}>
           {title}
-        </NativeText>
+        </AppText>
         {description ? (
-          <NativeText variant="caption" colorRole="muted">
+          <AppText variant="caption" style={styles.description}>
             {description}
-          </NativeText>
+          </AppText>
         ) : null}
-      </Column>
-      <Column style={styles.rows}>{children}</Column>
-    </Column>
+      </View>
+      <View style={styles.rows}>{children}</View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
+  section: {
+    gap: theme.spacing.scale.md,
+  },
+  heading: {
+    gap: theme.spacing.scale.xs,
+  },
   title: {
     textTransform: "uppercase",
     fontWeight: "600",
     letterSpacing: 0.8,
+  },
+  description: {
+    color: theme.colors.content.muted,
   },
   rows: {
     borderWidth: theme.border.width.default,

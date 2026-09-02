@@ -32,6 +32,13 @@ jest.mock("@/shared/ui", () => {
   };
 });
 
+jest.mock("@/shared/components/user-avatar/user-avatar", () => ({
+  UserAvatar: ({ testID }: { testID?: string }) => {
+    const { View } = require("react-native");
+    return <View testID={testID} />;
+  },
+}));
+
 jest.mock("../components/SettingsRow/SettingsRow", () => {
   const { Pressable, Text, View } = require("react-native");
   return {
@@ -57,27 +64,34 @@ describe("SettingsAccountActions", () => {
   it("exposes sign-in profile action to anonymous listeners", async () => {
     useAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
 
-    const { getByText, queryByText } = await render(<SettingsAccountActions />);
+    const { getByText, getByTestId, queryByText } = await render(<SettingsAccountActions />);
 
-    expect(getByText("Sign in to access your profile")).toBeTruthy();
+    expect(getByText("Guest")).toBeTruthy();
+    expect(getByText("Click to sign in")).toBeTruthy();
+    expect(getByTestId("settings-account-avatar")).toBeTruthy();
     expect(queryByText("Admin")).toBeNull();
   });
 
   it("keeps Support and Legal as the final secondary destinations", async () => {
-    const onNavigateToLegal = jest.fn();
+    const onNavigateToTerms = jest.fn();
+    const onNavigateToPrivacy = jest.fn();
     const onNavigateToSupport = jest.fn();
 
     useAuth.mockReturnValue({ isAuthenticated: false, isLoading: false });
 
     const { getAllByText } = await render(
       <SettingsSupportLegalActions
-        onNavigateToLegal={onNavigateToLegal}
+        onNavigateToTerms={onNavigateToTerms}
+        onNavigateToPrivacy={onNavigateToPrivacy}
         onNavigateToSupport={onNavigateToSupport}
       />,
     );
 
-    expect(getAllByText("Support").length).toBe(2);
-    expect(getAllByText("Legal").length).toBe(2);
+    expect(getAllByText("Support").length).toBe(1);
+    expect(getAllByText("Contact support").length).toBe(1);
+    expect(getAllByText("Legal").length).toBe(1);
+    expect(getAllByText("Terms and Conditions").length).toBe(1);
+    expect(getAllByText("Privacy Policy").length).toBe(1);
   });
 
   it("shows profile and Admin only when the backend-derived ability permits it", async () => {
@@ -91,10 +105,10 @@ describe("SettingsAccountActions", () => {
       isLoading: false,
     });
 
-    const { getByText } = await render(<SettingsAccountActions />);
+    const { getByText, getByTestId } = await render(<SettingsAccountActions />);
 
     expect(getByText("Test User")).toBeTruthy();
-    expect(getByText("Edit Profile")).toBeTruthy();
+    expect(getByTestId("settings-account-avatar")).toBeTruthy();
     expect(getByText("Admin")).toBeTruthy();
   });
 });

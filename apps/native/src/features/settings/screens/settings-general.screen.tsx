@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { ScrollView, Switch, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { UnistylesRuntime, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -32,6 +33,7 @@ function getInitialTheme(): ThemePreference {
 export function SettingsGeneralScreen(props: SettingsAccountActionsProps = {}) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
+  const insets = useSafeAreaInsets();
   const [themePreference, setThemePreference] = useState<ThemePreference>(getInitialTheme);
   const [notif, setNotif] = useState<NotificationState>({
     master: true,
@@ -63,11 +65,19 @@ export function SettingsGeneralScreen(props: SettingsAccountActionsProps = {}) {
     <View style={{ flex: 1 }}>
       <NativeBridgeHost testID="settings-general-host" matchContents={false}>
         <View style={{ flex: 1 }}>
-          <RootScreenHeader title={t("navigation.settings", "Settings")} />
+          <View
+            style={{
+              paddingTop: insets.top,
+              paddingHorizontal: theme.spacing.layout.pageX,
+            }}
+          >
+            <RootScreenHeader title={t("navigation.settings", "Settings")} />
+          </View>
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
               padding: theme.spacing.layout.pageX,
+              paddingBottom: theme.spacing.layout.pageY + insets.bottom + 96,
               gap: theme.spacing.layout.sectionY,
             }}
           >

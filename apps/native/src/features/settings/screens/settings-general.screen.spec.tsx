@@ -15,6 +15,10 @@ jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({ t: (_key: string, fallback: string) => fallback }),
 }));
 
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
+}));
+
 jest.mock("@expo/ui", () => {
   const { Text, View } = require("react-native");
   const Container = ({ children, testID }: { children?: React.ReactNode; testID?: string }) => (

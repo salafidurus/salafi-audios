@@ -54,12 +54,7 @@ export function SignInScreen({
           style={{ padding: theme.spacing.layout.pageX }}
         >
           {onBack ? (
-            <NativeButton
-              label={t("common.back", "Back")}
-              icon="back"
-              variant="ghost"
-              onPress={onBack}
-            />
+            <NativeButton label={t("common.back", "Back")} variant="ghost" onPress={onBack} />
           ) : null}
           <Column
             spacing={theme.spacing.scale.xs}

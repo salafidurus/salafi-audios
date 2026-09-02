@@ -1,8 +1,11 @@
 /** Native support surface presenting FAQ and contact guidance. */
 /** Renders native FAQ and support contact content. */
 import { Column, ScrollView } from "@expo/ui";
+import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUnistyles } from "react-native-unistyles";
 
+import { RootScreenHeader } from "@/features/navigation";
 import { NativeScreenHost, NativeText } from "@/shared/ui";
 
 /** Owns the static FAQ and support contact content shown to native users. */
@@ -38,51 +41,60 @@ const SUPPORT_SECTIONS = [
 ];
 
 /** Presents static FAQ and contact entries inside the native support surface. */
-export function SupportScreen() {
+export function SupportScreen({ onBack }: { onBack?: () => void } = {}) {
   const { theme } = useUnistyles();
+  const insets = useSafeAreaInsets();
 
   return (
-    <NativeScreenHost testID="support-screen-host">
-      <ScrollView showsIndicators={false}>
-        <Column
-          spacing={theme.spacing.scale.lg}
-          style={{
-            paddingHorizontal: theme.spacing.layout.pageX,
-            paddingVertical: theme.spacing.layout.pageY,
-          }}
-        >
-          <NativeText variant="titleLg" colorRole="strong">
-            Support
-          </NativeText>
-          {SUPPORT_SECTIONS.map((section) => (
-            <Column key={section.title} spacing={theme.spacing.scale.sm}>
-              <NativeText variant="titleMd" colorRole="strong">
-                {section.title}
-              </NativeText>
-              {section.items.map((item) => (
-                <Column
-                  key={item.q}
-                  spacing={theme.spacing.scale.xs}
-                  style={{
-                    padding: theme.spacing.scale.md,
-                    borderRadius: theme.radius.component.card,
-                    borderWidth: theme.border.width.default,
-                    borderColor: theme.colors.border.subtle,
-                    backgroundColor: theme.colors.surface.default,
-                  }}
-                >
-                  <NativeText variant="bodyMd" colorRole="strong">
-                    {item.q}
-                  </NativeText>
-                  <NativeText variant="bodySm" colorRole="muted">
-                    {item.a}
-                  </NativeText>
-                </Column>
-              ))}
-            </Column>
-          ))}
-        </Column>
-      </ScrollView>
-    </NativeScreenHost>
+    <View style={{ flex: 1 }}>
+      <View
+        style={{
+          paddingTop: insets.top,
+          paddingHorizontal: theme.spacing.layout.pageX,
+        }}
+      >
+        <RootScreenHeader title="Support" showSearch={false} onBack={onBack} />
+      </View>
+      <NativeScreenHost testID="support-screen-host">
+        <ScrollView showsIndicators={false}>
+          <Column
+            spacing={theme.spacing.scale.lg}
+            style={{
+              paddingHorizontal: theme.spacing.layout.pageX,
+              paddingVertical: theme.spacing.layout.pageY,
+              paddingBottom: theme.spacing.layout.pageY + insets.bottom + 96,
+            }}
+          >
+            {SUPPORT_SECTIONS.map((section) => (
+              <Column key={section.title} spacing={theme.spacing.scale.sm}>
+                <NativeText variant="titleMd" colorRole="strong">
+                  {section.title}
+                </NativeText>
+                {section.items.map((item) => (
+                  <Column
+                    key={item.q}
+                    spacing={theme.spacing.scale.xs}
+                    style={{
+                      padding: theme.spacing.scale.md,
+                      borderRadius: theme.radius.component.card,
+                      borderWidth: theme.border.width.default,
+                      borderColor: theme.colors.border.subtle,
+                      backgroundColor: theme.colors.surface.default,
+                    }}
+                  >
+                    <NativeText variant="bodyMd" colorRole="strong">
+                      {item.q}
+                    </NativeText>
+                    <NativeText variant="bodySm" colorRole="muted">
+                      {item.a}
+                    </NativeText>
+                  </Column>
+                ))}
+              </Column>
+            ))}
+          </Column>
+        </ScrollView>
+      </NativeScreenHost>
+    </View>
   );
 }

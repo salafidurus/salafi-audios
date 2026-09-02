@@ -1,8 +1,8 @@
-import { Host } from "@expo/ui";
+import { ArrowLeft } from "lucide-react-native";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
-import { AppText, NativeIcon } from "@/shared/ui";
+import { AppText } from "@/shared/ui";
 
 import { GlobalSearchButton } from "../GlobalSearchButton/GlobalSearchButton";
 
@@ -38,9 +38,7 @@ export function RootScreenHeader({ title, showSearch = true, onBack }: RootScree
           onPress={onBack}
           testID="root-screen-back-button"
         >
-          <Host>
-            <NativeIcon name="back" colorRole="strong" size={24} />
-          </Host>
+          <ArrowLeft color={theme.colors.content.strong} size={24} strokeWidth={2} />
         </Pressable>
       ) : null}
       <AppText variant="titleLg" style={styles.title}>

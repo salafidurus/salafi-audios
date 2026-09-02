@@ -1,9 +1,10 @@
 import { hasAnyAdminAccess, useAbility, useAccountProfile } from "@sd/domain-account";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 
@@ -18,7 +19,8 @@ import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 // oxlint-disable-next-line anti-slop/require-tsdoc -- the public callback contract is documented above.
 export type SettingsAccountActionsProps = {
   onNavigateToProfile?: () => void;
-  onNavigateToLegal?: () => void;
+  onNavigateToTerms?: () => void;
+  onNavigateToPrivacy?: () => void;
   onNavigateToSupport?: () => void;
   onNavigateToAdmin?: () => void;
   onSignOut?: () => void;
@@ -40,59 +42,143 @@ export function SettingsAccountActions({
   const { isAuthenticated } = useAuth();
   const { data: profile, isFetching } = useAccountProfile({ enabled: isAuthenticated });
   const { ability } = useAbility({ isAuthenticated });
+  const identity = getIdentityCopy(profile, t);
+  const hasAdminAccess = hasAnyAdminAccess(ability);
 
-  if (isFetching) return null;
-
-  const disclosure = <Text style={{ color: theme.colors.content.muted, fontSize: 24 }}>›</Text>;
-
-  return (
-    <AccountSettingsSection title={t("account.actions", "Account")} theme={theme}>
-      {profile ? (
-        <SettingsRow
-          label={profile.displayName || t("account.defaultUser", "User")}
-          sublabel={profile.email}
-        />
-      ) : null}
-      <SettingsRow
-        label={
-          profile
-            ? t("account.editProfile", "Edit Profile")
-            : t("account.signInToAccess", "Sign in to access your profile")
-        }
+  return isFetching ? null : (
+    <AccountSettingsSection title={t("settings.accountSection", "Account")} theme={theme}>
+      <AccountIdentityRow
+        avatarUrl={identity.avatarUrl}
+        displayName={identity.displayName}
+        email={identity.email}
+        accessibilityLabel={identity.accessibilityLabel}
         onPress={onNavigateToProfile}
-      >
-        {disclosure}
-      </SettingsRow>
-      {hasAnyAdminAccess(ability) ? (
-        <SettingsRow label={t("admin.dashboard.titleMobile", "Admin")} onPress={onNavigateToAdmin}>
-          {disclosure}
-        </SettingsRow>
-      ) : null}
-      {profile ? (
-        <SettingsRow label={t("account.signOut", "Sign Out")} onPress={onSignOut} />
-      ) : null}
+        theme={theme}
+      />
+      <AccountAdminRow visible={hasAdminAccess} onPress={onNavigateToAdmin} theme={theme} />
+      <AccountSignOutRow visible={Boolean(profile)} onPress={onSignOut} />
     </AccountSettingsSection>
   );
 }
 
+function getIdentityCopy(
+  profile: NonNullable<ReturnType<typeof useAccountProfile>["data"]> | undefined,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  if (profile) {
+    return {
+      avatarUrl: profile.avatarUrl,
+      displayName: profile.displayName || t("account.defaultUser", "User"),
+      email: profile.email,
+      accessibilityLabel: profile.displayName || t("account.defaultUser", "User"),
+    };
+  }
+  return {
+    avatarUrl: undefined,
+    displayName: t("account.guest", "Guest"),
+    email: t("account.clickToSignIn", "Click to sign in"),
+    accessibilityLabel: t("account.signInToAccess", "Click to sign in"),
+  };
+}
+
+function AccountIdentityRow({
+  avatarUrl,
+  displayName,
+  email,
+  accessibilityLabel,
+  onPress,
+  theme,
+}: {
+  avatarUrl?: string | null;
+  displayName: string;
+  email: string;
+  accessibilityLabel: string;
+  onPress?: () => void;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      onPress={onPress}
+      style={{
+        alignItems: "center",
+        flexDirection: "row",
+        gap: theme.spacing.component.gapMd,
+        minHeight: 72,
+        paddingVertical: theme.spacing.scale.md,
+      }}
+    >
+      <UserAvatar image={avatarUrl} name={displayName} size={48} testID="settings-account-avatar" />
+      <View style={{ flex: 1, gap: theme.spacing.scale.xs }}>
+        <Text style={{ color: theme.colors.content.strong, fontSize: 16, fontWeight: "600" }}>
+          {displayName}
+        </Text>
+        <Text style={{ color: theme.colors.content.muted, fontSize: 14 }}>{email}</Text>
+      </View>
+      <Text style={{ color: theme.colors.content.muted, fontSize: 24 }}>›</Text>
+    </Pressable>
+  );
+}
+
+function AccountAdminRow({
+  visible,
+  onPress,
+  theme,
+}: {
+  visible: boolean;
+  onPress?: () => void;
+  theme: ReturnType<typeof useUnistyles>["theme"];
+}) {
+  if (!visible) return null;
+  return (
+    <SettingsRow label="Admin" onPress={onPress}>
+      <Text style={{ color: theme.colors.content.muted, fontSize: 24 }}>›</Text>
+    </SettingsRow>
+  );
+}
+
+function AccountSignOutRow({ visible, onPress }: { visible: boolean; onPress?: () => void }) {
+  if (!visible) return null;
+  return <SettingsRow label="Sign Out" onPress={onPress} hideBorder />;
+}
+
 /** Renders the final Support and Legal destinations for the Settings screen. */
 export function SettingsSupportLegalActions({
-  onNavigateToLegal,
+  onNavigateToTerms,
+  onNavigateToPrivacy,
   onNavigateToSupport,
-}: Pick<SettingsAccountActionsProps, "onNavigateToLegal" | "onNavigateToSupport">) {
+}: Pick<
+  SettingsAccountActionsProps,
+  "onNavigateToTerms" | "onNavigateToPrivacy" | "onNavigateToSupport"
+>) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const disclosure = <Text style={{ color: theme.colors.content.muted, fontSize: 24 }}>›</Text>;
 
   return (
     <>
-      <AccountSettingsSection title={t("settings.support", "Support")} theme={theme}>
-        <SettingsRow label={t("settings.support", "Support")} onPress={onNavigateToSupport}>
+      <AccountSettingsSection title={t("settings.supportSection", "Support")} theme={theme}>
+        <SettingsRow
+          label={t("settings.contactSupport", "Contact support")}
+          onPress={onNavigateToSupport}
+          hideBorder
+        >
           {disclosure}
         </SettingsRow>
       </AccountSettingsSection>
       <AccountSettingsSection title={t("account.legal", "Legal")} theme={theme}>
-        <SettingsRow label={t("account.legal", "Legal")} onPress={onNavigateToLegal} hideBorder>
+        <SettingsRow
+          label={t("settings.legalTermsLabel", "Terms and Conditions")}
+          onPress={onNavigateToTerms}
+        >
+          {disclosure}
+        </SettingsRow>
+        <SettingsRow
+          label={t("settings.legalPrivacyLabel", "Privacy Policy")}
+          onPress={onNavigateToPrivacy}
+          hideBorder
+        >
           {disclosure}
         </SettingsRow>
       </AccountSettingsSection>

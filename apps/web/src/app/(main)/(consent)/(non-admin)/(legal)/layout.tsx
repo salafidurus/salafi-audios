@@ -1,26 +1,29 @@
 /** Documents this module's responsibility and public boundary. */
 "use client";
 
+import { getLegalDocument } from "@sd/domain-legal";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 
 import { TableOfContents } from "@/features/legal/components/TableOfContents";
-import {
-  COOKIE_SECTIONS,
-  PRIVACY_SECTIONS,
-  TERMS_SECTIONS,
-} from "@/features/legal/constants/sections";
 
 import styles from "./legal-layout.module.css";
 
+/** Selects the shared legal document metadata that drives the desktop contents navigation. */
 export default function LegalLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const pathname = usePathname();
-  const sections = pathname.includes("/privacy")
-    ? PRIVACY_SECTIONS
+  const documentId = pathname.includes("/privacy")
+    ? "privacy"
     : pathname.includes("/cookie-policy")
-      ? COOKIE_SECTIONS
-      : TERMS_SECTIONS;
+      ? "cookies"
+      : "terms";
+  const document = getLegalDocument(documentId);
+  const sections =
+    document?.sections.map((section) => ({
+      id: section.id,
+      title: section.heading.en,
+    })) ?? [];
 
   return (
     <div className={styles.shell}>

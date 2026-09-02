@@ -19,7 +19,8 @@ export default function SettingsIndexRoute() {
   return (
     <SettingsGeneralScreen
       onNavigateToProfile={() => router.push(routes.settings.profile)}
-      onNavigateToLegal={() => router.push(routes.settings.legal)}
+      onNavigateToTerms={() => router.push(routes.settings.terms)}
+      onNavigateToPrivacy={() => router.push(routes.settings.privacy)}
       onNavigateToSupport={() => router.push(routes.settings.support)}
       onNavigateToAdmin={() => router.push(routes.admin.index)}
       onSignOut={handleSignOut}
