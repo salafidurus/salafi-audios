@@ -1,6 +1,8 @@
 import { Host } from "@expo/ui";
+import { useCallback } from "react";
 import { StyleSheet } from "react-native-unistyles";
 
+import { useTranslation } from "@/core/i18n/use-translation";
 import { List, NativeIcon, NativeImage } from "@/shared/ui";
 
 /** Implements native search input, filtering, results, and empty states. */
@@ -13,6 +15,9 @@ export type SearchResultItemProps = {
   /** Stores the media duration used by playback and progress presentation. */
   durationSeconds?: number;
   onPress?: () => void;
+  /** Identifies the listing passed to the stable navigation callback on activation. */
+  listingSlug?: string;
+  onNavigateToListing?: (slug: string) => void;
 };
 
 /**
@@ -28,9 +33,19 @@ export function SearchResultItem({
   lectureCount,
   durationSeconds,
   onPress,
+  listingSlug,
+  onNavigateToListing,
 }: SearchResultItemProps) {
-  const durationLabel = formatDuration(durationSeconds);
-  const supportingText = [scholarName, formatLectureCount(lectureCount), durationLabel]
+  const { t } = useTranslation();
+  const handlePress = useCallback(() => {
+    if (listingSlug && onNavigateToListing) {
+      onNavigateToListing(listingSlug);
+      return;
+    }
+    onPress?.();
+  }, [listingSlug, onNavigateToListing, onPress]);
+  const durationLabel = formatDuration(durationSeconds, t);
+  const supportingText = [scholarName, formatLectureCount(lectureCount, t), durationLabel]
     .filter(Boolean)
     .join(" · ");
 
@@ -51,7 +66,7 @@ export function SearchResultItem({
             <NativeIcon name="music" colorRole="muted" />
           )
         }
-        onPress={onPress}
+        onPress={handlePress}
         testID="native-list-item"
       >
         {null}
@@ -74,16 +89,22 @@ const styles = StyleSheet.create((theme) => ({
   },
 }));
 
-function formatLectureCount(count: number): string {
-  if (count === 1) return "1 lecture";
-  return `${count} lectures`;
+function formatLectureCount(count: number, t: ReturnType<typeof useTranslation>["t"]): string {
+  return t("search.lectureCount", "{{count}} lectures", { count });
 }
 
-function formatDuration(durationSeconds?: number): string {
+function formatDuration(
+  durationSeconds: number | undefined,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
   if (!durationSeconds || durationSeconds <= 0) return "";
   const hours = Math.floor(durationSeconds / 3600);
   const minutes = Math.floor((durationSeconds % 3600) / 60);
-  if (hours > 0) return `${hours}hr ${String(minutes).padStart(2, "0")}m`;
-  if (minutes <= 0) return "";
-  return `${minutes}m`;
+  if (hours > 0) {
+    return t("search.durationHours", "{{hours}}hr {{minutes}}m", {
+      hours,
+      minutes: String(minutes).padStart(2, "0"),
+    });
+  }
+  return minutes > 0 ? t("search.durationMinutes", "{{minutes}}m", { minutes }) : "";
 }

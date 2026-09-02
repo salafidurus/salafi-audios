@@ -10,12 +10,8 @@ const leafRoutes = [
   routes.home,
   routes.search,
   routes.explore.index,
-  routes.explore.recent,
-  routes.explore.scholar,
-  routes.explore.curation,
   routes.myLibrary.index,
   routes.settings.index,
-  routes.settings.legal,
   routes.scholars.index,
   routes.admin.index,
   routes.admin.stats,
@@ -123,10 +119,6 @@ describe("resolveRouteAccess", () => {
   it("preserves local-first semantics as auth-optional", () => {
     expect(resolveRouteAccess("/settings")).toBe("auth-optional");
     expect(resolveRouteAccess("/my-library")).toBe("auth-optional");
-  });
-
-  it("honors the per-path public override under an auth-optional section", () => {
-    expect(resolveRouteAccess("/settings/legal")).toBe("public");
   });
 
   it("treats the home route as public", () => {

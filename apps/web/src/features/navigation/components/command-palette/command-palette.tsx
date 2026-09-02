@@ -216,6 +216,7 @@ function getActivePaletteResult(results: PaletteResult[], activeIndex: number) {
   return activeIndex >= 0 ? results[activeIndex] : undefined;
 }
 
+/** Provides the globally available catalog, topic, and scholar search surface. */
 export function CommandPalette() {
   const { i18n, t } = useTranslation();
   const router = useRouter();

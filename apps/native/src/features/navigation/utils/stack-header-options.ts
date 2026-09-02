@@ -1,5 +1,9 @@
+import React from "react";
+
 /** Provides themed stack-header contracts used by native route groups. */
 import type { AppThemeNative } from "@/core/styles/theme";
+
+import { GlobalSearchButton } from "../components/GlobalSearchButton/GlobalSearchButton";
 
 /** Provides themed stack-header contracts used by native route groups. */
 function getThemedHeaderColors(theme: AppThemeNative) {
@@ -19,6 +23,7 @@ export function getTabStackScreenOptions(theme: AppThemeNative) {
     headerShown: true,
     headerTransparent: false,
     headerLargeTitle: true,
+    headerRight: () => React.createElement(GlobalSearchButton),
     ...getThemedHeaderColors(theme),
   };
 }

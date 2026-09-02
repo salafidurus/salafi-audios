@@ -44,29 +44,47 @@ export function NativeButton({
   const isDisabled = isButtonDisabled(disabled, loading);
   const textVariant = getButtonTextVariant(size);
   const nativeVariant = getExpoButtonVariant(variant);
-  const buttonContent = renderButtonContent(
-    icon,
-    iconPosition,
-    label,
-    loading,
-    textVariant,
-    variant,
-    theme.spacing.component.gapSm,
-  );
   const accessibilityProps = getAccessibilityProps(accessibilityLabel);
 
   return (
     <Button
       {...props}
       {...accessibilityProps}
+      label={getNativeButtonLabel(icon, label, loading)}
       disabled={isDisabled}
       variant={nativeVariant}
       // SAFETY: getButtonStyle only returns properties supported by Expo UI Button.
       style={getButtonStyle(size, variant, disabled, theme, style, fullWidth)}
     >
-      {buttonContent}
+      {renderNativeButtonChildren(
+        icon,
+        iconPosition,
+        label,
+        loading,
+        textVariant,
+        variant,
+        theme.spacing.component.gapSm,
+      )}
     </Button>
   );
+}
+
+function getNativeButtonLabel(icon: ReactNode, label: string | number, loading: boolean) {
+  return icon ? undefined : getButtonLabel(label, loading);
+}
+
+function renderNativeButtonChildren(
+  icon: ReactNode,
+  iconPosition: "left" | "right",
+  label: string | number,
+  loading: boolean,
+  textVariant: "bodySm" | "bodyLg" | "labelMd",
+  variant: NativeButtonVariant,
+  gap: number,
+) {
+  return icon
+    ? renderButtonContent(icon, iconPosition, label, loading, textVariant, variant, gap)
+    : undefined;
 }
 
 function isButtonDisabled(disabled: boolean, loading: boolean) {
@@ -114,12 +132,11 @@ function renderButtonContent(
       {getButtonLabel(label, loading)}
     </NativeText>
   );
-  if (loading) return text;
   return (
     <Row alignment="center" spacing={gap}>
-      {iconPosition === "left" ? icon : null}
+      {!loading && iconPosition === "left" ? icon : null}
       {text}
-      {iconPosition === "right" ? icon : null}
+      {!loading && iconPosition === "right" ? icon : null}
     </Row>
   );
 }

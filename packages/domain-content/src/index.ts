@@ -18,9 +18,17 @@ export {
 } from "./hooks";
 
 export { useExploreRecentScreen } from "./use-explore-recent";
+export { useHomePromotions } from "./home.api";
 export { useMyLibrarySavedScreen } from "./use-my-library-saved";
 export { useMyLibraryCompletedScreen } from "./use-my-library-completed";
 export { useMyLibraryProgressScreen } from "./use-my-library-progress";
+export {
+  useMyLibrarySections,
+  type MyLibrarySection,
+  type MyLibrarySectionResult,
+  type MyLibrarySectionsResult,
+  type UseMyLibrarySectionsOptions,
+} from "./use-my-library-sections";
 export {
   useSavedStore,
   useIsSaved,
@@ -58,3 +66,4 @@ export {
 } from "./utils/format-scholar-name";
 export { getMyLibraryItemPercent } from "./utils/my-library-item-progress";
 export { mergeLiveProgress } from "./utils/merge-live-progress";
+export { useEnrichedLocalLibraryItems } from "./my-library.catalog";

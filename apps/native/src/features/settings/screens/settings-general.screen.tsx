@@ -1,16 +1,27 @@
 import { useCallback, useState } from "react";
 import { ScrollView, Switch, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { UnistylesRuntime, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import {
+  applyThemePreference,
+  setStoredThemePreference,
+  type ThemePreference,
+} from "@/core/styles/theme/theme-preference";
+import { RootScreenHeader } from "@/features/navigation";
 import { NativeBridgeHost } from "@/shared/ui";
 
 import { ContentLanguageToggle } from "../components/content-language-toggle/content-language-toggle";
 import { LanguageSwitch } from "../components/language-switch/language-switch";
 import { SegmentedControl } from "../components/SegmentedControl/SegmentedControl";
+import {
+  SettingsAccountActions,
+  SettingsSupportLegalActions,
+  type SettingsAccountActionsProps,
+} from "./settings-account-actions.screen";
 
 /** Renders the general settings form with RN layout and isolated Expo UI controls. */
-type ThemePreference = "system" | "light" | "dark";
 interface NotificationState {
   master: boolean;
   scholars: boolean;
@@ -23,9 +34,10 @@ function getInitialTheme(): ThemePreference {
 }
 
 /** Owns theme, language, and notification preferences for the Settings tab. */
-export function SettingsGeneralScreen() {
+export function SettingsGeneralScreen(props: SettingsAccountActionsProps = {}) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
+  const insets = useSafeAreaInsets();
   const [themePreference, setThemePreference] = useState<ThemePreference>(getInitialTheme);
   const [notif, setNotif] = useState<NotificationState>({
     master: true,
@@ -35,12 +47,8 @@ export function SettingsGeneralScreen() {
 
   const handleThemeChange = useCallback((value: ThemePreference) => {
     setThemePreference(value);
-    if (value === "system") {
-      UnistylesRuntime.setAdaptiveThemes(true);
-    } else {
-      UnistylesRuntime.setAdaptiveThemes(false);
-      UnistylesRuntime.setTheme(value);
-    }
+    applyThemePreference(value);
+    void setStoredThemePreference(value);
   }, []);
   const handleNotifChange = useCallback(
     (key: keyof NotificationState) => (checked: boolean) =>
@@ -54,71 +62,97 @@ export function SettingsGeneralScreen() {
   ];
 
   return (
-    <NativeBridgeHost testID="settings-general-host" matchContents={false}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          padding: theme.spacing.layout.pageX,
-          gap: theme.spacing.layout.sectionY,
-        }}
-      >
-        <SettingsSection title={t("settings.general.languageSection", "Language")} theme={theme}>
-          <View style={{ gap: theme.spacing.component.gapSm }}>
-            <View style={{ gap: theme.spacing.scale.xs }}>
-              <Text style={{ fontSize: 16, lineHeight: 24, color: theme.colors.content.strong }}>
-                {t("settings.general.appLanguage", "App Language")}
-              </Text>
-              <Text style={{ fontSize: 14, lineHeight: 20, color: theme.colors.content.muted }}>
-                {t("settings.general.appLanguageDesc", "Interface language for the app")}
-              </Text>
-            </View>
-            <LanguageSwitch />
+    <View style={{ flex: 1, backgroundColor: theme.colors.surface.canvas }}>
+      <NativeBridgeHost testID="settings-general-host" matchContents={false}>
+        <View style={{ flex: 1 }}>
+          <View
+            style={{
+              paddingTop: insets.top,
+              paddingHorizontal: theme.spacing.layout.pageX,
+            }}
+          >
+            <RootScreenHeader title={t("navigation.settings", "Settings")} />
           </View>
-          <ContentLanguageToggle />
-        </SettingsSection>
-        <SettingsSection title={t("settings.general.displaySection", "Display")} theme={theme}>
-          <Text style={{ fontSize: 14, lineHeight: 20, color: theme.colors.content.muted }}>
-            {t("settings.general.displayDesc", "Choose a theme for the interface.")}
-          </Text>
-          <SegmentedControl
-            options={options}
-            value={themePreference}
-            onChange={handleThemeChange}
-            ariaLabel={t("settings.general.themeAria", "Theme preference")}
-          />
-        </SettingsSection>
-        <SettingsSection title={t("settings.general.notifSection", "Notifications")} theme={theme}>
-          <PreferenceSwitch
-            label={t("settings.general.enableNotif", "Enable Notifications")}
-            detail={t("settings.general.enableNotifDesc", "Master toggle for all notifications")}
-            value={notif.master}
-            onValueChange={handleNotifChange("master")}
-          />
-          {notif.master ? (
-            <>
-              <PreferenceSwitch
-                label={t("settings.general.followedScholars", "Followed Scholars")}
-                detail={t(
-                  "settings.general.followedScholarsDesc",
-                  "Notify when a followed scholar posts",
-                )}
-                value={notif.scholars}
-                onValueChange={handleNotifChange("scholars")}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentInset={{ bottom: theme.spacing.layout.pageY + insets.bottom + 96 }}
+            contentContainerStyle={{
+              padding: theme.spacing.layout.pageX,
+              gap: theme.spacing.layout.sectionY,
+            }}
+          >
+            <SettingsAccountActions {...props} />
+            <SettingsSection
+              title={t("settings.general.languageSection", "Language")}
+              theme={theme}
+            >
+              <View style={{ gap: theme.spacing.component.gapSm }}>
+                <View style={{ gap: theme.spacing.scale.xs }}>
+                  <Text
+                    style={{ fontSize: 16, lineHeight: 24, color: theme.colors.content.strong }}
+                  >
+                    {t("settings.general.appLanguage", "App Language")}
+                  </Text>
+                  <Text style={{ fontSize: 14, lineHeight: 20, color: theme.colors.content.muted }}>
+                    {t("settings.general.appLanguageDesc", "Interface language for the app")}
+                  </Text>
+                </View>
+                <LanguageSwitch />
+              </View>
+              <ContentLanguageToggle />
+            </SettingsSection>
+            <SettingsSection title={t("settings.general.displaySection", "Display")} theme={theme}>
+              <Text style={{ fontSize: 14, lineHeight: 20, color: theme.colors.content.muted }}>
+                {t("settings.general.displayDesc", "Choose a theme for the interface.")}
+              </Text>
+              <SegmentedControl
+                options={options}
+                value={themePreference}
+                onChange={handleThemeChange}
+                ariaLabel={t("settings.general.themeAria", "Theme preference")}
               />
+            </SettingsSection>
+            <SettingsSection
+              title={t("settings.general.notifSection", "Notifications")}
+              theme={theme}
+            >
               <PreferenceSwitch
-                label={t("settings.general.newLectures", "New Lectures")}
+                label={t("settings.general.enableNotif", "Enable Notifications")}
                 detail={t(
-                  "settings.general.newLecturesDesc",
-                  "Notify when new lectures are published",
+                  "settings.general.enableNotifDesc",
+                  "Master toggle for all notifications",
                 )}
-                value={notif.lectures}
-                onValueChange={handleNotifChange("lectures")}
+                value={notif.master}
+                onValueChange={handleNotifChange("master")}
               />
-            </>
-          ) : null}
-        </SettingsSection>
-      </ScrollView>
-    </NativeBridgeHost>
+              {notif.master ? (
+                <>
+                  <PreferenceSwitch
+                    label={t("settings.general.followedScholars", "Followed Scholars")}
+                    detail={t(
+                      "settings.general.followedScholarsDesc",
+                      "Notify when a followed scholar posts",
+                    )}
+                    value={notif.scholars}
+                    onValueChange={handleNotifChange("scholars")}
+                  />
+                  <PreferenceSwitch
+                    label={t("settings.general.newLectures", "New Lectures")}
+                    detail={t(
+                      "settings.general.newLecturesDesc",
+                      "Notify when new lectures are published",
+                    )}
+                    value={notif.lectures}
+                    onValueChange={handleNotifChange("lectures")}
+                  />
+                </>
+              ) : null}
+            </SettingsSection>
+            <SettingsSupportLegalActions {...props} />
+          </ScrollView>
+        </View>
+      </NativeBridgeHost>
+    </View>
   );
 }
 

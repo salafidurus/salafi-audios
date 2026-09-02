@@ -39,16 +39,43 @@ migration proceeds incrementally.
 
 Mobile has search, auth, catalog browsing, audio playback with progress tracking, My Library, offline audio downloads, local-first sync, and admin surfaces implemented. See §6 for the sync architecture and §7 for playback/downloads specifics.
 
-The navigation surface has been reworked into a tabs-owned structure:
+The navigation surface uses five persistent listener-facing root destinations:
 
-- the main app surface lives under `apps/native/src/app/(tabs)/`
-- the shared tabs boundary is `apps/native/src/app/(tabs)/_layout.tsx`
-- top-level sections are real tabs: explore, library, settings, and admin
-- tab chrome UI is rendered by `apps/native/src/features/navigation/` components
-- route state is the source of truth for active tab and subsection
-- subsection selection happens inside each tab stack rather than through a shell-owned navigation store
+- Home
+- Explore
+- Scholars
+- My Library
+- Settings
+
+The shared tabs boundary is `apps/native/src/app/(tabs)/_layout.tsx`. Each root
+owns an independent Expo Router stack. Admin is an independent capability-aware
+stack outside the persistent tab shell, and Search is a pushed global action.
+Profile, Legal, and Support are secondary Settings screens. Started, Saved,
+and Completed are internal My Library selections rather than root destinations.
+
+Obsolete native subsection paths are intentionally invalid. They do not redirect
+or alias to replacement screens and resolve through the localized normal
+not-found state. The mini-player remains the sole bottom accessory while audio
+is active.
 
 This means mobile now uses Expo Router tabs for peer-root navigation, with app-local chrome layered over them for product-specific visuals.
+
+### Home study surface
+
+Home is the mobile study landing surface. Its public sections use the same
+Catalog semantics as web: discovery, scholars, recently added material, and
+curated promotions. Public sections remain available to anonymous listeners
+and are queried independently from personal state.
+
+Continue Listening is shown only after authentication resolves and only when
+the authenticated unfinished-progress projection exists. It is not inferred
+from Catalog data. Local playback progress may update the displayed position
+immediately while the existing synchronization layer reconciles durable state.
+
+Home does not cache the Catalog for offline use. Mobile continuity comes from
+the existing downloaded-audio registry and local-first progress behavior; a
+network failure must render a localized recoverable state rather than inventing
+an offline Catalog result.
 
 ## 4. Offline and Sync Principles
 
@@ -115,18 +142,17 @@ The tab bar is a product-specific navigation surface layered over a standard Exp
 ### Current Rules
 
 - The tab chrome mounts once at the shared `(tabs)` layout boundary.
-- Top-level section switches are owned by Expo Router tabs.
-- Subsection routes live inside each tab stack.
-- Current route state is authoritative for the active location.
-- Default subsection routes are canonical tab paths like `/(tabs)/(explore)`,
-  `/(tabs)/my-library`, and `/(tabs)/settings`.
+- Exactly five persistent root destinations are exposed to listeners.
+- Root switching is owned by Expo Router tabs and each root preserves its own stack.
+- Search, account, legal, support, and administrative screens are secondary or
+  independent stack destinations, not persistent tabs.
+- Removed native subsection paths remain invalid and are handled by the normal
+  localized not-found route.
 
 ### Ownership
 
-- Top-level tab chrome lives in `apps/native/src/features/navigation/components/CustomTabBar.tsx`
-- Subsection chrome lives in `apps/native/src/features/navigation/components/SubsectionBarHost.tsx`
-- Shared route helpers for tabs live in `apps/native/src/features/navigation/utils/tab-route-config.ts`
-- Native admin screens live under `apps/native/src/app/(tabs)/admin/` and
+- Root route ownership lives in `apps/native/src/features/navigation/utils/tab-route-config.ts`
+- Native admin screens live under `apps/native/src/app/admin/` and
   `apps/native/src/features/admin/`.
 
 ### Package Discipline
@@ -139,9 +165,9 @@ The tab bar is a product-specific navigation surface layered over a standard Exp
 
 ### Verification Status
 
-- The `(tabs)` route group is restored as the main app boundary
-- Mobile and web route defaults now align conceptually around explore,
-  library, and settings/account surfaces, while each platform keeps its own
-  route naming.
-- Mobile and web typecheck/lint pass on the tabs migration
-- Native runtime smoke coverage is still required to confirm the old shell-era crash is gone on device
+- The `(tabs)` route group is the main app boundary with five persistent roots.
+- Mobile and web route defaults align conceptually around Home, Explore,
+  Scholars, My Library, and Settings while each platform keeps its own route
+  composition.
+- Native runtime smoke coverage is required to confirm root navigation and the
+  absence of the old shell-era crash on device.

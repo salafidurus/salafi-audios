@@ -9,9 +9,7 @@ export {
   type ContentPreferenceStore,
 } from "./content-preference";
 export {
-  SUBNAV_KEYS,
   SCHOLAR_TITLE_KEYS,
-  getSubnavLabel,
   getEmptyStateText,
   getErrorStateText,
   getLocalizedName,

@@ -1,66 +1,13 @@
-/**
- * Centralized, statically-extractable translation keys for navigation subnav
- * labels and feed/live state text. The literal-string maps below let
- * i18next-parser trace every key (dynamic `t(\`...${id}\`)` calls cannot be
- * parsed statically).
- */
-
 import type { ScholarTitle } from "@sd/core-contracts";
 
-/** Provides statically extractable translation keys and localized fallback helpers. */
-/** Shared translation keys and semantic fallbacks for localized labels. */
-export const SUBNAV_KEYS = {
-  explore: {
-    recent: "navigation.subnav.explore.recent",
-    scholar: "navigation.subnav.explore.scholar",
-    curation: "navigation.subnav.explore.curation",
-  },
-  myLibrary: {
-    started: "navigation.subnav.myLibrary.started",
-    saved: "navigation.subnav.myLibrary.saved",
-    completed: "navigation.subnav.myLibrary.completed",
-  },
-  settings: {
-    general: "navigation.subnav.settings.general",
-    profile: "navigation.subnav.settings.profile",
-  },
-  adminContents: {
-    topics: "navigation.subnav.admin.topics",
-    listings: "navigation.subnav.admin.listings",
-  },
-} as const satisfies Record<string, Record<string, string>>;
-
-/** English fallback labels retained for keys unavailable at runtime. */
-export const SUBNAV_FALLBACKS = {
-  explore: {
-    recent: "Recent",
-    scholar: "Scholars",
-    curation: "Curation",
-  },
-  myLibrary: {
-    started: "Started",
-    saved: "Saved",
-    completed: "Completed",
-  },
-  settings: {
-    general: "General",
-    profile: "Profile",
-  },
-  adminContents: {
-    topics: "Topics",
-    listings: "Listings",
-  },
-} as const satisfies Record<string, Record<string, string>>;
-
-/** Minimal translation function shape required by these framework-neutral helpers. */
+/**
+ * Minimal translation callback accepted by framework-neutral localization
+ * helpers; callers provide a key and may provide interpolation options.
+ */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- the callback contract is documented above.
 export type TranslateFn = (key: any, options?: any) => any;
 
-type SubnavSection = keyof typeof SUBNAV_KEYS;
 type LocalizedNameInput = { en?: string; ar?: string } | string | undefined | null;
-
-function isSubnavSection(section: string): section is SubnavSection {
-  return section in SUBNAV_KEYS;
-}
 
 function isScholarTitle(value: string): value is ScholarTitle {
   return value in SCHOLAR_TITLE_KEYS;
@@ -68,18 +15,6 @@ function isScholarTitle(value: string): value is ScholarTitle {
 
 function isLocalizedNameRecord(value: LocalizedNameInput): value is { en?: string; ar?: string } {
   return Object.prototype.toString.call(value) === "[object Object]";
-}
-
-/** Translate a subsection tab label, falling back to the default label or raw id if unmapped. */
-export function getSubnavLabel(section: string, tabId: string, t: TranslateFn): string {
-  const key = isSubnavSection(section)
-    ? Object.entries(SUBNAV_KEYS[section]).find(([candidate]) => candidate === tabId)?.[1]
-    : undefined;
-  const fallback = isSubnavSection(section)
-    ? (Object.entries(SUBNAV_FALLBACKS[section]).find(([candidate]) => candidate === tabId)?.[1] ??
-      tabId)
-    : tabId;
-  return key ? t(key, fallback) : fallback;
 }
 
 /** Maps canonical scholar titles to translation keys without changing title identity. */

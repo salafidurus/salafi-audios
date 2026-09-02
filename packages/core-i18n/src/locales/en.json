@@ -284,14 +284,20 @@
     "filterAllAria": "Show all items",
     "filterByAria": "Filter by {{label}}",
     "filterRemoveAria": "Remove {{label}} filter",
-    "enterQuery": "Enter a search query to begin"
+    "enterQuery": "Enter a search query to begin",
+    "title": "Search",
+    "lectureCount": "{{count}} lectures",
+    "durationHours": "{{hours}}hr {{minutes}}m",
+    "durationMinutes": "{{minutes}}m"
   },
   "myLibrary": {
     "title": "My Library",
+    "started": "Started",
     "inProgress": "In Progress",
     "saved": "Saved",
     "completed": "Completed",
     "loadingSection": "Loading {{section}}…",
+    "error": "My Library could not be loaded.",
     "emptyProgress": "No lectures started yet. Browse the catalog to begin listening.",
     "emptySaved": "No saved lectures yet. Save lectures to keep track of them.",
     "emptyCompleted": "No completed lectures yet. Finish lectures to track your learning.",

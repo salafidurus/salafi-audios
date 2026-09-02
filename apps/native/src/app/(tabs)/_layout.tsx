@@ -1,20 +1,16 @@
-import { hasAnyAdminAccess, useAbility } from "@sd/domain-account";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { Platform } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
-import { RouteAccessGuard, useAuth } from "@/core/auth";
+import { RouteAccessGuard } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { BottomAccessoryInnerContent } from "@/features/navigation";
+import { BottomAccessoryContent } from "@/features/navigation/components/BottomAccessory/BottomAccessoryContent";
 
 /** Defines the Expo Router entrypoint for the native (tabs) route and delegates behavior to the feature layer. */
 /** Renders the native tabs layout surface and coordinates its user-facing state. */
 export default function TabsLayout() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
-  const { isAuthenticated } = useAuth();
-  const { ability } = useAbility({ isAuthenticated });
-  const hasAnyAccess = hasAnyAdminAccess(ability);
 
   return (
     <RouteAccessGuard>
@@ -26,12 +22,30 @@ export default function TabsLayout() {
         backgroundColor={theme.colors.surface.default}
         labelVisibilityMode="labeled"
       >
-        <NativeTabs.Trigger name="(explore)">
+        <NativeTabs.Trigger name="(home)">
+          <NativeTabs.Trigger.Icon
+            sf={{ default: "house", selected: "house.fill" }}
+            md={{ default: "home", selected: "home" }}
+          />
+          <NativeTabs.Trigger.Label>{t("navigation.home", "Home")}</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="explore">
           <NativeTabs.Trigger.Icon
             sf={{ default: "safari", selected: "safari.fill" }}
             md={{ default: "explore", selected: "explore" }}
           />
           <NativeTabs.Trigger.Label>{t("navigation.explore", "Explore")}</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="scholars">
+          <NativeTabs.Trigger.Icon
+            sf={{ default: "person.3", selected: "person.3.fill" }}
+            md={{ default: "school", selected: "school" }}
+          />
+          <NativeTabs.Trigger.Label>
+            {t("navigation.scholars", "Scholars")}
+          </NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
         <NativeTabs.Trigger name="my-library">
@@ -54,19 +68,9 @@ export default function TabsLayout() {
           </NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
-        <NativeTabs.Trigger name="admin" hidden={!hasAnyAccess}>
-          <NativeTabs.Trigger.Icon
-            sf={{ default: "shield", selected: "shield.fill" }}
-            md={{ default: "admin_panel_settings", selected: "admin_panel_settings" }}
-          />
-          <NativeTabs.Trigger.Label>
-            {t("admin.dashboard.titleMobile", "Admin")}
-          </NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
-
         {Platform.OS === "ios" ? (
           <NativeTabs.BottomAccessory>
-            <BottomAccessoryInnerContent />
+            <BottomAccessoryContent />
           </NativeTabs.BottomAccessory>
         ) : null}
       </NativeTabs>

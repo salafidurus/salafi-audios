@@ -2,18 +2,22 @@ import type { MenuAction } from "@expo/ui/community/menu";
 import type { MyLibraryItemDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
-import { getMyLibraryItemPercent } from "@sd/domain-content";
-import { Bookmark, Clock, CheckCircle } from "lucide-react-native";
+import { formatScholarName, getMyLibraryItemPercent } from "@sd/domain-content";
 import { View, type DimensionValue } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 import { AppText, List } from "@/shared/ui";
 
-/** Describes the inputs and callbacks accepted by My Library Item Row. */
-/** Describes the inputs, callbacks, and optional state accepted by My Library Item Row. */
+/**
+ * Describes one virtualized library row, including its display variant and
+ * optional long-press actions. The row owns title/artwork fallback and binds
+ * item identity to its callbacks so list callers remain presentation-only.
+ */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- the public prop contract is documented above.
 export type MyLibraryItemRowProps = {
   item: MyLibraryItemDto;
   variant: "progress" | "saved" | "completed";
@@ -23,29 +27,6 @@ export type MyLibraryItemRowProps = {
   actions?: MenuAction[];
   onAction?: (id: string) => void;
 };
-
-type MyLibraryItemIconProps = {
-  variant: "progress" | "saved" | "completed";
-};
-
-function MyLibraryItemIcon({ variant }: MyLibraryItemIconProps) {
-  const { theme } = useUnistyles();
-  const iconProps = { size: 20, color: theme.colors.content.muted };
-  const icon = (() => {
-    switch (variant) {
-      case "saved":
-        return <Bookmark {...iconProps} />;
-      case "progress":
-        return <Clock {...iconProps} />;
-      case "completed":
-        return <CheckCircle {...iconProps} />;
-    }
-  })();
-
-  const testID = `my-library-item-icon-${variant}`;
-
-  return <View testID={testID}>{icon}</View>;
-}
 
 function ProgressBarFill({ percent }: { percent: number }) {
   const width = getPercentWidth(percent);
@@ -120,22 +101,26 @@ export function MyLibraryItemRow({
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const lectureTitle = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
+  const scholarName = formatScholarName(item.scholarName, item.scholarTitle, t);
   const progress = getMyLibraryItemPercent(item);
 
   return (
     <List.Item onPress={onPress} testID={testID}>
       <View style={styles.rowContent}>
         <View style={styles.rowLayout}>
-          <View style={styles.iconContainer}>
-            <MyLibraryItemIcon variant={variant} />
-          </View>
+          <UserAvatar
+            image={item.coverImageUrl ?? item.scholarImageUrl}
+            name={lectureTitle}
+            size={64}
+            testID={`my-library-${variant}-avatar`}
+          />
           <View style={styles.content}>
             <View style={styles.columnLayout}>
               <AppText variant="bodyMd" numberOfLines={2}>
                 {lectureTitle}
               </AppText>
               <MarqueeText
-                text={`${item.scholarName}${item.seriesTitle ? ` · ${item.seriesTitle}` : ""}`}
+                text={`${scholarName}${item.seriesTitle ? ` · ${item.seriesTitle}` : ""}`}
                 variant="caption"
                 style={styles.subtitle}
               />
@@ -167,9 +152,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   columnLayout: {
     gap: theme.spacing.scale.xs,
-  },
-  iconContainer: {
-    paddingTop: theme.spacing.scale.xs,
   },
   content: {
     flex: 1,

@@ -38,7 +38,12 @@ export async function setStoredThemePreference(preference: ThemePreference): Pro
 /** Applies the resolved preference to the Unistyles runtime and returns the applied theme. */
 export function applyThemePreference(preference: ThemePreference): ResolvedTheme {
   const resolved = resolveThemePreference(preference, Appearance.getColorScheme());
-  UnistylesRuntime.setTheme(resolved);
+  if (preference === "system") {
+    UnistylesRuntime.setAdaptiveThemes(true);
+  } else {
+    UnistylesRuntime.setAdaptiveThemes(false);
+    UnistylesRuntime.setTheme(resolved);
+  }
   return resolved;
 }
 

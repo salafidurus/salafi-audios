@@ -27,13 +27,6 @@ vi.mock("@/shared/hooks/use-formatted-scholar-name", () => ({
   useFormattedScholarName: vi.fn().mockReturnValue("Scholar Name"),
 }));
 
-vi.mock("../../hooks/use-home-promotions", () => ({
-  useHomePromotions: () => ({
-    data: { hero: null, editorsPicks: [] },
-    isLoading: false,
-  }),
-}));
-
 const mockUseExploreRecentScreen = useExploreRecentScreen as unknown as ReturnType<typeof vi.fn>;
 
 const mockContentItems = Array.from({ length: 14 }, (_, index) => ({

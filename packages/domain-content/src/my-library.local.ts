@@ -33,8 +33,8 @@ export function localSavedItems(entries: SavedEntry[]): MyLibraryItemDto[] {
     .map((entry) => ({
       id: entry.id,
       listingId: entry.id,
-      listingTitle: entry.id,
-      listingSlug: entry.id,
+      listingTitle: entry.slug ?? entry.id,
+      listingSlug: entry.slug ?? entry.id,
       scholarId: "",
       scholarSlug: "",
       scholarName: "",

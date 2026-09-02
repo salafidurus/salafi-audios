@@ -12,6 +12,7 @@ const baseItem: FeedContentItemDto = {
   slug: "test-lecture",
   scholarName: "Scholar Name",
   scholarSlug: "scholar-name",
+  scholarImageUrl: null,
   thumbnailUrl: null,
   durationSeconds: 1800,
   publishedAt: "2026-06-20T10:00:00Z",
@@ -86,6 +87,25 @@ describe("ExplorePodcastRow", () => {
     await render(<ExplorePodcastRow item={baseItem} />);
     expect(screen.getByText("Test Lecture")).toBeTruthy();
     expect(screen.getByText("Scholar Name")).toBeTruthy();
+  });
+
+  it("uses the scholar image when the listing image is unavailable", async () => {
+    await render(
+      <ExplorePodcastRow
+        item={{ ...baseItem, scholarImageUrl: "https://example.com/scholar.jpg" }}
+      />,
+    );
+
+    expect(screen.getByTestId("explore-listing-avatar").props.source).toEqual([
+      { uri: "https://example.com/scholar.jpg" },
+    ]);
+  });
+
+  it("uses the listing title initial when both images are unavailable", async () => {
+    await render(<ExplorePodcastRow item={baseItem} />);
+
+    expect(screen.getByTestId("explore-listing-avatar")).toBeTruthy();
+    expect(screen.getByText("T")).toBeTruthy();
   });
 
   it("renders the scholar name with honorific title when available", async () => {

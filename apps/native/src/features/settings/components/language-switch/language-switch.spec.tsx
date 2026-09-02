@@ -23,6 +23,10 @@ jest.mock("@/core/i18n/i18n", () => ({
 }));
 
 jest.mock("react-native-unistyles", () => ({
+  useUnistyles: () => ({
+    theme: { direction: "ltr" },
+    rt: { themeName: "light" },
+  }),
   StyleSheet: {
     create: (styles: (theme: unknown) => unknown) =>
       styles({
