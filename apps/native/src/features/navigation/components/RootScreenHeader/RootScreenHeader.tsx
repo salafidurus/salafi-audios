@@ -1,8 +1,9 @@
-import { Host } from "@expo/ui";
+import { ArrowLeft } from "lucide-react-native";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
-import { AppText, NativeIcon } from "@/shared/ui";
+import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText } from "@/shared/ui";
 
 import { GlobalSearchButton } from "../GlobalSearchButton/GlobalSearchButton";
 
@@ -17,6 +18,7 @@ export type RootScreenHeaderProps = {
 /** Renders an accessible in-content header for root and pushed native screens. */
 export function RootScreenHeader({ title, showSearch = true, onBack }: RootScreenHeaderProps) {
   const { theme } = useUnistyles();
+  const { t } = useTranslation();
 
   return (
     <View
@@ -33,14 +35,18 @@ export function RootScreenHeader({ title, showSearch = true, onBack }: RootScree
       {onBack ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Navigate up"
+          accessibilityLabel={t("common.navigateUp")}
           hitSlop={8}
           onPress={onBack}
           testID="root-screen-back-button"
         >
-          <Host>
-            <NativeIcon name="back" colorRole="strong" size={24} />
-          </Host>
+          {/* RootScreenHeader owns the RN navigation shell; lucide keeps this icon out of the Compose boundary. */}
+          <ArrowLeft
+            color={theme.colors.content.strong}
+            size={theme.spacing.scale["2xl"]}
+            strokeWidth={2}
+            style={theme.direction === "rtl" ? { transform: [{ rotate: "180deg" }] } : undefined}
+          />
         </Pressable>
       ) : null}
       <AppText variant="titleLg" style={styles.title}>

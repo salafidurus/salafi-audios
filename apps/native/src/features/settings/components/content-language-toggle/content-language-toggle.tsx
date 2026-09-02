@@ -3,6 +3,7 @@ import { Text, View } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { createUniversalHostProps } from "@/core/styles/expo-ui";
 import {
   setShowOriginalContent,
   useShowOriginalContent,
@@ -13,7 +14,7 @@ import {
 /** Toggles whether native content prefers the original source language. */
 export function ContentLanguageToggle() {
   const { t } = useTranslation();
-  const { theme } = useUnistyles();
+  const { theme, rt } = useUnistyles();
   const showOriginal = useShowOriginalContent();
   return (
     <View
@@ -24,7 +25,7 @@ export function ContentLanguageToggle() {
           {t("account.showOriginalContent", "Show content in its original language")}
         </Text>
       </View>
-      <Host matchContents>
+      <Host matchContents {...createUniversalHostProps(theme, rt.themeName)}>
         <Switch
           value={showOriginal}
           onValueChange={setShowOriginalContent}

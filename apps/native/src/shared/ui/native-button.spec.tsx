@@ -25,6 +25,14 @@ describe("Button", () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
+  it("keeps the Compose child boundary stable when loading changes", async () => {
+    const view = await render(<Button label="Submit" />);
+
+    await view.rerender(<Button label="Submit" loading />);
+    expect(view.getByText("Submit…")).toBeTruthy();
+    await fireEvent.press(view.getByRole("button"));
+  });
+
   it("does not call onPress when disabled", async () => {
     const onPress = jest.fn();
     await render(<Button label="Submit" onPress={onPress} disabled />);

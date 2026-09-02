@@ -23,7 +23,10 @@ export const routes = {
 
   settings: {
     index: "/settings",
-    legal: "/settings/legal",
+    profile: "/settings/profile",
+    support: "/settings/support",
+    terms: "/settings/terms",
+    privacy: "/settings/privacy",
   },
 
   scholars: {
@@ -79,7 +82,8 @@ export interface RouteDefinition {
  */
 export const routeDefinitions: RouteDefinition[] = [
   { path: routes.explore.index, access: "public" },
-  { path: routes.settings.legal, access: "public" },
+  { path: routes.settings.terms, access: "public" },
+  { path: routes.settings.privacy, access: "public" },
   { path: routes.settings.index, access: "auth-optional" },
   { path: routes.myLibrary.index, access: "auth-optional" },
   { path: routes.search, access: "public" },

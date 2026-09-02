@@ -32,7 +32,7 @@ export default function AdminLayout() {
     <Stack screenOptions={getTabStackScreenOptions(theme)}>
       <Stack.Screen
         name="index"
-        options={{ title: t("admin.dashboard.title", "Admin Dashboard") }}
+        options={{ headerShown: false, title: t("admin.dashboard.title", "Admin Dashboard") }}
       />
       <Stack.Screen
         name="listings"

@@ -1,17 +1,27 @@
 import { useCallback, useState } from "react";
 import { ScrollView, Switch, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { UnistylesRuntime, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import {
+  applyThemePreference,
+  setStoredThemePreference,
+  type ThemePreference,
+} from "@/core/styles/theme/theme-preference";
 import { RootScreenHeader } from "@/features/navigation";
 import { NativeBridgeHost } from "@/shared/ui";
 
 import { ContentLanguageToggle } from "../components/content-language-toggle/content-language-toggle";
 import { LanguageSwitch } from "../components/language-switch/language-switch";
 import { SegmentedControl } from "../components/SegmentedControl/SegmentedControl";
+import {
+  SettingsAccountActions,
+  SettingsSupportLegalActions,
+  type SettingsAccountActionsProps,
+} from "./settings-account-actions.screen";
 
 /** Renders the general settings form with RN layout and isolated Expo UI controls. */
-type ThemePreference = "system" | "light" | "dark";
 interface NotificationState {
   master: boolean;
   scholars: boolean;
@@ -24,9 +34,10 @@ function getInitialTheme(): ThemePreference {
 }
 
 /** Owns theme, language, and notification preferences for the Settings tab. */
-export function SettingsGeneralScreen() {
+export function SettingsGeneralScreen(props: SettingsAccountActionsProps = {}) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
+  const insets = useSafeAreaInsets();
   const [themePreference, setThemePreference] = useState<ThemePreference>(getInitialTheme);
   const [notif, setNotif] = useState<NotificationState>({
     master: true,
@@ -36,12 +47,8 @@ export function SettingsGeneralScreen() {
 
   const handleThemeChange = useCallback((value: ThemePreference) => {
     setThemePreference(value);
-    if (value === "system") {
-      UnistylesRuntime.setAdaptiveThemes(true);
-    } else {
-      UnistylesRuntime.setAdaptiveThemes(false);
-      UnistylesRuntime.setTheme(value);
-    }
+    applyThemePreference(value);
+    void setStoredThemePreference(value);
   }, []);
   const handleNotifChange = useCallback(
     (key: keyof NotificationState) => (checked: boolean) =>
@@ -55,17 +62,26 @@ export function SettingsGeneralScreen() {
   ];
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.surface.canvas }}>
       <NativeBridgeHost testID="settings-general-host" matchContents={false}>
         <View style={{ flex: 1 }}>
-          <RootScreenHeader title={t("navigation.settings", "Settings")} />
+          <View
+            style={{
+              paddingTop: insets.top,
+              paddingHorizontal: theme.spacing.layout.pageX,
+            }}
+          >
+            <RootScreenHeader title={t("navigation.settings", "Settings")} />
+          </View>
           <ScrollView
             showsVerticalScrollIndicator={false}
+            contentInset={{ bottom: theme.spacing.layout.pageY + insets.bottom + 96 }}
             contentContainerStyle={{
               padding: theme.spacing.layout.pageX,
               gap: theme.spacing.layout.sectionY,
             }}
           >
+            <SettingsAccountActions {...props} />
             <SettingsSection
               title={t("settings.general.languageSection", "Language")}
               theme={theme}
@@ -132,6 +148,7 @@ export function SettingsGeneralScreen() {
                 </>
               ) : null}
             </SettingsSection>
+            <SettingsSupportLegalActions {...props} />
           </ScrollView>
         </View>
       </NativeBridgeHost>

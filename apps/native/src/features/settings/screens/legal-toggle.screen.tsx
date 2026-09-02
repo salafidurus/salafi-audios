@@ -1,97 +1,142 @@
-/** Native legal surface that switches between terms and privacy content. */
-/** Renders switchable terms and privacy content using native text and layout. */
-import { Column, ScrollView } from "@expo/ui";
-import { useState } from "react";
+import {
+  getLegalDocument,
+  type LegalBlock,
+  type LegalDocument,
+  type LegalLocale,
+} from "@sd/domain-legal";
+import { useTranslation } from "react-i18next";
+import { Linking, Pressable, ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUnistyles } from "react-native-unistyles";
 
-import { NativeScreenHost, NativeText } from "@/shared/ui";
+import { i18n } from "@/core/i18n/i18n";
+import { RootScreenHeader } from "@/features/navigation";
+import { NativeBridgeHost, NativeText } from "@/shared/ui";
 
-import { SegmentedControl } from "../components/SegmentedControl/SegmentedControl";
+/** Configures the document identity and navigation callbacks for a legal detail screen. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- the fields are documented by the exported contract and callback names.
+export type LegalToggleScreenProps = {
+  documentId: LegalDocument["id"];
+  onNavigateToSupport?: () => void;
+  onBack?: () => void;
+};
 
-/** Owns the terms/privacy selection and renders the selected legal document. */
-const TERMS_SECTIONS = [
-  {
-    heading: "Acceptance of Terms",
-    body: "By using Salafi Durus, you agree to these Terms. If you do not agree, do not use the service.",
-  },
-  {
-    heading: "Use of the Service",
-    body: "Content is for personal, non-commercial use. Do not redistribute or commercially exploit the content.",
-  },
-  {
-    heading: "User Accounts",
-    body: "You are responsible for your account credentials and all activity under your account.",
-  },
-  {
-    heading: "Content & IP",
-    body: "Audio content belongs to the scholars. Platform design and code belong to Salafi Durus.",
-  },
-  {
-    heading: "Contact",
-    body: "legal@salafidurus.com",
-  },
-];
-
-const PRIVACY_SECTIONS = [
-  {
-    heading: "Information We Collect",
-    body: "We collect information you provide when creating an account and usage data such as listening history. We do not sell your personal information.",
-  },
-  {
-    heading: "How We Use Your Information",
-    body: "Your information is used to provide the service, personalize your experience, and communicate important updates.",
-  },
-  {
-    heading: "Data Storage & Security",
-    body: "Your data is stored securely with industry-standard encryption. We retain your data only while your account is active.",
-  },
-  {
-    heading: "Contact",
-    body: "privacy@salafidurus.com",
-  },
-];
-
-type LegalTab = "terms" | "privacy";
-
-const TAB_OPTIONS: { value: LegalTab; label: string }[] = [
-  { value: "terms", label: "Terms of Use" },
-  { value: "privacy", label: "Privacy Policy" },
-];
-
-/** Switches between the static terms and privacy documents using native controls. */
-export function LegalToggleScreen() {
+/** Renders one shared legal document with native layout and locale-aware typography. */
+export function LegalToggleScreen({
+  documentId,
+  onNavigateToSupport,
+  onBack,
+}: LegalToggleScreenProps) {
   const { theme } = useUnistyles();
-  const [activeTab, setActiveTab] = useState<LegalTab>("terms");
-
-  const sections = activeTab === "terms" ? TERMS_SECTIONS : PRIVACY_SECTIONS;
-  const title = activeTab === "terms" ? "Terms of Use" : "Privacy Policy";
+  const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
+  const document = getLegalDocument(documentId);
+  const locale: LegalLocale = i18n.language.startsWith("ar") ? "ar" : "en";
 
   return (
-    <NativeScreenHost testID="legal-toggle-screen-host">
-      <ScrollView showsIndicators={false}>
-        <Column
-          spacing={theme.spacing.scale.lg}
-          style={{
-            paddingHorizontal: theme.spacing.layout.pageX,
-            paddingVertical: theme.spacing.layout.pageY,
-          }}
-        >
-          <SegmentedControl options={TAB_OPTIONS} value={activeTab} onChange={setActiveTab} />
-          <NativeText variant="titleLg" colorRole="strong">
-            {title}
+    <View style={{ flex: 1 }}>
+      <View
+        style={{
+          paddingTop: insets.top,
+          paddingHorizontal: theme.spacing.layout.pageX,
+        }}
+      >
+        <RootScreenHeader title={document.title[locale]} showSearch={false} onBack={onBack} />
+      </View>
+      <NativeBridgeHost testID={`legal-${documentId}-screen-host`} matchContents={false}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View
+            style={{
+              paddingHorizontal: theme.spacing.layout.pageX,
+              paddingVertical: theme.spacing.layout.pageY,
+              paddingBottom: theme.spacing.layout.pageY + insets.bottom + 96,
+            }}
+          >
+            <NativeText variant="caption" colorRole="muted">
+              {t("legal.lastUpdated", "Last updated")}: {document.updatedAt}
+            </NativeText>
+            {document.intro[locale].map((paragraph) => (
+              <NativeText key={paragraph} variant="bodyMd" colorRole="subtle">
+                {paragraph}
+              </NativeText>
+            ))}
+            {document.sections.map((section) => (
+              <View key={section.id} style={{ gap: theme.spacing.scale.sm }}>
+                <NativeText variant="titleMd" colorRole="strong">
+                  {section.heading[locale]}
+                </NativeText>
+                {section.blocks[locale].map((block, index) => (
+                  <LegalBlockView
+                    key={`${section.id}-${block.type}-${index}`}
+                    block={block}
+                    onNavigateToSupport={onNavigateToSupport}
+                  />
+                ))}
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </NativeBridgeHost>
+    </View>
+  );
+}
+
+function LegalBlockView({
+  block,
+  onNavigateToSupport,
+}: {
+  block: LegalBlock;
+  onNavigateToSupport?: () => void;
+}) {
+  const { theme } = useUnistyles();
+
+  if (block.type === "subheading") {
+    return <NativeText variant="titleMd">{block.text}</NativeText>;
+  }
+  if (block.type === "paragraph") {
+    return (
+      <NativeText variant="bodyMd" colorRole="subtle">
+        {block.text}
+      </NativeText>
+    );
+  }
+  if (block.type === "bullets") {
+    return (
+      <View style={{ gap: theme.spacing.scale.xs }}>
+        {block.items.map((item) => (
+          <NativeText key={item} variant="bodyMd" colorRole="subtle">
+            • {item}
           </NativeText>
-          {sections.map((section) => (
-            <Column key={section.heading} spacing={theme.spacing.scale.xs}>
-              <NativeText variant="titleMd" colorRole="strong">
-                {section.heading}
-              </NativeText>
-              <NativeText variant="bodyMd" colorRole="subtle">
-                {section.body}
-              </NativeText>
-            </Column>
-          ))}
-        </Column>
-      </ScrollView>
-    </NativeScreenHost>
+        ))}
+      </View>
+    );
+  }
+  if (block.type === "definitions") {
+    return (
+      <View style={{ gap: theme.spacing.scale.xs }}>
+        {block.items.map((item) => (
+          <NativeText key={item.term} variant="bodyMd" colorRole="subtle">
+            {item.term}: {item.definition}
+          </NativeText>
+        ))}
+      </View>
+    );
+  }
+  const href = block.href;
+  if (href.kind === "internal") {
+    return (
+      <Pressable accessibilityRole="button" onPress={onNavigateToSupport}>
+        <NativeText variant="bodyMd" colorRole="primary">
+          {block.text}
+        </NativeText>
+      </Pressable>
+    );
+  }
+  return (
+    <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(href.url)}>
+      <NativeText variant="bodyMd" colorRole="primary">
+        {block.text}
+      </NativeText>
+    </Pressable>
   );
 }

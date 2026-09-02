@@ -111,6 +111,7 @@
         "@sd/domain-account": "workspace:*",
         "@sd/domain-audio": "workspace:*",
         "@sd/domain-content": "workspace:*",
+        "@sd/domain-legal": "workspace:*",
         "@sd/domain-search": "workspace:*",
         "@sentry/react-native": "~7.11.0",
         "@shopify/flash-list": "2.3.2",
@@ -193,6 +194,7 @@
         "@sd/domain-account": "workspace:*",
         "@sd/domain-audio": "workspace:*",
         "@sd/domain-content": "workspace:*",
+        "@sd/domain-legal": "workspace:*",
         "@sd/domain-search": "workspace:*",
         "@sd/utils-error": "workspace:*",
         "@tanstack/react-query": "catalog:",
@@ -343,6 +345,10 @@
         "react": "^19.0.0",
         "react-i18next": "catalog:",
       },
+    },
+    "packages/domain-legal": {
+      "name": "@sd/domain-legal",
+      "version": "0.0.0",
     },
     "packages/domain-search": {
       "name": "@sd/domain-search",
@@ -1555,6 +1561,8 @@
     "@sd/domain-audio": ["@sd/domain-audio@workspace:packages/domain-audio"],
 
     "@sd/domain-content": ["@sd/domain-content@workspace:packages/domain-content"],
+
+    "@sd/domain-legal": ["@sd/domain-legal@workspace:packages/domain-legal"],
 
     "@sd/domain-search": ["@sd/domain-search@workspace:packages/domain-search"],
 

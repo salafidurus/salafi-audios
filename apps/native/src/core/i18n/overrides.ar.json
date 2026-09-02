@@ -4,11 +4,13 @@
     "profileDesc": "إدارة معلومات ملفك الشخصي.",
     "saved": "تم الحفظ.",
     "signInToAccess": "سجّل الدخول للوصول إلى ملفك الشخصي",
+    "clickToSignIn": "اضغط لتسجيل الدخول",
     "profile": {
       "signInTitle": "سجّل الدخول لعرض ملفك الشخصي"
     }
   },
   "admin": {
+    "title": "الإدارة",
     "manageAudios": "إدارة المحتوى الصوتي",
     "manageSeries": "إدارة الشيوخ والسلاسل",
     "scholarDetail": "تفاصيل الشيخ",
@@ -80,7 +82,8 @@
     "searchScholars": "البحث عن الشيوخ...",
     "searchDescription": "تصفح العلماء واعثر على أحدث دروسهم."
   },
-  "common": { "loadMore": "تحميل المزيد" },
+  "common": { "loadMore": "تحميل المزيد", "navigateUp": "العودة" },
+  "legal": { "lastUpdated": "آخر تحديث" },
   "search": {
     "label": "بحث",
     "description": "البحث في الفهرس",
@@ -92,6 +95,11 @@
     "popularNahw": "النحو"
   },
   "settings": {
-    "support": "الدعم"
+    "support": "الدعم",
+    "accountSection": "الحساب",
+    "supportSection": "الدعم",
+    "contactSupport": "تواصل مع الدعم",
+    "legalTermsLabel": "الشروط والأحكام",
+    "legalPrivacyLabel": "سياسة الخصوصية"
   }
 }

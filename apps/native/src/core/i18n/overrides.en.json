@@ -4,11 +4,13 @@
     "profileDesc": "Manage your personal profile information.",
     "saved": "Saved.",
     "signInToAccess": "Sign in to access your profile",
+    "clickToSignIn": "Click to sign in",
     "profile": {
       "signInTitle": "Sign in to view your profile"
     }
   },
   "admin": {
+    "title": "Admin",
     "manageAudios": "Manage audio content",
     "manageSeries": "Manage scholars & series",
     "scholarDetail": "Scholar Detail",
@@ -83,7 +85,8 @@
     "searchScholars": "Search scholars...",
     "searchDescription": "Browse scholars and find their latest lessons."
   },
-  "common": { "loadMore": "Load more" },
+  "common": { "loadMore": "Load more", "navigateUp": "Navigate up" },
+  "legal": { "lastUpdated": "Last updated" },
   "search": {
     "label": "Search",
     "description": "Search the catalog",
@@ -95,6 +98,11 @@
     "popularNahw": "Nahw"
   },
   "settings": {
-    "support": "Support"
+    "support": "Support",
+    "accountSection": "Account",
+    "supportSection": "Support",
+    "contactSupport": "Contact support",
+    "legalTermsLabel": "Terms and Conditions",
+    "legalPrivacyLabel": "Privacy Policy"
   }
 }
