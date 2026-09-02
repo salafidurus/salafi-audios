@@ -102,7 +102,7 @@
     "rimraf": "catalog:",
     "secretlint": "^13.0.5",
     "tsup": "catalog:",
-    "tsx": "4.23.12",
+    "tsx": "4.23.13",
     "turbo": "2.10.12",
     "typescript": "7.0.2",
     "unplugin-swc": "^1.5.11"
