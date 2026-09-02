@@ -29,6 +29,7 @@ interface LanguageSwitchProps {
   collapsed?: boolean;
 }
 
+/** Changes the active locale, clears stale query data, and refreshes the current route. */
 export function LanguageSwitch({ direction = "down", collapsed = false }: LanguageSwitchProps) {
   const { i18n, t } = useTranslation();
   const { refresh } = useRouter();
