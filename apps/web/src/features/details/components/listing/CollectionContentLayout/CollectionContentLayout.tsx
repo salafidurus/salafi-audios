@@ -17,6 +17,8 @@ export type CollectionContentLayoutProps = {
   modules: ListingModuleDto[];
   scholarName?: string;
   /** Documents the intent and contract of this field. */ scholarSlug?: string;
+  listingArtwork?: string;
+  scholarImageUrl?: string;
   collectionId?: string;
   /** Item id to scroll to and briefly highlight on mount (e.g. a lesson linked via URL anchor). */
   highlightItemId?: string;
@@ -27,6 +29,8 @@ export function CollectionContentLayout({
   modules,
   scholarName = "",
   scholarSlug,
+  listingArtwork,
+  scholarImageUrl,
   collectionId,
   highlightItemId,
 }: CollectionContentLayoutProps) {
@@ -91,7 +95,15 @@ export function CollectionContentLayout({
   // Construct all tracks across all modules for full queue context, crossing
   // module boundaries in order (all of module N's lessons, then module N+1's).
   const allTracksInContext: Track[] = buildTrackQueue(
-    { id: collectionId ?? "", title: "", format: "collection", scholarName, scholarSlug },
+    {
+      id: collectionId ?? "",
+      title: "",
+      format: "collection",
+      scholarName,
+      scholarSlug,
+      artworkUrl: listingArtwork,
+      scholarImageUrl,
+    },
     { format: "collection", modules },
   );
 

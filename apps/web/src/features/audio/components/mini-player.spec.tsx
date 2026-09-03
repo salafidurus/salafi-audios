@@ -40,6 +40,7 @@ const track: Track = {
   url: "https://stream.test/lecture-one.mp3",
   durationSeconds: 600,
   artworkUrl: "https://cdn.test/lecture-one.jpg",
+  scholarImageUrl: "https://cdn.test/scholar-one.jpg",
 };
 
 beforeEach(() => {
@@ -65,12 +66,33 @@ describe("MiniPlayer", () => {
     expect(screen.getByRole("region", { name: "Audio player" })).toBeInTheDocument();
     expect(screen.getAllByText("Lecture One")).not.toHaveLength(0);
     expect(screen.getAllByText("Scholar One")).not.toHaveLength(0);
-    expect(screen.getAllByRole("img", { name: "Lecture One" })[0]).toHaveAttribute(
-      "src",
-      track.artworkUrl,
-    );
+    expect(document.querySelectorAll("img")[0]).toHaveAttribute("src", track.artworkUrl);
     expect(screen.getAllByRole("button", { name: "Play" })[0]).toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Audio progress" })).toHaveValue("25");
+  });
+
+  it("falls back to the scholar avatar when listing artwork is absent", () => {
+    const scholarFallbackTrack = { ...track, artworkUrl: undefined };
+    usePlaybackStore.getState().actions.setCurrentTrack(scholarFallbackTrack);
+
+    render(<MiniPlayer />);
+
+    expect(document.querySelectorAll("img")[0]).toHaveAttribute(
+      "src",
+      scholarFallbackTrack.scholarImageUrl,
+    );
+  });
+
+  it("falls back to the first letter of the listing title when no images exist", () => {
+    usePlaybackStore.getState().actions.setCurrentTrack({
+      ...track,
+      artworkUrl: undefined,
+      scholarImageUrl: undefined,
+    });
+
+    render(<MiniPlayer />);
+
+    expect(screen.getAllByText("L")).not.toHaveLength(0);
   });
 
   it("opens the expanded player and exposes secondary controls", () => {
@@ -85,6 +107,11 @@ describe("MiniPlayer", () => {
     fireEvent.click(expandButton);
 
     expect(expandButton).toHaveAttribute("aria-expanded", "true");
+    expect(
+      within(screen.getByTestId("mini-player-compact-layout")).queryByRole("button", {
+        name: "Play",
+      }),
+    ).toBeNull();
     const expanded = screen.getByRole("region", { name: "Expanded player" });
     expect(within(expanded).getByRole("button", { name: "Previous track" })).toBeVisible();
     expect(

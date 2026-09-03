@@ -100,6 +100,8 @@ export function TopicDiscoverySection({
                   scholarName={listing.scholarName}
                   scholarSlug={listing.scholarSlug}
                   scholarTitle={listing.scholarTitle}
+                  listingArtwork={listing.coverImageUrl}
+                  scholarImageUrl={listing.scholarImageUrl}
                   slug={listing.slug}
                   id={listing.id}
                   format={listing.format}
@@ -126,6 +128,8 @@ type TopicListingCardProps = {
   scholarName: string;
   /** Documents the intent and contract of this field. */ scholarSlug: string;
   scholarTitle?: string | null;
+  listingArtwork?: string;
+  scholarImageUrl?: string | null;
   format: ListingFormat;
   lectureCount: number;
   /** Documents the intent and contract of this field. */ durationSeconds?: number;
@@ -139,6 +143,8 @@ function TopicListingCard({
   scholarName,
   scholarSlug,
   scholarTitle,
+  listingArtwork,
+  scholarImageUrl,
   format,
   lectureCount,
   durationSeconds,
@@ -156,6 +162,8 @@ function TopicListingCard({
     format,
     scholarName,
     scholarSlug,
+    artworkUrl: listingArtwork,
+    scholarImageUrl,
   });
 
   return (

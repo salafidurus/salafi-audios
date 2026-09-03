@@ -39,6 +39,8 @@ function resolveSeriesLecture(
       format: seriesContents.format,
       scholarName,
       scholarSlug: lecture.scholar.slug,
+      artworkUrl: lecture.coverImageUrl,
+      scholarImageUrl: lecture.scholar.imageUrl,
     },
     seriesContents,
     { startAtId: lecture.id },
@@ -61,7 +63,8 @@ function buildStandaloneTrack(
     artist: scholarName,
     url: asset.url,
     durationSeconds: asset.durationSeconds ?? lecture.durationSeconds ?? 0,
-    artworkUrl: undefined,
+    artworkUrl: lecture.coverImageUrl,
+    scholarImageUrl: lecture.scholar.imageUrl,
     seriesId: lecture.seriesContext?.seriesId ?? null,
     seriesTitle: lecture.seriesContext?.seriesTitle ?? null,
   };

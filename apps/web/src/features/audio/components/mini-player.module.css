@@ -34,6 +34,7 @@
 }
 
 .coverBadge {
+  position: relative;
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -51,10 +52,10 @@
   color: var(--content-primary-strong);
 }
 
-.artwork {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.artworkAvatar {
+  border-radius: 8px;
+  border: 0;
+  box-shadow: none;
 }
 .trackCopy {
   display: flex;

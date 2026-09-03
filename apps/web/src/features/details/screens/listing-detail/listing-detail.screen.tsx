@@ -24,7 +24,9 @@ import { SeriesContextBar } from "../../components/listing/series-context-bar/se
 import { contentItemAnchorId } from "../../utils/content-item-anchor-id";
 import styles from "./listing-detail.screen.module.css";
 
+/** Route inputs for the public listing detail screen. */
 export type ListingDetailScreenProps = {
+  /** Stable listing slug used to load the detail and content queue. */
   slug: string;
 };
 
@@ -123,6 +125,8 @@ function ListingContentBody({ model }: { model: ListingContentModel }) {
         format="single"
         scholarName={formatScholarName(listing.scholar)}
         scholarSlug={listing.scholar.slug}
+        listingArtwork={listing.coverImageUrl}
+        scholarImageUrl={listing.scholar.imageUrl}
       />
     );
   }
@@ -133,6 +137,8 @@ function ListingContentBody({ model }: { model: ListingContentModel }) {
         format="series"
         scholarName={formatScholarName(listing.scholar)}
         scholarSlug={listing.scholar.slug}
+        listingArtwork={listing.coverImageUrl}
+        scholarImageUrl={listing.scholar.imageUrl}
         seriesId={listing.id}
         seriesTitle={listing.title}
         highlightItemId={highlightItemId}
@@ -144,6 +150,8 @@ function ListingContentBody({ model }: { model: ListingContentModel }) {
       modules={filteredModules}
       scholarName={formatScholarName(listing.scholar)}
       scholarSlug={listing.scholar.slug}
+      listingArtwork={listing.coverImageUrl}
+      scholarImageUrl={listing.scholar.imageUrl}
       collectionId={listing.id}
       highlightItemId={highlightItemId}
     />
@@ -285,6 +293,7 @@ function ListingDetailFallback({
   onBack,
   t,
 }: {
+  /** Current fallback state while listing detail data is unavailable. */
   state: ListingFallbackState;
   onRetry: () => void;
   onBack: () => void;
@@ -458,6 +467,7 @@ function buildListingContentModel({
   };
 }
 
+/** Loads and renders listing detail content, metadata, and playback actions. */
 export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const { t } = useTranslation();
   const router = useRouter();

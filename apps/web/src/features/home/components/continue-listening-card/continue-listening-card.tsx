@@ -63,6 +63,7 @@ function RichResumeCard({ recentProgress, onContinueListening, isMobile }: RichR
     scholarName,
     scholarSlug: recentProgress.scholarSlug,
     artworkUrl: recentProgress.artworkUrl,
+    scholarImageUrl: recentProgress.scholarImageUrl,
   });
 
   return (

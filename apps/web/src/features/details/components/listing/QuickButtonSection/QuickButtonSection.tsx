@@ -52,7 +52,8 @@ function buildListingTracks(
         format: listing.format,
         scholarName: formatScholarName(listing.scholar),
         scholarSlug: listing.scholar.slug,
-        artworkUrl: listing.scholar.imageUrl,
+        artworkUrl: listing.coverImageUrl,
+        scholarImageUrl: listing.scholar.imageUrl,
       },
       contents,
       { startAtId },
@@ -67,7 +68,8 @@ function buildListingTracks(
       artist: formatScholarName(listing.scholar),
       url: listing.primaryAudioAsset.url,
       durationSeconds: listing.durationSeconds || listing.primaryAudioAsset.durationSeconds || 0,
-      artworkUrl: listing.scholar.imageUrl,
+      artworkUrl: listing.coverImageUrl,
+      scholarImageUrl: listing.scholar.imageUrl,
     },
   ];
 }

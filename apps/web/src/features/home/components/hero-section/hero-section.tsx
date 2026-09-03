@@ -102,6 +102,7 @@ function getHeroPlaybackInput(heroItem: HeroItem | null) {
     scholarName: heroItem.scholarName,
     scholarSlug: heroItem.scholarSlug,
     artworkUrl: heroItem.artworkUrl,
+    scholarImageUrl: heroItem.scholarImageUrl,
   };
 }
 

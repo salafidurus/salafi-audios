@@ -36,6 +36,7 @@ import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
 import { useExploreFilters } from "../hooks/use-explore-filters";
 import styles from "./explore-recent.screen.module.css";
 
+/** Navigation callbacks supplied by the recent Explore feed host. */
 export type FeedRecentScreenProps = {
   onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
@@ -61,7 +62,13 @@ function formatDuration(durationSeconds?: number | null): string {
 }
 
 function getFeedProgress(
-  progress: { positionSeconds: number; durationSeconds: number } | undefined,
+  progress:
+    | {
+        positionSeconds: number;
+        /** Duration used to calculate the feed card's completion percentage. */
+        durationSeconds: number;
+      }
+    | undefined,
 ) {
   return progress ? getProgressPercent(progress.positionSeconds, progress.durationSeconds) : 0;
 }
@@ -76,12 +83,17 @@ function FeedGridItemCard({
 }: {
   item: {
     id: string;
+    /** Stable route identity used to open and play the listing. */
     slug: string;
     title: string;
+    /** Listing format used to build the playback queue. */
     kind: string;
     scholarName: string;
+    /** Scholar route identity retained for playback metadata. */
     scholarSlug?: string;
+    scholarImageUrl?: string | null;
     thumbnailUrl?: string | null;
+    /** Duration used by the feed card metadata and progress presentation. */
     durationSeconds?: number | null;
     publishedLectureCount?: number;
     lectureCount?: number;
@@ -106,6 +118,7 @@ function FeedGridItemCard({
       scholarName,
       scholarSlug: item.scholarSlug,
       artworkUrl: item.thumbnailUrl ?? undefined,
+      scholarImageUrl: item.scholarImageUrl,
     },
     { onError: (message) => addToast(message, "error") },
   );
@@ -197,6 +210,7 @@ function buildFeedBlocks(
               kind: feedContentItem.kind,
               scholarName: feedContentItem.scholarName,
               scholarSlug: feedContentItem.scholarSlug,
+              scholarImageUrl: feedContentItem.scholarImageUrl,
               thumbnailUrl: feedContentItem.thumbnailUrl,
               durationSeconds: feedContentItem.durationSeconds,
               publishedLectureCount: feedContentItem.publishedLectureCount,
@@ -224,6 +238,7 @@ function FeedBody({
   t,
 }: {
   isHydrated: boolean;
+  /** Whether the recent-feed request failed and should show recovery UI. */
   isRecentError: boolean;
   isRecentFetching: boolean;
   items: FeedItemDto[];
@@ -271,6 +286,7 @@ function FeedBody({
 // screen decomposition, but do not block this vertical filter slice on that
 // unrelated refactor.
 // react-doctor-disable-next-line react-doctor/no-giant-component
+/** Renders the recent Explore feed, filters, pagination, and listing playback entry points. */
 export function FeedRecentScreen({
   onNavigateToListing,
   onNavigateToScholar,

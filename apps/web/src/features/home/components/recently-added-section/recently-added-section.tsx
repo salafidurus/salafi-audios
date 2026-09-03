@@ -115,6 +115,7 @@ function RecentlyAddedSectionContent({
           scholarName: featured.scholarName,
           scholarSlug: featured.scholarSlug,
           artworkUrl: featured.thumbnailUrl ?? undefined,
+          scholarImageUrl: featured.scholarImageUrl,
         }
       : null,
   );

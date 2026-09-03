@@ -28,6 +28,7 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 
 import styles from "./explore-list-row.module.css";
 
+/** Public feed-row inputs for listing navigation, playback, and saved state. */
 export type FeedListRowProps = {
   item: FeedContentItemDto;
   onPress?: () => void;
@@ -38,6 +39,7 @@ type FeedRowModel = {
   title: string;
   scholarName: string;
   initial: string;
+  /** Formatted duration shown in the compact metadata row. */
   durationText: string;
   publishedDateText: string;
   isMobile: boolean;
@@ -59,6 +61,7 @@ type FeedRowActions = {
 
 type FeedListRowContentProps = {
   model: FeedRowModel;
+  /** Current playback and save state projected for the row. */
   state: FeedRowState;
   actions: FeedRowActions;
 };
@@ -122,7 +125,12 @@ function saveFeedItem(event: React.MouseEvent, item: FeedContentItemDto, isSaved
 
 function getFeedProgressState(
   progress:
-    | { positionSeconds: number; durationSeconds: number; completedAt?: string | null }
+    | {
+        positionSeconds: number;
+        /** Duration used to calculate the row's completion percentage. */
+        durationSeconds: number;
+        completedAt?: string | null;
+      }
     | undefined,
 ) {
   return {
@@ -212,6 +220,7 @@ function FeedListRowContent({ model, state, actions }: FeedListRowContentProps) 
   );
 }
 
+/** Renders a recent-feed listing row with playback and save actions. */
 export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
@@ -236,6 +245,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
       scholarName,
       scholarSlug: item.scholarSlug,
       artworkUrl: item.thumbnailUrl ?? undefined,
+      scholarImageUrl: item.scholarImageUrl,
     },
     { onError: (message) => addToast(message, "error") },
   );

@@ -4,7 +4,6 @@
 import { useAudio, useQueue } from "@sd/domain-audio";
 import { useIsSaved, markSaved, markUnsaved } from "@sd/domain-content";
 import {
-  BookOpen,
   Bookmark,
   ChevronDown,
   ChevronUp,
@@ -19,6 +18,7 @@ import {
 import React, { useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AppAvatar } from "@/shared/components/app-avatar";
 
 import { audioService } from "../audio-service";
 import styles from "./mini-player.module.css";
@@ -94,18 +94,20 @@ export function MiniPlayer() {
         <SecondaryActions {...secondaryProps} />
       </div>
 
-      <div className={styles.compactLayout}>
+      <div className={styles.compactLayout} data-testid="mini-player-compact-layout">
         <TrackIdentity track={currentTrack} />
         <div className={styles.compactControls}>
-          <button
-            type="button"
-            className={styles.playPauseBtn}
-            onClick={handlePlayPause}
-            disabled={isLoading}
-            aria-label={playLabel}
-          >
-            <PlayPauseIcon isPlaying={isPlaying} isLoading={isLoading} />
-          </button>
+          {!isExpanded && (
+            <button
+              type="button"
+              className={styles.playPauseBtn}
+              onClick={handlePlayPause}
+              disabled={isLoading}
+              aria-label={playLabel}
+            >
+              <PlayPauseIcon isPlaying={isPlaying} isLoading={isLoading} />
+            </button>
+          )}
           <button
             type="button"
             className={styles.iconBtn}
@@ -155,11 +157,14 @@ function TrackIdentity({ track }: TrackIdentityProps) {
   return (
     <div className={styles.trackInfoGroup}>
       <div className={styles.coverBadge}>
-        {track.artworkUrl ? (
-          <img className={styles.artwork} src={track.artworkUrl} alt={track.title} />
-        ) : (
-          <BookOpen aria-hidden="true" size={18} />
-        )}
+        <AppAvatar
+          listingArtwork={track.artworkUrl}
+          scholarImageUrl={track.scholarImageUrl}
+          text={track.title}
+          fill
+          sizes="42px"
+          className={styles.artworkAvatar}
+        />
       </div>
       <div className={styles.trackCopy}>
         <p className={styles.title}>{track.title}</p>
