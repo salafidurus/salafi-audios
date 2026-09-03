@@ -36,6 +36,7 @@ import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
 import { useExploreFilters } from "../hooks/use-explore-filters";
 import styles from "./explore-recent.screen.module.css";
 
+/** Optional route callbacks that let parent layouts retain navigation ownership. */
 export type FeedRecentScreenProps = {
   onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
@@ -61,7 +62,13 @@ function formatDuration(durationSeconds?: number | null): string {
 }
 
 function getFeedProgress(
-  progress: { positionSeconds: number; durationSeconds: number } | undefined,
+  progress:
+    | {
+        positionSeconds: number;
+        /** Total track length used to calculate the resume percentage. */
+        durationSeconds: number;
+      }
+    | undefined,
 ) {
   return progress ? getProgressPercent(progress.positionSeconds, progress.durationSeconds) : 0;
 }
@@ -76,12 +83,16 @@ function FeedGridItemCard({
 }: {
   item: {
     id: string;
+    /** Listing identity used for navigation and playback state matching. */
     slug: string;
     title: string;
+    /** API format discriminator used to select the listing playback behavior. */
     kind: string;
     scholarName: string;
+    /** Optional scholar identity used to build scholar navigation and formatting. */
     scholarSlug?: string;
     thumbnailUrl?: string | null;
+    /** Optional duration displayed on the listing card. */
     durationSeconds?: number | null;
     publishedLectureCount?: number;
     lectureCount?: number;
@@ -148,6 +159,7 @@ function buildFeedBlocks(
   items: FeedItemDto[],
   onNavigateToListing: (slug: string) => void,
   onNavigateToScholar: (slug: string) => void,
+  t: ReturnType<typeof useTranslation>["t"],
 ): ReactNode[] {
   const blocks: ReactNode[] = [];
   let cards: { key: string; node: ReactNode }[] = [];
@@ -155,9 +167,13 @@ function buildFeedBlocks(
     if (cards.length === 0) return;
     const firstKey = cards[0]?.key ?? "grid";
     blocks.push(
-      <div key={`grid-${firstKey}`} className={styles.grid}>
-        {cards.map((card) => card.node)}
-      </div>,
+      <section
+        className={`${styles.module} ${styles.listingModule}`}
+        aria-label={t("explore.listings", "Listings")}
+        key={`listings-${firstKey}`}
+      >
+        <div className={styles.grid}>{cards.map((card) => card.node)}</div>
+      </section>,
     );
     cards = [];
   };
@@ -167,14 +183,22 @@ function buildFeedBlocks(
       flushGrid();
       const rowKey = item.scholars[0]?.slug ?? "scholars";
       blocks.push(
-        <section className={styles.section} key={`scholar-row-${rowKey}`}>
+        <section
+          className={`${styles.module} ${styles.scholarModule}`}
+          aria-label={t("explore.popularScholars", "Popular Scholars")}
+          key={`scholar-row-${rowKey}`}
+        >
           <FeedScholarRow scholars={item.scholars} onScholarPress={onNavigateToScholar} />
         </section>,
       );
     } else if (item.kind === "topic_row") {
       flushGrid();
       blocks.push(
-        <section className={styles.section} key={`topic-row-${item.topicName}`}>
+        <section
+          className={`${styles.module} ${styles.topicModule}`}
+          aria-label={item.topicName}
+          key={`topic-row-${item.topicName}`}
+        >
           <FeedTopicRow
             topicName={item.topicName}
             items={item.items}
@@ -224,6 +248,7 @@ function FeedBody({
   t,
 }: {
   isHydrated: boolean;
+  /** True when the initial request failed and the retry surface should be shown. */
   isRecentError: boolean;
   isRecentFetching: boolean;
   items: FeedItemDto[];
@@ -260,16 +285,17 @@ function FeedBody({
 
   return (
     <>
-      {buildFeedBlocks(items, onNavigateToListing, onNavigateToScholar)}
+      {buildFeedBlocks(items, onNavigateToListing, onNavigateToScholar, t)}
       <div ref={loadMoreRef} style={{ height: "20px" }} />
     </>
   );
 }
 
-// This screen predates the Explore redesign and already owns the feed, catalog,
-// playback, and navigation composition. Keep the warning visible for a future
-// screen decomposition, but do not block this vertical filter slice on that
-// unrelated refactor.
+/**
+ * Renders the API-composed Explore feed with presentation-only module grouping.
+ * Feed ordering, topic steering, pagination, navigation, and playback remain
+ * owned by their existing API and domain seams.
+ */
 // react-doctor-disable-next-line react-doctor/no-giant-component
 export function FeedRecentScreen({
   onNavigateToListing,
