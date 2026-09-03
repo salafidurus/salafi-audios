@@ -15,7 +15,10 @@ export type Track = {
   url: string; // stream URL or local file path URI
   /** Track duration in seconds when known. */
   durationSeconds: number;
+  /** Listing artwork, with the scholar image used as the display fallback. */
   artworkUrl?: string;
+  /** Scholar avatar used when the listing has no artwork. */
+  scholarImageUrl?: string | null;
   orderIndex?: number;
   /** Series identity, set only for a standalone Series. */
   seriesId?: string | null; // set only for a standalone Series (never for a Module)

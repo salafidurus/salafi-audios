@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Loads the recent explore feed and assembles its discovery modules. */
 "use client";
 
 import { routes, type FeedContentItemDto, type FeedItemDto } from "@sd/core-contracts";
@@ -65,7 +65,7 @@ function getFeedProgress(
   progress:
     | {
         positionSeconds: number;
-        /** Total track length used to calculate the resume percentage. */
+        /** Duration used to calculate the feed card's completion percentage. */
         durationSeconds: number;
       }
     | undefined,
@@ -83,16 +83,17 @@ function FeedGridItemCard({
 }: {
   item: {
     id: string;
-    /** Listing identity used for navigation and playback state matching. */
+    /** Stable route identity used to open and play the listing. */
     slug: string;
     title: string;
-    /** API format discriminator used to select the listing playback behavior. */
+    /** Listing format used to build the playback queue. */
     kind: string;
     scholarName: string;
-    /** Optional scholar identity used to build scholar navigation and formatting. */
+    /** Scholar route identity retained for playback metadata. */
     scholarSlug?: string;
+    scholarImageUrl?: string | null;
     thumbnailUrl?: string | null;
-    /** Optional duration displayed on the listing card. */
+    /** Duration used by the feed card metadata and progress presentation. */
     durationSeconds?: number | null;
     publishedLectureCount?: number;
     lectureCount?: number;
@@ -117,6 +118,7 @@ function FeedGridItemCard({
       scholarName,
       scholarSlug: item.scholarSlug,
       artworkUrl: item.thumbnailUrl ?? undefined,
+      scholarImageUrl: item.scholarImageUrl,
     },
     { onError: (message) => addToast(message, "error") },
   );
@@ -221,6 +223,7 @@ function buildFeedBlocks(
               kind: feedContentItem.kind,
               scholarName: feedContentItem.scholarName,
               scholarSlug: feedContentItem.scholarSlug,
+              scholarImageUrl: feedContentItem.scholarImageUrl,
               thumbnailUrl: feedContentItem.thumbnailUrl,
               durationSeconds: feedContentItem.durationSeconds,
               publishedLectureCount: feedContentItem.publishedLectureCount,
@@ -248,7 +251,7 @@ function FeedBody({
   t,
 }: {
   isHydrated: boolean;
-  /** True when the initial request failed and the retry surface should be shown. */
+  /** Whether the recent-feed request failed and should show recovery UI. */
   isRecentError: boolean;
   isRecentFetching: boolean;
   items: FeedItemDto[];

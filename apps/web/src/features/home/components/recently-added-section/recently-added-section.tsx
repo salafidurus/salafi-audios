@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Presents the most recently added public content and its playback actions. */
 "use client";
 
 import { routes, type FeedContentItemDto, type FeedItemDto } from "@sd/core-contracts";
@@ -19,7 +19,7 @@ function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
 
 const MAX_RECENT_ITEMS = 10;
 
-/** Documents the intent and contract of this declaration. */
+/** Content items supplied to the recently-added presentation. */
 export type RecentlyAddedSectionContentProps = {
   items: FeedContentItemDto[];
   isLoading?: boolean;
@@ -115,6 +115,7 @@ function RecentlyAddedSectionContent({
           scholarName: featured.scholarName,
           scholarSlug: featured.scholarSlug,
           artworkUrl: featured.thumbnailUrl ?? undefined,
+          scholarImageUrl: featured.scholarImageUrl,
         }
       : null,
   );
@@ -178,7 +179,7 @@ function RecentlyAddedSectionContent({
 
 export { RecentlyAddedSectionContent };
 
-/** Documents the intent and contract of this declaration. */
+/** Fetches and renders the recently-added section on the home screen. */
 export function RecentlyAddedSection() {
   const { data, isLoading: isExploreLoading } = useExploreRecentScreen({ limit: MAX_RECENT_ITEMS });
 
