@@ -1,24 +1,26 @@
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: var(--space-component-gap-md);
 }
 
 .card {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: var(--space-scale-sm);
-  padding: var(--space-component-card-padding);
+  gap: 16px;
+  min-width: 0;
+  padding: 16px;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-component-card);
+  border-radius: 16px;
   background: var(--surface-default);
 }
 
 .avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: var(--radius-component-card);
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 50%;
   background: var(--surface-subtle);
   background-image: linear-gradient(
     90deg,
@@ -28,6 +30,14 @@
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.info {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 7px;
 }
 
 .line {
@@ -45,12 +55,12 @@
 }
 
 .lineName {
-  width: 80%;
+  width: min(80%, 180px);
   height: 1rem;
 }
 
 .lineCount {
-  width: 50%;
+  width: min(45%, 96px);
 }
 
 @keyframes shimmer {
@@ -66,5 +76,15 @@
   .line,
   .avatar {
     animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 12px;
   }
 }
