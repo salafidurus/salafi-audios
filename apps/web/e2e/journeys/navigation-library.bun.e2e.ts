@@ -131,6 +131,49 @@ describe("navigation and My Library Bun.WebView journeys", () => {
       });
     });
 
+    it("exposes support and legal Settings links across supported viewport widths", async () => {
+      const viewports = [
+        { name: "mobile", width: 390, height: 844 },
+        { name: "tablet", width: 768, height: 1024 },
+        { name: "desktop", width: 1280, height: 800 },
+      ];
+      const expectedLinks = [
+        { name: "Contact Support", href: "/support" },
+        { name: "Terms and Conditions", href: "/terms-of-use" },
+        { name: "Privacy Policy", href: "/privacy" },
+        { name: "Cookie Policy", href: "/cookie-policy" },
+      ];
+
+      for (const viewport of viewports) {
+        await withBrowserJourney(
+          `Settings support and legal links ${viewport.name}`,
+          config.origin,
+          async ({ view }) => {
+            await view.navigate(`${config.origin}/settings`);
+            await waitForBrowserCondition(
+              view,
+              `${viewport.name} Settings links`,
+              `document.querySelectorAll('a[href="/support"], a[href="/terms-of-use"], a[href="/privacy"], a[href="/cookie-policy"]').length === 4`,
+            );
+
+            const links = await view.evaluate<Array<{ name: string; href: string }>>(`
+              [...document.querySelectorAll('a[href="/support"], a[href="/terms-of-use"], a[href="/privacy"], a[href="/cookie-policy"]')]
+                .map((link) => ({ name: link.textContent?.trim() ?? "", href: new URL(link.href).pathname }))
+            `);
+            expect(links).toEqual(expectedLinks);
+
+            for (const destination of expectedLinks) {
+              await view.navigate(`${config.origin}${destination.href}`);
+              await waitForUrl(view, `${config.origin}${destination.href}`);
+              await waitForText(view, destination.name.replace("Contact Support", "Support"));
+              expect(view.url).toBe(`${config.origin}${destination.href}`);
+            }
+          },
+          viewport,
+        );
+      }
+    });
+
     it("loads the public page on a narrow viewport without client errors", async () => {
       await withBrowserJourney(
         "public navigation narrow viewport",

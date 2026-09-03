@@ -4,6 +4,14 @@ import React from "react";
 
 import { SettingsGeneralScreen } from "./settings-general.screen";
 
+vi.mock("next/link", () => ({
+  default: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
 vi.mock("@/features/settings/i18n", () => ({
   LanguageSwitch: () => <div data-testid="language-switch">LanguageSwitch</div>,
   ContentLanguageToggle: () => (
@@ -136,6 +144,27 @@ describe("SettingsGeneralScreen", () => {
   it("renders Notifications section", () => {
     render(<SettingsGeneralScreen />);
     expect(screen.getByText("Notifications")).toBeInTheDocument();
+  });
+
+  it("exposes support and legal destinations through accessible Settings links", () => {
+    render(<SettingsGeneralScreen />);
+
+    expect(screen.getByRole("link", { name: "Contact Support" })).toHaveAttribute(
+      "href",
+      "/support",
+    );
+    expect(screen.getByRole("link", { name: "Terms and Conditions" })).toHaveAttribute(
+      "href",
+      "/terms-of-use",
+    );
+    expect(screen.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute(
+      "href",
+      "/privacy",
+    );
+    expect(screen.getByRole("link", { name: "Cookie Policy" })).toHaveAttribute(
+      "href",
+      "/cookie-policy",
+    );
   });
 
   it("does not render the mobile section", () => {

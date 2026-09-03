@@ -200,6 +200,16 @@
       "label": "Settings sections",
       "general": "General",
       "profile": "Profile"
+    },
+    "support": {
+      "title": "Support",
+      "contact": "Contact Support"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Terms and Conditions",
+      "privacy": "Privacy Policy",
+      "cookies": "Cookie Policy"
     }
   },
   "support": {

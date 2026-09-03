@@ -2,6 +2,7 @@
 "use client";
 
 import { routes } from "@sd/core-contracts";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { z } from "zod";
@@ -12,6 +13,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
 import { SegmentedControl } from "@/features/settings/components/SegmentedControl/SegmentedControl";
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
+import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Switch as Toggle } from "@/shared/components/ui/switch";
@@ -60,6 +62,13 @@ function loadThemePreference(): ThemePreference {
   return "system";
 }
 
+/**
+ * Renders the auth-optional General settings surface.
+ *
+ * Preference controls remain local to this tab, while support and legal
+ * actions link directly to the canonical public destinations owned by the
+ * web application.
+ */
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
@@ -227,6 +236,32 @@ export function SettingsGeneralScreen() {
               </SettingsRow>
             </>
           )}
+
+          <SettingsSection title={t("settings.support.title", "Support")}>
+            <SettingsRow fullWidth>
+              <Link className={styles.settingsLink} href={routes.support}>
+                {t("settings.support.contact", "Contact Support")}
+              </Link>
+            </SettingsRow>
+          </SettingsSection>
+
+          <SettingsSection title={t("settings.legal.title", "Legal")}>
+            <SettingsRow fullWidth>
+              <Link className={styles.settingsLink} href={routes.termsOfUse}>
+                {t("settings.legal.terms", "Terms and Conditions")}
+              </Link>
+            </SettingsRow>
+            <SettingsRow fullWidth>
+              <Link className={styles.settingsLink} href={routes.privacy}>
+                {t("settings.legal.privacy", "Privacy Policy")}
+              </Link>
+            </SettingsRow>
+            <SettingsRow fullWidth>
+              <Link className={styles.settingsLink} href={routes.cookiePolicy}>
+                {t("settings.legal.cookies", "Cookie Policy")}
+              </Link>
+            </SettingsRow>
+          </SettingsSection>
         </div>
       ) : (
         <SettingsProfileScreen hideHeader />
