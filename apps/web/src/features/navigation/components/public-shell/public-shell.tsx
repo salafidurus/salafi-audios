@@ -1,6 +1,9 @@
 /** Provides the navigation, content, and footer boundary for public consent pages. */
 "use client";
 
+import { useResponsive } from "@/shared/hooks/use-responsive";
+
+import { BottomNavigation } from "../bottom-navigation/bottom-navigation";
 import { Footer } from "../footer/footer";
 import { PublicNavigation } from "../public-navigation/public-navigation";
 
@@ -14,6 +17,8 @@ type PublicShellProps = {
 
 /** Wraps public pages with navigation, consent-aware content spacing, and the footer. */
 export function PublicShell({ children, beforeFooter, simulateFailure = false }: PublicShellProps) {
+  const { isMobile, isTablet } = useResponsive();
+
   if (simulateFailure) {
     throw new Error("Intentional public shell failure");
   }
@@ -25,7 +30,8 @@ export function PublicShell({ children, beforeFooter, simulateFailure = false }:
         <div className="appConsentMain">
           <div className="appConsentContent">{children}</div>
           {beforeFooter}
-          <Footer />
+          <BottomNavigation />
+          {!isMobile && !isTablet ? <Footer /> : null}
         </div>
       </div>
     </div>
