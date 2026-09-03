@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides the auth-optional General settings surface and its public destinations. */
 "use client";
 
 import { routes } from "@sd/core-contracts";
@@ -158,7 +158,7 @@ export function SettingsGeneralScreen() {
       </div>
 
       {activeTab === "general" ? (
-        <div className={styles.sectionWrap}>
+        <div className={styles.sectionWrap} data-testid="settings-general-sections">
           <p className={styles.sectionLabel}>{t("settings.general.languageSection", "LANGUAGE")}</p>
           <SettingsRow
             label={t("settings.general.appLanguage", "App Language")}

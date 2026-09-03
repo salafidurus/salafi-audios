@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides responsive section navigation for the shared legal document screens. */
 "use client";
 
 import { Menu, X } from "lucide-react";

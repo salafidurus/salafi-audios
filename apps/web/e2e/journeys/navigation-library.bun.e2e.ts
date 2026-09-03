@@ -153,11 +153,11 @@ describe("navigation and My Library Bun.WebView journeys", () => {
             await waitForBrowserCondition(
               view,
               `${viewport.name} Settings links`,
-              `document.querySelectorAll('a[href="/support"], a[href="/terms-of-use"], a[href="/privacy"], a[href="/cookie-policy"]').length === 4`,
+              `document.querySelector('[data-testid="settings-general-sections"]')?.querySelectorAll('a[href="/support"], a[href="/terms-of-use"], a[href="/privacy"], a[href="/cookie-policy"]').length === 4`,
             );
 
             const links = await view.evaluate<Array<{ name: string; href: string }>>(`
-              [...document.querySelectorAll('a[href="/support"], a[href="/terms-of-use"], a[href="/privacy"], a[href="/cookie-policy"]')]
+              [...document.querySelector('[data-testid="settings-general-sections"]')?.querySelectorAll('a[href="/support"], a[href="/terms-of-use"], a[href="/privacy"], a[href="/cookie-policy"]') ?? []]
                 .map((link) => ({ name: link.textContent?.trim() ?? "", href: new URL(link.href).pathname }))
             `);
             expect(links).toEqual(expectedLinks);
