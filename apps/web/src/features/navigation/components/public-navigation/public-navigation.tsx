@@ -14,7 +14,6 @@ import {
   BarChart3,
   LayoutDashboard,
   LibraryBig,
-  Menu,
   UsersRound,
   UserRound,
   type LucideIcon,
@@ -28,19 +27,9 @@ import { useAuth } from "@/core/auth";
 import { useSignOut } from "@/core/auth/use-sign-out";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AuthModal } from "@/features/auth";
-import { LanguageSwitch } from "@/features/settings";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
 import { ConfirmationDialog } from "@/shared/components/ui/confirmation-dialog";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/shared/components/ui/sheet";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 
 import {
@@ -152,14 +141,12 @@ function NavigationLinks({
   ariaLabel,
   isAdminWorkspace = false,
   onNavigate,
-  closeWithSheet = false,
 }: {
   items: AdminNavItem[];
   pathname: string;
   ariaLabel: string;
   isAdminWorkspace?: boolean;
   onNavigate?: () => void;
-  closeWithSheet?: boolean;
 }) {
   return (
     <nav className={clsx(styles.nav, isAdminWorkspace && styles.adminNav)} aria-label={ariaLabel}>
@@ -177,13 +164,7 @@ function NavigationLinks({
           </Link>
         );
 
-        return closeWithSheet ? (
-          <SheetClose asChild key={href}>
-            {link}
-          </SheetClose>
-        ) : (
-          link
-        );
+        return link;
       })}
     </nav>
   );
@@ -439,61 +420,11 @@ type NavigationActionsProps = {
   t: ReturnType<typeof useTranslation>["t"];
 };
 
-function MobileNavigationActions({
-  items,
-  pathname,
-  ariaLabel,
-  isAdminWorkspace,
-  hasAdminAccess,
-  returnPath,
-  t,
-  isRtl,
-}: NavigationActionsProps & { isRtl: boolean }) {
+function MobileNavigationActions() {
   return (
     <div className={styles.mobileActions}>
       <SearchControl />
       <AccountMenu compact />
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className={styles.menuTrigger} aria-label={ariaLabel}>
-            <Menu aria-hidden="true" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side={isRtl ? "left" : "right"} className={styles.sheet}>
-          <SheetHeader className={styles.sheetHeader}>
-            <div className={styles.sheetBrand}>
-              <span className={styles.sheetBrandMark} aria-hidden="true">
-                <Image src="/logo/logo_72.png" alt="" width={24} height={24} />
-              </span>
-              <div className={styles.sheetHeading}>
-                <SheetTitle>{t("navigation.siteTitle", "Salafi Durus")}</SheetTitle>
-                <SheetDescription>
-                  {t("navigation.mobileDescription", "Navigate your study space")}
-                </SheetDescription>
-              </div>
-            </div>
-          </SheetHeader>
-          <div className={styles.sheetNavigation}>
-            {isAdminWorkspace && (
-              <WorkspaceSwitch
-                isAdminWorkspace={isAdminWorkspace}
-                hasAdminAccess={hasAdminAccess}
-                returnPath={returnPath}
-              />
-            )}
-            <NavigationLinks
-              items={items}
-              pathname={pathname}
-              ariaLabel={ariaLabel}
-              isAdminWorkspace={isAdminWorkspace}
-              closeWithSheet
-            />
-          </div>
-          <div className={styles.sheetLanguage}>
-            <LanguageSwitch direction="down" />
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
@@ -530,7 +461,7 @@ function DesktopNavigationActions({
 
 /** Renders public navigation and capability-scoped admin workspace controls. */
 export function PublicNavigation() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { isMobile } = useResponsive();
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
@@ -555,7 +486,6 @@ export function PublicNavigation() {
     (item) => !isAdminWorkspace || !item.isVisible || item.isVisible(ability),
   );
   const isCompact = isMobile;
-  const isRtl = i18n.dir() === "rtl";
 
   return (
     <header className={styles.header}>
@@ -575,16 +505,7 @@ export function PublicNavigation() {
         </Link>
 
         {isCompact ? (
-          <MobileNavigationActions
-            items={items}
-            pathname={pathname}
-            ariaLabel={mainNavLabel}
-            isAdminWorkspace={isAdminWorkspace}
-            hasAdminAccess={hasAdminAccess}
-            returnPath={returnPath}
-            t={t}
-            isRtl={isRtl}
-          />
+          <MobileNavigationActions />
         ) : (
           <DesktopNavigationActions
             items={items}
