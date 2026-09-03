@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Renders a compact explore result with navigation and playback actions. */
 "use client";
 
 import type { FeedContentItemDto } from "@sd/core-contracts";

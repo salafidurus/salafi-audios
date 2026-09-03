@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Loads listing detail data and composes its metadata, contents, and actions. */
 "use client";
 
 import { useListingDetail, useListingContents } from "@sd/domain-content";

@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Loads the recent explore feed and assembles its discovery modules. */
 "use client";
 
 import { routes, type FeedContentItemDto, type FeedItemDto } from "@sd/core-contracts";

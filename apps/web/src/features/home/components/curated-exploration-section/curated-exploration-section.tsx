@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Presents curated discovery items with listing-aware playback metadata. */
 "use client";
 
 import { routes, type FeedContentItemDto } from "@sd/core-contracts";
@@ -116,7 +116,7 @@ function PopulatedSection({
   );
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Renders curated exploration cards and their playback actions. */
 export function CuratedExplorationSection({
   items,
   isLoading = false,

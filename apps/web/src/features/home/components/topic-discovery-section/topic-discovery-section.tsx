@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Shows topic-filtered discovery content and starts selected listings. */
 "use client";
 
 import { routes, type FeedContentItemDto, type ListingFormat } from "@sd/core-contracts";
@@ -25,7 +25,7 @@ type TopicDiscoverySectionProps = {
   onResume?: (lectureSlug: string) => void;
 };
 
-/** Documents the intent and contract of this declaration. */
+/** Describes the optional featured listing used by the discovery hero. */
 export function TopicDiscoverySection({
   featuredContent,
   isFeaturedLoading = false,
@@ -123,16 +123,16 @@ export function TopicDiscoverySection({
 
 type TopicListingCardProps = {
   id: string;
-  /** Documents the intent and contract of this field. */ slug: string;
+  /** Public listing slug used to build playback and navigation links. */ slug: string;
   title: string;
   scholarName: string;
-  /** Documents the intent and contract of this field. */ scholarSlug: string;
+  /** Public scholar slug associated with the listing. */ scholarSlug: string;
   scholarTitle?: string | null;
   listingArtwork?: string;
   scholarImageUrl?: string | null;
   format: ListingFormat;
   lectureCount: number;
-  /** Documents the intent and contract of this field. */ durationSeconds?: number;
+  /** Total duration used by the discovery card's progress affordance. */ durationSeconds?: number;
   onNavigate: (slug: string) => void;
 };
 

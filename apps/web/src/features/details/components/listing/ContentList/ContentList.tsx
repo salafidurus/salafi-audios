@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Lists a top-level listing's playable content and preserves its identity. */
 "use client";
 
 import type { ListingContentItemDto, ListingContentsDto } from "@sd/core-contracts";

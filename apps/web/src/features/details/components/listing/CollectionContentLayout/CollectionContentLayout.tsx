@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Renders collection modules and keeps their playback metadata consistent. */
 "use client";
 
 import type { ListingModuleDto, ListingContentItemDto } from "@sd/core-contracts";
@@ -12,11 +12,11 @@ import { CollectionToc } from "../CollectionToc/CollectionToc";
 import { ContentListItem } from "../ContentListItem/ContentListItem";
 import styles from "./CollectionContentLayout.module.css";
 
-/** Documents the intent and contract of this declaration. */
+/** Playback and navigation context shared by the collection layout. */
 export type CollectionContentLayoutProps = {
   modules: ListingModuleDto[];
   scholarName?: string;
-  /** Documents the intent and contract of this field. */ scholarSlug?: string;
+  /** Public scholar slug used by lesson playback metadata. */ scholarSlug?: string;
   listingArtwork?: string;
   scholarImageUrl?: string;
   collectionId?: string;
@@ -24,7 +24,7 @@ export type CollectionContentLayoutProps = {
   highlightItemId?: string;
 };
 
-/** Documents the intent and contract of this declaration. */
+/** Displays the collection table of contents and its module content. */
 export function CollectionContentLayout({
   modules,
   scholarName = "",

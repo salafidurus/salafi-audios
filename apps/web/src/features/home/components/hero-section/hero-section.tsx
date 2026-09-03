@@ -26,10 +26,10 @@ export type HeroSectionProps = {
 
 type HeroItem = {
   id: string;
-  /** Documents the intent and contract of this field. */ slug: string;
+  /** Public listing slug used by the hero playback action. */ slug: string;
   title: string;
   scholarName: string;
-  /** Documents the intent and contract of this field. */ scholarSlug: string;
+  /** Public scholar slug associated with the hero item. */ scholarSlug: string;
   scholarTitle?: string;
   format: FeedContentItemDto["kind"] | RecentProgressDto["format"];
   artworkUrl?: string;
@@ -184,7 +184,7 @@ function HeroEmptyState({ t }: { t: ReturnType<typeof useTranslation>["t"] }) {
   );
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Renders the home hero and its optional continue-listening action. */
 export function HeroSection({
   recentProgress,
   featuredContent,
