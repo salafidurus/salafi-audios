@@ -12,6 +12,7 @@ type PageState = {
   url: string;
   title: string;
   mainNavigation: string[];
+  bottomNavigation: string[];
   sidebarCount: number;
   visibleText: string;
 };
@@ -21,6 +22,9 @@ async function readPageState(view: Bun.WebView): Promise<PageState> {
     url: window.location.href,
     title: document.title,
     mainNavigation: [...document.querySelectorAll('nav[aria-label="Main"] a')]
+      .map((link) => link.textContent?.trim() ?? "")
+      .filter(Boolean),
+    bottomNavigation: [...document.querySelectorAll('nav[aria-label="Bottom navigation"] a')]
       .map((link) => link.textContent?.trim() ?? "")
       .filter(Boolean),
     sidebarCount: document.querySelectorAll('[data-testid="sidebar"]').length,
@@ -140,6 +144,40 @@ describe("navigation and My Library Bun.WebView journeys", () => {
           expect(console.filter((entry) => entry.type === "error")).toHaveLength(0);
         },
         { width: 375, height: 812 },
+      );
+    });
+
+    it.each([
+      [390, "mobile"],
+      [768, "tablet"],
+    ] as const)("exposes the five-root shell at %spx (%s)", async (width) => {
+      await withBrowserJourney(
+        `five-root shell at ${width}px`,
+        config.origin,
+        async ({ view }) => {
+          await view.navigate(`${config.origin}/explore`);
+          await waitForBrowserCondition(
+            view,
+            "bottom navigation is hydrated",
+            `document.querySelectorAll('nav[aria-label="Bottom navigation"] a').length === 5`,
+          );
+
+          const state = await readPageState(view);
+          expect(state.bottomNavigation).toEqual([
+            "Home",
+            "Explore",
+            "Scholars",
+            "My Library",
+            "Settings",
+          ]);
+          expect(
+            await view.evaluate(
+              `document.querySelector('nav[aria-label="Bottom navigation"] a[aria-current="page"]')?.textContent?.trim() ?? ""`,
+            ),
+          ).toBe("Explore");
+          expect(await view.evaluate(`document.querySelector("footer") === null`)).toBe(true);
+        },
+        { width, height: 900 },
       );
     });
   });

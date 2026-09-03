@@ -10,10 +10,7 @@
 }
 
 .inner {
-  width: min(
-    calc(var(--space-layout-content-max) + (2 * var(--space-layout-page-x))),
-    100%
-  );
+  width: min(calc(var(--space-layout-content-max) + (2 * var(--space-layout-page-x))), 100%);
   margin-inline: auto;
   padding: var(--space-scale-md) var(--space-layout-page-x);
   display: grid;
@@ -79,6 +76,10 @@
 }
 
 @media (max-width: 900px) {
+  .footer {
+    display: none;
+  }
+
   .inner {
     align-items: flex-start;
     grid-template-columns: minmax(0, 1fr) auto;
