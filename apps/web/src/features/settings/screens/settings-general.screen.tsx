@@ -2,6 +2,7 @@
 "use client";
 
 import { routes } from "@sd/core-contracts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState, useCallback, useEffect, useRef } from "react";
@@ -18,6 +19,7 @@ import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n"
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Switch as Toggle } from "@/shared/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
 import styles from "./settings-general.screen.module.css";
@@ -71,6 +73,8 @@ function loadThemePreference(): ThemePreference {
  */
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
+  const isRtl = useIsRtl();
+  const NavigationChevron = isRtl ? ChevronLeft : ChevronRight;
   const searchParams = useSearchParams();
   const queryTab = searchParams.get("tab") === "profile" ? "profile" : "general";
   const [activeTab, setActiveTab] = useState<"general" | "profile">(queryTab);
@@ -238,29 +242,25 @@ export function SettingsGeneralScreen() {
           )}
 
           <SettingsSection title={t("settings.support.title", "Support")}>
-            <SettingsRow fullWidth>
-              <Link className={styles.settingsLink} href={routes.support}>
-                {t("settings.support.contact", "Contact Support")}
-              </Link>
-            </SettingsRow>
+            <Link className={styles.settingsRowLink} href={routes.support}>
+              {t("settings.support.contact", "Contact Support")}
+              <NavigationChevron aria-hidden="true" />
+            </Link>
           </SettingsSection>
 
           <SettingsSection title={t("settings.legal.title", "Legal")}>
-            <SettingsRow fullWidth>
-              <Link className={styles.settingsLink} href={routes.termsOfUse}>
-                {t("settings.legal.terms", "Terms and Conditions")}
-              </Link>
-            </SettingsRow>
-            <SettingsRow fullWidth>
-              <Link className={styles.settingsLink} href={routes.privacy}>
-                {t("settings.legal.privacy", "Privacy Policy")}
-              </Link>
-            </SettingsRow>
-            <SettingsRow fullWidth>
-              <Link className={styles.settingsLink} href={routes.cookiePolicy}>
-                {t("settings.legal.cookies", "Cookie Policy")}
-              </Link>
-            </SettingsRow>
+            <Link className={styles.settingsRowLink} href={routes.termsOfUse}>
+              {t("settings.legal.terms", "Terms and Conditions")}
+              <NavigationChevron aria-hidden="true" />
+            </Link>
+            <Link className={styles.settingsRowLink} href={routes.privacy}>
+              {t("settings.legal.privacy", "Privacy Policy")}
+              <NavigationChevron aria-hidden="true" />
+            </Link>
+            <Link className={styles.settingsRowLink} href={routes.cookiePolicy}>
+              {t("settings.legal.cookies", "Cookie Policy")}
+              <NavigationChevron aria-hidden="true" />
+            </Link>
           </SettingsSection>
         </div>
       ) : (

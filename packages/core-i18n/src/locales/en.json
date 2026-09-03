@@ -440,6 +440,8 @@
   "legal": {
     "contents": "Legal document contents",
     "contentsTitle": "On this page",
+    "openContents": "Open table of contents",
+    "closeContents": "Close table of contents",
     "skipToDocument": "Skip to document",
     "privacy": {
       "title": "Privacy Policy",

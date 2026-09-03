@@ -440,6 +440,8 @@
   "legal": {
     "contents": "محتويات الوثيقة القانونية",
     "contentsTitle": "في هذه الصفحة",
+    "openContents": "فتح فهرس المحتويات",
+    "closeContents": "إغلاق فهرس المحتويات",
     "skipToDocument": "انتقل إلى الوثيقة",
     "privacy": {
       "title": "سياسة الخصوصية",
