@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Renders a user's resumable lecture with progress and playback identity. */
 "use client";
 
 import type { RecentProgressDto } from "@sd/core-contracts";
@@ -18,13 +18,13 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 
 import styles from "./continue-listening-card.module.css";
 
-/** Documents the intent and contract of this declaration. */
+/** Recent progress record used to build the continue-listening card. */
 export type ContinueListeningCardProps = {
   recentProgress?: RecentProgressDto | null;
   onContinueListening?: (listingSlug: string) => void;
 };
 
-/** Documents the intent and contract of this declaration. */
+/** Displays a resumable lecture card when recent progress is available. */
 export function ContinueListeningCard({
   recentProgress,
   onContinueListening,
@@ -63,6 +63,7 @@ function RichResumeCard({ recentProgress, onContinueListening, isMobile }: RichR
     scholarName,
     scholarSlug: recentProgress.scholarSlug,
     artworkUrl: recentProgress.artworkUrl,
+    scholarImageUrl: recentProgress.scholarImageUrl,
   });
 
   return (

@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides play, resume, restart, and save actions for a listing. */
 "use client";
 
 import type { ListingDetailDto, ListingContentsDto } from "@sd/core-contracts";
@@ -22,7 +22,7 @@ import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import { LectureSaveButton } from "../lecture-save-button/LectureSaveButton";
 import styles from "./QuickButtonSection.module.css";
 
-/** Documents the intent and contract of this declaration. */
+/** Supplies listing metadata and contents to the quick playback actions. */
 export type QuickButtonSectionProps = {
   listing: ListingDetailDto;
   contents?: ListingContentsDto;
@@ -52,7 +52,8 @@ function buildListingTracks(
         format: listing.format,
         scholarName: formatScholarName(listing.scholar),
         scholarSlug: listing.scholar.slug,
-        artworkUrl: listing.scholar.imageUrl,
+        artworkUrl: listing.coverImageUrl,
+        scholarImageUrl: listing.scholar.imageUrl,
       },
       contents,
       { startAtId },
@@ -67,7 +68,8 @@ function buildListingTracks(
       artist: formatScholarName(listing.scholar),
       url: listing.primaryAudioAsset.url,
       durationSeconds: listing.durationSeconds || listing.primaryAudioAsset.durationSeconds || 0,
-      artworkUrl: listing.scholar.imageUrl,
+      artworkUrl: listing.coverImageUrl,
+      scholarImageUrl: listing.scholar.imageUrl,
     },
   ];
 }
@@ -88,7 +90,7 @@ async function playResumeTrack(allTracks: Track[], resumeId: string | undefined)
   if (targetTrack) await audioService.playListing(targetTrack, allTracks);
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Renders the listing's primary playback and save controls. */
 export function QuickButtonSection({ listing, contents }: QuickButtonSectionProps) {
   const formatScholarName = useFormatScholarName();
   const { isAuthenticated } = useAuth();

@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Renders collection modules and keeps their playback metadata consistent. */
 "use client";
 
 import type { ListingModuleDto, ListingContentItemDto } from "@sd/core-contracts";
@@ -12,21 +12,25 @@ import { CollectionToc } from "../CollectionToc/CollectionToc";
 import { ContentListItem } from "../ContentListItem/ContentListItem";
 import styles from "./CollectionContentLayout.module.css";
 
-/** Documents the intent and contract of this declaration. */
+/** Playback and navigation context shared by the collection layout. */
 export type CollectionContentLayoutProps = {
   modules: ListingModuleDto[];
   scholarName?: string;
-  /** Documents the intent and contract of this field. */ scholarSlug?: string;
+  /** Public scholar slug used by lesson playback metadata. */ scholarSlug?: string;
+  listingArtwork?: string;
+  scholarImageUrl?: string;
   collectionId?: string;
   /** Item id to scroll to and briefly highlight on mount (e.g. a lesson linked via URL anchor). */
   highlightItemId?: string;
 };
 
-/** Documents the intent and contract of this declaration. */
+/** Displays the collection table of contents and its module content. */
 export function CollectionContentLayout({
   modules,
   scholarName = "",
   scholarSlug,
+  listingArtwork,
+  scholarImageUrl,
   collectionId,
   highlightItemId,
 }: CollectionContentLayoutProps) {
@@ -91,7 +95,15 @@ export function CollectionContentLayout({
   // Construct all tracks across all modules for full queue context, crossing
   // module boundaries in order (all of module N's lessons, then module N+1's).
   const allTracksInContext: Track[] = buildTrackQueue(
-    { id: collectionId ?? "", title: "", format: "collection", scholarName, scholarSlug },
+    {
+      id: collectionId ?? "",
+      title: "",
+      format: "collection",
+      scholarName,
+      scholarSlug,
+      artworkUrl: listingArtwork,
+      scholarImageUrl,
+    },
     { format: "collection", modules },
   );
 
