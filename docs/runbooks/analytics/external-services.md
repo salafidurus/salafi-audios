@@ -26,6 +26,13 @@ The primary owner must be able to rotate or revoke credentials. The backup
 administrator must independently be able to recover access. Do not use a
 personal account as the only administrator.
 
+## Selected account structure
+
+The approved setup is three separate Mixpanel projects—Development, Preview,
+and Production—and one New Relic account. New Relic isolation is enforced with
+distinct logical services and mandatory environment attributes rather than
+separate accounts.
+
 ## Naming convention
 
 Use exactly these environment values: `development`, `preview`, and
@@ -34,9 +41,7 @@ user agent.
 
 ### Mixpanel
 
-Use one separately isolated project per environment unless the account plan
-provides an equivalent isolation mechanism that prevents cross-environment
-writes:
+Use one separately isolated project per environment:
 
 ```text
 Salafi Durus — Development
