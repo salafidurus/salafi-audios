@@ -8,14 +8,12 @@ export type ProductEventPriority = z.infer<typeof ProductEventPrioritySchema>;
 
 /** Runtime identity shape for resettable anonymous and pseudonymous users. */
 export const ProductEventIdentitySchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("anonymous"), anonymous_id: z.string().min(1) }).strict(),
-  z
-    .object({
-      type: z.literal("authenticated"),
-      pseudonymous_id: z.string().min(1),
-      anonymous_id: z.string().min(1).optional(),
-    })
-    .strict(),
+  z.strictObject({ type: z.literal("anonymous"), anonymous_id: z.string().min(1) }),
+  z.strictObject({
+    type: z.literal("authenticated"),
+    pseudonymous_id: z.string().min(1),
+    anonymous_id: z.string().min(1).optional(),
+  }),
 ]);
 /** Identity carried by an event without exposing an authenticated database ID. */
 export type ProductEventIdentity = z.infer<typeof ProductEventIdentitySchema>;
@@ -31,56 +29,47 @@ export const ProductEventConsentStateSchema = z.enum([
 export type ProductEventConsentState = z.infer<typeof ProductEventConsentStateSchema>;
 
 /** Event-time language, geography, runtime, and source-surface context. */
-export const ProductEventContextSchema = z
-  .object({
-    interface_language: z.string().min(1).optional(),
-    preferred_language: z.string().min(1).optional(),
-    content_language: z.string().min(1).optional(),
-    audio_language: z.string().min(1).optional(),
-    country_code: z.string().length(2).optional(),
-    coarse_region: z.string().min(1).optional(),
-    timezone: z.string().min(1).optional(),
-    source_surface: z.string().min(1).optional(),
-    recommendation: z
-      .object({
-        request_id: z.string().min(1),
-        surface: z.string().min(1),
-        position: z.number().int().nonnegative(),
-        candidate_set_id: z.string().min(1),
-        recommendation_source: z.string().min(1),
-        algorithm_version: z.string().min(1).optional(),
-        experiment_id: z.string().min(1).optional(),
-        feature_flag_state: z.record(z.string(), z.boolean()).optional(),
-      })
-      .strict()
-      .optional(),
-  })
-  .strict();
+export const ProductEventContextSchema = z.strictObject({
+  interface_language: z.string().min(1).optional(),
+  preferred_language: z.string().min(1).optional(),
+  content_language: z.string().min(1).optional(),
+  audio_language: z.string().min(1).optional(),
+  country_code: z.string().length(2).optional(),
+  coarse_region: z.string().min(1).optional(),
+  timezone: z.string().min(1).optional(),
+  source_surface: z.string().min(1).optional(),
+  recommendation: z
+    .strictObject({
+      request_id: z.string().min(1),
+      surface: z.string().min(1),
+      position: z.number().int().nonnegative(),
+      candidate_set_id: z.string().min(1),
+      recommendation_source: z.string().min(1),
+      algorithm_version: z.string().min(1).optional(),
+      experiment_id: z.string().min(1).optional(),
+      feature_flag_state: z.record(z.string(), z.boolean()).optional(),
+    })
+    .optional(),
+});
 /** Context captured when the product event occurred, not reconstructed later. */
 export type ProductEventContext = z.infer<typeof ProductEventContextSchema>;
 
 /** Stable client-safe content identities; internal database IDs are excluded. */
-export const ProductEventContentReferencesSchema = z
-  .object({
-    listing_slug: z.string().min(1).optional(),
-    scholar_slug: z.string().min(1).optional(),
-  })
-  .strict();
+export const ProductEventContentReferencesSchema = z.strictObject({
+  listing_slug: z.string().min(1).optional(),
+  scholar_slug: z.string().min(1).optional(),
+});
 /** Stable public content references retained in historical product events. */
 export type ProductEventContentReferences = z.infer<typeof ProductEventContentReferencesSchema>;
 
 const EventTimestampSchema = z.iso.datetime({ offset: true });
-const ListingViewedPropertiesSchema = z
-  .object({
-    listing_slug: z.string().min(1).optional(),
-    scholar_slug: z.string().min(1).optional(),
-  })
-  .strict();
-const AudioCompletedPropertiesSchema = z
-  .object({
-    completion_source: z.literal("progress_persisted"),
-  })
-  .strict();
+const ListingViewedPropertiesSchema = z.strictObject({
+  listing_slug: z.string().min(1).optional(),
+  scholar_slug: z.string().min(1).optional(),
+});
+const AudioCompletedPropertiesSchema = z.strictObject({
+  completion_source: z.literal("progress_persisted"),
+});
 
 const CommonEventFields = {
   event_id: z.string().min(1),
@@ -96,36 +85,34 @@ const CommonEventFields = {
 };
 
 /** Typed client-owned observation of a listing being viewed. */
-const ListingViewedEventSchema = z
-  .object({
-    ...CommonEventFields,
-    event_name: z.literal("listing_viewed"),
-    source: z.literal("web"),
-    platform: z.literal("web"),
-    content_references: z
-      .object({ listing_slug: z.string().min(1), scholar_slug: z.string().min(1) })
-      .strict(),
-    authority: z.literal("client_observation"),
-    producer: z.literal("web"),
-    properties: ListingViewedPropertiesSchema,
-  })
-  .strict();
+const ListingViewedEventSchema = z.strictObject({
+  ...CommonEventFields,
+  event_name: z.literal("listing_viewed"),
+  source: z.literal("web"),
+  platform: z.literal("web"),
+  content_references: z.strictObject({
+    listing_slug: z.string().min(1),
+    scholar_slug: z.string().min(1),
+  }),
+  authority: z.literal("client_observation"),
+  producer: z.literal("web"),
+  properties: ListingViewedPropertiesSchema,
+});
 
 /** Typed backend-confirmed outcome produced after a persisted completion. */
-const AudioCompletedEventSchema = z
-  .object({
-    ...CommonEventFields,
-    event_name: z.literal("audio_completed"),
-    source: z.literal("api"),
-    platform: z.enum(["web", "ios", "android"]),
-    content_references: z
-      .object({ listing_slug: z.string().min(1), scholar_slug: z.string().min(1) })
-      .strict(),
-    authority: z.literal("backend_confirmed"),
-    producer: z.literal("api"),
-    properties: AudioCompletedPropertiesSchema,
-  })
-  .strict();
+const AudioCompletedEventSchema = z.strictObject({
+  ...CommonEventFields,
+  event_name: z.literal("audio_completed"),
+  source: z.literal("api"),
+  platform: z.enum(["web", "ios", "android"]),
+  content_references: z.strictObject({
+    listing_slug: z.string().min(1),
+    scholar_slug: z.string().min(1),
+  }),
+  authority: z.literal("backend_confirmed"),
+  producer: z.literal("api"),
+  properties: AudioCompletedPropertiesSchema,
+});
 
 /** The provider-neutral, immutable event union shared by future producers. */
 export const ProductEventSchema = z
