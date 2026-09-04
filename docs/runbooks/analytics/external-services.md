@@ -60,6 +60,18 @@ user IDs.
 
 ### New Relic
 
+New Relic services are normally created or updated when an agent or
+OpenTelemetry exporter first reports data. Do not create four blank APM
+services or select a vendor-specific APM agent just to satisfy this ticket.
+Record the logical names below now; the later observability implementation must
+emit them consistently.
+
+Use the OpenTelemetry setup for the API, Browser monitoring for the web app,
+and the dedicated Mobile monitoring setup for iOS and Android when those
+instrumentation tickets are implemented. The generated browser/mobile public
+identifiers and server-side ingestion credentials must remain environment-
+scoped and must not be exchanged in chat.
+
 Use these stable service names:
 
 ```text
