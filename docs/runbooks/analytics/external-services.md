@@ -44,9 +44,9 @@ user agent.
 Use one separately isolated project per environment:
 
 ```text
-Salafi Durus — Development
-Salafi Durus — Preview
-Salafi Durus — Production
+Salafi Durus - Development
+Salafi Durus - Preview
+Salafi Durus - Production
 ```
 
 Record each project identifier and owning account in the restricted operations
