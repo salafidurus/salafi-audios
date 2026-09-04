@@ -185,6 +185,11 @@ forbidden personal or exact-location fields. Storage, ingestion, buffering,
 and provider delivery remain separate downstream adapters; operational
 telemetry is not product-event history.
 
+Mixpanel and New Relic are environment-isolated downstream services. Their
+projects, entities, credentials, dashboards, retention settings, and teardown
+procedures are maintained in the
+[analytics provisioning runbook](runbooks/analytics/external-services.md).
+
 ## Operations and recovery
 
 Dokploy manages backend services, environment values, domains, Traefik,
