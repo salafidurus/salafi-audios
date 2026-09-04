@@ -11,8 +11,6 @@
     "lint": "oxlint .",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "test:watch": "bun test --watch",
-    "test:cov": "bun test --coverage",
     "test:prepush": "bun test"
   },
   "dependencies": {
