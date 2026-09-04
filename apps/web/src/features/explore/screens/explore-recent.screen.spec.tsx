@@ -16,7 +16,8 @@ vi.mock("@/core/auth", () => ({ useAuth: mockUseAuth }));
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     i18n: { language: "en" },
-    t: (_key: string, fallback: string) => fallback,
+    t: (key: string, fallback?: string) =>
+      key === "feed.error" ? "Unable to load this feed." : (fallback ?? key),
   }),
 }));
 vi.mock("@/shared/hooks/use-formatted-scholar-name", () => ({
@@ -143,6 +144,14 @@ describe("FeedRecentScreen", () => {
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   });
 
+  it("keeps heterogeneous feed modules in separate labeled regions", () => {
+    render(<FeedRecentScreen />);
+
+    expect(
+      screen.getAllByRole("region").map((region) => region.getAttribute("aria-label")),
+    ).toEqual(["Listings", "Popular Scholars", "Aqeedah"]);
+  });
+
   it("requests the selected Topic from the discovery API", () => {
     const updateFilter = vi.fn();
     currentExploreFilters = exploreHookValue({ updateFilter });
@@ -159,5 +168,23 @@ describe("FeedRecentScreen", () => {
     currentExploreFilters = exploreHookValue({ isHydrated: false });
     render(<FeedRecentScreen />);
     expect(screen.getByTestId("feed-skeleton")).toBeInTheDocument();
+  });
+
+  it("keeps the retry action in the Explore failure surface", () => {
+    const refetch = vi.fn();
+    mockUseExploreRecentScreen.mockReturnValue({
+      data: { pages: [] },
+      isFetching: false,
+      isError: true,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
+      refetch,
+    });
+
+    render(<FeedRecentScreen />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Unable to load this feed.");
+    fireEvent.click(screen.getByRole("button", { name: "Try Again" }));
+    expect(refetch).toHaveBeenCalledTimes(1);
   });
 });

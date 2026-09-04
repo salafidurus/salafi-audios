@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Starts a lecture or its containing series from the listing detail surface. */
 "use client";
 
 import type { ListingDetailDto } from "@sd/core-contracts";
@@ -13,7 +13,7 @@ import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./LecturePlayButton.module.css";
 
-/** Documents the intent and contract of this declaration. */
+/** Identifies the lecture whose audio should be started or resumed. */
 export type LecturePlayButtonProps = {
   lecture: ListingDetailDto;
 };
@@ -39,6 +39,8 @@ function resolveSeriesLecture(
       format: seriesContents.format,
       scholarName,
       scholarSlug: lecture.scholar.slug,
+      artworkUrl: lecture.coverImageUrl,
+      scholarImageUrl: lecture.scholar.imageUrl,
     },
     seriesContents,
     { startAtId: lecture.id },
@@ -61,7 +63,8 @@ function buildStandaloneTrack(
     artist: scholarName,
     url: asset.url,
     durationSeconds: asset.durationSeconds ?? lecture.durationSeconds ?? 0,
-    artworkUrl: undefined,
+    artworkUrl: lecture.coverImageUrl,
+    scholarImageUrl: lecture.scholar.imageUrl,
     seriesId: lecture.seriesContext?.seriesId ?? null,
     seriesTitle: lecture.seriesContext?.seriesTitle ?? null,
   };
@@ -90,7 +93,7 @@ async function playLecture(
   await audioService.playListing(track, [track]);
 }
 
-/** Documents the intent and contract of this declaration. */
+/** Renders the primary play action for a lecture listing. */
 export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
   const { isPlaying, currentTrack } = useAudio();
   const formatScholarName = useFormatScholarName();

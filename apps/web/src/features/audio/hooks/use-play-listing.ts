@@ -21,6 +21,8 @@ export type PlayListingRef = {
   /** Optional public scholar identity retained for track navigation and display. */
   scholarSlug?: string;
   artworkUrl?: string;
+  /** Scholar avatar used when the listing has no artwork. */
+  scholarImageUrl?: string | null;
 };
 
 /** Configures optional error delivery for the listing playback hook. */
@@ -81,6 +83,7 @@ export function usePlayListing(ref: PlayListingRef | null, options?: UsePlayList
           scholarName: ref.scholarName,
           scholarSlug: ref.scholarSlug,
           artworkUrl: ref.artworkUrl,
+          scholarImageUrl: ref.scholarImageUrl,
         },
         contents,
       );

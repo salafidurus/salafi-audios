@@ -12,6 +12,7 @@ export type QueueListingRef = {
   /** Scholar identity retained for display and navigation context. */
   scholarSlug?: string;
   artworkUrl?: string;
+  scholarImageUrl?: string | null;
 };
 
 /** Optional starting-position selection for queue construction. */
@@ -66,6 +67,7 @@ export function buildTrackQueue(
     url: item.id === startAtId ? (item.primaryAudioAsset?.url ?? "") : "",
     durationSeconds: item.durationSeconds ?? item.primaryAudioAsset?.durationSeconds ?? 0,
     artworkUrl: listing.artworkUrl,
+    scholarImageUrl: listing.scholarImageUrl,
     orderIndex: item.orderIndex,
     ...extra,
   }));

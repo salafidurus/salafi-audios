@@ -182,15 +182,15 @@ describe("PublicNavigation", () => {
     );
   });
 
-  it("uses a mobile Sheet for the same public destinations", () => {
+  it("keeps search and account controls in the mobile top bar", () => {
     (useResponsive as Mock<any>).mockReturnValue({ isMobile: true, isTablet: false, isWeb: false });
 
     render(<PublicNavigation />);
 
     expect(screen.queryByRole("navigation", { name: "Main" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Main" }));
-    expect(screen.getByRole("navigation", { name: "Main" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore");
+    expect(screen.getByRole("button", { name: "Search catalog" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Account: Guest" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Main" })).not.toBeInTheDocument();
   });
 
   it("keeps the full navigation on narrow desktop widths", () => {

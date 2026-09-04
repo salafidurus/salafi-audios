@@ -13,10 +13,7 @@
   grid-template-columns: max-content minmax(16rem, 20rem) minmax(0, 1fr) auto;
   grid-template-areas: "brand search nav utilities";
   align-items: center;
-  width: min(
-    calc(var(--space-layout-content-max) + (2 * var(--space-layout-page-x))),
-    100%
-  );
+  width: min(calc(var(--space-layout-content-max) + (2 * var(--space-layout-page-x))), 100%);
   min-height: 4.5rem;
   margin-inline: auto;
   gap: var(--space-component-gap-xl);
@@ -191,19 +188,6 @@
   display: none;
 }
 
-.menuTrigger {
-  min-width: 2.75rem;
-  border: 0;
-  border-radius: 0;
-  color: var(--content-default);
-  background: transparent;
-}
-
-.menuTrigger:hover,
-.menuTrigger:focus-visible {
-  background: transparent;
-}
-
 .accountControl,
 .workspaceSwitch {
   display: inline-flex;
@@ -364,109 +348,6 @@
 .mobileActions > :global(button),
 .mobileActions > :global(a) {
   min-height: 2.75rem;
-}
-
-.sheet .nav {
-  grid-area: auto;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  gap: var(--space-component-gap-sm);
-  padding: 0;
-}
-
-.sheetNavigation {
-  display: flex;
-  min-height: 0;
-  flex-direction: column;
-  gap: var(--space-component-gap-md);
-  padding: var(--space-component-gap-md) var(--space-scale-lg) 0;
-  overflow-y: auto;
-}
-
-.sheetBrand {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  gap: var(--space-component-gap-md);
-}
-
-.sheetBrandMark {
-  display: grid;
-  flex: 0 0 auto;
-  width: 2.25rem;
-  height: 2.25rem;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--action-primary) 28%, var(--border-subtle));
-  border-radius: var(--radius-component-panel);
-  background: color-mix(in srgb, var(--action-primary) 8%, var(--surface-subtle));
-}
-
-.sheetBrandMark img {
-  object-fit: contain;
-}
-
-.sheetHeading {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: var(--space-component-gap-xs);
-}
-
-.sheetHeading :global([data-slot="sheet-title"]) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sheetHeading :global([data-slot="sheet-description"]) {
-  color: var(--content-muted);
-  font-size: var(--typo-caption-font-size);
-}
-
-.sheet .navLink {
-  width: 100%;
-  min-height: 3.25rem;
-  padding: var(--space-component-gap-md) var(--space-scale-lg);
-  border-radius: var(--radius-component-panel);
-}
-
-.sheet .navLink + .navLink {
-  border-block-start: 1px solid transparent;
-}
-
-.sheet .navLink > svg {
-  display: none;
-}
-
-.sheet .workspaceSwitch {
-  width: 100%;
-  margin: 0;
-  justify-content: flex-start;
-}
-
-.sheet {
-  width: min(22rem, calc(100vw - var(--space-layout-page-x)));
-  border-color: var(--border-subtle);
-  background: var(--surface-elevated);
-}
-
-.sheetHeader {
-  gap: var(--space-component-gap-md);
-  padding: var(--space-scale-xl) var(--space-scale-lg) var(--space-scale-lg);
-  border-block-end: 1px solid var(--border-subtle);
-}
-
-.sheetLanguage {
-  width: auto;
-  margin-block-start: auto;
-  padding: var(--space-scale-lg);
-  border-block-start: 1px solid var(--border-subtle);
-}
-
-.sheetLanguage :global(button) {
-  width: 100%;
-  justify-content: space-between;
 }
 
 @media (max-width: 1600px) and (min-width: 641px) {

@@ -83,6 +83,43 @@ disappears when `completedAt` is accepted.
 
 ## Engineering vocabulary
 
+### Analytics vocabulary
+
+**Product event**:
+An immutable observation, interaction, exposure, or confirmed product outcome
+with event-time context. It is distinct from operational logs, metrics, and
+traces.
+
+**Canonical event**:
+The provider-neutral product-event value owned by the application. A sink may
+translate it, but a vendor does not define its meaning.
+
+**Event authority**:
+The declared source of truth for an event: client observation for what a
+runtime observed or initiated, or backend-confirmed for an authorized and
+persisted domain outcome.
+
+**Exposure event**:
+A product event recording content or a recommendation that was shown, with
+the context needed to interpret position and candidate selection.
+
+**Anonymous identity**:
+A resettable pseudonymous identifier used only for permitted non-sensitive
+product telemetry. It is not an authenticated account identity.
+
+**Owned event archive**:
+The application-controlled append-only history of canonical product events.
+It is separate from the transactional PostgreSQL database and analytics sinks.
+
+**Analytics sink**:
+A downstream adapter such as Mixpanel that receives canonical events for
+analysis. A sink is not the permanent source of truth.
+
+**Integration outbox**:
+A short-lived delivery mechanism for reliably forwarding selected
+backend-confirmed events after a transaction; it is not a permanent clickstream
+store.
+
 ### Native rendering vocabulary
 
 - **Universal UI** means a common component imported from the universal

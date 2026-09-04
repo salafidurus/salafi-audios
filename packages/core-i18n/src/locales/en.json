@@ -97,6 +97,7 @@
     "siteTitle": "Salafi Durus",
     "primarySidebar": "Primary sidebar",
     "mainNav": "Main",
+    "bottomNav": "Bottom navigation",
     "searchAnything": "Search anything",
     "searchCatalog": "Search catalog",
     "searchCatalogDescription": "Find topics, scholars, and listings.",
@@ -200,6 +201,16 @@
       "label": "Settings sections",
       "general": "General",
       "profile": "Profile"
+    },
+    "support": {
+      "title": "Support",
+      "contact": "Contact Support"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Terms and Conditions",
+      "privacy": "Privacy Policy",
+      "cookies": "Cookie Policy"
     }
   },
   "support": {
@@ -430,6 +441,8 @@
   "legal": {
     "contents": "Legal document contents",
     "contentsTitle": "On this page",
+    "openContents": "Open table of contents",
+    "closeContents": "Close table of contents",
     "skipToDocument": "Skip to document",
     "privacy": {
       "title": "Privacy Policy",
