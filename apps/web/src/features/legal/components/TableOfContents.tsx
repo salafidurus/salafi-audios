@@ -1,6 +1,7 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides responsive section navigation for the shared legal document screens. */
 "use client";
 
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -15,6 +16,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from "@/shared/components/ui/sidebar";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 
 import styles from "./table-of-contents.module.css";
 
@@ -27,9 +29,26 @@ interface TableOfContentsProps {
   sections: Section[];
 }
 
+/**
+ * Renders the legal document contents navigation.
+ *
+ * Desktop keeps the contents visible as a sidebar. At compact widths the
+ * navigation starts closed behind a floating Menu button and opens as a
+ * bounded panel, while section tracking and scrolling remain shared.
+ */
 export function TableOfContents({ sections }: TableOfContentsProps) {
   const { t } = useTranslation();
+  const isRtl = useIsRtl();
+  const [isOpen, setIsOpen] = useState(true);
   const [activeSection, setActiveSection] = useState<string>("");
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 1200px)");
+    const updateOpenState = () => setIsOpen(!mediaQuery.matches);
+    updateOpenState();
+    mediaQuery.addEventListener("change", updateOpenState);
+    return () => mediaQuery.removeEventListener("change", updateOpenState);
+  }, []);
 
   useEffect(() => {
     const container = document.querySelector<HTMLElement>(".appConsentContent");
@@ -89,9 +108,24 @@ export function TableOfContents({ sections }: TableOfContentsProps) {
   };
 
   return (
-    <SidebarProvider className={styles.provider}>
-      <nav aria-label={t("legal.contents", "Legal document contents")} className={styles.nav}>
-        <Sidebar collapsible="none" side="right" className={styles.container}>
+    <SidebarProvider open={isOpen} className={styles.provider}>
+      <nav
+        aria-label={t("legal.contents", "Legal document contents")}
+        className={styles.nav}
+        data-open={isOpen}
+      >
+        <Sidebar collapsible="none" side={isRtl ? "left" : "right"} className={styles.container}>
+          <div className={styles.header}>
+            <span className={styles.headerTitle}>{t("legal.contentsTitle", "On this page")}</span>
+            <button
+              type="button"
+              className={styles.closeButton}
+              aria-label={t("legal.closeContents", "Close table of contents")}
+              onClick={() => setIsOpen(false)}
+            >
+              <X aria-hidden="true" size={18} />
+            </button>
+          </div>
           <SidebarContent className={styles.content}>
             <SidebarGroup className={styles.group}>
               <SidebarGroupLabel className={styles.title}>
@@ -121,6 +155,15 @@ export function TableOfContents({ sections }: TableOfContentsProps) {
             </SidebarGroup>
           </SidebarContent>
         </Sidebar>
+        <button
+          type="button"
+          className={styles.floatingButton}
+          aria-expanded={isOpen}
+          aria-label={t("legal.openContents", "Open table of contents")}
+          onClick={() => setIsOpen(true)}
+        >
+          <Menu aria-hidden="true" size={20} />
+        </button>
       </nav>
     </SidebarProvider>
   );

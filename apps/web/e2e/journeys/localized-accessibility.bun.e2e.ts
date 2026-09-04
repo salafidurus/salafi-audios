@@ -105,6 +105,45 @@ describe("localized accessibility Bun.WebView journeys", () => {
     );
   });
 
+  it("exposes the localized five-root navigation in RTL", async () => {
+    await withBrowserJourney(
+      "Arabic five-root navigation journey",
+      config.origin,
+      async ({ view }) => {
+        await initializeBrowserJourney(view, config.origin, "ar");
+        await view.navigate(`${config.origin}/explore`);
+        await waitForBrowserCondition(
+          view,
+          "Arabic bottom navigation is hydrated",
+          `document.querySelectorAll('nav[aria-label="التنقل السفلي"] a').length === 5`,
+          { timeoutMs: config.readyTimeoutMs },
+        );
+
+        const navigation = await view.evaluate<{
+          direction: string;
+          labels: string[];
+          active: string;
+        }>(`(() => {
+          const root = document.querySelector('nav[aria-label="التنقل السفلي"]');
+          return {
+            direction: document.documentElement.dir,
+            labels: [...(root?.querySelectorAll("a") ?? [])]
+              .map((link) => link.textContent?.trim() ?? "")
+              .filter(Boolean),
+            active: root?.querySelector('a[aria-current="page"]')?.textContent?.trim() ?? "",
+          };
+        })()`);
+
+        expect(navigation).toEqual({
+          direction: "rtl",
+          labels: ["الرئيسية", "استكشاف", "العلماء", "مكتبتي", "الإعدادات"],
+          active: "استكشاف",
+        });
+      },
+      { width: 390, height: 900 },
+    );
+  });
+
   it("preserves localized branded and shell-unavailable fallback recovery", async () => {
     await withBrowserJourney(
       "localized fallback recovery journey",

@@ -97,6 +97,7 @@
     "siteTitle": "دروس سلفية",
     "primarySidebar": "الشريط الجانبي الرئيسي",
     "mainNav": "التنقل الرئيسي",
+    "bottomNav": "التنقل السفلي",
     "searchAnything": "ابحث عن أي شيء",
     "searchCatalog": "البحث في الفهرس",
     "searchCatalogDescription": "ابحث عن الموضوعات والعلماء والقوائم.",
@@ -200,6 +201,16 @@
       "label": "أقسام الإعدادات",
       "general": "عام",
       "profile": "الملف الشخصي"
+    },
+    "support": {
+      "title": "الدعم",
+      "contact": "تواصل مع الدعم"
+    },
+    "legal": {
+      "title": "قانوني",
+      "terms": "الشروط والأحكام",
+      "privacy": "سياسة الخصوصية",
+      "cookies": "سياسة ملفات تعريف الارتباط"
     }
   },
   "support": {
@@ -430,6 +441,8 @@
   "legal": {
     "contents": "محتويات الوثيقة القانونية",
     "contentsTitle": "في هذه الصفحة",
+    "openContents": "فتح فهرس المحتويات",
+    "closeContents": "إغلاق فهرس المحتويات",
     "skipToDocument": "انتقل إلى الوثيقة",
     "privacy": {
       "title": "سياسة الخصوصية",

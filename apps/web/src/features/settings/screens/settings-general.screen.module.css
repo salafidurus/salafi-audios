@@ -81,6 +81,39 @@
   width: 100%;
 }
 
+.settingsRowLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-component-gap-md);
+  min-height: 3rem;
+  padding: var(--space-scale-md) var(--space-scale-lg);
+  border-bottom: var(--border-width-default) solid var(--border-subtle);
+  color: var(--content-default);
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.settingsRowLink:last-child {
+  border-bottom: none;
+}
+
+.settingsRowLink svg {
+  flex: 0 0 auto;
+  color: var(--content-muted);
+}
+
+.settingsRowLink:hover {
+  color: var(--content-strong);
+  background: var(--surface-subtle);
+}
+
+.settingsRowLink:focus-visible {
+  outline: 2px solid var(--action-primary);
+  outline-offset: -2px;
+}
+
 @media (max-width: 900px) {
   .tabsViewport {
     width: 100%;

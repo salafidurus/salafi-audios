@@ -232,6 +232,13 @@
         "picocolors": "^1.1.1",
       },
     },
+    "packages/core-analytics": {
+      "name": "@sd/core-analytics",
+      "version": "0.0.0",
+      "dependencies": {
+        "zod": "catalog:",
+      },
+    },
     "packages/core-api": {
       "name": "@sd/core-api",
       "version": "0.0.0",
@@ -1546,6 +1553,8 @@
     "@rollup/rollup-win32-x64-msvc": ["@rollup/rollup-win32-x64-msvc@4.62.2", "", { "os": "win32", "cpu": "x64" }, "sha512-BfzEnDJOt9T8M989/lA37EcJgat01wLRnoi5dQf3QzOH7jzpqTAzdDbVfRljVr5r+jzKqpbHeyOfAaXxAd0PAA=="],
 
     "@scarf/scarf": ["@scarf/scarf@1.4.0", "", {}, "sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ=="],
+
+    "@sd/core-analytics": ["@sd/core-analytics@workspace:packages/core-analytics"],
 
     "@sd/core-api": ["@sd/core-api@workspace:packages/core-api"],
 

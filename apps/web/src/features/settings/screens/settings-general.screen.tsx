@@ -1,7 +1,9 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides the auth-optional General settings surface and its public destinations. */
 "use client";
 
 import { routes } from "@sd/core-contracts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { z } from "zod";
@@ -12,10 +14,12 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
 import { SegmentedControl } from "@/features/settings/components/SegmentedControl/SegmentedControl";
 import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
+import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Switch as Toggle } from "@/shared/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
 import styles from "./settings-general.screen.module.css";
@@ -60,8 +64,17 @@ function loadThemePreference(): ThemePreference {
   return "system";
 }
 
+/**
+ * Renders the auth-optional General settings surface.
+ *
+ * Preference controls remain local to this tab, while support and legal
+ * actions link directly to the canonical public destinations owned by the
+ * web application.
+ */
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
+  const isRtl = useIsRtl();
+  const NavigationChevron = isRtl ? ChevronLeft : ChevronRight;
   const searchParams = useSearchParams();
   const queryTab = searchParams.get("tab") === "profile" ? "profile" : "general";
   const [activeTab, setActiveTab] = useState<"general" | "profile">(queryTab);
@@ -145,7 +158,7 @@ export function SettingsGeneralScreen() {
       </div>
 
       {activeTab === "general" ? (
-        <div className={styles.sectionWrap}>
+        <div className={styles.sectionWrap} data-testid="settings-general-sections">
           <p className={styles.sectionLabel}>{t("settings.general.languageSection", "LANGUAGE")}</p>
           <SettingsRow
             label={t("settings.general.appLanguage", "App Language")}
@@ -227,6 +240,28 @@ export function SettingsGeneralScreen() {
               </SettingsRow>
             </>
           )}
+
+          <SettingsSection title={t("settings.support.title", "Support")}>
+            <Link className={styles.settingsRowLink} href={routes.support}>
+              {t("settings.support.contact", "Contact Support")}
+              <NavigationChevron aria-hidden="true" />
+            </Link>
+          </SettingsSection>
+
+          <SettingsSection title={t("settings.legal.title", "Legal")}>
+            <Link className={styles.settingsRowLink} href={routes.termsOfUse}>
+              {t("settings.legal.terms", "Terms and Conditions")}
+              <NavigationChevron aria-hidden="true" />
+            </Link>
+            <Link className={styles.settingsRowLink} href={routes.privacy}>
+              {t("settings.legal.privacy", "Privacy Policy")}
+              <NavigationChevron aria-hidden="true" />
+            </Link>
+            <Link className={styles.settingsRowLink} href={routes.cookiePolicy}>
+              {t("settings.legal.cookies", "Cookie Policy")}
+              <NavigationChevron aria-hidden="true" />
+            </Link>
+          </SettingsSection>
         </div>
       ) : (
         <SettingsProfileScreen hideHeader />

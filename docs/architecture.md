@@ -95,19 +95,19 @@ See [database and media](data/database.md) for data ownership and migrations.
 Dynadot owns the registration for `salafidurus.com`. Cloudflare manages the
 authoritative DNS records. They are separate responsibilities.
 
-| Role | Provider |
-| --- | --- |
-| Web hosting | Vercel |
-| Backend compute | Hetzner |
-| Backend runtime and deployment | Dokploy and Traefik |
-| PostgreSQL | Neon |
-| Redis | Dokploy-hosted, environment-specific services |
-| Media and Dokploy backups | Cloudflare R2 |
-| Source control and CI/CD | GitHub and GitHub Actions |
-| Container images | GHCR |
-| Mobile builds and releases | Expo / EAS |
-| Domain registration | Dynadot |
-| DNS | Cloudflare |
+| Role                           | Provider                                      |
+| ------------------------------ | --------------------------------------------- |
+| Web hosting                    | Vercel                                        |
+| Backend compute                | Hetzner                                       |
+| Backend runtime and deployment | Dokploy and Traefik                           |
+| PostgreSQL                     | Neon                                          |
+| Redis                          | Dokploy-hosted, environment-specific services |
+| Media and Dokploy backups      | Cloudflare R2                                 |
+| Source control and CI/CD       | GitHub and GitHub Actions                     |
+| Container images               | GHCR                                          |
+| Mobile builds and releases     | Expo / EAS                                    |
+| Domain registration            | Dynadot                                       |
+| DNS                            | Cloudflare                                    |
 
 Important hostnames, where active, are:
 
@@ -163,18 +163,27 @@ Web/mobile → API hostname → Cloudflare → Hetzner → Traefik → API
 API → Better Auth, Neon, environment Redis, and Cloudflare R2
 ```
 
-| Area | Development | Preview | Production |
-| --- | --- | --- | --- |
-| Web | Local | Vercel preview where configured | Vercel production where configured |
-| API | Local NestJS | Dokploy Preview API | Dokploy Production API |
-| Redis | Local/optional | Preview Redis | Production Redis |
-| Mobile | EAS development | EAS preview | EAS production |
+| Area   | Development     | Preview                         | Production                         |
+| ------ | --------------- | ------------------------------- | ---------------------------------- |
+| Web    | Local           | Vercel preview where configured | Vercel production where configured |
+| API    | Local NestJS    | Dokploy Preview API             | Dokploy Production API             |
+| Redis  | Local/optional  | Preview Redis                   | Production Redis                   |
+| Mobile | EAS development | EAS preview                     | EAS production                     |
 
 The API exposes `/health/healthz` for liveness and `/health` for dependency
 health, including database, storage/CDN, and Redis checks where configured.
 Web analytics use Vexo only after cookie consent and outside development.
 Native runtime monitoring is wired through Sentry when its public project
 configuration is present, with Vexo enabled when its project id is configured.
+
+Product analytics has a separate provider-neutral contract in
+`@sd/core-analytics`. Canonical product events are immutable, use public
+listing and scholar slugs, distinguish client observations from backend-
+confirmed outcomes, and carry event-time language, geography, consent, and
+identity context. The package validates strict event properties and rejects
+forbidden personal or exact-location fields. Storage, ingestion, buffering,
+and provider delivery remain separate downstream adapters; operational
+telemetry is not product-event history.
 
 ## Operations and recovery
 
@@ -213,21 +222,21 @@ DNS.
 
 ## Sources of truth
 
-| Concern | Source |
-| --- | --- |
-| Product intent | [`docs/product/`](product/) |
-| Platform map | This document |
-| Client architecture | [`docs/clients/`](clients/) |
-| API contracts | [`docs/backend/api.md`](backend/api.md) and `@sd/core-contracts` |
-| Authentication | [`docs/security/`](security/) and API implementation |
-| Database schema | Prisma schema and migrations |
-| Web delivery | [`apps/web/vercel.json`](../apps/web/vercel.json) and Vercel |
-| Mobile delivery | [`apps/native/eas.json`](../apps/native/eas.json) and EAS |
-| CI/CD | [`.github/workflows/`](../.github/workflows/) |
-| Images | GHCR |
-| Backend runtime | Dokploy and the infrastructure runbooks |
-| DNS | Cloudflare |
-| Domain ownership | Dynadot |
+| Concern             | Source                                                           |
+| ------------------- | ---------------------------------------------------------------- |
+| Product intent      | [`docs/product/`](product/)                                      |
+| Platform map        | This document                                                    |
+| Client architecture | [`docs/clients/`](clients/)                                      |
+| API contracts       | [`docs/backend/api.md`](backend/api.md) and `@sd/core-contracts` |
+| Authentication      | [`docs/security/`](security/) and API implementation             |
+| Database schema     | Prisma schema and migrations                                     |
+| Web delivery        | [`apps/web/vercel.json`](../apps/web/vercel.json) and Vercel     |
+| Mobile delivery     | [`apps/native/eas.json`](../apps/native/eas.json) and EAS        |
+| CI/CD               | [`.github/workflows/`](../.github/workflows/)                    |
+| Images              | GHCR                                                             |
+| Backend runtime     | Dokploy and the infrastructure runbooks                          |
+| DNS                 | Cloudflare                                                       |
+| Domain ownership    | Dynadot                                                          |
 
 ## Related documentation
 
