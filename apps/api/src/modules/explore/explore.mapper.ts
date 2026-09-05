@@ -6,12 +6,12 @@ import {
   type ExploreTopicsBatchDto,
   type FeedPageDto,
 } from '@sd/core-contracts';
-import type { ExploreRecommendationPage } from '../explore-recommendation/explore-recommendation.repo';
+import type { ExplorePage } from './explore.repo';
 
 /** Maps internal recommendation batches into the versioned public Explore contract. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- The preceding TSDoc describes the public projection invariant.
 export class ExploreMapper {
-  toFeedPage(page: ExploreRecommendationPage): FeedPageDto {
+  toFeedPage(page: ExplorePage): FeedPageDto {
     return FeedPageDtoSchema.parse({
       schemaVersion: ExploreRecommendationSchemaVersion,
       batches: page.batches.map((batch) => this.toFeedBatch(batch)),
@@ -21,13 +21,15 @@ export class ExploreMapper {
   }
 
   private toFeedBatch(
-    batch: ExploreRecommendationPage['batches'][number],
+    batch: ExplorePage['batches'][number],
   ): ExploreListingsBatchDto | ExploreScholarsBatchDto | ExploreTopicsBatchDto {
     if (batch.kind === 'listings') {
       return {
         kind: batch.kind,
         id: batch.id,
-        title: batch.title,
+        title: batch.topicSlug
+          ? { kind: 'topic_listings', topicSlug: batch.topicSlug, label: batch.topicSlug }
+          : { kind: 'listings', id: 'recent', label: 'Continue exploring' },
         reason: batch.reason,
         items: batch.items,
       };
@@ -36,7 +38,7 @@ export class ExploreMapper {
       return {
         kind: batch.kind,
         id: batch.id,
-        title: batch.title,
+        title: { kind: 'scholars', id: 'senior_scholars', label: 'Senior Scholars' },
         reason: batch.reason,
         items: batch.items,
       };
@@ -44,7 +46,7 @@ export class ExploreMapper {
     return {
       kind: batch.kind,
       id: batch.id,
-      title: batch.title,
+      title: { kind: 'topics', id: 'discoverable_topics', label: 'Explore topics' },
       reason: batch.reason,
       items: batch.items,
     };

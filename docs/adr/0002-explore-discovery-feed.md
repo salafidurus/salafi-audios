@@ -28,7 +28,9 @@ the authoritative relationships needed to rank content by Topic and Scholar.
   forms must remain semantic and must not make clients infer meaning from flat
   rows. The API owns composition, topic steering, deduplication, and exhaustion.
 - Keep recommendation execution in the explicit internal
-  `ExploreRecommendationModule`, with no controller and no public DTO seam.
+  `RecommendationModule`, with no controller and no public DTO seam. The
+  Explore-specific implementation remains in `explore-recommendation.*` files;
+  only `ExploreRecommendationService` is exported from the module.
   `ExploreModule` is the caller: it invokes the recommendation engine and maps
   its internal page into `FeedPageDto`. Internal recommendation DTOs stay local
   to the API modules; only the public response belongs in `@sd/core-contracts`.

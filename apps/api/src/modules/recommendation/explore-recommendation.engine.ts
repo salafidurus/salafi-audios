@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { ExploreRecommendationPage } from './explore-recommendation.repo';
+import type { ExploreRecommendationResult } from './explore-recommendation.repo';
 import { ExploreRecommendationRepo } from './explore-recommendation.repo';
 
 @Injectable()
@@ -8,7 +8,7 @@ import { ExploreRecommendationRepo } from './explore-recommendation.repo';
 export class ExploreRecommendationEngine {
   constructor(private readonly repo: ExploreRecommendationRepo) {}
 
-  recommend(cursor?: string, limit = 20, topicSlug?: string): Promise<ExploreRecommendationPage> {
+  recommend(cursor?: string, limit = 20, topicSlug?: string): Promise<ExploreRecommendationResult> {
     return this.repo.getRecommendations(cursor, limit, topicSlug);
   }
 }
