@@ -2,7 +2,7 @@ import type { ScholarListItemDto } from "@sd/core-contracts";
 
 import { subject } from "@casl/ability";
 import { useAbility } from "@sd/domain-account";
-import { useScholarsList } from "@sd/domain-content";
+import { useScholarDirectory } from "@sd/domain-content";
 import * as DocumentPicker from "expo-document-picker";
 import { useCallback, useMemo, useState } from "react";
 import { FlatList, type ViewStyle, View } from "react-native";
@@ -199,7 +199,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const { ability } = useAbility({ isAuthenticated });
-  const { data: scholarsData } = useScholarsList();
+  const { data: scholarsData } = useScholarDirectory();
   const scholars = (scholarsData?.scholars ?? []).filter((s) =>
     ability.can("upload", subject("Media", { scholarSlug: s.slug })),
   );

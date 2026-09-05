@@ -115,8 +115,22 @@ describe('Public API (e2e)', () => {
   });
 
   describe('Scholars', () => {
-    it('GET /scholars returns list wrapped in an object', async () => {
+    it('GET /scholars returns a versioned page feed', async () => {
       const res = await request(app.getHttpServer()).get('/v1/scholars').expect(200);
+
+      expect(res.body).toMatchObject({ schemaVersion: 1, exhausted: true });
+      expect(Array.isArray(res.body.batches)).toBe(true);
+      const scholarBatch = res.body.batches.find((batch: any) => batch.form === 'scholars');
+      expect(scholarBatch).toMatchObject({
+        id: 'scholars:allamah',
+        title: { kind: 'allamah', id: 'allamah_scholars' },
+      });
+      const allamahScholar = scholarBatch.items.find((s: any) => s.slug === 'fawzan');
+      expect(allamahScholar).toBeDefined();
+    });
+
+    it('GET /scholars/directory returns the flat directory', async () => {
+      const res = await request(app.getHttpServer()).get('/v1/scholars/directory').expect(200);
 
       expect(res.body).toHaveProperty('scholars');
       expect(Array.isArray(res.body.scholars)).toBe(true);

@@ -25,7 +25,9 @@ export const endpoints = {
     list: applicationPath("/topics"),
   },
   scholars: {
-    list: applicationPath("/scholars"),
+    pageFeed: applicationPath("/scholars"),
+    directory: applicationPath("/scholars/directory"),
+    search: applicationPath("/scholars/search"),
     detail: (scholarSlug: string) => applicationPath(`/scholars/${scholarSlug}`),
     content: (scholarSlug: string) => applicationPath(`/scholars/${scholarSlug}/content`),
     topics: (scholarSlug: string) => applicationPath(`/scholars/${scholarSlug}/topics`),

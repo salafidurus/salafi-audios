@@ -5,7 +5,7 @@ import {
   useHomeRecent,
   formatScholarName,
   useHomePromotions,
-  useScholarsList,
+  useScholarDirectory,
 } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
 import { useCallback, useMemo } from "react";
@@ -225,14 +225,14 @@ function getCuratedItems(data: ReturnType<typeof useHomePromotions>["data"]): Fe
   return data?.editorsPicks.map((pick) => pick.listing) ?? [];
 }
 
-function getScholars(data: ReturnType<typeof useScholarsList>["data"]): ScholarListItemDto[] {
+function getScholars(data: ReturnType<typeof useScholarDirectory>["data"]): ScholarListItemDto[] {
   return data?.scholars ?? [];
 }
 
 function isHomeLoading(
   promotions: ReturnType<typeof useHomePromotions>,
   explore: ReturnType<typeof useHomeRecent>,
-  scholars: ReturnType<typeof useScholarsList>,
+  scholars: ReturnType<typeof useScholarDirectory>,
 ) {
   return promotions.isLoading || explore.isLoading || scholars.isLoading;
 }
@@ -393,7 +393,7 @@ function useHomeQueries() {
     limit: 10,
     locale: getHomeLocale(i18n?.language),
   });
-  const scholarsQuery = useScholarsList();
+  const scholarsQuery = useScholarDirectory();
   const items = getContentItems(exploreQuery.data);
   const featured = getFeaturedItem(promotionsQuery.data, items);
   const curated = getCuratedItems(promotionsQuery.data);

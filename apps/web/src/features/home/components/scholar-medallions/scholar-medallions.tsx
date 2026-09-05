@@ -3,7 +3,7 @@
 
 import { routes } from "@sd/core-contracts";
 import { getScholarTitleLabel } from "@sd/core-i18n";
-import { useInfiniteScholarsList } from "@sd/domain-content";
+import { useScholarDirectory } from "@sd/domain-content";
 import Link from "next/link";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -64,9 +64,7 @@ function FeaturedScholar({
   scholar,
   t,
 }: {
-  scholar: NonNullable<
-    ReturnType<typeof useInfiniteScholarsList>["data"]
-  >["pages"][number]["items"][number];
+  scholar: NonNullable<ReturnType<typeof useScholarDirectory>["data"]>["scholars"][number];
   t: ReturnType<typeof useTranslation>["t"];
 }) {
   return (
@@ -106,9 +104,7 @@ function FeaturedScholar({
 function ScholarMedallion({
   scholar,
 }: {
-  scholar: NonNullable<
-    ReturnType<typeof useInfiniteScholarsList>["data"]
-  >["pages"][number]["items"][number];
+  scholar: NonNullable<ReturnType<typeof useScholarDirectory>["data"]>["scholars"][number];
 }) {
   return (
     <Link
@@ -142,8 +138,8 @@ function ScholarMedallion({
 }
 
 type ScholarListItem = NonNullable<
-  ReturnType<typeof useInfiniteScholarsList>["data"]
->["pages"][number]["items"][number];
+  ReturnType<typeof useScholarDirectory>["data"]
+>["scholars"][number];
 
 function selectScholarGroups(scholars: ScholarListItem[], featuredScholarSlug?: string) {
   const featuredScholar = featuredScholarSlug
@@ -160,8 +156,8 @@ function selectScholarGroups(scholars: ScholarListItem[], featuredScholarSlug?: 
 
 export function ScholarMedallions({ featuredScholarSlug }: ScholarMedallionsProps) {
   const { t } = useTranslation();
-  const { data, isLoading } = useInfiniteScholarsList();
-  const scholars = data?.pages.flatMap((page) => page.items) ?? [];
+  const { data, isLoading } = useScholarDirectory();
+  const scholars = data?.scholars ?? [];
   const { featuredScholar, regularScholars } = selectScholarGroups(scholars, featuredScholarSlug);
 
   if (isLoading && scholars.length === 0) {

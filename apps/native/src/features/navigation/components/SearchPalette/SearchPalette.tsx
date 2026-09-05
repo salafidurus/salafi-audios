@@ -1,6 +1,6 @@
 /** Provides the cross-root native search palette and its catalog result navigation boundary. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- module responsibility is documented above.
-import { useInfiniteScholarsList } from "@sd/domain-content";
+import { useScholarSearch } from "@sd/domain-content";
 import { useSearchCatalog, useTopicsList } from "@sd/domain-search";
 import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -26,7 +26,7 @@ import { SearchPaletteSheet } from "./SearchPaletteSheet";
  * Owns lazy catalog queries and result navigation for the app-global palette.
  * Visibility is held in Zustand so header actions do not depend on this provider's module.
  */
-// oxlint-disable-next-line complexity -- this is the single orchestration boundary for the palette lifecycle.
+// oxlint-disable complexity -- this is the single orchestration boundary for the palette lifecycle.
 // oxlint-disable-next-line anti-slop/require-tsdoc -- the provider contract is documented above.
 export function SearchPaletteProvider({ children }: { children: React.ReactNode }) {
   const isOpen = useSearchPaletteStore((state) => state.isOpen);
@@ -42,13 +42,20 @@ export function SearchPaletteProvider({ children }: { children: React.ReactNode 
     { enabled: isOpen && normalizedQuery.length > 0 },
   );
   const { data: topics = [], isLoading: isTopicsLoading } = useTopicsList({ enabled: isOpen });
-  const { data: scholarPages, isLoading: isScholarsLoading } = useInfiniteScholarsList({
-    enabled: isOpen,
+  const { data: scholarData, isLoading: isScholarsLoading } = useScholarSearch(normalizedQuery, {
+    enabled: isOpen && normalizedQuery.length > 0,
   });
 
   const results = useMemo(
-    () => buildPaletteResults(normalizedQuery, topics, scholarPages, listingData, i18n.language),
-    [i18n.language, listingData, normalizedQuery, scholarPages, topics],
+    () =>
+      buildPaletteResults(
+        normalizedQuery,
+        topics,
+        scholarData?.scholars,
+        listingData,
+        i18n.language,
+      ),
+    [i18n.language, listingData, normalizedQuery, scholarData?.scholars, topics],
   );
 
   const close = () => {
@@ -120,6 +127,7 @@ export function SearchPaletteProvider({ children }: { children: React.ReactNode 
     </>
   );
 }
+// oxlint-enable complexity
 
 function PaletteResults({
   isLoading,

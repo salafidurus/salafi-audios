@@ -23,12 +23,6 @@ export type PaletteResult = {
   metadata?: string;
 };
 
-type ScholarPage = {
-  items: ScholarListItemDto[];
-  nextCursor?: string;
-  hasMore?: boolean;
-};
-
 function matches(value: string, query: string) {
   return value.toLocaleLowerCase().includes(query.toLocaleLowerCase());
 }
@@ -38,7 +32,7 @@ function matches(value: string, query: string) {
 export function buildPaletteResults(
   query: string,
   topics: TopicDetailDto[] | undefined,
-  scholarPages: { pages: ScholarPage[]; pageParams?: unknown[] } | undefined,
+  scholars: ScholarListItemDto[] | undefined,
   listingData: SearchCatalogResultsDto | undefined,
   language: string,
 ): PaletteResult[] {
@@ -50,19 +44,12 @@ export function buildPaletteResults(
       ? [{ id: `topic-${topic.id}`, label, type: "topic" as const, slug: topic.slug }]
       : [];
   });
-  const scholarResults = (scholarPages?.pages.flatMap((page) => page.items) ?? []).flatMap(
-    (scholar) =>
-      matches(scholar.name, query)
-        ? [
-            {
-              id: `scholar-${scholar.id}`,
-              label: scholar.name,
-              type: "scholar" as const,
-              slug: scholar.slug,
-            },
-          ]
-        : [],
-  );
+  const scholarResults = (scholars ?? []).map((scholar) => ({
+    id: `scholar-${scholar.id}`,
+    label: scholar.name,
+    type: "scholar" as const,
+    slug: scholar.slug,
+  }));
   const listings: SearchCatalogItemDto[] = [
     ...(listingData?.collections ?? []),
     ...(listingData?.series ?? []),

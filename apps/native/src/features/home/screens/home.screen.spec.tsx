@@ -1,4 +1,4 @@
-import { useHomeRecent, useHomePromotions, useScholarsList } from "@sd/domain-content";
+import { useHomeRecent, useHomePromotions, useScholarDirectory } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
 import { render, screen, fireEvent, within } from "@testing-library/react-native";
 
@@ -21,7 +21,7 @@ jest.mock("@sd/domain-content", () => ({
   },
   useHomeRecent: jest.fn(),
   useHomePromotions: jest.fn(),
-  useScholarsList: jest.fn(),
+  useScholarDirectory: jest.fn(),
 }));
 jest.mock("@/core/auth/use-auth", () => ({ useAuth: jest.fn() }));
 jest.mock("@/core/i18n/use-translation", () => ({
@@ -37,7 +37,7 @@ jest.mock("react-native-safe-area-context", () => ({
 const mockedAuth = jest.mocked(useAuth);
 const mockedContinue = jest.mocked(useContinueListening);
 const mockedExplore = jest.mocked(useHomeRecent);
-const mockedScholars = jest.mocked(useScholarsList);
+const mockedScholars = jest.mocked(useScholarDirectory);
 const mockedPromotions = jest.mocked(useHomePromotions);
 
 const item = {

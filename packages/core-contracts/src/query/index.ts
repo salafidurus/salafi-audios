@@ -33,10 +33,9 @@ export const createQueryClient = () =>
 export const queryKeys = {
   scholars: {
     all: ["scholars"] as const,
-    list: {
-      all: () => [...queryKeys.scholars.all, "list"] as const,
-      infinite: () => [...queryKeys.scholars.all, "list", "infinite"] as const,
-    },
+    pageFeed: () => [...queryKeys.scholars.all, "page-feed"] as const,
+    directory: () => [...queryKeys.scholars.all, "directory"] as const,
+    search: (query: string) => [...queryKeys.scholars.all, "search", query] as const,
     detail: (scholarSlug: string) => [...queryKeys.scholars.all, "detail", scholarSlug] as const,
     content: (scholarSlug: string) => [...queryKeys.scholars.all, "content", scholarSlug] as const,
     topics: (scholarSlug: string) => [...queryKeys.scholars.all, "topics", scholarSlug] as const,

@@ -1,22 +1,22 @@
 import type { Mocked } from '../../test/setup';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { NotFoundException } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Test, TestingModule } from '@nestjs/testing';
 import type {
   CreateScholarDto,
   UpdateScholarDto,
   ScholarDetailDto,
   ScholarContentUnifiedDto,
-  ScholarListItemDto,
+  ScholarPageFeedDto,
 } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
 import { ScholarsService } from './scholars.service';
+import { ScholarPageFeedService } from '../recommendation/scholar-page-feed.service';
 
 describe('ScholarsService', () => {
   let service: ScholarsService;
   let repo: Mocked<ScholarsRepository>;
   let cacheManager: any;
+  let pageFeed: ScholarPageFeedService;
 
   const mockScholarDetail: ScholarDetailDto & {
     lectureCount: number;
@@ -55,57 +55,65 @@ describe('ScholarsService', () => {
       del: vi.fn().mockResolvedValue(undefined),
     };
 
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        ScholarsService,
-        {
-          provide: ScholarsRepository,
-          useValue: {
-            list: vi.fn<any>(),
-            findBySlug: vi.fn<any>(),
-            getContent: vi.fn<any>(),
-            getFormData: vi.fn<any>(),
-            create: vi.fn<any>(),
-            update: vi.fn<any>(),
-            findById: vi.fn<any>(),
-            upsertScholarTranslation: vi.fn<any>(),
-          } as Partial<Mocked<ScholarsRepository>>,
-        },
-        {
-          provide: CACHE_MANAGER,
-          useValue: cacheManager,
-        },
-      ],
-    }).compile();
-
-    service = module.get(ScholarsService);
-    repo = module.get(ScholarsRepository) as Mocked<ScholarsRepository>;
+    repo = {
+      directory: vi.fn<any>(),
+      hydratePageFeed: vi.fn<any>(),
+      findBySlug: vi.fn<any>(),
+      getContent: vi.fn<any>(),
+      getFormData: vi.fn<any>(),
+      create: vi.fn<any>(),
+      update: vi.fn<any>(),
+      findById: vi.fn<any>(),
+      upsertScholarTranslation: vi.fn<any>(),
+      search: vi.fn<any>(),
+    } as Partial<Mocked<ScholarsRepository>> as Mocked<ScholarsRepository>;
+    pageFeed = { recommend: vi.fn<any>() } as unknown as ScholarPageFeedService;
+    service = new ScholarsService(repo, pageFeed, cacheManager);
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('list', () => {
-    it('should return scholars list from repository', async () => {
-      const expected: { scholars: ScholarListItemDto[] } = {
+  describe('getPageFeed', () => {
+    it('hydrates the recommendation selected by the page-feed service', async () => {
+      const recommendation = {
+        form: 'scholars' as const,
+        id: 'scholars:allamah' as const,
+        titleKind: 'allamah' as const,
+        itemIds: ['s1'],
+      };
+      const expected: ScholarPageFeedDto = { schemaVersion: 1, batches: [], exhausted: true };
+      pageFeed.recommend = vi.fn().mockResolvedValue(recommendation);
+      repo.hydratePageFeed.mockResolvedValue(expected);
+
+      await expect(service.getPageFeed()).resolves.toEqual(expected);
+      expect(pageFeed.recommend).toHaveBeenCalledTimes(1);
+      expect(repo.hydratePageFeed).toHaveBeenCalledWith(recommendation);
+    });
+  });
+
+  describe('directory', () => {
+    it('should return the flat scholar directory from repository', async () => {
+      const expected = {
         scholars: [
           {
             id: 's1',
             name: 'Test Scholar',
             slug: 'test-scholar',
             imageUrl: 'test.jpg',
-            mainLanguage: 'en',
+            mainLanguage: 'en' as const,
             lectureCount: 10,
           },
         ],
+        hasMore: false,
       };
-      repo.list.mockResolvedValue(expected);
+      repo.directory.mockResolvedValue(expected);
 
-      const result = await service.list();
+      const result = await service.directory();
 
       expect(result).toEqual(expected);
-      expect(repo.list).toHaveBeenCalled();
+      expect(repo.directory).toHaveBeenCalled();
     });
   });
 

@@ -266,10 +266,10 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
   };
 
   const { data: scholarsData } = useApiQuery<{ scholars: ScholarListItemDto[] }>(
-    [...queryKeys.scholars.list.all()],
+    queryKeys.scholars.directory(),
     () =>
       httpClient<{ scholars: ScholarListItemDto[] }>({
-        url: endpoints.scholars.list,
+        url: endpoints.scholars.directory,
         method: "GET",
       }),
   );

@@ -10,6 +10,7 @@ import { ScholarsController } from './scholars.controller';
 import { AdminScholarsController } from './admin-scholars.controller';
 import { ScholarsService } from './scholars.service';
 import { PrismaService } from '../../core/db/prisma.service';
+import { ScholarPageFeedService } from '../recommendation/scholar-page-feed.service';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../../core/auth/auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -24,7 +25,9 @@ const mockPrisma = {
 };
 
 const mockScholarsService = {
-  list: vi.fn<any>().mockResolvedValue({ scholars: [] }),
+  getPageFeed: vi.fn<any>().mockResolvedValue({ schemaVersion: 1, batches: [], exhausted: true }),
+  directory: vi.fn<any>().mockResolvedValue({ scholars: [], hasMore: false }),
+  search: vi.fn<any>().mockResolvedValue({ scholars: [], hasMore: false }),
   getBySlug: vi.fn<any>().mockResolvedValue(null),
   getContent: vi.fn<any>().mockResolvedValue({ lectures: [], series: [] }),
   create: vi.fn<any>().mockResolvedValue({}),
@@ -43,6 +46,7 @@ describe('ScholarsController — auth boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: ScholarsService, useValue: mockScholarsService },
+        { provide: ScholarPageFeedService, useValue: { recommend: vi.fn() } },
         { provide: PrismaService, useValue: mockPrisma },
       ],
     });
@@ -57,6 +61,24 @@ describe('ScholarsController — auth boundaries', () => {
       const response = await request(app.getHttpServer()).get('/scholars');
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
+    });
+
+    it('GET /scholars/directory returns 200 without auth', async () => {
+      const response = await request(app.getHttpServer()).get('/scholars/directory');
+      expect(response.status).toBe(200);
+      expect(mockScholarsService.directory).toHaveBeenCalled();
+    });
+
+    it('GET /scholars/search requires a non-empty query', async () => {
+      const response = await request(app.getHttpServer()).get('/scholars/search?q=');
+      expect(response.status).toBe(400);
+      expect(mockScholarsService.search).not.toHaveBeenCalled();
+    });
+
+    it('GET /scholars/search delegates a normalized query without auth', async () => {
+      const response = await request(app.getHttpServer()).get('/scholars/search?q=%20ibn%20');
+      expect(response.status).toBe(200);
+      expect(mockScholarsService.search).toHaveBeenCalledWith('ibn');
     });
 
     it('GET /scholars/:slug returns 200 without auth', async () => {

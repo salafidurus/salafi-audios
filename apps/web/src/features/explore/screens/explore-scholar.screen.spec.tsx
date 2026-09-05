@@ -1,13 +1,13 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "bun:test";
 import React from "react";
 
 import { ExploreScholarScreen } from "./explore-scholar.screen";
 
-const mockUseInfiniteScholarsList = vi.fn();
+const mockUseScholarPageFeeds = vi.fn();
 
 vi.mock("@sd/domain-content", () => ({
-  useInfiniteScholarsList: mockUseInfiniteScholarsList,
+  useScholarPageFeeds: mockUseScholarPageFeeds,
 }));
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
@@ -16,26 +16,6 @@ vi.mock("@/core/i18n/use-translation", () => ({
 }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
-}));
-vi.mock("@/shared/components/Search", () => ({
-  Search: {
-    Bar: ({
-      placeholder,
-      value,
-      onChange,
-    }: {
-      placeholder?: string;
-      value: string;
-      onChange: (value: string) => void;
-    }) => (
-      <input
-        data-testid="search-bar"
-        placeholder={placeholder}
-        value={value}
-        onChange={(event) => onChange(event.currentTarget.value)}
-      />
-    ),
-  },
 }));
 vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
   ScreenView: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -69,13 +49,11 @@ describe("ExploreScholarScreen", () => {
   ];
 
   beforeEach(() => {
-    mockUseInfiniteScholarsList.mockReturnValue({
-      data: { pages: [] },
+    mockUseScholarPageFeeds.mockReturnValue({
+      data: undefined,
       isFetching: false,
       isLoading: false,
       isError: false,
-      hasNextPage: false,
-      fetchNextPage: vi.fn(),
       refetch: vi.fn(),
     });
   });
@@ -86,21 +64,12 @@ describe("ExploreScholarScreen", () => {
     expect(screen.getByText("Scholars")).toBeTruthy();
   });
 
-  it("renders search bar", () => {
-    render(<ExploreScholarScreen />);
-
-    const searchInput = screen.getByPlaceholderText(/search scholars/i);
-    expect(searchInput).toBeTruthy();
-  });
-
   it("renders skeleton when loading and no scholars", () => {
-    mockUseInfiniteScholarsList.mockReturnValue({
+    mockUseScholarPageFeeds.mockReturnValue({
       data: undefined,
       isFetching: true,
       isLoading: true,
       isError: false,
-      hasNextPage: false,
-      fetchNextPage: vi.fn(),
       refetch: vi.fn(),
     });
 
@@ -110,13 +79,11 @@ describe("ExploreScholarScreen", () => {
   });
 
   it("renders empty state when no scholars and not loading", () => {
-    mockUseInfiniteScholarsList.mockReturnValue({
-      data: { pages: [] },
+    mockUseScholarPageFeeds.mockReturnValue({
+      data: { batches: [], schemaVersion: 1, exhausted: true },
       isFetching: false,
       isLoading: false,
       isError: false,
-      hasNextPage: false,
-      fetchNextPage: vi.fn(),
       refetch: vi.fn(),
     });
 
@@ -125,14 +92,23 @@ describe("ExploreScholarScreen", () => {
     expect(screen.getByText("No scholars available.")).toBeTruthy();
   });
 
-  it("renders aligned scholar results and filters by name or slug", async () => {
-    mockUseInfiniteScholarsList.mockReturnValue({
-      data: { pages: [{ items: scholars }] },
+  it("renders scholars in the supplied page-feed order", () => {
+    mockUseScholarPageFeeds.mockReturnValue({
+      data: {
+        batches: [
+          {
+            form: "scholars",
+            id: "scholars:allamah",
+            title: { kind: "allamah", id: "allamah_scholars", label: "Allamah scholars" },
+            items: scholars,
+          },
+        ],
+        schemaVersion: 1,
+        exhausted: true,
+      },
       isFetching: false,
       isLoading: false,
       isError: false,
-      hasNextPage: false,
-      fetchNextPage: vi.fn(),
       refetch: vi.fn(),
     });
 
@@ -141,24 +117,17 @@ describe("ExploreScholarScreen", () => {
     expect(screen.getByRole("button", { name: /ibn baz/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /al albani/i })).toBeTruthy();
 
-    fireEvent.change(screen.getByTestId("search-bar"), { target: { value: "ibn-baz" } });
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
-    });
-
     expect(screen.getByRole("button", { name: /ibn baz/i })).toBeTruthy();
-    expect(screen.queryByRole("button", { name: /al albani/i })).toBeNull();
+    expect(screen.getByRole("button", { name: /al albani/i })).toBeTruthy();
   });
 
   it("renders an error retry action when the initial request fails", () => {
     const refetch = vi.fn();
-    mockUseInfiniteScholarsList.mockReturnValue({
-      data: { pages: [] },
+    mockUseScholarPageFeeds.mockReturnValue({
+      data: undefined,
       isFetching: false,
       isLoading: false,
       isError: true,
-      hasNextPage: false,
-      fetchNextPage: vi.fn(),
       refetch,
     });
 
@@ -168,21 +137,28 @@ describe("ExploreScholarScreen", () => {
     expect(refetch).toHaveBeenCalledTimes(1);
   });
 
-  it("renders and invokes load more when another page is available", () => {
-    const fetchNextPage = vi.fn();
-    mockUseInfiniteScholarsList.mockReturnValue({
-      data: { pages: [{ items: scholars }] },
+  it("does not render a load-more control", () => {
+    mockUseScholarPageFeeds.mockReturnValue({
+      data: {
+        batches: [
+          {
+            form: "scholars",
+            id: "scholars:allamah",
+            title: { kind: "allamah", id: "allamah_scholars", label: "Allamah scholars" },
+            items: scholars,
+          },
+        ],
+        schemaVersion: 1,
+        exhausted: true,
+      },
       isFetching: false,
       isLoading: false,
       isError: false,
-      hasNextPage: true,
-      fetchNextPage,
       refetch: vi.fn(),
     });
 
     render(<ExploreScholarScreen />);
 
-    fireEvent.click(screen.getByRole("button", { name: /load more/i }));
-    expect(fetchNextPage).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("button", { name: /load more/i })).toBeNull();
   });
 });

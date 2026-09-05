@@ -19,6 +19,9 @@ describe("public content endpoint builders", () => {
   it("builds static application paths under the versioned namespace", () => {
     expect(endpoints.search.general).toBe("/v1/search");
     expect(endpoints.explore.feed).toBe("/v1/explore");
+    expect(endpoints.scholars.pageFeed).toBe("/v1/scholars");
+    expect(endpoints.scholars.directory).toBe("/v1/scholars/directory");
+    expect(endpoints.scholars.search).toBe("/v1/scholars/search");
     expect(endpoints.topics.list).toBe("/v1/topics");
     expect(endpoints.myLibrary.savedSync).toBe("/v1/me/my-library/saved/sync");
     expect(endpoints.admin.dashboard).toBe("/v1/admin/dashboard");
