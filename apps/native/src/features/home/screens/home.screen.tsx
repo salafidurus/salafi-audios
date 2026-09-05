@@ -209,11 +209,7 @@ function getContentItems(
 ): FeedContentItemDto[] {
   const items: FeedContentItemDto[] = [];
   for (const page of data?.pages ?? []) {
-    for (const item of page.items) {
-      if (item.kind !== "scholar_row" && item.kind !== "topic_row") {
-        items.push(item);
-      }
-    }
+    for (const batch of page.batches) items.push(...batch.items);
   }
   return items;
 }

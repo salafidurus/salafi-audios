@@ -1,7 +1,7 @@
 /** Presents the most recently added public content and its playback actions. */
 "use client";
 
-import { routes, type FeedContentItemDto, type FeedItemDto } from "@sd/core-contracts";
+import { routes, type FeedContentItemDto } from "@sd/core-contracts";
 import { useExploreRecentScreen } from "@sd/domain-content";
 import Link from "next/link";
 
@@ -12,10 +12,6 @@ import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 import { FeaturedLectureCard } from "../featured-lecture-card/featured-lecture-card";
 import { LectureRow } from "../lecture-row/lecture-row";
 import styles from "./recently-added-section.module.css";
-
-function isContentItem(item: FeedItemDto): item is FeedContentItemDto {
-  return item.kind !== "scholar_row" && item.kind !== "topic_row";
-}
 
 const MAX_RECENT_ITEMS = 10;
 
@@ -185,11 +181,7 @@ export function RecentlyAddedSection() {
 
   const items: FeedContentItemDto[] = [];
   for (const page of data?.pages ?? []) {
-    for (const item of page.items) {
-      if (isContentItem(item)) {
-        items.push(item);
-      }
-    }
+    for (const batch of page.batches) items.push(...batch.items);
   }
 
   return <RecentlyAddedSectionContent items={items} isLoading={isExploreLoading} />;

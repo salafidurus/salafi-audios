@@ -44,6 +44,13 @@ The API is resource-oriented and intent-driven.
 - Normalize errors into a predictable structure.
 - Use pagination, filtering, and ordering explicitly rather than implicit client assumptions.
 
+The public Explore endpoint (`GET /listings/recent`) returns the versioned
+`FeedPageDto` contract from `@sd/core-contracts`: an ordered array of semantic
+recommendation batches, an opaque cursor, and an explicit exhaustion flag.
+Recommendation ordering, eligibility, topic steering, and cursor stability
+are backend responsibilities; web and native clients only render the returned
+batches and preserve their order.
+
 ## 4. API Surface Segmentation
 
 - **Public read APIs**: published catalog, search, recommendations, and other discovery endpoints.

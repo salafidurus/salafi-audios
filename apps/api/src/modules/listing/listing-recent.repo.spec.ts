@@ -27,7 +27,7 @@ describe('RecentListingsRepo', () => {
   });
 
   describe('getRecentListings', () => {
-    it('composes branching discovery modules for the continuous feed', async () => {
+    it('returns a versioned listings batch with topic title context', async () => {
       prismaFindManySpy.mockResolvedValue([
         {
           id: 'listing-1',
@@ -54,8 +54,15 @@ describe('RecentListingsRepo', () => {
 
       const result = await repo.getRecentListings(undefined, 20, 'aqeedah');
 
-      expect(result.items.map((item) => item.kind)).toEqual(['single', 'scholar_row', 'topic_row']);
-      expect(result.items[2]).toMatchObject({ kind: 'topic_row', topicName: 'Aqeedah' });
+      expect(result.schemaVersion).toBe(1);
+      expect(result.batches).toHaveLength(1);
+      expect(result.batches[0]).toMatchObject({
+        kind: 'listings',
+        id: 'listings:topic:aqeedah',
+        title: { kind: 'topic_listings', topicSlug: 'aqeedah', label: 'Aqeedah' },
+        reason: 'deterministic_recent',
+      });
+      expect(result.batches[0]?.items[0]?.slug).toBe('listing-1');
       expect(result.nextCursor).toBeUndefined();
       expect(result.exhausted).toBe(true);
     });
@@ -89,9 +96,23 @@ describe('RecentListingsRepo', () => {
 
       const callArgs = prismaFindManySpy.mock.calls[0][0];
 
-      expect(callArgs?.orderBy).toEqual([{ createdAt: 'desc' }]);
+      expect(callArgs?.orderBy).toEqual([{ createdAt: 'desc' }, { slug: 'desc' }]);
       expect(callArgs?.where?.createdAt?.lt).toBeDefined();
       expect(callArgs?.take).toBe(11);
+    });
+
+    it('uses the slug tie-breaker when a structured cursor is supplied', async () => {
+      const cursor = Buffer.from(
+        JSON.stringify({ date: '2026-07-24T12:00:00.000Z', slug: 'listing-5' }),
+      ).toString('base64url');
+
+      await repo.getRecentListings(cursor, 10);
+
+      const where = prismaFindManySpy.mock.calls[0][0]?.where;
+      expect(where?.OR).toEqual([
+        { createdAt: { lt: new Date('2026-07-24T12:00:00.000Z') } },
+        { createdAt: new Date('2026-07-24T12:00:00.000Z'), slug: { lt: 'listing-5' } },
+      ]);
     });
 
     it('maps rows with correct format-aware durationSeconds and thumbnailUrl', async () => {
@@ -140,9 +161,7 @@ describe('RecentListingsRepo', () => {
 
       const result = await repo.getRecentListings(undefined, 20);
 
-      const contentItems = result.items.filter(
-        (item) => item.kind === 'single' || item.kind === 'series',
-      );
+      const contentItems = result.batches[0]?.items ?? [];
       expect(contentItems).toHaveLength(2);
       const item0 = contentItems[0] as any;
       expect(item0?.kind).toBe('single');
@@ -182,7 +201,7 @@ describe('RecentListingsRepo', () => {
 
       const result = await repo.getRecentListings(undefined, 20);
 
-      expect(result.items).toHaveLength(20);
+      expect(result.batches[0]?.items).toHaveLength(20);
       expect(result.nextCursor).toBeDefined();
     });
 
@@ -213,7 +232,7 @@ describe('RecentListingsRepo', () => {
 
       const result = await repo.getRecentListings(undefined, 20);
 
-      expect(result.items.filter((item) => item.kind === 'single')).toHaveLength(10);
+      expect(result.batches[0]?.items).toHaveLength(10);
       expect(result.nextCursor).toBeUndefined();
       expect(result.exhausted).toBe(true);
     });

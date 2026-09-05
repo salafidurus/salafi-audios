@@ -33,7 +33,7 @@ export class ListingController {
   @Get('recent')
   @CacheTTL(3 * 60 * 60 * 1000) // Recent feed changes more often than catalog details
   @ApiOperation({ summary: 'Get the Explore discovery feed' })
-  @ApiOkResponse({ description: 'Cursor-paginated mixed discovery feed' })
+  @ApiOkResponse({ description: 'Versioned cursor-paginated Explore recommendation batches' })
   async getRecentListings(
     @Query('cursor') cursor?: string,
     @Query('limit') limitStr?: string,

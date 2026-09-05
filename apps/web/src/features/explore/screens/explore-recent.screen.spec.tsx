@@ -95,23 +95,27 @@ function setup() {
     data: {
       pages: [
         {
-          items: [
+          batches: [
             {
-              kind: "single",
-              id: "l1",
-              slug: "lesson-1",
-              title: "Lesson one",
-              scholarName: "Ibn Baz",
-              scholarSlug: "ibn-baz",
-              thumbnailUrl: null,
-              durationSeconds: 600,
-              publishedAt: "2026-08-22",
+              kind: "listings",
+              id: "listings:recent",
+              title: { kind: "listings", id: "recent", label: "Continue exploring" },
+              reason: "deterministic_recent",
+              items: [
+                {
+                  kind: "single",
+                  id: "l1",
+                  slug: "lesson-1",
+                  title: "Lesson one",
+                  scholarName: "Ibn Baz",
+                  scholarSlug: "ibn-baz",
+                  thumbnailUrl: null,
+                  scholarImageUrl: null,
+                  durationSeconds: 600,
+                  publishedAt: "2026-08-22",
+                },
+              ],
             },
-            {
-              kind: "scholar_row",
-              scholars: [{ id: "s1", slug: "ibn-baz", name: "Ibn Baz", imageUrl: null }],
-            },
-            { kind: "topic_row", topicName: "Aqeedah", items: [] },
           ],
           exhausted: false,
           nextCursor: "next",
@@ -134,22 +138,21 @@ describe("FeedRecentScreen", () => {
     setup();
   });
 
-  it("renders mixed discovery modules without a search box", () => {
+  it("renders the supplied listings batch without a search box", () => {
     render(<FeedRecentScreen />);
 
     expect(screen.getByRole("heading", { name: "Explore" })).toBeInTheDocument();
     expect(screen.getByText("Lesson one")).toBeInTheDocument();
-    expect(screen.getByTestId("scholar-feed-row")).toBeInTheDocument();
-    expect(screen.getByTestId("topic-feed-row")).toHaveTextContent("Aqeedah");
+    expect(screen.getByRole("region", { name: "Continue exploring" })).toBeInTheDocument();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   });
 
-  it("keeps heterogeneous feed modules in separate labeled regions", () => {
+  it("preserves the semantic batch title in its region", () => {
     render(<FeedRecentScreen />);
 
     expect(
       screen.getAllByRole("region").map((region) => region.getAttribute("aria-label")),
-    ).toEqual(["Listings", "Popular Scholars", "Aqeedah"]);
+    ).toEqual(["Continue exploring"]);
   });
 
   it("requests the selected Topic from the discovery API", () => {
