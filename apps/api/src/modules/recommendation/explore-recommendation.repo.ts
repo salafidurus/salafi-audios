@@ -10,7 +10,6 @@ export type ExploreRecommendationBatch =
       kind: 'listings';
       id: string;
       reason: 'deterministic_recent';
-      topicSlug?: string;
       itemIds: string[];
     }
   | { kind: 'scholars'; id: string; reason: 'deterministic_senior_scholars'; itemIds: string[] }
@@ -25,12 +24,7 @@ export type ExploreRecommendationResult = {
 
 type ListingCursor = { date: Date; slug?: string };
 
-function applyRecentFilters(
-  where: Prisma.ListingWhereInput,
-  topicSlug?: string,
-  cursor?: ListingCursor,
-): void {
-  if (topicSlug) where.topics = { some: { topic: { slug: topicSlug } } };
+function applyRecentFilters(where: Prisma.ListingWhereInput, cursor?: ListingCursor): void {
   if (!cursor) return;
   where.OR = cursor.slug
     ? [{ createdAt: { lt: cursor.date } }, { createdAt: cursor.date, slug: { lt: cursor.slug } }]
@@ -38,10 +32,7 @@ function applyRecentFilters(
   if (!cursor.slug) where.createdAt = { lt: cursor.date };
 }
 
-function buildRecentWhere(
-  topicSlug: string | undefined,
-  cursor?: ListingCursor,
-): Prisma.ListingWhereInput {
+function buildRecentWhere(cursor?: ListingCursor): Prisma.ListingWhereInput {
   const where: Prisma.ListingWhereInput = {
     format: { in: ['single', 'series', 'collection'] },
     status: Status.published,
@@ -49,7 +40,7 @@ function buildRecentWhere(
     parentId: null,
     scholar: { isActive: true },
   };
-  applyRecentFilters(where, topicSlug, cursor);
+  applyRecentFilters(where, cursor);
   return where;
 }
 
@@ -83,13 +74,9 @@ export class ExploreRecommendationRepo {
   constructor(private readonly prisma: PrismaService) {}
 
   // oxlint-disable-next-line complexity -- Selection coordinates three ordered recommendation families behind one small interface.
-  async getRecommendations(
-    cursor?: string,
-    limit = 20,
-    topicSlug?: string,
-  ): Promise<ExploreRecommendationResult> {
+  async getRecommendations(cursor?: string, limit = 20): Promise<ExploreRecommendationResult> {
     const listings = await this.prisma.listing.findMany({
-      where: buildRecentWhere(topicSlug, decodeCursor(cursor)),
+      where: buildRecentWhere(decodeCursor(cursor)),
       select: { id: true, slug: true, createdAt: true },
       orderBy: [{ createdAt: 'desc' }, { slug: 'desc' }],
       take: limit + 1,
@@ -99,11 +86,11 @@ export class ExploreRecommendationRepo {
     if (page.length > 0) {
       const batch = {
         kind: 'listings' as const,
-        id: topicSlug ? `listings:topic:${topicSlug}` : 'listings:recent',
+        id: 'listings:recent',
         reason: 'deterministic_recent' as const,
         itemIds: page.map((item) => item.id),
       };
-      batches.push(topicSlug ? { ...batch, topicSlug } : batch);
+      batches.push(batch);
     }
     if (!cursor) {
       const [scholars, topics] = await Promise.all([

@@ -200,8 +200,6 @@ export {
   ExploreRecommendationSchemaVersion,
   type ExploreDefaultListingsTitleContextDto,
   ExploreDefaultListingsTitleContextDtoSchema,
-  type ExploreTopicListingsTitleContextDto,
-  ExploreTopicListingsTitleContextDtoSchema,
   type ExploreListingsTitleContextDto,
   ExploreListingsTitleContextDtoSchema,
   type ExploreListingsBatchDto,

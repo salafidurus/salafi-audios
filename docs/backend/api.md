@@ -49,9 +49,10 @@ The public Explore endpoint (`GET /v1/explore`) returns the versioned
 recommendation batches (`listings`, `scholars`, and `topics`), an opaque cursor,
 and an explicit exhaustion flag. The topics batch contains stable public topic
 identity and request-locale display names.
-Recommendation ordering, eligibility, topic steering, and cursor stability
-are backend responsibilities; web and native clients only render the returned
-batches and preserve their order.
+Recommendation ordering, eligibility, recommendation context, and cursor
+stability are backend responsibilities; web and native clients do not submit
+topic-steering inputs and only render the returned batches in their supplied
+order.
 The API keeps those rules in the internal `RecommendationModule`; the
 controller and public DTO mapping belong to `ExploreModule`. This boundary
 allows additional recommendation engines to evolve without coupling them to

@@ -128,6 +128,17 @@ export function getE2EPort(env: Record<string, string | undefined>): number {
   return positiveInteger(env.BUN_E2E_PORT) ?? DEFAULT_E2E_PORT;
 }
 
+/** Derives a unique journey port from the shared worktree base port. */
+export function getE2EJourneyPort(
+  defaultPort: number | undefined,
+  env: Record<string, string | undefined>,
+): number {
+  if (defaultPort === undefined || env.BUN_E2E_PORT === undefined) {
+    return defaultPort ?? getE2EPort(env);
+  }
+  return getE2EPort(env) + defaultPort - DEFAULT_E2E_PORT;
+}
+
 /** Returns a filesystem-safe directory name for one failed journey. */
 export function getDiagnosticDirectory(testName: string): string {
   const slug = testName
@@ -216,7 +227,7 @@ export async function startWebServer(config: E2EConfig = getE2EConfig()): Promis
 export function createWebE2EServer(options: WebServerOptions = {}) {
   const env = { ...process.env };
   if (options.defaultPort !== undefined) {
-    env.BUN_E2E_PORT = process.env.BUN_E2E_PORT ?? String(options.defaultPort);
+    env.BUN_E2E_PORT = String(getE2EJourneyPort(options.defaultPort, process.env));
   }
   const config = getE2EConfig(env);
   let server: WebServer | undefined;

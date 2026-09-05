@@ -16,7 +16,7 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import { MetaDetails } from "./meta-details";
 import styles from "./user-item.module.css";
 
-/** Documents this module's responsibility and public boundary. */
+/** Describes the user record and optional access-management action rendered by an admin row. */
 export type UserItemProps = {
   user: AdminUserListItemDto;
   onManageAccess?: () => void;
@@ -62,6 +62,7 @@ function renderActionButtons(
   );
 }
 
+/** Renders a responsive user row or table row with capability-gated actions. */
 export function UserItem({ user, onManageAccess, layout = "list" }: UserItemProps): ReactNode {
   const { isMobile } = useResponsive();
   const isCompact = isMobile;
