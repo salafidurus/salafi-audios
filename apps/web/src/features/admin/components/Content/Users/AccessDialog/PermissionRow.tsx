@@ -14,7 +14,7 @@ import { ScopeSelector } from "./ScopeSelector";
 
 /** Scholar option shown by the scholar scope selector. */
 interface ScholarOption {
-  /** Stable public slug used as the selected scholar identifier. */
+  /** Public scholar slug sent back when a scholar-scoped permission is saved. */
   slug: string;
   name: string;
 }

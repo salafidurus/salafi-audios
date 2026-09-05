@@ -19,6 +19,7 @@ type MyLibraryShellProps = {
   children: ReactNode;
 };
 
+/** Renders the My Library heading, tab navigation, content region, and scroll affordance. */
 export function MyLibraryShell({ activeTab, children }: MyLibraryShellProps) {
   const { t } = useTranslation();
 

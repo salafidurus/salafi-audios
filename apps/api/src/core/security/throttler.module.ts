@@ -8,5 +8,5 @@ import { RateLimitGuard } from './rate-limit.guard';
   providers: [RateLimitGuard],
   exports: [RateLimitGuard],
 })
-/** Provides the API-owned rate-limit guard and named policy boundary. */
+/** Registers the API-owned rate-limit guard for every application module. */
 export class AppThrottlerModule {}
