@@ -56,7 +56,7 @@ describe('Content translations persistence (e2e)', () => {
       ]);
 
       await request(app.getHttpServer())
-        .post(`/listings/${TEST_LISTING_SLUG}/translations`)
+        .post(`/v1/listings/${TEST_LISTING_SLUG}/translations`)
         .set(auth.headers)
         .send({ locale: 'en', title: 'English Translation Title', description: 'English desc' })
         .expect(201);
@@ -85,7 +85,7 @@ describe('Content translations persistence (e2e)', () => {
       ]);
 
       await request(app.getHttpServer())
-        .patch(`/listings/${TEST_LISTING_SLUG}/translations/en`)
+        .patch(`/v1/listings/${TEST_LISTING_SLUG}/translations/en`)
         .set(auth.headers)
         .send({ title: 'Updated English Title' })
         .expect(200);
@@ -103,7 +103,7 @@ describe('Content translations persistence (e2e)', () => {
       ]);
 
       const res = await request(app.getHttpServer())
-        .put(`/admin/listings/${TEST_LISTING_ID}/details`)
+        .put(`/v1/admin/listings/${TEST_LISTING_ID}/details`)
         .set(auth.headers)
         .send({
           translations: [{ locale: 'ar', title: 'Should be ignored', description: null }],
@@ -126,7 +126,7 @@ describe('Content translations persistence (e2e)', () => {
       ]);
 
       await request(app.getHttpServer())
-        .post(`/scholars/${TEST_SCHOLAR_SLUG}/translations`)
+        .post(`/v1/scholars/${TEST_SCHOLAR_SLUG}/translations`)
         .set(auth.headers)
         .send({ locale: 'en', name: 'English Scholar Name', bio: 'English bio' })
         .expect(201);
@@ -151,7 +151,7 @@ describe('Content translations persistence (e2e)', () => {
       ]);
 
       await request(app.getHttpServer())
-        .patch(`/scholars/${TEST_SCHOLAR_SLUG}/translations/en`)
+        .patch(`/v1/scholars/${TEST_SCHOLAR_SLUG}/translations/en`)
         .set(auth.headers)
         .send({ name: 'Updated English Scholar Name' })
         .expect(200);
@@ -169,7 +169,7 @@ describe('Content translations persistence (e2e)', () => {
       ]);
 
       const res = await request(app.getHttpServer())
-        .patch(`/admin/scholars/${TEST_SCHOLAR_ID}`)
+        .patch(`/v1/admin/scholars/${TEST_SCHOLAR_ID}`)
         .set(auth.headers)
         .send({
           translations: [{ locale: 'ar', name: 'Should be ignored', bio: null }],
@@ -209,7 +209,7 @@ describe('Content translations persistence (e2e)', () => {
           accessGrant(AccessTarget.scholar, AccessCapability.write),
         ]);
         const res = await request(app.getHttpServer())
-          .post('/admin/scholars')
+          .post('/v1/admin/scholars')
           .set(auth.headers)
           .send({
             name: 'محمد الأول',
@@ -234,7 +234,7 @@ describe('Content translations persistence (e2e)', () => {
           accessGrant(AccessTarget.scholar, AccessCapability.write),
         ]);
         await request(app.getHttpServer())
-          .patch(`/admin/scholars/${scholarId}`)
+          .patch(`/v1/admin/scholars/${scholarId}`)
           .set(auth.headers)
           .send({ name: 'محمد الثاني' })
           .expect(200);
@@ -252,7 +252,7 @@ describe('Content translations persistence (e2e)', () => {
           accessGrant(AccessTarget.scholar, AccessCapability.write),
         ]);
         await request(app.getHttpServer())
-          .patch(`/admin/scholars/${scholarId}`)
+          .patch(`/v1/admin/scholars/${scholarId}`)
           .set(auth.headers)
           .send({ mainLanguage: 'en', name: 'Muhammad the Second' })
           .expect(200);
@@ -274,7 +274,7 @@ describe('Content translations persistence (e2e)', () => {
           accessGrant(AccessTarget.scholar, AccessCapability.write),
         ]);
         await request(app.getHttpServer())
-          .patch(`/admin/scholars/${scholarId}`)
+          .patch(`/v1/admin/scholars/${scholarId}`)
           .set(auth.headers)
           .send({ isActive: false })
           .expect(200);
@@ -292,7 +292,7 @@ describe('Content translations persistence (e2e)', () => {
           accessGrant(AccessTarget.listing, AccessCapability.write),
         ]);
         const res = await request(app.getHttpServer())
-          .post('/admin/listings')
+          .post('/v1/admin/listings')
           .set(auth.headers)
           .send({
             title: 'عنوان أول',
@@ -316,7 +316,7 @@ describe('Content translations persistence (e2e)', () => {
           accessGrant(AccessTarget.listing, AccessCapability.write),
         ]);
         await request(app.getHttpServer())
-          .put(`/admin/listings/${listingId}/details`)
+          .put(`/v1/admin/listings/${listingId}/details`)
           .set(auth.headers)
           .send({ title: 'عنوان ثانٍ' })
           .expect(200);
@@ -332,7 +332,7 @@ describe('Content translations persistence (e2e)', () => {
           accessGrant(AccessTarget.listing, AccessCapability.write),
         ]);
         await request(app.getHttpServer())
-          .put(`/admin/listings/${listingId}/details`)
+          .put(`/v1/admin/listings/${listingId}/details`)
           .set(auth.headers)
           .send({ language: 'en', title: 'The Second Title' })
           .expect(200);
@@ -357,7 +357,7 @@ describe('Content translations persistence (e2e)', () => {
         ]);
         topicSlug = `e2e-sync-topic-${crypto.randomUUID()}`;
         await request(app.getHttpServer())
-          .post('/admin/topics')
+          .post('/v1/admin/topics')
           .set(auth.headers)
           .send({ slug: topicSlug, name: { ar: 'موضوع أول' } })
           .expect(201);
@@ -376,7 +376,7 @@ describe('Content translations persistence (e2e)', () => {
           accessGrant(AccessTarget.topic, AccessCapability.write),
         ]);
         await request(app.getHttpServer())
-          .put(`/admin/topics/${topicSlug}`)
+          .put(`/v1/admin/topics/${topicSlug}`)
           .set(auth.headers)
           .send({ name: { ar: 'موضوع محدث' } })
           .expect(200);
@@ -415,7 +415,7 @@ describe('Content translations persistence (e2e)', () => {
         accessGrant(AccessTarget.scholar, AccessCapability.write),
       ]);
       const createRes = await request(app.getHttpServer())
-        .post('/admin/scholars')
+        .post('/v1/admin/scholars')
         .set(createAuth.headers)
         .send({
           name: `اسم عربي ${marker}`,
@@ -438,18 +438,18 @@ describe('Content translations persistence (e2e)', () => {
         }),
       ]);
       await request(app.getHttpServer())
-        .post(`/scholars/${scholarSlug}/translations`)
+        .post(`/v1/scholars/${scholarSlug}/translations`)
         .set(translateAuth.headers)
         .send({ locale: 'en', name: `English Name ${marker}`, bio: `English Bio ${marker}` })
         .expect(201);
       await request(app.getHttpServer())
-        .post(`/scholars/${scholarSlug}/translations/en/publish`)
+        .post(`/v1/scholars/${scholarSlug}/translations/en/publish`)
         .set(translateAuth.headers)
         .expect(201);
 
       const viewAuth = await authFactory.createAdminUser();
       const listRes = await request(app.getHttpServer())
-        .get('/admin/scholars?locale=en')
+        .get('/v1/admin/scholars?locale=en')
         .set(viewAuth.headers)
         .expect(200);
       const found = listRes.body.items.find((s: any) => s.id === scholarId);
@@ -457,7 +457,7 @@ describe('Content translations persistence (e2e)', () => {
       expect(found?.bio).toBe(`English Bio ${marker}`);
 
       const searchRes = await request(app.getHttpServer())
-        .get(`/admin/scholars?search=${encodeURIComponent(`English Name ${marker}`)}`)
+        .get(`/v1/admin/scholars?search=${encodeURIComponent(`English Name ${marker}`)}`)
         .set(viewAuth.headers)
         .expect(200);
       expect(searchRes.body.items.some((s: any) => s.id === scholarId)).toBe(true);
@@ -470,7 +470,7 @@ describe('Content translations persistence (e2e)', () => {
         accessGrant(AccessTarget.listing, AccessCapability.write),
       ]);
       const createRes = await request(app.getHttpServer())
-        .post('/admin/listings')
+        .post('/v1/admin/listings')
         .set(createAuth.headers)
         .send({
           title: `عنوان عربي ${marker}`,
@@ -501,18 +501,18 @@ describe('Content translations persistence (e2e)', () => {
         }),
       ]);
       await request(app.getHttpServer())
-        .post(`/listings/${listingSlug}/translations`)
+        .post(`/v1/listings/${listingSlug}/translations`)
         .set(translateAuth.headers)
         .send({ locale: 'en', title: `English Title ${marker}` })
         .expect(201);
       await request(app.getHttpServer())
-        .post(`/listings/${listingSlug}/translations/en/publish`)
+        .post(`/v1/listings/${listingSlug}/translations/en/publish`)
         .set(translateAuth.headers)
         .expect(201);
 
       const viewAuth = await authFactory.createAdminUser();
       const listRes = await request(app.getHttpServer())
-        .get('/admin/listings?locale=en')
+        .get('/v1/admin/listings?locale=en')
         .set(viewAuth.headers)
         .expect(200);
       const found = listRes.body.items.find((l: any) => l.id === listingId);
@@ -520,7 +520,9 @@ describe('Content translations persistence (e2e)', () => {
 
       // Case-insensitive base-field search.
       const caseInsensitiveRes = await request(app.getHttpServer())
-        .get(`/admin/listings?search=${encodeURIComponent(`عنوان عربي ${marker}`.toUpperCase())}`)
+        .get(
+          `/v1/admin/listings?search=${encodeURIComponent(`عنوان عربي ${marker}`.toUpperCase())}`,
+        )
         .set(viewAuth.headers)
         .expect(200);
       expect(caseInsensitiveRes.body.items.some((l: any) => l.id === listingId)).toBe(true);
@@ -528,7 +530,7 @@ describe('Content translations persistence (e2e)', () => {
       // Translation search — the English title text doesn't appear anywhere
       // in the base (Arabic) columns.
       const searchRes = await request(app.getHttpServer())
-        .get(`/admin/listings?search=${encodeURIComponent(`English Title ${marker}`)}`)
+        .get(`/v1/admin/listings?search=${encodeURIComponent(`English Title ${marker}`)}`)
         .set(viewAuth.headers)
         .expect(200);
       expect(searchRes.body.items.some((l: any) => l.id === listingId)).toBe(true);

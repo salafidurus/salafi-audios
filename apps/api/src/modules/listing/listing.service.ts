@@ -190,8 +190,8 @@ export class ListingService {
 
     // Invalidate listing detail and contents caches
     for (const locale of SUPPORTED_LOCALES) {
-      cacheKeysToInvalidate.push(`/listings/${id}:${locale}`);
-      cacheKeysToInvalidate.push(`/listings/${id}/contents:${locale}`);
+      cacheKeysToInvalidate.push(`/v1/listings/${id}:${locale}`);
+      cacheKeysToInvalidate.push(`/v1/listings/${id}/contents:${locale}`);
     }
 
     await Promise.all(cacheKeysToInvalidate.map((key) => this.cacheManager.del(key)));

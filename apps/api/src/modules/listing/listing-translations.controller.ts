@@ -15,7 +15,7 @@ import { ListingEditorialService } from './listing-editorial.service';
 /** NestJS listing translations controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Listing Translations')
 @ApiCommonErrors()
-@Controller('listings')
+@Controller({ path: 'listings', version: '1' })
 /** listing application module responsible for listing translations.controller behavior at the backend boundary. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ListingTranslationsController {

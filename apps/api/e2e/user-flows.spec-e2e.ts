@@ -33,13 +33,13 @@ describe('Core User Flows (e2e)', () => {
       const auth = await authFactory.createUser();
       // First save
       await request(app.getHttpServer())
-        .post(`/me/my-library/save/${TEST_LISTING_SLUG}`)
+        .post(`/v1/me/my-library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
 
       // Second save (should be idempotent, i.e., return 201/200 and not error)
       await request(app.getHttpServer())
-        .post(`/me/my-library/save/${TEST_LISTING_SLUG}`)
+        .post(`/v1/me/my-library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
     });
@@ -49,13 +49,13 @@ describe('Core User Flows (e2e)', () => {
 
       // Save it first
       await request(app.getHttpServer())
-        .post(`/me/my-library/save/${TEST_LISTING_SLUG}`)
+        .post(`/v1/me/my-library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
 
       // Fetch saved
       const res = await request(app.getHttpServer())
-        .get('/me/my-library/saved')
+        .get('/v1/me/my-library/saved')
         .set(auth.headers)
         .expect(200);
 
@@ -69,19 +69,19 @@ describe('Core User Flows (e2e)', () => {
 
       // Save it first
       await request(app.getHttpServer())
-        .post(`/me/my-library/save/${TEST_LISTING_SLUG}`)
+        .post(`/v1/me/my-library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(201);
 
       // Unsave it
       await request(app.getHttpServer())
-        .delete(`/me/my-library/save/${TEST_LISTING_SLUG}`)
+        .delete(`/v1/me/my-library/save/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .expect(200);
 
       // Fetch saved again, should not contain it
       const res = await request(app.getHttpServer())
-        .get('/me/my-library/saved')
+        .get('/v1/me/my-library/saved')
         .set(auth.headers)
         .expect(200);
 
@@ -96,7 +96,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Send progress update
       await request(app.getHttpServer())
-        .put(`/audio/progress/${TEST_LISTING_SLUG}`)
+        .put(`/v1/audio/progress/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .send({
           positionSeconds: 120,
@@ -120,7 +120,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Create a progress record
       await request(app.getHttpServer())
-        .put(`/audio/progress/${TEST_LISTING_SLUG}`)
+        .put(`/v1/audio/progress/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .send({
           positionSeconds: 50,
@@ -130,7 +130,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Get progress
       const res = await request(app.getHttpServer())
-        .get('/audio/progress')
+        .get('/v1/audio/progress')
         .set(auth.headers)
         .expect(200);
 
@@ -142,7 +142,7 @@ describe('Core User Flows (e2e)', () => {
       // Get progress with since set to the future
       const futureTime = new Date(Date.now() + 60000).toISOString();
       const resFuture = await request(app.getHttpServer())
-        .get(`/audio/progress?since=${futureTime}`)
+        .get(`/v1/audio/progress?since=${futureTime}`)
         .set(auth.headers)
         .expect(200);
       expect(resFuture.body).toBeInstanceOf(Array);
@@ -153,7 +153,7 @@ describe('Core User Flows (e2e)', () => {
       const auth = await authFactory.createUser();
 
       await request(app.getHttpServer())
-        .put(`/audio/progress/${TEST_LISTING_SLUG}`)
+        .put(`/v1/audio/progress/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .send({
           positionSeconds: 300,
@@ -176,7 +176,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Mark completed
       await request(app.getHttpServer())
-        .put(`/audio/progress/${TEST_LISTING_SLUG}`)
+        .put(`/v1/audio/progress/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .send({
           positionSeconds: 300,
@@ -187,7 +187,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Get completed listings
       const res = await request(app.getHttpServer())
-        .get('/me/my-library/completed')
+        .get('/v1/me/my-library/completed')
         .set(auth.headers)
         .expect(200);
 
@@ -201,7 +201,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Update progress, but not completed
       await request(app.getHttpServer())
-        .put(`/audio/progress/${TEST_LISTING_SLUG}`)
+        .put(`/v1/audio/progress/${TEST_LISTING_SLUG}`)
         .set(auth.headers)
         .send({
           positionSeconds: 150,
@@ -212,7 +212,7 @@ describe('Core User Flows (e2e)', () => {
 
       // Get progress library list
       const res = await request(app.getHttpServer())
-        .get('/me/my-library/progress')
+        .get('/v1/me/my-library/progress')
         .set(auth.headers)
         .expect(200);
 

@@ -3,7 +3,7 @@
 // errors when CommonJS companion dependencies synchronously call `require('@nestjs/common')`
 // synchronously call `require('@nestjs/common')` during execution, we must explicitly import the core ES modules first.
 // This forces Bun to evaluate the NestJS core ESM graph synchronously at startup so subsequent CJS requires succeed.
-import { StandardSchemaValidationPipe } from '@nestjs/common';
+import { StandardSchemaValidationPipe, VersioningType } from '@nestjs/common';
 import '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CDNHealthIndicator } from '../../src/core/health/cdn-health.indicator';
@@ -59,6 +59,7 @@ export async function createE2eApp(options?: {
   const app = module.createNestApplication<NestFastifyApplication>(
     new FastifyAdapter({ trustProxy: false }),
   );
+  app.enableVersioning({ type: VersioningType.URI });
 
   const config = app.get(ConfigService);
   const redis = app.get(RedisService);

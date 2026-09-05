@@ -77,7 +77,7 @@ describe('Infrastructure & Basic API Features (e2e)', () => {
   it('OpenAPI preserves the native schema for locale updates', async () => {
     const res = await request(app.getHttpServer()).get('/docs-json').expect(200);
     const schema =
-      res.body.paths['/auth/me/locale'].patch.requestBody.content['application/json'].schema;
+      res.body.paths['/v1/auth/me/locale'].patch.requestBody.content['application/json'].schema;
 
     expect(schema.type).toBe('object');
     expect(schema.properties.preferredLanguage).toBeDefined();
@@ -95,7 +95,9 @@ describe('Infrastructure & Basic API Features (e2e)', () => {
     const auth = await authFactory.createUser();
     const responses = [];
     for (let index = 0; index < 3; index += 1) {
-      responses.push(await request(app.getHttpServer()).get('/account/profile').set(auth.headers));
+      responses.push(
+        await request(app.getHttpServer()).get('/v1/account/profile').set(auth.headers),
+      );
     }
     const has429 = responses.some((res) => res.status === 429);
     const limited = responses.find((res) => res.status === 429);

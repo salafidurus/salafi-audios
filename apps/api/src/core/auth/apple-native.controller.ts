@@ -10,7 +10,7 @@ import { RateLimitPolicy } from '../security/rate-limit.decorator';
 
 /** NestJS apple native controller service or controller coordinating the API boundary for this responsibility. */
 @ApiExcludeController()
-@Controller('auth/apple')
+@Controller({ path: 'auth/apple', version: '1' })
 /** Core API apple native.controller module providing shared backend infrastructure and authority-boundary services. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AppleNativeController {

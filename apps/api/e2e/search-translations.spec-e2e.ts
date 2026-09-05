@@ -71,7 +71,7 @@ describe('Search across translations (e2e)', () => {
 
   it('GET /search/extended finds a listing by its English translation title even though the base title is Arabic', async () => {
     const res = await request(app.getHttpServer())
-      .get('/search/extended')
+      .get('/v1/search/extended')
       .query({ q: englishTitle, locale: 'en' })
       .expect(200);
 
@@ -80,7 +80,7 @@ describe('Search across translations (e2e)', () => {
 
   it('GET /search/extended finds a listing by its scholar English translation name', async () => {
     const res = await request(app.getHttpServer())
-      .get('/search/extended')
+      .get('/v1/search/extended')
       .query({ q: englishScholarName, locale: 'en' })
       .expect(200);
 
@@ -89,7 +89,7 @@ describe('Search across translations (e2e)', () => {
 
   it('GET /search/extended resolves scholarName to the request locale', async () => {
     const res = await request(app.getHttpServer())
-      .get('/search/extended')
+      .get('/v1/search/extended')
       .query({ q: englishTitle, locale: 'en' })
       .expect(200);
 
@@ -99,7 +99,7 @@ describe('Search across translations (e2e)', () => {
 
   it('GET /search/extended still resolves scholarName to Arabic (the original) when locale is ar', async () => {
     const res = await request(app.getHttpServer())
-      .get('/search/extended')
+      .get('/v1/search/extended')
       .query({ q: arabicTitle, locale: 'ar' })
       .expect(200);
 

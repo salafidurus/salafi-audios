@@ -1,14 +1,14 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Res, VERSION_NEUTRAL } from '@nestjs/common';
 import { RateLimitPolicy } from '../security/rate-limit.decorator';
 import { Public } from '../auth/decorators';
 import { ConfigService } from '../config/config.service';
 import { SitemapService } from './sitemap.service';
-import type { Response } from 'express';
+import type { FastifyReply } from 'fastify';
 
 /** NestJS sitemap controller service or controller coordinating the API boundary for this responsibility. */
 @RateLimitPolicy('public-read')
 @Public()
-@Controller()
+@Controller({ path: '', version: VERSION_NEUTRAL })
 /** Core API sitemap.controller module providing shared backend infrastructure and authority-boundary services. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class SitemapController {
@@ -18,7 +18,7 @@ export class SitemapController {
   ) {}
 
   @Get('sitemap.xml')
-  async getSitemap(@Res() res: Response): Promise<void> {
+  async getSitemap(@Res() res: FastifyReply): Promise<void> {
     if (this.configService.NODE_ENV !== 'production') {
       res.status(404).send('Not found');
       return;
@@ -29,14 +29,14 @@ export class SitemapController {
       return;
     }
     const sitemap = await this.sitemapService.generate(baseUrl);
-    res.setHeader('Content-Type', 'application/xml');
-    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+    res.header('Content-Type', 'application/xml');
+    res.header('Cache-Control', 'public, max-age=3600, s-maxage=3600');
     res.send(sitemap);
   }
 
   @Get('robots.txt')
-  getRobots(@Res() res: Response): void {
-    res.setHeader('Content-Type', 'text/plain');
+  getRobots(@Res() res: FastifyReply): void {
+    res.header('Content-Type', 'text/plain');
     res.send('User-agent: *\nDisallow: /\n');
   }
 }

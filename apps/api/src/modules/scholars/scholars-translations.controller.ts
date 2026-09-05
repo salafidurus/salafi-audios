@@ -15,7 +15,7 @@ import { ScholarsService } from './scholars.service';
 /** NestJS scholars translations controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Scholar Translations')
 @ApiCommonErrors()
-@Controller('scholars')
+@Controller({ path: 'scholars', version: '1' })
 /** scholars application module responsible for scholars translations.controller behavior at the backend boundary. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ScholarsTranslationsController {

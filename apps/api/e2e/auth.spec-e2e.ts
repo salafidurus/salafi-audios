@@ -22,12 +22,12 @@ describe('Authentication (e2e)', () => {
 
   describe('Unauthenticated Request Handling', () => {
     it('No auth header on protected route should return 401', async () => {
-      await request(app.getHttpServer()).get('/account/profile').expect(401);
+      await request(app.getHttpServer()).get('/v1/account/profile').expect(401);
     });
 
     it('Invalid token on protected route should return 401', async () => {
       await request(app.getHttpServer())
-        .get('/account/profile')
+        .get('/v1/account/profile')
         .set('Authorization', 'Bearer invalid-token-123')
         .expect(401);
     });
@@ -35,7 +35,7 @@ describe('Authentication (e2e)', () => {
 
   describe('Public Route Accessibility', () => {
     it('GET /scholars does not require authentication and returns 200', async () => {
-      await request(app.getHttpServer()).get('/scholars').expect(200);
+      await request(app.getHttpServer()).get('/v1/scholars').expect(200);
     });
 
     it('GET /health does not require authentication and returns 200', async () => {
@@ -47,7 +47,7 @@ describe('Authentication (e2e)', () => {
     it('GET /account/profile with valid token returns 200 and profile info', async () => {
       const auth = await authFactory.createUser();
       const res = await request(app.getHttpServer())
-        .get('/account/profile')
+        .get('/v1/account/profile')
         .set(auth.headers)
         .expect(200);
 
@@ -59,7 +59,7 @@ describe('Authentication (e2e)', () => {
       const auth = await authFactory.createUser();
       const updatedName = 'Updated Test User Name';
       const res = await request(app.getHttpServer())
-        .patch('/account/profile')
+        .patch('/v1/account/profile')
         .set(auth.headers)
         .send({ displayName: updatedName })
         .expect(200);
@@ -84,7 +84,7 @@ describe('Authentication (e2e)', () => {
         data: { banned: true, banExpires: null },
       });
 
-      await request(app.getHttpServer()).get('/account/profile').set(auth.headers).expect(403);
+      await request(app.getHttpServer()).get('/v1/account/profile').set(auth.headers).expect(403);
     });
   });
 
@@ -93,10 +93,10 @@ describe('Authentication (e2e)', () => {
       const auth = await authFactory.createUser();
 
       // Delete the account
-      await request(app.getHttpServer()).delete('/account').set(auth.headers).expect(200);
+      await request(app.getHttpServer()).delete('/v1/account').set(auth.headers).expect(200);
 
       // Verify subsequent request with the same token fails with 401
-      await request(app.getHttpServer()).get('/account/profile').set(auth.headers).expect(401);
+      await request(app.getHttpServer()).get('/v1/account/profile').set(auth.headers).expect(401);
     });
   });
 });

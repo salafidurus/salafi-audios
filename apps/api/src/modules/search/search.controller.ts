@@ -19,7 +19,7 @@ import { CacheControlInterceptor } from '../../shared/interceptors/cache-control
 @ApiTags('Search')
 @ApiCommonErrors()
 @Public()
-@Controller('search')
+@Controller({ path: 'search', version: '1' })
 @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
 @CacheTTL(15 * 60 * 1000) // Search results change with catalog mutations; writes clear cache
 /** search application module responsible for search.controller behavior at the backend boundary. */

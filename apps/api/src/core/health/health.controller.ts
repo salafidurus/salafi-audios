@@ -1,6 +1,6 @@
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { Public } from '../auth/decorators';
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RateLimitPolicy } from '../security/rate-limit.decorator';
 import { CDNHealthIndicator } from './cdn-health.indicator';
@@ -14,7 +14,7 @@ import { RedisService } from '../redis/redis.service';
 @ApiTags('Health')
 @ApiCommonErrors()
 @Public()
-@Controller('health')
+@Controller({ path: 'health', version: VERSION_NEUTRAL })
 /** Core API health.controller module providing shared backend infrastructure and authority-boundary services. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class HealthController {

@@ -22,7 +22,7 @@ import { CacheControlInterceptor } from '../../shared/interceptors/cache-control
 @ApiTags('Listings')
 @ApiCommonErrors()
 @Public()
-@Controller('listings')
+@Controller({ path: 'listings', version: '1' })
 @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
 @CacheTTL(24 * 60 * 60 * 1000) // 24 hours; successful mutations clear the cache
 /** listing application module responsible for listing.controller behavior at the backend boundary. */

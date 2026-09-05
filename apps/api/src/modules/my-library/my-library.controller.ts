@@ -16,7 +16,7 @@ import { MyLibraryService } from './my-library.service';
 /** NestJS my library controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('My Library')
 @ApiCommonErrors()
-@Controller('me/my-library')
+@Controller({ path: 'me/my-library', version: '1' })
 /** my-library application module responsible for my library.controller behavior at the backend boundary. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class MyLibraryController {

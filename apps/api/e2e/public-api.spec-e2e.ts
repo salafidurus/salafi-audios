@@ -35,7 +35,10 @@ describe('Public API (e2e)', () => {
 
   describe('Search', () => {
     it('GET /search?q={valid} returns results', async () => {
-      const res = await request(app.getHttpServer()).get('/search').query({ q: 'E2E' }).expect(200);
+      const res = await request(app.getHttpServer())
+        .get('/v1/search')
+        .query({ q: 'E2E' })
+        .expect(200);
 
       expect(res.body).toHaveProperty('collections');
       expect(res.body).toHaveProperty('series');
@@ -49,7 +52,7 @@ describe('Public API (e2e)', () => {
 
     it('GET /search?q=nonexistent returns empty lists', async () => {
       const res = await request(app.getHttpServer())
-        .get('/search')
+        .get('/v1/search')
         .query({ q: 'nonexistentquerythatshouldnotmatchanything' })
         .expect(200);
 
@@ -64,7 +67,7 @@ describe('Public API (e2e)', () => {
 
   describe('Listings - Recent Feed', () => {
     it('GET /listings/recent returns a versioned listings recommendation batch', async () => {
-      const res = await request(app.getHttpServer()).get('/listings/recent').expect(200);
+      const res = await request(app.getHttpServer()).get('/v1/listings/recent').expect(200);
 
       expect(res.body).toHaveProperty('schemaVersion', 1);
       expect(Array.isArray(res.body.batches)).toBe(true);
@@ -74,7 +77,7 @@ describe('Public API (e2e)', () => {
 
     it('GET /listings/recent?limit=5 returns <= 5 items', async () => {
       const res = await request(app.getHttpServer())
-        .get('/listings/recent')
+        .get('/v1/listings/recent')
         .query({ limit: 5 })
         .expect(200);
 
@@ -86,7 +89,7 @@ describe('Public API (e2e)', () => {
 
   describe('Scholars', () => {
     it('GET /scholars returns list wrapped in an object', async () => {
-      const res = await request(app.getHttpServer()).get('/scholars').expect(200);
+      const res = await request(app.getHttpServer()).get('/v1/scholars').expect(200);
 
       expect(res.body).toHaveProperty('scholars');
       expect(Array.isArray(res.body.scholars)).toBe(true);
@@ -96,7 +99,7 @@ describe('Public API (e2e)', () => {
 
     it('GET /scholars/{valid-slug} returns detail', async () => {
       const res = await request(app.getHttpServer())
-        .get(`/scholars/${TEST_SCHOLAR_SLUG}`)
+        .get(`/v1/scholars/${TEST_SCHOLAR_SLUG}`)
         .expect(200);
 
       expect(res.body).toHaveProperty('id');
@@ -112,7 +115,7 @@ describe('Public API (e2e)', () => {
 
   describe('Topics', () => {
     it('GET /topics returns array', async () => {
-      const res = await request(app.getHttpServer()).get('/topics').expect(200);
+      const res = await request(app.getHttpServer()).get('/v1/topics').expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
       const testTopic = res.body.find((t: any) => t.slug === 'e2e-parent-topic');
@@ -120,7 +123,7 @@ describe('Public API (e2e)', () => {
     });
 
     it('GET /topics/{valid-slug} returns detail', async () => {
-      const res = await request(app.getHttpServer()).get('/topics/e2e-parent-topic').expect(200);
+      const res = await request(app.getHttpServer()).get('/v1/topics/e2e-parent-topic').expect(200);
 
       expect(res.body).toHaveProperty('id');
       expect(res.body).toHaveProperty('slug', 'e2e-parent-topic');
@@ -133,7 +136,7 @@ describe('Public API (e2e)', () => {
   describe('Listings', () => {
     it('GET /listings/{valid-slug} returns full listing', async () => {
       const res = await request(app.getHttpServer())
-        .get(`/listings/${TEST_LISTING_SLUG}`)
+        .get(`/v1/listings/${TEST_LISTING_SLUG}`)
         .expect(200);
 
       expect(res.body).toHaveProperty('id', TEST_LISTING_ID);
@@ -144,7 +147,7 @@ describe('Public API (e2e)', () => {
 
     it('projects scholar, topics, ancestry, and playable content in one payload', async () => {
       const res = await request(app.getHttpServer())
-        .get(`/listings/${TEST_LISTING_SLUG}`)
+        .get(`/v1/listings/${TEST_LISTING_SLUG}`)
         .expect(200);
 
       expect(res.body.scholar).toMatchObject({
@@ -161,7 +164,7 @@ describe('Public API (e2e)', () => {
 
     it('GET /listings/invalid-id returns 404', async () => {
       const res = await request(app.getHttpServer())
-        .get('/listings/00000000-0000-0000-0000-000000000000')
+        .get('/v1/listings/00000000-0000-0000-0000-000000000000')
         .expect(404);
 
       expect(res.body).toHaveProperty('statusCode', 404);
@@ -207,10 +210,10 @@ describe('Public API (e2e)', () => {
     it('returns 404 for unknown slugs on every public read route', async () => {
       const server = app.getHttpServer();
 
-      await request(server).get('/listings/no-such-listing').expect(404);
-      await request(server).get('/listings/no-such-listing/contents').expect(404);
+      await request(server).get('/v1/listings/no-such-listing').expect(404);
+      await request(server).get('/v1/listings/no-such-listing/contents').expect(404);
       // Related resolves as an empty surface rather than leaking existence.
-      const related = await request(server).get('/listings/no-such-listing/related').expect(200);
+      const related = await request(server).get('/v1/listings/no-such-listing/related').expect(200);
       expect(related.body).toEqual([]);
     });
 
@@ -219,28 +222,28 @@ describe('Public API (e2e)', () => {
       const server = app.getHttpServer();
 
       // TEST_LISTING_ID exists as an internal id — it must still not resolve.
-      await request(server).get(`/listings/${TEST_LISTING_ID}`).expect(404);
-      await request(server).get(`/listings/${TEST_LISTING_ID}/contents`).expect(404);
-      await request(server).get(`/audio/listings/${TEST_LISTING_ID}/stream`).expect(404);
+      await request(server).get(`/v1/listings/${TEST_LISTING_ID}`).expect(404);
+      await request(server).get(`/v1/listings/${TEST_LISTING_ID}/contents`).expect(404);
+      await request(server).get(`/v1/audio/listings/${TEST_LISTING_ID}/stream`).expect(404);
       await request(server)
-        .post(`/me/my-library/save/${TEST_LISTING_ID}`)
+        .post(`/v1/me/my-library/save/${TEST_LISTING_ID}`)
         .set(auth.headers)
         .expect(404);
       await request(server)
-        .put(`/audio/progress/${TEST_LISTING_ID}`)
+        .put(`/v1/audio/progress/${TEST_LISTING_ID}`)
         .set(auth.headers)
         .send({ positionSeconds: 30 })
         .expect(404);
 
       // Protected reads resolve as not found without exposing existence.
       const lastPlayed = await request(server)
-        .get(`/listings/${TEST_LISTING_ID}/last-played`)
+        .get(`/v1/listings/${TEST_LISTING_ID}/last-played`)
         .set(auth.headers)
         .expect(200);
       expect(lastPlayed.text).toBe('null');
 
       const summary = await request(server)
-        .get(`/listings/${TEST_LISTING_ID}/progress-summary`)
+        .get(`/v1/listings/${TEST_LISTING_ID}/progress-summary`)
         .set(auth.headers)
         .expect(200);
       expect(summary.text).toBe('null');
@@ -249,15 +252,15 @@ describe('Public API (e2e)', () => {
     it('excludes unpublished and archived listings from public discovery', async () => {
       const server = app.getHttpServer();
 
-      await request(server).get(`/listings/${DRAFT_SLUG}`).expect(404);
-      await request(server).get(`/listings/${ARCHIVED_SLUG}`).expect(404);
-      await request(server).get(`/listings/${DRAFT_SLUG}/contents`).expect(404);
-      await request(server).get(`/listings/${ARCHIVED_SLUG}/contents`).expect(404);
+      await request(server).get(`/v1/listings/${DRAFT_SLUG}`).expect(404);
+      await request(server).get(`/v1/listings/${ARCHIVED_SLUG}`).expect(404);
+      await request(server).get(`/v1/listings/${DRAFT_SLUG}/contents`).expect(404);
+      await request(server).get(`/v1/listings/${ARCHIVED_SLUG}/contents`).expect(404);
       // Stream resolution is public discovery too.
-      await request(server).get(`/audio/listings/${DRAFT_SLUG}/stream`).expect(404);
-      await request(server).get(`/audio/listings/${ARCHIVED_SLUG}/stream`).expect(404);
+      await request(server).get(`/v1/audio/listings/${DRAFT_SLUG}/stream`).expect(404);
+      await request(server).get(`/v1/audio/listings/${ARCHIVED_SLUG}/stream`).expect(404);
 
-      const feed = await request(server).get('/listings/recent').expect(200);
+      const feed = await request(server).get('/v1/listings/recent').expect(200);
       const feedSlugs = feed.body.batches.flatMap((batch: { items: { slug: string }[] }) =>
         batch.items.map((item) => item.slug),
       );
@@ -273,13 +276,13 @@ describe('Public API (e2e)', () => {
       await prisma.listingTranslation.deleteMany({ where: { listingId: TEST_LISTING_ID } });
       const cache = app.get<Cache>(CACHE_MANAGER);
       for (const locale of SUPPORTED_LOCALES) {
-        await cache.del(`/listings/${TEST_LISTING_SLUG}:${locale}`);
+        await cache.del(`/v1/listings/${TEST_LISTING_SLUG}:${locale}`);
       }
     });
 
     it('serves base fields when the locale has no published translation', async () => {
       const res = await request(app.getHttpServer())
-        .get(`/listings/${TEST_LISTING_SLUG}`)
+        .get(`/v1/listings/${TEST_LISTING_SLUG}`)
         .set({ 'Accept-Language': 'en' })
         .expect(200);
 
@@ -292,7 +295,7 @@ describe('Public API (e2e)', () => {
       // The previous assertion cached this URL+locale pair before any
       // translation existed — drop it so the approved translation is read.
       const cache = app.get<Cache>(CACHE_MANAGER);
-      await cache.del(`/listings/${TEST_LISTING_SLUG}:en`);
+      await cache.del(`/v1/listings/${TEST_LISTING_SLUG}:en`);
 
       await prisma.listingTranslation.upsert({
         where: { listingId_locale: { listingId: TEST_LISTING_ID, locale: 'en' } },
@@ -307,7 +310,7 @@ describe('Public API (e2e)', () => {
 
       try {
         const res = await request(app.getHttpServer())
-          .get(`/listings/${TEST_LISTING_SLUG}`)
+          .get(`/v1/listings/${TEST_LISTING_SLUG}`)
           .set({ 'Accept-Language': 'en' })
           .expect(200);
 
@@ -320,7 +323,7 @@ describe('Public API (e2e)', () => {
         await prisma.listingTranslation.deleteMany({ where: { listingId: TEST_LISTING_ID } });
         const cache = app.get<Cache>(CACHE_MANAGER);
         for (const locale of SUPPORTED_LOCALES) {
-          await cache.del(`/listings/${TEST_LISTING_SLUG}:${locale}`);
+          await cache.del(`/v1/listings/${TEST_LISTING_SLUG}:${locale}`);
         }
       }
     });

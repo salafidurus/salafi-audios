@@ -32,6 +32,10 @@ The API is resource-oriented and intent-driven.
 - Keep contracts stable and explicit.
 - Prefer additive evolution over breaking churn.
 - Treat the API as the boundary shared by web, mobile, and backend tooling.
+- Business application routes use the canonical `/v1` URI namespace. An
+  unversioned business request is unsupported and is not aliased to `/v1`.
+- Health, readiness, documentation, sitemap, robots, and Better Auth routes
+  retain their separate version-neutral paths.
 
 ### Request and Response Rules
 
@@ -80,11 +84,11 @@ Authentication and authorization are centralized in the backend.
 
 ### Route Mappings & Resource Namespaces
 
-- Public listing details are resolved by a globally unique slug at `GET /listings/:slug` for both web and mobile clients.
-- User access management is mapped as a unified sub-resource at `/admin/users/:userId/access`.
+- Public listing details are resolved by a globally unique slug at `GET /v1/listings/:slug` for both web and mobile clients.
+- User access management is mapped as a unified sub-resource at `/v1/admin/users/:userId/access`.
 - The access endpoint replaces the former separate grant and role endpoints with a versioned aggregate snapshot and replacement operation.
-- GDPR account deletions are resolved via `DELETE /account` and administrative user deletion endpoints.
-- Personal sync state exposes matched bulk-push/delta-pull pairs per resource: `POST /audio/progress/sync` + `GET /audio/progress?since=` for progress, `POST /me/my-library/saved/sync` + `GET /me/my-library/saved/delta?since=` for saved state. Both bulk-push bodies use a unified `{ items: [...] }` shape (one endpoint per resource, not split save/unsave or start/stop calls) so the client-side sync engine (`@sd/core-sync`) can treat every resource the same way.
+- GDPR account deletions are resolved via `DELETE /v1/account` and administrative user deletion endpoints.
+- Personal sync state exposes matched bulk-push/delta-pull pairs per resource: `POST /v1/audio/progress/sync` + `GET /v1/audio/progress?since=` for progress, `POST /v1/me/my-library/saved/sync` + `GET /v1/me/my-library/saved/delta?since=` for saved state. Both bulk-push bodies use a unified `{ items: [...] }` shape (one endpoint per resource, not split save/unsave or start/stop calls) so the client-side sync engine (`@sd/core-sync`) can treat every resource the same way.
 
 ### Sync and Conflict Resolution
 
@@ -118,7 +122,8 @@ resolution.
 ## 7. Contracts and Documentation
 
 - `@sd/core-contracts` is the shared TypeScript contract package for clients and server.
-- Swagger/OpenAPI may be exposed in development at `/api/docs` when enabled.
+- Swagger/OpenAPI may be exposed in development at `/docs` when enabled and
+  describes the versioned `/v1` application paths.
 - Public client base URLs are configured via `NEXT_PUBLIC_API_URL` for web and `EXPO_PUBLIC_API_URL` for mobile.
 
 ### API rate-limit policies
