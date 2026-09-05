@@ -81,11 +81,44 @@ export const ExploreScholarsBatchDtoSchema = z.object({
 /** Ordered senior scholars with recommendation-owned eligibility and ranking. */
 export type ExploreScholarsBatchDto = z.infer<typeof ExploreScholarsBatchDtoSchema>;
 
+/** Semantic title context for the deterministic discoverable-topics recommendation. */
+export const ExploreTopicsTitleContextDtoSchema = z.object({
+  kind: z.literal("topics"),
+  id: z.literal("discoverable_topics"),
+  label: z.string().min(1),
+});
+/** Display-ready title context identifying the discoverable topics recommendation. */
+export type ExploreTopicsTitleContextDto = z.infer<typeof ExploreTopicsTitleContextDtoSchema>;
+
+/** Topic identity and localized name required by Explore presentation. */
+export const ExploreTopicItemDtoSchema = z.object({
+  id: z.string().min(1),
+  slug: z.string().min(1),
+  name: z.string().min(1),
+});
+/** Stable public topic identity paired with the request-locale display name. */
+export type ExploreTopicItemDto = z.infer<typeof ExploreTopicItemDtoSchema>;
+
+/** A semantic, ordered discoverable-topics recommendation batch. */
+export const ExploreTopicsBatchDtoSchema = z.object({
+  kind: z.literal("topics"),
+  id: z.string().min(1),
+  title: ExploreTopicsTitleContextDtoSchema,
+  reason: z.literal("deterministic_topics"),
+  items: z.array(ExploreTopicItemDtoSchema),
+});
+/** Ordered topics whose eligibility and ordering remain recommendation-owned. */
+export type ExploreTopicsBatchDto = z.infer<typeof ExploreTopicsBatchDtoSchema>;
+
 /** Versioned public response for the Explore recommendation sequence. */
 export const FeedPageDtoSchema = z.object({
   schemaVersion: z.literal(ExploreRecommendationSchemaVersion),
   batches: z.array(
-    z.discriminatedUnion("kind", [ExploreListingsBatchDtoSchema, ExploreScholarsBatchDtoSchema]),
+    z.discriminatedUnion("kind", [
+      ExploreListingsBatchDtoSchema,
+      ExploreScholarsBatchDtoSchema,
+      ExploreTopicsBatchDtoSchema,
+    ]),
   ),
   nextCursor: z.string().optional(),
   exhausted: z.boolean(),

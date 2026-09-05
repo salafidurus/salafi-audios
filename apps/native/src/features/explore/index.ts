@@ -13,6 +13,10 @@ export {
   type ExploreTopicRowProps,
 } from "./components/explore-topic-row/explore-topic-row";
 export {
+  ExploreTopicBatchRow,
+  type ExploreTopicBatchRowProps,
+} from "./components/explore-topic-batch-row/explore-topic-batch-row";
+export {
   ExploreSkeleton,
   type ExploreSkeletonProps,
 } from "./components/explore-skeleton/explore-skeleton";

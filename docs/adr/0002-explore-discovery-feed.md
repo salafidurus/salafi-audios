@@ -23,9 +23,10 @@ the authoritative relationships needed to rank content by Topic and Scholar.
   promise of chronological recency.
 - Return a versioned, cursor-paginated `FeedPageDto` containing ordered,
   semantic recommendation batches. Ticket #898 starts with a deterministic
-  `listings` batch (`reason: deterministic_recent`); later tickets can add
-  batch forms without making clients infer meaning from flat rows. The API
-  owns composition, topic steering, deduplication, and exhaustion.
+  `listings` batch (`reason: deterministic_recent`), followed by the
+  `scholars` and `topics` batches added by later Explore tickets. New batch
+  forms must remain semantic and must not make clients infer meaning from flat
+  rows. The API owns composition, topic steering, deduplication, and exhaustion.
 - Treat Topic selection as steering: selected-topic content is prioritized,
   while adjacent and serendipitous content remains possible. It is not a
   strict search filter.
@@ -45,6 +46,13 @@ It is ordered by `createdAt DESC, slug DESC`, with a cursor containing both
 values so equal timestamps cannot duplicate or skip listings. The optional
 `topic` query steers the initial batch to that topic and supplies a localized
 typed title context; clients preserve the returned batch and item order.
+
+The initial topics recommendation is a semantic `topics` batch with stable
+identity `topics:discoverable` and reason `deterministic_topics`. A topic is
+eligible when it is attached to at least one published, non-deleted, top-level
+listing in a supported format whose scholar is active. Topic items are ordered
+by `orderIndex ASC, slug ASC` and expose the public topic ID, slug, and
+request-locale display name. Empty topic results omit the batch.
 
 ## Consequences
 

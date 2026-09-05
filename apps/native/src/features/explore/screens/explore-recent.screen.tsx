@@ -1,4 +1,8 @@
-import type { ExploreListingsBatchDto, ExploreScholarsBatchDto } from "@sd/core-contracts";
+import type {
+  ExploreListingsBatchDto,
+  ExploreScholarsBatchDto,
+  ExploreTopicsBatchDto,
+} from "@sd/core-contracts";
 import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
@@ -20,6 +24,7 @@ import {
   ExploreLoadingFooter,
   ExploreStatusView,
 } from "../components/explore-status/explore-status";
+import { ExploreTopicBatchRow } from "../components/explore-topic-batch-row/explore-topic-batch-row";
 
 /** Composes the mixed native discovery feed without peer subsection navigation. */
 /** Describes navigation callbacks accepted by the Explore root screen. */
@@ -71,10 +76,21 @@ function ExploreRecentStatus({
 }
 
 function renderFeedItem(
-  item: ExploreListingsBatchDto | ExploreScholarsBatchDto,
+  item: ExploreListingsBatchDto | ExploreScholarsBatchDto | ExploreTopicsBatchDto,
   onNavigateToListing?: (slug: string) => void,
   onNavigateToScholar?: (slug: string) => void,
+  onTopicPress?: (slug: string) => void,
 ) {
+  if (item.kind === "topics") {
+    return (
+      <ExploreTopicBatchRow
+        title={item.title.label}
+        topics={item.items}
+        onTopicPress={onTopicPress}
+      />
+    );
+  }
+
   return (
     <View>
       <AppText variant="titleMd">{item.title.label}</AppText>
@@ -97,7 +113,9 @@ function renderFeedItem(
   );
 }
 
-function getItemKey(item: ExploreListingsBatchDto | ExploreScholarsBatchDto): string {
+function getItemKey(
+  item: ExploreListingsBatchDto | ExploreScholarsBatchDto | ExploreTopicsBatchDto,
+): string {
   return item.id;
 }
 
@@ -112,8 +130,11 @@ export function ExploreScreen({ onNavigateToListing, onNavigateToScholar }: Expl
   const items = data?.pages.flatMap((p) => p.batches) ?? [];
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<ExploreListingsBatchDto | ExploreScholarsBatchDto>) =>
-      renderFeedItem(item, onNavigateToListing, onNavigateToScholar),
+    ({
+      item,
+    }: ListRenderItemInfo<
+      ExploreListingsBatchDto | ExploreScholarsBatchDto | ExploreTopicsBatchDto
+    >) => renderFeedItem(item, onNavigateToListing, onNavigateToScholar, setTopicSlug),
     [onNavigateToListing, onNavigateToScholar],
   );
 

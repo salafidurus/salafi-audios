@@ -8,6 +8,8 @@ import type {
   ExploreListingsBatchDto,
   ExploreScholarsBatchDto,
   ExploreScholarItemDto,
+  ExploreTopicsBatchDto,
+  ExploreTopicItemDto,
   ListingFormat,
   ScholarTitle,
   Locale,
@@ -201,6 +203,28 @@ function buildSeniorScholarsBatch(
   };
 }
 
+function topicsTitleLabel(locale: Locale): string {
+  return locale === 'ar' ? 'استكشف المواضيع' : 'Explore topics';
+}
+
+function buildTopicsBatch(
+  items: ExploreTopicItemDto[],
+  locale: Locale,
+): ExploreTopicsBatchDto | undefined {
+  if (items.length === 0) return undefined;
+  return {
+    kind: 'topics',
+    id: 'topics:discoverable',
+    title: {
+      kind: 'topics',
+      id: 'discoverable_topics',
+      label: topicsTitleLabel(locale),
+    },
+    reason: 'deterministic_topics',
+    items,
+  };
+}
+
 function listingsTitleLabel(locale: Locale): string {
   return locale === 'ar' ? 'مواصلة الاستكشاف' : 'Continue exploring';
 }
@@ -271,6 +295,36 @@ async function findSeniorScholars(prisma: PrismaService, locale: Locale) {
   });
 }
 
+async function findDiscoverableTopics(prisma: PrismaService, locale: Locale) {
+  return prisma.topic.findMany({
+    where: {
+      listingTopics: {
+        some: {
+          listing: {
+            format: { in: ['single', 'series', 'collection'] },
+            status: Status.published,
+            deletedAt: null,
+            parentId: null,
+            scholar: { isActive: true },
+          },
+        },
+      },
+    },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      translations: {
+        where: { locale },
+        select: { name: true },
+        take: 1,
+      },
+    },
+    orderBy: [{ orderIndex: 'asc' }, { slug: 'asc' }],
+    take: 20,
+  });
+}
+
 @Injectable()
 /** NestJS recent listings repo service or controller coordinating the API boundary for this responsibility. */
 export class RecentListingsRepo {
@@ -322,6 +376,15 @@ export class RecentListingsRepo {
       }),
       locale,
     );
+    const topics = cursor ? [] : await findDiscoverableTopics(this.prisma, locale);
+    const topicBatch = buildTopicsBatch(
+      topics.map((topic) => ({
+        id: topic.id,
+        slug: topic.slug,
+        name: topic.translations[0]?.name ?? topic.name,
+      })),
+      locale,
+    );
 
     const lastItem = page.at(-1);
     const nextCursor = encodeNextCursor(hasMore, lastItem, (date, slug) =>
@@ -330,8 +393,10 @@ export class RecentListingsRepo {
 
     return {
       schemaVersion: ExploreRecommendationSchemaVersion,
-      batches: [batch, scholarBatch].filter(
-        (candidate): candidate is ExploreListingsBatchDto | ExploreScholarsBatchDto =>
+      batches: [batch, scholarBatch, topicBatch].filter(
+        (
+          candidate,
+        ): candidate is ExploreListingsBatchDto | ExploreScholarsBatchDto | ExploreTopicsBatchDto =>
           candidate !== undefined,
       ),
       nextCursor,

@@ -89,6 +89,19 @@ describe('Public API (e2e)', () => {
       expect(scholarBatch.items.every((item: any) => item.name)).toBe(true);
     });
 
+    it('includes the ordered discoverable topics recommendation batch', async () => {
+      const res = await request(app.getHttpServer()).get('/v1/listings/recent').expect(200);
+
+      const topicBatch = res.body.batches.find((batch: any) => batch.kind === 'topics');
+      expect(topicBatch).toMatchObject({
+        id: 'topics:discoverable',
+        title: { kind: 'topics', id: 'discoverable_topics' },
+        reason: 'deterministic_topics',
+      });
+      expect(topicBatch.items.length).toBeGreaterThan(0);
+      expect(topicBatch.items.every((item: any) => item.id && item.slug && item.name)).toBe(true);
+    });
+
     it('GET /listings/recent?limit=5 returns <= 5 items', async () => {
       const res = await request(app.getHttpServer())
         .get('/v1/listings/recent')
