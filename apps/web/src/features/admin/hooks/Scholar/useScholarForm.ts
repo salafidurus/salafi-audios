@@ -3,6 +3,7 @@ import type { Locale, ScholarFormDataDto, ScholarTitle, CountryCode } from "@sd/
 import { useReducer } from "react";
 
 /** Documents this module's responsibility and public boundary. */
+/** Persisted scholar values captured to identify edits before saving. */
 export type ScholarChangeSnapshot = {
   name: string;
   bio: string;
@@ -10,6 +11,7 @@ export type ScholarChangeSnapshot = {
   isActive: boolean;
   title?: ScholarTitle;
   country?: CountryCode;
+  /** Locale of the scholar's canonical name and biography. */
   mainLanguage: Locale;
   socialTwitter?: string;
   socialTelegram?: string;
@@ -18,18 +20,21 @@ export type ScholarChangeSnapshot = {
   orderIndex: number;
 };
 
+/** Reducer state for creating or editing a scholar and staging its image. */
 export type FormState = {
   // Immutable fields (edit mode only)
   id?: string;
 
   // Mutable fields
   name: string;
+  /** Stable public identifier; immutable after an existing scholar is loaded. */
   slug: string;
   bio: string;
   imageUrl: string;
   isActive: boolean;
   title?: ScholarTitle;
   country?: CountryCode;
+  /** Locale containing the canonical scholar content. */
   mainLanguage: Locale;
   socialTwitter?: string;
   socialTelegram?: string;
@@ -41,6 +46,7 @@ export type FormState = {
   // Snapshot of the mutable fields as fetched, for diffing in the review tab. Null in create mode.
   initialSnapshot: ScholarChangeSnapshot | null;
   saving: boolean;
+  /** Validation or persistence error shown by the form. */
   error: string | null;
   isEditing: boolean;
 
@@ -58,11 +64,16 @@ type UpdateFieldAction = {
   [K in UpdatableField]: { type: "UPDATE_FIELD"; field: K; value: FormState[K] };
 }[UpdatableField];
 
+/** Reducer events for field edits, initialization, saving, and image staging. */
 export type FormAction =
   | UpdateFieldAction
   | { type: "INIT_FORM"; data: ScholarFormDataDto }
   | { type: "SET_SAVING"; saving: boolean }
-  | { type: "SET_ERROR"; error: string | null }
+  | {
+      type: "SET_ERROR";
+      /** Validation or persistence error detail; null clears it. */
+      error: string | null;
+    }
   | { type: "SET_STAGED_IMAGE"; file: File | null; preview: string | null };
 
 const IMMUTABLE_FIELDS = ["slug"];

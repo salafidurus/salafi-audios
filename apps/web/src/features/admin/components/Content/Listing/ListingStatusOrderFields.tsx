@@ -15,14 +15,18 @@ import { validateLectureStatus, type LectureStatus } from "@/shared/types/form-t
 
 import styles from "./listing-modal.module.css";
 
+/** Controls the listing status and editorial order fields in the listing form. */
 interface ListingStatusOrderFieldsProps {
+  /** Current publication lifecycle status displayed by the selector. */
   status: LectureStatus;
   orderIndex: number;
+  /** Reports a validated status chosen by the editor. */
   onStatusChange: (status: LectureStatus) => void;
   onOrderIndexChange: (orderIndex: number) => void;
   idPrefix?: string;
 }
 
+/** Renders the status selector and numeric ordering control for a listing. */
 export function ListingStatusOrderFields({
   status,
   orderIndex,

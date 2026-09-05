@@ -11,6 +11,7 @@ type UserAvatarProps = {
   fill?: boolean;
 };
 
+/** Renders a user image or deterministic initials fallback at the requested size. */
 export function UserAvatar({
   image,
   name,

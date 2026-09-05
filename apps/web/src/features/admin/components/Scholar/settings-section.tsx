@@ -15,6 +15,7 @@ interface SettingsSectionProps {
   dispatch: React.Dispatch<FormAction>;
 }
 
+/** Renders the scholar active toggle and editorial ordering controls. */
 export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
   const { t } = useTranslation();
 

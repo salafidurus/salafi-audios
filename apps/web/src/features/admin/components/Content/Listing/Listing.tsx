@@ -64,6 +64,7 @@ function ListingActions({
   );
 }
 
+/** Renders a listing row with actions filtered by the current user's abilities. */
 export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps) {
   const { isMobile } = useResponsive();
   const { ability } = useAbility();

@@ -46,9 +46,11 @@ type Props = {
   searchOptions: PromotionListingOption[];
   editorsPicks: PromotionListingOption[];
   onEditorsPicksChange: (value: PromotionListingOption[]) => void;
+  /** Receives duplicate-selection feedback so the parent can show it beside Save. */
   onError: (message: string) => void;
 };
 
+/** Renders searchable, sortable editor-picked listings for homepage curation. */
 export function EditorsPicksSection({
   search,
   onSearchChange,

@@ -26,6 +26,7 @@ interface GeneralDataSectionProps {
   isEditing?: boolean;
 }
 
+/** Renders the scholar identity, title, country, and staged avatar controls. */
 export function GeneralDataSection({
   formData,
   dispatch,

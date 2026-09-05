@@ -10,11 +10,13 @@ import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./scholar-grid-card.module.css";
 
+/** Scholar summary and navigation callback for one Explore grid card. */
 export type ScholarGridCardProps = {
   scholar: ScholarListItemDto;
   onPress?: (slug: string) => void;
 };
 
+/** Renders a scholar avatar, localized identity, and optional detail navigation. */
 export function ScholarGridCard({ scholar, onPress }: ScholarGridCardProps) {
   const { t } = useTranslation();
   const formatScholarName = useFormatScholarName();

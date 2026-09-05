@@ -34,6 +34,7 @@ import { Textarea } from "@/shared/components/ui/textarea";
 
 import styles from "./support.screen.module.css";
 
+/** Renders localized support FAQs and the support-request form. */
 export function SupportScreen() {
   const { t } = useTranslation();
   const [category, setCategory] = useState("technical");

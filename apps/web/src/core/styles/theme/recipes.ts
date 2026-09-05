@@ -7,6 +7,7 @@ import type {
 } from "@sd/design-tokens";
 
 /** Documents this module's responsibility and public boundary. */
+/** Web-specific accent recipes with CSS-ready light/dark presentation values. */
 export type AccentRecipesWeb = AccentRecipesShared & {
   primaryCta: AccentRecipesShared["primaryCta"] & {
     background: string;
@@ -50,6 +51,7 @@ const createLayeredBackground = (
     radial.radius * 100,
   )}%), linear-gradient(${Math.round(Math.atan2(linear.end.y - linear.start.y, linear.end.x - linear.start.x) * (180 / Math.PI) - 90)}deg, ${linear.colors[0]}, ${linear.colors[1]})`;
 
+/** Resolves shared accent recipes into the web theme's CSS-ready values. */
 export const createAccentRecipesWeb = (
   colors: AppColors,
   focusRingColor: string,

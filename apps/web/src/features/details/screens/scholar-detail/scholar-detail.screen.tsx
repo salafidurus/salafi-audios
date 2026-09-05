@@ -28,11 +28,14 @@ import { formatDuration } from "@/shared/utils/format";
 
 import styles from "./scholar-detail.screen.module.css";
 
+/** Route input and query state needed to render a scholar's detail screen. */
 export type ScholarDetailScreenProps = {
+  /** Public scholar slug used to load the detail and content queries. */
   slug: string;
 };
 
 type ScholarStateProps = {
+  /** Whether the current scholar query failed without usable cached data. */
   isError: boolean;
   isFetching: boolean;
   hasScholar: boolean;
@@ -266,6 +269,7 @@ function ScholarLoadedView({
   );
 }
 
+/** Coordinates scholar loading, topic filtering, search, and listing navigation. */
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { t } = useTranslation();
   const showOriginal = useShowOriginalContent();

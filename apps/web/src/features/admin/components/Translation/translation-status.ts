@@ -3,7 +3,9 @@ import type { Locale } from "@sd/core-contracts";
 import type { TranslationFormState } from "@/features/admin/hooks/Translation/useTranslationForm";
 
 /** Documents this module's responsibility and public boundary. */
+/** Visual status variants used by translation indicators. */
 export type StatusDot = "published" | "draft" | "notCreated";
+/** Localized label and visual status for one translation locale. */
 export type StatusInfo = { label: string; dot: StatusDot };
 
 /**

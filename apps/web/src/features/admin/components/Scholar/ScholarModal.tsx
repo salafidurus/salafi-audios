@@ -37,6 +37,7 @@ import styles from "./scholar-modal.module.css";
 import { SettingsSection } from "./settings-section";
 import { SocialSection } from "./social-section";
 
+/** Modal lifecycle and save callbacks for creating or editing a scholar. */
 export interface ScholarModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -140,6 +141,7 @@ function ScholarLoadingModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
+  /** Error returned while loading the existing scholar being edited. */
   fetchError: string | null;
   t: ReturnType<typeof useTranslation>["t"];
 }) {
@@ -206,9 +208,11 @@ function ScholarFormTabs({
   onTabChange,
   t,
 }: {
+  /** Current reducer-backed scholar values rendered by the active tab. */
   state: FormState;
   dispatch: React.Dispatch<FormAction>;
   activeTab: string;
+  /** Tabs containing validation errors, used to guide the editor to fixes. */
   errorTabs: string[];
   changedFields: ReturnType<typeof getChangedScholarFields>;
   onImageStaged: (file: File | null, preview: string | null) => void;
@@ -303,6 +307,7 @@ function ScholarFormTabs({
   );
 }
 
+/** Coordinates scholar loading, tabbed editing, validation, and persistence. */
 export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarModalProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<string>("general");

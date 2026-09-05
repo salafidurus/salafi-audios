@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import styles from "./settings-row.module.css";
 
 /** Documents this module's responsibility and public boundary. */
+/** Label, supporting text, and control content for one settings row. */
 export interface SettingsRowProps {
   label?: string;
   sublabel?: string;
@@ -11,6 +12,7 @@ export interface SettingsRowProps {
   fullWidth?: boolean;
 }
 
+/** Renders either a labelled control row or a full-width settings child. */
 export function SettingsRow({ label, sublabel, children, fullWidth = false }: SettingsRowProps) {
   if (fullWidth) {
     return <div className={styles.rowFull}>{children}</div>;

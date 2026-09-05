@@ -9,8 +9,10 @@ import {
 } from "../utils/explore-filters";
 
 /** Documents this module's responsibility and public boundary. */
+/** Locale and optional identity used to isolate persisted Explore filters. */
 export type UseExploreFiltersOptions = {
   locale: string;
+  /** Authenticated user identity; absent uses the anonymous filter namespace. */
   userId?: string;
 };
 
@@ -22,6 +24,7 @@ function browserStorage(): Storage | null {
   }
 }
 
+/** Loads, updates, and persists Explore filters for the active locale and user. */
 export function useExploreFilters({ locale, userId }: UseExploreFiltersOptions) {
   const storageKey = exploreFiltersStorageKey(locale, userId);
   const [filters, setFilters] = useState<ExploreFilters>(DEFAULT_EXPLORE_FILTERS);

@@ -33,7 +33,6 @@
     "anti-slop/no-unsafe-dictionary-type": "error",
     "anti-slop/no-widen-then-assert": "error",
     "anti-slop/require-safety-comment-for-type-assertion": "error",
-    "anti-slop/require-tsdoc": ["error", { "mode": "final" }],
     "jsdoc/no-blank-blocks": "error",
     "import/no-duplicates": "error",
     "import/first": "error",
@@ -62,7 +61,6 @@
         "anti-slop/no-unsafe-dictionary-type": "off",
         "anti-slop/no-widen-then-assert": "off",
         "anti-slop/require-safety-comment-for-type-assertion": "off",
-        "anti-slop/require-tsdoc": "off",
         "eslint/complexity": "off"
       }
     },

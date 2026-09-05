@@ -12,6 +12,7 @@ import { MarqueeText } from "@/shared/components/MarqueeText";
 
 import styles from "./admin-item.module.css";
 
+/** Metadata label/value pair rendered inside a responsive admin item. */
 export interface AdminItemMetadataItem {
   /** Metadata label (e.g., "Email", "Role", "Access") */
   label: string;
@@ -23,6 +24,7 @@ export interface AdminItemMetadataItem {
   expandable?: boolean;
 }
 
+/** Content and actions for one responsive admin list item. */
 export interface AdminItemProps {
   /** Optional thumbnail (image src/alt or custom React element like avatar) */
   thumbnail?: { src: string; alt: string } | React.ReactNode;
@@ -51,6 +53,7 @@ function isThumbnailImage(
   return ThumbnailImageSchema.safeParse(thumbnail).success;
 }
 
+/** Renders an admin item and manages expansion of truncated metadata values. */
 export function AdminItem({
   thumbnail,
   title,

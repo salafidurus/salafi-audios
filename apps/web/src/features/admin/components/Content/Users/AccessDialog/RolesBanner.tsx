@@ -7,9 +7,11 @@ import styles from "./AccessDialog.module.css";
 
 /** Documents this module's responsibility and public boundary. */
 interface RolesBannerProps {
+  /** Effective roles that explain the permissions shown in the access dialog. */
   roles: string[];
 }
 
+/** Renders effective role badges when a user has at least one assigned role. */
 export function RolesBanner({ roles }: RolesBannerProps): ReactNode {
   if (roles.length === 0) return null;
 

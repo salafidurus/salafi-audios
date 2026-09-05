@@ -13,12 +13,15 @@ type MetaDetailsProps = {
     name: string | null;
     email: string;
     image: string | null;
+    /** Assigned roles, available to callers that render additional user metadata. */
     roles: string[];
+    /** ISO timestamp used to format the user's joined date in UTC. */
     createdAt: string;
   };
   showJoinedDate?: boolean;
 };
 
+/** Renders a user's name, email, and optionally their localized joined date. */
 export function MetaDetails({ user, showJoinedDate = true }: MetaDetailsProps): ReactNode {
   const { i18n } = useTranslation();
   const joinDateFormatter = useMemo(

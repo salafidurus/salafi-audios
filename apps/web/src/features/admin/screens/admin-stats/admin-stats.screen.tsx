@@ -40,7 +40,11 @@ function hasAccess(isLoading: boolean, check: () => boolean): boolean {
   return !isLoading && check();
 }
 
-type AuthorizedQuery = { isLoading?: boolean; isError?: boolean };
+type AuthorizedQuery = {
+  isLoading?: boolean;
+  /** Query failure state used to show partial-data feedback. */
+  isError?: boolean;
+};
 
 function selectAuthorized(
   entries: Array<{ enabled: boolean; query: AuthorizedQuery }>,
@@ -108,12 +112,15 @@ type AdminStatsContentProps = {
     listings: number;
     users: number;
   };
+  /** Selected listing status; `all` leaves the result set unfiltered. */
   statusFilter: string;
+  /** Updates the listing status filter used by the table. */
   setStatusFilter: (value: string) => void;
   table: {
     columns: AdaptiveDataViewColumn<AdminListingListItemDto>[];
     sortedListings: AdminListingListItemDto[];
     listings: AdminListingListItemDto[];
+    /** Whether the listing query returned an error alongside any cached rows. */
     isError: boolean;
     sort: { key: SortKey; direction: "ascending" | "descending" };
     handleSort: (key: string) => void;
@@ -198,6 +205,7 @@ function AdminStatsContent({
   );
 }
 
+/** Loads authorized admin metrics and renders the listing statistics table. */
 export function AdminStatsScreen() {
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useAuth();

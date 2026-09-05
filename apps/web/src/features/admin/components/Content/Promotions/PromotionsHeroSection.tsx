@@ -16,6 +16,7 @@ import { InputField } from "@/shared/components/ui/input-field";
 
 import styles from "./promotions-content.module.css";
 
+/** A listing option used by promotion search controls and the active selection summary. */
 export type PromotionListingOption = { id: string; title: string; scholarName: string };
 
 type Props = {
@@ -30,6 +31,7 @@ type Props = {
   activeListing?: PromotionListingOption;
 };
 
+/** Renders the searchable hero-listing selector and its optional headline field. */
 export function PromotionsHeroSection({
   search,
   onSearchChange,

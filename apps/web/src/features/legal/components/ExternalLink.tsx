@@ -13,6 +13,7 @@ interface ExternalLinkProps {
   title: string;
 }
 
+/** Renders an external destination with its full URL available through a tooltip. */
 export function ExternalLink({ href, title }: ExternalLinkProps) {
   return (
     <TooltipProvider>

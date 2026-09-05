@@ -7,6 +7,7 @@ import type { AppThemeWeb } from "./index";
  * with the base theme and the emitted CSS stays lean.
  */
 
+/** Serializes color and accent tokens into CSS custom-property declarations. */
 export const getColorThemeProperties = (theme: AppThemeWeb): string => `
   --surface-canvas: ${theme.colors.surface.canvas};
   --surface-default: ${theme.colors.surface.default};
@@ -116,6 +117,7 @@ export const getColorThemeProperties = (theme: AppThemeWeb): string => `
   --badge-danger-fg: ${theme.recipes.badge.danger.foregroundColor};
 `;
 
+/** Serializes spacing, radius, border, shadow, and typography tokens into CSS. */
 export const getNonColorThemeProperties = (theme: AppThemeWeb): string => `
   --chrome-shadow: ${theme.shadows.lg};
 
@@ -225,8 +227,10 @@ export const getNonColorThemeProperties = (theme: AppThemeWeb): string => `
   --typo-xs-letter-spacing: ${theme.typography.xs.letterSpacing};
 `;
 
+/** Combines all web theme token groups into one CSS declaration block. */
 export const getThemeProperties = (theme: AppThemeWeb): string =>
   `${getColorThemeProperties(theme)}${getNonColorThemeProperties(theme)}`;
 
+/** Wraps serialized theme properties in the selector consumed by the web app. */
 export const createThemeCssBlock = (selector: string, theme: AppThemeWeb): string =>
   `${selector} {${getThemeProperties(theme)}}`;

@@ -11,6 +11,7 @@ import { useAuth } from "./use-auth";
  * Mounted at the (tabs) layout — one level below the root navigator — so the
  * <Redirect> never renders before the root layout is mounted.
  */
+/** Applies the registry's auth requirement while preserving the initial loading mount. */
 export function RouteAccessGuard({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { isAuthenticated, isLoading } = useAuth();

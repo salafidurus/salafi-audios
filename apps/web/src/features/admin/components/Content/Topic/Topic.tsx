@@ -20,6 +20,7 @@ interface TopicProps {
   onTranslate?: (topic: TopicDetailDto) => void;
 }
 
+/** Renders one topic row and exposes only the actions allowed by the current user. */
 export function Topic({ topic, onEdit, onDelete, onTranslate }: TopicProps) {
   const { isMobile } = useResponsive();
   const { i18n } = useTranslation();

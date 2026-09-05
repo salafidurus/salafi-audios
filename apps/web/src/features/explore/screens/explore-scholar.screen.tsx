@@ -14,7 +14,7 @@ import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 
 import styles from "./explore-scholar.screen.module.css";
 
-/** Describes navigation behavior for the recommendation-composed Scholars screen. */
+/** Describes navigation state for the recommendation-composed Explore scholar directory. */
 export type ExploreScholarScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
@@ -75,7 +75,7 @@ function ScholarResults({
   return <div className={styles.empty}>{t("explore.noScholars", "No scholars available.")}</div>;
 }
 
-/** Renders the recommendation-composed Scholars screen while preserving batch order. */
+/** Renders recommendation-composed scholars with ordered batches and resilient UI states. */
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
   const router = useRouter();

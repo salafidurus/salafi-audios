@@ -8,6 +8,7 @@ type ScreenInProgressProps = {
   description?: string;
 };
 
+/** Renders the localized placeholder used for unfinished product surfaces. */
 export function ScreenInProgressResponsive({
   title = "Screen in progress",
   description = "We are building this experience. Please check back soon.",

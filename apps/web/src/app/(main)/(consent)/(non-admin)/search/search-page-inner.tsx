@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 
 import { SearchProcessingScreen } from "@/features/search";
 
+/** Reads search and topic parameters before rendering the search processing screen. */
 export default function SearchPageInner() {
   const searchParams = useSearchParams();
   const searchKey = searchParams.get("searchKey") ?? undefined;
