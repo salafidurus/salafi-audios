@@ -44,6 +44,8 @@ bun run verify:build-configs
 # preserving explicitly supplied CI or developer values.
 export NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL:-http://localhost:4000}"
 export NEXT_PUBLIC_WEB_URL="${NEXT_PUBLIC_WEB_URL:-http://localhost:3000}"
+export DIRECT_DB_URL="${DIRECT_DB_URL:-postgresql://ci:ci@localhost:5432/ci}"
+export DATABASE_URL="${DATABASE_URL:-postgresql://ci:ci@localhost:5432/ci}"
 
 # Run Turborepo tasks only on packages affected since the comparison base.
 # TURBO_SCM_BASE instructs Turborepo what git commit/ref to compare changes against.
