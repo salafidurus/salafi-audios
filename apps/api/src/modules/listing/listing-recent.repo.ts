@@ -6,6 +6,8 @@ import type {
   FeedContentItemDto,
   FeedPageDto,
   ExploreListingsBatchDto,
+  ExploreScholarsBatchDto,
+  ExploreScholarItemDto,
   ListingFormat,
   ScholarTitle,
   Locale,
@@ -177,6 +179,28 @@ function buildListingsBatch(
   };
 }
 
+function seniorScholarsTitleLabel(locale: Locale): string {
+  return locale === 'ar' ? 'العلماء الكبار' : 'Senior Scholars';
+}
+
+function buildSeniorScholarsBatch(
+  items: ExploreScholarItemDto[],
+  locale: Locale,
+): ExploreScholarsBatchDto | undefined {
+  if (items.length === 0) return undefined;
+  return {
+    kind: 'scholars',
+    id: 'scholars:senior',
+    title: {
+      kind: 'scholars',
+      id: 'senior_scholars',
+      label: seniorScholarsTitleLabel(locale),
+    },
+    reason: 'deterministic_senior_scholars',
+    items,
+  };
+}
+
 function listingsTitleLabel(locale: Locale): string {
   return locale === 'ar' ? 'مواصلة الاستكشاف' : 'Continue exploring';
 }
@@ -215,6 +239,38 @@ async function findRecentListings(
   } satisfies Prisma.ListingFindManyArgs);
 }
 
+async function findSeniorScholars(prisma: PrismaService, locale: Locale) {
+  return prisma.scholar.findMany({
+    where: { title: 'allamah', isActive: true },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      imageUrl: true,
+      mainLanguage: true,
+      title: true,
+      translations: {
+        where: { locale, status: TranslationStatus.published },
+        select: { name: true },
+        take: 1,
+      },
+      _count: {
+        select: {
+          listings: {
+            where: {
+              format: 'single',
+              status: Status.published,
+              deletedAt: null,
+            },
+          },
+        },
+      },
+    },
+    orderBy: [{ orderIndex: 'asc' }, { slug: 'asc' }],
+    take: 20,
+  });
+}
+
 @Injectable()
 /** NestJS recent listings repo service or controller coordinating the API boundary for this responsibility. */
 export class RecentListingsRepo {
@@ -243,6 +299,30 @@ export class RecentListingsRepo {
       await this.resolveListingsTitle(topicSlug, locale),
     );
 
+    const seniorScholars = cursor ? [] : await findSeniorScholars(this.prisma, locale);
+    const scholarBatch = buildSeniorScholarsBatch(
+      seniorScholars.map((scholar) => {
+        const resolved = resolveContentTranslation({
+          base: { name: scholar.name },
+          originalLanguage: scholar.mainLanguage,
+          targetLocale: locale,
+          publishedTranslation: scholar.translations[0] ?? null,
+        });
+        return {
+          id: scholar.id,
+          slug: scholar.slug,
+          name: resolved.fields.name,
+          imageUrl: scholar.imageUrl ?? undefined,
+          mainLanguage: scholar.mainLanguage ?? undefined,
+          originalLanguage: resolved.originalLanguage,
+          original: resolved.original ? { name: resolved.original.name } : undefined,
+          title: scholar.title ?? undefined,
+          lectureCount: scholar._count.listings,
+        };
+      }),
+      locale,
+    );
+
     const lastItem = page.at(-1);
     const nextCursor = encodeNextCursor(hasMore, lastItem, (date, slug) =>
       this.encodeCursor(date, slug),
@@ -250,7 +330,10 @@ export class RecentListingsRepo {
 
     return {
       schemaVersion: ExploreRecommendationSchemaVersion,
-      batches: batch ? [batch] : [],
+      batches: [batch, scholarBatch].filter(
+        (candidate): candidate is ExploreListingsBatchDto | ExploreScholarsBatchDto =>
+          candidate !== undefined,
+      ),
       nextCursor,
       exhausted: !nextCursor,
     };

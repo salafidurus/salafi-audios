@@ -1,4 +1,4 @@
-import type { ExploreListingsBatchDto } from "@sd/core-contracts";
+import type { ExploreListingsBatchDto, ExploreScholarsBatchDto } from "@sd/core-contracts";
 import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
@@ -14,6 +14,7 @@ import { SearchFilter } from "@/features/search";
 import { AppText, ScreenView } from "@/shared/ui";
 
 import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
+import { ExploreScholarRow } from "../components/explore-scholar-row/explore-scholar-row";
 import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
 import {
   ExploreLoadingFooter,
@@ -70,29 +71,38 @@ function ExploreRecentStatus({
 }
 
 function renderFeedItem(
-  item: ExploreListingsBatchDto,
+  item: ExploreListingsBatchDto | ExploreScholarsBatchDto,
   onNavigateToListing?: (slug: string) => void,
+  onNavigateToScholar?: (slug: string) => void,
 ) {
   return (
     <View>
       <AppText variant="titleMd">{item.title.label}</AppText>
-      {item.items.map((subItem) => (
-        <ExplorePodcastRow
-          key={subItem.id}
-          item={subItem}
-          onNavigateToListing={onNavigateToListing}
+      {item.kind === "listings" ? (
+        item.items.map((subItem) => (
+          <ExplorePodcastRow
+            key={subItem.id}
+            item={subItem}
+            onNavigateToListing={onNavigateToListing}
+          />
+        ))
+      ) : (
+        <ExploreScholarRow
+          scholars={item.items}
+          title={item.title.label}
+          onScholarPress={onNavigateToScholar}
         />
-      ))}
+      )}
     </View>
   );
 }
 
-function getItemKey(item: ExploreListingsBatchDto): string {
+function getItemKey(item: ExploreListingsBatchDto | ExploreScholarsBatchDto): string {
   return item.id;
 }
 
 /** Renders the mixed Explore feed and coordinates its user-facing state. */
-export function ExploreScreen({ onNavigateToListing }: ExploreScreenProps) {
+export function ExploreScreen({ onNavigateToListing, onNavigateToScholar }: ExploreScreenProps) {
   const { t } = useTranslation();
   const [topicSlug, setTopicSlug] = useState<string | undefined>();
   const { data: topics = [] } = useTopicsList();
@@ -102,9 +112,9 @@ export function ExploreScreen({ onNavigateToListing }: ExploreScreenProps) {
   const items = data?.pages.flatMap((p) => p.batches) ?? [];
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<ExploreListingsBatchDto>) =>
-      renderFeedItem(item, onNavigateToListing),
-    [onNavigateToListing],
+    ({ item }: ListRenderItemInfo<ExploreListingsBatchDto | ExploreScholarsBatchDto>) =>
+      renderFeedItem(item, onNavigateToListing, onNavigateToScholar),
+    [onNavigateToListing, onNavigateToScholar],
   );
 
   return (

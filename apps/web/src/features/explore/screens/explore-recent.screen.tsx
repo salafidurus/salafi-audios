@@ -1,7 +1,12 @@
 /** Loads the recent explore feed and assembles its discovery modules. */
 "use client";
 
-import { type FeedContentItemDto, type ExploreListingsBatchDto } from "@sd/core-contracts";
+import {
+  routes,
+  type FeedContentItemDto,
+  type ExploreListingsBatchDto,
+  type ExploreScholarsBatchDto,
+} from "@sd/core-contracts";
 import { getErrorStateText, getLocalizedName } from "@sd/core-i18n";
 import {
   getProgressPercent,
@@ -12,12 +17,14 @@ import {
 } from "@sd/domain-audio";
 import { useExploreRecentScreen } from "@sd/domain-content";
 import { useTopicsList } from "@sd/domain-search";
+import { useRouter } from "next/navigation";
 import React, { useRef, useEffect, useMemo, type ReactNode } from "react";
 
 import { useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useToast } from "@/core/toast";
 import { audioService, usePlayListing } from "@/features/audio";
+import { ScholarGridCard } from "@/features/explore/components/scholar-grid-card/scholar-grid-card";
 import { LectureCard } from "@/features/home/components/lecture-card/lecture-card";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -41,6 +48,11 @@ export type FeedRecentScreenProps = {
 
 function getExploreLocale(language: string) {
   return language === "ar" ? "ar" : "en";
+}
+
+function useScholarNavigation(onNavigateToScholar?: (slug: string) => void) {
+  const router = useRouter();
+  return onNavigateToScholar ?? ((slug: string) => router.push(routes.scholars.detail(slug)));
 }
 
 function formatDuration(durationSeconds?: number | null): string {
@@ -148,27 +160,32 @@ function FeedGridItemCard({
 }
 
 function buildFeedBlocks(
-  batches: ExploreListingsBatchDto[],
+  batches: Array<ExploreListingsBatchDto | ExploreScholarsBatchDto>,
   onNavigateToListing: (slug: string) => void,
+  onNavigateToScholar: (slug: string) => void,
   t: ReturnType<typeof useTranslation>["t"],
 ): ReactNode[] {
   const blocks: ReactNode[] = [];
   batches.forEach((batch) => {
     blocks.push(
       <section
-        className={`${styles.module} ${styles.listingModule}`}
+        className={`${styles.module} ${batch.kind === "listings" ? styles.listingModule : ""}`}
         aria-label={batch.title.label}
         key={batch.id}
       >
         <h2>{batch.title.label || t("explore.listings", "Listings")}</h2>
         <div className={styles.grid}>
-          {batch.items.map((feedContentItem: FeedContentItemDto) => (
-            <FeedGridItemCard
-              key={feedContentItem.id}
-              item={feedContentItem}
-              onNavigate={onNavigateToListing}
-            />
-          ))}
+          {batch.kind === "listings"
+            ? batch.items.map((feedContentItem: FeedContentItemDto) => (
+                <FeedGridItemCard
+                  key={feedContentItem.id}
+                  item={feedContentItem}
+                  onNavigate={onNavigateToListing}
+                />
+              ))
+            : batch.items.map((scholar) => (
+                <ScholarGridCard key={scholar.id} scholar={scholar} onPress={onNavigateToScholar} />
+              ))}
         </div>
       </section>,
     );
@@ -183,6 +200,7 @@ function FeedBody({
   items,
   onRetry,
   onNavigateToListing,
+  onNavigateToScholar,
   loadMoreRef,
   t,
 }: {
@@ -190,9 +208,10 @@ function FeedBody({
   /** Whether the recent-feed request failed and should show recovery UI. */
   isRecentError: boolean;
   isRecentFetching: boolean;
-  items: ExploreListingsBatchDto[];
+  items: Array<ExploreListingsBatchDto | ExploreScholarsBatchDto>;
   onRetry: () => void;
   onNavigateToListing: (slug: string) => void;
+  onNavigateToScholar: (slug: string) => void;
   loadMoreRef: React.RefObject<HTMLDivElement | null>;
   t: ReturnType<typeof useTranslation>["t"];
 }) {
@@ -223,7 +242,7 @@ function FeedBody({
 
   return (
     <>
-      {buildFeedBlocks(items, onNavigateToListing, t)}
+      {buildFeedBlocks(items, onNavigateToListing, onNavigateToScholar, t)}
       <div ref={loadMoreRef} style={{ height: "20px" }} />
     </>
   );
@@ -235,8 +254,12 @@ function FeedBody({
  * owned by their existing API and domain seams.
  */
 // react-doctor-disable-next-line react-doctor/no-giant-component
-export function FeedRecentScreen({ onNavigateToListing }: FeedRecentScreenProps) {
+export function FeedRecentScreen({
+  onNavigateToListing,
+  onNavigateToScholar,
+}: FeedRecentScreenProps) {
   const { i18n, t } = useTranslation();
+  const handleNavigateToScholar = useScholarNavigation(onNavigateToScholar);
   const { user } = useAuth();
   const { navigateToListing } = useListingNavigation();
   const handleNavigateToListing = onNavigateToListing ?? navigateToListing;
@@ -327,6 +350,7 @@ export function FeedRecentScreen({ onNavigateToListing }: FeedRecentScreenProps)
       items={visibleRecentItems}
       onRetry={() => void refetchRecent()}
       onNavigateToListing={handleNavigateToListing}
+      onNavigateToScholar={handleNavigateToScholar}
       loadMoreRef={loadMoreRef}
       t={t}
     />

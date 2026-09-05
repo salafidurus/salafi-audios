@@ -61,6 +61,19 @@ vi.mock("../components/feed-skeleton/feed-skeleton", () => ({
 vi.mock("../components/feed-scholar-row/feed-scholar-row", () => ({
   FeedScholarRow: () => <div data-testid="scholar-feed-row">Scholar discovery</div>,
 }));
+vi.mock("../components/scholar-grid-card/scholar-grid-card", () => ({
+  ScholarGridCard: ({
+    scholar,
+    onPress,
+  }: {
+    scholar: { name: string; slug: string };
+    onPress?: (slug: string) => void;
+  }) => (
+    <button type="button" onClick={() => onPress?.(scholar.slug)}>
+      {scholar.name}
+    </button>
+  ),
+}));
 vi.mock("../components/feed-topic-row/feed-topic-row", () => ({
   FeedTopicRow: ({ topicName }: { topicName: string }) => (
     <div data-testid="topic-feed-row">{topicName}</div>
@@ -189,5 +202,48 @@ describe("FeedRecentScreen", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Unable to load this feed.");
     fireEvent.click(screen.getByRole("button", { name: "Try Again" }));
     expect(refetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders the supplied senior scholars batch and preserves scholar navigation", () => {
+    const onNavigateToScholar = vi.fn();
+    mockUseExploreRecentScreen.mockReturnValue({
+      data: {
+        pages: [
+          {
+            batches: [
+              {
+                kind: "scholars",
+                id: "scholars:senior",
+                title: { kind: "scholars", id: "senior_scholars", label: "Senior Scholars" },
+                reason: "deterministic_senior_scholars",
+                items: [
+                  {
+                    id: "s1",
+                    slug: "scholar-one",
+                    name: "Scholar One",
+                    imageUrl: "https://cdn.example.com/scholar.jpg",
+                    mainLanguage: "ar",
+                    title: "allamah",
+                    lectureCount: 12,
+                  },
+                ],
+              },
+            ],
+            exhausted: true,
+          },
+        ],
+      },
+      isFetching: false,
+      isError: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
+      refetch: vi.fn(),
+    });
+
+    render(<FeedRecentScreen onNavigateToScholar={onNavigateToScholar} />);
+
+    expect(screen.getByRole("region", { name: "Senior Scholars" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Scholar One" }));
+    expect(onNavigateToScholar).toHaveBeenCalledWith("scholar-one");
   });
 });
