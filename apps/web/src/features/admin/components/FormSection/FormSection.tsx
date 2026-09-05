@@ -5,6 +5,7 @@ import styles from "./form-section.module.css";
  * The title is rendered as the subsection heading, while `children` remains responsible for
  * the field controls and their validation behavior.
  */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- the interface contract is documented in the block above.
 export interface FormSectionProps {
   title: string;
   children: React.ReactNode;

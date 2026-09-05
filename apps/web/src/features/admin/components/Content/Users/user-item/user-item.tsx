@@ -17,6 +17,7 @@ import { MetaDetails } from "./meta-details";
 import styles from "./user-item.module.css";
 
 /** Describes the user record and optional access-management action rendered by an admin row. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- the row prop contract is documented in the block above.
 export type UserItemProps = {
   user: AdminUserListItemDto;
   onManageAccess?: () => void;

@@ -1,8 +1,10 @@
-/** Documents this module's responsibility and public boundary. */
+/** User-selected theme preference, including the system-color-scheme fallback. */
 export type ThemePreference = "system" | "light" | "dark";
 
+/** Concrete theme values applied to the document after resolving a preference. */
 export type ResolvedTheme = "light" | "dark";
 
+/** Versioned local-storage key shared by the inline bootstrap and mounted theme sync. */
 export const THEME_KEY = "theme-preference:v1";
 
 const INLINE_SCRIPT_ESCAPE_MAP = {
@@ -20,6 +22,7 @@ const INLINE_SCRIPT_ESCAPE_MAP = {
   "\u2029": "\\u2029",
 } satisfies Record<string, string>;
 
+/** Escapes characters that could terminate or alter the serialized inline bootstrap script. */
 export function escapeUnsafeForInlineScript(value: string): string {
   return value.replace(/[<>/\\\b\f\n\r\t\0\u2028\u2029]/g, (character) => {
     // SAFETY: this callback only receives characters matched by the escape regex above.
@@ -37,6 +40,7 @@ export function getThemeBootstrapScript(): string {
   return `!function(){try{var p=window.localStorage.getItem(${serializedThemeKey}),d=p==="dark"||(p!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.setAttribute("data-theme",d?"dark":"light"),document.documentElement.classList.toggle("dark",d)}catch(_){}}()`;
 }
 
+/** Resolves an explicit preference or system preference into a concrete document theme. */
 export function resolveTheme(preference: ThemePreference, prefersDark: boolean): ResolvedTheme {
   return preference === "system" ? (prefersDark ? "dark" : "light") : preference;
 }
