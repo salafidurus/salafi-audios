@@ -8,6 +8,7 @@ export type FeedSkeletonProps = {
   count?: number;
 };
 
+/** Renders placeholder cards while the Explore feed is loading. */
 export function FeedSkeleton({ count = 6 }: FeedSkeletonProps) {
   return (
     <div className={styles.grid} aria-busy="true" aria-label="Loading catalog">

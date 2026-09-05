@@ -15,8 +15,11 @@ import {
 } from "@/shared/components/ui/dialog";
 import { cn } from "@/shared/utils";
 
+/** Named width presets supported by the shared modal shell. */
 export type ModalWidthVariant = "wide" | "standard" | "narrow" | "auto";
+/** Named height presets supported by the shared modal shell. */
 export type ModalHeightVariant = "long" | "standard" | "short" | "auto";
+/** Configuration for the shared modal and its optional confirmation content. */
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -288,15 +291,21 @@ function ModalConfirmText({
   );
 }
 
+/** Renders the shared modal root while exposing its composed subcomponents. */
 export function Modal(props: ModalProps) {
   return <ModalRoot {...props} />;
 }
 
 export namespace Modal {
+  /** Header subcomponent for a modal title. */
   export const Header = ModalHeader;
+  /** Scrollable body subcomponent for modal content. */
   export const Body = ModalBody;
+  /** Footer subcomponent for modal actions. */
   export const Footer = ModalFooter;
+  /** Confirmation dialog subcomponent for destructive or gated actions. */
   export const ConfirmDialog = ModalConfirmDialog;
+  /** Confirmation text-entry subcomponent for typed confirmations. */
   export const ConfirmText = ModalConfirmText;
 }
 

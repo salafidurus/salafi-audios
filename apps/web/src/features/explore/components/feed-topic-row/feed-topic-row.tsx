@@ -33,12 +33,14 @@ function FeedTopicItem({
   );
 }
 
+/** Inputs for one topic section of the Explore content feed. */
 export type FeedTopicRowProps = {
   topicName: string;
   items: ContentSuggestionDto[];
   onItemPress?: (slug: string) => void;
 };
 
+/** Renders a topic row and omits the section when no suggestions are available. */
 export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProps) {
   const showOriginal = useShowOriginalContent();
 

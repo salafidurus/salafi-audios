@@ -1,4 +1,7 @@
 # Git passes information about refs being pushed on stdin in the format:
+# Fail immediately when any required validation command fails; do not defer
+# a local failure to CI.
+set -e
 # <local_ref> <local_sha> <remote_ref> <remote_sha>
 # We read stdin to find the target branch's current remote SHA.
 ZERO_SHA="0000000000000000000000000000000000000000"
