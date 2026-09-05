@@ -328,7 +328,19 @@ describe("HomeScreen", () => {
 
     (useExploreRecentScreen as unknown as Mock<any>).mockReturnValue({
       data: {
-        pages: [{ items: [item("recent-lesson", "Recently published lesson")] }],
+        pages: [
+          {
+            batches: [
+              {
+                kind: "listings",
+                id: "listings:recent",
+                title: { kind: "listings", id: "recent", label: "Continue exploring" },
+                reason: "deterministic_recent",
+                items: [item("recent-lesson", "Recently published lesson")],
+              },
+            ],
+          },
+        ],
       },
       isLoading: false,
     });

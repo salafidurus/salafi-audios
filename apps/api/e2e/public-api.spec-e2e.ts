@@ -63,13 +63,12 @@ describe('Public API (e2e)', () => {
   });
 
   describe('Listings - Recent Feed', () => {
-    it('GET /listings/recent returns FeedPageDto with items', async () => {
+    it('GET /listings/recent returns a versioned listings recommendation batch', async () => {
       const res = await request(app.getHttpServer()).get('/listings/recent').expect(200);
 
-      expect(res.body).toHaveProperty('items');
-      expect(Array.isArray(res.body.items)).toBe(true);
-      // Should return mixed format items (single, series, collection)
-      const kinds = res.body.items.map((item: any) => item.kind);
+      expect(res.body).toHaveProperty('schemaVersion', 1);
+      expect(Array.isArray(res.body.batches)).toBe(true);
+      const kinds = res.body.batches[0].items.map((item: any) => item.kind);
       expect(kinds.some((k: string) => k === 'single')).toBe(true);
     });
 
@@ -79,9 +78,9 @@ describe('Public API (e2e)', () => {
         .query({ limit: 5 })
         .expect(200);
 
-      expect(res.body).toHaveProperty('items');
-      expect(Array.isArray(res.body.items)).toBe(true);
-      expect(res.body.items.length).toBeLessThanOrEqual(5);
+      expect(res.body).toHaveProperty('batches');
+      expect(Array.isArray(res.body.batches)).toBe(true);
+      expect(res.body.batches[0].items.length).toBeLessThanOrEqual(5);
     });
   });
 
@@ -259,7 +258,9 @@ describe('Public API (e2e)', () => {
       await request(server).get(`/audio/listings/${ARCHIVED_SLUG}/stream`).expect(404);
 
       const feed = await request(server).get('/listings/recent').expect(200);
-      const feedSlugs = feed.body.items.map((item: { slug: string }) => item.slug);
+      const feedSlugs = feed.body.batches.flatMap((batch: { items: { slug: string }[] }) =>
+        batch.items.map((item) => item.slug),
+      );
       expect(feedSlugs).not.toContain(DRAFT_SLUG);
       expect(feedSlugs).not.toContain(ARCHIVED_SLUG);
     });

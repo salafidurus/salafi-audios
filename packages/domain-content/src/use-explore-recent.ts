@@ -1,4 +1,10 @@
-import { httpClient, endpoints, queryKeys, type FeedPageDto } from "@sd/core-contracts";
+import {
+  httpClient,
+  endpoints,
+  queryKeys,
+  FeedPageDtoSchema,
+  type FeedPageDto,
+} from "@sd/core-contracts";
 import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 
 /** Fetches the public recent-feed Catalog surface with optional topic steering. */
@@ -27,11 +33,12 @@ export function useExploreRecentScreen({ limit, topicSlug }: UseExploreRecentScr
       if (pageParam) params.cursor = pageParam;
       if (limit) params.limit = String(limit);
       if (topicSlug) params.topic = topicSlug;
-      return httpClient<FeedPageDto>({
+      const response = await httpClient<unknown>({
         url: endpoints.listings.recent,
         method: "GET",
         params,
       });
+      return FeedPageDtoSchema.parse(response);
     },
     initialPageParam,
     getNextPageParam: (lastPage) => lastPage.nextCursor,

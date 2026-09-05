@@ -56,7 +56,22 @@ beforeEach(() => {
   mockedAuth.mockReturnValue({ isAuthenticated: false, isLoading: false, user: undefined });
   mockedContinue.mockReturnValue({ recentProgress: null, data: null, isLoading: false } as never);
   mockedExplore.mockReturnValue({
-    data: { pages: [{ items: [item], exhausted: true }] },
+    data: {
+      pages: [
+        {
+          batches: [
+            {
+              kind: "listings",
+              id: "listings:recent",
+              title: { kind: "listings", id: "recent", label: "Continue exploring" },
+              reason: "deterministic_recent",
+              items: [item],
+            },
+          ],
+          exhausted: true,
+        },
+      ],
+    },
     isLoading: false,
     isError: false,
   } as never);

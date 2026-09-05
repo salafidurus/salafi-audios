@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../core/db/prisma.service';
 import { Prisma, Status, TranslationStatus } from '@sd/core-db';
+import { ExploreRecommendationSchemaVersion } from '@sd/core-contracts';
 import type {
-  ContentSuggestionDto,
   FeedContentItemDto,
   FeedPageDto,
+  ExploreListingsBatchDto,
   ListingFormat,
-  ScholarChipDto,
   ScholarTitle,
   Locale,
 } from '@sd/core-contracts';
@@ -106,33 +106,113 @@ function paginateRecentListings<T>(items: T[], limit: number) {
   return { hasMore, page: hasMore ? items.slice(0, limit) : items };
 }
 
-function getRecentNextCursor<
-  T extends {
-    /** Creation time used as the stable cursor boundary. */
-    createdAt: Date;
-  },
->(
-  page: T[],
-  hasMore: boolean,
-  pageNumber: number,
-  encodeCursor: (date: Date, page: number) => string,
-): string | undefined {
-  const lastItem = page[page.length - 1];
-  return hasMore && lastItem ? encodeCursor(lastItem.createdAt, pageNumber + 1) : undefined;
-}
-
-function getRecentContentLimit(pageNumber: number, limit: number): number {
-  const moduleCount = pageNumber % 2 === 0 ? 2 : 0;
-  return Math.max(1, limit - moduleCount);
-}
-
 function applyRecentFilters(
   where: Prisma.ListingWhereInput,
   topicSlug?: string,
-  cursorDate?: Date,
+  cursor?: { date: Date; /** Stable tie-breaker carried by structured cursors. */ slug?: string },
 ) {
   if (topicSlug) where.topics = { some: { topic: { slug: topicSlug } } };
-  if (cursorDate) where.createdAt = { lt: cursorDate };
+  if (cursor) {
+    where.OR = cursor.slug
+      ? [{ createdAt: { lt: cursor.date } }, { createdAt: cursor.date, slug: { lt: cursor.slug } }]
+      : undefined;
+    if (!cursor.slug) where.createdAt = { lt: cursor.date };
+  }
+}
+
+function buildRecentWhere(
+  topicSlug: string | undefined,
+  cursor:
+    | {
+        date?: Date;
+        /** Stable tie-breaker carried by structured cursors. */
+        slug?: string;
+      }
+    | undefined,
+): Prisma.ListingWhereInput {
+  const where: Prisma.ListingWhereInput = {
+    format: { in: ['single', 'series', 'collection'] },
+    status: Status.published,
+    deletedAt: null,
+    parentId: null,
+    scholar: { isActive: true },
+  };
+  applyRecentFilters(
+    where,
+    topicSlug,
+    cursor?.date ? { date: cursor.date, slug: cursor.slug } : undefined,
+  );
+  return where;
+}
+
+function encodeNextCursor<
+  T extends {
+    /** Timestamp used as the primary cursor ordering key. */
+    createdAt: Date;
+    /** Stable public identity used to break timestamp ties. */
+    slug: string;
+  },
+>(
+  hasMore: boolean,
+  lastItem: T | undefined,
+  encode: (date: Date, slug: string) => string,
+): string | undefined {
+  return hasMore && lastItem ? encode(lastItem.createdAt, lastItem.slug) : undefined;
+}
+
+function buildListingsBatch(
+  items: FeedContentItemDto[],
+  topicSlug: string | undefined,
+  topicLabel: string | undefined,
+): ExploreListingsBatchDto | undefined {
+  if (items.length === 0) return undefined;
+  return {
+    kind: 'listings',
+    id: topicSlug ? `listings:topic:${topicSlug}` : 'listings:recent',
+    title: topicSlug
+      ? { kind: 'topic_listings', topicSlug, label: topicLabel ?? topicSlug }
+      : { kind: 'listings', id: 'recent', label: topicLabel ?? listingsTitleLabel('en') },
+    reason: 'deterministic_recent',
+    items,
+  };
+}
+
+function listingsTitleLabel(locale: Locale): string {
+  return locale === 'ar' ? 'مواصلة الاستكشاف' : 'Continue exploring';
+}
+
+async function findRecentListings(
+  prisma: PrismaService,
+  where: Prisma.ListingWhereInput,
+  locale: Locale,
+  limit: number,
+) {
+  return prisma.listing.findMany({
+    where,
+    include: {
+      translations: {
+        where: { locale, status: TranslationStatus.published },
+        select: { title: true },
+        take: 1,
+      },
+      scholar: {
+        select: {
+          name: true,
+          slug: true,
+          title: true,
+          imageUrl: true,
+          mainLanguage: true,
+          translations: {
+            where: { locale, status: TranslationStatus.published },
+            select: { name: true },
+            take: 1,
+          },
+        },
+      },
+    },
+    orderBy: [{ createdAt: 'desc' }, { slug: 'desc' }],
+    take: limit + 1,
+  } satisfies Prisma.ListingFindManyArgs);
 }
 
 @Injectable()
@@ -146,58 +226,41 @@ export class RecentListingsRepo {
   async getRecentListings(cursor?: string, limit = 20, topicSlug?: string): Promise<FeedPageDto> {
     const locale = getRequestLocale();
     const decodedCursor = this.decodeCursor(cursor);
-    const cursorDate = decodedCursor?.date;
-    const pageNumber = decodedCursor?.page ?? 0;
 
-    const where: Prisma.ListingWhereInput = {
-      format: { in: ['single', 'series', 'collection'] },
-      status: Status.published,
-      deletedAt: null,
-      parentId: null,
-      scholar: { isActive: true },
-    };
-    applyRecentFilters(where, topicSlug, cursorDate);
-
-    const contentLimit = getRecentContentLimit(pageNumber, limit);
-    const queryArgs = {
-      where,
-      include: {
-        translations: {
-          where: { locale, status: TranslationStatus.published },
-          select: { title: true },
-          take: 1,
-        },
-        scholar: {
-          select: {
-            name: true,
-            slug: true,
-            title: true,
-            imageUrl: true,
-            mainLanguage: true,
-            translations: {
-              where: { locale, status: TranslationStatus.published },
-              select: { name: true },
-              take: 1,
-            },
-          },
-        },
-      },
-      orderBy: [{ createdAt: 'desc' }],
-      take: contentLimit + 1,
-    } satisfies Prisma.ListingFindManyArgs;
-    const listings = await this.prisma.listing.findMany(queryArgs);
-
-    const { hasMore, page } = paginateRecentListings(listings, contentLimit);
-
-    const contentItems: FeedContentItemDto[] = page.map((r) => this.toRecentContentItem(r, locale));
-    const items: FeedPageDto['items'] = [...contentItems];
-    await this.appendDiscoveryRows(items, page, contentItems, pageNumber, topicSlug, locale);
-
-    const nextCursor = getRecentNextCursor(page, hasMore, pageNumber, (date, page) =>
-      this.encodeCursor(date, page),
+    const listings = await findRecentListings(
+      this.prisma,
+      buildRecentWhere(topicSlug, decodedCursor),
+      locale,
+      limit,
     );
 
-    return { items, nextCursor, exhausted: !nextCursor };
+    const { hasMore, page } = paginateRecentListings(listings, limit);
+
+    const contentItems: FeedContentItemDto[] = page.map((r) => this.toRecentContentItem(r, locale));
+    const batch = buildListingsBatch(
+      contentItems,
+      topicSlug,
+      await this.resolveListingsTitle(topicSlug, locale),
+    );
+
+    const lastItem = page.at(-1);
+    const nextCursor = encodeNextCursor(hasMore, lastItem, (date, slug) =>
+      this.encodeCursor(date, slug),
+    );
+
+    return {
+      schemaVersion: ExploreRecommendationSchemaVersion,
+      batches: batch ? [batch] : [],
+      nextCursor,
+      exhausted: !nextCursor,
+    };
+  }
+
+  private async resolveListingsTitle(
+    topicSlug: string | undefined,
+    locale: Locale,
+  ): Promise<string | undefined> {
+    return topicSlug ? this.resolveTopicName(topicSlug, locale) : listingsTitleLabel(locale);
   }
 
   private toRecentContentItem(r: RecentFeedListing, locale: Locale): FeedContentItemDto {
@@ -217,76 +280,6 @@ export class RecentListingsRepo {
     const presentation = recentListingPresentation(r, (value) => this.toOptionalPublicUrl(value));
     return buildRecentContentItem(r, resolved, scholarName, presentation);
   }
-  private async appendDiscoveryRows(
-    items: FeedPageDto['items'],
-    page: Parameters<RecentListingsRepo['buildScholarRow']>[0],
-    contentItems: FeedContentItemDto[],
-    pageNumber: number,
-    topicSlug: string | undefined,
-    locale: Locale,
-  ) {
-    if (page.length === 0 || pageNumber % 2 !== 0) return;
-    const scholars = this.buildScholarRow(page, locale);
-    if (scholars.length > 0) items.push({ kind: 'scholar_row', scholars });
-
-    const topicItems: ContentSuggestionDto[] = contentItems.slice(0, 6).map((item) => ({
-      id: item.id,
-      title: item.title,
-      slug: item.slug,
-      kind: item.kind,
-      scholarName: item.scholarName,
-      scholarSlug: item.scholarSlug,
-      thumbnailUrl: item.thumbnailUrl,
-      durationSeconds: item.durationSeconds,
-      originalLanguage: item.originalLanguage,
-      original: item.original,
-    }));
-    if (topicItems.length > 0) {
-      const topicName = topicSlug
-        ? await this.resolveTopicName(topicSlug, locale)
-        : 'Continue exploring';
-      items.push({
-        kind: 'topic_row',
-        topicName,
-        items: topicItems,
-      });
-    }
-  }
-
-  private buildScholarRow(
-    listings: Array<{
-      scholar: {
-        name: string;
-        /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
-        imageUrl: string | null;
-        /** Documents the mainLanguage field's API projection semantics and lifecycle meaning. */ mainLanguage: Locale;
-        translations: Array<{ name: string }>;
-      } | null;
-    }>,
-    locale: Locale,
-  ): ScholarChipDto[] {
-    const seen = new Set<string>();
-    return listings.flatMap((listing) => {
-      const scholar = listing.scholar;
-      if (!scholar || seen.has(scholar.slug)) return [];
-      seen.add(scholar.slug);
-      const resolved = resolveContentTranslation({
-        base: { name: scholar.name },
-        originalLanguage: scholar.mainLanguage,
-        targetLocale: locale,
-        publishedTranslation: scholar.translations[0] ?? null,
-      });
-      return [
-        {
-          id: scholar.slug,
-          name: resolved.fields.name,
-          slug: scholar.slug,
-          imageUrl: scholar.imageUrl,
-        },
-      ];
-    });
-  }
-
   private async resolveTopicName(slug: string, locale: Locale): Promise<string> {
     const topic = await this.prisma.topic.findUnique({
       where: { slug },
@@ -302,23 +295,30 @@ export class RecentListingsRepo {
     return topic?.translations[0]?.name ?? topic?.name ?? slug;
   }
 
-  private decodeCursor(cursor?: string): { date?: Date; page: number } | undefined {
-    if (!cursor) return { page: 0 };
+  private decodeCursor(cursor?: string):
+    | {
+        date?: Date;
+        /** Stable tie-breaker emitted with structured cursors. */
+        slug?: string;
+      }
+    | undefined {
+    if (!cursor) return undefined;
     try {
       // SAFETY: cursors are emitted by encodeCursor and contain these two fields; invalid external cursors fall through to the legacy date parser.
       const decoded = JSON.parse(Buffer.from(cursor, 'base64url').toString()) as {
         date: string;
-        page: number;
+        /** Stable tie-breaker emitted with structured cursors. */
+        slug?: string;
       };
-      return { date: new Date(decoded.date), page: decoded.page };
+      return { date: new Date(decoded.date), slug: decoded.slug };
     } catch {
       const date = new Date(cursor);
-      return Number.isNaN(date.getTime()) ? undefined : { date, page: 1 };
+      return Number.isNaN(date.getTime()) ? undefined : { date };
     }
   }
 
-  private encodeCursor(date: Date, page: number): string {
-    return Buffer.from(JSON.stringify({ date: date.toISOString(), page })).toString('base64url');
+  private encodeCursor(date: Date, slug: string): string {
+    return Buffer.from(JSON.stringify({ date: date.toISOString(), slug })).toString('base64url');
   }
 
   private toPublicUrl(value: string): string {

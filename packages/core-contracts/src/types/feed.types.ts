@@ -1,11 +1,10 @@
 import { z } from "zod";
 
-import {
-  ContentSuggestionDtoSchema,
-  HomePromotionListingDtoSchema,
-  ScholarChipDtoSchema,
-  type HomePromotionListingDto,
-} from "./home.types";
+import { HomePromotionListingDtoSchema, type HomePromotionListingDto } from "./home.types";
+
+/** Numeric wire version that lets clients select the matching recommendation parser. */
+/** Defines the runtime wire-version value for Explore recommendation responses. */
+export const ExploreRecommendationSchemaVersion = 1 as const;
 
 /** Discovery-feed item, branch, and pagination contracts returned by the public catalog API. */
 /** Defines the runtime contract value for feed content item dto schema. */
@@ -13,35 +12,51 @@ export const FeedContentItemDtoSchema = HomePromotionListingDtoSchema;
 /** Defines the contract type for feed content item dto. */
 export type FeedContentItemDto = HomePromotionListingDto;
 
-/** Defines the runtime contract value for feed scholar row dto schema. */
-export const FeedScholarRowDtoSchema = z.object({
-  kind: z.literal("scholar_row"),
-  scholars: z.array(ScholarChipDtoSchema),
+/** Semantic title context for the default deterministic listings recommendation. */
+export const ExploreDefaultListingsTitleContextDtoSchema = z.object({
+  kind: z.literal("listings"),
+  id: z.literal("recent"),
+  label: z.string().min(1),
 });
-/** Defines the contract type for feed scholar row dto. */
-export type FeedScholarRowDto = z.infer<typeof FeedScholarRowDtoSchema>;
+/** Display-ready title context for an unfiltered recent-listings batch. */
+export type ExploreDefaultListingsTitleContextDto = z.infer<
+  typeof ExploreDefaultListingsTitleContextDtoSchema
+>;
 
-/** Defines the runtime contract value for feed topic row dto schema. */
-export const FeedTopicRowDtoSchema = z.object({
-  kind: z.literal("topic_row"),
-  topicName: z.string(),
-  items: z.array(ContentSuggestionDtoSchema),
+/** Semantic title context for listings recommended through a selected topic. */
+export const ExploreTopicListingsTitleContextDtoSchema = z.object({
+  kind: z.literal("topic_listings"),
+  topicSlug: z.string().min(1),
+  label: z.string().min(1),
 });
-/** Defines the contract type for feed topic row dto. */
-export type FeedTopicRowDto = z.infer<typeof FeedTopicRowDtoSchema>;
+/** Display-ready title context identifying the topic steering the batch. */
+export type ExploreTopicListingsTitleContextDto = z.infer<
+  typeof ExploreTopicListingsTitleContextDtoSchema
+>;
 
-/** Defines the runtime contract value for feed item dto schema. */
-export const FeedItemDtoSchema = z.union([
-  FeedContentItemDtoSchema,
-  FeedScholarRowDtoSchema,
-  FeedTopicRowDtoSchema,
+/** Approved title contexts for the listings batch in ticket 898. */
+export const ExploreListingsTitleContextDtoSchema = z.discriminatedUnion("kind", [
+  ExploreDefaultListingsTitleContextDtoSchema,
+  ExploreTopicListingsTitleContextDtoSchema,
 ]);
-/** Defines the contract type for feed item dto. */
-export type FeedItemDto = z.infer<typeof FeedItemDtoSchema>;
+/** Closed title-context union supported by the initial recommendation response. */
+export type ExploreListingsTitleContextDto = z.infer<typeof ExploreListingsTitleContextDtoSchema>;
 
-/** Defines the runtime contract value for feed page dto schema. */
+/** A semantic, ordered listings recommendation batch. */
+export const ExploreListingsBatchDtoSchema = z.object({
+  kind: z.literal("listings"),
+  id: z.string().min(1),
+  title: ExploreListingsTitleContextDtoSchema,
+  reason: z.literal("deterministic_recent"),
+  items: z.array(FeedContentItemDtoSchema),
+});
+/** Ordered listings and the semantic context explaining their recommendation module. */
+export type ExploreListingsBatchDto = z.infer<typeof ExploreListingsBatchDtoSchema>;
+
+/** Versioned public response for the Explore recommendation sequence. */
 export const FeedPageDtoSchema = z.object({
-  items: z.array(FeedItemDtoSchema),
+  schemaVersion: z.literal(ExploreRecommendationSchemaVersion),
+  batches: z.array(ExploreListingsBatchDtoSchema),
   nextCursor: z.string().optional(),
   exhausted: z.boolean(),
 });

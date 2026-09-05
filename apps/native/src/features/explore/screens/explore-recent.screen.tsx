@@ -1,4 +1,4 @@
-import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import type { ExploreListingsBatchDto } from "@sd/core-contracts";
 import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
@@ -14,13 +14,11 @@ import { SearchFilter } from "@/features/search";
 import { AppText, ScreenView } from "@/shared/ui";
 
 import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
-import { ExploreScholarRow } from "../components/explore-scholar-row/explore-scholar-row";
 import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
 import {
   ExploreLoadingFooter,
   ExploreStatusView,
 } from "../components/explore-status/explore-status";
-import { ExploreTopicRow } from "../components/explore-topic-row/explore-topic-row";
 
 /** Composes the mixed native discovery feed without peer subsection navigation. */
 /** Describes navigation callbacks accepted by the Explore root screen. */
@@ -28,15 +26,6 @@ export type ExploreScreenProps = {
   onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
-
-type GroupedFeedItem =
-  | FeedItemDto
-  | {
-      /** Defines the native kind contract used by this module. */
-      kind: "grouped_podcasts";
-      id: string;
-      items: FeedContentItemDto[];
-    };
 
 function ExploreRecentStatus({
   isError,
@@ -80,86 +69,42 @@ function ExploreRecentStatus({
   return null;
 }
 
-function groupFeedItems(items: FeedItemDto[]): GroupedFeedItem[] {
-  const grouped: GroupedFeedItem[] = [];
-  let currentGroup: FeedContentItemDto[] = [];
-
-  items.forEach((item) => {
-    if (item.kind === "scholar_row" || item.kind === "topic_row") {
-      if (currentGroup.length > 0) {
-        grouped.push({
-          kind: "grouped_podcasts",
-          id: `group-${grouped.length}`,
-          items: currentGroup,
-        });
-        currentGroup = [];
-      }
-      grouped.push(item);
-    } else {
-      currentGroup.push(item);
-    }
-  });
-
-  if (currentGroup.length > 0) {
-    grouped.push({ kind: "grouped_podcasts", id: `group-${grouped.length}`, items: currentGroup });
-  }
-  return grouped;
-}
-
 function renderFeedItem(
-  item: GroupedFeedItem,
+  item: ExploreListingsBatchDto,
   onNavigateToListing?: (slug: string) => void,
-  onNavigateToScholar?: (slug: string) => void,
 ) {
-  if (item.kind === "scholar_row") {
-    return <ExploreScholarRow scholars={item.scholars} onScholarPress={onNavigateToScholar} />;
-  }
-  if (item.kind === "topic_row") {
-    return (
-      <ExploreTopicRow
-        topicName={item.topicName}
-        items={item.items}
-        onItemPress={onNavigateToListing}
-      />
-    );
-  }
-  if (item.kind === "grouped_podcasts") {
-    return (
-      <View>
-        {item.items.map((subItem) => (
-          <ExplorePodcastRow
-            key={subItem.id}
-            item={subItem}
-            onNavigateToListing={onNavigateToListing}
-          />
-        ))}
-      </View>
-    );
-  }
-  return null;
+  return (
+    <View>
+      <AppText variant="titleMd">{item.title.label}</AppText>
+      {item.items.map((subItem) => (
+        <ExplorePodcastRow
+          key={subItem.id}
+          item={subItem}
+          onNavigateToListing={onNavigateToListing}
+        />
+      ))}
+    </View>
+  );
 }
 
-function getItemKey(item: GroupedFeedItem, index: number): string {
-  if (item.kind === "scholar_row") return `scholar-row-${index}`;
-  if (item.kind === "topic_row") return `topic-row-${index}`;
+function getItemKey(item: ExploreListingsBatchDto): string {
   return item.id;
 }
 
 /** Renders the mixed Explore feed and coordinates its user-facing state. */
-export function ExploreScreen({ onNavigateToListing, onNavigateToScholar }: ExploreScreenProps) {
+export function ExploreScreen({ onNavigateToListing }: ExploreScreenProps) {
   const { t } = useTranslation();
   const [topicSlug, setTopicSlug] = useState<string | undefined>();
   const { data: topics = [] } = useTopicsList();
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useExploreRecentScreen(
     { topicSlug },
   );
-  const rawItems = data?.pages.flatMap((p) => p.items) ?? [];
-  const items = groupFeedItems(rawItems);
+  const items = data?.pages.flatMap((p) => p.batches) ?? [];
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<GroupedFeedItem>) =>
-      renderFeedItem(item, onNavigateToListing, onNavigateToScholar),
-    [onNavigateToListing, onNavigateToScholar],
+    ({ item }: ListRenderItemInfo<ExploreListingsBatchDto>) =>
+      renderFeedItem(item, onNavigateToListing),
+    [onNavigateToListing],
   );
 
   return (

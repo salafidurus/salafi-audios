@@ -43,11 +43,14 @@ const mockContentItems = Array.from({ length: 14 }, (_, index) => ({
 
 const mockPages = [
   {
-    items: [
-      ...mockContentItems.slice(0, 2),
-      { kind: "scholar_row", scholars: [] },
-      { kind: "topic_row", topicName: "Fiqh", items: [] },
-      ...mockContentItems.slice(2),
+    batches: [
+      {
+        kind: "listings",
+        id: "listings:recent",
+        title: { kind: "listings", id: "recent", label: "Continue exploring" },
+        reason: "deterministic_recent",
+        items: mockContentItems,
+      },
     ],
   },
 ];
