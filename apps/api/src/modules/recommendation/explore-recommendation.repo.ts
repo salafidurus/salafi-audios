@@ -1,0 +1,158 @@
+/** Internal recommendation selection adapter for ordered Explore candidates. */
+/* oxlint-disable anti-slop/require-tsdoc -- Internal candidate references are intentionally not public DTOs. */
+import { Injectable } from '@nestjs/common';
+import { Prisma, Status } from '@sd/core-db';
+import { PrismaService } from '../../core/db/prisma.service';
+
+/** Entity references selected by a recommendation strategy. */
+export type ExploreRecommendationBatch =
+  | {
+      kind: 'listings';
+      id: string;
+      reason: 'deterministic_recent';
+      topicSlug?: string;
+      itemIds: string[];
+    }
+  | { kind: 'scholars'; id: string; reason: 'deterministic_senior_scholars'; itemIds: string[] }
+  | { kind: 'topics'; id: string; reason: 'deterministic_topics'; itemIds: string[] };
+
+/** Recommendation output consumed by an application module for hydration. */
+export type ExploreRecommendationResult = {
+  batches: ExploreRecommendationBatch[];
+  nextCursor?: string;
+  exhausted: boolean;
+};
+
+type ListingCursor = { date: Date; slug?: string };
+
+function applyRecentFilters(
+  where: Prisma.ListingWhereInput,
+  topicSlug?: string,
+  cursor?: ListingCursor,
+): void {
+  if (topicSlug) where.topics = { some: { topic: { slug: topicSlug } } };
+  if (!cursor) return;
+  where.OR = cursor.slug
+    ? [{ createdAt: { lt: cursor.date } }, { createdAt: cursor.date, slug: { lt: cursor.slug } }]
+    : undefined;
+  if (!cursor.slug) where.createdAt = { lt: cursor.date };
+}
+
+function buildRecentWhere(
+  topicSlug: string | undefined,
+  cursor?: ListingCursor,
+): Prisma.ListingWhereInput {
+  const where: Prisma.ListingWhereInput = {
+    format: { in: ['single', 'series', 'collection'] },
+    status: Status.published,
+    deletedAt: null,
+    parentId: null,
+    scholar: { isActive: true },
+  };
+  applyRecentFilters(where, topicSlug, cursor);
+  return where;
+}
+
+function paginate<T>(items: T[], limit: number) {
+  const hasMore = items.length > limit;
+  return { page: hasMore ? items.slice(0, limit) : items, hasMore };
+}
+
+function decodeCursor(cursor?: string): ListingCursor | undefined {
+  if (!cursor) return undefined;
+  try {
+    // SAFETY: the recommendation cursor encoder emits this shape; invalid values fall through to the legacy date parser.
+    const decoded = JSON.parse(Buffer.from(cursor, 'base64url').toString()) as {
+      date: string;
+      slug?: string;
+    };
+    return { date: new Date(decoded.date), slug: decoded.slug };
+  } catch {
+    const date = new Date(cursor);
+    return Number.isNaN(date.getTime()) ? undefined : { date };
+  }
+}
+
+function encodeCursor(date: Date, slug: string): string {
+  return Buffer.from(JSON.stringify({ date: date.toISOString(), slug })).toString('base64url');
+}
+
+@Injectable()
+/** Selects ordered entity references and continuation state for an Explore strategy. */
+export class ExploreRecommendationRepo {
+  constructor(private readonly prisma: PrismaService) {}
+
+  // oxlint-disable-next-line complexity -- Selection coordinates three ordered recommendation families behind one small interface.
+  async getRecommendations(
+    cursor?: string,
+    limit = 20,
+    topicSlug?: string,
+  ): Promise<ExploreRecommendationResult> {
+    const listings = await this.prisma.listing.findMany({
+      where: buildRecentWhere(topicSlug, decodeCursor(cursor)),
+      select: { id: true, slug: true, createdAt: true },
+      orderBy: [{ createdAt: 'desc' }, { slug: 'desc' }],
+      take: limit + 1,
+    });
+    const { page, hasMore } = paginate(listings, limit);
+    const batches: ExploreRecommendationBatch[] = [];
+    if (page.length > 0) {
+      const batch = {
+        kind: 'listings' as const,
+        id: topicSlug ? `listings:topic:${topicSlug}` : 'listings:recent',
+        reason: 'deterministic_recent' as const,
+        itemIds: page.map((item) => item.id),
+      };
+      batches.push(topicSlug ? { ...batch, topicSlug } : batch);
+    }
+    if (!cursor) {
+      const [scholars, topics] = await Promise.all([
+        this.prisma.scholar.findMany({
+          where: { title: 'allamah', isActive: true },
+          select: { id: true },
+          orderBy: [{ orderIndex: 'asc' }, { slug: 'asc' }],
+          take: 20,
+        }),
+        this.prisma.topic.findMany({
+          where: {
+            listingTopics: {
+              some: {
+                listing: {
+                  format: { in: ['single', 'series', 'collection'] },
+                  status: Status.published,
+                  deletedAt: null,
+                  parentId: null,
+                  scholar: { isActive: true },
+                },
+              },
+            },
+          },
+          select: { id: true },
+          orderBy: [{ orderIndex: 'asc' }, { slug: 'asc' }],
+          take: 20,
+        }),
+      ]);
+      if (scholars.length)
+        batches.push({
+          kind: 'scholars',
+          id: 'scholars:senior',
+          reason: 'deterministic_senior_scholars',
+          itemIds: scholars.map((item) => item.id),
+        });
+      if (topics.length)
+        batches.push({
+          kind: 'topics',
+          id: 'topics:discoverable',
+          reason: 'deterministic_topics',
+          itemIds: topics.map((item) => item.id),
+        });
+    }
+    const lastListing = page.at(-1);
+    return {
+      batches,
+      nextCursor:
+        hasMore && lastListing ? encodeCursor(lastListing.createdAt, lastListing.slug) : undefined,
+      exhausted: !hasMore,
+    };
+  }
+}
