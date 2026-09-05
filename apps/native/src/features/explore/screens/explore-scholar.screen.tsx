@@ -1,13 +1,11 @@
-import type { ScholarListItemDto } from "@sd/core-contracts";
-import type { ListRenderItemInfo } from "react-native";
-
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useScholarPageFeeds } from "@sd/domain-content";
-import { useCallback, useMemo } from "react";
-import { FlatList, View } from "react-native";
+import { useMemo } from "react";
+import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { ScholarContentList } from "@/features/listing/components/scholar-content-list/scholar-content-list";
 import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
 import { RootScreenHeader } from "@/features/navigation";
 import { AppText, ScreenView } from "@/shared/ui";
@@ -64,13 +62,17 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
 
   const { data, isFetching, isError, refetch } = useScholarPageFeeds();
 
-  const allScholars = useMemo(() => data?.batches.flatMap((batch) => batch.items) ?? [], [data]);
-
-  const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<ScholarListItemDto>) => (
-      <ScholarRow scholar={item} onPress={onNavigateToScholar} />
-    ),
-    [onNavigateToScholar],
+  const scholarBatches = useMemo(
+    () => data?.batches.filter((batch) => batch.form === "scholars") ?? [],
+    [data],
+  );
+  const listingBatches = useMemo(
+    () => data?.batches.filter((batch) => batch.form === "scholar_listings") ?? [],
+    [data],
+  );
+  const allScholars = useMemo(
+    () => scholarBatches.flatMap((batch) => batch.items),
+    [scholarBatches],
   );
 
   return (
@@ -93,16 +95,21 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
           />
         </View>
       ) : (
-        <>
+        <ScrollView>
           <View style={styles.listCard}>
-            <FlatList
-              data={allScholars}
-              keyExtractor={(item) => item.id}
-              renderItem={renderItem}
-              ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
-            />
+            {allScholars.map((scholar) => (
+              <ScholarRow key={scholar.id} scholar={scholar} onPress={onNavigateToScholar} />
+            ))}
+            {isFetching ? <ExploreLoadingFooter /> : null}
+            {listingBatches.map((batch) => (
+              <View key={batch.id} style={styles.listingBatch}>
+                <AppText variant="titleMd">{batch.title.label}</AppText>
+                <ScholarRow scholar={batch.scholar} onPress={onNavigateToScholar} />
+                <ScholarContentList items={batch.items} />
+              </View>
+            ))}
           </View>
-        </>
+        </ScrollView>
       )}
     </ScreenView>
   );
@@ -119,5 +126,9 @@ const styles = StyleSheet.create((theme) => ({
   listCard: {
     flex: 1,
     marginVertical: theme.spacing.scale.md,
+  },
+  listingBatch: {
+    gap: theme.spacing.scale.sm,
+    marginTop: theme.spacing.scale.lg,
   },
 }));

@@ -8,7 +8,7 @@ export class ScholarPageFeedEngine {
   constructor(private readonly repo: ScholarPageFeedRepo) {}
 
   /** Keeps selection and ordering behind an internal strategy boundary. */
-  recommend(): Promise<ScholarPageFeedRecommendation> {
+  recommend(): Promise<ScholarPageFeedRecommendation[]> {
     return this.repo.getRecommendations();
   }
 }
