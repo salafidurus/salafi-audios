@@ -31,10 +31,42 @@ describe("Scholar page feed contract", () => {
           items: [scholar],
         },
       ],
-      exhausted: true,
+      nextCursor: "eyJvZmZzZXQiOjEwfQ",
+      exhausted: false,
     });
 
     expect(result.batches[0]?.items).toEqual([scholar]);
+    expect(result.nextCursor).toBe("eyJvZmZzZXQiOjEwfQ");
+  });
+
+  it("preserves opaque continuation metadata while parsing supported batches", () => {
+    const result = parseScholarPageFeedDto({
+      schemaVersion: 1,
+      batches: [],
+      nextCursor: "next-page",
+      exhausted: false,
+    });
+
+    expect(result).toMatchObject({ nextCursor: "next-page", exhausted: false });
+  });
+
+  it("requires continuation metadata to agree with exhaustion", () => {
+    expect(() =>
+      ScholarPageFeedDtoSchema.parse({
+        schemaVersion: 1,
+        batches: [],
+        nextCursor: "next-page",
+        exhausted: true,
+      }),
+    ).toThrow();
+
+    expect(() =>
+      ScholarPageFeedDtoSchema.parse({
+        schemaVersion: 1,
+        batches: [],
+        exhausted: false,
+      }),
+    ).toThrow();
   });
 
   it("keeps supported batches while ignoring unknown future forms", () => {

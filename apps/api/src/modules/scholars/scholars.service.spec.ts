@@ -85,8 +85,17 @@ describe('ScholarsService', () => {
           itemIds: ['s1'],
         },
       ];
-      const expected: ScholarPageFeedDto = { schemaVersion: 1, batches: [], exhausted: true };
-      pageFeed.recommend = vi.fn().mockResolvedValue(recommendation);
+      const expected: ScholarPageFeedDto = {
+        schemaVersion: 1,
+        batches: [],
+        nextCursor: 'next-page',
+        exhausted: false,
+      };
+      pageFeed.recommend = vi.fn().mockResolvedValue({
+        recommendations: recommendation,
+        nextCursor: 'next-page',
+        exhausted: false,
+      });
       repo.hydratePageFeed.mockResolvedValue(expected);
 
       await expect(service.getPageFeed()).resolves.toEqual(expected);

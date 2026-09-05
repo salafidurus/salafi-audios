@@ -3,6 +3,7 @@ import type { Locale, TranslationStatus, TranslationViewDto } from "@sd/core-con
 import { useReducer } from "react";
 
 /** Stores nullable field values while preserving the sparse shape of one locale's translation draft. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- the record contract is documented in the block above.
 export type TranslationFieldsRecord = Record<string, string | null>;
 
 /** Lifecycle states for loading the source entity and its translations. */

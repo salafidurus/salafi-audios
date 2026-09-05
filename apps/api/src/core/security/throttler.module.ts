@@ -11,4 +11,5 @@ import { RateLimitGuard } from './rate-limit.guard';
   exports: [RateLimitGuard],
 })
 /** Registers the global rate-limit guard and its configuration dependency for API requests. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the module declaration from its TSDoc.
 export class AppThrottlerModule {}

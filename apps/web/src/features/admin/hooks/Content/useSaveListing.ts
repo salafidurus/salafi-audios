@@ -93,6 +93,7 @@ async function saveListing(state: FormState): Promise<void> {
   await createNewListing(state);
 }
 
+// oxlint-disable-next-line anti-slop/require-tsdoc -- the hook's lifecycle and callback contract are defined by its typed parameters and implementation below.
 export function useSaveListing(
   state: FormState,
   dispatch: (action: FormAction) => void,

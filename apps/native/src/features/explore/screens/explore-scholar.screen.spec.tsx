@@ -14,6 +14,7 @@ jest.mock("@sd/core-i18n", () => ({
 jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     t: (_key: string, fallback: string) => fallback,
+    i18n: { language: "en" },
   }),
 }));
 jest.mock("@/features/navigation", () => ({
@@ -133,5 +134,36 @@ describe("ExploreScholarScreen", () => {
     expect(result.getByText("Aqeedah scholars")).toBeTruthy();
     expect(result.getByText("Aqeedah")).toBeTruthy();
     expect(result.getByText("Ibn Baz")).toBeTruthy();
+  });
+
+  it("ignores unknown future batches while rendering supported batches", async () => {
+    mockUseScholarPageFeeds.mockReturnValue({
+      data: {
+        schemaVersion: 1,
+        exhausted: true,
+        batches: [
+          {
+            form: "future_form",
+            id: "future:1",
+            title: { kind: "future", id: "future", label: "Future" },
+            items: [],
+          },
+          {
+            form: "scholars",
+            id: "scholars:allamah",
+            title: { kind: "allamah", id: "allamah_scholars", label: "Allamah scholars" },
+            items: [{ id: "s1", slug: "ibn-baz", name: "Ibn Baz", lectureCount: 2 }],
+          },
+        ],
+      },
+      isFetching: false,
+      isError: false,
+      refetch: jest.fn(),
+    } as never);
+
+    const result = await render(<ExploreScholarScreen />);
+
+    expect(result.getByText("Ibn Baz")).toBeTruthy();
+    expect(result.queryByText("Future")).toBeNull();
   });
 });

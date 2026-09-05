@@ -12,6 +12,7 @@ vi.mock("@sd/domain-content", () => ({
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     t: (key: string, defaultVal: string) => defaultVal,
+    i18n: { language: "en" },
   }),
 }));
 vi.mock("next/navigation", () => ({
@@ -236,5 +237,37 @@ describe("ExploreScholarScreen", () => {
     expect(screen.getByText("Aqeedah scholars")).toBeTruthy();
     expect(screen.getByText("Aqeedah")).toBeTruthy();
     expect(screen.getAllByText("Ibn Baz").length).toBeGreaterThan(0);
+  });
+
+  it("ignores unknown future batches while rendering supported batches", () => {
+    mockUseScholarPageFeeds.mockReturnValue({
+      data: {
+        batches: [
+          {
+            form: "future_form",
+            id: "future:1",
+            title: { kind: "future", id: "future", label: "Future" },
+            items: [],
+          },
+          {
+            form: "scholars",
+            id: "scholars:allamah",
+            title: { kind: "allamah", id: "allamah_scholars", label: "Allamah scholars" },
+            items: [scholars[0]],
+          },
+        ],
+        schemaVersion: 1,
+        exhausted: true,
+      },
+      isFetching: false,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    });
+
+    render(<ExploreScholarScreen />);
+
+    expect(screen.getByRole("button", { name: /ibn baz/i })).toBeTruthy();
+    expect(screen.queryByText("Future")).toBeNull();
   });
 });

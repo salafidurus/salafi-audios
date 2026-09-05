@@ -13,6 +13,7 @@ import {
   parseScholarPageFeedDto,
   type ScholarPageFeedDto,
   type ScholarListDto,
+  type Locale,
 } from "@sd/core-contracts";
 
 /** Query hooks and presentation grouping for public scholar catalog content. */
@@ -39,16 +40,24 @@ export function useScholarDirectory(
   );
 }
 
-/** Reads the recommendation-composed root Scholars page without client-side ranking. */
+/**
+ * Reads one locale-specific, recommendation-composed root Scholars page.
+ *
+ * The cursor is opaque continuation state returned by the API and is included
+ * in both the request and the React Query cache key.
+ */
 export function useScholarPageFeeds(
+  locale: Locale = "en",
+  cursor?: string,
   options?: Omit<UseQueryOptions<ScholarPageFeedDto>, "queryKey" | "queryFn">,
 ) {
   return useApiQuery(
-    queryKeys.scholars.pageFeed(),
+    queryKeys.scholars.pageFeed(locale, cursor),
     async () => {
       const response = await httpClient<unknown>({
         url: endpoints.scholars.pageFeed,
         method: "GET",
+        params: cursor ? { cursor } : undefined,
       });
       return parseScholarPageFeedDto(response);
     },

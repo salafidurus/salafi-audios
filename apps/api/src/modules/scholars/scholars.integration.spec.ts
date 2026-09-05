@@ -63,6 +63,22 @@ describe('ScholarsController — auth boundaries', () => {
       expect(response.body).toBeDefined();
     });
 
+    it('GET /scholars forwards opaque continuation and bounded page size', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/scholars')
+        .query({ cursor: 'opaque-next-page', limit: 2 });
+
+      expect(response.status).toBe(200);
+      expect(mockScholarsService.getPageFeed).toHaveBeenLastCalledWith('opaque-next-page', 2);
+    });
+
+    it('GET /scholars rejects an invalid page size', async () => {
+      const response = await request(app.getHttpServer()).get('/scholars').query({ limit: 101 });
+
+      expect(response.status).toBe(400);
+      expect(mockScholarsService.getPageFeed).not.toHaveBeenLastCalledWith(undefined, 101);
+    });
+
     it('GET /scholars/directory returns 200 without auth', async () => {
       const response = await request(app.getHttpServer()).get('/scholars/directory');
       expect(response.status).toBe(200);
