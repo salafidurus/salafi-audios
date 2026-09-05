@@ -25,6 +25,8 @@ type PausedRequest = {
   request: { method: string; url: string };
 };
 
+type AuthFixtureServer = ReturnType<typeof Bun.serve>;
+
 const users = {
   listener: { id: "listener-1", name: "Listener", email: "listener@example.com" },
   "scoped-admin": { id: "scoped-admin-1", name: "Scoped Admin", email: "scoped@example.com" },
@@ -72,6 +74,25 @@ function sessionFor(role: AuthRole) {
   };
 }
 
+/** Narrows a fixture header to one of the supported deterministic auth roles. */
+function isAuthRole(value: string | null): value is AuthRole {
+  return value !== null && value in users;
+}
+
+/** Returns a JSON response for the local API fixture server. */
+function localJsonResponse(body: JsonValue, status: number, origin: string): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "content-type": "application/json",
+      "access-control-allow-origin": origin,
+      "access-control-allow-credentials": "true",
+      "access-control-allow-methods": "GET, POST, PATCH, OPTIONS",
+      "access-control-allow-headers": "content-type, x-e2e-auth-role",
+    },
+  });
+}
+
 /**
  * Installs deterministic Better Auth and account responses for one isolated
  * browser journey. Only the application endpoints needed by auth/account
@@ -93,6 +114,75 @@ export async function installAuthFixtures(
   const session = role ? sessionFor(role) : { session: null, user: null };
   const webOrigin = journey.origin;
   const pendingPausedRequests = new Set<Promise<void>>();
+  let fixtureServer: AuthFixtureServer | undefined;
+
+  const apiUrl = new URL(apiOrigin);
+  if (apiUrl.port !== "" && (apiUrl.hostname === "localhost" || apiUrl.hostname === "127.0.0.1")) {
+    fixtureServer = Bun.serve({
+      hostname: apiUrl.hostname,
+      port: Number(apiUrl.port || 80),
+      reusePort: true,
+      async fetch(request) {
+        const url = new URL(request.url);
+        const fixtureRole = request.headers.get("x-e2e-auth-role");
+        const fixtureSession = isAuthRole(fixtureRole) ? sessionFor(fixtureRole) : session;
+        const fixtureProfileRole = isAuthRole(fixtureRole) ? fixtureRole : role;
+        const fixtureSessionStatus =
+          request.headers.get("x-e2e-session-status") === "500" ? 500 : sessionStatus;
+        const fixtureSignOutStatus =
+          request.headers.get("x-e2e-sign-out-status") === "500" ? 500 : signOutStatus;
+
+        if (request.method === "OPTIONS") return localJsonResponse({}, 204, webOrigin);
+        if (url.pathname === "/api/auth/get-session") {
+          if (sessionDelayMs > 0) await Bun.sleep(sessionDelayMs);
+          return localJsonResponse(
+            fixtureSessionStatus === 200
+              ? fixtureSession
+              : { error: { message: "Provider failed" } },
+            fixtureSessionStatus,
+            webOrigin,
+          );
+        }
+        if (url.pathname === "/api/auth/sign-out") {
+          return localJsonResponse(
+            fixtureSignOutStatus === 200
+              ? { success: true }
+              : { error: { message: "Provider failed" } },
+            fixtureSignOutStatus,
+            webOrigin,
+          );
+        }
+        if (url.pathname === endpoints.account.profile && fixtureProfileRole) {
+          const user = users[fixtureProfileRole];
+          return localJsonResponse(
+            {
+              ...user,
+              avatarUrl: null,
+              displayName: user.name,
+              emailVerified: true,
+              roles: fixtureProfileRole === "superadmin" ? ["superadmin"] : [],
+              rules: rules[fixtureProfileRole],
+              createdAt: "2026-01-01T00:00:00.000Z",
+              updatedAt: "2026-01-01T00:00:00.000Z",
+            },
+            200,
+            webOrigin,
+          );
+        }
+        if (url.pathname === endpoints.admin.users.list) {
+          return localJsonResponse({ users: [], nextCursor: null, hasMore: false }, 200, webOrigin);
+        }
+        return localJsonResponse({}, 404, webOrigin);
+      },
+    });
+    await journey.view.cdp("Network.setExtraHTTPHeaders", {
+      headers: {
+        "x-e2e-auth-role": role ?? "anonymous",
+        "x-e2e-session-status": String(sessionStatus),
+        "x-e2e-sign-out-status": String(signOutStatus),
+      },
+    });
+  }
 
   const handlePaused = async (event: Event) => {
     // SAFETY: Bun.WebView's Fetch.requestPaused event always exposes the CDP payload as `data`.
@@ -172,6 +262,8 @@ export async function installAuthFixtures(
     journey.view.removeEventListener("Fetch.requestPaused", onPaused);
     await Promise.allSettled(pendingPausedRequests);
     await journey.view.cdp("Fetch.disable").catch(() => undefined);
+    await journey.view.cdp("Network.setExtraHTTPHeaders", { headers: {} }).catch(() => undefined);
+    fixtureServer?.stop(true);
   };
 }
 
