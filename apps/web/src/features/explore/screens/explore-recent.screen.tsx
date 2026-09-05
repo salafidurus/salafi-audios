@@ -9,7 +9,7 @@ import {
   type ExploreTopicItemDto,
   type ExploreTopicsBatchDto,
 } from "@sd/core-contracts";
-import { getErrorStateText, getLocalizedName } from "@sd/core-i18n";
+import { getErrorStateText } from "@sd/core-i18n";
 import {
   getProgressPercent,
   isListingFormat,
@@ -18,11 +18,9 @@ import {
   useProgressStore,
 } from "@sd/domain-audio";
 import { mergeExplorePages, useExploreRecentScreen } from "@sd/domain-content";
-import { useTopicsList } from "@sd/domain-search";
 import { useRouter } from "next/navigation";
-import React, { useRef, useEffect, useMemo, type ReactNode } from "react";
+import React, { useRef, useEffect, type ReactNode } from "react";
 
-import { useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useToast } from "@/core/toast";
 import { audioService, usePlayListing } from "@/features/audio";
@@ -34,12 +32,10 @@ import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { Button } from "@/shared/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/shared/components/ui/empty";
-import { ToggleGroup, ToggleGroupItem } from "@/shared/components/ui/toggle-group";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
-import { useExploreFilters } from "../hooks/use-explore-filters";
 import styles from "./explore-recent.screen.module.css";
 
 /** Optional route callbacks that let parent layouts retain navigation ownership. */
@@ -217,7 +213,6 @@ function buildFeedBlocks(
 }
 
 function FeedBody({
-  isHydrated,
   isRecentError,
   isRecentFetching,
   items,
@@ -227,7 +222,6 @@ function FeedBody({
   loadMoreRef,
   t,
 }: {
-  isHydrated: boolean;
   /** Whether the recent-feed request failed and should show recovery UI. */
   isRecentError: boolean;
   isRecentFetching: boolean;
@@ -238,7 +232,6 @@ function FeedBody({
   loadMoreRef: React.RefObject<HTMLDivElement | null>;
   t: ReturnType<typeof useTranslation>["t"];
 }) {
-  if (!isHydrated) return <FeedSkeleton />;
   if (isRecentError && items.length === 0) {
     return (
       <div className={styles.state} role="alert">
@@ -273,7 +266,7 @@ function FeedBody({
 
 /**
  * Renders the API-composed Explore feed with presentation-only module grouping.
- * Feed ordering, topic steering, pagination, navigation, and playback remain
+ * Feed ordering, pagination, navigation, and playback remain
  * owned by their existing API and domain seams.
  */
 // react-doctor-disable-next-line react-doctor/no-giant-component
@@ -283,53 +276,10 @@ export function FeedRecentScreen({
 }: FeedRecentScreenProps) {
   const { i18n, t } = useTranslation();
   const handleNavigateToScholar = useScholarNavigation(onNavigateToScholar);
-  const { user } = useAuth();
   const { navigateToListing } = useListingNavigation();
   const handleNavigateToListing = onNavigateToListing ?? navigateToListing;
 
-  // Topic steering state. The API owns the mixed feed composition.
-  const locale = getExploreLocale(i18n.language);
-  const { filters, isHydrated, updateFilter } = useExploreFilters({ locale, userId: user?.id });
-
-  const hasHydratedUrlTopic = useRef(false);
-  useEffect(() => {
-    const browserWindow = globalThis.window;
-    if (!isHydrated || !browserWindow || hasHydratedUrlTopic.current) return;
-    hasHydratedUrlTopic.current = true;
-    const params = new URLSearchParams(browserWindow.location.search);
-    const urlTopic = params.get("topic") ?? "";
-    if (urlTopic && urlTopic !== filters.topic) updateFilter("topic", urlTopic);
-  }, [filters.topic, isHydrated, updateFilter]);
-
-  useEffect(() => {
-    const browserWindow = globalThis.window;
-    if (!isHydrated || !browserWindow) return;
-    const url = new URL(browserWindow.location.href);
-    if (filters.topic) url.searchParams.set("topic", filters.topic);
-    else url.searchParams.delete("topic");
-    browserWindow.history.replaceState(
-      browserWindow.history.state,
-      "",
-      `${url.pathname}${url.search}`,
-    );
-  }, [filters.topic, isHydrated]);
-
-  const { data: topics = [] } = useTopicsList();
-
-  const topicChips = useMemo(() => {
-    return topics
-      .toSorted((a, b) =>
-        getLocalizedName(a.name, i18n.language).localeCompare(
-          getLocalizedName(b.name, i18n.language),
-        ),
-      )
-      .map((topic) => ({
-        id: topic.slug,
-        label: getLocalizedName(topic.name, i18n.language),
-      }));
-  }, [topics, i18n.language]);
-
-  // Discovery feed data. Topic steering is part of the request identity.
+  // Discovery feed composition and recommendation context are backend-owned.
   const {
     data: recentData,
     isFetching: isRecentFetching,
@@ -339,7 +289,6 @@ export function FeedRecentScreen({
     refetch: refetchRecent,
   } = useExploreRecentScreen({
     locale: getExploreLocale(i18n.language),
-    topicSlug: filters.topic || undefined,
   });
 
   const recentItems = mergeExplorePages(recentData?.pages ?? []);
@@ -368,7 +317,6 @@ export function FeedRecentScreen({
   const feedTitle = t("explore.title", "Explore");
   const body = (
     <FeedBody
-      isHydrated={isHydrated}
       isRecentError={isRecentError}
       isRecentFetching={isRecentFetching}
       items={visibleRecentItems}
@@ -385,29 +333,6 @@ export function FeedRecentScreen({
       <StickyHeaderLayout>
         <StickyHeaderLayout.Header>
           <PageHeader title={feedTitle} />
-          <div
-            className={styles.topicSteering}
-            aria-label={t("explore.topicSteering", "Explore by topic")}
-          >
-            <span className={styles.topicLabel}>
-              {t("explore.exploreByTopic", "Explore by topic")}
-            </span>
-            <ToggleGroup
-              type="single"
-              value={filters.topic}
-              onValueChange={(value) => updateFilter("topic", value)}
-              className={styles.topicGroup}
-            >
-              <ToggleGroupItem value="" aria-label={t("explore.allTopics", "All topics")}>
-                {t("explore.allTopics", "All")}
-              </ToggleGroupItem>
-              {topicChips.map((topic) => (
-                <ToggleGroupItem key={topic.id} value={topic.id}>
-                  {topic.label}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          </div>
         </StickyHeaderLayout.Header>
         <StickyHeaderLayout.Content>
           <div className={styles.page}>{body}</div>

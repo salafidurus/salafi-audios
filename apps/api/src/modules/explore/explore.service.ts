@@ -16,12 +16,8 @@ export class ExploreService {
     private readonly mapper: ExploreMapper,
   ) {}
 
-  async getRecentRecommendations(
-    cursor?: string,
-    limit = 20,
-    topicSlug?: string,
-  ): Promise<FeedPageDto> {
-    const recommendations = await this.recommendation.recommend(cursor, limit, topicSlug);
+  async getRecentRecommendations(cursor?: string, limit = 20): Promise<FeedPageDto> {
+    const recommendations = await this.recommendation.recommend(cursor, limit);
     const page = await this.repo.hydrate(recommendations, getRequestLocale());
     return this.mapper.toFeedPage(page);
   }

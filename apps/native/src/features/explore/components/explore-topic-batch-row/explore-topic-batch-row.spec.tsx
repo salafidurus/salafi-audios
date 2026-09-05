@@ -1,6 +1,6 @@
 import type { ExploreTopicItemDto } from "@sd/core-contracts";
 
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import { render, screen } from "@testing-library/react-native";
 import React from "react";
 
 import { ExploreTopicBatchRow } from "./explore-topic-batch-row";
@@ -19,14 +19,9 @@ describe("ExploreTopicBatchRow", () => {
     expect(screen.getByText("Fiqh")).toBeTruthy();
   });
 
-  it("uses the public topic slug when a topic is pressed", async () => {
-    const onTopicPress = jest.fn();
-    await render(
-      <ExploreTopicBatchRow title="Explore topics" topics={topics} onTopicPress={onTopicPress} />,
-    );
+  it("does not expose topic steering callbacks", async () => {
+    await render(<ExploreTopicBatchRow title="Explore topics" topics={topics} />);
 
-    await fireEvent.press(screen.getByTestId("native-topic-card-aqeedah"));
-
-    expect(onTopicPress).toHaveBeenCalledWith("aqeedah");
+    expect(screen.getByTestId("native-topic-card-aqeedah")).toBeTruthy();
   });
 });

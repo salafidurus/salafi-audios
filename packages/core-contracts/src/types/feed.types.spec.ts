@@ -56,24 +56,14 @@ describe("Explore recommendation contract", () => {
     expect(result.batches[0]?.items[0]?.slug).toBe("a-lesson");
   });
 
-  it("accepts topic context and rejects unsupported title combinations", () => {
-    expect(
+  it("rejects client-selected topic title contexts", () => {
+    expect(() =>
       ExploreListingsBatchDtoSchema.parse({
         kind: "listings",
         id: "listings:topic:aqeedah",
         title: { kind: "topic_listings", topicSlug: "aqeedah", label: "Aqeedah" },
         reason: "deterministic_recent",
         items: [listing],
-      }),
-    ).toBeTruthy();
-
-    expect(() =>
-      ExploreListingsBatchDtoSchema.parse({
-        kind: "listings",
-        id: "bad",
-        title: { kind: "listings", id: "recent" },
-        reason: "deterministic_recent",
-        items: [],
       }),
     ).toThrow();
   });

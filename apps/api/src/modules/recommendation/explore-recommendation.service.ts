@@ -10,7 +10,7 @@ import { ExploreRecommendationEngine } from './explore-recommendation.engine';
 export class ExploreRecommendationService {
   constructor(private readonly engine: ExploreRecommendationEngine) {}
 
-  recommend(cursor?: string, limit = 20, topicSlug?: string): Promise<ExploreRecommendationResult> {
-    return this.engine.recommend(cursor, limit, topicSlug);
+  recommend(cursor?: string, limit = 20): Promise<ExploreRecommendationResult> {
+    return this.engine.recommend(cursor, limit);
   }
 }

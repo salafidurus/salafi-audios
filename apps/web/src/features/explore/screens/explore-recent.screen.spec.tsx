@@ -2,16 +2,12 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "bun:test";
 import React from "react";
 
-import { DEFAULT_EXPLORE_FILTERS } from "../utils/explore-filters";
 import { FeedRecentScreen } from "./explore-recent.screen";
 
 const mockUseExploreRecentScreen = vi.fn();
-const mockUseTopicsList = vi.fn();
 const mockUseAuth = vi.fn();
-const mockUseExploreFilters = vi.fn();
 
 vi.mock("@sd/domain-content", () => ({ useExploreRecentScreen: mockUseExploreRecentScreen }));
-vi.mock("@sd/domain-search", () => ({ useTopicsList: mockUseTopicsList }));
 vi.mock("@/core/auth", () => ({ useAuth: mockUseAuth }));
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
@@ -79,31 +75,12 @@ vi.mock("../components/feed-topic-row/feed-topic-row", () => ({
     <div data-testid="topic-feed-row">{topicName}</div>
   ),
 }));
-vi.mock("../hooks/use-explore-filters", () => ({ useExploreFilters: mockUseExploreFilters }));
 vi.mock("@/features/home/components/lecture-card/lecture-card", () => ({
   LectureCard: ({ title }: { title: string }) => <article>{title}</article>,
 }));
 
-function filters(overrides: Partial<typeof DEFAULT_EXPLORE_FILTERS> = {}) {
-  return { ...DEFAULT_EXPLORE_FILTERS, ...overrides };
-}
-
-function exploreHookValue(overrides: Record<string, unknown> = {}) {
-  return {
-    filters: filters(),
-    isHydrated: true,
-    updateFilter: vi.fn(),
-    ...overrides,
-  };
-}
-
-let currentExploreFilters = exploreHookValue();
-
 function setup() {
   mockUseAuth.mockReturnValue({ user: null });
-  mockUseTopicsList.mockReturnValue({
-    data: [{ slug: "aqeedah", name: { en: "Aqeedah", ar: "العقيدة" } }],
-  });
   mockUseExploreRecentScreen.mockReturnValue({
     data: {
       pages: [
@@ -141,8 +118,6 @@ function setup() {
     fetchNextPage: vi.fn(),
     refetch: vi.fn(),
   });
-  currentExploreFilters = exploreHookValue();
-  mockUseExploreFilters.mockImplementation(() => currentExploreFilters);
 }
 
 describe("FeedRecentScreen", () => {
@@ -168,21 +143,25 @@ describe("FeedRecentScreen", () => {
     ).toEqual(["Continue exploring"]);
   });
 
-  it("requests the selected Topic from the discovery API", () => {
-    const updateFilter = vi.fn();
-    currentExploreFilters = exploreHookValue({ updateFilter });
+  it("does not expose or submit frontend topic steering", () => {
     render(<FeedRecentScreen />);
 
     expect(mockUseExploreRecentScreen).toHaveBeenCalledWith({
       locale: "en",
-      topicSlug: undefined,
     });
-    fireEvent.click(screen.getByRole("radio", { name: "Aqeedah" }));
-    expect(updateFilter).toHaveBeenCalledWith("topic", "aqeedah");
+    expect(screen.queryByLabelText("Explore by topic")).not.toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: "Aqeedah" })).not.toBeInTheDocument();
   });
 
-  it("renders the loading state before hydration", () => {
-    currentExploreFilters = exploreHookValue({ isHydrated: false });
+  it("renders the loading state while the recommendation request is pending", () => {
+    mockUseExploreRecentScreen.mockReturnValue({
+      data: { pages: [] },
+      isFetching: true,
+      isError: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
+      refetch: vi.fn(),
+    });
     render(<FeedRecentScreen />);
     expect(screen.getByTestId("feed-skeleton")).toBeInTheDocument();
   });

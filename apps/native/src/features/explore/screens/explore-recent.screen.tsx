@@ -7,14 +7,12 @@ import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { mergeExplorePages, useExploreRecentScreen } from "@sd/domain-content";
-import { useTopicsList } from "@sd/domain-search";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { FlatList, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { RootScreenHeader } from "@/features/navigation";
-import { SearchFilter } from "@/features/search";
 import { AppText, ScreenView } from "@/shared/ui";
 
 import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
@@ -26,8 +24,8 @@ import {
 } from "../components/explore-status/explore-status";
 import { ExploreTopicBatchRow } from "../components/explore-topic-batch-row/explore-topic-batch-row";
 
-/** Composes the mixed native discovery feed without peer subsection navigation. */
-/** Describes navigation callbacks accepted by the Explore root screen. */
+/** ExploreScreenProps keeps listing and scholar route ownership with the parent of the API-ordered feed. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- The preceding TSDoc documents the callback ownership invariant.
 export type ExploreScreenProps = {
   onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
@@ -79,16 +77,9 @@ function renderFeedItem(
   item: ExploreListingsBatchDto | ExploreScholarsBatchDto | ExploreTopicsBatchDto,
   onNavigateToListing?: (slug: string) => void,
   onNavigateToScholar?: (slug: string) => void,
-  onTopicPress?: (slug: string) => void,
 ) {
   if (item.kind === "topics") {
-    return (
-      <ExploreTopicBatchRow
-        title={item.title.label}
-        topics={item.items}
-        onTopicPress={onTopicPress}
-      />
-    );
+    return <ExploreTopicBatchRow title={item.title.label} topics={item.items} />;
   }
 
   return (
@@ -126,10 +117,8 @@ function getExploreLocale(language: string): "ar" | "en" {
 /** Renders the mixed Explore feed and coordinates its user-facing state. */
 export function ExploreScreen({ onNavigateToListing, onNavigateToScholar }: ExploreScreenProps) {
   const { i18n, t } = useTranslation();
-  const [topicSlug, setTopicSlug] = useState<string | undefined>();
-  const { data: topics = [] } = useTopicsList();
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useExploreRecentScreen(
-    { locale: getExploreLocale(i18n.language), topicSlug },
+    { locale: getExploreLocale(i18n.language) },
   );
   const items = mergeExplorePages(data?.pages ?? []);
 
@@ -138,24 +127,13 @@ export function ExploreScreen({ onNavigateToListing, onNavigateToScholar }: Expl
       item,
     }: ListRenderItemInfo<
       ExploreListingsBatchDto | ExploreScholarsBatchDto | ExploreTopicsBatchDto
-    >) => renderFeedItem(item, onNavigateToListing, onNavigateToScholar, setTopicSlug),
+    >) => renderFeedItem(item, onNavigateToListing, onNavigateToScholar),
     [onNavigateToListing, onNavigateToScholar],
   );
 
   return (
     <ScreenView>
       <RootScreenHeader title={t("explore.title", "Explore")} />
-      <View style={styles.filterSection}>
-        <AppText variant="titleMd">{t("explore.exploreByTopic", "Explore by topic")}</AppText>
-        <AppText variant="bodySm" colorRole="muted">
-          {t("explore.exploreByTopicDescription", "Choose a topic to shape your study feed.")}
-        </AppText>
-        <SearchFilter
-          value={topicSlug ? [topicSlug] : []}
-          onChange={(value) => setTopicSlug(value[0])}
-          topics={topics}
-        />
-      </View>
       <View style={styles.screen}>
         {items.length === 0 ? (
           <ExploreRecentStatus
@@ -189,9 +167,5 @@ const styles = StyleSheet.create((theme) => ({
   listContent: {
     paddingVertical: theme.spacing.scale.md,
     gap: theme.spacing.scale.md,
-  },
-  filterSection: {
-    gap: theme.spacing.scale.xs,
-    paddingBottom: theme.spacing.scale.sm,
   },
 }));
