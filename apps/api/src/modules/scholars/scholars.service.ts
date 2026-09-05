@@ -83,12 +83,12 @@ export class ScholarsService {
 
     // Invalidate list cache
     for (const locale of SUPPORTED_LOCALES) {
-      cacheKeysToInvalidate.push(`/scholars:${locale}`);
+      cacheKeysToInvalidate.push(`/v1/scholars:${locale}`);
     }
 
     // Invalidate detail caches
     for (const locale of SUPPORTED_LOCALES) {
-      cacheKeysToInvalidate.push(`/scholars/${slug}:${locale}`);
+      cacheKeysToInvalidate.push(`/v1/scholars/${slug}:${locale}`);
     }
 
     await Promise.all(cacheKeysToInvalidate.map((key) => this.cacheManager.del(key)));

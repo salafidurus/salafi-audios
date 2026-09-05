@@ -20,7 +20,7 @@ import { ScholarsService } from './scholars.service';
 @ApiTags('Scholars')
 @ApiCommonErrors()
 @Public()
-@Controller('scholars')
+@Controller({ path: 'scholars', version: '1' })
 @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor) // Cache control must wrap cache interceptor to capture cache hits
 @CacheTTL(24 * 60 * 60 * 1000) // 24 hours; successful mutations clear the cache
 /** scholars application module responsible for scholars.controller behavior at the backend boundary. */

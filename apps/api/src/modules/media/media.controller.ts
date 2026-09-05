@@ -20,7 +20,7 @@ import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 /** NestJS media controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Media')
 @ApiCommonErrors()
-@Controller('admin/media')
+@Controller({ path: 'admin/media', version: '1' })
 /** media application module responsible for media.controller behavior at the backend boundary. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class MediaController {

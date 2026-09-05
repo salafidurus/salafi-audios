@@ -15,7 +15,7 @@ import { TopicsService } from './topics.service';
 /** NestJS topics translations controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Topic Translations')
 @ApiCommonErrors()
-@Controller('topics')
+@Controller({ path: 'topics', version: '1' })
 /** topics application module responsible for topics translations.controller behavior at the backend boundary. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class TopicsTranslationsController {

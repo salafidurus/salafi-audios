@@ -16,7 +16,7 @@ import { CacheControlInterceptor } from '../../shared/interceptors/cache-control
 /** NestJS audio controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Audio')
 @ApiCommonErrors()
-@Controller('audio')
+@Controller({ path: 'audio', version: '1' })
 /** audio application module responsible for audio.controller behavior at the backend boundary. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AudioController {

@@ -76,7 +76,7 @@ describe('Arrange commit (e2e)', () => {
 
   it('creates lessons with audio assets under a series and syncs counters', async () => {
     const res = await request(app.getHttpServer())
-      .post(`/admin/listings/${SERIES_ID}/arrange-commit`)
+      .post(`/v1/admin/listings/${SERIES_ID}/arrange-commit`)
       .set(creatorHeaders)
       .send({
         lessons: [
@@ -132,7 +132,7 @@ describe('Arrange commit (e2e)', () => {
     });
 
     await request(app.getHttpServer())
-      .post(`/admin/listings/${SERIES_ID}/arrange-commit`)
+      .post(`/v1/admin/listings/${SERIES_ID}/arrange-commit`)
       .set(creatorHeaders)
       .send({
         lessons: [
@@ -158,7 +158,7 @@ describe('Arrange commit (e2e)', () => {
 
   it('creates a module with nested lessons under a collection', async () => {
     await request(app.getHttpServer())
-      .post(`/admin/listings/${COLLECTION_ID}/arrange-commit`)
+      .post(`/v1/admin/listings/${COLLECTION_ID}/arrange-commit`)
       .set(creatorHeaders)
       .send({
         modules: [
@@ -200,7 +200,7 @@ describe('Arrange commit (e2e)', () => {
 
   it("rejects a lesson nested under a new module when it only satisfies the root prefix, not the module's own slug", async () => {
     const res = await request(app.getHttpServer())
-      .post(`/admin/listings/${COLLECTION_ID}/arrange-commit`)
+      .post(`/v1/admin/listings/${COLLECTION_ID}/arrange-commit`)
       .set(creatorHeaders)
       .send({
         modules: [
@@ -238,7 +238,7 @@ describe('Arrange commit (e2e)', () => {
     });
 
     await request(app.getHttpServer())
-      .post(`/admin/listings/${COLLECTION_ID}/arrange-commit`)
+      .post(`/v1/admin/listings/${COLLECTION_ID}/arrange-commit`)
       .set(creatorHeaders)
       .send({
         modules: [
@@ -271,7 +271,7 @@ describe('Arrange commit (e2e)', () => {
     });
 
     await request(app.getHttpServer())
-      .post(`/admin/listings/${COLLECTION_ID}/arrange-commit`)
+      .post(`/v1/admin/listings/${COLLECTION_ID}/arrange-commit`)
       .set(creatorHeaders)
       .send({
         modules: [
@@ -299,7 +299,7 @@ describe('Arrange commit (e2e)', () => {
 
   it('returns 409 with conflictingSlugs and rolls the whole commit back', async () => {
     const res = await request(app.getHttpServer())
-      .post(`/admin/listings/${SERIES_ID}/arrange-commit`)
+      .post(`/v1/admin/listings/${SERIES_ID}/arrange-commit`)
       .set(creatorHeaders)
       .send({
         lessons: [
@@ -327,7 +327,7 @@ describe('Arrange commit (e2e)', () => {
 
   it('rejects update targets that are not under the root', async () => {
     await request(app.getHttpServer())
-      .post(`/admin/listings/${COLLECTION_ID}/arrange-commit`)
+      .post(`/v1/admin/listings/${COLLECTION_ID}/arrange-commit`)
       .set(creatorHeaders)
       .send({
         modules: [{ op: 'update', id: TAKEN_ID, lessons: [] }],
@@ -338,7 +338,7 @@ describe('Arrange commit (e2e)', () => {
   it('rejects commits without listing write access', async () => {
     const viewer = await authFactory.createAdminUser();
     await request(app.getHttpServer())
-      .post(`/admin/listings/${SERIES_ID}/arrange-commit`)
+      .post(`/v1/admin/listings/${SERIES_ID}/arrange-commit`)
       .set(viewer.headers)
       .send({ lessons: [] })
       .expect(403);
@@ -346,7 +346,7 @@ describe('Arrange commit (e2e)', () => {
 
   it('GET arrange-data returns the children tree including drafts', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/admin/listings/${SERIES_ID}/arrange-data`)
+      .get(`/v1/admin/listings/${SERIES_ID}/arrange-data`)
       .set(creatorHeaders)
       .expect(200);
 

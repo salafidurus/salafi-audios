@@ -14,7 +14,7 @@ import { TopicsService } from './topics.service';
 @ApiTags('Topics')
 @ApiCommonErrors()
 @Public()
-@Controller('topics')
+@Controller({ path: 'topics', version: '1' })
 @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor) // Cache control must wrap cache interceptor to capture cache hits
 @CacheTTL(24 * 60 * 60 * 1000) // 24 hours; successful mutations clear the cache
 /** topics application module responsible for topics.controller behavior at the backend boundary. */

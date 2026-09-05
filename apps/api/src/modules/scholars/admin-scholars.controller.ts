@@ -15,7 +15,7 @@ import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 /** NestJS admin scholars controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Scholars')
 @ApiCommonErrors()
-@Controller('admin/scholars')
+@Controller({ path: 'admin/scholars', version: '1' })
 /** scholars application module responsible for admin scholars.controller behavior at the backend boundary. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AdminScholarsController {
