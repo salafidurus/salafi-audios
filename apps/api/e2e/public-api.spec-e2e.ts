@@ -75,6 +75,20 @@ describe('Public API (e2e)', () => {
       expect(kinds.some((k: string) => k === 'single')).toBe(true);
     });
 
+    it('includes the ordered allamah scholar recommendation batch', async () => {
+      const res = await request(app.getHttpServer()).get('/v1/listings/recent').expect(200);
+
+      const scholarBatch = res.body.batches.find((batch: any) => batch.kind === 'scholars');
+      expect(scholarBatch).toMatchObject({
+        id: 'scholars:senior',
+        title: { kind: 'scholars', id: 'senior_scholars' },
+        reason: 'deterministic_senior_scholars',
+      });
+      expect(scholarBatch.items.length).toBeGreaterThan(0);
+      expect(scholarBatch.items.every((item: any) => item.title === 'allamah')).toBe(true);
+      expect(scholarBatch.items.every((item: any) => item.name)).toBe(true);
+    });
+
     it('GET /listings/recent?limit=5 returns <= 5 items', async () => {
       const res = await request(app.getHttpServer())
         .get('/v1/listings/recent')

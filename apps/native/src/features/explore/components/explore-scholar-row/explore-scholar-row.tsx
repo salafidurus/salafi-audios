@@ -1,4 +1,4 @@
-import type { ScholarChipDto } from "@sd/core-contracts";
+import type { ExploreScholarItemDto } from "@sd/core-contracts";
 import type { ListRenderItemInfo } from "react-native";
 
 import { FlatList, Pressable, View } from "react-native";
@@ -11,13 +11,18 @@ import { AppText } from "@/shared/ui";
 /** Describes the inputs and callbacks accepted by Explore Scholar Row. */
 /** Describes the inputs, callbacks, and optional state accepted by Explore Scholar Row. */
 export type ExploreScholarRowProps = {
-  scholars: ScholarChipDto[];
+  scholars: ExploreScholarItemDto[];
+  title?: string;
   onScholarPress?: (slug: string) => void;
 };
 
 /** Renders the native explore scholar row surface and coordinates its user-facing state. */
-export function ExploreScholarRow({ scholars, onScholarPress }: ExploreScholarRowProps) {
-  function renderScholar({ item: scholar }: ListRenderItemInfo<ScholarChipDto>) {
+export function ExploreScholarRow({
+  scholars,
+  title = "Popular Scholars",
+  onScholarPress,
+}: ExploreScholarRowProps) {
+  function renderScholar({ item: scholar }: ListRenderItemInfo<ExploreScholarItemDto>) {
     return (
       <Pressable
         onPress={() => onScholarPress?.(scholar.slug)}
@@ -35,7 +40,7 @@ export function ExploreScholarRow({ scholars, onScholarPress }: ExploreScholarRo
   return (
     <View style={styles.container}>
       <AppText variant="titleMd" style={styles.heading}>
-        Popular Scholars
+        {title}
       </AppText>
       <FlatList
         horizontal
