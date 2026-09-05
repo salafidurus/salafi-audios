@@ -39,6 +39,12 @@ printf "pre-push: validating changed packages against %s...\n" "$COMPARISON_BASE
 
 bun run verify:build-configs
 
+# Next.js inlines public URLs into the browser bundle during production builds.
+# Keep local pre-push builds aligned with the E2E fixture defaults while
+# preserving explicitly supplied CI or developer values.
+export NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL:-http://localhost:4000}"
+export NEXT_PUBLIC_WEB_URL="${NEXT_PUBLIC_WEB_URL:-http://localhost:3000}"
+
 # Run Turborepo tasks only on packages affected since the comparison base.
 # TURBO_SCM_BASE instructs Turborepo what git commit/ref to compare changes against.
 TURBO_SCM_BASE="$COMPARISON_BASE" bun run turbo lint typecheck test:prepush build --affected --continue

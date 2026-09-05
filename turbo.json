@@ -29,6 +29,7 @@
       "dependsOn": ["^build"],
       // Env files included because Next.js and NestJS inline env vars at build time
       "inputs": ["$TURBO_DEFAULT$", ".env*", "tsconfig*.json", "next.config.*"],
+      "env": ["NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_WEB_URL"],
       "outputs": ["dist/**", "build/**", ".next/**", "lib/**", "generated/**", "src/generated/**"]
     },
     "lint": {

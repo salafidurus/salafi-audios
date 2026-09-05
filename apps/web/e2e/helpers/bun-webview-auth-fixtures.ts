@@ -88,7 +88,8 @@ function localJsonResponse(body: JsonValue, status: number, origin: string): Res
       "access-control-allow-origin": origin,
       "access-control-allow-credentials": "true",
       "access-control-allow-methods": "GET, POST, PATCH, OPTIONS",
-      "access-control-allow-headers": "content-type, x-e2e-auth-role",
+      "access-control-allow-headers":
+        "content-type, x-e2e-auth-role, x-e2e-session-status, x-e2e-sign-out-status",
     },
   });
 }
@@ -119,7 +120,6 @@ export async function installAuthFixtures(
   const apiUrl = new URL(apiOrigin);
   if (apiUrl.port !== "" && (apiUrl.hostname === "localhost" || apiUrl.hostname === "127.0.0.1")) {
     fixtureServer = Bun.serve({
-      hostname: apiUrl.hostname,
       port: Number(apiUrl.port || 80),
       reusePort: true,
       async fetch(request) {
