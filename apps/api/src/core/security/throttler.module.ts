@@ -3,6 +3,7 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '../config/config.module';
 import { RateLimitGuard } from './rate-limit.guard';
 
+/** Defines the global NestJS module that provides the API rate-limit guard. */
 @Global()
 @Module({
   imports: [ConfigModule],

@@ -14,6 +14,7 @@ interface MobileHeaderProps {
   onMenuClick: () => void;
 }
 
+/** Renders the mobile brand header and exposes the control that opens navigation. */
 export function MobileHeader({ onMenuClick }: MobileHeaderProps) {
   const { t } = useTranslation();
 
