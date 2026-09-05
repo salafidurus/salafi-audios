@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Client-side detail editor for one child listing in the hierarchy. */
 "use client";
 
 import { sanitizeError } from "@sd/utils-error";
@@ -18,6 +18,7 @@ import { InputField } from "@/shared/components/ui/input-field";
 import styles from "./listing-modal.module.css";
 import { ListingStatusOrderFields } from "./ListingStatusOrderFields";
 
+/** Child listing identity and callbacks owned by the parent tab. */
 export interface ListingSublistingDetailProps {
   childId: string;
   onBack: () => void;
@@ -25,11 +26,15 @@ export interface ListingSublistingDetailProps {
   onSaved: () => void;
 }
 
+/** Request and editable values for the child listing detail view. */
 interface DetailState {
+  /** Current request state for the child listing. */
   status: "loading" | "ready" | "error";
+  /** Sanitized load or save error shown in the editor. */
   error: string | null;
   title: string;
   description: string;
+  /** Current API-valid status of the child listing. */
   lectureStatus: LectureStatus;
   orderIndex: number;
   saving: boolean;
@@ -51,6 +56,7 @@ const initialState: DetailState = {
  * reusing the same generic form-data/update-details endpoints as the root
  * listing modal — modules/lessons are just Listing rows with a parentId.
  */
+/** Loads, edits, and saves one child listing before returning to its parent. */
 export function ListingSublistingDetail({
   childId,
   onBack,

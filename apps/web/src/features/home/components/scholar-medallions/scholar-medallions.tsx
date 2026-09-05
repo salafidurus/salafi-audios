@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Client-side scholar showcase with an optional featured senior scholar. */
 "use client";
 
 import { routes } from "@sd/core-contracts";
@@ -27,6 +27,7 @@ const LANGUAGE_LABELS = {
 } as const;
 
 type ScholarMedallionsProps = {
+  /** Slug of the scholar that should receive the featured treatment. */
   featuredScholarSlug?: string;
 };
 
@@ -158,6 +159,7 @@ function selectScholarGroups(scholars: ScholarListItem[], featuredScholarSlug?: 
   };
 }
 
+/** Renders the home-page scholar showcase and separates its featured item. */
 export function ScholarMedallions({ featuredScholarSlug }: ScholarMedallionsProps) {
   const { t } = useTranslation();
   const { data, isLoading } = useInfiniteScholarsList();

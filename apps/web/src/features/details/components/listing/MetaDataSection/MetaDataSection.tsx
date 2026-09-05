@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Client-side listing identity, scholar, topic, and metadata presentation. */
 "use client";
 
 import type { ListingDetailDto } from "@sd/core-contracts";
@@ -38,6 +38,7 @@ function formatLanguage(
   return language;
 }
 
+/** Listing data and layout variant used by the metadata section. */
 export type MetaDataSectionProps = {
   listing: ListingDetailDto;
   layout?: "inline" | "sidebar";
@@ -46,7 +47,9 @@ export type MetaDataSectionProps = {
 
 type MetadataViewModel = {
   listing: ListingDetailDto;
+  /** Human-readable duration derived from the listing's seconds fields. */
   duration: string;
+  /** Localized language label for the listing. */
   language: string;
   hasLessonCount: boolean;
   moduleCount?: number;
@@ -57,6 +60,7 @@ type MetadataRowsProps = {
   t: ReturnType<typeof useTranslation>["t"];
 };
 
+/** Renders the listing metadata row in a stable semantic order. */
 function MetadataRows({ metadata, t }: MetadataRowsProps) {
   return (
     <div className={styles.metaRow}>
@@ -175,6 +179,7 @@ function MetaDataView({
   );
 }
 
+/** Renders the listing identity, artwork, scholar link, and metadata. */
 export function MetaDataSection({ listing, layout = "inline", moduleCount }: MetaDataSectionProps) {
   const { t } = useTranslation();
   const showOriginal = useShowOriginalContent();

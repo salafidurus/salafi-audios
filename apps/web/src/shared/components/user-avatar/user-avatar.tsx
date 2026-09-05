@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { AppAvatar } from "@/shared/components/app-avatar";
 
-/** Documents this module's responsibility and public boundary. */
+/** Props for rendering a user's image with a name-based fallback. */
 type UserAvatarProps = {
   image: string | null;
   name: string | null;
@@ -11,6 +11,7 @@ type UserAvatarProps = {
   fill?: boolean;
 };
 
+/** Renders the shared avatar treatment used for authenticated users. */
 export function UserAvatar({
   image,
   name,

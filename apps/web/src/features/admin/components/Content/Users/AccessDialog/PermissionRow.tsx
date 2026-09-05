@@ -12,7 +12,14 @@ import { Switch as Toggle } from "@/shared/components/ui/switch";
 import styles from "./AccessDialog.module.css";
 import { ScopeSelector } from "./ScopeSelector";
 
-/** Documents this module's responsibility and public boundary. */
+/** Scholar option shown by the scholar scope selector. */
+interface ScholarOption {
+  /** Stable public slug used as the selected scholar identifier. */
+  slug: string;
+  name: string;
+}
+
+/** Data and callbacks required to edit one target's access policy. */
 interface PermissionRowProps {
   title: string;
   description: string;
@@ -20,7 +27,8 @@ interface PermissionRowProps {
   enabled: boolean;
   capabilities: AccessCapability[];
   selectedCapabilities: { [key in AccessCapability]?: boolean };
-  scholarOptions: { slug: string; name: string }[];
+  /** Scholars available when this target is scoped to selected scholars. */
+  scholarOptions: ScholarOption[];
   selectedScholars: string[];
   localeOptions: readonly string[];
   selectedLocales: string[];
@@ -31,6 +39,7 @@ interface PermissionRowProps {
   onUpdateLocales: (locales: string[]) => void;
 }
 
+/** Renders one expandable access-policy row and its optional scope selectors. */
 export function PermissionRow({
   title,
   description,

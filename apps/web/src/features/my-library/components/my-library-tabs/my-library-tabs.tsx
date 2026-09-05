@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Client-side tab navigation for the user's library sections. */
 "use client";
 
 import { routes } from "@sd/core-contracts";
@@ -9,12 +9,15 @@ import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 
 import styles from "./my-library-tabs.module.css";
 
+/** URL tab values supported by the My Library route. */
 export type MyLibraryTab = "started" | "saved" | "completed";
 
+/** Active section used to mark the corresponding library tab. */
 type MyLibraryTabsProps = {
   activeTab: MyLibraryTab;
 };
 
+/** Renders links for the three persisted My Library sections. */
 export function MyLibraryTabs({ activeTab }: MyLibraryTabsProps) {
   const { t } = useTranslation();
 

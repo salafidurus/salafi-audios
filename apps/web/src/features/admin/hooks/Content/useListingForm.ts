@@ -1,20 +1,25 @@
+/** Reducer state and actions for the admin listing editor. */
 import type { Locale, ListingFormDataDto } from "@sd/core-contracts";
 
 import { useReducer } from "react";
 
 import { type LectureStatus } from "@/shared/types/form-types";
 
-/** Documents this module's responsibility and public boundary. */
+/** Snapshot and reducer model for the admin listing editor. */
+/** Snapshot of editable listing values used to identify review-tab changes. */
 export type ListingChangeSnapshot = {
   title: string;
   description: string;
+  /** Current API-valid publication status. */
   status: LectureStatus;
   orderIndex: number;
   selectedTopics: string[];
+  /** Current locale selected for the listing content. */
   language: Locale;
   coverImageUrl: string;
 };
 
+/** Complete state owned by the listing editor reducer. */
 export type FormState = {
   // Immutable fields (edit mode only)
   id?: string;
@@ -22,17 +27,21 @@ export type FormState = {
 
   // Mutable fields
   title: string;
+  /** Slug submitted for the listing. */
   slug: string;
   // Create-mode-only UI state: the raw text typed after the locked
   // `${scholarSlug}-` prefix. Not submitted to the API — `slug` (derived
   // from this + the selected scholar's slug) is the single value sent.
+  /** Raw suffix used to derive the create-mode slug. */
   slugSuffix: string;
   description: string;
   scholarId: string;
   format: "single" | "series" | "collection";
+  /** Current API-valid publication status. */
   status: LectureStatus;
   orderIndex: number;
   selectedTopics: string[];
+  /** Current locale selected for the listing content. */
   language: Locale;
   coverImageUrl: string;
 
@@ -40,6 +49,7 @@ export type FormState = {
   // Snapshot of the mutable fields as fetched, for diffing in the review tab. Null in create mode.
   initialSnapshot: ListingChangeSnapshot | null;
   saving: boolean;
+  /** Error shown when loading or saving the form fails. */
   formError: string | null;
   isEditing: boolean;
 
@@ -57,15 +67,21 @@ type UpdateFieldAction = {
   [K in UpdatableField]: { type: "UPDATE_FIELD"; field: K; value: FormState[K] };
 }[UpdatableField];
 
+/** Actions supported by the listing editor reducer. */
 export type FormAction =
   | UpdateFieldAction
   | { type: "INIT_FORM"; data: ListingFormDataDto }
   | { type: "SET_SAVING"; saving: boolean }
-  | { type: "SET_ERROR"; error: string | null }
+  | {
+      type: "SET_ERROR";
+      /** Sanitized error message displayed by the editor. */
+      error: string | null;
+    }
   | { type: "SET_STAGED_IMAGE"; file: File | null; preview: string | null };
 
 const IMMUTABLE_FIELDS = ["slug", "scholarId", "format"];
 
+/** Returns the initial create-mode listing form and its reducer dispatcher. */
 function getInitialFormState(): FormState {
   return {
     title: "",

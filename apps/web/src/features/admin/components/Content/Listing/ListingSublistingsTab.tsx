@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Client-side tab for browsing, bulk-updating, and editing child listings. */
 "use client";
 
 import { sanitizeError } from "@sd/utils-error";
@@ -12,21 +12,25 @@ import { Button } from "@/shared/components/ui/button";
 import styles from "./listing-modal.module.css";
 import { ListingSublistingDetail } from "./ListingSublistingDetail";
 
+/** Root listing identity used to load its child hierarchy. */
 export interface ListingSublistingsTabProps {
   rootListingId: string;
 }
 
+/** Minimal lesson data needed by the child-listing controls. */
 interface LessonSummary {
   id: string;
   title: string;
 }
 
+/** Module summary with the lessons nested beneath it. */
 interface ModuleGroup {
   id: string;
   title: string;
   lessons: LessonSummary[];
 }
 
+/** API-shaped hierarchy data normalized for the tab view. */
 interface TabData {
   modules: ModuleGroup[];
   topLevelLessons: LessonSummary[];
@@ -34,18 +38,23 @@ interface TabData {
   allChildIds: string[];
 }
 
+/** Loading, success, or failure state for the child hierarchy. */
 interface TabState {
+  /** Current request state for the hierarchy. */
   status: "loading" | "ready" | "error";
+  /** Sanitized request failure shown to the administrator. */
   error: string | null;
   data: TabData;
 }
 
 const EMPTY_DATA: TabData = { modules: [], topLevelLessons: [], allChildIds: [] };
 
+/** Returns whether the hierarchy contains anything to display. */
 function hasChildren(data: TabData) {
   return data.modules.length > 0 || data.topLevelLessons.length > 0;
 }
 
+/** Maps request state to the tab's loading, error, or empty presentation. */
 function renderTabStatus(
   state: TabState,
   containsChildren: boolean,

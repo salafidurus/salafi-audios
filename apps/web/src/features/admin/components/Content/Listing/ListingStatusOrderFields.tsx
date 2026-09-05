@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Client-side status and ordering controls for a listing editor. */
 "use client";
 
 import React from "react";
@@ -15,14 +15,18 @@ import { validateLectureStatus, type LectureStatus } from "@/shared/types/form-t
 
 import styles from "./listing-modal.module.css";
 
+/** Values and handlers needed to edit a listing's status and order. */
 interface ListingStatusOrderFieldsProps {
+  /** Current API-valid publication status. */
   status: LectureStatus;
   orderIndex: number;
+  /** Persists a newly selected publication status in the parent form. */
   onStatusChange: (status: LectureStatus) => void;
   onOrderIndexChange: (orderIndex: number) => void;
   idPrefix?: string;
 }
 
+/** Renders the status selector and numeric order field for a listing. */
 export function ListingStatusOrderFields({
   status,
   orderIndex,
