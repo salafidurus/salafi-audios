@@ -22,7 +22,7 @@ import { RateLimitPolicy } from '../security/rate-limit.decorator';
 /** NestJS admin users controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Users')
 @ApiCommonErrors()
-@Controller('admin/users')
+@Controller({ path: 'admin/users', version: '1' })
 /** Core API admin users.controller module providing shared backend infrastructure and authority-boundary services. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AdminUsersController {

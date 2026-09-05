@@ -15,7 +15,7 @@ import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
 /** NestJS admin topics controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Admin Topics')
 @ApiCommonErrors()
-@Controller('admin/topics')
+@Controller({ path: 'admin/topics', version: '1' })
 /** topics application module responsible for admin topics.controller behavior at the backend boundary. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AdminTopicsController {

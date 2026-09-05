@@ -56,7 +56,7 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
     });
 
     const res = await request(app.getHttpServer())
-      .get('/account/profile')
+      .get('/v1/account/profile')
       .set(auth.headers)
       .expect(200);
 
@@ -94,7 +94,7 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
     });
 
     const res = await request(app.getHttpServer())
-      .get('/account/profile')
+      .get('/v1/account/profile')
       .set(auth.headers)
       .expect(200);
 
@@ -130,7 +130,7 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
     });
 
     const res = await request(app.getHttpServer())
-      .get('/account/profile')
+      .get('/v1/account/profile')
       .set(auth.headers)
       .expect(200);
 
@@ -157,7 +157,7 @@ describe('Account profile packed-rules equivalence (e2e)', () => {
     const auth = await authFactory.createUser();
 
     const res = await request(app.getHttpServer())
-      .get('/account/profile')
+      .get('/v1/account/profile')
       .set(auth.headers)
       .expect(200);
 

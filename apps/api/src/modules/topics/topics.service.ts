@@ -53,13 +53,13 @@ export class TopicsService {
 
     // Invalidate list cache
     for (const locale of SUPPORTED_LOCALES) {
-      cacheKeysToInvalidate.push(`/topics:${locale}`);
+      cacheKeysToInvalidate.push(`/v1/topics:${locale}`);
     }
 
     // Also invalidate detail caches when a specific slug is provided
     if (slug) {
       for (const locale of SUPPORTED_LOCALES) {
-        cacheKeysToInvalidate.push(`/topics/${slug}:${locale}`);
+        cacheKeysToInvalidate.push(`/v1/topics/${slug}:${locale}`);
       }
     }
 

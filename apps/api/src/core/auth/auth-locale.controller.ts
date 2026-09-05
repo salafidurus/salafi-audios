@@ -6,7 +6,7 @@ import { CurrentUser } from './decorators';
 
 /** NestJS auth locale controller service or controller coordinating the API boundary for this responsibility. */
 @ApiTags('Auth')
-@Controller('auth/me')
+@Controller({ path: 'auth/me', version: '1' })
 /** Core API auth locale.controller module providing shared backend infrastructure and authority-boundary services. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AuthLocaleController {

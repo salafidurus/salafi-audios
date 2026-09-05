@@ -78,11 +78,11 @@ describe('SitemapController', () => {
     });
 
     it('calls generate with base URL and returns XML with correct headers', async () => {
-      const res = { setHeader: vi.fn<any>().mockReturnThis(), send: vi.fn<any>() } as any;
+      const res = { header: vi.fn<any>().mockReturnThis(), send: vi.fn<any>() } as any;
       await controller.getSitemap(res);
       expect(sitemapService.generate).toHaveBeenCalledWith('https://www.salafidurus.com');
-      expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/xml');
-      expect(res.setHeader).toHaveBeenCalledWith(
+      expect(res.header).toHaveBeenCalledWith('Content-Type', 'application/xml');
+      expect(res.header).toHaveBeenCalledWith(
         'Cache-Control',
         'public, max-age=3600, s-maxage=3600',
       );
@@ -121,9 +121,9 @@ describe('SitemapController', () => {
     });
 
     it('always returns Disallow for all, regardless of environment', async () => {
-      const res = { setHeader: vi.fn<any>().mockReturnThis(), send: vi.fn<any>() } as any;
+      const res = { header: vi.fn<any>().mockReturnThis(), send: vi.fn<any>() } as any;
       controller.getRobots(res);
-      expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'text/plain');
+      expect(res.header).toHaveBeenCalledWith('Content-Type', 'text/plain');
       expect(res.send).toHaveBeenCalledWith('User-agent: *\nDisallow: /\n');
     });
   });
