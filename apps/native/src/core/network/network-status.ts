@@ -7,6 +7,7 @@ import * as Network from "expo-network";
  * very first "connected" event does count as a reconnect. Returns an
  * unsubscribe function.
  */
+/** Subscribes to connectivity changes and invokes the callback on each reconnect edge. */
 export function onNetworkReconnect(callback: () => void): () => void {
   let wasConnected = false;
 

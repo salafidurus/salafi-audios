@@ -318,3 +318,17 @@ export {
   type AppSubjects,
   type AppAbility,
 } from "../types/ability.types";
+export {
+  ScholarPageFeedSchemaVersion,
+  ScholarPageFeedAllamahTitleContextSchema,
+  type ScholarPageFeedAllamahTitleContext,
+  ScholarPageFeedScholarsBatchSchema,
+  type ScholarPageFeedScholarsBatch,
+  ScholarPageFeedScholarListingsTitleContextSchema,
+  type ScholarPageFeedScholarListingsTitleContext,
+  ScholarPageFeedScholarListingsBatchSchema,
+  type ScholarPageFeedScholarListingsBatch,
+  ScholarPageFeedDtoSchema,
+  type ScholarPageFeedDto,
+  parseScholarPageFeedDto,
+} from "./scholar-page-feed.types";

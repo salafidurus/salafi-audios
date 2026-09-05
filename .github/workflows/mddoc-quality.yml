@@ -1,4 +1,4 @@
-name: docs-qa
+name: mddoc-quality
 
 on:
   pull_request:
@@ -9,14 +9,14 @@ on:
       - "AGENT.md"
       - "CONTRIBUTING.md"
       - ".github/copilot-instructions.md"
-      - ".github/workflows/docs-qa.yml"
+      - ".github/workflows/mddoc-quality.yml"
 
 permissions:
   contents: read
 
 jobs:
   docs_quality:
-    name: docs:quality
+    name: mddoc:quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

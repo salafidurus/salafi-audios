@@ -38,6 +38,7 @@ import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import styles from "./listing-modal.module.css";
 import { ListingModalTabContent } from "./ListingModalTabContent";
 
+/** Controls the listing editor modal and reports its save lifecycle to the parent. */
 export interface ListingModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -137,7 +138,9 @@ type ListingModalTab = "general" | "main" | "sublistings" | "review";
 type ListingModalTabsProps = {
   activeTab: ListingModalTab;
   onTabChange: (tab: ListingModalTab) => void;
+  /** Tab identifiers whose validation errors need visible navigation feedback. */
   errorTabs: string[];
+  /** Current staged listing form state rendered by the active tab. */
   state: FormState;
   dispatch: React.Dispatch<FormAction>;
   scholars: ScholarListItemDto[];
@@ -232,6 +235,7 @@ function ListingModalLoading({
 }: {
   isOpen: boolean;
   onClose: () => void;
+  /** Hydration failure shown when an existing listing cannot be loaded. */
   fetchError: string | null;
   t: ReturnType<typeof useTranslation>["t"];
 }) {
@@ -248,6 +252,7 @@ function ListingModalLoading({
   );
 }
 
+/** Renders the staged listing editor, including hydration, validation, and save handling. */
 export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingModalProps) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
@@ -266,10 +271,10 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
   };
 
   const { data: scholarsData } = useApiQuery<{ scholars: ScholarListItemDto[] }>(
-    [...queryKeys.scholars.list.all()],
+    queryKeys.scholars.directory(),
     () =>
       httpClient<{ scholars: ScholarListItemDto[] }>({
-        url: endpoints.scholars.list,
+        url: endpoints.scholars.directory,
         method: "GET",
       }),
   );

@@ -9,8 +9,10 @@ import {
   type ScholarDetailStats,
   type ScholarContentItemDto,
   type ScholarContentUnifiedDto,
-  type ScholarListItemDto,
   type ScholarTopicsDto,
+  parseScholarPageFeedDto,
+  type ScholarPageFeedDto,
+  type ScholarListDto,
 } from "@sd/core-contracts";
 
 /** Query hooks and presentation grouping for public scholar catalog content. */
@@ -20,23 +22,55 @@ type SplitScholarContentResult = {
   browse: ScholarContentItemDto[];
 };
 
-/** Reads the public scholar list, optionally using a supplied query client. */
-export function useScholarsList(
-  options?: Omit<
-    UseQueryOptions<{ scholars: ScholarListItemDto[] }, Error, { scholars: ScholarListItemDto[] }>,
-    "queryKey" | "queryFn"
-  >,
+/** Reads the flat active-scholar directory used by non-feed catalog consumers. */
+export function useScholarDirectory(
+  options?: Omit<UseQueryOptions<ScholarListDto, Error, ScholarListDto>, "queryKey" | "queryFn">,
   queryClient?: QueryClient,
 ) {
   return useApiQuery(
-    queryKeys.scholars.list.all(),
+    queryKeys.scholars.directory(),
     () =>
-      httpClient<{ scholars: ScholarListItemDto[] }>({
-        url: endpoints.scholars.list,
+      httpClient<ScholarListDto>({
+        url: endpoints.scholars.directory,
         method: "GET",
       }),
     options,
     queryClient,
+  );
+}
+
+/** Reads the recommendation-composed root Scholars page without client-side ranking. */
+export function useScholarPageFeeds(
+  options?: Omit<UseQueryOptions<ScholarPageFeedDto>, "queryKey" | "queryFn">,
+) {
+  return useApiQuery(
+    queryKeys.scholars.pageFeed(),
+    async () => {
+      const response = await httpClient<unknown>({
+        url: endpoints.scholars.pageFeed,
+        method: "GET",
+      });
+      return parseScholarPageFeedDto(response);
+    },
+    options,
+  );
+}
+
+/** Searches active scholars through the backend-owned public scholar search boundary. */
+export function useScholarSearch(
+  query: string,
+  options?: Omit<UseQueryOptions<ScholarListDto>, "queryKey" | "queryFn">,
+) {
+  const normalizedQuery = query.trim();
+  return useApiQuery(
+    queryKeys.scholars.search(normalizedQuery),
+    () =>
+      httpClient<ScholarListDto>({
+        url: endpoints.scholars.search,
+        method: "GET",
+        params: { q: normalizedQuery },
+      }),
+    { enabled: normalizedQuery.length > 0, ...options },
   );
 }
 

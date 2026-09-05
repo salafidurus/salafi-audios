@@ -1,9 +1,9 @@
-/** Client-side scholar showcase with an optional featured senior scholar. */
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { routes } from "@sd/core-contracts";
 import { getScholarTitleLabel } from "@sd/core-i18n";
-import { useInfiniteScholarsList } from "@sd/domain-content";
+import { useScholarDirectory } from "@sd/domain-content";
 import Link from "next/link";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -27,7 +27,7 @@ const LANGUAGE_LABELS = {
 } as const;
 
 type ScholarMedallionsProps = {
-  /** Slug of the scholar that should receive the featured treatment. */
+  /** Optional scholar slug whose medallion receives the featured treatment. */
   featuredScholarSlug?: string;
 };
 
@@ -65,9 +65,7 @@ function FeaturedScholar({
   scholar,
   t,
 }: {
-  scholar: NonNullable<
-    ReturnType<typeof useInfiniteScholarsList>["data"]
-  >["pages"][number]["items"][number];
+  scholar: NonNullable<ReturnType<typeof useScholarDirectory>["data"]>["scholars"][number];
   t: ReturnType<typeof useTranslation>["t"];
 }) {
   return (
@@ -107,9 +105,7 @@ function FeaturedScholar({
 function ScholarMedallion({
   scholar,
 }: {
-  scholar: NonNullable<
-    ReturnType<typeof useInfiniteScholarsList>["data"]
-  >["pages"][number]["items"][number];
+  scholar: NonNullable<ReturnType<typeof useScholarDirectory>["data"]>["scholars"][number];
 }) {
   return (
     <Link
@@ -143,8 +139,8 @@ function ScholarMedallion({
 }
 
 type ScholarListItem = NonNullable<
-  ReturnType<typeof useInfiniteScholarsList>["data"]
->["pages"][number]["items"][number];
+  ReturnType<typeof useScholarDirectory>["data"]
+>["scholars"][number];
 
 function selectScholarGroups(scholars: ScholarListItem[], featuredScholarSlug?: string) {
   const featuredScholar = featuredScholarSlug
@@ -159,11 +155,11 @@ function selectScholarGroups(scholars: ScholarListItem[], featuredScholarSlug?: 
   };
 }
 
-/** Renders the home-page scholar showcase and separates its featured item. */
+/** Renders the horizontal scholar medallion rail and its public detail links. */
 export function ScholarMedallions({ featuredScholarSlug }: ScholarMedallionsProps) {
   const { t } = useTranslation();
-  const { data, isLoading } = useInfiniteScholarsList();
-  const scholars = data?.pages.flatMap((page) => page.items) ?? [];
+  const { data, isLoading } = useScholarDirectory();
+  const scholars = data?.scholars ?? [];
   const { featuredScholar, regularScholars } = selectScholarGroups(scholars, featuredScholarSlug);
 
   if (isLoading && scholars.length === 0) {

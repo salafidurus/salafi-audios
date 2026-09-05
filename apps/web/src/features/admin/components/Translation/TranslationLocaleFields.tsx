@@ -27,8 +27,10 @@ const STATUS_DOT_CLASS = {
   notCreated: styles.dotNotCreated ?? "",
 } satisfies Record<StatusDot, string>;
 
+/** Locale, reducer state, and callbacks needed to render translation fields. */
 export interface TranslationLocaleFieldsProps {
   config: TranslationEntityConfig;
+  /** Current source, saved, and edited values for the translation form. */
   state: TranslationFormState;
   dispatch: React.Dispatch<TranslationFormAction>;
   locale: Locale;

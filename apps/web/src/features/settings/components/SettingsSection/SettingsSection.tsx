@@ -3,12 +3,14 @@ import type { ReactNode } from "react";
 import styles from "./settings-section.module.css";
 
 /** Documents this module's responsibility and public boundary. */
+/** Content and heading data for a grouped settings section. */
 export interface SettingsSectionProps {
   title: string;
   description?: string;
   children: ReactNode;
 }
 
+/** Renders a titled group of settings rows with an optional description. */
 export function SettingsSection({ title, description, children }: SettingsSectionProps) {
   return (
     <section className={styles.section}>

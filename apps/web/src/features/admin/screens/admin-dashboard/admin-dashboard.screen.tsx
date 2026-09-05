@@ -140,6 +140,7 @@ function canLoadDashboard(
   return isAuthenticated && !isAccessLoading && hasAnyAdminAccess(ability);
 }
 
+/** Renders capability-filtered shortcuts and dashboard statistics for administrators. */
 export function AdminDashboardScreen() {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();

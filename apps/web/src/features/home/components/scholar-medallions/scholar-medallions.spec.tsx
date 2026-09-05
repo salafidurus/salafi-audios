@@ -1,4 +1,4 @@
-import { useInfiniteScholarsList } from "@sd/domain-content";
+import { useScholarDirectory } from "@sd/domain-content";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
@@ -6,7 +6,7 @@ import React from "react";
 import { ScholarMedallions } from "./scholar-medallions";
 
 vi.mock("@sd/domain-content", () => ({
-  useInfiniteScholarsList: vi.fn(),
+  useScholarDirectory: vi.fn(),
 }));
 
 vi.mock("@/core/i18n/use-translation", () => ({
@@ -15,7 +15,7 @@ vi.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 
-const mockUseInfiniteScholarsList = useInfiniteScholarsList as unknown as ReturnType<typeof vi.fn>;
+const mockUseScholarDirectory = useScholarDirectory as unknown as ReturnType<typeof vi.fn>;
 
 const mockScholars = [
   {
@@ -46,8 +46,8 @@ const mockScholars = [
 
 describe("ScholarMedallions", () => {
   beforeEach(() => {
-    mockUseInfiniteScholarsList.mockReturnValue({
-      data: { pages: [{ items: mockScholars }] },
+    mockUseScholarDirectory.mockReturnValue({
+      data: { scholars: mockScholars },
     });
   });
 
@@ -77,7 +77,7 @@ describe("ScholarMedallions", () => {
   });
 
   it("renders nothing when there are no scholars", () => {
-    mockUseInfiniteScholarsList.mockReturnValue({ data: undefined });
+    mockUseScholarDirectory.mockReturnValue({ data: undefined });
 
     render(<ScholarMedallions />);
 

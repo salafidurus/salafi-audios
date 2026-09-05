@@ -2,29 +2,29 @@
 "use client";
 
 import { routes, type ScholarListItemDto } from "@sd/core-contracts";
-import { useInfiniteScholarsList } from "@sd/domain-content";
+import { useScholarPageFeeds } from "@sd/domain-content";
 import { useRouter } from "next/navigation";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { ContentRow } from "@/features/details/components/scholar/scholar-content-list/scholar-content-list";
 import { ScholarGridCard } from "@/features/explore/components/scholar-grid-card/scholar-grid-card";
 import { ScholarGridSkeleton } from "@/features/explore/components/scholar-grid-skeleton/scholar-grid-skeleton";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
-import { Search } from "@/shared/components/Search";
-import { useDebouncedSearch } from "@/shared/hooks";
 
 import styles from "./explore-scholar.screen.module.css";
 
+/** Describes navigation state for the recommendation-composed Explore scholar directory. */
 export type ExploreScholarScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
 type ScholarResultsProps = {
   scholars: ScholarListItemDto[];
+  /** Indicates that the initial page-feed request failed and can be retried. */
   isError: boolean;
   isLoading: boolean;
   isFetching: boolean;
-  debouncedSearch: string;
   onRetry: () => void;
   onNavigateToScholar: (slug: string) => void;
 };
@@ -34,13 +34,10 @@ function ScholarResults({
   isError,
   isLoading,
   isFetching,
-  debouncedSearch,
   onRetry,
   onNavigateToScholar,
 }: ScholarResultsProps) {
   const { t } = useTranslation();
-  const filteredScholars = filterScholars(scholars, debouncedSearch);
-
   if (isError && scholars.length === 0) {
     return (
       <div className={styles.empty} role="alert">
@@ -57,10 +54,10 @@ function ScholarResults({
     );
   }
 
-  if (filteredScholars.length > 0) {
+  if (scholars.length > 0) {
     return (
       <div className={styles.grid}>
-        {filteredScholars.map((scholar) => (
+        {scholars.map((scholar) => (
           <ScholarGridCard key={scholar.id} scholar={scholar} onPress={onNavigateToScholar} />
         ))}
       </div>
@@ -75,64 +72,20 @@ function ScholarResults({
     );
   }
 
-  return (
-    <div className={styles.empty}>
-      {debouncedSearch
-        ? t("scholarContent.searchNoMatch", "No scholars match your search.")
-        : t("explore.noScholars", "No scholars available.")}
-    </div>
-  );
+  return <div className={styles.empty}>{t("explore.noScholars", "No scholars available.")}</div>;
 }
 
-function filterScholars(scholars: ScholarListItemDto[], search: string): ScholarListItemDto[] {
-  const normalizedSearch = search.trim().toLowerCase();
-  if (!normalizedSearch) return scholars;
-  return scholars.filter(
-    (scholar) =>
-      scholar.name.toLowerCase().includes(normalizedSearch) ||
-      scholar.slug.toLowerCase().includes(normalizedSearch),
-  );
-}
-
-function LoadMoreButton({
-  isFetching,
-  onLoadMore,
-}: {
-  isFetching: boolean;
-  onLoadMore: () => void;
-}) {
-  const { t } = useTranslation();
-
-  return (
-    <div className={styles.loadMoreWrapper}>
-      <button
-        type="button"
-        className={styles.loadMoreButton}
-        onClick={onLoadMore}
-        disabled={isFetching}
-      >
-        {isFetching ? t("common.loading", "Loading...") : t("common.loadMore", "Load more")}
-      </button>
-    </div>
-  );
-}
-
+/** Renders recommendation-composed scholars with ordered batches and resilient UI states. */
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const handleNavigateToScholar =
     onNavigateToScholar ?? ((slug) => router.push(routes.scholars.detail(slug)));
 
-  const {
-    query: searchQuery,
-    setQuery: setSearchQuery,
-    debouncedQuery: debouncedSearch,
-  } = useDebouncedSearch();
-
-  const { data, isFetching, isLoading, isError, refetch, hasNextPage, fetchNextPage } =
-    useInfiniteScholarsList();
-
-  const allScholars = data?.pages.flatMap((p) => p.items) ?? [];
+  const { data, isFetching, isLoading, isError, refetch } = useScholarPageFeeds();
+  const scholarBatches = data?.batches.filter((batch) => batch.form === "scholars") ?? [];
+  const listingBatches = data?.batches.filter((batch) => batch.form === "scholar_listings") ?? [];
+  const allScholars = scholarBatches.flatMap((batch) => batch.items);
 
   const title = t("explore.scholarsTitle", "Scholars");
 
@@ -140,13 +93,6 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     <ScreenView contentStyle={{ flex: 1 }}>
       <div className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>{title}</h1>
-        <div className={styles.searchWrapper}>
-          <Search.Bar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder={t("scholarContent.searchScholars", "Search scholars...")}
-          />
-        </div>
       </div>
 
       <ScholarResults
@@ -154,12 +100,21 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
         isError={isError}
         isLoading={isLoading}
         isFetching={isFetching}
-        debouncedSearch={debouncedSearch}
         onRetry={refetch}
         onNavigateToScholar={handleNavigateToScholar}
       />
 
-      {hasNextPage && <LoadMoreButton isFetching={isFetching} onLoadMore={fetchNextPage} />}
+      {listingBatches.map((batch) => (
+        <section key={batch.id} aria-labelledby={`${batch.id}-title`}>
+          <h2 id={`${batch.id}-title`}>{batch.title.label}</h2>
+          <ScholarGridCard scholar={batch.scholar} onPress={handleNavigateToScholar} />
+          <div>
+            {batch.items.map((item) => (
+              <ContentRow key={item.id} item={item} scholarImageUrl={batch.scholar.imageUrl} />
+            ))}
+          </div>
+        </section>
+      ))}
 
       <ScrollToTopButton />
     </ScreenView>

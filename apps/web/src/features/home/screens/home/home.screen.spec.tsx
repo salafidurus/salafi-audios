@@ -60,7 +60,7 @@ vi.mock("@sd/domain-search", () => ({
 }));
 
 vi.mock("@sd/domain-content", () => ({
-  useInfiniteScholarsList: () => ({ data: undefined }),
+  useScholarDirectory: () => ({ data: undefined }),
   useHomeRecent: vi.fn(),
   useHomePromotions: vi.fn(),
 }));

@@ -86,6 +86,7 @@ function ReviewSocial({ formData, changedFields, t }: ReviewContentProps) {
   );
 }
 
+/** Summarizes changed scholar fields and staged imagery before submission. */
 export function ReviewSection({ formData, changedFields, stagedImagePreview }: ReviewSectionProps) {
   const { t } = useTranslation();
 

@@ -9,9 +9,12 @@ import type { TranslationEntityConfig, TranslationChildSummary } from "./transla
 import styles from "./translation-modal.module.css";
 import { TranslationChildDetail } from "./TranslationChildDetail";
 
+/** Translation state and callbacks for child listing locale editing. */
 export interface TranslationChildrenTabProps {
   config: TranslationEntityConfig;
+  /** Load lifecycle for the child translation list. */
   status: "idle" | "loading" | "ready" | "error";
+  /** Last load/save error displayed above the child fields. */
   error: string | null;
   items: TranslationChildSummary[] | null;
   selectedChildId: string | null;

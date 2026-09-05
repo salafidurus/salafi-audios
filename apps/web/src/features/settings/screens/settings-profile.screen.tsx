@@ -63,6 +63,7 @@ function ProfileAccountStatus({
   t,
 }: {
   profile: { email: string; emailVerified: boolean };
+  /** Roles returned by the account profile and displayed as badges. */
   roles: string[];
   t: ProfileEditActionsProps["t"];
 }) {
@@ -96,6 +97,7 @@ function ProfileUpdateStatus({
   t,
 }: {
   isSuccess: boolean;
+  /** Whether the latest display-name mutation failed. */
   isError: boolean;
   t: ProfileEditActionsProps["t"];
 }) {
@@ -365,6 +367,7 @@ function SignInCta() {
   );
 }
 
+/** Renders authenticated profile settings or the anonymous sign-in call to action. */
 export function SettingsProfileScreen({ hideHeader = false }: { hideHeader?: boolean }) {
   const { isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation();

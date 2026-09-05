@@ -10,6 +10,7 @@ import { Button } from "@/shared/components/ui/button";
 import { useCookieConsent } from "../hooks/use-cookie-consent";
 import styles from "./cookie-consent-gate.module.css";
 
+/** Shows the cookie-policy consent banner until the visitor accepts it. */
 export function CookieConsentGate() {
   const { hasAccepted, isResolved, accept } = useCookieConsent();
   const { t } = useTranslation();

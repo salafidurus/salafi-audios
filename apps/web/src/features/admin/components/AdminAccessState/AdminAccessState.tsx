@@ -5,10 +5,13 @@ import { useTranslation } from "@/core/i18n/use-translation";
 
 import styles from "./admin-access-state.module.css";
 
+/** Loading or denial state shown when an admin capability is unavailable. */
 export type AdminAccessStateProps = {
+  /** Access result that determines the explanatory state shown to the user. */
   status: "loading" | "denied";
 };
 
+/** Renders a stable admin loading or access-denied presentation. */
 export function AdminAccessState({ status }: AdminAccessStateProps) {
   const { t } = useTranslation();
   const isLoading = status === "loading";

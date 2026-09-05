@@ -72,6 +72,7 @@ function ContentActions({ isMobile, activeTab, canCreate, onClick, t }: ContentA
   );
 }
 
+/** Coordinates content tabs, capability gates, search, and editorial modals. */
 export function AdminContentsScreen() {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();

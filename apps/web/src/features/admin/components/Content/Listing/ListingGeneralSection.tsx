@@ -26,6 +26,7 @@ import styles from "./listing-modal.module.css";
 import { ListingStatusOrderFields } from "./ListingStatusOrderFields";
 
 interface ListingGeneralSectionProps {
+  /** Current reducer-backed values for the listing form. */
   state: FormState;
   dispatch: React.Dispatch<FormAction>;
   scholars: ScholarListItemDto[];
@@ -53,8 +54,11 @@ function ListingSlugControl({
   t,
 }: {
   isEditing: boolean;
+  /** Full persisted slug shown while editing an existing listing. */
   slug: string;
+  /** Editable child slug suffix used when creating a listing. */
   slugSuffix: string;
+  /** Scholar slug used as the prefix for a newly derived child slug. */
   scholarSlug: string;
   scholarId?: string;
   suffixIsEmpty: boolean;
@@ -200,6 +204,7 @@ function ListingTopicsField({
   );
 }
 
+/** Renders listing identity, scholar/topic selection, and status/order fields. */
 export function ListingGeneralSection({
   state,
   dispatch,

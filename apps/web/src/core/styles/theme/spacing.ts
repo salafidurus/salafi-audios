@@ -1,4 +1,5 @@
 /** Documents this module's responsibility and public boundary. */
+/** Responsive spacing tokens shared by web layouts and components. */
 export const spacingWeb = {
   scale: {
     xs: "0.25rem",
@@ -30,4 +31,5 @@ export const spacingWeb = {
   },
 } as const;
 
+/** Type of the canonical web spacing token collection. */
 export type SpacingWeb = typeof spacingWeb;

@@ -10,6 +10,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 
 import styles from "./AdminCard.module.css";
 
+/** Metadata label/value pair rendered inside an admin card. */
 export interface AdminCardMetadataItem {
   /** Metadata label (e.g., "Email", "Role", "Access") */
   label: string;
@@ -21,6 +22,7 @@ export interface AdminCardMetadataItem {
   expandable?: boolean;
 }
 
+/** Content and actions for one admin card presentation. */
 export interface AdminCardProps {
   /** Optional thumbnail (image src/alt or custom React element like avatar) */
   thumbnail?: { src: string; alt: string } | React.ReactNode;
@@ -112,6 +114,7 @@ function AdminCardMetadataItemView({ item }: { item: AdminCardMetadataItem }) {
   );
 }
 
+/** Renders an admin card with optional thumbnail, metadata, and actions. */
 export function AdminCard({
   thumbnail,
   title,

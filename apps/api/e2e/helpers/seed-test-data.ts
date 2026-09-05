@@ -11,6 +11,8 @@ export const TEST_PARENT_TOPIC_ID = uuid(997); // index 997 parent topic (e2e-pa
 export const TEST_CHILD_TOPIC_ID = uuid(996); // index 996 child topic (e2e-child-topic)
 export const TEST_LISTING_ID = uuid(110); // index 110 single (e2e-listing-slug)
 export const TEST_LISTING_SLUG = 'e2e-listing-slug';
+export const TEST_RECOMMENDED_LISTING_ID = uuid(111);
+export const TEST_RECOMMENDED_LISTING_SLUG = 'e2e-recommended-listing-slug';
 export const TEST_LIVE_CHANNEL_ID = 'e2e-live-channel-1';
 export const TEST_LIVE_CHANNEL_TELEGRAM_ID = '-10022334455';
 
@@ -100,6 +102,43 @@ export async function seedTestData(prisma: PrismaService): Promise<void> {
     },
   });
 
+  const allamahScholar = await prisma.scholar.findUnique({
+    where: { slug: 'fawzan' },
+    select: { id: true },
+  });
+  if (!allamahScholar) {
+    throw new Error('Canonical Allamah scholar fawzan is required for scholar page-feed E2E data');
+  }
+
+  await prisma.listing.upsert({
+    where: { id: TEST_RECOMMENDED_LISTING_ID },
+    update: {
+      slug: TEST_RECOMMENDED_LISTING_SLUG,
+      title: 'E2E Recommended Listing',
+      description: 'E2E Recommended Listing Description',
+      format: 'single',
+      language: 'ar',
+      status: 'published',
+      scholarId: allamahScholar.id,
+      parentId: null,
+      deletedAt: null,
+      publishedAt: new Date(),
+      durationSeconds: 300,
+    },
+    create: {
+      id: TEST_RECOMMENDED_LISTING_ID,
+      slug: TEST_RECOMMENDED_LISTING_SLUG,
+      title: 'E2E Recommended Listing',
+      description: 'E2E Recommended Listing Description',
+      format: 'single',
+      language: 'ar',
+      status: 'published',
+      scholarId: allamahScholar.id,
+      publishedAt: new Date(),
+      durationSeconds: 300,
+    },
+  });
+
   await prisma.listingTopic.upsert({
     where: {
       listingId_topicId: {
@@ -120,12 +159,20 @@ export async function seedTestData(prisma: PrismaService): Promise<void> {
  * Deletion order respects FK constraints (leaf tables first).
  */
 export async function cleanupE2ETestData(prisma: PrismaService): Promise<void> {
-  for (const id of [TEST_LISTING_ID, TEST_SCHOLAR_ID, TEST_PARENT_TOPIC_ID, TEST_CHILD_TOPIC_ID]) {
+  for (const id of [
+    TEST_LISTING_ID,
+    TEST_RECOMMENDED_LISTING_ID,
+    TEST_SCHOLAR_ID,
+    TEST_PARENT_TOPIC_ID,
+    TEST_CHILD_TOPIC_ID,
+  ]) {
     await prisma.listingTranslation.deleteMany({ where: { listingId: id } });
     await prisma.audioAsset.deleteMany({ where: { listingId: id } });
     await prisma.listingTopic.deleteMany({ where: { listingId: id } });
   }
-  await prisma.listing.deleteMany({ where: { id: TEST_LISTING_ID } });
+  await prisma.listing.deleteMany({
+    where: { id: { in: [TEST_LISTING_ID, TEST_RECOMMENDED_LISTING_ID] } },
+  });
   await prisma.scholar.deleteMany({ where: { id: TEST_SCHOLAR_ID } });
   await prisma.topic.deleteMany({
     where: { id: { in: [TEST_PARENT_TOPIC_ID, TEST_CHILD_TOPIC_ID] } },

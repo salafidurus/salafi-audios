@@ -1,5 +1,8 @@
 /**
- * Formats a duration in seconds into a human-readable string (e.g. "1hr 05m", "42m").
+ * Converts a positive duration to the compact playback-label format used by the web UI.
+ *
+ * Zero, negative, missing, and sub-minute durations intentionally return an empty string
+ * so callers can omit a label when there is no useful minute-level value to display.
  */
 export function formatDuration(durationSeconds?: number): string {
   if (!durationSeconds || durationSeconds <= 0) {

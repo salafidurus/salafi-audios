@@ -115,8 +115,38 @@ describe('Public API (e2e)', () => {
   });
 
   describe('Scholars', () => {
-    it('GET /scholars returns list wrapped in an object', async () => {
+    it('GET /scholars returns a versioned page feed', async () => {
       const res = await request(app.getHttpServer()).get('/v1/scholars').expect(200);
+
+      expect(res.body).toMatchObject({ schemaVersion: 1, exhausted: true });
+      expect(Array.isArray(res.body.batches)).toBe(true);
+      const scholarBatch = res.body.batches.find((batch: any) => batch.form === 'scholars');
+      expect(scholarBatch).toMatchObject({
+        id: 'scholars:allamah',
+        title: { kind: 'allamah', id: 'allamah_scholars' },
+      });
+      const allamahScholar = scholarBatch.items.find((s: any) => s.slug === 'fawzan');
+      expect(allamahScholar).toBeDefined();
+    });
+
+    it('includes hydrated scholar listings in recommendation order', async () => {
+      const res = await request(app.getHttpServer()).get('/v1/scholars').expect(200);
+
+      const listingsBatch = res.body.batches.find(
+        (batch: any) => batch.form === 'scholar_listings',
+      );
+      expect(listingsBatch).toMatchObject({
+        scholarSlug: expect.any(String),
+        scholar: { slug: expect.any(String), name: expect.any(String) },
+      });
+      expect(listingsBatch.items.length).toBeGreaterThan(0);
+      expect(listingsBatch.items.every((item: any) => item.slug && item.title && item.type)).toBe(
+        true,
+      );
+    });
+
+    it('GET /scholars/directory returns the flat directory', async () => {
+      const res = await request(app.getHttpServer()).get('/v1/scholars/directory').expect(200);
 
       expect(res.body).toHaveProperty('scholars');
       expect(Array.isArray(res.body.scholars)).toBe(true);

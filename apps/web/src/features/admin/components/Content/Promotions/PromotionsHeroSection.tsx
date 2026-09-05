@@ -1,4 +1,4 @@
-/** Client-side controls for selecting the listing and headline shown in the hero. */
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { Award, Star } from "lucide-react";
@@ -16,10 +16,9 @@ import { InputField } from "@/shared/components/ui/input-field";
 
 import styles from "./promotions-content.module.css";
 
-/** Search result shape used by the hero listing selector. */
+/** A listing option used by promotion search controls and the active selection summary. */
 export type PromotionListingOption = { id: string; title: string; scholarName: string };
 
-/** Props for the hero curation controls. */
 type Props = {
   search: string;
   onSearchChange: (value: string) => void;
@@ -32,7 +31,7 @@ type Props = {
   activeListing?: PromotionListingOption;
 };
 
-/** Renders the featured-hero listing search and headline editor. */
+/** Renders the searchable hero-listing selector and its optional headline field. */
 export function PromotionsHeroSection({
   search,
   onSearchChange,

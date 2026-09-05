@@ -89,6 +89,7 @@ function AdminScholarsHeader({
   );
 }
 
+/** Loads the scholar directory and coordinates search, editing, translation, and deletion. */
 export function AdminScholarsScreen() {
   const isDesktop = useIsDesktop();
   const { ability } = useAbility();

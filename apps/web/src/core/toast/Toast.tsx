@@ -6,6 +6,7 @@ import { AlertCircle, CheckCircle, Info, AlertTriangle, X } from "lucide-react";
 import { useToastStore } from "./toast-store";
 import styles from "./toast.module.css";
 
+/** Renders active notifications and provides an explicit dismiss action for each. */
 export function ToastContainer() {
   const toasts = useToastStore((state) => state.toasts);
   const removeToast = useToastStore((state) => state.removeToast);

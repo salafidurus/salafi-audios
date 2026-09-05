@@ -20,6 +20,7 @@ function setCookieConsentInStorage(): void {
   window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_CHANGE_EVENT));
 }
 
+/** Persists cookie consent and notifies active consent consumers in this tab. */
 export const accept = () => {
   setCookieConsentInStorage();
 };
@@ -32,6 +33,7 @@ function subscribeToCookieConsent(onChange: () => void): () => void {
   };
 }
 
+/** Subscribes to cookie consent storage and exposes resolved state plus acceptance. */
 export function useCookieConsent() {
   const consent = useSyncExternalStore(
     subscribeToCookieConsent,

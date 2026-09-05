@@ -14,6 +14,7 @@ function getResolvedTheme(): "light" | "dark" {
   return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
 }
 
+/** Toggles the persisted theme preference and follows changes made elsewhere in the app. */
 export function ThemeSwitch({ className }: { className?: string }) {
   const { t } = useTranslation();
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(getResolvedTheme);

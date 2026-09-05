@@ -2,12 +2,15 @@ import type { Locale, TranslationStatus, TranslationViewDto } from "@sd/core-con
 
 import { useReducer } from "react";
 
-/** Field values for one locale, as returned by the source entity or a translation row. */
+/** Stores nullable field values while preserving the sparse shape of one locale's translation draft. */
 export type TranslationFieldsRecord = Record<string, string | null>;
 
+/** Lifecycle states for loading the source entity and its translations. */
 export type TranslationFormLifecycle = "loading" | "ready" | "error";
 
+/** Reducer state for source values, locale drafts, and save feedback. */
 export interface TranslationFormState {
+  /** Whether the form is still loading, ready for editing, or failed to load. */
   status: TranslationFormLifecycle;
   entityId: string | null;
   mainLocale: Locale;
@@ -20,19 +23,27 @@ export interface TranslationFormState {
   /** draft/published per locale (absent = not created yet, or entity doesn't track status). */
   translationStatus: Partial<Record<Locale, TranslationStatus>>;
   saving: boolean;
+  /** Last load/save error shown to the editor, if any. */
   error: string | null;
 }
 
+/** Actions that initialize, edit, persist, or report errors for the form. */
 export type TranslationFormAction =
   | {
       type: "INIT";
       entityId: string;
       mainLocale: Locale;
+      /** Read-only source fields used as the translation reference. */
       source: TranslationFieldsRecord;
       translations: TranslationViewDto[];
     }
   | { type: "EDIT_FIELD"; locale: Locale; field: string; value: string }
-  | { type: "SET_STATUS"; locale: Locale; status: TranslationStatus }
+  | {
+      type: "SET_STATUS";
+      locale: Locale;
+      /** Publication state to associate with the selected locale. */
+      status: TranslationStatus;
+    }
   | {
       type: "MARK_INITIAL";
       locale: Locale;
@@ -41,7 +52,11 @@ export type TranslationFormAction =
       fields: TranslationFieldsRecord;
     }
   | { type: "SET_SAVING"; saving: boolean }
-  | { type: "SET_ERROR"; error: string | null };
+  | {
+      type: "SET_ERROR";
+      /** Load or save failure detail; null clears the current error. */
+      error: string | null;
+    };
 
 function getInitialState(): TranslationFormState {
   return {
@@ -153,6 +168,7 @@ export function isLocaleDirty(state: TranslationFormState, locale: Locale): bool
   return Object.entries(edited).some(([key, value]) => (initial?.[key] ?? "") !== value);
 }
 
+/** Creates the translation reducer state and dispatcher used by editor dialogs. */
 export function useTranslationForm() {
   const [state, dispatch] = useReducer(formReducer, undefined, getInitialState);
   return { state, dispatch };

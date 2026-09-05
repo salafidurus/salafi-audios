@@ -10,11 +10,13 @@ import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./feed-scholar-row.module.css";
 
+/** Inputs for the horizontally scrolling popular-scholar shortcut row. */
 export type FeedScholarRowProps = {
   scholars: ScholarChipDto[];
   onScholarPress?: (slug: string) => void;
 };
 
+/** Renders scholar shortcuts while preserving the API-provided scholar order. */
 export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps) {
   const { t } = useTranslation();
   const formatScholarName = useFormatScholarName();

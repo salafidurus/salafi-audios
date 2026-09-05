@@ -83,6 +83,7 @@ async function persistScholar(state: FormState): Promise<void> {
   await createScholar(payload);
 }
 
+/** Validates and persists a scholar form, uploading a staged image before notifying the editor. */
 export function useSaveScholar(
   state: FormState,
   dispatch: (action: FormAction) => void,

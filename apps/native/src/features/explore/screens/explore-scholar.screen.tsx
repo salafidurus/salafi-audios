@@ -1,16 +1,14 @@
-import type { ScholarListItemDto } from "@sd/core-contracts";
-import type { ListRenderItemInfo } from "react-native";
-
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
-import { useInfiniteScholarsList } from "@sd/domain-content";
-import { useCallback, useMemo, useState } from "react";
-import { FlatList, View } from "react-native";
+import { useScholarPageFeeds } from "@sd/domain-content";
+import { useMemo } from "react";
+import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { ScholarContentList } from "@/features/listing/components/scholar-content-list/scholar-content-list";
 import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
 import { RootScreenHeader } from "@/features/navigation";
-import { AppText, NativeButton, NativeFormField, ScreenView } from "@/shared/ui";
+import { AppText, ScreenView } from "@/shared/ui";
 
 import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
 import {
@@ -58,87 +56,60 @@ function ExploreScholarStatus({
   return null;
 }
 
-function filterScholars(scholars: ScholarListItemDto[], searchQuery: string) {
-  const query = searchQuery.trim().toLowerCase();
-  if (!query) return scholars;
-  return scholars.filter(
-    (scholar) =>
-      scholar.name.toLowerCase().includes(query) || scholar.slug.toLowerCase().includes(query),
-  );
-}
-
 /** Renders the native explore scholar screen surface and coordinates its user-facing state. */
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
-    useInfiniteScholarsList();
+  const { data, isFetching, isError, refetch } = useScholarPageFeeds();
 
-  const allScholars = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data?.pages]);
-
-  const filteredScholars = useMemo(
-    () => filterScholars(allScholars, searchQuery),
-    [allScholars, searchQuery],
+  const scholarBatches = useMemo(
+    () => data?.batches.filter((batch) => batch.form === "scholars") ?? [],
+    [data],
   );
-
-  const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<ScholarListItemDto>) => (
-      <ScholarRow scholar={item} onPress={onNavigateToScholar} />
-    ),
-    [onNavigateToScholar],
+  const listingBatches = useMemo(
+    () => data?.batches.filter((batch) => batch.form === "scholar_listings") ?? [],
+    [data],
+  );
+  const allScholars = useMemo(
+    () => scholarBatches.flatMap((batch) => batch.items),
+    [scholarBatches],
   );
 
   return (
     <ScreenView>
       <RootScreenHeader title={t("explore.scholarsTitle", "Scholars")} />
-      <NativeFormField
-        label={t("scholarContent.searchScholars", "Search scholars...")}
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        placeholder={t("scholarContent.searchScholars", "Search scholars...")}
-        testID="native-scholar-search-input"
-      />
       <View style={styles.intro}>
         <AppText variant="bodySm" colorRole="muted">
           {t("scholarContent.searchDescription", "Browse scholars and find their latest lessons.")}
         </AppText>
       </View>
-      {filteredScholars.length === 0 ? (
+      {allScholars.length === 0 ? (
         <View style={styles.status}>
           <ExploreScholarStatus
             isError={isError}
             isFetching={isFetching}
             hasItems={false}
-            emptyMessage={
-              searchQuery
-                ? t("scholarContent.searchNoMatch", "No scholars match your search.")
-                : getEmptyStateText("feed", t)
-            }
+            emptyMessage={getEmptyStateText("feed", t)}
             t={t}
             refetch={refetch}
           />
         </View>
       ) : (
-        <>
+        <ScrollView>
           <View style={styles.listCard}>
-            <FlatList
-              data={filteredScholars}
-              keyExtractor={(item) => item.id}
-              renderItem={renderItem}
-              onEndReached={() => hasNextPage && fetchNextPage()}
-              onEndReachedThreshold={0.5}
-              ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
-            />
+            {allScholars.map((scholar) => (
+              <ScholarRow key={scholar.id} scholar={scholar} onPress={onNavigateToScholar} />
+            ))}
+            {isFetching ? <ExploreLoadingFooter /> : null}
+            {listingBatches.map((batch) => (
+              <View key={batch.id} style={styles.listingBatch}>
+                <AppText variant="titleMd">{batch.title.label}</AppText>
+                <ScholarRow scholar={batch.scholar} onPress={onNavigateToScholar} />
+                <ScholarContentList items={batch.items} />
+              </View>
+            ))}
           </View>
-          {hasNextPage ? (
-            <NativeButton
-              label={t("common.loadMore", "Load more")}
-              loading={isFetching}
-              onPress={() => void fetchNextPage()}
-            />
-          ) : null}
-        </>
+        </ScrollView>
       )}
     </ScreenView>
   );
@@ -155,5 +126,9 @@ const styles = StyleSheet.create((theme) => ({
   listCard: {
     flex: 1,
     marginVertical: theme.spacing.scale.md,
+  },
+  listingBatch: {
+    gap: theme.spacing.scale.sm,
+    marginTop: theme.spacing.scale.lg,
   },
 }));

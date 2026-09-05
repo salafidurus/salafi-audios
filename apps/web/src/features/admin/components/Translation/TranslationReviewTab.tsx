@@ -16,8 +16,10 @@ import type { TranslationEntityConfig } from "./translation-entities";
 
 import styles from "./translation-modal.module.css";
 
+/** Read-only summary data shown before a translation save/publish action. */
 export interface TranslationReviewTabProps {
   config: TranslationEntityConfig;
+  /** Current translation form state used to calculate pending changes. */
   state: TranslationFormState;
   secondaryLocales: Locale[];
 }

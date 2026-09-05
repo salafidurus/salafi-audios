@@ -22,6 +22,7 @@ import type { TranslationEntityConfig } from "./translation-entities";
 import styles from "./translation-modal.module.css";
 import { TranslationLocaleFields } from "./TranslationLocaleFields";
 
+/** Describes the parent callbacks and identity needed to edit one child translation. */
 export interface TranslationChildDetailProps {
   config: TranslationEntityConfig;
   childId: string;
@@ -33,6 +34,7 @@ export interface TranslationChildDetailProps {
 interface TranslationChildDetailViewProps {
   config: TranslationEntityConfig;
   childId: string;
+  /** Current loading, editable, or failed child-translation state. */
   state: TranslationFormState;
   dispatch: React.Dispatch<TranslationFormAction>;
   locale: Locale | null;
@@ -46,6 +48,7 @@ interface TranslationChildDetailViewProps {
 interface TranslationChildReadyViewProps {
   config: TranslationEntityConfig;
   childId: string;
+  /** Loaded child-translation state whose fields can be edited and saved. */
   state: TranslationFormState;
   dispatch: React.Dispatch<TranslationFormAction>;
   locale: Locale;

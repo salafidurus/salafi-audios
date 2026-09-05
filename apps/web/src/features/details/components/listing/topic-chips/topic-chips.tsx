@@ -1,4 +1,4 @@
-/** Client-side topic badges for a listing's descriptive metadata. */
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import type { TopicRefDto } from "@sd/core-contracts";
@@ -7,12 +7,12 @@ import { Badge } from "@/shared/components/ui/badge";
 
 import styles from "./topic-chips.module.css";
 
-/** Topic references available for badge rendering. */
+/** Topic references to render as compact, non-interactive listing badges. */
 export type TopicChipsProps = {
   topics: TopicRefDto[];
 };
 
-/** Renders nothing when a listing has no topics, otherwise renders badges. */
+/** Renders nothing for an empty topic set and badges for each related topic otherwise. */
 export function TopicChips({ topics }: TopicChipsProps) {
   if (topics.length === 0) {
     return null;

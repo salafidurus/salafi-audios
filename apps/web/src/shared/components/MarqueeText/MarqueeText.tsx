@@ -1,15 +1,15 @@
-/** Client-side text treatment that animates only when its content overflows. */
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import { useEffect, useRef } from "react";
 
-/** Input contract for the overflow-aware marquee. */
+/** Text content and styling for a label that animates only when it overflows. */
 export type MarqueeTextProps = {
   text: string;
   className?: string;
 };
 
-/** Displays a label and alternates its horizontal position when clipped. */
+/** Keeps long labels readable by animating overflow on hover/focus. */
 export function MarqueeText({ text, className }: MarqueeTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);

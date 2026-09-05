@@ -98,8 +98,11 @@ function AdminUsersHeader({
 }: {
   searchQuery: string;
   setSearchQuery: (value: string) => void;
+  /** Active role filter selected in the users toolbar. */
   role: string;
+  /** Updates the active role filter and therefore the users query. */
   setRole: (value: string) => void;
+  /** Available role filter choices localized for the current admin. */
   roleOptions: Array<{ id: string; label: string }>;
 }) {
   const { t } = useTranslation();
@@ -150,8 +153,10 @@ function AdminUsersContent({
   onManageAccess,
 }: {
   visibleItems: AdminUserListItemDto[];
+  /** Pagination/loading state passed from the users query. */
   listState: {
     isLoading: boolean;
+    /** Whether another page is available from the users query. */
     hasNextPage: boolean | undefined;
     isFetchingNextPage: boolean;
   };
@@ -160,6 +165,7 @@ function AdminUsersContent({
   sort: UserSort;
   onSort: (key: UserSortKey) => void;
   debouncedQuery: string;
+  /** Active role filter; empty means all roles. */
   role: string;
   onManageAccess: (user: AdminUserListItemDto) => void;
 }) {
@@ -192,6 +198,7 @@ function AdminUsersContent({
   );
 }
 
+/** Loads, filters, sorts, and renders users with access-management actions. */
 export function AdminUsersScreen(): ReactNode {
   const queryClient = useQueryClient();
   const isDesktop = useIsDesktop();

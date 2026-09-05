@@ -26,7 +26,7 @@ vi.mock("@sd/domain-search", () => ({
 }));
 
 vi.mock("@sd/domain-content", () => ({
-  useInfiniteScholarsList: vi.fn(() => ({ data: undefined, isLoading: false })),
+  useScholarSearch: vi.fn(() => ({ data: undefined, isLoading: false })),
 }));
 
 vi.mock("@/core/i18n/use-translation", () => ({

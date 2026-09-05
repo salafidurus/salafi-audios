@@ -1,7 +1,6 @@
 /** Public Content Catalog package surface for Listings, scholars, topics, and My Library. */
 // Infinite scroll hooks
 export {
-  useInfiniteScholarsList,
   useInfiniteMyLibrarySaved,
   useInfiniteMyLibraryCompleted,
   useInfiniteMyLibraryProgress,
@@ -9,7 +8,6 @@ export {
   useInfiniteAdminListings,
   useAdminListingSeriesByScholar,
   useAdminTopicsList,
-  type UseInfiniteScholarsListOptions,
   type UseInfiniteMyLibrarySavedOptions,
   type UseInfiniteMyLibraryCompletedOptions,
   type UseInfiniteMyLibraryProgressOptions,
@@ -48,7 +46,9 @@ export {
 } from "./saved/saved.sync";
 export { useListingDetail, useListingContents, useLastPlayedLesson } from "./listing.api";
 export {
-  useScholarsList,
+  useScholarDirectory,
+  useScholarPageFeeds,
+  useScholarSearch,
   useScholarDetail,
   useScholarContent,
   useScholarTopics,

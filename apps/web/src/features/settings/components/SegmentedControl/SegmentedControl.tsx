@@ -1,15 +1,15 @@
-/** Client-side segmented choice control with pressed-state accessibility. */
+/** Documents this module's responsibility and public boundary. */
 "use client";
 
 import styles from "./segmented-control.module.css";
 
-/** Label and value for one selectable segment. */
+/** One selectable value in the settings segmented control. */
 export interface SegmentedControlOption<T extends string> {
   value: T;
   label: string;
 }
 
-/** Controlled state and options for the segmented control. */
+/** Options, selected value, and change callback for a segmented control. */
 export interface SegmentedControlProps<T extends string> {
   options: SegmentedControlOption<T>[];
   value: T;
@@ -18,7 +18,7 @@ export interface SegmentedControlProps<T extends string> {
   ariaLabel?: string;
 }
 
-/** Renders a controlled row of mutually exclusive segment buttons. */
+/** Renders mutually exclusive options and reports the selected value on activation. */
 export function SegmentedControl<T extends string>({
   options,
   value,

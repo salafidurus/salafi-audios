@@ -5,7 +5,7 @@ import { QueryClient, QueryClientContext } from "@tanstack/react-query";
 import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useScholarsList } from "../scholar.api";
+import { useScholarDirectory } from "../scholar.api";
 
 /** Formats scholar names with locale-aware honorifics and stable slug matching. */
 /** Scholar display data accepted by the low-level formatter. */
@@ -99,7 +99,7 @@ export function useFormattedScholarName(
   const contextClient = React.useContext(QueryClientContext);
   const shouldFetch = Boolean(contextClient && scholarName && scholarSlug);
 
-  const scholarsQuery = useScholarsList(
+  const scholarsQuery = useScholarDirectory(
     { enabled: shouldFetch },
     contextClient ?? fallbackQueryClient,
   );

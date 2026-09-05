@@ -21,6 +21,7 @@ interface LocationSectionProps {
   dispatch: React.Dispatch<FormAction>;
 }
 
+/** Renders scholar country and locale fields used by the editorial form. */
 export function LocationSection({ formData, dispatch }: LocationSectionProps) {
   const { t } = useTranslation();
 

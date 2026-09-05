@@ -16,7 +16,11 @@ import type {
   CreateScholarDto,
   UpdateScholarDto,
   SaveScholarTranslationDto,
+  ScholarListDto,
+  ScholarPageFeedDto,
+  ScholarTitle,
 } from '@sd/core-contracts';
+import type { ScholarPageFeedRecommendation } from '../recommendation/scholar-page-feed.repo';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
@@ -62,7 +66,7 @@ type ScholarFormRecord = {
   /** Documents the mainLanguage field's API projection semantics and lifecycle meaning. */
   mainLanguage: string | null;
   isActive: boolean;
-  title: string | null;
+  title: ScholarTitle | null;
   orderIndex: number;
   socialTwitter: string | null;
   socialTelegram: string | null;
@@ -132,12 +136,212 @@ function mapScholarFormData(scholar: ScholarFormRecord) {
   };
 }
 
+type ScholarListRecord = {
+  id: string;
+  /** Public, locale-independent scholar identity used by client routes. */
+  slug: string;
+  name: string;
+  imageUrl: string | null;
+  /** Original language used when resolving localized scholar presentation. */
+  mainLanguage: Locale | null;
+  title: ScholarTitle | null;
+  translations: Array<{ name: string }>;
+  _count: { listings: number };
+};
+
+function mapScholarListItem(record: ScholarListRecord, locale: Locale): ScholarListItemDto {
+  const resolved = resolveContentTranslation({
+    base: { name: record.name },
+    originalLanguage: record.mainLanguage,
+    targetLocale: locale,
+    publishedTranslation: record.translations[0] ?? null,
+  });
+  return {
+    id: record.id,
+    slug: record.slug,
+    name: resolved.fields.name,
+    imageUrl: record.imageUrl ?? undefined,
+    mainLanguage: record.mainLanguage ?? undefined,
+    originalLanguage: resolved.originalLanguage,
+    original: resolved.original ? { name: resolved.original.name } : undefined,
+    title: record.title ?? undefined,
+    lectureCount: record._count.listings,
+  };
+}
+
+function scholarListSelect(locale: Locale) {
+  return {
+    id: true,
+    slug: true,
+    name: true,
+    imageUrl: true,
+    mainLanguage: true,
+    title: true,
+    translations: {
+      where: { locale, status: 'published' },
+      select: { name: true },
+      take: 1,
+    },
+    _count: {
+      select: {
+        listings: {
+          where: {
+            format: 'single',
+            status: Status.published,
+            deletedAt: null,
+          },
+        },
+      },
+    },
+  } as const;
+}
+
 @Injectable()
 /** NestJS scholars repository service or controller coordinating the API boundary for this responsibility. */
 export class ScholarsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(
+  /** Hydrates the engine's ordered scholar references into one localized page-feed response. */
+  async hydratePageFeed(
+    recommendations: ScholarPageFeedRecommendation[],
+  ): Promise<ScholarPageFeedDto> {
+    const locale = getRequestLocale();
+    const scholarRecommendations = recommendations.filter(
+      (item): item is Extract<ScholarPageFeedRecommendation, { form: 'scholars' }> =>
+        item.form === 'scholars',
+    );
+    const listingRecommendations = recommendations.filter(
+      (item): item is Extract<ScholarPageFeedRecommendation, { form: 'scholar_listings' }> =>
+        item.form === 'scholar_listings',
+    );
+    const scholarIds = [
+      ...new Set([
+        ...scholarRecommendations.flatMap((item) => item.itemIds),
+        ...listingRecommendations.map((item) => item.scholarId),
+      ]),
+    ];
+    const listingIds = [...new Set(listingRecommendations.flatMap((item) => item.itemIds))];
+    const rows = await this.prisma.scholar.findMany({
+      where: { id: { in: scholarIds }, isActive: true },
+      select: scholarListSelect(locale),
+    });
+    // SAFETY: scholarListSelect returns exactly the fields represented by ScholarListRecord.
+    const byId = new Map(rows.map((row) => [row.id, row as ScholarListRecord]));
+    const hydratedListings = listingIds.length
+      ? await this.prisma.listing.findMany({
+          where: {
+            id: { in: listingIds },
+            parentId: null,
+            status: Status.published,
+            deletedAt: null,
+            scholar: { isActive: true },
+          },
+          select: {
+            id: true,
+            scholarId: true,
+            slug: true,
+            title: true,
+            format: true,
+            language: true,
+            coverImageUrl: true,
+            publishedLectureCount: true,
+            publishedDurationSeconds: true,
+            durationSeconds: true,
+            publishedAt: true,
+            createdAt: true,
+            translations: {
+              where: { locale, status: 'published' },
+              select: { title: true },
+              take: 1,
+            },
+          },
+        })
+      : [];
+    const listingsById = new Map(hydratedListings.map((listing) => [listing.id, listing]));
+    const mapListing = (
+      listing: (typeof hydratedListings)[number],
+      scholarImageUrl: string | null,
+    ) => {
+      const resolved = resolveContentTranslation({
+        base: { title: listing.title },
+        originalLanguage: listing.language,
+        targetLocale: locale,
+        publishedTranslation: listing.translations[0] ?? null,
+      });
+      const { lectureCount, durationSeconds } = getListingStats(listing);
+      const item: ScholarContentItemDto = {
+        id: listing.id,
+        slug: listing.slug,
+        title: resolved.fields.title,
+        type: listing.format,
+        recencyAt: (listing.publishedAt ?? listing.createdAt).toISOString(),
+        coverImageUrl: listing.coverImageUrl ?? undefined,
+        scholarImageUrl: scholarImageUrl ?? undefined,
+        lectureCount,
+        durationSeconds,
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
+      };
+      return item;
+    };
+
+    const batches = recommendations.flatMap(
+      (recommendation): Array<ScholarPageFeedDto['batches'][number]> => {
+        if (recommendation.form === 'scholars') {
+          const items = recommendation.itemIds.flatMap((id) => {
+            const row = byId.get(id);
+            return row ? [mapScholarListItem(row, locale)] : [];
+          });
+          return items.length
+            ? [
+                {
+                  form: recommendation.form,
+                  id: recommendation.id,
+                  title: {
+                    kind: recommendation.titleKind,
+                    id: 'allamah_scholars' as const,
+                    label: 'Allamah scholars',
+                  },
+                  items,
+                },
+              ]
+            : [];
+        }
+
+        const scholar = byId.get(recommendation.scholarId);
+        if (!scholar) return [];
+        const scholarItem = mapScholarListItem(scholar, locale);
+        const items = recommendation.itemIds.flatMap((id) => {
+          const listing = listingsById.get(id);
+          return listing ? [mapListing(listing, scholar.imageUrl)] : [];
+        });
+        return items.length
+          ? [
+              {
+                form: recommendation.form,
+                id: recommendation.id,
+                scholarSlug: recommendation.scholarSlug,
+                title: {
+                  kind: recommendation.titleKind,
+                  id: 'scholar_listings' as const,
+                  label: `${scholarItem.name}'s listings`,
+                },
+                scholar: scholarItem,
+                items,
+              },
+            ]
+          : [];
+      },
+    );
+
+    return {
+      schemaVersion: 1,
+      batches,
+      exhausted: true,
+    };
+  }
+
+  async directory(
     cursor?: string,
   ): Promise<{ scholars: ScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
     const locale = getRequestLocale();
@@ -150,56 +354,50 @@ export class ScholarsRepository {
       take,
       orderBy: [{ title: 'asc' }, { orderIndex: 'asc' }],
       select: {
-        id: true,
-        slug: true,
-        name: true,
-        imageUrl: true,
-        mainLanguage: true,
-        title: true,
-        translations: {
-          where: { locale, status: 'published' },
-          select: { name: true },
-          take: 1,
-        },
-        _count: {
-          select: {
-            listings: {
-              where: {
-                format: 'single',
-                status: Status.published,
-                deletedAt: null,
-              },
-            },
-          },
-        },
+        ...scholarListSelect(locale),
       },
     });
     if (decodedCursor) {
       records.splice(0, 0);
     }
 
-    const scholars: ScholarListItemDto[] = records.map((r) => {
-      const resolved = resolveContentTranslation({
-        base: { name: r.name },
-        originalLanguage: r.mainLanguage,
-        targetLocale: locale,
-        publishedTranslation: r.translations[0] ?? null,
-      });
-      return {
-        id: r.id,
-        slug: r.slug,
-        name: resolved.fields.name,
-        imageUrl: r.imageUrl ?? undefined,
-        mainLanguage: r.mainLanguage ?? undefined,
-        originalLanguage: resolved.originalLanguage,
-        original: resolved.original ? { name: resolved.original.name } : undefined,
-        title: r.title ?? undefined,
-        lectureCount: r._count.listings,
-      };
-    });
+    // SAFETY: the shared selector is the structural source for ScholarListRecord.
+    const scholars: ScholarListItemDto[] = records.map((record) =>
+      mapScholarListItem(record as ScholarListRecord, locale),
+    );
 
     const result = buildPaginatedResult(scholars, pageSize);
     return { scholars: result.items, nextCursor: result.nextCursor, hasMore: result.hasMore };
+  }
+
+  /** Searches active scholars by public slug, base name, or published translation. */
+  async search(query: string): Promise<ScholarListDto> {
+    const locale = getRequestLocale();
+    const normalizedQuery = query.trim();
+    const records = await this.prisma.scholar.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          { slug: { contains: normalizedQuery, mode: 'insensitive' } },
+          { name: { contains: normalizedQuery, mode: 'insensitive' } },
+          {
+            translations: {
+              some: {
+                status: 'published',
+                name: { contains: normalizedQuery, mode: 'insensitive' },
+              },
+            },
+          },
+        ],
+      },
+      orderBy: [{ title: 'asc' }, { orderIndex: 'asc' }, { slug: 'asc' }],
+      select: scholarListSelect(locale),
+    });
+    return {
+      // SAFETY: the shared selector is the structural source for ScholarListRecord.
+      scholars: records.map((record) => mapScholarListItem(record as ScholarListRecord, locale)),
+      hasMore: false,
+    };
   }
 
   async findBySlug(slug: string): Promise<(ScholarDetailDto & ScholarDetailStats) | null> {

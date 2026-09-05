@@ -26,9 +26,11 @@ interface TopicModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSaved: (slug: string) => void | Promise<void>;
+  /** Existing topic slug when the modal edits a topic; absent for creation. */
   topicSlug?: string;
 }
 
+/** Loads, validates, and submits the Arabic topic name and ordering fields. */
 export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalProps) {
   const { t } = useTranslation();
   const isEditing = !!topicSlug;

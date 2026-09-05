@@ -1,4 +1,7 @@
 # Git passes information about refs being pushed on stdin in the format:
+# Fail immediately when any required validation command fails; do not defer
+# a local failure to CI.
+set -e
 # <local_ref> <local_sha> <remote_ref> <remote_sha>
 # We read stdin to find the target branch's current remote SHA.
 ZERO_SHA="0000000000000000000000000000000000000000"
@@ -102,10 +105,13 @@ else
   printf "pre-push: skipping e2e (no e2e-affecting changes)\n"
 fi
 
-if git diff --quiet "$COMPARISON_BASE"...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
-  printf "pre-push: skipping docs:quality (no docs changes)\n"
+printf "pre-push: running tsdoc:quality\n"
+bun run tsdoc:quality
+
+if git diff --quiet "$COMPARISON_BASE"...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md CONTRIBUTING.md .github/copilot-instructions.md; then
+  printf "pre-push: skipping mddoc:quality (no docs changes)\n"
 else
-  bun run docs:quality
+  bun run mddoc:quality
 fi
 
 if git diff --quiet "$COMPARISON_BASE"...HEAD -- packages/core-db/prisma/schema.prisma packages/core-db/prisma.config.ts packages/core-db/package.json; then

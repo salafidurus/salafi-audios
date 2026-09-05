@@ -13,10 +13,12 @@ import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./scholar-header.module.css";
 
+/** Scholar identity, summary statistics, and optional follow action for the header. */
 export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {
     lectureCount: number;
     seriesCount: number;
+    /** Total audio duration available for the scholar, in seconds. */
     totalDurationSeconds: number;
   };
   onFollow?: () => void;
@@ -99,6 +101,7 @@ function renderFollowButton(
   );
 }
 
+/** Renders scholar identity, localized summary information, bio, and follow action. */
 export function ScholarHeader({ scholar, onFollow, layout = "inline" }: ScholarHeaderProps) {
   const { t } = useTranslation();
   const formatScholarName = useFormatScholarName();

@@ -1,0 +1,30 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.next/**",
+    "**/.expo/**",
+    "**/coverage/**",
+    "**/generated/**"
+  ],
+  "jsPlugins": [{ "name": "anti-slop", "specifier": "./tools/oxlint/anti-slop/index.ts" }],
+  "rules": {
+    "anti-slop/require-tsdoc": ["error", { "mode": "final", "scope": "production" }]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/*.spec.{ts,tsx}",
+        "**/*.test.{ts,tsx}",
+        "**/__tests__/**/*.{ts,tsx}",
+        "**/*.spec-e2e.{ts,tsx}",
+        "**/e2e/**/*.{ts,tsx}"
+      ],
+      "rules": {
+        "anti-slop/require-tsdoc": "off"
+      }
+    }
+  ]
+}
