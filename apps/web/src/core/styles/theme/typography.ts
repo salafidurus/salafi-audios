@@ -20,6 +20,7 @@ const getWebFontFamily = (role: "display" | "body" | "mono"): string => {
   }
 };
 
+/** Converts shared typography tokens into CSS-ready web font and spacing values. */
 export const createTypographyWeb = () => {
   // SAFETY: `typographyBase` already covers every `TypographyVariant`; this mapping preserves
   // the same keys while converting token values into concrete web typography primitives.
@@ -46,6 +47,8 @@ export const createTypographyWeb = () => {
   >;
 };
 
+/** Materialized web typography tokens consumed by theme generation. */
 export const typographyWeb = createTypographyWeb();
 
+/** Inferred shape of the materialized web typography token collection. */
 export type TypographyWeb = typeof typographyWeb;

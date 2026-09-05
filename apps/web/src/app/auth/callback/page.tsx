@@ -118,6 +118,7 @@ function AuthCallbackFallback() {
   );
 }
 
+/** Resolves the auth callback and renders recovery UI while session verification runs. */
 export default function AuthCallbackPage() {
   return (
     <Suspense fallback={<AuthCallbackFallback />}>

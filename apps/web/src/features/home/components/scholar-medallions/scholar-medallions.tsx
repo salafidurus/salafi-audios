@@ -27,6 +27,7 @@ const LANGUAGE_LABELS = {
 } as const;
 
 type ScholarMedallionsProps = {
+  /** Optional scholar slug whose medallion receives the featured treatment. */
   featuredScholarSlug?: string;
 };
 
@@ -154,6 +155,7 @@ function selectScholarGroups(scholars: ScholarListItem[], featuredScholarSlug?: 
   };
 }
 
+/** Renders the horizontal scholar medallion rail and its public detail links. */
 export function ScholarMedallions({ featuredScholarSlug }: ScholarMedallionsProps) {
   const { t } = useTranslation();
   const { data, isLoading } = useScholarDirectory();

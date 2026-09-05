@@ -38,6 +38,7 @@ function formatLanguage(
   return language;
 }
 
+/** Listing metadata and layout preferences used by the detail header. */
 export type MetaDataSectionProps = {
   listing: ListingDetailDto;
   layout?: "inline" | "sidebar";
@@ -46,7 +47,9 @@ export type MetaDataSectionProps = {
 
 type MetadataViewModel = {
   listing: ListingDetailDto;
+  /** Human-readable duration, omitted when the listing has no duration. */
   duration: string;
+  /** Localized language label, omitted when the listing has no language. */
   language: string;
   hasLessonCount: boolean;
   moduleCount?: number;
@@ -175,6 +178,7 @@ function MetaDataView({
   );
 }
 
+/** Renders topic, duration, language, lesson-count, and module metadata. */
 export function MetaDataSection({ listing, layout = "inline", moduleCount }: MetaDataSectionProps) {
   const { t } = useTranslation();
   const showOriginal = useShowOriginalContent();

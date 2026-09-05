@@ -31,6 +31,7 @@ import {
 import styles from "../../../screens/admin-contents/admin-contents.screen.module.css";
 import { Content } from "../Content";
 
+/** Inputs for the responsive topic table/list and its editorial callbacks. */
 export type TopicsContentProps = {
   searchQuery: string;
   debouncedSearch: string;
@@ -50,6 +51,7 @@ function SortIcon({ active, direction }: { active: boolean; direction: SortDirec
   );
 }
 
+/** Filters, sorts, and renders topics with edit, delete, and translation actions. */
 export function TopicsContent({
   searchQuery,
   debouncedSearch,

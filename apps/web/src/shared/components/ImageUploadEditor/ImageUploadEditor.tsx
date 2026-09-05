@@ -80,6 +80,7 @@ function ImagePreview({
   );
 }
 
+/** Provides preview, selection, and replacement controls for a staged image upload. */
 export function ImageUploadEditor({
   imageUrl,
   onImageStaged,

@@ -1,6 +1,7 @@
 import type { StorageAdapter } from "@sd/core-sync";
 
 /** `@sd/core-sync` `StorageAdapter` backed by `window.localStorage`. */
+/** Creates a best-effort browser storage adapter that converts access failures to no-ops. */
 export function createLocalStorageAdapter(): StorageAdapter {
   return {
     getItem: async (key) => {

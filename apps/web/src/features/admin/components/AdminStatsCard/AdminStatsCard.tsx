@@ -8,6 +8,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { cn } from "@/shared/utils";
 
+/** Statistic value, label, and optional navigation behavior for an admin card. */
 export interface AdminStatsCardProps {
   /** Icon element (lucide-react icon) */
   icon: ReactNode;
@@ -28,6 +29,7 @@ export interface AdminStatsCardProps {
   className?: string;
 }
 
+/** Renders a statistic as a card or link while preserving its optional action. */
 export function AdminStatsCard({
   icon,
   label,

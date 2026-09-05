@@ -7,11 +7,14 @@ import { SanadChain } from "../sanad-chain/sanad-chain";
 import styles from "./lecture-card.module.css";
 
 /** Documents this module's responsibility and public boundary. */
+/** Display data and playback/navigation callbacks for a lecture card. */
 export type LectureCardProps = {
   title: string;
   category: string;
   scholarName: string;
+  /** Public scholar slug used to format the scholar identity consistently. */
   scholarSlug?: string;
+  /** Already-formatted duration displayed beside the scholar name. */
   duration: string;
   progress?: number;
   totalLessons?: number;
@@ -20,6 +23,7 @@ export type LectureCardProps = {
   onPlay?: (e: React.MouseEvent) => void;
 };
 
+/** Renders lecture identity, progress, and a play action with keyboard support. */
 export function LectureCard({
   title,
   category,

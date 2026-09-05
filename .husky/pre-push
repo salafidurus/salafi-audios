@@ -102,10 +102,13 @@ else
   printf "pre-push: skipping e2e (no e2e-affecting changes)\n"
 fi
 
-if git diff --quiet "$COMPARISON_BASE"...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
-  printf "pre-push: skipping docs:quality (no docs changes)\n"
+printf "pre-push: running tsdoc:quality\n"
+bun run tsdoc:quality
+
+if git diff --quiet "$COMPARISON_BASE"...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md CONTRIBUTING.md .github/copilot-instructions.md; then
+  printf "pre-push: skipping mddoc:quality (no docs changes)\n"
 else
-  bun run docs:quality
+  bun run mddoc:quality
 fi
 
 if git diff --quiet "$COMPARISON_BASE"...HEAD -- packages/core-db/prisma/schema.prisma packages/core-db/prisma.config.ts packages/core-db/package.json; then

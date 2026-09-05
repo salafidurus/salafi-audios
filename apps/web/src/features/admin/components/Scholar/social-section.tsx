@@ -64,6 +64,7 @@ function reconstructUrl(handle: string, prefix: string | null): string {
   return handle ? `${prefix}${handle}` : "";
 }
 
+/** Renders optional scholar social and website fields. */
 export function SocialSection({ formData, dispatch }: SocialSectionProps) {
   const { t } = useTranslation();
 

@@ -9,6 +9,7 @@ import { THEME_KEY, resolveTheme, type ThemePreference } from "./theme-bootstrap
 
 export { THEME_KEY } from "./theme-bootstrap";
 export type { ThemePreference } from "./theme-bootstrap";
+/** Window event emitted when a settings control changes the persisted theme. */
 export const THEME_CHANGE_EVENT = "theme-change";
 
 function applyTheme(preference: ThemePreference, mediaQuery: MediaQueryList) {
@@ -31,6 +32,7 @@ function getStoredThemePreference(): ThemePreference {
   return "system";
 }
 
+/** Synchronizes the DOM theme with local preference and system color-scheme changes. */
 export function ThemeSync() {
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");

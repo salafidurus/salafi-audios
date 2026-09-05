@@ -14,6 +14,7 @@ function SignInPageInner() {
   return <SignInResponsiveScreen redirectTo={redirectTo} />;
 }
 
+/** Provides the suspense boundary required by the sign-in page's URL search params. */
 export default function SignInPage() {
   return (
     <Suspense fallback={null}>

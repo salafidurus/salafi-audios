@@ -1,4 +1,5 @@
 /** Documents this module's responsibility and public boundary. */
+/** Web radius tokens shared by primitive controls and larger content surfaces. */
 export const radiusWeb = {
   scale: {
     xs: "0.25rem",
@@ -17,4 +18,5 @@ export const radiusWeb = {
   },
 } as const;
 
+/** Inferred shape of the web radius token collection. */
 export type RadiusWeb = typeof radiusWeb;

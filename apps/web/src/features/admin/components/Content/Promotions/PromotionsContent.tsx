@@ -66,6 +66,7 @@ function PromotionsStatus({
   t,
 }: {
   isLoading: boolean;
+  /** Whether loading the current promotion configuration failed. */
   isError: boolean;
   onRetry: () => void;
   t: ReturnType<typeof useTranslation>["t"];
@@ -90,6 +91,7 @@ function PromotionsFooter({
   t,
 }: {
   feedback: "success" | "error" | null;
+  /** Server-provided save failure detail, when the mutation returned one. */
   error: string | null;
   pending: boolean;
   onSave: () => void;
@@ -120,7 +122,13 @@ function PromotionsGate({
   children,
 }: {
   canManage: boolean;
-  status: { isLoading: boolean; isError: boolean; onRetry: () => void };
+  /** Query state used to decide whether the curation controls can render. */
+  status: {
+    isLoading: boolean;
+    /** Whether loading the current promotion configuration failed. */
+    isError: boolean;
+    onRetry: () => void;
+  };
   children: ReactNode;
 }) {
   const { t } = useTranslation();
@@ -138,6 +146,7 @@ function PromotionsGate({
   return children;
 }
 
+/** Coordinates permission checks, promotion loading, editing, and persistence. */
 export function PromotionsContent() {
   const { t } = useTranslation();
   const { ability } = useAbility();

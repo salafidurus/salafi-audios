@@ -3,11 +3,13 @@
 
 import { useEffect, useRef } from "react";
 
+/** Text content and styling for a label that animates only when it overflows. */
 export type MarqueeTextProps = {
   text: string;
   className?: string;
 };
 
+/** Keeps long labels readable by animating overflow on hover/focus. */
 export function MarqueeText({ text, className }: MarqueeTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);

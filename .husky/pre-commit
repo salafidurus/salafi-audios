@@ -57,3 +57,4 @@ fi
 # dependency alignment end
 
 bun run lint:staged
+bun run tsdoc:quality

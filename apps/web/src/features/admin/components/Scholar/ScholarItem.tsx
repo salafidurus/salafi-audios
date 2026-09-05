@@ -16,6 +16,7 @@ import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./scholar-item.module.css";
 
+/** Scholar summary and editorial actions for one admin list item. */
 export interface ScholarItemProps {
   scholar: AdminScholarListItemDto;
   onEdit: () => void;
@@ -128,6 +129,7 @@ function ScholarCountry({
   );
 }
 
+/** Renders a scholar row with capability-filtered edit and translation actions. */
 export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();

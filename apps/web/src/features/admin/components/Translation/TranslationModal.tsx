@@ -36,6 +36,7 @@ import { TranslationChildrenTab } from "./TranslationChildrenTab";
 import { TranslationLocaleFields } from "./TranslationLocaleFields";
 import { TranslationReviewTab } from "./TranslationReviewTab";
 
+/** Controls the translation editor target and its modal lifecycle. */
 export interface TranslationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -62,8 +63,10 @@ function TranslationStatusNotices({
   error,
   t,
 }: {
+  /** Current translation-form lifecycle state used to choose notices. */
   status: string;
   entityId?: string | null;
+  /** Recoverable load or save failure shown beside the active form. */
   error: string | null;
   t: ReturnType<typeof useTranslation>["t"];
 }) {
@@ -134,12 +137,16 @@ type TranslationModalTabsProps = {
   onTabChange: (tab: string) => void;
   config: TranslationEntityConfig;
   targetEntity: ClientTranslationTarget["entity"];
+  /** Current translated values and lifecycle state rendered by each tab. */
   state: TranslationFormState;
   dispatch: React.Dispatch<TranslationFormAction>;
   secondaryLocales: Locale[];
   showChildrenTab: boolean;
+  /** Translation tabs containing validation errors. */
   errorTabs: string[];
+  /** Loading lifecycle for the optional child-translation list. */
   childrenStatus: "idle" | "loading" | "ready" | "error";
+  /** Recoverable child-list loading failure, when present. */
   childrenError: string | null;
   childItems: TranslationChildSummary[] | null;
   selectedChildId: string | null;
@@ -240,6 +247,7 @@ function TranslationModalTabs({
   );
 }
 
+/** Renders localized fields, child translations, review, and publish controls for one target. */
 export function TranslationModal({ isOpen, onClose, target }: TranslationModalProps) {
   const { t } = useTranslation();
   // Empty until the user picks a tab — falls back to the first secondary locale

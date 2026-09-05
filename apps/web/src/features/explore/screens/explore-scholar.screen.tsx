@@ -13,12 +13,14 @@ import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 
 import styles from "./explore-scholar.screen.module.css";
 
+/** Query and navigation state needed by the Explore scholar directory. */
 export type ExploreScholarScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
 type ScholarResultsProps = {
   scholars: ScholarListItemDto[];
+  /** Whether the scholar directory request failed without usable data. */
   isError: boolean;
   isLoading: boolean;
   isFetching: boolean;
@@ -72,6 +74,7 @@ function ScholarResults({
   return <div className={styles.empty}>{t("explore.noScholars", "No scholars available.")}</div>;
 }
 
+/** Renders searchable scholars with loading, error, and empty-state handling. */
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
   const router = useRouter();

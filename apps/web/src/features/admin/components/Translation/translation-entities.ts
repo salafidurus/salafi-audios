@@ -17,11 +17,13 @@ import { fetchScholarFormData, fetchAdminTopic } from "@/features/admin/api/admi
  * Topics are hydrated by slug (`fetchAdminTopic`) but written by id (`AdminTopicDetailDto.id`),
  * so the client-side target carries both.
  */
+/** Client target identity, including the topic slug needed during hydration. */
 export type ClientTranslationTarget =
   | { entity: "listing"; listingId: string }
   | { entity: "scholar"; scholarId: string }
   | { entity: "topic"; topicId: string; topicSlug: string };
 
+/** Field metadata used to render and validate one translatable value. */
 export interface TranslationFieldConfig {
   key: string;
   labelKey: string;
@@ -30,9 +32,11 @@ export interface TranslationFieldConfig {
   required?: boolean;
 }
 
+/** Source entity and persisted translations loaded for an editor modal. */
 export interface TranslationLoadResult {
   entityId: string;
   mainLocale: Locale;
+  /** Read-only canonical values used as the translation reference. */
   source: Record<string, string | null>;
   translations: TranslationViewDto[];
   /** Listing format, if known — used only to decide whether a "sub-listings" tab is worth showing. */
@@ -43,6 +47,7 @@ export interface TranslationLoadResult {
 export interface TranslationChildSummary {
   id: string;
   title: string;
+  /** Child format used to render module versus lesson identity. */
   kind: "module" | "lesson";
   /** True for a lesson nested under a module — used to indent it in the list. */
   indent: boolean;
@@ -198,6 +203,7 @@ const topicConfig: TranslationEntityConfig = {
   },
 };
 
+/** Registry of loading and persistence behavior for each translatable entity. */
 export const translationEntities = {
   listing: listingConfig,
   scholar: scholarConfig,

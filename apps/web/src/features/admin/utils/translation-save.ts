@@ -9,6 +9,7 @@ import {
 } from "@/features/admin/hooks/Translation/useTranslationForm";
 
 /** Documents this module's responsibility and public boundary. */
+/** Result of validating dirty secondary locales before persistence. */
 export interface LocalesToSaveResult {
   /** Locales that are dirty and safe to persist, with their merged field values. */
   toSave: Map<Locale, Record<string, string>>;

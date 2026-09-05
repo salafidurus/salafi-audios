@@ -3,12 +3,14 @@ import type { ReactNode } from "react";
 import { cn } from "@/shared/utils";
 
 /** Documents this module's responsibility and public boundary. */
+/** Title, optional subtitle, and layout controls for a page heading. */
 export interface PageHeaderProps {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
 }
 
+/** Renders the responsive page heading used across public and admin screens. */
 export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
   return (
     <header

@@ -138,9 +138,11 @@ function mapScholarFormData(scholar: ScholarFormRecord) {
 
 type ScholarListRecord = {
   id: string;
+  /** Public slug used by catalog routes and scholar identity links. */
   slug: string;
   name: string;
   imageUrl: string | null;
+  /** Locale of the scholar's canonical name and biography. */
   mainLanguage: Locale | null;
   title: ScholarTitle | null;
   translations: Array<{ name: string }>;

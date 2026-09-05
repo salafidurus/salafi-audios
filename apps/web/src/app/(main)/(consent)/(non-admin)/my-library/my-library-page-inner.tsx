@@ -15,6 +15,7 @@ function isMyLibraryTab(value: string | null): value is MyLibraryTab {
   return value !== null && MY_LIBRARY_TABS.includes(value as MyLibraryTab);
 }
 
+/** Selects the canonical library screen from the validated `tab` query value. */
 export default function MyLibraryPageInner() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
