@@ -8,10 +8,13 @@ import { Button } from "@/shared/components/ui/button";
 import styles from "./error.module.css";
 
 type ErrorProps = {
+  /** The route error captured by Next.js, including its optional diagnostic digest. */
   error: Error & { digest?: string };
+  /** Retries rendering the failed route segment. */
   reset: () => void;
 };
 
+/** Renders the route-level recovery UI and exposes Next.js's retry action. */
 export default function MainError({ error, reset }: ErrorProps) {
   useEffect(() => {
     error satisfies Error;
