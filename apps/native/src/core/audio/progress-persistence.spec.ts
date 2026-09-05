@@ -27,9 +27,9 @@ jest.mock("@sd/core-contracts", () => ({
   endpoints: {
     audio: {
       progress: {
-        get: "/audio/progress",
-        sync: "/audio/progress/sync",
-        update: (listingSlug: string) => `/audio/progress/${listingSlug}`,
+        get: "/v1/audio/progress",
+        sync: "/v1/audio/progress/sync",
+        update: (listingSlug: string) => `/v1/audio/progress/${listingSlug}`,
       },
     },
   },
@@ -117,7 +117,7 @@ describe("initProgressPersistence", () => {
     const cleanup = initProgressPersistence(USER_ID);
 
     expect(mockedHttpClient).toHaveBeenCalledWith({
-      url: "/audio/progress",
+      url: "/v1/audio/progress",
       method: "GET",
       params: undefined,
     });
@@ -150,7 +150,7 @@ describe("initProgressPersistence", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(mockedHttpClient).toHaveBeenCalledWith({
-      url: "/audio/progress/l9",
+      url: "/v1/audio/progress/l9",
       method: "PUT",
       body: { positionSeconds: 30, durationSeconds: 200 },
     });
@@ -176,7 +176,7 @@ describe("initProgressPersistence", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(mockedHttpClient).not.toHaveBeenCalledWith({
-      url: "/audio/progress/l9",
+      url: "/v1/audio/progress/l9",
       method: "PUT",
       body: { positionSeconds: 30, durationSeconds: 200 },
     });
@@ -208,7 +208,7 @@ describe("initProgressPersistence", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(mockedHttpClient).toHaveBeenCalledWith({
-      url: "/audio/progress/l3",
+      url: "/v1/audio/progress/l3",
       method: "PUT",
       body: { positionSeconds: 1, durationSeconds: 100 },
     });

@@ -7,7 +7,7 @@ import { AdminScholarsScreen } from "./admin-scholars.screen";
 jest.mock("@sd/core-contracts", () => ({
   useApiQuery: jest.fn(),
   httpClient: jest.fn(),
-  endpoints: { scholars: { list: "/scholars" } },
+  endpoints: { scholars: { list: "/v1/scholars" } },
 }));
 
 jest.mock("expo-router", () => ({

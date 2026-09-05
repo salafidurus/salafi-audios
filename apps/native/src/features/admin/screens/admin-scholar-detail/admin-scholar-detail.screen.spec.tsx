@@ -12,7 +12,7 @@ jest.mock("@sd/core-contracts", () => ({
   httpClient: jest.fn(),
   endpoints: {
     scholars: {
-      detail: (slug: string) => `/scholars/${slug}`,
+      detail: (slug: string) => `/v1/scholars/${slug}`,
     },
   },
 }));

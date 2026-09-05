@@ -6,7 +6,7 @@ import { fetchAdminDashboard } from "./admin-dashboard.api";
 const mockHttpClient = vi.fn();
 
 vi.mock("@sd/core-contracts", () => ({
-  endpoints: { admin: { dashboard: "/admin/dashboard" } },
+  endpoints: { admin: { dashboard: "/v1/admin/dashboard" } },
   httpClient: mockHttpClient,
 }));
 
@@ -21,7 +21,7 @@ describe("fetchAdminDashboard", () => {
     await fetchAdminDashboard();
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/admin/dashboard",
+      url: "/v1/admin/dashboard",
       method: "GET",
     });
   });

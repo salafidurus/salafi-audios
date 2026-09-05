@@ -1,113 +1,133 @@
-/** Canonical API endpoint paths shared by web, native, and backend-facing clients. */
-/** Defines the runtime contract value for endpoints. */
+/** Shared canonical application API paths for every platform client. */
+const APPLICATION_API_PREFIX = "/v1";
+
+/**
+ * Prefixes ordinary application API routes with the canonical compatibility
+ * namespace. Better Auth, operational, and external URLs are intentionally
+ * outside this builder and must retain their own route boundaries.
+ */
+const applicationPath = (path: string): string => `${APPLICATION_API_PREFIX}${path}`;
+
+/**
+ * Canonical application API paths shared by web, native, and backend-facing
+ * clients. Every path uses the `/v1` compatibility namespace; Better Auth,
+ * operational, and external URLs retain separate route boundaries.
+ */
 export const endpoints = {
   search: {
-    general: "/search",
-    extended: "/search/extended",
+    general: applicationPath("/search"),
+    extended: applicationPath("/search/extended"),
   },
   topics: {
-    list: "/topics",
+    list: applicationPath("/topics"),
   },
   scholars: {
-    list: "/scholars",
-    detail: (scholarSlug: string) => `/scholars/${scholarSlug}`,
-    content: (scholarSlug: string) => `/scholars/${scholarSlug}/content`,
-    topics: (scholarSlug: string) => `/scholars/${scholarSlug}/topics`,
+    list: applicationPath("/scholars"),
+    detail: (scholarSlug: string) => applicationPath(`/scholars/${scholarSlug}`),
+    content: (scholarSlug: string) => applicationPath(`/scholars/${scholarSlug}/content`),
+    topics: (scholarSlug: string) => applicationPath(`/scholars/${scholarSlug}/topics`),
   },
   listings: {
-    detail: (listingSlug: string) => `/listings/${listingSlug}`,
-    contents: (listingSlug: string) => `/listings/${listingSlug}/contents`,
-    related: (listingSlug: string) => `/listings/${listingSlug}/related`,
-    lastPlayed: (listingSlug: string) => `/listings/${listingSlug}/last-played`,
-    progressSummary: (listingSlug: string) => `/listings/${listingSlug}/progress-summary`,
-    recent: "/listings/recent",
-    promotions: "/listings/promotions",
+    detail: (listingSlug: string) => applicationPath(`/listings/${listingSlug}`),
+    contents: (listingSlug: string) => applicationPath(`/listings/${listingSlug}/contents`),
+    related: (listingSlug: string) => applicationPath(`/listings/${listingSlug}/related`),
+    lastPlayed: (listingSlug: string) => applicationPath(`/listings/${listingSlug}/last-played`),
+    progressSummary: (listingSlug: string) =>
+      applicationPath(`/listings/${listingSlug}/progress-summary`),
+    recent: applicationPath("/listings/recent"),
+    promotions: applicationPath("/listings/promotions"),
   },
   myLibrary: {
-    saved: "/me/my-library/saved",
-    savedDelta: "/me/my-library/saved/delta",
-    savedSync: "/me/my-library/saved/sync",
-    completed: "/me/my-library/completed",
-    progress: "/me/my-library/progress",
-    recentProgress: "/me/my-library/recent-progress",
-    saveListing: (listingSlug: string) => `/me/my-library/save/${listingSlug}`,
+    saved: applicationPath("/me/my-library/saved"),
+    savedDelta: applicationPath("/me/my-library/saved/delta"),
+    savedSync: applicationPath("/me/my-library/saved/sync"),
+    completed: applicationPath("/me/my-library/completed"),
+    progress: applicationPath("/me/my-library/progress"),
+    recentProgress: applicationPath("/me/my-library/recent-progress"),
+    saveListing: (listingSlug: string) => applicationPath(`/me/my-library/save/${listingSlug}`),
   },
   account: {
-    profile: "/account/profile",
-    deleteAccount: "/account",
+    profile: applicationPath("/account/profile"),
+    deleteAccount: applicationPath("/account"),
   },
   audio: {
     progress: {
-      get: "/audio/progress",
-      sync: "/audio/progress/sync",
-      update: (listingSlug: string) => `/audio/progress/${listingSlug}`,
+      get: applicationPath("/audio/progress"),
+      sync: applicationPath("/audio/progress/sync"),
+      update: (listingSlug: string) => applicationPath(`/audio/progress/${listingSlug}`),
     },
     listings: {
-      stream: (listingSlug: string) => `/audio/listings/${listingSlug}/stream`,
+      stream: (listingSlug: string) => applicationPath(`/audio/listings/${listingSlug}/stream`),
     },
   },
   admin: {
-    dashboard: "/admin/dashboard",
+    dashboard: applicationPath("/admin/dashboard"),
     users: {
-      list: "/admin/users",
-      access: (userId: string) => `/admin/users/${userId}/access`,
+      list: applicationPath("/admin/users"),
+      access: (userId: string) => applicationPath(`/admin/users/${userId}/access`),
     },
     scholars: {
-      list: "/admin/scholars",
-      create: "/admin/scholars",
-      update: (id: string) => `/admin/scholars/${id}`,
-      formData: (id: string) => `/admin/scholars/${id}/form-data`,
+      list: applicationPath("/admin/scholars"),
+      create: applicationPath("/admin/scholars"),
+      update: (id: string) => applicationPath(`/admin/scholars/${id}`),
+      formData: (id: string) => applicationPath(`/admin/scholars/${id}/form-data`),
     },
     topics: {
-      list: "/admin/topics",
-      create: "/admin/topics",
-      detail: (slug: string) => `/admin/topics/${slug}`,
-      update: (slug: string) => `/admin/topics/${slug}`,
-      delete: (slug: string) => `/admin/topics/${slug}`,
+      list: applicationPath("/admin/topics"),
+      create: applicationPath("/admin/topics"),
+      detail: (slug: string) => applicationPath(`/admin/topics/${slug}`),
+      update: (slug: string) => applicationPath(`/admin/topics/${slug}`),
+      delete: (slug: string) => applicationPath(`/admin/topics/${slug}`),
     },
     listings: {
-      list: "/admin/listings",
-      detail: (id: string) => `/admin/listings/${id}`,
-      create: "/admin/listings",
-      update: (id: string) => `/admin/listings/${id}`,
-      updateDetails: (id: string) => `/admin/listings/${id}/details`,
-      updateMedia: (id: string) => `/admin/listings/${id}/media`,
-      mediaData: (id: string) => `/admin/listings/${id}/media-data`,
-      formData: (id: string) => `/admin/listings/${id}/form-data`,
+      list: applicationPath("/admin/listings"),
+      detail: (id: string) => applicationPath(`/admin/listings/${id}`),
+      create: applicationPath("/admin/listings"),
+      update: (id: string) => applicationPath(`/admin/listings/${id}`),
+      updateDetails: (id: string) => applicationPath(`/admin/listings/${id}/details`),
+      updateMedia: (id: string) => applicationPath(`/admin/listings/${id}/media`),
+      mediaData: (id: string) => applicationPath(`/admin/listings/${id}/media-data`),
+      formData: (id: string) => applicationPath(`/admin/listings/${id}/form-data`),
 
-      publish: (id: string) => `/admin/listings/${id}/publish`,
-      archive: (id: string) => `/admin/listings/${id}/archive`,
-      series: "/admin/listings/series",
-      bulk: "/admin/listings/bulk",
-      arrangeData: (id: string) => `/admin/listings/${id}/arrange-data`,
-      arrangeCommit: (id: string) => `/admin/listings/${id}/arrange-commit`,
-      promotions: "/admin/listings/promotions",
+      publish: (id: string) => applicationPath(`/admin/listings/${id}/publish`),
+      archive: (id: string) => applicationPath(`/admin/listings/${id}/archive`),
+      series: applicationPath("/admin/listings/series"),
+      bulk: applicationPath("/admin/listings/bulk"),
+      arrangeData: (id: string) => applicationPath(`/admin/listings/${id}/arrange-data`),
+      arrangeCommit: (id: string) => applicationPath(`/admin/listings/${id}/arrange-commit`),
+      promotions: applicationPath("/admin/listings/promotions"),
     },
     media: {
-      presignedUrl: "/admin/media/presigned-url",
-      presignBatch: "/admin/media/presign-batch",
+      presignedUrl: applicationPath("/admin/media/presigned-url"),
+      presignBatch: applicationPath("/admin/media/presign-batch"),
     },
   },
   translations: {
     scholars: {
-      list: (id: string) => `/scholars/${id}/translations`,
-      save: (id: string) => `/scholars/${id}/translations`,
-      update: (id: string, locale: string) => `/scholars/${id}/translations/${locale}`,
-      publish: (id: string, locale: string) => `/scholars/${id}/translations/${locale}/publish`,
-      unpublish: (id: string, locale: string) => `/scholars/${id}/translations/${locale}/unpublish`,
+      list: (id: string) => applicationPath(`/scholars/${id}/translations`),
+      save: (id: string) => applicationPath(`/scholars/${id}/translations`),
+      update: (id: string, locale: string) =>
+        applicationPath(`/scholars/${id}/translations/${locale}`),
+      publish: (id: string, locale: string) =>
+        applicationPath(`/scholars/${id}/translations/${locale}/publish`),
+      unpublish: (id: string, locale: string) =>
+        applicationPath(`/scholars/${id}/translations/${locale}/unpublish`),
     },
     listings: {
-      list: (slug: string) => `/listings/${slug}/translations`,
-      save: (slug: string) => `/listings/${slug}/translations`,
-      update: (slug: string, locale: string) => `/listings/${slug}/translations/${locale}`,
-      publish: (slug: string, locale: string) => `/listings/${slug}/translations/${locale}/publish`,
+      list: (slug: string) => applicationPath(`/listings/${slug}/translations`),
+      save: (slug: string) => applicationPath(`/listings/${slug}/translations`),
+      update: (slug: string, locale: string) =>
+        applicationPath(`/listings/${slug}/translations/${locale}`),
+      publish: (slug: string, locale: string) =>
+        applicationPath(`/listings/${slug}/translations/${locale}/publish`),
       unpublish: (slug: string, locale: string) =>
-        `/listings/${slug}/translations/${locale}/unpublish`,
+        applicationPath(`/listings/${slug}/translations/${locale}/unpublish`),
     },
     topics: {
-      list: (id: string) => `/topics/${id}/translations`,
-      save: (id: string) => `/topics/${id}/translations`,
-      update: (id: string, locale: string) => `/topics/${id}/translations/${locale}`,
+      list: (id: string) => applicationPath(`/topics/${id}/translations`),
+      save: (id: string) => applicationPath(`/topics/${id}/translations`),
+      update: (id: string, locale: string) =>
+        applicationPath(`/topics/${id}/translations/${locale}`),
     },
   },
   auth: {},

@@ -24,7 +24,7 @@ vi.mock("@sd/core-contracts", () => ({
   endpoints: {
     audio: {
       listings: {
-        stream: (id: string) => `/audio/listings/${id}/stream`,
+        stream: (id: string) => `/v1/audio/listings/${id}/stream`,
       },
     },
   },
@@ -221,7 +221,7 @@ describe("DurusAudioService", () => {
     await service.playListing(stubTrack);
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/audio/listings/l1-slug/stream",
+      url: "/v1/audio/listings/l1-slug/stream",
       method: "GET",
     });
     expect(mockEngine.load).toHaveBeenCalledWith({ ...stubTrack, url: "https://fresh-signed.mp3" });
@@ -235,7 +235,7 @@ describe("DurusAudioService", () => {
     await service.playListing(stubTrack);
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/audio/listings/tafsir-al-fatiha/stream",
+      url: "/v1/audio/listings/tafsir-al-fatiha/stream",
       method: "GET",
     });
   });
@@ -287,7 +287,7 @@ describe("DurusAudioService", () => {
       await localService.playListing(stubTrack);
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/audio/listings/l1-slug/stream",
+        url: "/v1/audio/listings/l1-slug/stream",
         method: "GET",
       });
       expect(mockEngine.load).toHaveBeenCalledWith({
@@ -407,7 +407,7 @@ describe("DurusAudioService", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/audio/listings/l2-slug/stream",
+      url: "/v1/audio/listings/l2-slug/stream",
       method: "GET",
     });
 
@@ -418,7 +418,7 @@ describe("DurusAudioService", () => {
     expect(httpClient).not.toHaveBeenCalled();
     expect(mockEngine.load).toHaveBeenLastCalledWith({
       ...stubTrack2,
-      url: "https://resolved/audio/listings/l2-slug/stream",
+      url: "https://resolved/v1/audio/listings/l2-slug/stream",
     });
   });
 });

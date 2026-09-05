@@ -18,9 +18,9 @@ vi.mock("@sd/core-contracts", () => ({
   endpoints: {
     audio: {
       progress: {
-        update: (listingSlug: string) => `/audio/progress/${listingSlug}`,
-        get: "/audio/progress",
-        sync: "/audio/progress/sync",
+        update: (listingSlug: string) => `/v1/audio/progress/${listingSlug}`,
+        get: "/v1/audio/progress",
+        sync: "/v1/audio/progress/sync",
       },
     },
   },
@@ -43,7 +43,7 @@ describe("progress.sync", () => {
       await flushPendingProgress();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/audio/progress/l1",
+        url: "/v1/audio/progress/l1",
         method: "PUT",
         body: { positionSeconds: 90, durationSeconds: 1800 },
       });
@@ -82,7 +82,7 @@ describe("progress.sync", () => {
       await hydrateProgressFromServer();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/audio/progress",
+        url: "/v1/audio/progress",
         method: "GET",
         params: undefined,
       });
@@ -102,7 +102,7 @@ describe("progress.sync", () => {
       await hydrateProgressFromServer();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/audio/progress",
+        url: "/v1/audio/progress",
         method: "GET",
         params: { since: "2026-01-01T00:00:00.000Z" },
       });
@@ -157,7 +157,7 @@ describe("progress.sync", () => {
       await bulkSyncProgress(items);
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/audio/progress/sync",
+        url: "/v1/audio/progress/sync",
         method: "POST",
         body: { items },
       });
@@ -199,7 +199,7 @@ describe("progress.sync", () => {
       await drainPendingProgress();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/audio/progress/l1",
+        url: "/v1/audio/progress/l1",
         method: "PUT",
         body: { positionSeconds: 90, durationSeconds: 1800 },
       });
