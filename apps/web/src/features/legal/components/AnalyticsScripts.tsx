@@ -7,6 +7,7 @@ import { isDev } from "@/core/config/env";
 
 import { useCookieConsent } from "../hooks/use-cookie-consent";
 
+/** Loads analytics only after consent and never in development environments. */
 export function AnalyticsScripts() {
   const { hasAccepted } = useCookieConsent();
 

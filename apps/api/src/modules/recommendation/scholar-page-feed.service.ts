@@ -9,7 +9,7 @@ export class ScholarPageFeedService {
   constructor(private readonly engine: ScholarPageFeedEngine) {}
 
   /** Returns ordered entity references without exposing database policy to clients. */
-  recommend(): Promise<ScholarPageFeedRecommendation> {
+  recommend(): Promise<ScholarPageFeedRecommendation[]> {
     return this.engine.recommend();
   }
 }

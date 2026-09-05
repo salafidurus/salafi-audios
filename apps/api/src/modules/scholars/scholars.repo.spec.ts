@@ -28,12 +28,14 @@ describe('ScholarsRepository page-feed hydration', () => {
     ]);
     const repository = new ScholarsRepository({ scholar: { findMany } } as never);
 
-    const result = await repository.hydratePageFeed({
-      form: 'scholars',
-      id: 'scholars:allamah',
-      titleKind: 'allamah',
-      itemIds: ['scholar-2', 'missing-scholar', 'scholar-1'],
-    });
+    const result = await repository.hydratePageFeed([
+      {
+        form: 'scholars',
+        id: 'scholars:allamah',
+        titleKind: 'allamah',
+        itemIds: ['scholar-2', 'missing-scholar', 'scholar-1'],
+      },
+    ]);
 
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -52,12 +54,78 @@ describe('ScholarsRepository page-feed hydration', () => {
     } as never);
 
     await expect(
-      repository.hydratePageFeed({
-        form: 'scholars',
-        id: 'scholars:allamah',
-        titleKind: 'allamah',
-        itemIds: ['missing-scholar'],
-      }),
+      repository.hydratePageFeed([
+        {
+          form: 'scholars',
+          id: 'scholars:allamah',
+          titleKind: 'allamah',
+          itemIds: ['missing-scholar'],
+        },
+      ]),
     ).resolves.toEqual({ schemaVersion: 1, batches: [], exhausted: true });
+  });
+
+  it('hydrates scholar listings in recommendation order and omits stale listings', async () => {
+    const scholarFindMany = vi.fn().mockResolvedValue([
+      {
+        id: 'scholar-1',
+        slug: 'first-scholar',
+        name: 'First Scholar',
+        imageUrl: 'scholar.jpg',
+        mainLanguage: 'en',
+        title: 'allamah',
+        translations: [],
+        _count: { listings: 2 },
+      },
+    ]);
+    const listingFindMany = vi.fn().mockResolvedValue([
+      {
+        id: 'listing-2',
+        scholarId: 'scholar-1',
+        slug: 'second',
+        title: 'Second',
+        format: 'single',
+        language: 'en',
+        coverImageUrl: null,
+        publishedLectureCount: null,
+        publishedDurationSeconds: null,
+        durationSeconds: 120,
+        publishedAt: new Date('2026-01-02T00:00:00.000Z'),
+        createdAt: new Date('2026-01-02T00:00:00.000Z'),
+        translations: [],
+      },
+    ]);
+    const repository = new ScholarsRepository({
+      scholar: { findMany: scholarFindMany },
+      listing: { findMany: listingFindMany },
+    } as never);
+
+    const result = await repository.hydratePageFeed([
+      {
+        form: 'scholar_listings',
+        id: 'scholar-listings:first-scholar',
+        scholarSlug: 'first-scholar',
+        scholarId: 'scholar-1',
+        titleKind: 'scholar_listings',
+        itemIds: ['listing-1', 'listing-2'],
+      },
+    ]);
+
+    expect(result.batches[0]).toMatchObject({
+      form: 'scholar_listings',
+      scholarSlug: 'first-scholar',
+      scholar: { slug: 'first-scholar', name: 'First Scholar' },
+      items: [{ slug: 'second', title: 'Second' }],
+    });
+    expect(listingFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          id: { in: ['listing-1', 'listing-2'] },
+          parentId: null,
+          status: 'published',
+          deletedAt: null,
+        }),
+      }),
+    );
   });
 });

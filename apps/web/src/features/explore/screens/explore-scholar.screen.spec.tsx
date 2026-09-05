@@ -29,6 +29,9 @@ vi.mock("@/shared/utils/format-scholar-name", () => ({
 vi.mock("../components/scholar-grid-skeleton/scholar-grid-skeleton", () => ({
   ScholarGridSkeleton: () => <div data-testid="scholar-grid-skeleton" />,
 }));
+vi.mock("@/features/details/components/scholar/scholar-content-list/scholar-content-list", () => ({
+  ContentRow: ({ item }: { item: { title: string } }) => <div>{item.title}</div>,
+}));
 
 describe("ExploreScholarScreen", () => {
   const scholars = [
@@ -160,5 +163,49 @@ describe("ExploreScholarScreen", () => {
     render(<ExploreScholarScreen />);
 
     expect(screen.queryByRole("button", { name: /load more/i })).toBeNull();
+  });
+
+  it("renders scholar listings batches in the supplied order", () => {
+    mockUseScholarPageFeeds.mockReturnValue({
+      data: {
+        batches: [
+          {
+            form: "scholar_listings",
+            id: "scholar-listings:ibn-baz",
+            scholarSlug: "ibn-baz",
+            title: { kind: "scholar_listings", id: "scholar_listings", label: "Ibn Baz listings" },
+            scholar: scholars[0],
+            items: [
+              {
+                id: "listing-1",
+                slug: "first",
+                title: "First listing",
+                type: "single",
+                recencyAt: "2026-01-01T00:00:00.000Z",
+              },
+              {
+                id: "listing-2",
+                slug: "second",
+                title: "Second listing",
+                type: "series",
+                recencyAt: "2025-01-01T00:00:00.000Z",
+              },
+            ],
+          },
+        ],
+        schemaVersion: 1,
+        exhausted: true,
+      },
+      isFetching: false,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    });
+
+    render(<ExploreScholarScreen />);
+
+    expect(screen.getByText("Ibn Baz listings")).toBeTruthy();
+    expect(screen.getByText("First listing")).toBeTruthy();
+    expect(screen.getByText("Second listing")).toBeTruthy();
   });
 });

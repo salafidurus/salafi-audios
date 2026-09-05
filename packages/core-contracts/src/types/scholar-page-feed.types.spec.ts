@@ -10,6 +10,15 @@ const scholar = {
   lectureCount: 12,
 };
 
+const listing = {
+  id: "listing-1",
+  slug: "patience",
+  title: "Patience",
+  type: "single" as const,
+  recencyAt: "2026-09-01T00:00:00.000Z",
+  lectureCount: 1,
+};
+
 describe("Scholar page feed contract", () => {
   it("accepts a versioned ordered Allamah scholars batch", () => {
     const result = ScholarPageFeedDtoSchema.parse({
@@ -39,6 +48,14 @@ describe("Scholar page feed contract", () => {
           items: [],
         },
         {
+          form: "scholar_listings",
+          id: "scholar-listings:ibn-baz",
+          scholarSlug: "ibn-baz",
+          title: { kind: "scholar_listings", id: "scholar_listings", label: "Ibn Baz listings" },
+          scholar,
+          items: [listing],
+        },
+        {
           form: "scholars",
           id: "scholars:allamah",
           title: { kind: "allamah", id: "allamah_scholars", label: "Allamah scholars" },
@@ -48,8 +65,28 @@ describe("Scholar page feed contract", () => {
       exhausted: true,
     });
 
-    expect(result.batches).toHaveLength(1);
-    expect(result.batches[0]?.form).toBe("scholars");
+    expect(result.batches).toHaveLength(2);
+    expect(result.batches[0]?.form).toBe("scholar_listings");
+    expect(result.batches[1]?.form).toBe("scholars");
+  });
+
+  it("requires a public scholar slug and complete listing contents", () => {
+    expect(() =>
+      ScholarPageFeedDtoSchema.parse({
+        schemaVersion: 1,
+        batches: [
+          {
+            form: "scholar_listings",
+            id: "scholar-listings:ibn-baz",
+            scholarSlug: "",
+            title: { kind: "scholar_listings", id: "scholar_listings", label: "Listings" },
+            scholar,
+            items: [listing],
+          },
+        ],
+        exhausted: true,
+      }),
+    ).toThrow();
   });
 
   it("rejects a scholars batch with a non-Allamah title context", () => {

@@ -1,4 +1,5 @@
 /** Documents this module's responsibility and public boundary. */
+/** Focus-ring shadows shared by the light and dark web themes. */
 export const shadowsShared = {
   focus: {
     light: "0 0 0 3px rgb(20 184 166 / 0.28)",
@@ -6,6 +7,7 @@ export const shadowsShared = {
   },
 } as const;
 
+/** Raw light/dark elevation shadows used to build the web theme. */
 export const shadowsWeb = {
   xs: {
     light: "0 1px 3px rgb(15 23 42 / 0.10)",
@@ -33,6 +35,7 @@ export const shadowsWeb = {
   },
 } as const;
 
+/** Resolved shadow values for one selected web color mode. */
 export type ShadowsWebTheme = {
   focus: string;
   xs: string;
@@ -43,6 +46,7 @@ export type ShadowsWebTheme = {
   top: string;
 };
 
+/** Resolves the shared and elevation shadows for the requested color mode. */
 export const createShadowsWeb = (mode: "light" | "dark"): ShadowsWebTheme => {
   return {
     focus: selectShadow(mode, shadowsShared.focus),

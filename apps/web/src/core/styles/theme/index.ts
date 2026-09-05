@@ -8,6 +8,7 @@ import { spacingWeb, type SpacingWeb } from "./spacing";
 import { typographyWeb, type TypographyWeb } from "./typography";
 
 /** Documents this module's responsibility and public boundary. */
+/** Complete web theme contract consumed by components and CSS generation. */
 export type AppThemeWeb = {
   colors: AppColors;
   recipes: AccentRecipesWeb;
@@ -36,5 +37,7 @@ export const createThemeWeb = (mode: "light" | "dark"): AppThemeWeb => {
   };
 };
 
+/** Fully resolved light theme used by the default web appearance. */
 export const lightWebTheme = createThemeWeb("light");
+/** Fully resolved dark theme used by the dark web appearance. */
 export const darkWebTheme = createThemeWeb("dark");

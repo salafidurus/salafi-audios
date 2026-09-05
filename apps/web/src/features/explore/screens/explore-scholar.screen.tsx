@@ -6,6 +6,7 @@ import { useScholarPageFeeds } from "@sd/domain-content";
 import { useRouter } from "next/navigation";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { ContentRow } from "@/features/details/components/scholar/scholar-content-list/scholar-content-list";
 import { ScholarGridCard } from "@/features/explore/components/scholar-grid-card/scholar-grid-card";
 import { ScholarGridSkeleton } from "@/features/explore/components/scholar-grid-skeleton/scholar-grid-skeleton";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -13,14 +14,14 @@ import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 
 import styles from "./explore-scholar.screen.module.css";
 
-/** Query and navigation state needed by the Explore scholar directory. */
+/** Describes navigation state for the recommendation-composed Explore scholar directory. */
 export type ExploreScholarScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
 type ScholarResultsProps = {
   scholars: ScholarListItemDto[];
-  /** Whether the scholar directory request failed without usable data. */
+  /** Indicates that the initial page-feed request failed and can be retried. */
   isError: boolean;
   isLoading: boolean;
   isFetching: boolean;
@@ -74,7 +75,7 @@ function ScholarResults({
   return <div className={styles.empty}>{t("explore.noScholars", "No scholars available.")}</div>;
 }
 
-/** Renders searchable scholars with loading, error, and empty-state handling. */
+/** Renders recommendation-composed scholars with ordered batches and resilient UI states. */
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -82,7 +83,9 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     onNavigateToScholar ?? ((slug) => router.push(routes.scholars.detail(slug)));
 
   const { data, isFetching, isLoading, isError, refetch } = useScholarPageFeeds();
-  const allScholars = data?.batches.flatMap((batch) => batch.items) ?? [];
+  const scholarBatches = data?.batches.filter((batch) => batch.form === "scholars") ?? [];
+  const listingBatches = data?.batches.filter((batch) => batch.form === "scholar_listings") ?? [];
+  const allScholars = scholarBatches.flatMap((batch) => batch.items);
 
   const title = t("explore.scholarsTitle", "Scholars");
 
@@ -100,6 +103,18 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
         onRetry={refetch}
         onNavigateToScholar={handleNavigateToScholar}
       />
+
+      {listingBatches.map((batch) => (
+        <section key={batch.id} aria-labelledby={`${batch.id}-title`}>
+          <h2 id={`${batch.id}-title`}>{batch.title.label}</h2>
+          <ScholarGridCard scholar={batch.scholar} onPress={handleNavigateToScholar} />
+          <div>
+            {batch.items.map((item) => (
+              <ContentRow key={item.id} item={item} scholarImageUrl={batch.scholar.imageUrl} />
+            ))}
+          </div>
+        </section>
+      ))}
 
       <ScrollToTopButton />
     </ScreenView>
