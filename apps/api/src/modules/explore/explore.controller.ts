@@ -11,10 +11,10 @@ import { ExploreService } from './explore.service';
 
 /** Public Explore read boundary for recommendation-backed discovery pages. */
 @RateLimitPolicy('public-read')
-@ApiTags('Listings')
+@ApiTags('Explore')
 @ApiCommonErrors()
 @Public()
-@Controller({ path: 'listings', version: '1' })
+@Controller({ path: 'explore', version: '1' })
 @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
 @CacheTTL(3 * 60 * 60 * 1000)
 /** Public HTTP adapter for the recommendation-backed Explore feed. */
@@ -22,10 +22,10 @@ import { ExploreService } from './explore.service';
 export class ExploreController {
   constructor(private readonly service: ExploreService) {}
 
-  @Get('recent')
+  @Get()
   @ApiOperation({ summary: 'Get the Explore discovery feed' })
   @ApiOkResponse({ description: 'Versioned cursor-paginated Explore recommendation batches' })
-  getRecentRecommendations(
+  getRecommendations(
     @Query('cursor') cursor?: string,
     @Query('limit') limitStr?: string,
     @Query('topic') topicSlug?: string,

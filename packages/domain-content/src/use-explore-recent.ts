@@ -26,9 +26,7 @@ export function useExploreRecentScreen({
 }: UseExploreRecentScreenOptions = {}) {
   const initialPageParam: string | undefined = undefined;
   const queryKey = [
-    ...queryKeys.listings.all,
-    "recent",
-    topicSlug ?? "",
+    ...queryKeys.explore.feed(topicSlug, undefined),
     limit ?? null,
     locale ?? "default",
   ] as const;
@@ -47,7 +45,7 @@ export function useExploreRecentScreen({
       if (limit) params.limit = String(limit);
       if (topicSlug) params.topic = topicSlug;
       const response = await httpClient<unknown>({
-        url: endpoints.listings.recent,
+        url: endpoints.explore.feed,
         method: "GET",
         params,
       });

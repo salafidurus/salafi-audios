@@ -41,6 +41,11 @@ export const queryKeys = {
     content: (scholarSlug: string) => [...queryKeys.scholars.all, "content", scholarSlug] as const,
     topics: (scholarSlug: string) => [...queryKeys.scholars.all, "topics", scholarSlug] as const,
   },
+  explore: {
+    all: ["explore"] as const,
+    feed: (topicSlug?: string, cursor?: string) =>
+      [...queryKeys.explore.all, "feed", topicSlug ?? "", cursor] as const,
+  },
   listings: {
     all: ["listings"] as const,
     detail: (listingSlug: string) => [...queryKeys.listings.all, "detail", listingSlug] as const,
@@ -51,8 +56,6 @@ export const queryKeys = {
       [...queryKeys.listings.all, "last-played", listingSlug] as const,
     progressSummary: (listingSlug: string) =>
       [...queryKeys.listings.all, "progress-summary", listingSlug] as const,
-    recent: (topicSlug?: string, cursor?: string) =>
-      [...queryKeys.listings.all, "recent", topicSlug ?? "", cursor] as const,
   },
   topics: {
     all: ["topics"] as const,

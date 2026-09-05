@@ -18,7 +18,7 @@ the authoritative relationships needed to rank content by Topic and Scholar.
 
 ## Decision
 
-- Repurpose `GET /listings/recent` as the Explore discovery endpoint. The route
+- Expose `GET /explore` as the Explore discovery endpoint. The route
   remains stable, but its response is now a discovery feed rather than a
   promise of chronological recency.
 - Return a versioned, cursor-paginated `FeedPageDto` containing ordered,
@@ -75,7 +75,7 @@ Rejected because it would leave two competing public feed contracts and make it
 unclear which one clients should use. The existing route is already the
 Explore feed seam and can evolve without changing its public purpose.
 
-### Keep `/listings/recent` chronological
+### Keep `/explore` chronological
 
 Rejected because chronology is only one possible discovery strategy and cannot
 support Scholar/Topic modules or topic steering without a second endpoint.

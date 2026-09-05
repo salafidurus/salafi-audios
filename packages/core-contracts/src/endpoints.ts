@@ -18,6 +18,9 @@ export const endpoints = {
     general: applicationPath("/search"),
     extended: applicationPath("/search/extended"),
   },
+  explore: {
+    feed: applicationPath("/explore"),
+  },
   topics: {
     list: applicationPath("/topics"),
   },
@@ -34,7 +37,6 @@ export const endpoints = {
     lastPlayed: (listingSlug: string) => applicationPath(`/listings/${listingSlug}/last-played`),
     progressSummary: (listingSlug: string) =>
       applicationPath(`/listings/${listingSlug}/progress-summary`),
-    recent: applicationPath("/listings/recent"),
     promotions: applicationPath("/listings/promotions"),
   },
   myLibrary: {
