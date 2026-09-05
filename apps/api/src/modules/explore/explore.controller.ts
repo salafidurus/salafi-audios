@@ -28,9 +28,8 @@ export class ExploreController {
   getRecommendations(
     @Query('cursor') cursor?: string,
     @Query('limit') limitStr?: string,
-    @Query('topic') topicSlug?: string,
   ): Promise<FeedPageDto> {
     const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
-    return this.service.getRecentRecommendations(cursor, limit, topicSlug);
+    return this.service.getRecentRecommendations(cursor, limit);
   }
 }

@@ -9,7 +9,6 @@ jest.mock("@sd/domain-content", () => ({
     pages.flatMap((page) => page.batches),
   useExploreRecentScreen: jest.fn(),
 }));
-jest.mock("@sd/domain-search", () => ({ useTopicsList: () => ({ data: [] }) }));
 jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     i18n: { language: "en" },
@@ -22,9 +21,6 @@ jest.mock("@/features/navigation", () => ({
     const { Text } = require("react-native");
     return <Text>{title}</Text>;
   },
-}));
-jest.mock("@/features/search", () => ({
-  SearchFilter: () => null,
 }));
 jest.mock("@/shared/ui", () => ({
   AppText: ({ children, ...props }: { children: React.ReactNode; testID?: string }) => {
@@ -89,5 +85,12 @@ describe("ExploreScreen", () => {
     expect(screen.getByText("Explore topics")).toBeTruthy();
     expect(screen.getByText("Aqeedah")).toBeTruthy();
     expect(screen.getByText("Fiqh")).toBeTruthy();
+  });
+
+  it("does not expose frontend topic steering", async () => {
+    await render(<ExploreScreen />);
+
+    expect(screen.queryByText("Explore by topic")).toBeNull();
+    expect(mockUseExploreRecentScreen).toHaveBeenCalledWith({ locale: "en" });
   });
 });

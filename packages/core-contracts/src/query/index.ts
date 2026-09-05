@@ -43,8 +43,7 @@ export const queryKeys = {
   },
   explore: {
     all: ["explore"] as const,
-    feed: (topicSlug?: string, cursor?: string) =>
-      [...queryKeys.explore.all, "feed", topicSlug ?? "", cursor] as const,
+    feed: (cursor?: string) => [...queryKeys.explore.all, "feed", cursor] as const,
   },
   listings: {
     all: ["listings"] as const,

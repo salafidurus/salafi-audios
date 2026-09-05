@@ -26,7 +26,7 @@ the authoritative relationships needed to rank content by Topic and Scholar.
   `listings` batch (`reason: deterministic_recent`), followed by the
   `scholars` and `topics` batches added by later Explore tickets. New batch
   forms must remain semantic and must not make clients infer meaning from flat
-  rows. The API owns composition, topic steering, deduplication, and exhaustion.
+  rows. The API owns composition, recommendation context, deduplication, and exhaustion.
 - Keep recommendation execution in the explicit internal
   `RecommendationModule`, with no controller and no public DTO seam. The
   Explore-specific implementation remains in `explore-recommendation.*` files;
@@ -34,12 +34,12 @@ the authoritative relationships needed to rank content by Topic and Scholar.
   `ExploreModule` is the caller: it invokes the recommendation engine and maps
   its internal page into `FeedPageDto`. Internal recommendation DTOs stay local
   to the API modules; only the public response belongs in `@sd/core-contracts`.
-- Treat Topic selection as steering: selected-topic content is prioritized,
-  while adjacent and serendipitous content remains possible. It is not a
-  strict search filter.
+- Keep recommendation context engine-owned. Explore clients do not submit a
+  topic or reproduce recommendation inputs; future topic-aware rules may use
+  internal topic relationships to compose related batches.
 - Use one continuous mixed feed. Listing cards and discovery modules share the
-  same cursor, while Topic selection steers the stream without creating a
-  separate mode or URL-addressable view.
+  same cursor without creating a separate client-selected topic mode or
+  URL-addressable recommendation view.
 - Define “explored” for this feature as displayed in the current feed session.
   Listening, opening, saving, and completion are separate concepts.
 - Do not repeat Listing items after the catalog is exhausted. Return an
@@ -50,9 +50,9 @@ the authoritative relationships needed to rank content by Topic and Scholar.
 The initial batch is eligible only when the listing is published, not deleted,
 top-level, in a supported listing format, and attached to an active scholar.
 It is ordered by `createdAt DESC, slug DESC`, with a cursor containing both
-values so equal timestamps cannot duplicate or skip listings. The optional
-`topic` query steers the initial batch to that topic and supplies a localized
-typed title context; clients preserve the returned batch and item order.
+values so equal timestamps cannot duplicate or skip listings. Recommendation
+context is selected by the engine; clients preserve the returned batch and
+item order.
 
 The initial topics recommendation is a semantic `topics` batch with stable
 identity `topics:discoverable` and reason `deterministic_topics`. A topic is
@@ -80,7 +80,8 @@ Explore feed seam and can evolve without changing its public purpose.
 ### Keep `/explore` chronological
 
 Rejected because chronology is only one possible discovery strategy and cannot
-support Scholar/Topic modules or topic steering without a second endpoint.
+support Scholar/Topic modules or engine-owned recommendation context without a
+second endpoint.
 
 ### Assemble the feed in each client
 
