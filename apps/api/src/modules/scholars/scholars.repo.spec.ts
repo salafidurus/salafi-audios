@@ -128,4 +128,49 @@ describe('ScholarsRepository page-feed hydration', () => {
       }),
     );
   });
+
+  it('hydrates topic scholars in recommendation order and omits stale scholars', async () => {
+    const scholarFindMany = vi.fn().mockResolvedValue([
+      {
+        id: 'scholar-2',
+        slug: 'second-scholar',
+        name: 'Second Scholar',
+        imageUrl: null,
+        mainLanguage: 'en',
+        title: 'sheikh',
+        translations: [],
+        _count: { listings: 1 },
+      },
+    ]);
+    const topicFindMany = vi.fn().mockResolvedValue([
+      {
+        id: 'topic-1',
+        slug: 'aqeedah',
+        name: 'العقيدة',
+        translations: [{ name: 'Aqeedah' }],
+        listingTopics: [{ listing: { scholarId: 'scholar-2' } }],
+      },
+    ]);
+    const repository = new ScholarsRepository({
+      scholar: { findMany: scholarFindMany },
+      topic: { findMany: topicFindMany },
+    } as never);
+
+    const result = await repository.hydratePageFeed([
+      {
+        form: 'topic_scholars',
+        id: 'topic-scholars:aqeedah',
+        topicSlug: 'aqeedah',
+        topicId: 'topic-1',
+        titleKind: 'topic_scholars',
+        itemIds: ['missing-scholar', 'scholar-2'],
+      },
+    ]);
+
+    expect(result.batches[0]).toMatchObject({
+      form: 'topic_scholars',
+      topic: { slug: 'aqeedah', name: 'Aqeedah' },
+      items: [{ slug: 'second-scholar' }],
+    });
+  });
 });

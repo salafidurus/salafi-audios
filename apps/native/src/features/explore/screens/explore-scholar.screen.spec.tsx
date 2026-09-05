@@ -106,4 +106,32 @@ describe("ExploreScholarScreen", () => {
     expect(result.getByText("First listing")).toBeTruthy();
     expect(result.getByText("Second listing")).toBeTruthy();
   });
+
+  it("renders topic scholars batches from the hydrated response", async () => {
+    mockUseScholarPageFeeds.mockReturnValue({
+      data: {
+        schemaVersion: 1,
+        exhausted: true,
+        batches: [
+          {
+            form: "topic_scholars",
+            id: "topic-scholars:aqeedah",
+            topicSlug: "aqeedah",
+            title: { kind: "topic_scholars", id: "topic_scholars", label: "Aqeedah scholars" },
+            topic: { id: "topic-1", slug: "aqeedah", name: "Aqeedah" },
+            items: [{ id: "s1", slug: "ibn-baz", name: "Ibn Baz", lectureCount: 2 }],
+          },
+        ],
+      },
+      isFetching: false,
+      isError: false,
+      refetch: jest.fn(),
+    } as never);
+
+    const result = await render(<ExploreScholarScreen />);
+
+    expect(result.getByText("Aqeedah scholars")).toBeTruthy();
+    expect(result.getByText("Aqeedah")).toBeTruthy();
+    expect(result.getByText("Ibn Baz")).toBeTruthy();
+  });
 });

@@ -76,6 +76,7 @@ function ScholarResults({
 }
 
 /** Renders recommendation-composed scholars with ordered batches and resilient UI states. */
+// oxlint-disable-next-line complexity -- The screen branches only on the closed semantic batch union and keeps its supplied order.
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -83,9 +84,14 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     onNavigateToScholar ?? ((slug) => router.push(routes.scholars.detail(slug)));
 
   const { data, isFetching, isLoading, isError, refetch } = useScholarPageFeeds();
-  const scholarBatches = data?.batches.filter((batch) => batch.form === "scholars") ?? [];
-  const listingBatches = data?.batches.filter((batch) => batch.form === "scholar_listings") ?? [];
-  const allScholars = scholarBatches.flatMap((batch) => batch.items);
+  const allScholars =
+    data?.batches.reduce<ScholarListItemDto[]>((scholars, batch) => {
+      if (batch.form === "scholars") {
+        scholars.push(...batch.items);
+      }
+      return scholars;
+    }, []) ?? [];
+  const hasBatchItems = data?.batches.some((batch) => batch.items.length > 0) ?? false;
 
   const title = t("explore.scholarsTitle", "Scholars");
 
@@ -95,26 +101,65 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
         <h1 className={styles.pageTitle}>{title}</h1>
       </div>
 
-      <ScholarResults
-        scholars={allScholars}
-        isError={isError}
-        isLoading={isLoading}
-        isFetching={isFetching}
-        onRetry={refetch}
-        onNavigateToScholar={handleNavigateToScholar}
-      />
+      {!hasBatchItems ? (
+        <ScholarResults
+          scholars={allScholars}
+          isError={isError}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          onRetry={refetch}
+          onNavigateToScholar={handleNavigateToScholar}
+        />
+      ) : null}
 
-      {listingBatches.map((batch) => (
-        <section key={batch.id} aria-labelledby={`${batch.id}-title`}>
-          <h2 id={`${batch.id}-title`}>{batch.title.label}</h2>
-          <ScholarGridCard scholar={batch.scholar} onPress={handleNavigateToScholar} />
-          <div>
-            {batch.items.map((item) => (
-              <ContentRow key={item.id} item={item} scholarImageUrl={batch.scholar.imageUrl} />
-            ))}
-          </div>
-        </section>
-      ))}
+      {data?.batches.map((batch) => {
+        if (batch.form === "scholars") {
+          return (
+            <section key={batch.id} aria-labelledby={`${batch.id}-title`}>
+              <h2 id={`${batch.id}-title`}>{batch.title.label}</h2>
+              <div className={styles.grid}>
+                {batch.items.map((scholar) => (
+                  <ScholarGridCard
+                    key={scholar.id}
+                    scholar={scholar}
+                    onPress={handleNavigateToScholar}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        }
+
+        if (batch.form === "scholar_listings") {
+          return (
+            <section key={batch.id} aria-labelledby={`${batch.id}-title`}>
+              <h2 id={`${batch.id}-title`}>{batch.title.label}</h2>
+              <ScholarGridCard scholar={batch.scholar} onPress={handleNavigateToScholar} />
+              <div>
+                {batch.items.map((item) => (
+                  <ContentRow key={item.id} item={item} scholarImageUrl={batch.scholar.imageUrl} />
+                ))}
+              </div>
+            </section>
+          );
+        }
+
+        return (
+          <section key={batch.id} aria-labelledby={`${batch.id}-title`}>
+            <h2 id={`${batch.id}-title`}>{batch.title.label}</h2>
+            <p>{batch.topic.name}</p>
+            <div className={styles.grid}>
+              {batch.items.map((scholar) => (
+                <ScholarGridCard
+                  key={scholar.id}
+                  scholar={scholar}
+                  onPress={handleNavigateToScholar}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })}
 
       <ScrollToTopButton />
     </ScreenView>

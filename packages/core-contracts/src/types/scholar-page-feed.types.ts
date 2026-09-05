@@ -59,11 +59,52 @@ export type ScholarPageFeedScholarListingsBatch = z.infer<
   typeof ScholarPageFeedScholarListingsBatchSchema
 >;
 
+/** The title context for scholars recommended through a selected topic. */
+export const ScholarPageFeedTopicScholarsTitleContextSchema = z.object({
+  kind: z.literal("topic_scholars"),
+  id: z.literal("topic_scholars"),
+  label: z.string().min(1),
+});
+
+/** Localized title context used to present a topic scholars batch. */
+export type ScholarPageFeedTopicScholarsTitleContext = z.infer<
+  typeof ScholarPageFeedTopicScholarsTitleContextSchema
+>;
+
+/** Public topic identity and request-locale name required by the Scholars page. */
+export const ScholarPageFeedTopicItemSchema = z.object({
+  id: z.string().min(1),
+  slug: z.string().min(1),
+  name: z.string().min(1),
+});
+
+/** Topic identity paired with its localized presentation name. */
+export type ScholarPageFeedTopicItem = z.infer<typeof ScholarPageFeedTopicItemSchema>;
+
+/** Ordered active scholars associated with one recommended topic. */
+export const ScholarPageFeedTopicScholarsBatchSchema = z.object({
+  form: z.literal("topic_scholars"),
+  id: z.string().min(1),
+  topicSlug: z.string().min(1),
+  title: ScholarPageFeedTopicScholarsTitleContextSchema,
+  topic: ScholarPageFeedTopicItemSchema,
+  items: z.array(ScholarListItemDtoSchema),
+});
+
+/** Fully hydrated topic and scholars selected for one page-feed batch. */
+export type ScholarPageFeedTopicScholarsBatch = z.infer<
+  typeof ScholarPageFeedTopicScholarsBatchSchema
+>;
+
 /** Versioned public response for the root Scholars page. */
 export const ScholarPageFeedDtoSchema = z.object({
   schemaVersion: z.literal(ScholarPageFeedSchemaVersion),
   batches: z.array(
-    z.union([ScholarPageFeedScholarsBatchSchema, ScholarPageFeedScholarListingsBatchSchema]),
+    z.union([
+      ScholarPageFeedScholarsBatchSchema,
+      ScholarPageFeedScholarListingsBatchSchema,
+      ScholarPageFeedTopicScholarsBatchSchema,
+    ]),
   ),
   exhausted: z.boolean(),
 });
@@ -89,7 +130,9 @@ export function parseScholarPageFeedDto(input: unknown): ScholarPageFeedDto {
     const scholarBatch = ScholarPageFeedScholarsBatchSchema.safeParse(batch);
     if (scholarBatch.success) return [scholarBatch.data];
     const listingsBatch = ScholarPageFeedScholarListingsBatchSchema.safeParse(batch);
-    return listingsBatch.success ? [listingsBatch.data] : [];
+    if (listingsBatch.success) return [listingsBatch.data];
+    const topicBatch = ScholarPageFeedTopicScholarsBatchSchema.safeParse(batch);
+    return topicBatch.success ? [topicBatch.data] : [];
   });
 
   return ScholarPageFeedDtoSchema.parse({ ...page, batches });

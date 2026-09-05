@@ -208,4 +208,33 @@ describe("ExploreScholarScreen", () => {
     expect(screen.getByText("First listing")).toBeTruthy();
     expect(screen.getByText("Second listing")).toBeTruthy();
   });
+
+  it("renders topic scholars batches without fetching topic data separately", () => {
+    mockUseScholarPageFeeds.mockReturnValue({
+      data: {
+        batches: [
+          {
+            form: "topic_scholars",
+            id: "topic-scholars:aqeedah",
+            topicSlug: "aqeedah",
+            title: { kind: "topic_scholars", id: "topic_scholars", label: "Aqeedah scholars" },
+            topic: { id: "topic-1", slug: "aqeedah", name: "Aqeedah" },
+            items: [scholars[0]],
+          },
+        ],
+        schemaVersion: 1,
+        exhausted: true,
+      },
+      isFetching: false,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    });
+
+    render(<ExploreScholarScreen />);
+
+    expect(screen.getByText("Aqeedah scholars")).toBeTruthy();
+    expect(screen.getByText("Aqeedah")).toBeTruthy();
+    expect(screen.getAllByText("Ibn Baz").length).toBeGreaterThan(0);
+  });
 });
