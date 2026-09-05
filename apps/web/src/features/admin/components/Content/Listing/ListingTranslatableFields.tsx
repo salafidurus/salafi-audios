@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Client-side title and description fields for the active listing locale. */
 "use client";
 
 import React from "react";
@@ -10,12 +10,15 @@ import { InputField } from "@/shared/components/ui/input-field";
 
 import styles from "./listing-modal.module.css";
 
+/** Form state and callbacks needed by the translatable listing fields. */
 interface ListingTranslatableFieldsProps {
+  /** Current mutable listing form state. */
   state: FormState;
   dispatch: React.Dispatch<FormAction>;
   handleTitleChange: (val: string) => void;
 }
 
+/** Renders editable title and description fields for a listing. */
 export function ListingTranslatableFields({
   state,
   dispatch,

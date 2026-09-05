@@ -18,19 +18,18 @@ describe('ExploreRecommendationRepo', () => {
     } as never);
   });
 
-  it('selects ordered listing references without hydrating presentation data', async () => {
+  it('selects ordered unsteered listing references without hydrating presentation data', async () => {
     listingFindMany.mockResolvedValue([
       { id: 'listing-1', slug: 'listing-1', createdAt: new Date('2026-07-24') },
     ]);
 
-    const result = await repo.getRecommendations(undefined, 20, 'aqeedah');
+    const result = await repo.getRecommendations(undefined, 20);
 
     expect(result.batches).toEqual([
       {
         kind: 'listings',
-        id: 'listings:topic:aqeedah',
+        id: 'listings:recent',
         reason: 'deterministic_recent',
-        topicSlug: 'aqeedah',
         itemIds: ['listing-1'],
       },
     ]);

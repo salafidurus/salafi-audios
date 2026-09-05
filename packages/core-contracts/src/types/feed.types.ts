@@ -24,23 +24,9 @@ export type ExploreDefaultListingsTitleContextDto = z.infer<
   typeof ExploreDefaultListingsTitleContextDtoSchema
 >;
 
-/** Semantic title context for listings recommended through a selected topic. */
-export const ExploreTopicListingsTitleContextDtoSchema = z.object({
-  kind: z.literal("topic_listings"),
-  topicSlug: z.string().min(1),
-  label: z.string().min(1),
-});
-/** Display-ready title context identifying the topic steering the batch. */
-export type ExploreTopicListingsTitleContextDto = z.infer<
-  typeof ExploreTopicListingsTitleContextDtoSchema
->;
-
-/** Approved title contexts for the listings batch in ticket 898. */
-export const ExploreListingsTitleContextDtoSchema = z.discriminatedUnion("kind", [
-  ExploreDefaultListingsTitleContextDtoSchema,
-  ExploreTopicListingsTitleContextDtoSchema,
-]);
-/** Closed title-context union supported by the initial recommendation response. */
+/** The title context supported by the engine-owned deterministic listings recommendation. */
+export const ExploreListingsTitleContextDtoSchema = ExploreDefaultListingsTitleContextDtoSchema;
+/** Closed title context supported by the initial recommendation response. */
 export type ExploreListingsTitleContextDto = z.infer<typeof ExploreListingsTitleContextDtoSchema>;
 
 /** A semantic, ordered listings recommendation batch. */

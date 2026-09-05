@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test";
 
 import {
   DEFAULT_E2E_PORT,
+  getE2EJourneyPort,
   getE2EPort,
   getE2EConfig,
   getDiagnosticDirectory,
@@ -16,6 +17,13 @@ describe("Bun.WebView E2E configuration", () => {
 
   it("accepts a valid isolated port", () => {
     expect(getE2EPort({ BUN_E2E_PORT: "3011" })).toBe(3011);
+  });
+
+  it("keeps journey ports distinct under a shared worktree base port", () => {
+    const env = { BUN_E2E_PORT: "3213" };
+    expect(getE2EJourneyPort(3016, env)).toBe(3221);
+    expect(getE2EJourneyPort(3028, env)).toBe(3233);
+    expect(getE2EJourneyPort(undefined, env)).toBe(3213);
   });
 
   it("rejects malformed and out-of-range ports", () => {

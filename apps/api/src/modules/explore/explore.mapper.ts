@@ -27,9 +27,7 @@ export class ExploreMapper {
       return {
         kind: batch.kind,
         id: batch.id,
-        title: batch.topicSlug
-          ? { kind: 'topic_listings', topicSlug: batch.topicSlug, label: batch.topicSlug }
-          : { kind: 'listings', id: 'recent', label: 'Continue exploring' },
+        title: { kind: 'listings', id: 'recent', label: 'Continue exploring' },
         reason: batch.reason,
         items: batch.items,
       };

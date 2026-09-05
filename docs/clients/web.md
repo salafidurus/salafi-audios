@@ -52,16 +52,16 @@ sections allowed by their capabilities and scope.
   content, a plain home link, and browser reload behavior.
 
 Explore is a discovery-first feed rather than a query/results screen. It is one
-continuous mixed stream of listing cards and discovery modules, with Topic
-steering as its only primary mode. Advanced refinements remain available behind
-a Sheet and are not the main Explore canvas. The API owns the mixed feed
-composition, relevance, deduplication, cursor, and exhaustion decisions.
+continuous mixed stream of listing cards and discovery modules. Recommendation
+context is owned by the API: the web client renders the returned batches and
+does not submit a client-selected topic or persist topic-steering state. The
+API owns the mixed feed composition, relevance, deduplication, cursor, and
+exhaustion decisions.
 
-Topic is URL-addressable so discovery paths can be shared and restored. Topic
-state may persist in browser storage until explicitly cleared, scoped by route,
-locale, and User where relevant. The client must never infer personalized
-discovery from listening history until a
-separate event contract defines that behavior.
+Topic batches may still appear as semantic discovery modules in the response,
+but they are presentation data rather than a client-controlled Explore mode.
+The client must never infer personalized discovery from listening history until
+a separate event contract defines that behavior.
 
 ### Layered Structure
 
