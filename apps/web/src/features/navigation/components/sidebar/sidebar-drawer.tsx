@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides the mobile navigation drawer with focus, escape-key, and body-scroll handling. */
 "use client";
 
 import { useEffect, useRef, useEffectEvent } from "react";
@@ -13,6 +13,7 @@ interface SidebarDrawerProps {
   onClose: () => void;
 }
 
+/** Renders the drawer and restores document state when it closes or unmounts. */
 export function SidebarDrawer({ isOpen, onClose }: SidebarDrawerProps) {
   const { t } = useTranslation();
   const drawerRef = useRef<HTMLDivElement>(null);

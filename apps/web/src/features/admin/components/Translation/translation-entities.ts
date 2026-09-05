@@ -21,7 +21,12 @@ import { fetchScholarFormData, fetchAdminTopic } from "@/features/admin/api/admi
 export type ClientTranslationTarget =
   | { entity: "listing"; listingId: string }
   | { entity: "scholar"; scholarId: string }
-  | { entity: "topic"; topicId: string; topicSlug: string };
+  | {
+      entity: "topic";
+      topicId: string;
+      /** Canonical slug used to load the topic editor route and form data. */
+      topicSlug: string;
+    };
 
 /** Field metadata used to render and validate one translatable value. */
 export interface TranslationFieldConfig {
