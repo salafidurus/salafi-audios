@@ -32,7 +32,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.4.0"
+          bun-version-file: .bun-version
 
       - name: Validate Dependabot Helper policy
         run: bun infra/dependabot-helper/cli.ts validate
