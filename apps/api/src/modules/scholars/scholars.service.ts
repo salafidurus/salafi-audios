@@ -5,7 +5,6 @@ import type {
   CreateScholarDto,
   SaveScholarTranslationDto,
   UpdateScholarDto,
-  ScholarListItemDto,
   ScholarDetailDto,
   ScholarDetailStats,
   ScholarContentUnifiedDto,
@@ -13,9 +12,12 @@ import type {
   TranslationViewDto,
   AdminScholarListDto,
   Locale,
+  ScholarPageFeedDto,
+  ScholarListDto,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
+import { ScholarPageFeedService } from '../recommendation/scholar-page-feed.service';
 
 /** NestJS scholars service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
@@ -23,12 +25,23 @@ import { ScholarsRepository } from './scholars.repo';
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ScholarsService {
   constructor(
-    private readonly repo: ScholarsRepository,
+    @Inject(ScholarsRepository) private readonly repo: ScholarsRepository,
+    @Inject(ScholarPageFeedService) private readonly pageFeed: ScholarPageFeedService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  list(): Promise<{ scholars: ScholarListItemDto[] }> {
-    return this.repo.list();
+  /** Returns the recommendation-composed root Scholars page feed. */
+  async getPageFeed(): Promise<ScholarPageFeedDto> {
+    const recommendation = await this.pageFeed.recommend();
+    return this.repo.hydratePageFeed(recommendation);
+  }
+
+  directory(): Promise<ScholarListDto> {
+    return this.repo.directory();
+  }
+
+  search(query: string): Promise<ScholarListDto> {
+    return this.repo.search(query);
   }
 
   adminList(
@@ -81,9 +94,10 @@ export class ScholarsService {
     // LocaleCacheInterceptor uses format: ${url}:${locale}[:${userId}]
     const cacheKeysToInvalidate: string[] = [];
 
-    // Invalidate list cache
+    // Invalidate root page-feed and flat-directory caches.
     for (const locale of SUPPORTED_LOCALES) {
       cacheKeysToInvalidate.push(`/v1/scholars:${locale}`);
+      cacheKeysToInvalidate.push(`/v1/scholars/directory:${locale}`);
     }
 
     // Invalidate detail caches

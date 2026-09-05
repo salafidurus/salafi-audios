@@ -1,6 +1,6 @@
 import { createMongoAbility } from "@casl/ability";
 import { useAbility } from "@sd/domain-account";
-import { useScholarsList } from "@sd/domain-content";
+import { useScholarDirectory } from "@sd/domain-content";
 import { render, screen } from "@testing-library/react-native";
 import React from "react";
 
@@ -40,7 +40,7 @@ jest.mock("expo-audio", () => ({
   createAudioPlayer: jest.fn(),
 }));
 jest.mock("@sd/domain-content", () => ({
-  useScholarsList: jest.fn(),
+  useScholarDirectory: jest.fn(),
 }));
 jest.mock("@sd/domain-account", () => ({
   useAbility: jest.fn(),
@@ -54,12 +54,12 @@ jest.mock("@/features/admin/api/admin-listings.api", () => ({
   createListing: jest.fn(),
 }));
 
-const mockUseScholarsList = jest.mocked(useScholarsList) as any;
+const mockUseScholarDirectory = jest.mocked(useScholarDirectory) as any;
 const mockedUseAbility = jest.mocked(useAbility) as any;
 
 describe("AudioUploaderSheet", () => {
   beforeEach(() => {
-    mockUseScholarsList.mockReturnValue({
+    mockUseScholarDirectory.mockReturnValue({
       data: {
         scholars: [
           { id: "sch-1", slug: "scholar-one", name: "Scholar One", lectureCount: 1 },

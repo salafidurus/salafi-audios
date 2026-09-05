@@ -19,9 +19,9 @@ describe('Scholar/Topic order-by (e2e)', () => {
     await app.close();
   });
 
-  describe('GET /scholars', () => {
+  describe('GET /scholars/directory', () => {
     it('includes seeded scholars (sanity check)', async () => {
-      const res = await request(app.getHttpServer()).get('/v1/scholars').expect(200);
+      const res = await request(app.getHttpServer()).get('/v1/scholars/directory').expect(200);
       expect(res.body).toHaveProperty('scholars');
       expect(Array.isArray(res.body.scholars)).toBe(true);
       const slugs = res.body.scholars.map((s: any) => s.slug);
@@ -30,7 +30,7 @@ describe('Scholar/Topic order-by (e2e)', () => {
     });
 
     it('returns scholars in title→orderIndex order: allamah, sheikh, untitled', async () => {
-      const res = await request(app.getHttpServer()).get('/v1/scholars').expect(200);
+      const res = await request(app.getHttpServer()).get('/v1/scholars/directory').expect(200);
       const slugs = res.body.scholars.map((s: any) => s.slug);
       const relevant = slugs.filter((s: string) =>
         [

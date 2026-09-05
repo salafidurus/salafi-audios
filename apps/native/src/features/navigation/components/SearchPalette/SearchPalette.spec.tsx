@@ -25,16 +25,7 @@ describe("buildPaletteResults", () => {
       ],
     } as SearchCatalogResultsDto;
 
-    const results = buildPaletteResults(
-      "one",
-      topics,
-      {
-        pages: [{ items: scholars, nextCursor: undefined, hasMore: false }],
-        pageParams: [undefined],
-      },
-      listings,
-      "en",
-    );
+    const results = buildPaletteResults("one", topics, scholars, listings, "en");
 
     expect(results.map((result) => result.type)).toEqual(["scholar", "listing"]);
     expect(results.map((result) => result.slug)).toEqual(["scholar-one", "listing-one"]);

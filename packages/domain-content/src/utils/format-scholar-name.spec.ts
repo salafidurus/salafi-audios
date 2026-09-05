@@ -137,7 +137,7 @@ function makeWrapperWithScholars(
   });
 
   const queryClient = new QueryClient();
-  queryClient.setQueryData(queryKeys.scholars.list.all(), { scholars });
+  queryClient.setQueryData(queryKeys.scholars.directory(), { scholars, hasMore: false });
 
   return function Wrapper({ children }: { children: ReactNode }) {
     return createElement(

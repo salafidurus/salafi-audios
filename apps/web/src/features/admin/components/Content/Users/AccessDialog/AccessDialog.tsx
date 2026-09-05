@@ -332,7 +332,7 @@ export function AccessDialog({
 
     // Fetch full scholars list to get translated names and titles
     httpClient<{ scholars: ScholarListItemDto[] }>({
-      url: endpoints.scholars.list,
+      url: endpoints.scholars.directory,
       method: "GET",
     })
       .then((res) => setAllScholars(res.scholars))

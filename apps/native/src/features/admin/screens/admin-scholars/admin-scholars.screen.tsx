@@ -1,6 +1,6 @@
 import type { ScholarListDto } from "@sd/core-contracts";
 
-import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
+import { useApiQuery, httpClient, endpoints, queryKeys } from "@sd/core-contracts";
 import { Stack } from "expo-router";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
@@ -20,8 +20,8 @@ type AdminScholarsScreenProps = {
 /** Renders the native admin scholars screen surface and coordinates its user-facing state. */
 export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreenProps) {
   const { theme } = useUnistyles();
-  const { data, isLoading } = useApiQuery<ScholarListDto>(["scholars", "list"], () =>
-    httpClient<ScholarListDto>({ url: endpoints.scholars.list, method: "GET" }),
+  const { data, isLoading } = useApiQuery<ScholarListDto>(queryKeys.scholars.directory(), () =>
+    httpClient<ScholarListDto>({ url: endpoints.scholars.directory, method: "GET" }),
   );
   const [searchQuery, setSearchQuery] = useState("");
 

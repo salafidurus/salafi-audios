@@ -7,7 +7,7 @@ import { CommandPalette } from "./command-palette";
 const mockPush = vi.fn();
 const mockUseSearchCatalog = vi.fn();
 const mockUseTopicsList = vi.fn();
-const mockUseInfiniteScholarsList = vi.fn();
+const mockUseScholarSearch = vi.fn();
 
 vi.mock("@sd/domain-search", () => ({
   useSearchCatalog: mockUseSearchCatalog,
@@ -15,7 +15,7 @@ vi.mock("@sd/domain-search", () => ({
 }));
 
 vi.mock("@sd/domain-content", () => ({
-  useInfiniteScholarsList: mockUseInfiniteScholarsList,
+  useScholarSearch: mockUseScholarSearch,
 }));
 
 vi.mock("@/core/i18n/use-translation", () => ({
@@ -35,7 +35,7 @@ describe("CommandPalette", () => {
     vi.clearAllMocks();
     mockUseSearchCatalog.mockReturnValue({ data: undefined, isLoading: false } as never);
     mockUseTopicsList.mockReturnValue({ data: [], isLoading: false } as never);
-    mockUseInfiniteScholarsList.mockReturnValue({ data: undefined, isLoading: false } as never);
+    mockUseScholarSearch.mockReturnValue({ data: undefined, isLoading: false } as never);
   });
 
   it("opens from the pointer trigger and routes catalog results without account or admin actions", async () => {
@@ -61,18 +61,14 @@ describe("CommandPalette", () => {
       data: [{ id: "topic-1", slug: "aqeedah", name: { ar: "العقيدة", en: "Aqeedah" } }],
       isLoading: false,
     } as never);
-    mockUseInfiniteScholarsList.mockReturnValue({
+    mockUseScholarSearch.mockReturnValue({
       data: {
-        pages: [
+        scholars: [
           {
-            items: [
-              {
-                id: "scholar-1",
-                slug: "ibn-baz",
-                name: "Ibn Baz",
-                lectureCount: 10,
-              },
-            ],
+            id: "scholar-1",
+            slug: "ibn-baz",
+            name: "Ibn Baz",
+            lectureCount: 10,
           },
         ],
       },

@@ -3,7 +3,7 @@
 
 import { routes } from "@sd/core-contracts";
 import { getLocalizedName } from "@sd/core-i18n";
-import { useInfiniteScholarsList } from "@sd/domain-content";
+import { useScholarSearch } from "@sd/domain-content";
 import { useSearchCatalog, useTopicsList } from "@sd/domain-search";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -35,7 +35,7 @@ function includesQuery(value: string, query: string) {
 }
 
 type PaletteTopics = NonNullable<ReturnType<typeof useTopicsList>["data"]>;
-type PaletteScholarPages = NonNullable<ReturnType<typeof useInfiniteScholarsList>["data"]>;
+type PaletteScholarData = NonNullable<ReturnType<typeof useScholarSearch>["data"]>;
 type PaletteListingData = NonNullable<ReturnType<typeof useSearchCatalog>["data"]>;
 
 function buildTopicResults(
@@ -58,27 +58,21 @@ function buildTopicResults(
 }
 
 function buildScholarResults(
-  query: string,
-  pages: PaletteScholarPages | undefined,
+  data: PaletteScholarData | undefined,
   t: ReturnType<typeof useTranslation>["t"],
 ): PaletteResult[] {
-  return (pages?.pages.flatMap((page) => page.items) ?? []).reduce<PaletteResult[]>(
-    (matches, scholar) => {
-      if (includesQuery(scholar.name, query)) {
-        matches.push({
-          id: `scholar-${scholar.id}`,
-          label: scholar.name,
-          type: "scholar",
-          href: routes.scholars.detail(scholar.slug),
-          metadata: t("navigation.searchCatalogScholarMetadata", "{{count}} listings", {
-            count: scholar.lectureCount,
-          }),
-        });
-      }
-      return matches;
-    },
-    [],
-  );
+  return (data?.scholars ?? []).reduce<PaletteResult[]>((matches, scholar) => {
+    matches.push({
+      id: `scholar-${scholar.id}`,
+      label: scholar.name,
+      type: "scholar",
+      href: routes.scholars.detail(scholar.slug),
+      metadata: t("navigation.searchCatalogScholarMetadata", "{{count}} listings", {
+        count: scholar.lectureCount,
+      }),
+    });
+    return matches;
+  }, []);
 }
 
 function buildListingResults(query: string, data: PaletteListingData | undefined): PaletteResult[] {
@@ -104,7 +98,7 @@ function buildListingResults(query: string, data: PaletteListingData | undefined
 function buildPaletteResults(
   normalizedQuery: string,
   topics: PaletteTopics,
-  scholarPages: PaletteScholarPages | undefined,
+  scholarData: PaletteScholarData | undefined,
   listingData: PaletteListingData | undefined,
   language: string,
   t: ReturnType<typeof useTranslation>["t"],
@@ -113,7 +107,7 @@ function buildPaletteResults(
 
   return [
     ...buildTopicResults(normalizedQuery, topics, language),
-    ...buildScholarResults(normalizedQuery, scholarPages, t),
+    ...buildScholarResults(scholarData, t),
     ...buildListingResults(normalizedQuery, listingData),
   ];
 }
@@ -231,20 +225,13 @@ export function CommandPalette() {
     { enabled: isOpen && normalizedQuery.length > 0 },
   );
   const { data: topics = [], isLoading: isTopicsLoading } = useTopicsList({ enabled: isOpen });
-  const { data: scholarPages, isLoading: isScholarsLoading } = useInfiniteScholarsList({
-    enabled: isOpen,
+  const { data: scholarData, isLoading: isScholarsLoading } = useScholarSearch(normalizedQuery, {
+    enabled: isOpen && normalizedQuery.length > 0,
   });
 
   const results = useMemo<PaletteResult[]>(() => {
-    return buildPaletteResults(
-      normalizedQuery,
-      topics,
-      scholarPages,
-      listingData,
-      i18n.language,
-      t,
-    );
-  }, [i18n.language, listingData, normalizedQuery, scholarPages, t, topics]);
+    return buildPaletteResults(normalizedQuery, topics, scholarData, listingData, i18n.language, t);
+  }, [i18n.language, listingData, normalizedQuery, scholarData, t, topics]);
 
   const isLoading = getPaletteLoadingState(
     isOpen,
