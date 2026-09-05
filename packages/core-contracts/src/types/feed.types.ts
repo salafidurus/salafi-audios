@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { HomePromotionListingDtoSchema, type HomePromotionListingDto } from "./home.types";
+import { ScholarListItemDtoSchema, type ScholarListItemDto } from "./scholar.types";
 
 /** Numeric wire version that lets clients select the matching recommendation parser. */
 /** Defines the runtime wire-version value for Explore recommendation responses. */
@@ -53,10 +54,39 @@ export const ExploreListingsBatchDtoSchema = z.object({
 /** Ordered listings and the semantic context explaining their recommendation module. */
 export type ExploreListingsBatchDto = z.infer<typeof ExploreListingsBatchDtoSchema>;
 
+/** Semantic title context for the initial senior-scholar recommendation. */
+export const ExploreSeniorScholarsTitleContextDtoSchema = z.object({
+  kind: z.literal("scholars"),
+  id: z.literal("senior_scholars"),
+  label: z.string().min(1),
+});
+/** Display-ready title context identifying the senior scholars recommendation. */
+export type ExploreSeniorScholarsTitleContextDto = z.infer<
+  typeof ExploreSeniorScholarsTitleContextDtoSchema
+>;
+
+/** Display-ready scholar projection used by the Explore recommendation batch. */
+export const ExploreScholarItemDtoSchema = ScholarListItemDtoSchema;
+/** Scholar identity, localized name, image, title, and catalog summary for Explore. */
+export type ExploreScholarItemDto = ScholarListItemDto;
+
+/** A semantic, ordered senior-scholar recommendation batch. */
+export const ExploreScholarsBatchDtoSchema = z.object({
+  kind: z.literal("scholars"),
+  id: z.string().min(1),
+  title: ExploreSeniorScholarsTitleContextDtoSchema,
+  reason: z.literal("deterministic_senior_scholars"),
+  items: z.array(ExploreScholarItemDtoSchema),
+});
+/** Ordered senior scholars with recommendation-owned eligibility and ranking. */
+export type ExploreScholarsBatchDto = z.infer<typeof ExploreScholarsBatchDtoSchema>;
+
 /** Versioned public response for the Explore recommendation sequence. */
 export const FeedPageDtoSchema = z.object({
   schemaVersion: z.literal(ExploreRecommendationSchemaVersion),
-  batches: z.array(ExploreListingsBatchDtoSchema),
+  batches: z.array(
+    z.discriminatedUnion("kind", [ExploreListingsBatchDtoSchema, ExploreScholarsBatchDtoSchema]),
+  ),
   nextCursor: z.string().optional(),
   exhausted: z.boolean(),
 });

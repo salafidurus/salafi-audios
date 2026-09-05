@@ -1,7 +1,7 @@
 /** Provides the web Home study surface and composes shared Catalog data capabilities. */
 "use client";
 
-import type { FeedContentItemDto, ExploreListingsBatchDto } from "@sd/core-contracts";
+import type { FeedContentItemDto, FeedPageDto } from "@sd/core-contracts";
 
 import { useProgressStore } from "@sd/domain-audio";
 import { useExploreRecentScreen, useHomePromotions } from "@sd/domain-content";
@@ -27,12 +27,12 @@ export type HomeScreenProps = {
 
 const MAX_RECENT_ITEMS = 10;
 
-function getContentItems(
-  exploreData: { pages?: { batches: ExploreListingsBatchDto[] }[] } | undefined,
-) {
+function getContentItems(exploreData: { pages?: FeedPageDto[] } | undefined) {
   const items: FeedContentItemDto[] = [];
   for (const page of exploreData?.pages ?? []) {
-    for (const batch of page.batches) items.push(...batch.items);
+    for (const batch of page.batches) {
+      if (batch.kind === "listings") items.push(...batch.items);
+    }
   }
   return items;
 }
@@ -72,7 +72,7 @@ function getHomeContentData(
         editorsPicks?: { listing: FeedContentItemDto }[];
       }
     | undefined,
-  exploreData: { pages?: { batches: ExploreListingsBatchDto[] }[] } | undefined,
+  exploreData: { pages?: FeedPageDto[] } | undefined,
   recentProgress: Parameters<typeof getLiveRecentProgress>[0],
   localProgress: Parameters<typeof getLiveRecentProgress>[1],
 ) {

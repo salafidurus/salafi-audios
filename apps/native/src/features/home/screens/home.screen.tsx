@@ -209,7 +209,9 @@ function getContentItems(
 ): FeedContentItemDto[] {
   const items: FeedContentItemDto[] = [];
   for (const page of data?.pages ?? []) {
-    for (const batch of page.batches) items.push(...batch.items);
+    for (const batch of page.batches) {
+      if (batch.kind === "listings") items.push(...batch.items);
+    }
   }
   return items;
 }

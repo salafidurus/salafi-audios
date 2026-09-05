@@ -4,11 +4,13 @@ import { RecentListingsRepo } from './listing-recent.repo';
 describe('RecentListingsRepo', () => {
   let repo: RecentListingsRepo;
   let prismaFindManySpy: any;
+  let scholarFindManySpy: any;
   let prisma: any;
   let config: any;
 
   beforeEach(() => {
     prismaFindManySpy = vi.fn().mockResolvedValue([]);
+    scholarFindManySpy = vi.fn().mockResolvedValue([]);
 
     prisma = {
       listing: {
@@ -16,6 +18,9 @@ describe('RecentListingsRepo', () => {
       },
       topic: {
         findUnique: vi.fn().mockResolvedValue({ name: 'Aqeedah', translations: [] }),
+      },
+      scholar: {
+        findMany: scholarFindManySpy,
       },
     };
 
@@ -235,6 +240,53 @@ describe('RecentListingsRepo', () => {
       expect(result.batches[0]?.items).toHaveLength(10);
       expect(result.nextCursor).toBeUndefined();
       expect(result.exhausted).toBe(true);
+    });
+
+    it('returns an ordered senior scholars batch for the initial page', async () => {
+      scholarFindManySpy.mockResolvedValue([
+        {
+          id: 'scholar-1',
+          slug: 'scholar-1',
+          name: 'Scholar One',
+          imageUrl: 'scholars/one.jpg',
+          mainLanguage: 'ar',
+          title: 'allamah',
+          translations: [{ name: 'العالم الأول' }],
+          _count: { listings: 12 },
+        },
+        {
+          id: 'scholar-2',
+          slug: 'scholar-2',
+          name: 'Scholar Two',
+          imageUrl: null,
+          mainLanguage: 'ar',
+          title: 'allamah',
+          translations: [],
+          _count: { listings: 3 },
+        },
+      ]);
+
+      const result = await repo.getRecentListings();
+
+      expect(result.batches.map((batch) => batch.kind)).toEqual(['scholars']);
+      expect(result.batches[0]).toMatchObject({
+        id: 'scholars:senior',
+        title: { kind: 'scholars', id: 'senior_scholars', label: 'Senior Scholars' },
+        reason: 'deterministic_senior_scholars',
+      });
+      expect(result.batches[0]?.items.map((item) => item.slug)).toEqual(['scholar-1', 'scholar-2']);
+      expect(scholarFindManySpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { title: 'allamah', isActive: true },
+          orderBy: [{ orderIndex: 'asc' }, { slug: 'asc' }],
+        }),
+      );
+    });
+
+    it('omits the scholar batch when no eligible scholars exist', async () => {
+      const result = await repo.getRecentListings();
+
+      expect(result.batches).toEqual([]);
     });
   });
 });

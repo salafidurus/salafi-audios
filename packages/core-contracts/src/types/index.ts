@@ -206,6 +206,12 @@ export {
   ExploreListingsTitleContextDtoSchema,
   type ExploreListingsBatchDto,
   ExploreListingsBatchDtoSchema,
+  type ExploreSeniorScholarsTitleContextDto,
+  ExploreSeniorScholarsTitleContextDtoSchema,
+  type ExploreScholarItemDto,
+  ExploreScholarItemDtoSchema,
+  type ExploreScholarsBatchDto,
+  ExploreScholarsBatchDtoSchema,
   type FeedPageDto,
   FeedPageDtoSchema,
 } from "../types/feed.types";
