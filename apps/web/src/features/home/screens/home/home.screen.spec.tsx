@@ -1,5 +1,5 @@
 import { useProgressStore } from "@sd/domain-audio";
-import { useExploreRecentScreen, useHomePromotions } from "@sd/domain-content";
+import { useHomeRecent, useHomePromotions } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
 import { act, render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
@@ -61,7 +61,7 @@ vi.mock("@sd/domain-search", () => ({
 
 vi.mock("@sd/domain-content", () => ({
   useInfiniteScholarsList: () => ({ data: undefined }),
-  useExploreRecentScreen: vi.fn(),
+  useHomeRecent: vi.fn(),
   useHomePromotions: vi.fn(),
 }));
 
@@ -80,7 +80,7 @@ describe("HomeScreen", () => {
       recentProgress: null,
       isLoading: false,
     });
-    (useExploreRecentScreen as unknown as Mock<any>).mockReturnValue({
+    (useHomeRecent as unknown as Mock<any>).mockReturnValue({
       data: undefined,
       isLoading: false,
     });
@@ -326,7 +326,7 @@ describe("HomeScreen", () => {
       publishedAt: "2026-08-22T00:00:00.000Z",
     });
 
-    (useExploreRecentScreen as unknown as Mock<any>).mockReturnValue({
+    (useHomeRecent as unknown as Mock<any>).mockReturnValue({
       data: {
         pages: [
           {
@@ -362,7 +362,7 @@ describe("HomeScreen", () => {
     expect(screen.getByTestId("home-curated-section")).toBeTruthy();
     expect(screen.getByText("Recently published lesson")).toBeTruthy();
     expect(screen.getByText("Curated lesson")).toBeTruthy();
-    expect(useExploreRecentScreen).toHaveBeenCalledTimes(1);
+    expect(useHomeRecent).toHaveBeenCalledTimes(1);
 
     const landmarks = [
       screen.getByTestId("home-study-header"),
@@ -415,7 +415,7 @@ describe("HomeScreen", () => {
       recentProgress: null,
       isLoading: true,
     });
-    (useExploreRecentScreen as unknown as Mock<any>).mockReturnValue({
+    (useHomeRecent as unknown as Mock<any>).mockReturnValue({
       data: undefined,
       isLoading: true,
     });

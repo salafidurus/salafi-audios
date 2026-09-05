@@ -5,11 +5,16 @@ import React from "react";
 import { ExploreScreen } from "./explore-recent.screen";
 
 jest.mock("@sd/domain-content", () => ({
+  mergeExplorePages: (pages: Array<{ batches: unknown[] }>) =>
+    pages.flatMap((page) => page.batches),
   useExploreRecentScreen: jest.fn(),
 }));
 jest.mock("@sd/domain-search", () => ({ useTopicsList: () => ({ data: [] }) }));
 jest.mock("@/core/i18n/use-translation", () => ({
-  useTranslation: () => ({ t: (_key: string, fallback: string) => fallback }),
+  useTranslation: () => ({
+    i18n: { language: "en" },
+    t: (_key: string, fallback: string) => fallback,
+  }),
 }));
 jest.mock("@/features/navigation", () => ({
   RootScreenHeader: ({ title }: { title: string }) => {

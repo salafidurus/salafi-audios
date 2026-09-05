@@ -17,7 +17,7 @@ import {
   useAudio,
   useProgressStore,
 } from "@sd/domain-audio";
-import { useExploreRecentScreen } from "@sd/domain-content";
+import { mergeExplorePages, useExploreRecentScreen } from "@sd/domain-content";
 import { useTopicsList } from "@sd/domain-search";
 import { useRouter } from "next/navigation";
 import React, { useRef, useEffect, useMemo, type ReactNode } from "react";
@@ -338,10 +338,11 @@ export function FeedRecentScreen({
     fetchNextPage: fetchRecentNextPage,
     refetch: refetchRecent,
   } = useExploreRecentScreen({
+    locale: getExploreLocale(i18n.language),
     topicSlug: filters.topic || undefined,
   });
 
-  const recentItems = recentData?.pages.flatMap((p) => p.batches) ?? [];
+  const recentItems = mergeExplorePages(recentData?.pages ?? []);
   const visibleRecentItems = recentItems;
   const loadMoreRef = useRef<HTMLDivElement>(null);
 

@@ -19,7 +19,6 @@ import type {
   ListingContentsDto,
   LastPlayedLessonDto,
   ListingProgressSummaryDto,
-  FeedPageDto,
   AdminArrangeDataDto,
   ArrangeCommitDto,
   ArrangeCommitResultDto,
@@ -28,7 +27,6 @@ import type {
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ListingRepository } from './listing.repo';
-import { RecentListingsRepo } from './listing-recent.repo';
 
 /** NestJS listing service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
@@ -37,7 +35,6 @@ import { RecentListingsRepo } from './listing-recent.repo';
 export class ListingService {
   constructor(
     private readonly repo: ListingRepository,
-    private readonly recentRepo: RecentListingsRepo,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
@@ -49,14 +46,6 @@ export class ListingService {
 
   async getRelated(slug: string): Promise<RelatedListingDto[]> {
     return this.repo.findRelated(slug);
-  }
-
-  async getRecentListings(
-    cursor?: string,
-    limit?: number,
-    topicSlug?: string,
-  ): Promise<FeedPageDto> {
-    return this.recentRepo.getRecentListings(cursor, limit, topicSlug);
   }
 
   async getPromotions(): Promise<HomePromotionsDto> {

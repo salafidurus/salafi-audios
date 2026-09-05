@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { Public, CurrentUser } from '../../core/auth/decorators';
@@ -9,7 +9,6 @@ import type {
   ListingContentsDto,
   LastPlayedLessonDto,
   ListingProgressSummaryDto,
-  FeedPageDto,
   HomePromotionsDto,
 } from '@sd/core-contracts';
 import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
@@ -29,19 +28,6 @@ import { CacheControlInterceptor } from '../../shared/interceptors/cache-control
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ListingController {
   constructor(private readonly service: ListingService) {}
-
-  @Get('recent')
-  @CacheTTL(3 * 60 * 60 * 1000) // Recent feed changes more often than catalog details
-  @ApiOperation({ summary: 'Get the Explore discovery feed' })
-  @ApiOkResponse({ description: 'Versioned cursor-paginated Explore recommendation batches' })
-  async getRecentListings(
-    @Query('cursor') cursor?: string,
-    @Query('limit') limitStr?: string,
-    @Query('topic') topicSlug?: string,
-  ): Promise<FeedPageDto> {
-    const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
-    return this.service.getRecentListings(cursor, limit, topicSlug);
-  }
 
   @Get('promotions')
   @CacheTTL(24 * 60 * 60 * 1000)

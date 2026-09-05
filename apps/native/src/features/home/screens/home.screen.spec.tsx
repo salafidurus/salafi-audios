@@ -1,4 +1,4 @@
-import { useExploreRecentScreen, useHomePromotions, useScholarsList } from "@sd/domain-content";
+import { useHomeRecent, useHomePromotions, useScholarsList } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
 import { render, screen, fireEvent, within } from "@testing-library/react-native";
 
@@ -19,7 +19,7 @@ jest.mock("@sd/domain-content", () => ({
     const scholarTitle = typeof scholar === "string" ? title : scholar.title;
     return scholarTitle ? `${scholarTitle} ${name}` : name;
   },
-  useExploreRecentScreen: jest.fn(),
+  useHomeRecent: jest.fn(),
   useHomePromotions: jest.fn(),
   useScholarsList: jest.fn(),
 }));
@@ -36,7 +36,7 @@ jest.mock("react-native-safe-area-context", () => ({
 
 const mockedAuth = jest.mocked(useAuth);
 const mockedContinue = jest.mocked(useContinueListening);
-const mockedExplore = jest.mocked(useExploreRecentScreen);
+const mockedExplore = jest.mocked(useHomeRecent);
 const mockedScholars = jest.mocked(useScholarsList);
 const mockedPromotions = jest.mocked(useHomePromotions);
 

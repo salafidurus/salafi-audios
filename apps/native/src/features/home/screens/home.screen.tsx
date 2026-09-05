@@ -2,7 +2,7 @@ import type { FeedContentItemDto, RecentProgressDto, ScholarListItemDto } from "
 
 import { useProgressStore } from "@sd/domain-audio";
 import {
-  useExploreRecentScreen,
+  useHomeRecent,
   formatScholarName,
   useHomePromotions,
   useScholarsList,
@@ -204,9 +204,7 @@ function ContinueListening({
   );
 }
 
-function getContentItems(
-  data: ReturnType<typeof useExploreRecentScreen>["data"],
-): FeedContentItemDto[] {
+function getContentItems(data: ReturnType<typeof useHomeRecent>["data"]): FeedContentItemDto[] {
   const items: FeedContentItemDto[] = [];
   for (const page of data?.pages ?? []) {
     for (const batch of page.batches) {
@@ -233,7 +231,7 @@ function getScholars(data: ReturnType<typeof useScholarsList>["data"]): ScholarL
 
 function isHomeLoading(
   promotions: ReturnType<typeof useHomePromotions>,
-  explore: ReturnType<typeof useExploreRecentScreen>,
+  explore: ReturnType<typeof useHomeRecent>,
   scholars: ReturnType<typeof useScholarsList>,
 ) {
   return promotions.isLoading || explore.isLoading || scholars.isLoading;
@@ -382,11 +380,19 @@ function HomeSurface({
   );
 }
 
+function getHomeLocale(language?: string): "ar" | "en" {
+  return language === "ar" ? "ar" : "en";
+}
+
 function useHomeQueries() {
+  const { i18n } = useTranslation();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const progressQuery = useContinueListening({ enabled: !isAuthLoading && isAuthenticated });
   const promotionsQuery = useHomePromotions();
-  const exploreQuery = useExploreRecentScreen({ limit: 10 });
+  const exploreQuery = useHomeRecent({
+    limit: 10,
+    locale: getHomeLocale(i18n?.language),
+  });
   const scholarsQuery = useScholarsList();
   const items = getContentItems(exploreQuery.data);
   const featured = getFeaturedItem(promotionsQuery.data, items);

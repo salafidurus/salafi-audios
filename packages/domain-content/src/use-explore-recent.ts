@@ -2,7 +2,8 @@ import {
   httpClient,
   endpoints,
   queryKeys,
-  FeedPageDtoSchema,
+  parseFeedPageDto,
+  type Locale,
   type FeedPageDto,
 } from "@sd/core-contracts";
 import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
@@ -11,14 +12,24 @@ import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 /** Controls the recent Explore feed size and optional topic steering. */
 export type UseExploreRecentScreenOptions = {
   limit?: number;
+  /** Request locale included in the cache identity for localized recommendation pages. */
+  locale?: Locale;
   /** Public topic identity used to steer, not strictly filter, the feed. */
   topicSlug?: string;
 };
 
 /** Reads API-composed recent Catalog pages for the Explore screen. */
-export function useExploreRecentScreen({ limit, topicSlug }: UseExploreRecentScreenOptions = {}) {
+export function useExploreRecentScreen({
+  limit,
+  locale,
+  topicSlug,
+}: UseExploreRecentScreenOptions = {}) {
   const initialPageParam: string | undefined = undefined;
-  const queryKey = [...queryKeys.listings.all, "recent", topicSlug ?? "", limit ?? null] as const;
+  const queryKey = [
+    ...queryKeys.explore.feed(topicSlug, undefined),
+    limit ?? null,
+    locale ?? "default",
+  ] as const;
 
   return useInfiniteQuery<
     FeedPageDto,
@@ -34,13 +45,18 @@ export function useExploreRecentScreen({ limit, topicSlug }: UseExploreRecentScr
       if (limit) params.limit = String(limit);
       if (topicSlug) params.topic = topicSlug;
       const response = await httpClient<unknown>({
-        url: endpoints.listings.recent,
+        url: endpoints.explore.feed,
         method: "GET",
         params,
       });
-      return FeedPageDtoSchema.parse(response);
+      return parseFeedPageDto(response);
     },
     initialPageParam,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
+}
+
+/** Reads the Home recent-content slice without coupling Home callers to Explore screen behavior. */
+export function useHomeRecent(options: Omit<UseExploreRecentScreenOptions, "topicSlug"> = {}) {
+  return useExploreRecentScreen(options);
 }

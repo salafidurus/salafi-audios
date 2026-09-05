@@ -65,9 +65,9 @@ describe('Public API (e2e)', () => {
     });
   });
 
-  describe('Listings - Recent Feed', () => {
-    it('GET /listings/recent returns a versioned listings recommendation batch', async () => {
-      const res = await request(app.getHttpServer()).get('/v1/listings/recent').expect(200);
+  describe('Explore Feed', () => {
+    it('GET /explore returns a versioned recommendation batch', async () => {
+      const res = await request(app.getHttpServer()).get('/v1/explore').expect(200);
 
       expect(res.body).toHaveProperty('schemaVersion', 1);
       expect(Array.isArray(res.body.batches)).toBe(true);
@@ -76,7 +76,7 @@ describe('Public API (e2e)', () => {
     });
 
     it('includes the ordered allamah scholar recommendation batch', async () => {
-      const res = await request(app.getHttpServer()).get('/v1/listings/recent').expect(200);
+      const res = await request(app.getHttpServer()).get('/v1/explore').expect(200);
 
       const scholarBatch = res.body.batches.find((batch: any) => batch.kind === 'scholars');
       expect(scholarBatch).toMatchObject({
@@ -90,7 +90,7 @@ describe('Public API (e2e)', () => {
     });
 
     it('includes the ordered discoverable topics recommendation batch', async () => {
-      const res = await request(app.getHttpServer()).get('/v1/listings/recent').expect(200);
+      const res = await request(app.getHttpServer()).get('/v1/explore').expect(200);
 
       const topicBatch = res.body.batches.find((batch: any) => batch.kind === 'topics');
       expect(topicBatch).toMatchObject({
@@ -102,9 +102,9 @@ describe('Public API (e2e)', () => {
       expect(topicBatch.items.every((item: any) => item.id && item.slug && item.name)).toBe(true);
     });
 
-    it('GET /listings/recent?limit=5 returns <= 5 items', async () => {
+    it('GET /explore?limit=5 returns <= 5 items', async () => {
       const res = await request(app.getHttpServer())
-        .get('/v1/listings/recent')
+        .get('/v1/explore')
         .query({ limit: 5 })
         .expect(200);
 
@@ -287,7 +287,7 @@ describe('Public API (e2e)', () => {
       await request(server).get(`/v1/audio/listings/${DRAFT_SLUG}/stream`).expect(404);
       await request(server).get(`/v1/audio/listings/${ARCHIVED_SLUG}/stream`).expect(404);
 
-      const feed = await request(server).get('/v1/listings/recent').expect(200);
+      const feed = await request(server).get('/v1/explore').expect(200);
       const feedSlugs = feed.body.batches.flatMap((batch: { items: { slug: string }[] }) =>
         batch.items.map((item) => item.slug),
       );

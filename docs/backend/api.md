@@ -44,7 +44,7 @@ The API is resource-oriented and intent-driven.
 - Normalize errors into a predictable structure.
 - Use pagination, filtering, and ordering explicitly rather than implicit client assumptions.
 
-The public Explore endpoint (`GET /listings/recent`) returns the versioned
+The public Explore endpoint (`GET /v1/explore`) returns the versioned
 `FeedPageDto` contract from `@sd/core-contracts`: an ordered array of semantic
 recommendation batches (`listings`, `scholars`, and `topics`), an opaque cursor,
 and an explicit exhaustion flag. The topics batch contains stable public topic
@@ -52,6 +52,10 @@ identity and request-locale display names.
 Recommendation ordering, eligibility, topic steering, and cursor stability
 are backend responsibilities; web and native clients only render the returned
 batches and preserve their order.
+The API keeps those rules in the internal `RecommendationModule`; the
+controller and public DTO mapping belong to `ExploreModule`. This boundary
+allows additional recommendation engines to evolve without coupling them to
+the Listing module or exposing internal DTOs through `@sd/core-contracts`.
 
 ## 4. API Surface Segmentation
 

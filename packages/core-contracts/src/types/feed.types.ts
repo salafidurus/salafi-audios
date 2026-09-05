@@ -125,3 +125,27 @@ export const FeedPageDtoSchema = z.object({
 });
 /** Defines the contract type for feed page dto. */
 export type FeedPageDto = z.infer<typeof FeedPageDtoSchema>;
+
+const FeedPageCompatibilitySchema = z.object({
+  schemaVersion: z.literal(ExploreRecommendationSchemaVersion),
+  batches: z.array(z.unknown()),
+  nextCursor: z.string().optional(),
+  exhausted: z.boolean(),
+});
+
+/** Parses a feed page while ignoring recommendation batch kinds unknown to this client version. */
+// oxlint-disable-next-line anti-slop/no-unknown-parameters -- This is the external response parser boundary.
+export function parseFeedPageDto(input: unknown): FeedPageDto {
+  const page = FeedPageCompatibilitySchema.parse(input);
+  const knownBatchSchema = z.discriminatedUnion("kind", [
+    ExploreListingsBatchDtoSchema,
+    ExploreScholarsBatchDtoSchema,
+    ExploreTopicsBatchDtoSchema,
+  ]);
+  const batches = page.batches.flatMap((batch) => {
+    const parsed = knownBatchSchema.safeParse(batch);
+    return parsed.success ? [parsed.data] : [];
+  });
+
+  return FeedPageDtoSchema.parse({ ...page, batches });
+}
