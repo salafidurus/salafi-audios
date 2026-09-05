@@ -32,38 +32,83 @@ export type ScholarPageFeedRecommendation =
       titleKind: 'scholar_listings';
       /** Ordered listing IDs selected by the recommendation strategy. */
       itemIds: string[];
+    }
+  | {
+      /** Identifies the public batch renderer that will hydrate these references. */
+      form: 'topic_scholars';
+      /** Stable identity derived from the associated public topic slug. */
+      id: string;
+      /** Identifies the topic without exposing an internal database ID. */
+      topicSlug: string;
+      /** Internal topic identity used only to constrain hydration. */
+      topicId: string;
+      /** Identifies the editorial title context represented by this reference batch. */
+      titleKind: 'topic_scholars';
+      /** Ordered scholar IDs selected for the topic by the recommendation strategy. */
+      itemIds: string[];
     };
 
 @Injectable()
-/** Selects active Allamah scholars using stable editorial ordering. */
+/** Selects root Scholars batches using stable editorial ordering and catalog eligibility. */
 export class ScholarPageFeedRepo {
   constructor(private readonly prisma: PrismaService) {}
 
   /** Returns references only; presentation hydration remains owned by the Scholars caller. */
   async getRecommendations(): Promise<ScholarPageFeedRecommendation[]> {
-    const scholars = await this.prisma.scholar.findMany({
-      where: { isActive: true, title: 'allamah' },
-      select: { id: true, slug: true },
-      orderBy: [{ orderIndex: 'asc' }, { slug: 'asc' }],
-    });
-
-    const listings = await this.prisma.listing.findMany({
-      where: {
-        scholarId: { in: scholars.map((scholar) => scholar.id) },
-        parentId: null,
-        status: 'published',
-        deletedAt: null,
-      },
-      select: { id: true, scholarId: true },
-      orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }, { slug: 'asc' }],
-    });
+    const [scholars, listings] = await Promise.all([
+      this.prisma.scholar.findMany({
+        where: { isActive: true, title: 'allamah' },
+        select: { id: true, slug: true },
+        orderBy: [{ orderIndex: 'asc' }, { slug: 'asc' }],
+      }),
+      this.prisma.listing.findMany({
+        where: {
+          parentId: null,
+          status: 'published',
+          deletedAt: null,
+          scholar: { isActive: true },
+        },
+        select: {
+          id: true,
+          scholarId: true,
+          topics: { select: { topicId: true, topic: { select: { slug: true } } } },
+        },
+        orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }, { slug: 'asc' }],
+      }),
+    ]);
 
     const listingsByScholar = new Map<string, string[]>();
+    const scholarIdsByTopic = new Map<string, Set<string>>();
     for (const listing of listings) {
       const itemIds = listingsByScholar.get(listing.scholarId) ?? [];
       itemIds.push(listing.id);
       listingsByScholar.set(listing.scholarId, itemIds);
+      for (const relation of listing.topics) {
+        const scholarIds = scholarIdsByTopic.get(relation.topicId) ?? new Set<string>();
+        scholarIds.add(listing.scholarId);
+        scholarIdsByTopic.set(relation.topicId, scholarIds);
+      }
     }
+
+    const topicIds = [...scholarIdsByTopic.keys()];
+    const topics = topicIds.length
+      ? await this.prisma.topic.findMany({
+          where: { id: { in: topicIds } },
+          select: { id: true, slug: true },
+          orderBy: [{ orderIndex: 'asc' }, { slug: 'asc' }],
+        })
+      : [];
+    const recommendedScholarIds = [
+      ...new Set([...scholarIdsByTopic.values()].flatMap((ids) => [...ids])),
+    ];
+    const topicScholars = topicIds.length
+      ? await this.prisma.scholar.findMany({
+          where: { id: { in: recommendedScholarIds }, isActive: true },
+          select: { id: true, slug: true },
+          orderBy: [{ orderIndex: 'asc' }, { slug: 'asc' }],
+        })
+      : [];
+    const scholarOrder = new Map(topicScholars.map((scholar, index) => [scholar.id, index]));
 
     return [
       {
@@ -82,6 +127,23 @@ export class ScholarPageFeedRepo {
                 scholarSlug: scholar.slug,
                 scholarId: scholar.id,
                 titleKind: 'scholar_listings' as const,
+                itemIds,
+              },
+            ]
+          : [];
+      }),
+      ...topics.flatMap((topic) => {
+        const itemIds = [...(scholarIdsByTopic.get(topic.id) ?? [])]
+          .filter((id) => scholarOrder.has(id))
+          .sort((a, b) => (scholarOrder.get(a) ?? 0) - (scholarOrder.get(b) ?? 0));
+        return itemIds.length
+          ? [
+              {
+                form: 'topic_scholars' as const,
+                id: `topic-scholars:${topic.slug}`,
+                topicSlug: topic.slug,
+                topicId: topic.id,
+                titleKind: 'topic_scholars' as const,
                 itemIds,
               },
             ]

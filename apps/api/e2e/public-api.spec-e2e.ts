@@ -145,6 +145,18 @@ describe('Public API (e2e)', () => {
       );
     });
 
+    it('includes hydrated topic scholars with public topic identity', async () => {
+      const res = await request(app.getHttpServer()).get('/v1/scholars').expect(200);
+
+      const topicBatch = res.body.batches.find((batch: any) => batch.form === 'topic_scholars');
+      expect(topicBatch).toMatchObject({
+        topicSlug: expect.any(String),
+        topic: { id: expect.any(String), slug: expect.any(String), name: expect.any(String) },
+      });
+      expect(topicBatch.items.length).toBeGreaterThan(0);
+      expect(topicBatch.items.every((item: any) => item.id && item.slug && item.name)).toBe(true);
+    });
+
     it('GET /scholars/directory returns the flat directory', async () => {
       const res = await request(app.getHttpServer()).get('/v1/scholars/directory').expect(200);
 

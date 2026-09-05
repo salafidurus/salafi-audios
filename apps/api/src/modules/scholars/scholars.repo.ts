@@ -202,6 +202,7 @@ export class ScholarsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   /** Hydrates the engine's ordered scholar references into one localized page-feed response. */
+  // oxlint-disable-next-line complexity -- One hydration pass preserves the ordered batch contract across three semantic forms.
   async hydratePageFeed(
     recommendations: ScholarPageFeedRecommendation[],
   ): Promise<ScholarPageFeedDto> {
@@ -214,19 +215,60 @@ export class ScholarsRepository {
       (item): item is Extract<ScholarPageFeedRecommendation, { form: 'scholar_listings' }> =>
         item.form === 'scholar_listings',
     );
+    const topicRecommendations = recommendations.filter(
+      (item): item is Extract<ScholarPageFeedRecommendation, { form: 'topic_scholars' }> =>
+        item.form === 'topic_scholars',
+    );
     const scholarIds = [
       ...new Set([
         ...scholarRecommendations.flatMap((item) => item.itemIds),
         ...listingRecommendations.map((item) => item.scholarId),
+        ...topicRecommendations.flatMap((item) => item.itemIds),
       ]),
     ];
     const listingIds = [...new Set(listingRecommendations.flatMap((item) => item.itemIds))];
+    const topicIds = [...new Set(topicRecommendations.map((item) => item.topicId))];
     const rows = await this.prisma.scholar.findMany({
       where: { id: { in: scholarIds }, isActive: true },
       select: scholarListSelect(locale),
     });
     // SAFETY: scholarListSelect returns exactly the fields represented by ScholarListRecord.
     const byId = new Map(rows.map((row) => [row.id, row as ScholarListRecord]));
+    const topics = topicIds.length
+      ? await this.prisma.topic.findMany({
+          where: {
+            id: { in: topicIds },
+            listingTopics: {
+              some: {
+                listing: {
+                  parentId: null,
+                  status: Status.published,
+                  deletedAt: null,
+                  scholar: { isActive: true },
+                },
+              },
+            },
+          },
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            translations: { where: { locale }, select: { name: true }, take: 1 },
+            listingTopics: {
+              where: {
+                listing: {
+                  parentId: null,
+                  status: Status.published,
+                  deletedAt: null,
+                  scholar: { isActive: true },
+                },
+              },
+              select: { listing: { select: { scholarId: true } } },
+            },
+          },
+        })
+      : [];
+    const topicsById = new Map(topics.map((topic) => [topic.id, topic]));
     const hydratedListings = listingIds.length
       ? await this.prisma.listing.findMany({
           where: {
@@ -286,6 +328,7 @@ export class ScholarsRepository {
     };
 
     const batches = recommendations.flatMap(
+      // oxlint-disable-next-line complexity -- This mapper preserves omission and ordering rules for each supported batch form.
       (recommendation): Array<ScholarPageFeedDto['batches'][number]> => {
         if (recommendation.form === 'scholars') {
           const items = recommendation.itemIds.flatMap((id) => {
@@ -301,6 +344,38 @@ export class ScholarsRepository {
                     kind: recommendation.titleKind,
                     id: 'allamah_scholars' as const,
                     label: 'Allamah scholars',
+                  },
+                  items,
+                },
+              ]
+            : [];
+        }
+
+        if (recommendation.form === 'topic_scholars') {
+          const topic = topicsById.get(recommendation.topicId);
+          if (!topic) return [];
+          const eligibleScholarIds = new Set(
+            topic.listingTopics.map((relation) => relation.listing.scholarId),
+          );
+          const items = recommendation.itemIds.flatMap((id) => {
+            const row = byId.get(id);
+            return row && eligibleScholarIds.has(id) ? [mapScholarListItem(row, locale)] : [];
+          });
+          return items.length
+            ? [
+                {
+                  form: recommendation.form,
+                  id: recommendation.id,
+                  topicSlug: recommendation.topicSlug,
+                  title: {
+                    kind: recommendation.titleKind,
+                    id: 'topic_scholars' as const,
+                    label: `${topic.translations[0]?.name ?? topic.name} scholars`,
+                  },
+                  topic: {
+                    id: topic.id,
+                    slug: topic.slug,
+                    name: topic.translations[0]?.name ?? topic.name,
                   },
                   items,
                 },

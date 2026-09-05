@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Provides the desktop navigation shell and delegates mobile rendering to `SidebarMobile`. */
 "use client";
 
 import { routes } from "@sd/core-contracts";
@@ -12,6 +12,7 @@ import { NavItems } from "./nav-items";
 import { SidebarMobile } from "./sidebar.mobile";
 import styles from "./sidebar.module.css";
 
+/** Renders the responsive sidebar when the current viewport is not mobile. */
 export function Sidebar() {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();

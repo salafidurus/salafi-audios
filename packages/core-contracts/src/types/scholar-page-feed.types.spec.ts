@@ -105,4 +105,23 @@ describe("Scholar page feed contract", () => {
       }),
     ).toThrow();
   });
+
+  it("accepts a topic scholars batch with localized topic data", () => {
+    const result = ScholarPageFeedDtoSchema.parse({
+      schemaVersion: 1,
+      batches: [
+        {
+          form: "topic_scholars",
+          id: "topic-scholars:aqeedah",
+          topicSlug: "aqeedah",
+          title: { kind: "topic_scholars", id: "topic_scholars", label: "Aqeedah scholars" },
+          topic: { id: "topic-1", slug: "aqeedah", name: "Aqeedah" },
+          items: [scholar],
+        },
+      ],
+      exhausted: true,
+    });
+
+    expect(result.batches[0]?.form).toBe("topic_scholars");
+  });
 });

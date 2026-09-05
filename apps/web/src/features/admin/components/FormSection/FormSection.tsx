@@ -1,11 +1,16 @@
 import styles from "./form-section.module.css";
 
-/** Documents this module's responsibility and public boundary. */
+/**
+ * Defines the stable content boundary for a visually grouped administration-form subsection.
+ * The title is rendered as the subsection heading, while `children` remains responsible for
+ * the field controls and their validation behavior.
+ */
 export interface FormSectionProps {
   title: string;
   children: React.ReactNode;
 }
 
+/** Renders a titled form subsection while keeping its fields in the shared admin layout. */
 export function FormSection({ title, children }: FormSectionProps) {
   return (
     <div className={styles.section}>

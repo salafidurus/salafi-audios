@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Builds the responsive primary navigation and filters admin destinations by user ability. */
 "use client";
 
 import { routes, type AppActions, type AppSubjectType } from "@sd/core-contracts";
@@ -268,6 +268,7 @@ function AuthFooter({ isAuthenticated, isLoading, user, onItemClick, t }: AuthFo
   );
 }
 
+/** Renders primary links, scoped admin links, and mobile-only navigation controls. */
 export function NavItems({ onItemClick }: NavItemsProps) {
   const pathname = usePathname();
   const { t } = useTranslation();

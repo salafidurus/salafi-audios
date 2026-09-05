@@ -1,3 +1,4 @@
+/** Configures the API's global rate-limit guard and its configuration dependency. */
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '../config/config.module';
 import { RateLimitGuard } from './rate-limit.guard';
@@ -8,5 +9,5 @@ import { RateLimitGuard } from './rate-limit.guard';
   providers: [RateLimitGuard],
   exports: [RateLimitGuard],
 })
-/** Provides the API-owned rate-limit guard and named policy boundary. */
+/** Registers the global rate-limit guard and its configuration dependency for API requests. */
 export class AppThrottlerModule {}
