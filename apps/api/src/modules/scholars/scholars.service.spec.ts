@@ -77,12 +77,14 @@ describe('ScholarsService', () => {
 
   describe('getPageFeed', () => {
     it('hydrates the recommendation selected by the page-feed service', async () => {
-      const recommendation = {
-        form: 'scholars' as const,
-        id: 'scholars:allamah' as const,
-        titleKind: 'allamah' as const,
-        itemIds: ['s1'],
-      };
+      const recommendation = [
+        {
+          form: 'scholars' as const,
+          id: 'scholars:allamah' as const,
+          titleKind: 'allamah' as const,
+          itemIds: ['s1'],
+        },
+      ];
       const expected: ScholarPageFeedDto = { schemaVersion: 1, batches: [], exhausted: true };
       pageFeed.recommend = vi.fn().mockResolvedValue(recommendation);
       repo.hydratePageFeed.mockResolvedValue(expected);

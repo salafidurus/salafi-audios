@@ -129,6 +129,22 @@ describe('Public API (e2e)', () => {
       expect(allamahScholar).toBeDefined();
     });
 
+    it('includes hydrated scholar listings in recommendation order', async () => {
+      const res = await request(app.getHttpServer()).get('/v1/scholars').expect(200);
+
+      const listingsBatch = res.body.batches.find(
+        (batch: any) => batch.form === 'scholar_listings',
+      );
+      expect(listingsBatch).toMatchObject({
+        scholarSlug: expect.any(String),
+        scholar: { slug: expect.any(String), name: expect.any(String) },
+      });
+      expect(listingsBatch.items.length).toBeGreaterThan(0);
+      expect(listingsBatch.items.every((item: any) => item.slug && item.title && item.type)).toBe(
+        true,
+      );
+    });
+
     it('GET /scholars/directory returns the flat directory', async () => {
       const res = await request(app.getHttpServer()).get('/v1/scholars/directory').expect(200);
 

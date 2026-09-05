@@ -138,9 +138,11 @@ function mapScholarFormData(scholar: ScholarFormRecord) {
 
 type ScholarListRecord = {
   id: string;
+  /** Public, locale-independent scholar identity used by client routes. */
   slug: string;
   name: string;
   imageUrl: string | null;
+  /** Original language used when resolving localized scholar presentation. */
   mainLanguage: Locale | null;
   title: ScholarTitle | null;
   translations: Array<{ name: string }>;
@@ -201,36 +203,140 @@ export class ScholarsRepository {
 
   /** Hydrates the engine's ordered scholar references into one localized page-feed response. */
   async hydratePageFeed(
-    recommendation: ScholarPageFeedRecommendation,
+    recommendations: ScholarPageFeedRecommendation[],
   ): Promise<ScholarPageFeedDto> {
     const locale = getRequestLocale();
+    const scholarRecommendations = recommendations.filter(
+      (item): item is Extract<ScholarPageFeedRecommendation, { form: 'scholars' }> =>
+        item.form === 'scholars',
+    );
+    const listingRecommendations = recommendations.filter(
+      (item): item is Extract<ScholarPageFeedRecommendation, { form: 'scholar_listings' }> =>
+        item.form === 'scholar_listings',
+    );
+    const scholarIds = [
+      ...new Set([
+        ...scholarRecommendations.flatMap((item) => item.itemIds),
+        ...listingRecommendations.map((item) => item.scholarId),
+      ]),
+    ];
+    const listingIds = [...new Set(listingRecommendations.flatMap((item) => item.itemIds))];
     const rows = await this.prisma.scholar.findMany({
-      where: { id: { in: recommendation.itemIds }, isActive: true },
+      where: { id: { in: scholarIds }, isActive: true },
       select: scholarListSelect(locale),
     });
     // SAFETY: scholarListSelect returns exactly the fields represented by ScholarListRecord.
     const byId = new Map(rows.map((row) => [row.id, row as ScholarListRecord]));
-    const items = recommendation.itemIds.flatMap((id) => {
-      const row = byId.get(id);
-      return row ? [mapScholarListItem(row, locale)] : [];
-    });
+    const hydratedListings = listingIds.length
+      ? await this.prisma.listing.findMany({
+          where: {
+            id: { in: listingIds },
+            parentId: null,
+            status: Status.published,
+            deletedAt: null,
+            scholar: { isActive: true },
+          },
+          select: {
+            id: true,
+            scholarId: true,
+            slug: true,
+            title: true,
+            format: true,
+            language: true,
+            coverImageUrl: true,
+            publishedLectureCount: true,
+            publishedDurationSeconds: true,
+            durationSeconds: true,
+            publishedAt: true,
+            createdAt: true,
+            translations: {
+              where: { locale, status: 'published' },
+              select: { title: true },
+              take: 1,
+            },
+          },
+        })
+      : [];
+    const listingsById = new Map(hydratedListings.map((listing) => [listing.id, listing]));
+    const mapListing = (
+      listing: (typeof hydratedListings)[number],
+      scholarImageUrl: string | null,
+    ) => {
+      const resolved = resolveContentTranslation({
+        base: { title: listing.title },
+        originalLanguage: listing.language,
+        targetLocale: locale,
+        publishedTranslation: listing.translations[0] ?? null,
+      });
+      const { lectureCount, durationSeconds } = getListingStats(listing);
+      const item: ScholarContentItemDto = {
+        id: listing.id,
+        slug: listing.slug,
+        title: resolved.fields.title,
+        type: listing.format,
+        recencyAt: (listing.publishedAt ?? listing.createdAt).toISOString(),
+        coverImageUrl: listing.coverImageUrl ?? undefined,
+        scholarImageUrl: scholarImageUrl ?? undefined,
+        lectureCount,
+        durationSeconds,
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
+      };
+      return item;
+    };
+
+    const batches = recommendations.flatMap(
+      (recommendation): Array<ScholarPageFeedDto['batches'][number]> => {
+        if (recommendation.form === 'scholars') {
+          const items = recommendation.itemIds.flatMap((id) => {
+            const row = byId.get(id);
+            return row ? [mapScholarListItem(row, locale)] : [];
+          });
+          return items.length
+            ? [
+                {
+                  form: recommendation.form,
+                  id: recommendation.id,
+                  title: {
+                    kind: recommendation.titleKind,
+                    id: 'allamah_scholars' as const,
+                    label: 'Allamah scholars',
+                  },
+                  items,
+                },
+              ]
+            : [];
+        }
+
+        const scholar = byId.get(recommendation.scholarId);
+        if (!scholar) return [];
+        const scholarItem = mapScholarListItem(scholar, locale);
+        const items = recommendation.itemIds.flatMap((id) => {
+          const listing = listingsById.get(id);
+          return listing ? [mapListing(listing, scholar.imageUrl)] : [];
+        });
+        return items.length
+          ? [
+              {
+                form: recommendation.form,
+                id: recommendation.id,
+                scholarSlug: recommendation.scholarSlug,
+                title: {
+                  kind: recommendation.titleKind,
+                  id: 'scholar_listings' as const,
+                  label: `${scholarItem.name}'s listings`,
+                },
+                scholar: scholarItem,
+                items,
+              },
+            ]
+          : [];
+      },
+    );
 
     return {
       schemaVersion: 1,
-      batches: items.length
-        ? [
-            {
-              form: recommendation.form,
-              id: recommendation.id,
-              title: {
-                kind: recommendation.titleKind,
-                id: 'allamah_scholars',
-                label: 'Allamah scholars',
-              },
-              items,
-            },
-          ]
-        : [],
+      batches,
       exhausted: true,
     };
   }
