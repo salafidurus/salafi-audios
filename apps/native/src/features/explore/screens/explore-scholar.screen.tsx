@@ -58,9 +58,10 @@ function ExploreScholarStatus({
 
 /** Renders the native explore scholar screen surface and coordinates its user-facing state. */
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
-  const { data, isFetching, isError, refetch } = useScholarPageFeeds();
+  const locale = i18n.language === "ar" ? "ar" : "en";
+  const { data, isFetching, isError, refetch } = useScholarPageFeeds(locale);
 
   const hasBatchItems = useMemo(
     () => data?.batches.some((batch) => batch.items.length > 0) ?? false,
@@ -104,6 +105,8 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
                   </View>
                 );
               }
+              if (batch.form !== "topic_scholars") return null;
+
               return (
                 <View key={batch.id} style={styles.listingBatch}>
                   <AppText variant="titleMd">{batch.title.label}</AppText>

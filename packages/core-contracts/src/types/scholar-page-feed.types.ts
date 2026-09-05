@@ -97,17 +97,29 @@ export type ScholarPageFeedTopicScholarsBatch = z.infer<
 >;
 
 /** Versioned public response for the root Scholars page. */
-export const ScholarPageFeedDtoSchema = z.object({
-  schemaVersion: z.literal(ScholarPageFeedSchemaVersion),
-  batches: z.array(
-    z.union([
-      ScholarPageFeedScholarsBatchSchema,
-      ScholarPageFeedScholarListingsBatchSchema,
-      ScholarPageFeedTopicScholarsBatchSchema,
-    ]),
-  ),
-  exhausted: z.boolean(),
-});
+export const ScholarPageFeedDtoSchema = z
+  .object({
+    schemaVersion: z.literal(ScholarPageFeedSchemaVersion),
+    batches: z.array(
+      z.union([
+        ScholarPageFeedScholarsBatchSchema,
+        ScholarPageFeedScholarListingsBatchSchema,
+        ScholarPageFeedTopicScholarsBatchSchema,
+      ]),
+    ),
+    /** Opaque continuation token for the next recommendation sequence page. */
+    nextCursor: z.string().min(1).optional(),
+    exhausted: z.boolean(),
+  })
+  .superRefine((page, context) => {
+    if (page.exhausted !== (page.nextCursor === undefined)) {
+      context.addIssue({
+        code: "custom",
+        message: "Continuation metadata must agree with exhaustion",
+        path: ["nextCursor"],
+      });
+    }
+  });
 
 /** Fully hydrated semantic batches for the root Scholars page. */
 export type ScholarPageFeedDto = z.infer<typeof ScholarPageFeedDtoSchema>;
@@ -115,6 +127,7 @@ export type ScholarPageFeedDto = z.infer<typeof ScholarPageFeedDtoSchema>;
 const ScholarPageFeedCompatibilitySchema = z.object({
   schemaVersion: z.literal(ScholarPageFeedSchemaVersion),
   batches: z.array(z.unknown()),
+  nextCursor: z.string().min(1).optional(),
   exhausted: z.boolean(),
 });
 

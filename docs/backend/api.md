@@ -58,6 +58,15 @@ controller and public DTO mapping belong to `ExploreModule`. This boundary
 allows additional recommendation engines to evolve without coupling them to
 the Listing module or exposing internal DTOs through `@sd/core-contracts`.
 
+The public Scholars endpoint (`GET /v1/scholars`) returns the versioned
+`ScholarPageFeedDto` contract: an ordered sequence of hydrated semantic batches
+for the root Scholars screen. Its optional `cursor` and `limit` request values
+advance an opaque recommendation-sequence cursor; clients must not decode or
+reconstruct it. `nextCursor` is present only when `exhausted` is false. The
+backend owns eligibility, duplicate removal within a batch, ordering, and
+locale-aware hydration, while web and native clients preserve supplied order and
+ignore unknown future batch forms.
+
 ## 4. API Surface Segmentation
 
 - **Public read APIs**: published catalog, search, recommendations, and other discovery endpoints.

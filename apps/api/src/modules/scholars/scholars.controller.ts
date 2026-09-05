@@ -39,8 +39,20 @@ export class ScholarsController {
   @Get()
   @ApiOperation({ summary: 'Get the Scholars page feed' })
   @ApiOkResponse({ description: 'Versioned deterministic Scholars page-feed batches' })
-  getPageFeed(): Promise<ScholarPageFeedDto> {
-    return this.scholars.getPageFeed();
+  getPageFeed(
+    @Query('cursor') cursor?: string,
+    @Query('limit') limit?: string,
+  ): Promise<ScholarPageFeedDto> {
+    const parsedLimit = limit === undefined ? undefined : Number(limit);
+    if (
+      parsedLimit !== undefined &&
+      (!Number.isInteger(parsedLimit) || parsedLimit < 1 || parsedLimit > 100)
+    ) {
+      throw new BadRequestException(
+        'The Scholars recommendation limit must be an integer from 1 to 100',
+      );
+    }
+    return this.scholars.getPageFeed(cursor, parsedLimit);
   }
 
   @Get('directory')

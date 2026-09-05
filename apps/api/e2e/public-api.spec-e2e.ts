@@ -102,6 +102,23 @@ describe('Public API (e2e)', () => {
       expect(topicBatch.items.every((item: any) => item.id && item.slug && item.name)).toBe(true);
     });
 
+    it('continues the Scholars recommendation sequence with an opaque cursor', async () => {
+      const firstPage = await request(app.getHttpServer())
+        .get('/v1/scholars')
+        .query({ limit: 1 })
+        .expect(200);
+
+      expect(firstPage.body.exhausted).toBe(false);
+      expect(firstPage.body.nextCursor).toEqual(expect.any(String));
+
+      const nextPage = await request(app.getHttpServer())
+        .get('/v1/scholars')
+        .query({ limit: 1, cursor: firstPage.body.nextCursor })
+        .expect(200);
+
+      expect(nextPage.body.batches[0]?.id).not.toBe(firstPage.body.batches[0]?.id);
+    });
+
     it('GET /explore?limit=5 returns <= 5 items', async () => {
       const res = await request(app.getHttpServer())
         .get('/v1/explore')

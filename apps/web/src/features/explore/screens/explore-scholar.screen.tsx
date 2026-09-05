@@ -78,12 +78,13 @@ function ScholarResults({
 /** Renders recommendation-composed scholars with ordered batches and resilient UI states. */
 // oxlint-disable-next-line complexity -- The screen branches only on the closed semantic batch union and keeps its supplied order.
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const handleNavigateToScholar =
     onNavigateToScholar ?? ((slug) => router.push(routes.scholars.detail(slug)));
 
-  const { data, isFetching, isLoading, isError, refetch } = useScholarPageFeeds();
+  const locale = i18n.language === "ar" ? "ar" : "en";
+  const { data, isFetching, isLoading, isError, refetch } = useScholarPageFeeds(locale);
   const allScholars =
     data?.batches.reduce<ScholarListItemDto[]>((scholars, batch) => {
       if (batch.form === "scholars") {
@@ -143,6 +144,8 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
             </section>
           );
         }
+
+        if (batch.form !== "topic_scholars") return null;
 
         return (
           <section key={batch.id} aria-labelledby={`${batch.id}-title`}>

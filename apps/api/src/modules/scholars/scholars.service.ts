@@ -30,10 +30,15 @@ export class ScholarsService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  /** Returns the recommendation-composed root Scholars page feed. */
-  async getPageFeed(): Promise<ScholarPageFeedDto> {
-    const recommendation = await this.pageFeed.recommend();
-    return this.repo.hydratePageFeed(recommendation);
+  /** Returns one hydrated recommendation sequence page for the root Scholars screen. */
+  async getPageFeed(cursor?: string, limit?: number): Promise<ScholarPageFeedDto> {
+    const recommendation = await this.pageFeed.recommend(cursor, limit);
+    const page = await this.repo.hydratePageFeed(recommendation.recommendations);
+    return {
+      ...page,
+      nextCursor: recommendation.nextCursor,
+      exhausted: recommendation.exhausted,
+    };
   }
 
   directory(): Promise<ScholarListDto> {
