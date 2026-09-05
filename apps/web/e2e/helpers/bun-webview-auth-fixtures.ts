@@ -1,3 +1,5 @@
+import { endpoints } from "@sd/core-contracts";
+
 import type { BrowserJourney } from "./bun-webview-harness";
 
 /** Represents the backend-derived capability profiles used by web journeys. */
@@ -111,7 +113,7 @@ export async function installAuthFixtures(
         signOutStatus,
         webOrigin,
       );
-    } else if (url.pathname === "/account/profile" && role) {
+    } else if (url.pathname === endpoints.account.profile && role) {
       const user = users[role];
       response = jsonResponse(
         {
@@ -127,7 +129,7 @@ export async function installAuthFixtures(
         200,
         webOrigin,
       );
-    } else if (url.pathname === "/admin/users") {
+    } else if (url.pathname === endpoints.admin.users.list) {
       response = jsonResponse({ users: [], nextCursor: null, hasMore: false }, 200, webOrigin);
     } else {
       response = jsonResponse({}, 404, webOrigin);
@@ -154,8 +156,8 @@ export async function installAuthFixtures(
   await journey.view.cdp("Fetch.enable", {
     patterns: [
       { urlPattern: `${apiOrigin}/api/auth/*` },
-      { urlPattern: `${apiOrigin}/account/profile` },
-      { urlPattern: `${apiOrigin}/admin/users*` },
+      { urlPattern: `${apiOrigin}${endpoints.account.profile}` },
+      { urlPattern: `${apiOrigin}${endpoints.admin.users.list}*` },
     ],
   });
 
