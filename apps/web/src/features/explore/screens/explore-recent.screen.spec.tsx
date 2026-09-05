@@ -174,6 +174,7 @@ describe("FeedRecentScreen", () => {
     render(<FeedRecentScreen />);
 
     expect(mockUseExploreRecentScreen).toHaveBeenCalledWith({
+      locale: "en",
       topicSlug: undefined,
     });
     fireEvent.click(screen.getByRole("radio", { name: "Aqeedah" }));

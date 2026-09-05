@@ -52,6 +52,10 @@ identity and request-locale display names.
 Recommendation ordering, eligibility, topic steering, and cursor stability
 are backend responsibilities; web and native clients only render the returned
 batches and preserve their order.
+The API keeps those rules in the internal `ExploreRecommendationModule`; the
+controller and public DTO mapping belong to `ExploreModule`. This boundary
+allows additional recommendation engines to evolve without coupling them to
+the Listing module or exposing internal DTOs through `@sd/core-contracts`.
 
 ## 4. API Surface Segmentation
 

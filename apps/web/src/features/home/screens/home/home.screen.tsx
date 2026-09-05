@@ -4,7 +4,7 @@
 import type { FeedContentItemDto, FeedPageDto } from "@sd/core-contracts";
 
 import { useProgressStore } from "@sd/domain-audio";
-import { useExploreRecentScreen, useHomePromotions } from "@sd/domain-content";
+import { useHomeRecent, useHomePromotions } from "@sd/domain-content";
 import { useContinueListening } from "@sd/domain-search";
 
 import { useAuth } from "@/core/auth";
@@ -26,6 +26,10 @@ export type HomeScreenProps = {
 };
 
 const MAX_RECENT_ITEMS = 10;
+
+function getHomeLocale(language?: string): "ar" | "en" {
+  return language === "ar" ? "ar" : "en";
+}
 
 function getContentItems(exploreData: { pages?: FeedPageDto[] } | undefined) {
   const items: FeedContentItemDto[] = [];
@@ -198,6 +202,7 @@ function HomeContent({
 
 /** Renders public Home content and overlays authenticated local-first listening continuity. */
 export function HomeScreen({ onContinueListening }: HomeScreenProps) {
+  const { i18n } = useTranslation();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { recentProgress } = useContinueListening({
     enabled: !isAuthLoading && isAuthenticated,
@@ -206,8 +211,9 @@ export function HomeScreen({ onContinueListening }: HomeScreenProps) {
     recentProgress ? state.progressMap[recentProgress.listingSlug] : undefined,
   );
   const { data: promoData, isLoading: isPromosLoading } = useHomePromotions();
-  const { data: exploreData, isLoading: isExploreLoading } = useExploreRecentScreen({
+  const { data: exploreData, isLoading: isExploreLoading } = useHomeRecent({
     limit: MAX_RECENT_ITEMS,
+    locale: getHomeLocale(i18n?.language),
   });
   const { featuredContent, recentItems, curatedItems, liveRecentProgress } = getHomeContentData(
     promoData,

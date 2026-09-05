@@ -27,6 +27,11 @@ the authoritative relationships needed to rank content by Topic and Scholar.
   `scholars` and `topics` batches added by later Explore tickets. New batch
   forms must remain semantic and must not make clients infer meaning from flat
   rows. The API owns composition, topic steering, deduplication, and exhaustion.
+- Keep recommendation execution in the explicit internal
+  `ExploreRecommendationModule`, with no controller and no public DTO seam.
+  `ExploreModule` is the caller: it invokes the recommendation engine and maps
+  its internal page into `FeedPageDto`. Internal recommendation DTOs stay local
+  to the API modules; only the public response belongs in `@sd/core-contracts`.
 - Treat Topic selection as steering: selected-topic content is prioritized,
   while adjacent and serendipitous content remains possible. It is not a
   strict search filter.

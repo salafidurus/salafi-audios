@@ -220,6 +220,7 @@ export {
   ExploreTopicsBatchDtoSchema,
   type FeedPageDto,
   FeedPageDtoSchema,
+  parseFeedPageDto,
 } from "../types/feed.types";
 export {
   type MyLibraryItemDto,

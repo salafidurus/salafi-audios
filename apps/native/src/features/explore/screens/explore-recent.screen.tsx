@@ -6,7 +6,7 @@ import type {
 import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
-import { useExploreRecentScreen } from "@sd/domain-content";
+import { mergeExplorePages, useExploreRecentScreen } from "@sd/domain-content";
 import { useTopicsList } from "@sd/domain-search";
 import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
@@ -119,15 +119,19 @@ function getItemKey(
   return item.id;
 }
 
+function getExploreLocale(language: string): "ar" | "en" {
+  return language === "ar" ? "ar" : "en";
+}
+
 /** Renders the mixed Explore feed and coordinates its user-facing state. */
 export function ExploreScreen({ onNavigateToListing, onNavigateToScholar }: ExploreScreenProps) {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
   const [topicSlug, setTopicSlug] = useState<string | undefined>();
   const { data: topics = [] } = useTopicsList();
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useExploreRecentScreen(
-    { topicSlug },
+    { locale: getExploreLocale(i18n.language), topicSlug },
   );
-  const items = data?.pages.flatMap((p) => p.batches) ?? [];
+  const items = mergeExplorePages(data?.pages ?? []);
 
   const renderItem = useCallback(
     ({

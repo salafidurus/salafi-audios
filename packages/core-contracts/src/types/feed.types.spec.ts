@@ -5,6 +5,7 @@ import {
   ExploreScholarsBatchDtoSchema,
   ExploreTopicsBatchDtoSchema,
   FeedPageDtoSchema,
+  parseFeedPageDto,
 } from "./feed.types";
 
 const listing = {
@@ -131,6 +132,31 @@ describe("Explore recommendation contract", () => {
     });
 
     expect(result.batches.map((batch) => batch.kind)).toEqual(["listings", "scholars", "topics"]);
+  });
+
+  it("ignores unknown future batch kinds without dropping known batches", () => {
+    const result = parseFeedPageDto({
+      schemaVersion: 1,
+      batches: [
+        {
+          kind: "future_engine",
+          id: "future-1",
+          title: { label: "Future" },
+          reason: "future_reason",
+          items: [],
+        },
+        {
+          kind: "topics",
+          id: "topics:discoverable",
+          title: { kind: "topics", id: "discoverable_topics", label: "Explore topics" },
+          reason: "deterministic_topics",
+          items: [topic],
+        },
+      ],
+      exhausted: true,
+    });
+
+    expect(result.batches.map((batch) => batch.kind)).toEqual(["topics"]);
   });
 
   it("rejects unsupported scholar title contexts", () => {

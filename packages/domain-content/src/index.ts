@@ -17,7 +17,8 @@ export {
   type UseInfiniteAdminListingsOptions,
 } from "./hooks";
 
-export { useExploreRecentScreen } from "./use-explore-recent";
+export { useExploreRecentScreen, useHomeRecent } from "./use-explore-recent";
+export { mergeExplorePages } from "./merge-explore-pages";
 export { useHomePromotions } from "./home.api";
 export { useMyLibrarySavedScreen } from "./use-my-library-saved";
 export { useMyLibraryCompletedScreen } from "./use-my-library-completed";

@@ -1,8 +1,8 @@
 import { vi, describe, it, expect, beforeEach } from 'bun:test';
-import { RecentListingsRepo } from './listing-recent.repo';
+import { ExploreRecommendationRepo } from './explore-recommendation.repo';
 
-describe('RecentListingsRepo', () => {
-  let repo: RecentListingsRepo;
+describe('ExploreRecommendationRepo', () => {
+  let repo: ExploreRecommendationRepo;
   let prismaFindManySpy: any;
   let scholarFindManySpy: any;
   let topicFindManySpy: any;
@@ -31,10 +31,10 @@ describe('RecentListingsRepo', () => {
       ASSET_CDN_BASE_URL: 'https://cdn.example.com',
     };
 
-    repo = new RecentListingsRepo(prisma, config);
+    repo = new ExploreRecommendationRepo(prisma, config);
   });
 
-  describe('getRecentListings', () => {
+  describe('getRecommendations', () => {
     it('returns a versioned listings batch with topic title context', async () => {
       prismaFindManySpy.mockResolvedValue([
         {
@@ -60,9 +60,8 @@ describe('RecentListingsRepo', () => {
         },
       ]);
 
-      const result = await repo.getRecentListings(undefined, 20, 'aqeedah');
+      const result = await repo.getRecommendations(undefined, 20, 'aqeedah');
 
-      expect(result.schemaVersion).toBe(1);
       expect(result.batches).toHaveLength(1);
       expect(result.batches[0]).toMatchObject({
         kind: 'listings',
@@ -76,7 +75,7 @@ describe('RecentListingsRepo', () => {
     });
 
     it('queries all three listing formats (single, series, collection)', async () => {
-      await repo.getRecentListings();
+      await repo.getRecommendations();
 
       expect(prismaFindManySpy).toHaveBeenCalledTimes(1);
       const callArgs = prismaFindManySpy.mock.calls[0][0];
@@ -89,7 +88,7 @@ describe('RecentListingsRepo', () => {
     });
 
     it('includes translations and scholar in one query (no separate roundtrips)', async () => {
-      await repo.getRecentListings();
+      await repo.getRecommendations();
 
       const callArgs = prismaFindManySpy.mock.calls[0][0];
 
@@ -100,7 +99,7 @@ describe('RecentListingsRepo', () => {
 
     it('orders by createdAt DESC and applies cursor pagination', async () => {
       const cursorDate = new Date('2026-07-24T12:00:00Z').toISOString();
-      await repo.getRecentListings(cursorDate, 10);
+      await repo.getRecommendations(cursorDate, 10);
 
       const callArgs = prismaFindManySpy.mock.calls[0][0];
 
@@ -114,7 +113,7 @@ describe('RecentListingsRepo', () => {
         JSON.stringify({ date: '2026-07-24T12:00:00.000Z', slug: 'listing-5' }),
       ).toString('base64url');
 
-      await repo.getRecentListings(cursor, 10);
+      await repo.getRecommendations(cursor, 10);
 
       const where = prismaFindManySpy.mock.calls[0][0]?.where;
       expect(where?.OR).toEqual([
@@ -167,7 +166,7 @@ describe('RecentListingsRepo', () => {
 
       prismaFindManySpy.mockResolvedValue(mockListings);
 
-      const result = await repo.getRecentListings(undefined, 20);
+      const result = await repo.getRecommendations(undefined, 20);
 
       const contentItems = result.batches[0]?.items ?? [];
       expect(contentItems).toHaveLength(2);
@@ -207,7 +206,7 @@ describe('RecentListingsRepo', () => {
 
       prismaFindManySpy.mockResolvedValue(mockListings);
 
-      const result = await repo.getRecentListings(undefined, 20);
+      const result = await repo.getRecommendations(undefined, 20);
 
       expect(result.batches[0]?.items).toHaveLength(20);
       expect(result.nextCursor).toBeDefined();
@@ -238,7 +237,7 @@ describe('RecentListingsRepo', () => {
 
       prismaFindManySpy.mockResolvedValue(mockListings);
 
-      const result = await repo.getRecentListings(undefined, 20);
+      const result = await repo.getRecommendations(undefined, 20);
 
       expect(result.batches[0]?.items).toHaveLength(10);
       expect(result.nextCursor).toBeUndefined();
@@ -269,7 +268,7 @@ describe('RecentListingsRepo', () => {
         },
       ]);
 
-      const result = await repo.getRecentListings();
+      const result = await repo.getRecommendations();
 
       expect(result.batches.map((batch) => batch.kind)).toEqual(['scholars']);
       expect(result.batches[0]).toMatchObject({
@@ -287,7 +286,7 @@ describe('RecentListingsRepo', () => {
     });
 
     it('omits the scholar batch when no eligible scholars exist', async () => {
-      const result = await repo.getRecentListings();
+      const result = await repo.getRecommendations();
 
       expect(result.batches).toEqual([]);
     });
@@ -308,7 +307,7 @@ describe('RecentListingsRepo', () => {
         },
       ]);
 
-      const result = await repo.getRecentListings();
+      const result = await repo.getRecommendations();
 
       expect(result.batches).toMatchObject([
         {
@@ -343,7 +342,7 @@ describe('RecentListingsRepo', () => {
     });
 
     it('omits the topic batch when no usable topics exist', async () => {
-      const result = await repo.getRecentListings();
+      const result = await repo.getRecommendations();
 
       expect(result.batches).toEqual([]);
     });

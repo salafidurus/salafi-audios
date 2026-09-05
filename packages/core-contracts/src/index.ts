@@ -157,6 +157,7 @@ export {
   ExploreTopicsBatchDtoSchema,
   type FeedPageDto,
   FeedPageDtoSchema,
+  parseFeedPageDto,
   type MyLibraryItemDto,
   MyLibraryItemDtoSchema,
   type MyLibraryPageDto,

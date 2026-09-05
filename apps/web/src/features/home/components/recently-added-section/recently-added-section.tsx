@@ -2,7 +2,7 @@
 "use client";
 
 import { routes, type FeedContentItemDto } from "@sd/core-contracts";
-import { useExploreRecentScreen } from "@sd/domain-content";
+import { useHomeRecent } from "@sd/domain-content";
 import Link from "next/link";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -14,6 +14,10 @@ import { LectureRow } from "../lecture-row/lecture-row";
 import styles from "./recently-added-section.module.css";
 
 const MAX_RECENT_ITEMS = 10;
+
+function getHomeLocale(language?: string): "ar" | "en" {
+  return language === "ar" ? "ar" : "en";
+}
 
 /** Content items supplied to the recently-added presentation. */
 export type RecentlyAddedSectionContentProps = {
@@ -177,7 +181,11 @@ export { RecentlyAddedSectionContent };
 
 /** Fetches and renders the recently-added section on the home screen. */
 export function RecentlyAddedSection() {
-  const { data, isLoading: isExploreLoading } = useExploreRecentScreen({ limit: MAX_RECENT_ITEMS });
+  const { i18n } = useTranslation();
+  const { data, isLoading: isExploreLoading } = useHomeRecent({
+    limit: MAX_RECENT_ITEMS,
+    locale: getHomeLocale(i18n?.language),
+  });
 
   const items: FeedContentItemDto[] = [];
   for (const page of data?.pages ?? []) {

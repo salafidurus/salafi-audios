@@ -1,50 +1,101 @@
+/** Internal deterministic recommendation adapter for the Explore discovery sequence. */
+/* oxlint-disable anti-slop/require-tsdoc -- Internal structural fields are documented by their owning batch types. */
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../core/db/prisma.service';
 import { Prisma, Status, TranslationStatus } from '@sd/core-db';
-import { ExploreRecommendationSchemaVersion } from '@sd/core-contracts';
-import type {
-  FeedContentItemDto,
-  FeedPageDto,
-  ExploreListingsBatchDto,
-  ExploreScholarsBatchDto,
-  ExploreScholarItemDto,
-  ExploreTopicsBatchDto,
-  ExploreTopicItemDto,
-  ListingFormat,
-  ScholarTitle,
-  Locale,
-} from '@sd/core-contracts';
+import type { ListingFormat, ScholarTitle, Locale } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { ConfigService } from '../../core/config/config.service';
 
-/** listing application module responsible for listing recent.repo behavior at the backend boundary. */
+/** Ordered internal listing recommendation content returned by the engine. */
+export type ExploreRecommendationListingItem = {
+  kind: ListingFormat;
+  id: string;
+  title: string;
+  slug: string;
+  scholarName: string;
+  scholarSlug: string;
+  scholarTitle?: ScholarTitle;
+  scholarImageUrl: string | null;
+  thumbnailUrl: string | null;
+  durationSeconds: number;
+  publishedLectureCount: number;
+  publishedAt: string;
+  originalLanguage?: Locale;
+  original?: { title?: string };
+};
+
+/** Ordered internal scholar recommendation content returned by the engine. */
+export type ExploreRecommendationScholarItem = {
+  id: string;
+  slug: string;
+  name: string;
+  imageUrl?: string;
+  mainLanguage?: Locale;
+  originalLanguage?: Locale;
+  original?: { name?: string };
+  title?: ScholarTitle;
+  lectureCount: number;
+};
+
+/** Ordered internal topic recommendation content returned by the engine. */
+export type ExploreRecommendationTopicItem = { id: string; slug: string; name: string };
+
+export type ExploreRecommendationBatch =
+  | {
+      kind: 'listings';
+      id: string;
+      title:
+        | { kind: 'listings'; id: 'recent'; label: string }
+        | { kind: 'topic_listings'; topicSlug: string; label: string };
+      reason: 'deterministic_recent';
+      items: ExploreRecommendationListingItem[];
+    }
+  | {
+      kind: 'scholars';
+      id: string;
+      title: { kind: 'scholars'; id: 'senior_scholars'; label: string };
+      reason: 'deterministic_senior_scholars';
+      items: ExploreRecommendationScholarItem[];
+    }
+  | {
+      kind: 'topics';
+      id: string;
+      title: { kind: 'topics'; id: 'discoverable_topics'; label: string };
+      reason: 'deterministic_topics';
+      items: ExploreRecommendationTopicItem[];
+    };
+
+/** Internal Explore recommendation page adapted to the public contract by Explore. */
+export type ExploreRecommendationPage = {
+  batches: ExploreRecommendationBatch[];
+  nextCursor?: string;
+  exhausted: boolean;
+};
+
 type RecentListingRecord = {
   format: ListingFormat;
-  /** Documents the durationSeconds field's API projection semantics and lifecycle meaning. */ durationSeconds:
-    | number
-    | null;
-  /** Documents the publishedDurationSeconds field's API projection semantics and lifecycle meaning. */ publishedDurationSeconds:
-    | number
-    | null;
+  durationSeconds: number | null;
+  publishedDurationSeconds: number | null;
   coverImageUrl: string | null;
   publishedLectureCount: number | null;
 };
 
 type RecentFeedListing = RecentListingRecord & {
   id: string;
-  /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
+  slug: string;
   title: string;
-  /** Documents the language field's API projection semantics and lifecycle meaning. */ language: Locale | null;
-  /** Documents the publishedAt field's API projection semantics and lifecycle meaning. */ publishedAt: Date | null;
-  /** Documents the createdAt field's API projection semantics and lifecycle meaning. */ createdAt: Date;
+  language: Locale | null;
+  publishedAt: Date | null;
+  createdAt: Date;
   translations: Array<{ title: string }>;
   scholar: {
     name: string;
-    /** Documents the slug field's API projection semantics and lifecycle meaning. */ slug: string;
+    slug: string;
     title: ScholarTitle | null;
     imageUrl: string | null;
-    /** Documents the mainLanguage field's API projection semantics and lifecycle meaning. */ mainLanguage: Locale;
+    mainLanguage: Locale;
     translations: Array<{ name: string }>;
   };
 };
@@ -81,12 +132,12 @@ function buildRecentContentItem(
   record: RecentFeedListing,
   resolved: {
     fields: { title: string };
-    /** Documents the originalLanguage field's API projection semantics and lifecycle meaning. */ originalLanguage?: Locale;
+    originalLanguage?: Locale;
     original?: { title: string | null } | null;
   },
   scholarName: string,
   presentation: ReturnType<typeof recentListingPresentation>,
-): FeedContentItemDto {
+): ExploreRecommendationListingItem {
   return {
     kind: record.format,
     id: record.id,
@@ -113,7 +164,7 @@ function paginateRecentListings<T>(items: T[], limit: number) {
 function applyRecentFilters(
   where: Prisma.ListingWhereInput,
   topicSlug?: string,
-  cursor?: { date: Date; /** Stable tie-breaker carried by structured cursors. */ slug?: string },
+  cursor?: { date: Date; slug?: string },
 ) {
   if (topicSlug) where.topics = { some: { topic: { slug: topicSlug } } };
   if (cursor) {
@@ -165,10 +216,10 @@ function encodeNextCursor<
 }
 
 function buildListingsBatch(
-  items: FeedContentItemDto[],
+  items: ExploreRecommendationListingItem[],
   topicSlug: string | undefined,
   topicLabel: string | undefined,
-): ExploreListingsBatchDto | undefined {
+): ExploreRecommendationBatch | undefined {
   if (items.length === 0) return undefined;
   return {
     kind: 'listings',
@@ -186,9 +237,9 @@ function seniorScholarsTitleLabel(locale: Locale): string {
 }
 
 function buildSeniorScholarsBatch(
-  items: ExploreScholarItemDto[],
+  items: ExploreRecommendationScholarItem[],
   locale: Locale,
-): ExploreScholarsBatchDto | undefined {
+): ExploreRecommendationBatch | undefined {
   if (items.length === 0) return undefined;
   return {
     kind: 'scholars',
@@ -208,9 +259,9 @@ function topicsTitleLabel(locale: Locale): string {
 }
 
 function buildTopicsBatch(
-  items: ExploreTopicItemDto[],
+  items: ExploreRecommendationTopicItem[],
   locale: Locale,
-): ExploreTopicsBatchDto | undefined {
+): ExploreRecommendationBatch | undefined {
   if (items.length === 0) return undefined;
   return {
     kind: 'topics',
@@ -326,14 +377,17 @@ async function findDiscoverableTopics(prisma: PrismaService, locale: Locale) {
 }
 
 @Injectable()
-/** NestJS recent listings repo service or controller coordinating the API boundary for this responsibility. */
-export class RecentListingsRepo {
+export class ExploreRecommendationRepo {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
   ) {}
 
-  async getRecentListings(cursor?: string, limit = 20, topicSlug?: string): Promise<FeedPageDto> {
+  async getRecommendations(
+    cursor?: string,
+    limit = 20,
+    topicSlug?: string,
+  ): Promise<ExploreRecommendationPage> {
     const locale = getRequestLocale();
     const decodedCursor = this.decodeCursor(cursor);
 
@@ -346,7 +400,9 @@ export class RecentListingsRepo {
 
     const { hasMore, page } = paginateRecentListings(listings, limit);
 
-    const contentItems: FeedContentItemDto[] = page.map((r) => this.toRecentContentItem(r, locale));
+    const contentItems: ExploreRecommendationListingItem[] = page.map((r) =>
+      this.toRecentContentItem(r, locale),
+    );
     const batch = buildListingsBatch(
       contentItems,
       topicSlug,
@@ -392,12 +448,8 @@ export class RecentListingsRepo {
     );
 
     return {
-      schemaVersion: ExploreRecommendationSchemaVersion,
       batches: [batch, scholarBatch, topicBatch].filter(
-        (
-          candidate,
-        ): candidate is ExploreListingsBatchDto | ExploreScholarsBatchDto | ExploreTopicsBatchDto =>
-          candidate !== undefined,
+        (candidate): candidate is ExploreRecommendationBatch => candidate !== undefined,
       ),
       nextCursor,
       exhausted: !nextCursor,
@@ -411,7 +463,10 @@ export class RecentListingsRepo {
     return topicSlug ? this.resolveTopicName(topicSlug, locale) : listingsTitleLabel(locale);
   }
 
-  private toRecentContentItem(r: RecentFeedListing, locale: Locale): FeedContentItemDto {
+  private toRecentContentItem(
+    r: RecentFeedListing,
+    locale: Locale,
+  ): ExploreRecommendationListingItem {
     const resolved = resolveContentTranslation({
       base: { title: r.title },
       originalLanguage: r.language,

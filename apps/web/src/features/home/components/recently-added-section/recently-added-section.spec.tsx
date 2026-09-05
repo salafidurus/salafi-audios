@@ -1,4 +1,4 @@
-import { useExploreRecentScreen } from "@sd/domain-content";
+import { useHomeRecent } from "@sd/domain-content";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
@@ -14,7 +14,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@sd/domain-content", () => ({
-  useExploreRecentScreen: vi.fn(),
+  useHomeRecent: vi.fn(),
 }));
 
 vi.mock("@/core/i18n/use-translation", () => ({
@@ -27,7 +27,7 @@ vi.mock("@/shared/hooks/use-formatted-scholar-name", () => ({
   useFormattedScholarName: vi.fn().mockReturnValue("Scholar Name"),
 }));
 
-const mockUseExploreRecentScreen = useExploreRecentScreen as unknown as ReturnType<typeof vi.fn>;
+const mockUseHomeRecent = useHomeRecent as unknown as ReturnType<typeof vi.fn>;
 
 const mockContentItems = Array.from({ length: 14 }, (_, index) => ({
   kind: "lecture",
@@ -57,7 +57,7 @@ const mockPages = [
 
 describe("RecentlyAddedSection", () => {
   beforeEach(() => {
-    mockUseExploreRecentScreen.mockReturnValue({
+    mockUseHomeRecent.mockReturnValue({
       data: { pages: mockPages },
     });
   });
@@ -65,7 +65,7 @@ describe("RecentlyAddedSection", () => {
   it("requests a limited recent feed from the API", () => {
     render(<RecentlyAddedSection />);
 
-    expect(mockUseExploreRecentScreen).toHaveBeenCalledWith({ limit: 10 });
+    expect(mockUseHomeRecent).toHaveBeenCalledWith({ limit: 10, locale: "en" });
   });
 
   it("renders the content items the API returned", () => {
@@ -83,7 +83,7 @@ describe("RecentlyAddedSection", () => {
   });
 
   it("renders an intentional empty state when there is no data", () => {
-    mockUseExploreRecentScreen.mockReturnValue({ data: undefined });
+    mockUseHomeRecent.mockReturnValue({ data: undefined });
 
     render(<RecentlyAddedSection />);
 
