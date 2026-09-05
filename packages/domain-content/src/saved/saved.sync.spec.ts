@@ -17,9 +17,9 @@ vi.mock("@sd/core-contracts", () => ({
   httpClient: vi.fn<() => Promise<any>>(),
   endpoints: {
     myLibrary: {
-      saveListing: (listingId: string) => `/me/my-library/save/${listingId}`,
-      savedSync: "/me/my-library/saved/sync",
-      savedDelta: "/me/my-library/saved/delta",
+      saveListing: (listingId: string) => `/v1/me/my-library/save/${listingId}`,
+      savedSync: "/v1/me/my-library/saved/sync",
+      savedDelta: "/v1/me/my-library/saved/delta",
     },
   },
 }));
@@ -42,7 +42,7 @@ describe("saved.sync", () => {
       await flushPendingSaved();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/my-library/save/l1",
+        url: "/v1/me/my-library/save/l1",
         method: "POST",
       });
     });
@@ -58,7 +58,7 @@ describe("saved.sync", () => {
       await flushPendingSaved();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/my-library/save/l1",
+        url: "/v1/me/my-library/save/l1",
         method: "DELETE",
       });
     });
@@ -69,7 +69,7 @@ describe("saved.sync", () => {
       await flushPendingSaved();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/my-library/save/tafsir-al-fatiha",
+        url: "/v1/me/my-library/save/tafsir-al-fatiha",
         method: "POST",
       });
     });
@@ -80,7 +80,7 @@ describe("saved.sync", () => {
       await flushPendingSaved();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/my-library/save/l1",
+        url: "/v1/me/my-library/save/l1",
         method: "POST",
       });
     });
@@ -124,7 +124,7 @@ describe("saved.sync", () => {
       await hydrateSavedFromServer();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/my-library/saved/delta",
+        url: "/v1/me/my-library/saved/delta",
         method: "GET",
         params: undefined,
       });
@@ -160,7 +160,7 @@ describe("saved.sync", () => {
       await hydrateSavedFromServer();
 
       expect(httpClient).toHaveBeenNthCalledWith(2, {
-        url: "/me/my-library/saved/delta",
+        url: "/v1/me/my-library/saved/delta",
         method: "GET",
         params: { since: "2026-01-01T00:00:00.000Z" },
       });
@@ -189,7 +189,7 @@ describe("saved.sync", () => {
       await drainPendingSaved();
 
       expect(httpClient).toHaveBeenCalledWith({
-        url: "/me/my-library/save/l1",
+        url: "/v1/me/my-library/save/l1",
         method: "POST",
       });
     });

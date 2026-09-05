@@ -9,7 +9,7 @@ vi.mock("@sd/core-contracts", () => ({
   endpoints: {
     admin: {
       scholars: {
-        formData: (id: string) => `/admin/scholars/${id}/form-data`,
+        formData: (id: string) => `/v1/admin/scholars/${id}/form-data`,
       },
     },
   },
@@ -37,7 +37,7 @@ describe("fetchScholarFormData", () => {
     const result = await fetchScholarFormData("scholar-1");
 
     expect(mockHttpClient).toHaveBeenCalledWith({
-      url: "/admin/scholars/scholar-1/form-data",
+      url: "/v1/admin/scholars/scholar-1/form-data",
       method: "GET",
     });
     expect(result).toEqual(mockResponse);
@@ -55,6 +55,6 @@ describe("fetchScholarFormData", () => {
 
     expect(mockHttpClient).toHaveBeenCalled();
     const call = mockHttpClient.mock.calls[0]?.[0];
-    expect(call?.url).toBe("/admin/scholars/s2/form-data");
+    expect(call?.url).toBe("/v1/admin/scholars/s2/form-data");
   });
 });

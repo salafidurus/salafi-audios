@@ -10,16 +10,16 @@ vi.mock("@sd/core-contracts", () => ({
   endpoints: {
     audio: {
       progress: {
-        get: "/audio/progress",
-        sync: "/audio/progress/sync",
-        update: (listingSlug: string) => `/audio/progress/${listingSlug}`,
+        get: "/v1/audio/progress",
+        sync: "/v1/audio/progress/sync",
+        update: (listingSlug: string) => `/v1/audio/progress/${listingSlug}`,
       },
     },
     myLibrary: {
-      saved: "/me/my-library/saved",
-      savedDelta: "/me/my-library/saved/delta",
-      savedSync: "/me/my-library/saved/sync",
-      saveListing: (listingId: string) => `/me/my-library/save/${listingId}`,
+      saved: "/v1/me/my-library/saved",
+      savedDelta: "/v1/me/my-library/saved/delta",
+      savedSync: "/v1/me/my-library/saved/sync",
+      saveListing: (listingId: string) => `/v1/me/my-library/save/${listingId}`,
     },
   },
 }));
@@ -27,7 +27,7 @@ vi.mock("@sd/core-contracts", () => ({
 const USER_ID = "user-1";
 
 function defaultHttpClientMock(opts: { url: string }) {
-  if (opts.url === "/me/my-library/saved/delta") return Promise.resolve([]);
+  if (opts.url === "/v1/me/my-library/saved/delta") return Promise.resolve([]);
   return Promise.resolve([]);
 }
 
@@ -81,7 +81,7 @@ describe("initProgressPersistence", () => {
     const cleanup = initProgressPersistence(USER_ID);
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/audio/progress",
+      url: "/v1/audio/progress",
       method: "GET",
       params: undefined,
     });
@@ -92,7 +92,7 @@ describe("initProgressPersistence", () => {
     const cleanup = initProgressPersistence(USER_ID);
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/me/my-library/saved/delta",
+      url: "/v1/me/my-library/saved/delta",
       method: "GET",
       params: undefined,
     });
@@ -117,7 +117,7 @@ describe("initProgressPersistence", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/audio/progress/l9",
+      url: "/v1/audio/progress/l9",
       method: "PUT",
       body: { positionSeconds: 30, durationSeconds: 200 },
     });
@@ -142,7 +142,7 @@ describe("initProgressPersistence", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(httpClient).not.toHaveBeenCalledWith({
-      url: "/audio/progress/l9",
+      url: "/v1/audio/progress/l9",
       method: "PUT",
       body: { positionSeconds: 30, durationSeconds: 200 },
     });
@@ -173,7 +173,7 @@ describe("initProgressPersistence", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/audio/progress/l3",
+      url: "/v1/audio/progress/l3",
       method: "PUT",
       body: { positionSeconds: 1, durationSeconds: 100 },
     });
@@ -189,7 +189,7 @@ describe("initProgressPersistence", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(httpClient).toHaveBeenCalledWith({
-      url: "/audio/progress/l4",
+      url: "/v1/audio/progress/l4",
       method: "PUT",
       body: { positionSeconds: 2, durationSeconds: 100 },
     });

@@ -1,6 +1,6 @@
-import type { ListingDetailDto } from "@sd/core-contracts";
 import type { Metadata } from "next";
 
+import { endpoints, type ListingDetailDto } from "@sd/core-contracts";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { z } from "zod";
@@ -29,7 +29,9 @@ const fetchListingDetail = cache(async (slug: string): Promise<ListingDetailDto 
   if (!baseUrl) return null;
 
   try {
-    const res = await fetch(`${baseUrl}/listings/${slug}`, { next: { revalidate: 600 } });
+    const res = await fetch(`${baseUrl}${endpoints.listings.detail(slug)}`, {
+      next: { revalidate: 600 },
+    });
     if (!res.ok) return null;
     // SAFETY: ListingDetailSchema validates the network payload before it is treated as the DTO shape.
     return ListingDetailSchema.parse(await res.json()) as ListingDetailDto;
@@ -38,10 +40,14 @@ const fetchListingDetail = cache(async (slug: string): Promise<ListingDetailDto 
   }
 });
 
+/** Resolves listing metadata through the canonical versioned application API. */
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{
+    /** Public listing slug used by the API detail endpoint. */
+    slug: string;
+  }>;
 }): Promise<Metadata> {
   const { slug } = await params;
   const listing = await fetchListingDetail(slug);
@@ -51,7 +57,15 @@ export async function generateMetadata({
   };
 }
 
-export default async function ListingPage({ params }: { params: Promise<{ slug: string }> }) {
+/** Renders listing content and redirects child listings to their root context. */
+export default async function ListingPage({
+  params,
+}: {
+  params: Promise<{
+    /** Public listing slug used to load the detail surface. */
+    slug: string;
+  }>;
+}) {
   const { slug } = await params;
   const listing = await fetchListingDetail(slug);
 

@@ -10,7 +10,7 @@ vi.mock("@sd/core-contracts", () => ({
   httpClient: mockHttpClient,
   endpoints: {
     listings: {
-      contents: (id: string) => `/listings/${id}/contents`,
+      contents: (id: string) => `/v1/listings/${id}/contents`,
     },
   },
 }));

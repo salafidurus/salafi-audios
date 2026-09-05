@@ -5,7 +5,7 @@ import { useAdminListings } from "./use-admin-listings";
 jest.mock("@sd/core-contracts", () => ({
   useApiQuery: jest.fn(),
   httpClient: jest.fn(),
-  endpoints: { admin: { listings: { list: "/admin/listings" } } },
+  endpoints: { admin: { listings: { list: "/v1/admin/listings" } } },
 }));
 
 const mockUseApiQuery = useApiQuery as jest.Mock;

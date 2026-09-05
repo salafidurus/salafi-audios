@@ -41,7 +41,7 @@ jest.mock("@sd/core-contracts", () => ({
   httpClient: jest.fn(),
   endpoints: {
     listings: {
-      contents: (id: string) => `/listings/${id}/contents`,
+      contents: (id: string) => `/v1/listings/${id}/contents`,
     },
   },
 }));
@@ -218,7 +218,7 @@ describe("ExplorePodcastRow", () => {
     await fireEvent.press(screen.getByTestId("podcast-row"));
 
     expect(httpClientMock).toHaveBeenCalledWith({
-      url: "/listings/test-lecture/contents",
+      url: "/v1/listings/test-lecture/contents",
       method: "GET",
     });
     const lastCall = audioMock.playListing.mock.calls.at(-1);
