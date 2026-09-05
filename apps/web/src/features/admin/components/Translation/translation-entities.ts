@@ -24,7 +24,7 @@ export type ClientTranslationTarget =
   | {
       entity: "topic";
       topicId: string;
-      /** Public topic identity used to load the editable topic record. */
+      /** Canonical slug used to load the topic editor route and form data. */
       topicSlug: string;
     };
 

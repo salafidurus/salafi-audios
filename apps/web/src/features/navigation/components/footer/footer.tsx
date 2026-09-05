@@ -10,6 +10,7 @@ import { ThemeSwitch } from "@/features/settings/components/theme-switch/theme-s
 
 import styles from "./footer.module.css";
 
+/** Renders the site footer with policy links and language and theme controls. */
 export function Footer() {
   const { t } = useTranslation();
   const year = new Date().getFullYear();

@@ -9,6 +9,7 @@ type NavigationState = {
   toggleMobileDrawer: () => void;
 };
 
+/** Persists the mobile drawer state and exposes transitions used by navigation controls. */
 export const useNavigationStore = create<NavigationState>()(
   persist(
     (set) => ({

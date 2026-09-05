@@ -29,6 +29,7 @@ import {
 
 import { Content } from "../Content";
 
+/** Describes the search and modal state supplied to the admin listings content view. */
 export type ListingsContentProps = {
   debouncedSearch: string;
   isAudioUploaderOpen: boolean;
@@ -174,6 +175,7 @@ function DesktopListingsTable({
   );
 }
 
+/** Renders searchable, sortable admin listings with editorial and translation actions. */
 export function ListingsContent({
   debouncedSearch,
   isAudioUploaderOpen,

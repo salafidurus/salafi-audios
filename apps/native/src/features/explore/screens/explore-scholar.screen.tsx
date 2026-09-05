@@ -62,17 +62,9 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
 
   const { data, isFetching, isError, refetch } = useScholarPageFeeds();
 
-  const scholarBatches = useMemo(
-    () => data?.batches.filter((batch) => batch.form === "scholars") ?? [],
+  const hasBatchItems = useMemo(
+    () => data?.batches.some((batch) => batch.items.length > 0) ?? false,
     [data],
-  );
-  const listingBatches = useMemo(
-    () => data?.batches.filter((batch) => batch.form === "scholar_listings") ?? [],
-    [data],
-  );
-  const allScholars = useMemo(
-    () => scholarBatches.flatMap((batch) => batch.items),
-    [scholarBatches],
   );
 
   return (
@@ -83,7 +75,7 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
           {t("scholarContent.searchDescription", "Browse scholars and find their latest lessons.")}
         </AppText>
       </View>
-      {allScholars.length === 0 ? (
+      {!hasBatchItems ? (
         <View style={styles.status}>
           <ExploreScholarStatus
             isError={isError}
@@ -97,17 +89,34 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
       ) : (
         <ScrollView>
           <View style={styles.listCard}>
-            {allScholars.map((scholar) => (
-              <ScholarRow key={scholar.id} scholar={scholar} onPress={onNavigateToScholar} />
-            ))}
+            {data?.batches.map((batch) => {
+              if (batch.form === "scholars") {
+                return batch.items.map((scholar) => (
+                  <ScholarRow key={scholar.id} scholar={scholar} onPress={onNavigateToScholar} />
+                ));
+              }
+              if (batch.form === "scholar_listings") {
+                return (
+                  <View key={batch.id} style={styles.listingBatch}>
+                    <AppText variant="titleMd">{batch.title.label}</AppText>
+                    <ScholarRow scholar={batch.scholar} onPress={onNavigateToScholar} />
+                    <ScholarContentList items={batch.items} />
+                  </View>
+                );
+              }
+              return (
+                <View key={batch.id} style={styles.listingBatch}>
+                  <AppText variant="titleMd">{batch.title.label}</AppText>
+                  <AppText variant="bodySm" colorRole="muted">
+                    {batch.topic.name}
+                  </AppText>
+                  {batch.items.map((scholar) => (
+                    <ScholarRow key={scholar.id} scholar={scholar} onPress={onNavigateToScholar} />
+                  ))}
+                </View>
+              );
+            })}
             {isFetching ? <ExploreLoadingFooter /> : null}
-            {listingBatches.map((batch) => (
-              <View key={batch.id} style={styles.listingBatch}>
-                <AppText variant="titleMd">{batch.title.label}</AppText>
-                <ScholarRow scholar={batch.scholar} onPress={onNavigateToScholar} />
-                <ScholarContentList items={batch.items} />
-              </View>
-            ))}
           </View>
         </ScrollView>
       )}
