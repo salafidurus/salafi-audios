@@ -46,7 +46,9 @@ The API is resource-oriented and intent-driven.
 
 The public Explore endpoint (`GET /listings/recent`) returns the versioned
 `FeedPageDto` contract from `@sd/core-contracts`: an ordered array of semantic
-recommendation batches, an opaque cursor, and an explicit exhaustion flag.
+recommendation batches (`listings`, `scholars`, and `topics`), an opaque cursor,
+and an explicit exhaustion flag. The topics batch contains stable public topic
+identity and request-locale display names.
 Recommendation ordering, eligibility, topic steering, and cursor stability
 are backend responsibilities; web and native clients only render the returned
 batches and preserve their order.

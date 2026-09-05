@@ -6,6 +6,8 @@ import {
   type FeedContentItemDto,
   type ExploreListingsBatchDto,
   type ExploreScholarsBatchDto,
+  type ExploreTopicItemDto,
+  type ExploreTopicsBatchDto,
 } from "@sd/core-contracts";
 import { getErrorStateText, getLocalizedName } from "@sd/core-i18n";
 import {
@@ -159,8 +161,17 @@ function FeedGridItemCard({
   );
 }
 
+/** Renders a display-ready topic identity without deriving recommendation meaning client-side. */
+function TopicGridItem({ item }: { item: ExploreTopicItemDto }) {
+  return (
+    <article data-testid={`topic-card-${item.slug}`}>
+      <span>{item.name}</span>
+    </article>
+  );
+}
+
 function buildFeedBlocks(
-  batches: Array<ExploreListingsBatchDto | ExploreScholarsBatchDto>,
+  batches: Array<ExploreListingsBatchDto | ExploreScholarsBatchDto | ExploreTopicsBatchDto>,
   onNavigateToListing: (slug: string) => void,
   onNavigateToScholar: (slug: string) => void,
   t: ReturnType<typeof useTranslation>["t"],
@@ -169,7 +180,13 @@ function buildFeedBlocks(
   batches.forEach((batch) => {
     blocks.push(
       <section
-        className={`${styles.module} ${batch.kind === "listings" ? styles.listingModule : ""}`}
+        className={`${styles.module} ${
+          batch.kind === "listings"
+            ? styles.listingModule
+            : batch.kind === "topics"
+              ? styles.topicModule
+              : styles.scholarModule
+        }`}
         aria-label={batch.title.label}
         key={batch.id}
       >
@@ -183,9 +200,15 @@ function buildFeedBlocks(
                   onNavigate={onNavigateToListing}
                 />
               ))
-            : batch.items.map((scholar) => (
-                <ScholarGridCard key={scholar.id} scholar={scholar} onPress={onNavigateToScholar} />
-              ))}
+            : batch.kind === "scholars"
+              ? batch.items.map((scholar) => (
+                  <ScholarGridCard
+                    key={scholar.id}
+                    scholar={scholar}
+                    onPress={onNavigateToScholar}
+                  />
+                ))
+              : batch.items.map((item) => <TopicGridItem key={item.id} item={item} />)}
         </div>
       </section>,
     );
@@ -208,7 +231,7 @@ function FeedBody({
   /** Whether the recent-feed request failed and should show recovery UI. */
   isRecentError: boolean;
   isRecentFetching: boolean;
-  items: Array<ExploreListingsBatchDto | ExploreScholarsBatchDto>;
+  items: Array<ExploreListingsBatchDto | ExploreScholarsBatchDto | ExploreTopicsBatchDto>;
   onRetry: () => void;
   onNavigateToListing: (slug: string) => void;
   onNavigateToScholar: (slug: string) => void;

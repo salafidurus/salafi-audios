@@ -5,22 +5,25 @@ describe('RecentListingsRepo', () => {
   let repo: RecentListingsRepo;
   let prismaFindManySpy: any;
   let scholarFindManySpy: any;
+  let topicFindManySpy: any;
   let prisma: any;
   let config: any;
 
   beforeEach(() => {
     prismaFindManySpy = vi.fn().mockResolvedValue([]);
     scholarFindManySpy = vi.fn().mockResolvedValue([]);
+    topicFindManySpy = vi.fn().mockResolvedValue([]);
 
     prisma = {
       listing: {
         findMany: prismaFindManySpy,
       },
-      topic: {
-        findUnique: vi.fn().mockResolvedValue({ name: 'Aqeedah', translations: [] }),
-      },
       scholar: {
         findMany: scholarFindManySpy,
+      },
+      topic: {
+        findMany: topicFindManySpy,
+        findUnique: vi.fn().mockResolvedValue({ name: 'Aqeedah', translations: [] }),
       },
     };
 
@@ -284,6 +287,62 @@ describe('RecentListingsRepo', () => {
     });
 
     it('omits the scholar batch when no eligible scholars exist', async () => {
+      const result = await repo.getRecentListings();
+
+      expect(result.batches).toEqual([]);
+    });
+
+    it('returns localized eligible topics in deterministic order on the initial page', async () => {
+      topicFindManySpy.mockResolvedValue([
+        {
+          id: 'topic-1',
+          slug: 'aqeedah',
+          name: 'العقيدة',
+          translations: [{ name: 'Aqeedah' }],
+        },
+        {
+          id: 'topic-2',
+          slug: 'fiqh',
+          name: 'الفقه',
+          translations: [],
+        },
+      ]);
+
+      const result = await repo.getRecentListings();
+
+      expect(result.batches).toMatchObject([
+        {
+          kind: 'topics',
+          id: 'topics:discoverable',
+          title: { kind: 'topics', id: 'discoverable_topics', label: 'Explore topics' },
+          reason: 'deterministic_topics',
+          items: [
+            { id: 'topic-1', slug: 'aqeedah', name: 'Aqeedah' },
+            { id: 'topic-2', slug: 'fiqh', name: 'الفقه' },
+          ],
+        },
+      ]);
+      expect(topicFindManySpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            listingTopics: {
+              some: {
+                listing: expect.objectContaining({
+                  format: { in: ['single', 'series', 'collection'] },
+                  status: 'published',
+                  deletedAt: null,
+                  parentId: null,
+                  scholar: { isActive: true },
+                }),
+              },
+            },
+          },
+          orderBy: [{ orderIndex: 'asc' }, { slug: 'asc' }],
+        }),
+      );
+    });
+
+    it('omits the topic batch when no usable topics exist', async () => {
       const result = await repo.getRecentListings();
 
       expect(result.batches).toEqual([]);

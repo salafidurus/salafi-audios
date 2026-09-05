@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import {
   ExploreListingsBatchDtoSchema,
   ExploreScholarsBatchDtoSchema,
+  ExploreTopicsBatchDtoSchema,
   FeedPageDtoSchema,
 } from "./feed.types";
 
@@ -27,6 +28,12 @@ const scholar = {
   mainLanguage: "ar" as const,
   title: "allamah" as const,
   lectureCount: 12,
+};
+
+const topic = {
+  id: "topic-1",
+  slug: "aqeedah",
+  name: "Aqeedah",
 };
 
 describe("Explore recommendation contract", () => {
@@ -82,7 +89,19 @@ describe("Explore recommendation contract", () => {
     expect(result.items[0]?.slug).toBe("scholar-1");
   });
 
-  it("preserves listings then scholar batch order in a page", () => {
+  it("accepts a typed discoverable topics batch with display-ready contents", () => {
+    const result = ExploreTopicsBatchDtoSchema.parse({
+      kind: "topics",
+      id: "topics:discoverable",
+      title: { kind: "topics", id: "discoverable_topics", label: "Explore topics" },
+      reason: "deterministic_topics",
+      items: [topic],
+    });
+
+    expect(result.items[0]).toEqual(topic);
+  });
+
+  it("preserves listings, scholar, then topic batch order in a page", () => {
     const result = FeedPageDtoSchema.parse({
       schemaVersion: 1,
       batches: [
@@ -100,11 +119,18 @@ describe("Explore recommendation contract", () => {
           reason: "deterministic_senior_scholars",
           items: [scholar],
         },
+        {
+          kind: "topics",
+          id: "topics:discoverable",
+          title: { kind: "topics", id: "discoverable_topics", label: "Explore topics" },
+          reason: "deterministic_topics",
+          items: [topic],
+        },
       ],
       exhausted: true,
     });
 
-    expect(result.batches.map((batch) => batch.kind)).toEqual(["listings", "scholars"]);
+    expect(result.batches.map((batch) => batch.kind)).toEqual(["listings", "scholars", "topics"]);
   });
 
   it("rejects unsupported scholar title contexts", () => {
@@ -115,6 +141,18 @@ describe("Explore recommendation contract", () => {
         title: { kind: "scholars", id: "popular", label: "Popular Scholars" },
         reason: "deterministic_senior_scholars",
         items: [scholar],
+      }),
+    ).toThrow();
+  });
+
+  it("rejects unsupported topic title contexts", () => {
+    expect(() =>
+      ExploreTopicsBatchDtoSchema.parse({
+        kind: "topics",
+        id: "topics:discoverable",
+        title: { kind: "topics", id: "popular", label: "Popular topics" },
+        reason: "deterministic_topics",
+        items: [topic],
       }),
     ).toThrow();
   });

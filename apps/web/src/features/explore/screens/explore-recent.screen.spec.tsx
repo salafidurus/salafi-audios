@@ -246,4 +246,42 @@ describe("FeedRecentScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Scholar One" }));
     expect(onNavigateToScholar).toHaveBeenCalledWith("scholar-one");
   });
+
+  it("renders the supplied topics batch in API order", () => {
+    mockUseExploreRecentScreen.mockReturnValue({
+      data: {
+        pages: [
+          {
+            batches: [
+              {
+                kind: "topics",
+                id: "topics:discoverable",
+                title: { kind: "topics", id: "discoverable_topics", label: "Explore topics" },
+                reason: "deterministic_topics",
+                items: [
+                  { id: "t1", slug: "aqeedah", name: "Aqeedah" },
+                  { id: "t2", slug: "fiqh", name: "Fiqh" },
+                ],
+              },
+            ],
+            exhausted: true,
+          },
+        ],
+      },
+      isFetching: false,
+      isError: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
+      refetch: vi.fn(),
+    });
+
+    render(<FeedRecentScreen />);
+
+    expect(screen.getByRole("region", { name: "Explore topics" })).toBeInTheDocument();
+    expect(screen.getAllByTestId(/topic-card/).map((card) => card.textContent)).toEqual([
+      "Aqeedah",
+      "Fiqh",
+    ]);
+    expect(screen.queryByText("Scholar One")).not.toBeInTheDocument();
+  });
 });

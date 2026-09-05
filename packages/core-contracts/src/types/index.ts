@@ -212,6 +212,12 @@ export {
   ExploreScholarItemDtoSchema,
   type ExploreScholarsBatchDto,
   ExploreScholarsBatchDtoSchema,
+  type ExploreTopicsTitleContextDto,
+  ExploreTopicsTitleContextDtoSchema,
+  type ExploreTopicItemDto,
+  ExploreTopicItemDtoSchema,
+  type ExploreTopicsBatchDto,
+  ExploreTopicsBatchDtoSchema,
   type FeedPageDto,
   FeedPageDtoSchema,
 } from "../types/feed.types";

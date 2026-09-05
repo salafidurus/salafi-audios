@@ -99,6 +99,20 @@ export async function seedTestData(prisma: PrismaService): Promise<void> {
       durationSeconds: 300,
     },
   });
+
+  await prisma.listingTopic.upsert({
+    where: {
+      listingId_topicId: {
+        listingId: TEST_LISTING_ID,
+        topicId: TEST_PARENT_TOPIC_ID,
+      },
+    },
+    update: {},
+    create: {
+      listingId: TEST_LISTING_ID,
+      topicId: TEST_PARENT_TOPIC_ID,
+    },
+  });
 }
 
 /**
