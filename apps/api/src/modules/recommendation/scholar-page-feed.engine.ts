@@ -16,7 +16,7 @@ export type ScholarPageFeedRecommendationPage = {
   exhausted: boolean;
 };
 
-const SequenceCursorSchema = z.object({ offset: z.number().int().nonnegative() }).strict();
+const SequenceCursorSchema = z.strictObject({ offset: z.number().int().nonnegative() });
 type SequenceCursor = z.infer<typeof SequenceCursorSchema>;
 
 function encodeSequenceCursor(offset: number): string {
