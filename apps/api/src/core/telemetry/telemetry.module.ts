@@ -7,6 +7,6 @@ import { TelemetryService } from './telemetry.service';
   providers: [TelemetryService],
   exports: [TelemetryService],
 })
-/** NestJS telemetry module service or controller coordinating the API boundary for this responsibility. */
+/** Registers the optional telemetry lifecycle globally so exporters cannot affect API availability. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class TelemetryModule {}
