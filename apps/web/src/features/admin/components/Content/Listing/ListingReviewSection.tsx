@@ -26,8 +26,10 @@ function sameTopics(a: string[], b: string[]) {
 type ReviewChanges = {
   titleChanged: boolean;
   descriptionChanged: boolean;
+  /** Whether the editorial publication status differs from the initial snapshot. */
   statusChanged: boolean;
   orderIndexChanged: boolean;
+  /** Whether the listing's content language differs from the initial snapshot. */
   languageChanged: boolean;
   coverImageChanged: boolean;
   topicsChanged: boolean;
@@ -124,8 +126,10 @@ function MainChanges({ title, description, mainLocale, t, changes }: MainChanges
 }
 
 type DetailChangesProps = {
+  /** Current editorial status rendered when `statusChanged` is true. */
   status: string;
   orderIndex: number | null;
+  /** Current content language rendered when `languageChanged` is true. */
   language: Locale;
   topicNames: string[];
   t: ReturnType<typeof useTranslation>["t"];
@@ -214,6 +218,12 @@ function DetailChanges({
   );
 }
 
+/**
+ * Summarizes pending listing edits before the editor submits them.
+ *
+ * Create-mode output reflects only fields accepted by the create workflow;
+ * edit-mode output compares the current form against its initial snapshot.
+ */
 export function ListingReviewSection({ state, mainLocale, topics }: ListingReviewSectionProps) {
   const { t, i18n } = useTranslation();
   const { title, description, status, orderIndex, selectedTopics, language } = state;
