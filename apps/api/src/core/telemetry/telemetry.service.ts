@@ -33,7 +33,12 @@ export function isTelemetryConfigured(
 export function getTelemetryResourceAttributes(
   env: Pick<
     TelemetryEnvironment,
-    'OTEL_SERVICE_NAME' | 'NODE_ENV' | 'OTEL_DEPLOYMENT_VERSION' | 'OTEL_PLATFORM' | 'OTEL_REGION'
+    | 'OTEL_SERVICE_NAME'
+    | 'NODE_ENV'
+    | 'OTEL_DEPLOYMENT_VERSION'
+    | 'OTEL_PLATFORM'
+    | 'OTEL_ENVIRONMENT'
+    | 'OTEL_REGION'
   >,
 ): Attributes {
   return {
