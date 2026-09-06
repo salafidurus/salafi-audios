@@ -80,7 +80,7 @@
     "expo-web-browser": "~57.0.2",
     "i18next": "catalog:",
     "intl-pluralrules": "^2.0.1",
-    "lucide-react-native": "^1.38.0",
+    "lucide-react-native": "^1.40.0",
     "react": "catalog:",
     "react-content-loader": "^7.1.2",
     "react-dom": "catalog:",
