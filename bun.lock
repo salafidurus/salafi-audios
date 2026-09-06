@@ -187,6 +187,7 @@
       "dependencies": {
         "@base-ui/react": "^1.7.0",
         "@casl/ability": "catalog:",
+        "@sd/core-analytics": "workspace:*",
         "@sd/core-api": "workspace:*",
         "@sd/core-contracts": "workspace:*",
         "@sd/core-i18n": "workspace:*",

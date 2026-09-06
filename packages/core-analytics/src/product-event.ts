@@ -37,6 +37,7 @@ export const ProductEventContextSchema = z.strictObject({
   country_code: z.string().length(2).optional(),
   coarse_region: z.string().min(1).optional(),
   timezone: z.string().min(1).optional(),
+  session_id: z.string().min(1).optional(),
   source_surface: z.string().min(1).optional(),
   recommendation: z
     .strictObject({

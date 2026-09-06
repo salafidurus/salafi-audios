@@ -64,6 +64,9 @@ export const endpoints = {
       stream: (listingSlug: string) => applicationPath(`/audio/listings/${listingSlug}/stream`),
     },
   },
+  analytics: {
+    events: applicationPath("/analytics/events"),
+  },
   admin: {
     dashboard: applicationPath("/admin/dashboard"),
     users: {

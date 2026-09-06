@@ -1,11 +1,7 @@
 import { z } from 'zod';
 import { CanonicalProductEventSchema } from '@sd/core-analytics';
 
-/**
- * Validates the ingestion envelope's structural contract before service policy
- * runs: it bounds the batch and serialized size, rejects unknown properties,
- * and reports duplicate event IDs without persisting anything.
- */
+/** Validates bounded analytics batches, strict fields, payload size, and unique event IDs. */
 export const IngestAnalyticsEventsDtoSchema = z
   .strictObject({
     events: z.array(CanonicalProductEventSchema).min(1).max(20),

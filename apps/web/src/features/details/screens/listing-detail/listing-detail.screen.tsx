@@ -6,7 +6,9 @@ import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useMemo } from "react";
 
+import { webAnalytics } from "@/core/analytics";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useCookieConsent } from "@/features/legal";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Search } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
@@ -23,6 +25,19 @@ import { QuickButtonSection } from "../../components/listing/QuickButtonSection/
 import { SeriesContextBar } from "../../components/listing/series-context-bar/series-context-bar";
 import { contentItemAnchorId } from "../../utils/content-item-anchor-id";
 import styles from "./listing-detail.screen.module.css";
+
+function useListingViewedAnalytics(
+  listing: NonNullable<ReturnType<typeof useListingDetail>["data"]> | undefined,
+  hasAccepted: boolean,
+): void {
+  useEffect(() => {
+    if (!listing || !hasAccepted) return;
+    webAnalytics.recordListingViewed({
+      listing_slug: listing.slug,
+      scholar_slug: listing.scholar.slug,
+    });
+  }, [hasAccepted, listing?.scholar.slug, listing?.slug]);
+}
 
 /** Route inputs for the public listing detail screen. */
 export type ListingDetailScreenProps = {
@@ -473,6 +488,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const router = useRouter();
   const formatScholarName = useFormatScholarName();
   const [searchQuery, setSearchQuery] = useState("");
+  const { hasAccepted } = useCookieConsent();
 
   const {
     data: listing,
@@ -484,6 +500,8 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
     listing?.slug ?? "",
   );
   const highlightItemId = useListingHighlight(contents);
+
+  useListingViewedAnalytics(listing, hasAccepted);
 
   const { isMultiItem, content } = useListingContentModel({
     contents,
