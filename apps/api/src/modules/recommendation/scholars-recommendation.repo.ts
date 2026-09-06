@@ -8,7 +8,7 @@ import { PrismaService } from '../../core/db/prisma.service';
  * leaving the public response free to evolve independently.
  */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- the type-level invariant is documented in the block above.
-export type ScholarPageFeedRecommendation =
+export type ScholarsRecommendation =
   | {
       /** Identifies the public batch renderer that will hydrate these references. */
       form: 'scholars';
@@ -50,11 +50,11 @@ export type ScholarPageFeedRecommendation =
 
 @Injectable()
 /** Selects root Scholars batches using stable editorial ordering and catalog eligibility. */
-export class ScholarPageFeedRepo {
+export class ScholarsRecommendationRepo {
   constructor(private readonly prisma: PrismaService) {}
 
   /** Returns references only; presentation hydration remains owned by the Scholars caller. */
-  async getRecommendations(): Promise<ScholarPageFeedRecommendation[]> {
+  async getRecommendations(): Promise<ScholarsRecommendation[]> {
     const [scholars, listings] = await Promise.all([
       this.prisma.scholar.findMany({
         where: { isActive: true, title: 'allamah' },

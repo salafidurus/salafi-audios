@@ -20,7 +20,7 @@ import type {
   ScholarPageFeedDto,
   ScholarTitle,
 } from '@sd/core-contracts';
-import type { ScholarPageFeedRecommendation } from '../recommendation/scholar-page-feed.repo';
+import type { ScholarsRecommendation } from '../recommendation/scholars-recommendation.repo';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
@@ -203,20 +203,18 @@ export class ScholarsRepository {
 
   /** Hydrates the engine's ordered scholar references into one localized page-feed response. */
   // oxlint-disable-next-line complexity -- One hydration pass preserves the ordered batch contract across three semantic forms.
-  async hydratePageFeed(
-    recommendations: ScholarPageFeedRecommendation[],
-  ): Promise<ScholarPageFeedDto> {
+  async hydratePageFeed(recommendations: ScholarsRecommendation[]): Promise<ScholarPageFeedDto> {
     const locale = getRequestLocale();
     const scholarRecommendations = recommendations.filter(
-      (item): item is Extract<ScholarPageFeedRecommendation, { form: 'scholars' }> =>
+      (item): item is Extract<ScholarsRecommendation, { form: 'scholars' }> =>
         item.form === 'scholars',
     );
     const listingRecommendations = recommendations.filter(
-      (item): item is Extract<ScholarPageFeedRecommendation, { form: 'scholar_listings' }> =>
+      (item): item is Extract<ScholarsRecommendation, { form: 'scholar_listings' }> =>
         item.form === 'scholar_listings',
     );
     const topicRecommendations = recommendations.filter(
-      (item): item is Extract<ScholarPageFeedRecommendation, { form: 'topic_scholars' }> =>
+      (item): item is Extract<ScholarsRecommendation, { form: 'topic_scholars' }> =>
         item.form === 'topic_scholars',
     );
     const scholarIds = [

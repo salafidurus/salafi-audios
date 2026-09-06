@@ -10,13 +10,13 @@ import type {
 } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
 import { ScholarsService } from './scholars.service';
-import { ScholarPageFeedService } from '../recommendation/scholar-page-feed.service';
+import { ScholarsRecommendationService } from '../recommendation/scholars-recommendation.service';
 
 describe('ScholarsService', () => {
   let service: ScholarsService;
   let repo: Mocked<ScholarsRepository>;
   let cacheManager: any;
-  let pageFeed: ScholarPageFeedService;
+  let pageFeed: ScholarsRecommendationService;
 
   const mockScholarDetail: ScholarDetailDto & {
     lectureCount: number;
@@ -67,7 +67,7 @@ describe('ScholarsService', () => {
       upsertScholarTranslation: vi.fn<any>(),
       search: vi.fn<any>(),
     } as Partial<Mocked<ScholarsRepository>> as Mocked<ScholarsRepository>;
-    pageFeed = { recommend: vi.fn<any>() } as unknown as ScholarPageFeedService;
+    pageFeed = { recommend: vi.fn<any>() } as unknown as ScholarsRecommendationService;
     service = new ScholarsService(repo, pageFeed, cacheManager);
   });
 
