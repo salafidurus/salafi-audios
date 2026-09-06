@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { AppLoggerService } from '../../core/logger/app-logger.service';
 import { PrimaryDbService } from '../../core/db/primary-db.service';
@@ -9,6 +9,7 @@ import type { Prisma } from '@sd/core-db';
 import { publishedListingSlugWhere } from '../../shared/utils/published-listing-slug-where';
 import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
 import { z } from 'zod';
+import { AnalyticsDispatchRepository } from '../analytics/analytics-dispatch.repository';
 
 /** audio application module responsible for audio.repo behavior at the backend boundary. */
 const COMPLETION_PERCENT_THRESHOLD = 0.95;
@@ -82,6 +83,7 @@ export class AudioRepository {
     private readonly redis: RedisService,
     private readonly config: ConfigService,
     private readonly logger: AppLoggerService,
+    @Optional() private readonly analyticsDispatch?: AnalyticsDispatchRepository,
   ) {
     this.logger.setContext(AudioRepository.name);
   }
@@ -291,25 +293,35 @@ export class AudioRepository {
   }
 
   private async persistProgressImmediately(input: ProgressWrite): Promise<void> {
-    const existing = await this.prisma.userListingProgress.findUnique({
-      where: { userId_listingId: { userId: input.userId, listingId: input.listingId } },
-      select: { isCompleted: true },
-    });
-    const finalCompleted = Boolean(existing?.isCompleted) || input.isCompleted;
-    await this.prisma.userListingProgress.upsert({
-      where: { userId_listingId: { userId: input.userId, listingId: input.listingId } },
-      create: {
-        userId: input.userId,
-        listingId: input.listingId,
-        positionSeconds: input.positionSeconds,
-        isCompleted: finalCompleted,
-        updatedAt: input.updatedAt,
-      },
-      update: {
-        positionSeconds: input.positionSeconds,
-        isCompleted: finalCompleted,
-        updatedAt: input.updatedAt,
-      },
+    await this.prisma.$transaction(async (transaction) => {
+      const existing = await transaction.userListingProgress.findUnique({
+        where: { userId_listingId: { userId: input.userId, listingId: input.listingId } },
+        select: { isCompleted: true },
+      });
+      const finalCompleted = Boolean(existing?.isCompleted) || input.isCompleted;
+      await transaction.userListingProgress.upsert({
+        where: { userId_listingId: { userId: input.userId, listingId: input.listingId } },
+        create: {
+          userId: input.userId,
+          listingId: input.listingId,
+          positionSeconds: input.positionSeconds,
+          isCompleted: finalCompleted,
+          updatedAt: input.updatedAt,
+        },
+        update: {
+          positionSeconds: input.positionSeconds,
+          isCompleted: finalCompleted,
+          updatedAt: input.updatedAt,
+        },
+      });
+      if (!existing?.isCompleted && finalCompleted && this.analyticsDispatch) {
+        await this.analyticsDispatch.append(transaction, {
+          eventName: 'audio_completed',
+          subjectId: input.userId,
+          payload: { listing_id: input.listingId },
+          occurredAt: input.updatedAt,
+        });
+      }
     });
   }
 
@@ -339,19 +351,26 @@ export class AudioRepository {
     );
   }
 
+  // eslint-disable-next-line complexity -- this batch boundary combines canonical duration, monotonic completion, and intent emission.
   private async persistProgressBatch(
     items: ProgressWrite[],
     knownDurations?: Map<string, number | null>,
   ): Promise<void> {
     if (items.length === 0) return;
     const durationById = knownDurations ?? (await this.loadProgressDurations(items));
-    const operations = [];
-    for (const item of items) {
-      if (!durationById.has(item.listingId)) continue;
-      const completed =
-        item.isCompleted ||
-        isPositionCompleted(item.positionSeconds, durationById.get(item.listingId));
-      operations.push(this.prisma.$executeRaw`
+    // eslint-disable-next-line complexity -- transaction callback combines canonical duration, monotonic completion, and intent emission.
+    await this.prisma.$transaction(async (transaction) => {
+      for (const item of items) {
+        if (!durationById.has(item.listingId)) continue;
+        const completed =
+          item.isCompleted ||
+          isPositionCompleted(item.positionSeconds, durationById.get(item.listingId));
+        // react-doctor-disable-next-line react-doctor/async-await-in-loop -- Ordered reads and writes preserve each progress transition inside one transaction.
+        const existing = await transaction.userListingProgress.findUnique({
+          where: { userId_listingId: { userId: item.userId, listingId: item.listingId } },
+          select: { isCompleted: true },
+        });
+        await transaction.$executeRaw`
           INSERT INTO "UserListingProgress" ("userId", "listingId", "positionSeconds", "isCompleted", "updatedAt")
           VALUES (${item.userId}, ${item.listingId}::uuid, ${item.positionSeconds}, ${completed}, ${item.updatedAt})
           ON CONFLICT ("userId", "listingId")
@@ -359,9 +378,17 @@ export class AudioRepository {
             "positionSeconds" = CASE WHEN "UserListingProgress"."updatedAt" > ${item.updatedAt} THEN "UserListingProgress"."positionSeconds" ELSE ${item.positionSeconds} END,
             "isCompleted" = "UserListingProgress"."isCompleted" OR ${completed},
             "updatedAt" = CASE WHEN "UserListingProgress"."updatedAt" > ${item.updatedAt} THEN "UserListingProgress"."updatedAt" ELSE ${item.updatedAt} END
-        `);
-    }
-    await this.prisma.$transaction(operations);
+        `;
+        if (!existing?.isCompleted && completed && this.analyticsDispatch) {
+          await this.analyticsDispatch.append(transaction, {
+            eventName: 'audio_completed',
+            subjectId: item.userId,
+            payload: { listing_id: item.listingId },
+            occurredAt: item.updatedAt,
+          });
+        }
+      }
+    });
   }
 
   private async loadProgressDurations(items: ProgressWrite[]): Promise<Map<string, number | null>> {

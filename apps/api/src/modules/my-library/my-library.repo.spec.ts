@@ -51,6 +51,7 @@ describe('MyLibraryRepository — rollup to top-level listings', () => {
       favoriteListing: {
         findMany: vi.fn<any>(),
       },
+      $transaction: vi.fn<any>((callback: (transaction: any) => unknown) => callback(prisma)),
     };
     listingRepo = {
       getProgressSummaryByListingId: vi.fn<any>(),

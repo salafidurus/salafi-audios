@@ -15,6 +15,8 @@ export type RecommendationRecurrence = client.RecommendationRecurrence;
 export type Locale = client.Locale;
 /** Database translation-status type generated from the Prisma schema. */
 export type TranslationStatus = client.TranslationStatus;
+/** Database analytics dispatch status generated from the Prisma schema. */
+export type AnalyticsDispatchStatus = client.AnalyticsDispatchStatus;
 /** Database access-target type generated from the Prisma schema. */
 export type AccessTarget = client.AccessTarget;
 /** Database access-capability type generated from the Prisma schema. */
@@ -35,6 +37,8 @@ export const RecommendationRecurrence = client.RecommendationRecurrence;
 export const Locale = client.Locale;
 /** Runtime values for the database translation-status enum. */
 export const TranslationStatus = client.TranslationStatus;
+/** Runtime values for the database analytics dispatch status enum. */
+export const AnalyticsDispatchStatus = client.AnalyticsDispatchStatus;
 /** Runtime values for the database access-target enum. */
 export const AccessTarget = client.AccessTarget;
 /** Runtime values for the database access-capability enum. */

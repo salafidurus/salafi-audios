@@ -158,6 +158,46 @@ describe("canonical product-event contract", () => {
     expect(result.success).toBe(true);
   });
 
+  it("accepts API-confirmed registration and saved-state outcomes", () => {
+    const base = {
+      schema_version: "v1",
+      occurred_at: "2026-09-03T12:00:00.000Z",
+      source: "api" as const,
+      platform: "api" as const,
+      app_version: "api-release",
+      consent_state: "essential" as const,
+      identity: {
+        type: "authenticated" as const,
+        pseudonymous_id: "user-pseudo-123",
+      },
+      event_context: { source_surface: "api" },
+      priority: "important" as const,
+      authority: "backend_confirmed" as const,
+      producer: "api" as const,
+      properties: {},
+    };
+
+    expect(
+      ProductEventSchema.safeParse({
+        ...base,
+        event_id: "registration-1",
+        event_name: "user_registered",
+        content_references: {},
+      }).success,
+    ).toBe(true);
+    expect(
+      ProductEventSchema.safeParse({
+        ...base,
+        event_id: "saved-1",
+        event_name: "listing_saved",
+        content_references: {
+          listing_slug: "foundations-of-tawheed",
+          scholar_slug: "salih-al-fawzan",
+        },
+      }).success,
+    ).toBe(true);
+  });
+
   it("rejects missing required envelope fields and unsupported authority combinations", () => {
     const result = CanonicalProductEventSchema.safeParse({
       event_name: "listing_viewed",

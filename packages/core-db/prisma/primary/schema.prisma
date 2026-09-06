@@ -69,6 +69,13 @@ enum TranslationStatus {
   published
 }
 
+enum AnalyticsDispatchStatus {
+  pending
+  processing
+  delivered
+  dead_letter
+}
+
 enum ScholarTitle {
   allamah
   sheikh
@@ -109,6 +116,25 @@ model User {
   // Content Management
   progress  UserListingProgress[]
   favorites FavoriteListing[]
+}
+
+/// Short-lived backend analytics delivery coordination; the permanent event archive is separate.
+model AnalyticsDispatchIntent {
+  eventId     String                  @id @map("event_id")
+  eventName   String                  @map("event_name")
+  subjectId   String                  @map("subject_id")
+  payload     Json
+  attempts    Int                     @default(0)
+  availableAt DateTime                @default(now()) @map("available_at")
+  status      AnalyticsDispatchStatus @default(pending)
+  claimedAt   DateTime?               @map("claimed_at")
+  lastError   String?                 @map("last_error")
+  createdAt   DateTime                @default(now()) @map("created_at")
+  updatedAt   DateTime                @updatedAt @map("updated_at")
+
+  @@index([status, availableAt], map: "idx_analytics_dispatch_due")
+  @@index([subjectId, createdAt], map: "idx_analytics_dispatch_subject_created")
+  @@map("analytics_dispatch_intents")
 }
 
 model UserAccessGrant {

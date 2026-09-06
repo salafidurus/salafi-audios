@@ -13,10 +13,11 @@ describe('MyLibraryRepository — save/unsave by slug', () => {
       favoriteListing: {
         upsert: vi.fn<any>().mockResolvedValue(undefined),
         updateMany: vi.fn<any>().mockResolvedValue({ count: 1 }),
+        findUnique: vi.fn<any>(),
         findMany: vi.fn<any>(),
       },
       $executeRaw: vi.fn<any>(),
-      $transaction: vi.fn<any>().mockResolvedValue(undefined),
+      $transaction: vi.fn<any>((callback: (transaction: any) => unknown) => callback(prisma)),
     };
     repo = new MyLibraryRepository(prisma, {} as any);
   });

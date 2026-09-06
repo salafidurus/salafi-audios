@@ -52,7 +52,7 @@ describe('AudioRepository', () => {
         upsert: vi.fn<any>().mockResolvedValue(undefined),
       },
       $executeRaw: vi.fn<any>(),
-      $transaction: vi.fn<any>().mockResolvedValue(undefined),
+      $transaction: vi.fn<any>((callback: (transaction: any) => unknown) => callback(prisma)),
     };
     redis = {
       enabled: false,
@@ -78,6 +78,32 @@ describe('AudioRepository', () => {
   });
 
   describe('upsertProgress', () => {
+    it('appends one backend completion intent in the same transaction as the progress write', async () => {
+      const analyticsDispatch = { append: vi.fn<any>() };
+      repo = new AudioRepository(
+        prisma,
+        redis,
+        config,
+        {
+          setContext: vi.fn(),
+          warn: vi.fn(),
+          error: vi.fn(),
+        } as any,
+        analyticsDispatch as any,
+      );
+      prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
+      prisma.userListingProgress.findUnique.mockResolvedValue({ isCompleted: false });
+
+      await repo.upsertProgress('user1', 'listing-slug', 95);
+
+      expect(analyticsDispatch.append).toHaveBeenCalledWith(prisma, {
+        eventName: 'audio_completed',
+        subjectId: 'user1',
+        payload: { listing_id: 'listing1' },
+        occurredAt: expect.any(Date),
+      });
+    });
+
     it('writes directly to PostgreSQL when Redis is not configured', async () => {
       prisma.listing.findFirst.mockResolvedValue({ id: 'listing1', durationSeconds: 100 });
 

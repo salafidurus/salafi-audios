@@ -15,6 +15,7 @@ import { resolveContentTranslation } from '../../shared/i18n/resolve-content-tra
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { ListingRepository } from '../listing/listing.repo';
 import { ConfigService } from '../../core/config/config.service';
+import { AnalyticsDispatchRepository } from '../analytics/analytics-dispatch.repository';
 
 /** my library application module responsible for my library.repo behavior at the backend boundary. */
 type ProgressGroup = {
@@ -236,6 +237,7 @@ export class MyLibraryRepository {
     private readonly prisma: PrimaryDbService,
     private readonly listingRepo: ListingRepository,
     @Optional() private readonly config?: ConfigService,
+    @Optional() private readonly analyticsDispatch?: AnalyticsDispatchRepository,
   ) {}
 
   async findInProgress(
@@ -406,12 +408,26 @@ export class MyLibraryRepository {
     const listingId = await this.resolveListingId(slug);
     if (!listingId) return false;
 
-    await this.prisma.favoriteListing.upsert({
-      where: { userId_listingId: { userId, listingId } },
-      // Clears any prior tombstone (unsave then save again) and bumps updatedAt
-      // on both branches so this write always wins its own LWW comparison.
-      create: { userId, listingId, deletedAt: null },
-      update: { deletedAt: null, updatedAt: new Date() },
+    await this.prisma.$transaction(async (transaction) => {
+      const existing = await transaction.favoriteListing.findUnique({
+        where: { userId_listingId: { userId, listingId } },
+        select: { deletedAt: true },
+      });
+      const changed = !existing || existing.deletedAt !== null;
+      await transaction.favoriteListing.upsert({
+        where: { userId_listingId: { userId, listingId } },
+        // Clears any prior tombstone (unsave then save again) and bumps updatedAt
+        // on both branches so this write always wins its own LWW comparison.
+        create: { userId, listingId, deletedAt: null },
+        update: { deletedAt: null, updatedAt: new Date() },
+      });
+      if (changed && this.analyticsDispatch) {
+        await this.analyticsDispatch.append(transaction, {
+          eventName: 'listing_saved',
+          subjectId: userId,
+          payload: { listing_id: listingId },
+        });
+      }
     });
     return true;
   }
@@ -427,9 +443,22 @@ export class MyLibraryRepository {
     const listingId = await this.resolveListingId(slug);
     if (!listingId) return false;
 
-    await this.prisma.favoriteListing.updateMany({
-      where: { userId, listingId },
-      data: { deletedAt: new Date(), updatedAt: new Date() },
+    await this.prisma.$transaction(async (transaction) => {
+      const existing = await transaction.favoriteListing.findUnique({
+        where: { userId_listingId: { userId, listingId } },
+        select: { deletedAt: true },
+      });
+      await transaction.favoriteListing.updateMany({
+        where: { userId, listingId },
+        data: { deletedAt: new Date(), updatedAt: new Date() },
+      });
+      if (existing && existing.deletedAt === null && this.analyticsDispatch) {
+        await this.analyticsDispatch.append(transaction, {
+          eventName: 'listing_unsaved',
+          subjectId: userId,
+          payload: { listing_id: listingId },
+        });
+      }
     });
     return true;
   }
@@ -449,14 +478,24 @@ export class MyLibraryRepository {
    * an earlier save and vice versa, so `deletedAt` and `updatedAt` are decided
    * together by whichever write is newer, not OR-guarded.
    */
+  // eslint-disable-next-line complexity -- this sync boundary combines LWW conflict resolution and transition intent emission.
   async bulkSync(userId: string, items: SavedSyncItemDto[]): Promise<void> {
     if (items.length === 0) return;
 
-    const operations = items.map((item) => {
-      const clientUpdatedAt = new Date(item.updatedAt);
-      const deletedAt = item.saved ? null : clientUpdatedAt;
+    // eslint-disable-next-line complexity -- transaction callback combines LWW conflict resolution and transition intent emission.
+    await this.prisma.$transaction(async (transaction) => {
+      for (const item of items) {
+        const clientUpdatedAt = new Date(item.updatedAt);
+        const deletedAt = item.saved ? null : clientUpdatedAt;
+        // react-doctor-disable-next-line react-doctor/async-await-in-loop -- The read must precede each LWW write and intent decision in the transaction.
+        const existing = await transaction.favoriteListing.findUnique({
+          where: { userId_listingId: { userId, listingId: item.listingId } },
+          select: { deletedAt: true, updatedAt: true },
+        });
+        const wins = !existing || existing.updatedAt <= clientUpdatedAt;
+        const changed = wins && (!existing || (existing.deletedAt === null) !== item.saved);
 
-      return this.prisma.$executeRaw`
+        await transaction.$executeRaw`
         INSERT INTO "FavoriteListing" ("userId", "listingId", "createdAt", "updatedAt", "deletedAt")
         VALUES (${userId}, ${item.listingId}::uuid, ${clientUpdatedAt}, ${clientUpdatedAt}, ${deletedAt})
         ON CONFLICT ("userId", "listingId")
@@ -472,9 +511,16 @@ export class MyLibraryRepository {
             ELSE ${deletedAt}
           END
       `;
+        if (changed && this.analyticsDispatch) {
+          await this.analyticsDispatch.append(transaction, {
+            eventName: item.saved ? 'listing_saved' : 'listing_unsaved',
+            subjectId: userId,
+            payload: { listing_id: item.listingId },
+            occurredAt: clientUpdatedAt,
+          });
+        }
+      }
     });
-
-    await this.prisma.$transaction(operations);
   }
 
   async getRecentProgress(userId: string): Promise<RecentProgressDto | null> {
