@@ -10,6 +10,7 @@ import { AnalyticsBuffer as AnalyticsBufferClass, type AnalyticsBuffer } from ".
 
 const ANONYMOUS_ID_KEY = "sd:analytics-anonymous-id:v1";
 const SESSION_ID_KEY = "sd:analytics-session-id:v1";
+let fallbackIdCounter = 0;
 
 function getBrowserStorage(): WebAnalyticsRuntime["storage"] {
   if (!hasWindow()) return undefined;
@@ -43,9 +44,17 @@ export interface WebAnalyticsRecorder {
 
 function id(prefix: string): string {
   const uuid = globalThis.crypto?.randomUUID?.();
-  return uuid
-    ? `${prefix}-${uuid}`
-    : `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  if (uuid) return `${prefix}-${uuid}`;
+
+  const bytes = new Uint8Array(16);
+  const getRandomValues = globalThis.crypto?.getRandomValues;
+  if (getRandomValues) {
+    getRandomValues.call(globalThis.crypto, bytes);
+    const randomPart = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+    return `${prefix}-${Date.now()}-${randomPart}`;
+  }
+
+  return `${prefix}-${Date.now()}-${fallbackIdCounter++}`;
 }
 
 function getOrCreate(storage: WebAnalyticsRuntime["storage"], key: string, prefix: string): string {
