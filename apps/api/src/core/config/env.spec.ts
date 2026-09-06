@@ -109,6 +109,7 @@ describe('getApiEnv — operational telemetry', () => {
   it('normalizes empty optional URLs from dotenv files', () => {
     expect(getApiEnv({ ...baseDevEnv, SITEMAP_BASE_URL: '' }).SITEMAP_BASE_URL).toBeUndefined();
     expect(getApiEnv({ ...baseDevEnv, ASSET_CDN_BASE_URL: '' }).ASSET_CDN_BASE_URL).toBeUndefined();
+    expect(getApiEnv({ ...baseDevEnv, REDIS_URL: '' }).REDIS_URL).toBeUndefined();
   });
 
   it('allows deployment metadata to be explicitly supplied', () => {
