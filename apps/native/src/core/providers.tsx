@@ -20,6 +20,9 @@ import { handleDownloadOutboxEntry } from "@/features/downloads/engine/download.
 import { drainDownloadsOutbox } from "@/features/downloads/outbox/outbox.drain";
 import { useDownloadsStore } from "@/features/downloads/store/downloads.store";
 
+import { createAnalyticsBuffer } from "./analytics/buffer";
+import { drainAnalyticsBuffer } from "./analytics/delivery";
+import { createNativeAnalyticsRecorder } from "./analytics/recorder";
 import { initProgressPersistence } from "./audio/progress-persistence";
 import { authClient } from "./auth/auth-client";
 import { useAuth } from "./auth/use-auth";
@@ -34,6 +37,7 @@ import {
   subscribeToSystemTheme,
 } from "./styles/theme/theme-preference";
 import { syncTypographyToLocale } from "./styles/theme/typography-sync";
+import { createSqliteKvAdapter } from "./sync/sqlite-kv-adapter";
 
 /** Composes the native provider tree and establishes app-wide runtime dependencies. */
 LogBox.ignoreLogs(["API client initialization failed", "Open debugger to view warnings"]);
@@ -130,6 +134,44 @@ export function Providers({ children, apiBaseUrl }: Props) {
       unsubscribeAppearance();
     };
   }, []);
+
+  useEffect(() => {
+    if (!i18nReady) return;
+
+    let active = true;
+    const buffer = createAnalyticsBuffer(createSqliteKvAdapter());
+    const recorder = createNativeAnalyticsRecorder(buffer);
+    const initialized = (async () => {
+      await buffer.hydrate();
+      if (!active) return;
+      await recorder.recordLifecycle("app_opened", "active");
+      await recorder.recordLifecycle("session_started", "active");
+    })().catch(() => {
+      console.warn("[analytics] native initialization failed");
+    });
+    const drain = () => {
+      void initialized.then(() => drainAnalyticsBuffer(buffer));
+    };
+
+    const unsubscribeNetwork = onNetworkReconnect(drain);
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "active") {
+        drain();
+      } else if (nextState === "background") {
+        void initialized.then(() => recorder.recordLifecycle("app_backgrounded", "background"));
+      } else if (nextState === "inactive") {
+        void initialized.then(() => recorder.recordLifecycle("session_ended", "inactive"));
+      }
+    });
+
+    drain();
+
+    return () => {
+      active = false;
+      unsubscribeNetwork();
+      subscription.remove();
+    };
+  }, [i18nReady]);
 
   useEffect(() => {
     // RN fetch has no cookie jar, so forward the @better-auth/expo session

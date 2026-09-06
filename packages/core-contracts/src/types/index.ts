@@ -21,6 +21,13 @@ export {
   type ErrorResponseDto,
   ErrorResponseDtoSchema,
 } from "../types/common.types";
+
+export {
+  AnalyticsEventOutcomeSchema,
+  type AnalyticsEventOutcome,
+  IngestAnalyticsEventsResponseSchema,
+  type IngestAnalyticsEventsResponse,
+} from "./analytics.types";
 export {
   type TopicSlug,
   TopicSlugSchema,

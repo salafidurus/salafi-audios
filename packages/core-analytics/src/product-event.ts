@@ -38,6 +38,8 @@ export const ProductEventContextSchema = z.strictObject({
   coarse_region: z.string().min(1).optional(),
   timezone: z.string().min(1).optional(),
   source_surface: z.string().min(1).optional(),
+  session_id: z.string().min(1).optional(),
+  lifecycle_state: z.enum(["active", "background", "inactive"]).optional(),
   recommendation: z
     .strictObject({
       request_id: z.string().min(1),
@@ -67,6 +69,17 @@ const ListingViewedPropertiesSchema = z.strictObject({
   listing_slug: z.string().min(1).optional(),
   scholar_slug: z.string().min(1).optional(),
 });
+const NativeLifecycleEventNameSchema = z.enum([
+  "app_opened",
+  "app_backgrounded",
+  "session_started",
+  "session_ended",
+]);
+
+const ClientSourceSchema = z.enum(["web", "native"]);
+const ClientPlatformSchema = z.enum(["web", "ios", "android"]);
+const ClientProducerSchema = z.enum(["web", "native"]);
+
 const AudioCompletedPropertiesSchema = z.strictObject({
   completion_source: z.literal("progress_persisted"),
 });
@@ -89,15 +102,27 @@ const CommonEventFields = {
 const ListingViewedEventSchema = z.strictObject({
   ...CommonEventFields,
   event_name: z.literal("listing_viewed"),
-  source: z.literal("web"),
-  platform: z.literal("web"),
+  source: ClientSourceSchema,
+  platform: ClientPlatformSchema,
   content_references: z.strictObject({
     listing_slug: z.string().min(1),
     scholar_slug: z.string().min(1),
   }),
   authority: z.literal("client_observation"),
-  producer: z.literal("web"),
+  producer: ClientProducerSchema,
   properties: ListingViewedPropertiesSchema,
+});
+
+/** Typed native lifecycle observation with process-scoped session context. */
+const NativeLifecycleEventSchema = z.strictObject({
+  ...CommonEventFields,
+  event_name: NativeLifecycleEventNameSchema,
+  source: z.literal("native"),
+  platform: z.enum(["ios", "android"]),
+  content_references: ProductEventContentReferencesSchema,
+  authority: z.literal("client_observation"),
+  producer: z.literal("native"),
+  properties: z.strictObject({}),
 });
 
 /** Typed backend-confirmed outcome produced after a persisted completion. */
@@ -117,8 +142,30 @@ const AudioCompletedEventSchema = z.strictObject({
 
 /** The provider-neutral, immutable event union shared by future producers. */
 export const ProductEventSchema = z
-  .discriminatedUnion("event_name", [ListingViewedEventSchema, AudioCompletedEventSchema])
+  .discriminatedUnion("event_name", [
+    ListingViewedEventSchema,
+    NativeLifecycleEventSchema,
+    AudioCompletedEventSchema,
+  ])
   .superRefine((event, context) => {
+    const runtime =
+      event.event_name === "listing_viewed"
+        ? `${event.source}:${event.platform}:${event.producer}`
+        : null;
+    const validClientRuntimes = new Set([
+      "web:web:web",
+      "native:ios:native",
+      "native:android:native",
+    ]);
+
+    if (runtime !== null && !validClientRuntimes.has(runtime)) {
+      context.addIssue({
+        code: "custom",
+        message: "Client observations must use a matching source, platform, and producer",
+        path: ["platform"],
+      });
+    }
+
     const serialized = JSON.stringify(event);
     if (serialized.length > 64 * 1024) {
       context.addIssue({
