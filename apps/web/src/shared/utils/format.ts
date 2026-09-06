@@ -1,8 +1,8 @@
 /**
- * Converts a positive duration to the compact playback-label format used by the web UI.
+ * Formats a duration for compact playback metadata.
  *
- * Zero, negative, missing, and sub-minute durations intentionally return an empty string
- * so callers can omit a label when there is no useful minute-level value to display.
+ * @param durationSeconds - Duration in seconds; non-positive and missing values produce an empty label.
+ * @returns A short hours-and-minutes or minutes-only label, or an empty string when no label is useful.
  */
 export function formatDuration(durationSeconds?: number): string {
   if (!durationSeconds || durationSeconds <= 0) {

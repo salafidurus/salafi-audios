@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'bun:test';
 
-import { ScholarsRepository } from './scholars.repo';
+import { ScholarsRecommendationProjection } from './scholars-recommendation.projection';
 
-describe('ScholarsRepository page-feed hydration', () => {
+describe('ScholarsRecommendationProjection', () => {
   it('preserves engine order and omits references missing from the active hydration query', async () => {
     const findMany = vi.fn().mockResolvedValue([
       {
@@ -26,9 +26,9 @@ describe('ScholarsRepository page-feed hydration', () => {
         _count: { listings: 1 },
       },
     ]);
-    const repository = new ScholarsRepository({ scholar: { findMany } } as never);
+    const projection = new ScholarsRecommendationProjection({ scholar: { findMany } } as never);
 
-    const result = await repository.hydratePageFeed([
+    const result = await projection.project([
       {
         form: 'scholars',
         id: 'scholars:allamah',
@@ -49,12 +49,12 @@ describe('ScholarsRepository page-feed hydration', () => {
   });
 
   it('returns an exhausted empty page when no recommendation item hydrates', async () => {
-    const repository = new ScholarsRepository({
+    const projection = new ScholarsRecommendationProjection({
       scholar: { findMany: vi.fn().mockResolvedValue([]) },
     } as never);
 
     await expect(
-      repository.hydratePageFeed([
+      projection.project([
         {
           form: 'scholars',
           id: 'scholars:allamah',
@@ -63,6 +63,40 @@ describe('ScholarsRepository page-feed hydration', () => {
         },
       ]),
     ).resolves.toEqual({ schemaVersion: 1, batches: [], exhausted: true });
+  });
+
+  it('applies a published Scholar translation while preserving the original identity', async () => {
+    const projection = new ScholarsRecommendationProjection({
+      scholar: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 'scholar-1',
+            slug: 'first-scholar',
+            name: 'العالم الأول',
+            imageUrl: null,
+            mainLanguage: 'ar',
+            title: 'allamah',
+            translations: [{ name: 'First Scholar' }],
+            _count: { listings: 2 },
+          },
+        ]),
+      },
+    } as never);
+
+    const result = await projection.project([
+      {
+        form: 'scholars',
+        id: 'scholars:allamah',
+        titleKind: 'allamah',
+        itemIds: ['scholar-1'],
+      },
+    ]);
+
+    expect(result.batches[0]?.items[0]).toMatchObject({
+      name: 'First Scholar',
+      originalLanguage: 'ar',
+      original: { name: 'العالم الأول' },
+    });
   });
 
   it('hydrates scholar listings in recommendation order and omits stale listings', async () => {
@@ -95,12 +129,12 @@ describe('ScholarsRepository page-feed hydration', () => {
         translations: [],
       },
     ]);
-    const repository = new ScholarsRepository({
+    const projection = new ScholarsRecommendationProjection({
       scholar: { findMany: scholarFindMany },
       listing: { findMany: listingFindMany },
     } as never);
 
-    const result = await repository.hydratePageFeed([
+    const result = await projection.project([
       {
         form: 'scholar_listings',
         id: 'scholar-listings:first-scholar',
@@ -151,12 +185,12 @@ describe('ScholarsRepository page-feed hydration', () => {
         listingTopics: [{ listing: { scholarId: 'scholar-2' } }],
       },
     ]);
-    const repository = new ScholarsRepository({
+    const projection = new ScholarsRecommendationProjection({
       scholar: { findMany: scholarFindMany },
       topic: { findMany: topicFindMany },
     } as never);
 
-    const result = await repository.hydratePageFeed([
+    const result = await projection.project([
       {
         form: 'topic_scholars',
         id: 'topic-scholars:aqeedah',
