@@ -11,6 +11,7 @@
  * Theme preference values persisted by the web client and accepted by theme
  * resolution. Unknown stored values are normalized to `system` by readers.
  */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- The theme union contract is documented above.
 export type ThemePreference = "system" | "light" | "dark";
 
 /** Concrete theme values applied to the document after resolving a preference. */

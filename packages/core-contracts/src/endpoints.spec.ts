@@ -25,5 +25,6 @@ describe("public content endpoint builders", () => {
     expect(endpoints.topics.list).toBe("/v1/topics");
     expect(endpoints.myLibrary.savedSync).toBe("/v1/me/my-library/saved/sync");
     expect(endpoints.admin.dashboard).toBe("/v1/admin/dashboard");
+    expect(endpoints.analytics.events).toBe("/v1/analytics/events");
   });
 });
