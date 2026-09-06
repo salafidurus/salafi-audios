@@ -11,7 +11,7 @@ import type {
 } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import type { ScholarsRecommendation } from '../recommendation/scholars-recommendation.repo';
 
 type ScholarListRecord = {
@@ -101,7 +101,7 @@ function getListingStats(listing: {
  */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- the class-level responsibility is documented above.
 export class ScholarsRecommendationProjection {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrimaryDbService) {}
 
   /** Returns locale-aware public batches without changing recommendation metadata. */
   // oxlint-disable-next-line complexity -- One hydration pass preserves the ordered batch contract across three semantic forms.

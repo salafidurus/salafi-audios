@@ -1,4 +1,9 @@
-/** Formats duration seconds as a compact playback label, or empty text when no minute-level label is useful. */
+/**
+ * Formats a duration for compact playback metadata.
+ *
+ * @param durationSeconds - Duration in seconds; non-positive and missing values produce an empty label.
+ * @returns A short hours-and-minutes or minutes-only label, or an empty string when no label is useful.
+ */
 export function formatDuration(durationSeconds?: number): string {
   if (!durationSeconds || durationSeconds <= 0) {
     return "";
