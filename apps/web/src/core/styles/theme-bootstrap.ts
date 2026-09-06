@@ -1,4 +1,7 @@
-/** User-selected theme preference, including the system-color-scheme fallback. */
+/**
+ * Theme preference persisted by the client; `system` defers to the operating
+ * system's color-scheme media query while `light` and `dark` are explicit.
+ */
 export type ThemePreference = "system" | "light" | "dark";
 
 /** Concrete theme values applied to the document after resolving a preference. */

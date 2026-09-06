@@ -27,6 +27,7 @@ export class AnalyticsService {
   ): Promise<{
     outcomes: Array<{
       event_id: string;
+      /** Outcome for this event after consent filtering and append-only persistence. */
       status: 'accepted' | 'deduplicated' | 'dropped';
       code?: string;
     }>;
