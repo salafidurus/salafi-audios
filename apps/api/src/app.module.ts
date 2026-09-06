@@ -26,6 +26,7 @@ import { AudioModule } from './modules/audio/audio.module';
 import { MediaModule } from './modules/media/media.module';
 import { ListingModule } from './modules/listing/listing.module';
 import { ExploreModule } from './modules/explore/explore.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
 import { LocaleMiddleware } from './shared/i18n/locale.middleware';
 import { CacheInvalidationInterceptor } from './shared/interceptors/cache-invalidation.interceptor';
@@ -61,6 +62,7 @@ import { RateLimitGuard } from './core/security/rate-limit.guard';
     MediaModule,
     ListingModule,
     ExploreModule,
+    AnalyticsModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: CacheInvalidationInterceptor },
