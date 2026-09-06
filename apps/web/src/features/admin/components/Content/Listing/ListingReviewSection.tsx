@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Summarizes pending listing changes before an editorial form is submitted. */
 "use client";
 
 import type { Locale, TopicDetailDto } from "@sd/core-contracts";
@@ -11,6 +11,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 
 interface ListingReviewSectionProps {
+  /** Current form snapshot used to calculate create or edit differences. */
   state: FormState;
   mainLocale: Locale;
   topics: TopicDetailDto[];
@@ -26,8 +27,10 @@ function sameTopics(a: string[], b: string[]) {
 type ReviewChanges = {
   titleChanged: boolean;
   descriptionChanged: boolean;
+  /** Whether the persisted publication status differs from the edited value. */
   statusChanged: boolean;
   orderIndexChanged: boolean;
+  /** Whether the selected content language differs from the persisted value. */
   languageChanged: boolean;
   coverImageChanged: boolean;
   topicsChanged: boolean;
@@ -124,8 +127,10 @@ function MainChanges({ title, description, mainLocale, t, changes }: MainChanges
 }
 
 type DetailChangesProps = {
+  /** Current publication status shown when that field changed. */
   status: string;
   orderIndex: number | null;
+  /** Current content language shown when that field changed. */
   language: Locale;
   topicNames: string[];
   t: ReturnType<typeof useTranslation>["t"];
@@ -214,6 +219,7 @@ function DetailChanges({
   );
 }
 
+/** Renders localized, field-level summaries for changes detected in the listing form. */
 export function ListingReviewSection({ state, mainLocale, topics }: ListingReviewSectionProps) {
   const { t, i18n } = useTranslation();
   const { title, description, status, orderIndex, selectedTopics, language } = state;

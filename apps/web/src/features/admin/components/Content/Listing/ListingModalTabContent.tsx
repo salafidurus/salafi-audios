@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Selects the listing-editorial tab content and routes shared form state to each tab. */
 "use client";
 
 import type { Locale, ScholarListItemDto, TopicDetailDto } from "@sd/core-contracts";
@@ -14,9 +14,11 @@ import { ListingSublistingsTab } from "./ListingSublistingsTab";
 import { ListingTranslatableFields } from "./ListingTranslatableFields";
 
 interface ListingModalTabContentProps {
+  /** Current listing form values, including the latest validation error. */
   state: FormState;
   dispatch: React.Dispatch<FormAction>;
   activeTab: string;
+  /** Tabs that currently contain validation errors and need an inline banner. */
   errorTabSet: Set<string>;
   scholars: ScholarListItemDto[];
   topics: TopicDetailDto[];
