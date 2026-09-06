@@ -11,7 +11,7 @@ import {
 } from "@sd/core-contracts";
 import { localeToDir } from "@sd/core-i18n";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 
 import { authClient } from "@/core/auth/auth-client";
@@ -20,7 +20,7 @@ import { ToastContainer } from "@/core/toast";
 import { useCookieConsent } from "@/features/legal/hooks/use-cookie-consent";
 import { hasDocument, hasWindow } from "@/shared/lib/runtime-guards";
 
-import { subscribeWebAnalytics, webAnalyticsBuffer } from "./analytics/web-analytics";
+import { subscribeWebAnalytics, webAnalytics, webAnalyticsBuffer } from "./analytics/web-analytics";
 import { flushWebAnalytics } from "./analytics/web-analytics-delivery";
 import { initProgressPersistence } from "./audio/progress-persistence";
 import { createI18n } from "./i18n/i18n";
@@ -52,6 +52,7 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   const [i18n] = useState(() => createI18n(initialLocale));
   const { isAuthenticated, user } = useAuth();
   const { hasAccepted } = useCookieConsent();
+  const previousConsent = useRef<boolean | null>(null);
 
   // Synchronously configure API client on first render if a custom apiBaseUrl is provided (e.g. in tests/Storybook)
   useState(() => {
@@ -61,6 +62,13 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   });
 
   // httpClient requires the API client to be configured (done at module load above).
+  useEffect(() => {
+    if (previousConsent.current === true && !hasAccepted) {
+      webAnalytics.withdrawConsent();
+    }
+    previousConsent.current = hasAccepted;
+  }, [hasAccepted]);
+
   useEffect(() => {
     if (!isAuthenticated || !user?.id) return;
     return initProgressPersistence(user.id, {

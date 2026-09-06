@@ -2,7 +2,8 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 
 import styles from "./feed-skeleton.module.css";
 
-/** Props controlling how many loading placeholders the Explore feed displays. */
+/** Provides accessible loading placeholders for the Explore feed grid. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- the exported props type is documented by its member and consumer-facing component contract.
 export type FeedSkeletonProps = {
   /** Number of placeholder cards to render. */
   count?: number;

@@ -3,6 +3,7 @@ import { parseProductEvent, type CanonicalProductEvent } from "@sd/core-analytic
 
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
+import webPackage from "../../../package.json";
 import { AnalyticsBuffer as AnalyticsBufferClass, type AnalyticsBuffer } from "./analytics-buffer";
 
 /** Builds provider-neutral web observations and manages resettable browser identity. */
@@ -65,7 +66,7 @@ export function createWebAnalyticsRecorder(
         event_name: "listing_viewed",
         schema_version: "v1",
         occurred_at: new Date(now()).toISOString(),
-        app_version: "web-0.1.0",
+        app_version: `web-${webPackage.version}`,
         source: "web",
         platform: "web",
         consent_state: "optional_granted",
