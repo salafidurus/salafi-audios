@@ -29,7 +29,8 @@ async function main() {
   const lockPath = getGeneratedClientLockPath(pkgRoot);
 
   await withGeneratedClientLock(lockPath, async () => {
-    await runPrismaGenerate(pkgRoot);
+    await runPrismaGenerate(pkgRoot, "primary");
+    await runPrismaGenerate(pkgRoot, "analytics");
     await runCommand(
       process.execPath,
       ["run", "tsup", "src/index.ts", "--format", "esm,cjs", "--out-dir", "dist"],

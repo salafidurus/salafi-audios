@@ -75,7 +75,8 @@ const CommonEventFields = {
   event_id: z.string().min(1),
   schema_version: z.string().regex(/^v\d+$/, "Schema versions must use the vN format"),
   occurred_at: EventTimestampSchema,
-  received_at: EventTimestampSchema,
+  /** Server-owned ingestion timestamp; client producers must omit it. */
+  received_at: EventTimestampSchema.optional(),
   app_version: z.string().min(1),
   consent_state: ProductEventConsentStateSchema,
   identity: ProductEventIdentitySchema,

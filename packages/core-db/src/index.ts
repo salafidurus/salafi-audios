@@ -1,5 +1,5 @@
 import * as analyticsClient from "./generated/analytics/client";
-import * as client from "./generated/prisma/client";
+import * as client from "./generated/primary/client";
 
 /** Repository-owned database boundary re-exporting generated Prisma client types and values. */
 // Export enum types and values

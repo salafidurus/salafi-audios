@@ -5,8 +5,10 @@
   "compilerOptions": {
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
-    "composite": true,
     "incremental": true,
+    // The API runs from TypeScript source and does not publish declarations;
+    // Prisma's generated payload paths should not leak into declaration names.
+    "isolatedDeclarations": false,
     "types": ["bun-types", "node"],
     // @casl/ability only declares types via package.json "exports" conditions,
     // which the preset's Node10 moduleResolution can't follow. "bundler" reads

@@ -1,4 +1,4 @@
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import { ConfigService } from '../../core/config/config.service';
 import {
   BadRequestException,
@@ -302,7 +302,7 @@ function isNewlyPublished(status: Status, existingStatus: Status | null | undefi
 /** NestJS listing repository service or controller coordinating the API boundary for this responsibility. */
 export class ListingRepository {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrimaryDbService,
     private readonly config?: ConfigService,
   ) {}
 

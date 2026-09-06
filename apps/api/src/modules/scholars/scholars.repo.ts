@@ -1,4 +1,4 @@
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import { Injectable } from '@nestjs/common';
 import { Status, Prisma } from '@sd/core-db';
 import { validateCountryCode } from '@sd/core-contracts';
@@ -199,7 +199,7 @@ function scholarListSelect(locale: Locale) {
 @Injectable()
 /** NestJS scholars repository service or controller coordinating the API boundary for this responsibility. */
 export class ScholarsRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrimaryDbService) {}
 
   /** Hydrates the engine's ordered scholar references into one localized page-feed response. */
   // oxlint-disable-next-line complexity -- One hydration pass preserves the ordered batch contract across three semantic forms.

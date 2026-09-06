@@ -58,10 +58,10 @@ bun run --filter @sd/core-db grant:access user@example.com superadmin grant
 
 ### Production and External Databases
 
-To run the CLI script against a production database, supply `DATABASE_URL` or `DIRECT_DB_URL` as environment variables:
+To run the CLI script against a production database, supply `PRIMARY_DATABASE_URL` or `PRIMARY_DIRECT_DATABASE_URL` as environment variables:
 
 ```bash
-DIRECT_DB_URL="<database-url>" \
+PRIMARY_DIRECT_DATABASE_URL="<database-url>" \
   bun run --filter @sd/core-db grant:access admin@example.com superadmin grant
 ```
 

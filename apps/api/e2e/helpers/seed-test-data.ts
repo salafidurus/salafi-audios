@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import { PrismaService } from '../../src/core/db/prisma.service';
+import { PrimaryDbService } from '../../src/core/db/primary-db.service';
 
 function uuid(index: number): string {
   return `a0000000-0000-0000-0000-${String(index).padStart(12, '0')}`;
@@ -16,7 +16,7 @@ export const TEST_RECOMMENDED_LISTING_SLUG = 'e2e-recommended-listing-slug';
 export const TEST_LIVE_CHANNEL_ID = 'e2e-live-channel-1';
 export const TEST_LIVE_CHANNEL_TELEGRAM_ID = '-10022334455';
 
-export async function seedTestData(prisma: PrismaService): Promise<void> {
+export async function seedTestData(prisma: PrimaryDbService): Promise<void> {
   // Seed regular scholars/topics from the canonical seed data — imported
   // directly (not duplicated here) so this fixture can never drift from
   // packages/core-db/scripts/seed/data, per apps/api/e2e/AGENT.md.
@@ -158,7 +158,7 @@ export async function seedTestData(prisma: PrismaService): Promise<void> {
  * Delete the E2E test fixtures created by seedTestData.
  * Deletion order respects FK constraints (leaf tables first).
  */
-export async function cleanupE2ETestData(prisma: PrismaService): Promise<void> {
+export async function cleanupE2ETestData(prisma: PrimaryDbService): Promise<void> {
   for (const id of [
     TEST_LISTING_ID,
     TEST_RECOMMENDED_LISTING_ID,

@@ -6,7 +6,7 @@ Clean, modular database seeding system for development and testing.
 
 The seeder respects the following environment variables:
 
-- `DATABASE_URL` or `DIRECT_DB_URL` - Database connection string (required)
+- `PRIMARY_DATABASE_URL` or `PRIMARY_DIRECT_DATABASE_URL` - Primary database connection string (required)
 - No `MEDIA_CDN_BASE_URL` — audio URLs are hardcoded real CDN URLs in seed data.
 
 ## Structure

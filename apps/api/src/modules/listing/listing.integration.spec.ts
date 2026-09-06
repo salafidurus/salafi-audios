@@ -6,7 +6,7 @@ import request from 'supertest';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AuthGuard } from '../../core/auth/auth.guard';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import { ListingController } from './listing.controller';
 import { ListingService } from './listing.service';
 
@@ -34,7 +34,7 @@ describe('ListingController — public Home access', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: ListingService, useValue: mockListingService },
-        { provide: PrismaService, useValue: mockPrisma },
+        { provide: PrimaryDbService, useValue: mockPrisma },
       ],
     }).compile();
 

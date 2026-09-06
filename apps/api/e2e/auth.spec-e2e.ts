@@ -1,17 +1,17 @@
 import { createE2eApp } from './helpers/create-e2e-app';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
-import { PrismaService } from '../src/core/db/prisma.service';
+import { PrimaryDbService } from '../src/core/db/primary-db.service';
 import { TestAuthFactory } from './helpers/test-auth.factory';
 
 describe('Authentication (e2e)', () => {
   let app: NestFastifyApplication;
-  let prisma: PrismaService;
+  let prisma: PrimaryDbService;
   let authFactory: TestAuthFactory;
 
   beforeAll(async () => {
     ({ app } = await createE2eApp({ disableThrottler: true }));
-    prisma = app.get(PrismaService);
+    prisma = app.get(PrimaryDbService);
     authFactory = new TestAuthFactory(prisma);
   });
 

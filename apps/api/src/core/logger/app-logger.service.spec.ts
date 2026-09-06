@@ -32,10 +32,10 @@ describe('AppLoggerService', () => {
     const logger = createLogger();
     const service = new AppLoggerService(logger as unknown as ApplicationLogger);
 
-    service.setContext('PrismaService');
+    service.setContext('PrimaryDbService');
     service.info({ db: true }, 'Prisma connected to database');
 
-    expect(logger.child).toHaveBeenCalledWith({ context: 'PrismaService' });
+    expect(logger.child).toHaveBeenCalledWith({ context: 'PrimaryDbService' });
     expect(logger.childLogger.info).toHaveBeenCalledWith(
       { db: true },
       'Prisma connected to database',

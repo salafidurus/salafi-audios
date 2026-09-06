@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import type { PrismaService } from '../../db/prisma.service';
+import type { PrimaryDbService } from '../../db/primary-db.service';
 import type { AppActions, AppSubjectType } from '../ability/ability.types';
 import type { PolicyResource } from '../policy';
 
@@ -19,7 +19,7 @@ export type PolicyRequestContext = {
 /** API type describing the policy resource resolver contract. */
 export type PolicyResourceResolver = (
   ctx: PolicyRequestContext,
-  prisma: PrismaService,
+  prisma: PrimaryDbService,
 ) => Promise<PolicyResource> | PolicyResource;
 
 /** API type describing the check policy metadata contract. */

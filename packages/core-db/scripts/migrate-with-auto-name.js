@@ -21,12 +21,20 @@ function autoName() {
   return `auto-${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}-${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}`;
 }
 
-getDbEnv(process.env);
+const role = process.argv[2];
+if (role !== "primary" && role !== "analytics") {
+  throw new Error("A database role is required: primary or analytics");
+}
+
+getDbEnv(process.env, role);
+
+const schemaPath = `./prisma/${role}/schema.prisma`;
+const configPath = `./prisma.${role}.config.ts`;
 
 const name = autoName();
 
-runBun(["run", "prisma:format"]);
-runBun(["run", "prisma:validate"]);
+runBun(["run", `${role}:prisma:format`]);
+runBun(["run", `${role}:prisma:validate`]);
 runBun([
   "x",
   "prisma",
@@ -35,6 +43,6 @@ runBun([
   "--create-only",
   "--name",
   name,
-  "--schema=./prisma/schema.prisma",
-  "--config=./prisma.config.ts",
+  `--schema=${schemaPath}`,
+  `--config=${configPath}`,
 ]);

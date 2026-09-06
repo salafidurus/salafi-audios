@@ -3,7 +3,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { PrismaClient } from "../src/generated/prisma/client.js";
+import { PrismaClient } from "../src/generated/primary/client.js";
 import { loadDbEnvFiles } from "./load-db-env.js";
 
 export const ACCESS_TARGETS = [
@@ -152,8 +152,11 @@ async function main(): Promise<void> {
   const parsed = parseAccessArgs(args);
   const scriptDir = path.dirname(fileURLToPath(import.meta.url));
   loadDbEnvFiles(path.resolve(scriptDir, ".."));
-  const connectionString = process.env.DIRECT_DB_URL ?? process.env.DATABASE_URL;
-  if (!connectionString) throw new Error("DATABASE_URL or DIRECT_DB_URL must be set.");
+  const connectionString =
+    process.env.PRIMARY_DIRECT_DATABASE_URL ?? process.env.PRIMARY_DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("PRIMARY_DATABASE_URL or PRIMARY_DIRECT_DATABASE_URL must be set.");
+  }
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 
   try {

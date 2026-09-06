@@ -6,11 +6,11 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { AppLoggerService } from '../logger/app-logger.service';
 import { getPrismaLogLevels } from './prisma-log-levels';
 
-/** NestJS prisma service service or controller coordinating the API boundary for this responsibility. */
+/** NestJS primary database service coordinating the API's transactional database boundary. */
 @Injectable()
-/** Core API prisma.service module providing shared backend infrastructure and authority-boundary services. */
+/** Core API primary-db.service module providing shared backend infrastructure and authority-boundary services. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrimaryDbService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private isConnected = false;
 
   constructor(
@@ -23,19 +23,19 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       adapter,
       log: getPrismaLogLevels(getPrismaLogQueries(config)),
     });
-    this.logger?.setContext(PrismaService.name);
+    this.logger?.setContext(PrimaryDbService.name);
   }
 
   async onModuleInit() {
     await this.$connect();
     this.isConnected = true;
-    this.logger?.info({ db: true }, 'Prisma connected to database');
+    this.logger?.info({ db: 'primary' }, 'Primary database connected');
   }
 
   async onModuleDestroy() {
     await this.$disconnect();
     this.isConnected = false;
-    this.logger?.info({ db: true }, 'Prisma disconnected from database');
+    this.logger?.info({ db: 'primary' }, 'Primary database disconnected');
   }
 
   async ensureConnection() {
@@ -44,10 +44,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     try {
       await this.$connect();
       this.isConnected = true;
-      this.logger?.warn({ db: true }, 'Prisma reconnected');
+      this.logger?.warn({ db: 'primary' }, 'Primary database reconnected');
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
-      this.logger?.error({ err: error, db: true }, 'Prisma reconnect failed');
+      this.logger?.error({ err: error, db: 'primary' }, 'Primary database reconnect failed');
       throw err;
     }
   }
@@ -55,9 +55,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
 function requireDatabaseConnection(config: ConfigService): string {
   const connectionString =
-    config?.DATABASE_URL ?? process.env['DATABASE_URL'] ?? process.env['DIRECT_DB_URL'];
+    config?.PRIMARY_DATABASE_URL ??
+    process.env['PRIMARY_DATABASE_URL'] ??
+    process.env['PRIMARY_DIRECT_DATABASE_URL'];
   if (!connectionString) {
-    throw new Error('DATABASE_URL is required and no DB fallback is allowed.');
+    throw new Error('PRIMARY_DATABASE_URL is required and no DB fallback is allowed.');
   }
   return connectionString;
 }

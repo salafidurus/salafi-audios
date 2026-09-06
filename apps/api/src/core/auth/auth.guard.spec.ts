@@ -3,7 +3,7 @@ import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { AuthGuard } from './auth.guard';
 import { Reflector } from '@nestjs/core';
 import { ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
-import type { PrismaService } from '../db/prisma.service';
+import type { PrimaryDbService } from '../db/primary-db.service';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -21,7 +21,7 @@ function mockContext(headers: Record<string, string> = {}): ExecutionContext {
 describe('AuthGuard', () => {
   let guard: AuthGuard;
   let reflector: Reflector;
-  let mockPrisma: Partial<PrismaService>;
+  let mockPrisma: Partial<PrimaryDbService>;
 
   beforeEach(() => {
     reflector = new Reflector();
@@ -32,8 +32,8 @@ describe('AuthGuard', () => {
       userAccessGrant: {
         findMany: vi.fn<any>().mockResolvedValue([]),
       },
-    } as unknown as Partial<PrismaService>;
-    guard = new AuthGuard(reflector, mockPrisma as PrismaService);
+    } as unknown as Partial<PrimaryDbService>;
+    guard = new AuthGuard(reflector, mockPrisma as PrimaryDbService);
     vi.clearAllMocks();
   });
 

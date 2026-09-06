@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from 'bun:test';
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 import { AccountService } from './account.service';
 
 describe('AccountService', () => {
@@ -22,7 +22,7 @@ describe('AccountService', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    service = new AccountService(mockPrisma as unknown as PrismaService);
+    service = new AccountService(mockPrisma as unknown as PrimaryDbService);
   });
 
   it('should be defined', () => {

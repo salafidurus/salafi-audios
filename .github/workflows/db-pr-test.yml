@@ -8,7 +8,7 @@ on:
       - spec/** # Specification integration PRs require schema feedback
     paths:
       - packages/core-db/prisma/**
-      - packages/core-db/prisma.config.ts
+      - packages/core-db/prisma.*.config.ts
       - packages/core-db/package.json
       - packages/core-db/src/generated/**
 
@@ -80,17 +80,24 @@ jobs:
 
       - name: Validate Prisma schema
         env:
-          DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          PRIMARY_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          ANALYTICS_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
         run: bun run --filter @sd/core-db prisma:validate
 
       - name: Apply migrations to Neon branch
         env:
-          DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
-        run: bun run --filter @sd/core-db migrate:deploy
+          PRIMARY_DIRECT_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+        run: bun run --filter @sd/core-db primary:migrate:deploy
+
+      - name: Apply analytics migrations to Neon branch
+        env:
+          ANALYTICS_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+        run: bun run --filter @sd/core-db analytics:migrate:deploy
 
       - name: Generate Prisma client
         env:
-          DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          PRIMARY_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          ANALYTICS_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
         run: bun run --filter @sd/core-db prisma:generate
 
   policy_check:
@@ -100,8 +107,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Use fallback DB for policy check (doesn't need real DB)
-      DIRECT_DB_URL: postgresql://ci:ci@localhost:5432/ci
-      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      PRIMARY_DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      ANALYTICS_DATABASE_URL: postgresql://ci:ci@localhost:5432/ci_analytics
     steps:
       - uses: actions/checkout@v7
         with:

@@ -3,7 +3,13 @@
   "cacheMaxSize": "1GB",
   "ui": "tui",
   // Prisma client generation needs DB URLs at build time; pass them through to all tasks
-  "globalPassThroughEnv": ["DIRECT_DB_URL", "DATABASE_URL"],
+  "globalPassThroughEnv": [
+    "PRIMARY_DATABASE_URL",
+    "PRIMARY_DIRECT_DATABASE_URL",
+    "PRIMARY_SHADOW_DATABASE_URL",
+    "ANALYTICS_DATABASE_URL",
+    "ANALYTICS_IDENTITY_HMAC_SECRET"
+  ],
   // Root-level shared lint/tsconfig presets — a change here invalidates every task's cache
   "globalDependencies": [
     "tsconfig.base.json",

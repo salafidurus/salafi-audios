@@ -8,7 +8,7 @@
 #   Port Exposes:        4000   (app defaults to this via ENV PORT below)
 #   Port Mappings:       empty  (Dokploy/Traefik route internally)
 #
-# All runtime env vars (DATABASE_URL, better-auth, OAuth, R2, CORS, ...) are
+# All runtime env vars (PRIMARY_DATABASE_URL, ANALYTICS_DATABASE_URL, better-auth, OAuth, R2, CORS, ...) are
 # injected by Dokploy at runtime. Nothing secret is baked into this image and
 # no .env file is copied in. Neon PostgreSQL, Cloudflare R2 and Redis run
 # outside this container.
@@ -34,14 +34,14 @@ WORKDIR /app
 
 # Build-time ONLY — never carried into the runtime image.
 # prisma.config.ts (packages/core-db) refuses to run `prisma generate`
-# without DIRECT_DB_URL or DATABASE_URL. Prisma 7 generation is OFFLINE
+# without primary or analytics database URLs. Prisma 7 generation is OFFLINE
 # (it does not connect to the database), so the value only needs to be
 # non-empty — it is never used to connect and never reaches the runtime
 # image. This is a deliberate, non-secret placeholder. Dokploy can override
 # it via build args only if you ever need generation to read a live schema.
-ARG DIRECT_DB_URL="prisma-generate-offline-placeholder"
-ARG DATABASE_URL="${DIRECT_DB_URL}"
-ENV DIRECT_DB_URL="$DIRECT_DB_URL" DATABASE_URL="$DATABASE_URL"
+ARG PRIMARY_DATABASE_URL="prisma-generate-offline-placeholder"
+ARG ANALYTICS_DATABASE_URL="prisma-generate-offline-placeholder"
+ENV PRIMARY_DATABASE_URL="$PRIMARY_DATABASE_URL" ANALYTICS_DATABASE_URL="$ANALYTICS_DATABASE_URL"
 
 # Install from pruned manifests + lockfile first (caching: source-code
 # changes never force a full dependency reinstall).

@@ -14,11 +14,6 @@
       "types": "./src/index.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
-    },
-    "./client": {
-      "types": "./src/generated/prisma/client.d.ts",
-      "import": "./dist/generated/prisma/client.js",
-      "require": "./dist/generated/prisma/client.js"
     }
   },
   "scripts": {
@@ -31,17 +26,23 @@
     "test:prepush": "bun test",
     "pretypecheck": "bun run prisma:generate",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prisma:studio": "prisma studio",
+    "primary:prisma:studio": "prisma studio --schema=./prisma/primary/schema.prisma --config=./prisma.primary.config.ts",
     "prisma:generate": "bun ./scripts/generate-prisma.js",
     "analytics:prisma:generate": "prisma generate --schema=./prisma/analytics/schema.prisma --config=./prisma.analytics.config.ts",
-    "prisma:format": "prisma format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
-    "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "primary:prisma:format": "prisma format --schema=./prisma/primary/schema.prisma --config=./prisma.primary.config.ts",
+    "analytics:prisma:format": "prisma format --schema=./prisma/analytics/schema.prisma --config=./prisma.analytics.config.ts",
+    "prisma:format": "bun run primary:prisma:format && bun run analytics:prisma:format",
+    "primary:prisma:validate": "prisma validate --schema=./prisma/primary/schema.prisma --config=./prisma.primary.config.ts",
+    "analytics:prisma:validate": "prisma validate --schema=./prisma/analytics/schema.prisma --config=./prisma.analytics.config.ts",
+    "prisma:validate": "bun run primary:prisma:validate && bun run analytics:prisma:validate",
     "prisma:seed": "bun run scripts/seed.ts",
     "grant:access": "bun ./scripts/grant-access.ts",
-    "prisma:reset:seed": "prisma migrate reset --force && bun run prisma:seed",
-    "prisma:reset": "prisma migrate reset --force",
-    "migrate:create-only": "bun ./scripts/migrate-with-auto-name.js",
-    "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "primary:migrate:reset:seed": "prisma migrate reset --force --schema=./prisma/primary/schema.prisma --config=./prisma.primary.config.ts && bun run prisma:seed",
+    "primary:migrate:reset": "prisma migrate reset --force --schema=./prisma/primary/schema.prisma --config=./prisma.primary.config.ts",
+    "primary:migrate:create-only": "bun ./scripts/migrate-with-auto-name.js primary",
+    "primary:migrate:deploy": "prisma migrate deploy --schema=./prisma/primary/schema.prisma --config=./prisma.primary.config.ts",
+    "analytics:migrate:create-only": "bun ./scripts/migrate-with-auto-name.js analytics",
+    "analytics:migrate:deploy": "prisma migrate deploy --schema=./prisma/analytics/schema.prisma --config=./prisma.analytics.config.ts",
     "build": "bun ./scripts/build.js",
     "dev": "bun run build"
   },

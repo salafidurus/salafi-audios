@@ -10,7 +10,7 @@ import { PolicyGuard } from '../../core/auth/policy.guard';
 import { ScholarsController } from './scholars.controller';
 import { ScholarsTranslationsController } from './scholars-translations.controller';
 import { ScholarsService } from './scholars.service';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../../core/auth/auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -56,7 +56,7 @@ async function buildApp(_overrideGuard?: () => boolean | never): Promise<NestFas
       { provide: APP_GUARD, useClass: AuthGuard },
       { provide: APP_GUARD, useClass: PolicyGuard },
       { provide: ScholarsService, useValue: mockScholarsService },
-      { provide: PrismaService, useValue: mockPrisma },
+      { provide: PrimaryDbService, useValue: mockPrisma },
     ],
   });
 

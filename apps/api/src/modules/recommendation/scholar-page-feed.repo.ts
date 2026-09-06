@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 
 /**
  * Carries ordered entity references across the recommendation/hydration seam;
@@ -51,7 +51,7 @@ export type ScholarPageFeedRecommendation =
 @Injectable()
 /** Selects root Scholars batches using stable editorial ordering and catalog eligibility. */
 export class ScholarPageFeedRepo {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrimaryDbService) {}
 
   /** Returns references only; presentation hydration remains owned by the Scholars caller. */
   async getRecommendations(): Promise<ScholarPageFeedRecommendation[]> {

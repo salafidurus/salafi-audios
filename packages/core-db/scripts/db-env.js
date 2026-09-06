@@ -3,19 +3,22 @@
  */
 
 /** @param {NodeJS.ProcessEnv} raw */
-export function getDbEnv(raw = process.env) {
-  const url = raw["DATABASE_URL"];
+export function getDbEnv(raw = process.env, role = "primary") {
+  const prefix = role === "analytics" ? "ANALYTICS" : "PRIMARY";
+  const url = raw[`${prefix}_DATABASE_URL`];
   if (!url) {
-    throw new Error("Invalid DB environment variables:\nDATABASE_URL is required");
+    throw new Error(`Invalid DB environment variables:\n${prefix}_DATABASE_URL is required`);
   }
   try {
     new URL(url);
   } catch {
-    throw new Error("Invalid DB environment variables:\nDATABASE_URL must be a valid URL");
+    throw new Error(
+      `Invalid DB environment variables:\n${prefix}_DATABASE_URL must be a valid URL`,
+    );
   }
   return {
-    DATABASE_URL: url,
-    DIRECT_DB_URL: raw["DIRECT_DB_URL"],
-    SHADOW_DATABASE_URL: raw["SHADOW_DATABASE_URL"],
+    [`${prefix}_DATABASE_URL`]: url,
+    [`${prefix}_DIRECT_DATABASE_URL`]: raw[`${prefix}_DIRECT_DATABASE_URL`],
+    [`${prefix}_SHADOW_DATABASE_URL`]: raw[`${prefix}_SHADOW_DATABASE_URL`],
   };
 }

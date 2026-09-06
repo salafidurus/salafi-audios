@@ -3,7 +3,9 @@ import { getApiEnv } from './env';
 
 const baseDevEnv = {
   NODE_ENV: 'development',
-  DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+  PRIMARY_DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+  ANALYTICS_DATABASE_URL: 'postgresql://user:pass@localhost:5432/analytics',
+  ANALYTICS_IDENTITY_HMAC_SECRET: '01234567890123456789012345678901',
   BETTER_AUTH_SECRET: '01234567890123456789012345678901',
   BETTER_AUTH_URL: 'http://localhost:4000',
   GOOGLE_CLIENT_ID: 'dummy-google-id',
@@ -18,6 +20,18 @@ const baseDevEnv = {
 };
 
 describe('getApiEnv — Neon control-plane credentials', () => {
+  it('requires the explicitly named primary database URL', () => {
+    expect(getApiEnv({ ...baseDevEnv }).PRIMARY_DATABASE_URL).toContain('postgresql://');
+    expect(() => getApiEnv({ ...baseDevEnv, PRIMARY_DATABASE_URL: undefined })).toThrow();
+  });
+
+  it('requires the dedicated analytics database and identity secret', () => {
+    expect(getApiEnv({ ...baseDevEnv }).ANALYTICS_DATABASE_URL).toContain('postgresql://');
+    expect(getApiEnv({ ...baseDevEnv }).ANALYTICS_IDENTITY_HMAC_SECRET).toHaveLength(32);
+    expect(() => getApiEnv({ ...baseDevEnv, ANALYTICS_DATABASE_URL: undefined })).toThrow();
+    expect(() => getApiEnv({ ...baseDevEnv, ANALYTICS_IDENTITY_HMAC_SECRET: undefined })).toThrow();
+  });
+
   it('parses successfully in development without any NEON_* variables', () => {
     const env = getApiEnv({ ...baseDevEnv });
 

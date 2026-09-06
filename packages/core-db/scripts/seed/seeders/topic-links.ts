@@ -2,7 +2,7 @@
  * Seed topic-listing links
  */
 
-import type { PrismaClient } from "../../../src/generated/prisma/client.js";
+import type { PrismaClient } from "../../../src/generated/primary/client.js";
 import type { TopicPair } from "../types.js";
 
 /**

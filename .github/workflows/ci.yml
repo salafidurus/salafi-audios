@@ -49,6 +49,8 @@ jobs:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:4000' }}
           NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL || 'http://localhost:3000' }}
-          DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
-          DATABASE_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
+          PRIMARY_DATABASE_URL: ${{ secrets.PRIMARY_DATABASE_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
+          PRIMARY_DIRECT_DATABASE_URL: ${{ secrets.PRIMARY_DIRECT_DATABASE_URL || secrets.PRIMARY_DATABASE_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
+          ANALYTICS_DATABASE_URL: ${{ secrets.ANALYTICS_DATABASE_URL || 'postgresql://ci:ci@localhost:5432/ci_analytics' }}
+          ANALYTICS_IDENTITY_HMAC_SECRET: ci-analytics-identity-secret-0123456789
         run: bun run turbo run build lint typecheck test --continue

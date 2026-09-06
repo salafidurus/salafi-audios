@@ -1,4 +1,4 @@
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
 import type {
@@ -54,7 +54,7 @@ function mapOriginalLecture(
 @Injectable()
 /** NestJS topics repository service or controller coordinating the API boundary for this responsibility. */
 export class TopicsRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrimaryDbService) {}
 
   private normalizeLectureLimit(limit?: number): number {
     return limit != null && Number.isFinite(limit) ? Math.max(1, Math.min(100, limit)) : 50;

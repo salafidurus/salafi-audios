@@ -14,10 +14,10 @@ function getAuthPrisma(config: ConfigService): PrismaClient {
     return prisma;
   }
 
-  const connectionString = config.DATABASE_URL;
+  const connectionString = config.PRIMARY_DATABASE_URL;
 
   if (!connectionString) {
-    throw new Error('DATABASE_URL is required for Better Auth Prisma client.');
+    throw new Error('PRIMARY_DATABASE_URL is required for Better Auth Prisma client.');
   }
 
   const adapter = new PrismaPg({ connectionString });

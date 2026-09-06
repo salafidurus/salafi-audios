@@ -12,7 +12,7 @@ import type {
   UserAccessSnapshot,
 } from '@sd/core-contracts';
 
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 
 /** Core API access.service module providing shared backend infrastructure and authority-boundary services. */
 type AccessGrant = {
@@ -78,7 +78,7 @@ function deriveAccessRoles(
 @Injectable()
 /** NestJS access service service or controller coordinating the API boundary for this responsibility. */
 export class AccessService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrimaryDbService) {}
 
   async snapshot(userId: string): Promise<UserAccessSnapshot> {
     const [user, scholars] = await Promise.all([

@@ -7,11 +7,13 @@ const {
   withGeneratedClientLock,
 } = require("./generated-client-lock.js");
 
-function runPrismaGenerate(pkgRoot) {
+function runPrismaGenerate(pkgRoot, role) {
+  const config = role === "analytics" ? "prisma.analytics.config.ts" : "prisma.primary.config.ts";
+  const schema = `./prisma/${role}/schema.prisma`;
   return new Promise((resolve, reject) => {
     const child = spawn(
       path.join(pkgRoot, "node_modules", ".bin", "prisma"),
-      ["generate", "--schema=./prisma/schema.prisma", "--config=./prisma.config.ts"],
+      ["generate", `--schema=${schema}`, `--config=${config}`],
       { cwd: pkgRoot, stdio: "inherit" },
     );
 
@@ -32,7 +34,8 @@ async function main() {
   const lockPath = getGeneratedClientLockPath(pkgRoot);
 
   await withGeneratedClientLock(lockPath, async () => {
-    await runPrismaGenerate(pkgRoot);
+    await runPrismaGenerate(pkgRoot, "primary");
+    await runPrismaGenerate(pkgRoot, "analytics");
     await copyGeneratedClient(pkgRoot);
   });
 }

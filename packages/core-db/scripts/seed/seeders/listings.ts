@@ -7,7 +7,7 @@ import type {
   ListingFormat,
   Locale,
   Status,
-} from "../../../src/generated/prisma/client.js";
+} from "../../../src/generated/primary/client.js";
 import type { TopicPair } from "../types.js";
 
 import { SCHOLARS, TOPICS, SINGLES, SERIES, COLLECTIONS } from "../data/index.js";

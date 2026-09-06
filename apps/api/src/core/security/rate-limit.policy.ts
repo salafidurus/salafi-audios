@@ -14,6 +14,7 @@ export type RateLimitPolicyName =
   | 'authentication'
   | 'admin-write'
   | 'expensive-search'
+  | 'analytics-ingest'
   | 'health-probe';
 
 /** Runtime mode that changes limits without changing route classification. */
@@ -68,6 +69,13 @@ const productionPolicies = {
   'expensive-search': {
     name: 'expensive-search',
     limit: 20,
+    timeWindowMs: 60_000,
+    appliesGlobalSafety: true,
+    failureMode: 'open',
+  },
+  'analytics-ingest': {
+    name: 'analytics-ingest',
+    limit: 60,
     timeWindowMs: 60_000,
     appliesGlobalSafety: true,
     failureMode: 'open',

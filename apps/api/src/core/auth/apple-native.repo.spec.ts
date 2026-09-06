@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 import { AppleNativeRepository } from './apple-native.repo';
 
 describe('AppleNativeRepository', () => {
@@ -19,7 +19,7 @@ describe('AppleNativeRepository', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AppleNativeRepository, { provide: PrismaService, useValue: prisma }],
+      providers: [AppleNativeRepository, { provide: PrimaryDbService, useValue: prisma }],
     }).compile();
 
     repo = module.get<AppleNativeRepository>(AppleNativeRepository);
