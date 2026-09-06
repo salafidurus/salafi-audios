@@ -129,6 +129,20 @@ describe('Public API (e2e)', () => {
       expect(Array.isArray(res.body.batches)).toBe(true);
       expect(res.body.batches[0].items.length).toBeLessThanOrEqual(5);
     });
+
+    it('GET /explore rejects malformed continuation cursors', async () => {
+      await request(app.getHttpServer())
+        .get('/v1/explore')
+        .query({ cursor: 'not-a-valid-cursor' })
+        .expect(400);
+    });
+
+    it('GET /scholars rejects malformed continuation cursors', async () => {
+      await request(app.getHttpServer())
+        .get('/v1/scholars')
+        .query({ cursor: 'not-a-valid-cursor' })
+        .expect(400);
+    });
   });
 
   describe('Scholars', () => {

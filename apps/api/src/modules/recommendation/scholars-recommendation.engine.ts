@@ -19,15 +19,17 @@ export type ScholarsRecommendationPage = {
   exhausted: boolean;
 };
 
-const SequenceCursorSchema = z.strictObject({ offset: z.number().int().nonnegative() });
+const SequenceCursorSchema = z.strictObject({ after: z.string().min(1) });
 type SequenceCursor = z.infer<typeof SequenceCursorSchema>;
 
-function encodeSequenceCursor(offset: number): string {
-  return Buffer.from(JSON.stringify({ offset }), 'utf8').toString('base64url');
+/** Encodes the last semantic batch emitted by the current Scholars page. */
+function encodeSequenceCursor(after: string): string {
+  return Buffer.from(JSON.stringify({ after }), 'utf8').toString('base64url');
 }
 
-function decodeSequenceCursor(cursor?: string): SequenceCursor {
-  if (!cursor) return { offset: 0 };
+/** Rejects malformed continuation rather than treating it as a first page. */
+function decodeSequenceCursor(cursor?: string): SequenceCursor | undefined {
+  if (!cursor) return undefined;
 
   try {
     return SequenceCursorSchema.parse(
@@ -51,23 +53,33 @@ export class ScholarsRecommendationEngine {
   /**
    * Returns one ordered recommendation sequence page.
    *
-   * The cursor encodes only an internal sequence offset and is opaque to API
-   * clients. Repeated entity references are removed within each semantic batch
-   * while the same entity may remain visible in a different batch context.
+   * The cursor identifies the last emitted semantic batch and is opaque to API
+   * clients. The sequence is re-planned from current Catalog state, so a batch
+   * inserted before the anchor does not repeat an already emitted batch. A
+   * missing anchor produces an exhausted empty page rather than restarting.
+   * Repeated entity references are removed within each semantic batch while
+   * the same entity may remain visible in a different batch context.
    */
   async recommend(
     cursor?: string,
     limit = ScholarsRecommendationPageSize,
   ): Promise<ScholarsRecommendationPage> {
-    const { offset } = decodeSequenceCursor(cursor);
+    const sequenceCursor = decodeSequenceCursor(cursor);
     const recommendations = (await this.repo.getRecommendations()).map(deduplicateReferences);
-    const page = recommendations.slice(offset, offset + limit);
-    const nextOffset = offset + page.length;
-    const exhausted = nextOffset >= recommendations.length;
+    const start = sequenceCursor
+      ? recommendations.findIndex((recommendation) => recommendation.id === sequenceCursor.after) +
+        1
+      : 0;
+    if (sequenceCursor && start === 0) {
+      return { recommendations: [], nextCursor: undefined, exhausted: true };
+    }
+
+    const page = recommendations.slice(start, start + limit);
+    const exhausted = start + page.length >= recommendations.length;
 
     return {
       recommendations: page,
-      nextCursor: exhausted ? undefined : encodeSequenceCursor(nextOffset),
+      nextCursor: exhausted ? undefined : encodeSequenceCursor(page.at(-1)!.id),
       exhausted,
     };
   }
