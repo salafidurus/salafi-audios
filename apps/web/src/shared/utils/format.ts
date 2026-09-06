@@ -1,9 +1,4 @@
-/**
- * Converts a positive duration to the compact playback-label format used by the web UI.
- *
- * Zero, negative, missing, and sub-minute durations intentionally return an empty string
- * so callers can omit a label when there is no useful minute-level value to display.
- */
+/** Formats duration seconds as a compact playback label, or empty text when no minute-level label is useful. */
 export function formatDuration(durationSeconds?: number): string {
   if (!durationSeconds || durationSeconds <= 0) {
     return "";

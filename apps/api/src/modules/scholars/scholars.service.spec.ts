@@ -11,12 +11,14 @@ import type {
 import { ScholarsRepository } from './scholars.repo';
 import { ScholarsService } from './scholars.service';
 import { ScholarsRecommendationService } from '../recommendation/scholars-recommendation.service';
+import { ScholarsRecommendationProjection } from './scholars-recommendation.projection';
 
 describe('ScholarsService', () => {
   let service: ScholarsService;
   let repo: Mocked<ScholarsRepository>;
   let cacheManager: any;
   let pageFeed: ScholarsRecommendationService;
+  let projection: ScholarsRecommendationProjection;
 
   const mockScholarDetail: ScholarDetailDto & {
     lectureCount: number;
@@ -57,7 +59,6 @@ describe('ScholarsService', () => {
 
     repo = {
       directory: vi.fn<any>(),
-      hydratePageFeed: vi.fn<any>(),
       findBySlug: vi.fn<any>(),
       getContent: vi.fn<any>(),
       getFormData: vi.fn<any>(),
@@ -68,7 +69,8 @@ describe('ScholarsService', () => {
       search: vi.fn<any>(),
     } as Partial<Mocked<ScholarsRepository>> as Mocked<ScholarsRepository>;
     pageFeed = { recommend: vi.fn<any>() } as unknown as ScholarsRecommendationService;
-    service = new ScholarsService(repo, pageFeed, cacheManager);
+    projection = { project: vi.fn<any>() } as unknown as ScholarsRecommendationProjection;
+    service = new ScholarsService(repo, pageFeed, projection, cacheManager);
   });
 
   afterEach(() => {
@@ -96,11 +98,11 @@ describe('ScholarsService', () => {
         nextCursor: 'next-page',
         exhausted: false,
       });
-      repo.hydratePageFeed.mockResolvedValue(expected);
+      projection.project = vi.fn().mockResolvedValue(expected);
 
       await expect(service.getPageFeed()).resolves.toEqual(expected);
       expect(pageFeed.recommend).toHaveBeenCalledTimes(1);
-      expect(repo.hydratePageFeed).toHaveBeenCalledWith(recommendation);
+      expect(projection.project).toHaveBeenCalledWith(recommendation);
     });
   });
 

@@ -18,6 +18,7 @@ import type {
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
 import { ScholarsRecommendationService } from '../recommendation/scholars-recommendation.service';
+import { ScholarsRecommendationProjection } from './scholars-recommendation.projection';
 
 /** NestJS scholars service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
@@ -28,13 +29,15 @@ export class ScholarsService {
     @Inject(ScholarsRepository) private readonly repo: ScholarsRepository,
     @Inject(ScholarsRecommendationService)
     private readonly pageFeed: ScholarsRecommendationService,
+    @Inject(ScholarsRecommendationProjection)
+    private readonly projection: ScholarsRecommendationProjection,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   /** Returns one hydrated recommendation sequence page for the root Scholars screen. */
   async getPageFeed(cursor?: string, limit?: number): Promise<ScholarPageFeedDto> {
     const recommendation = await this.pageFeed.recommend(cursor, limit);
-    const page = await this.repo.hydratePageFeed(recommendation.recommendations);
+    const page = await this.projection.project(recommendation.recommendations);
     return {
       ...page,
       nextCursor: recommendation.nextCursor,
