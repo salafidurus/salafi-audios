@@ -67,6 +67,17 @@ backend owns eligibility, duplicate removal within a batch, ordering, and
 locale-aware hydration, while web and native clients preserve supplied order and
 ignore unknown future batch forms.
 
+Explore and Scholars share the internal `RecommendationModule` only as a Nest
+composition container. Their `ExploreRecommendationService` and
+`ScholarsRecommendationService` seams remain independent: each owns its own
+selection, eligibility, ordering, continuation, deduplication, and exhaustion
+semantics. Recommendation services return reference-only batches; the Explore
+and Scholars callers own locale-aware hydration and projection into their
+respective public DTOs. A deterministic implementation may later be replaced
+by an ML or hybrid adapter within one domain without introducing a shared
+ranking model or paginator. The existing Explore discovery decision remains
+authoritative, and root Scholars is not an Explore variant.
+
 ## 4. API Surface Segmentation
 
 - **Public read APIs**: published catalog, search, recommendations, and other discovery endpoints.
