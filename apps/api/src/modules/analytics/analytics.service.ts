@@ -9,6 +9,7 @@ import type { CanonicalProductEvent } from '@sd/core-analytics';
 import { createHmac } from 'node:crypto';
 import { AnalyticsRepository } from './analytics.repository';
 import { ConfigService } from '../../core/config/config.service';
+import { TelemetryService } from '../../core/telemetry/telemetry.service';
 
 /** NestJS analytics service coordinating the API boundary for this responsibility. */
 @Injectable()
@@ -18,6 +19,7 @@ export class AnalyticsService {
   constructor(
     private readonly repository: AnalyticsRepository,
     private readonly config: ConfigService,
+    private readonly telemetry: TelemetryService,
   ) {}
 
   /** Stores accepted events and maps persistence failures to stable API errors. */
@@ -32,6 +34,7 @@ export class AnalyticsService {
       code?: string;
     }>;
   }> {
+    this.telemetry.recordAnalyticsStage('received', events.length);
     const normalized = events.map((event) =>
       normalizeIdentity(event, authenticatedUserId, this.config),
     );
@@ -39,6 +42,7 @@ export class AnalyticsService {
       (event) => event.consent_state === 'essential' || event.consent_state === 'optional_granted',
     );
     if (!accepted.length) {
+      this.telemetry.recordAnalyticsStage('dropped', events.length);
       return {
         outcomes: events.map((event) => ({
           event_id: event.event_id,
@@ -57,6 +61,9 @@ export class AnalyticsService {
       );
       const acceptedIds = new Set(result.accepted);
       const deduplicatedIds = new Set(result.deduplicated);
+      this.telemetry.recordAnalyticsStage('accepted', result.accepted.length);
+      this.telemetry.recordAnalyticsStage('deduplicated', result.deduplicated.length);
+      this.telemetry.recordAnalyticsStage('dropped', events.length - accepted.length);
       return {
         outcomes: events.map((event) =>
           event.consent_state !== 'essential' && event.consent_state !== 'optional_granted'
@@ -69,6 +76,7 @@ export class AnalyticsService {
         ),
       };
     } catch (error) {
+      this.telemetry.recordAnalyticsStage('failed');
       if (error instanceof Error && error.message.startsWith('analytics_event_id_conflict:')) {
         throw new ConflictException({ code: 'analytics_event_id_conflict' });
       }

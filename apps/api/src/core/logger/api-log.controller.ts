@@ -1,6 +1,6 @@
 import { LogController } from 'fastify';
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { isHealthProbePath } from './logger.factory';
+import { getTelemetryCorrelationFields, isHealthProbePath } from './logger.factory';
 
 /**
  * Defines the API's Fastify request lifecycle policy, suppressing successful
@@ -31,13 +31,25 @@ export class ApiLogController extends LogController {
   ): void {
     if (error) {
       reply.log.error(
-        { res: reply, err: error, responseTime: reply.elapsedTime },
+        {
+          ...getTelemetryCorrelationFields(request.id),
+          res: reply,
+          err: error,
+          responseTime: reply.elapsedTime,
+        },
         'request errored',
       );
       return;
     }
 
-    super.requestCompleted(error, request, reply);
+    reply.log.info(
+      {
+        ...getTelemetryCorrelationFields(request.id),
+        res: reply,
+        responseTime: reply.elapsedTime,
+      },
+      'request completed',
+    );
   }
 
   /** Keeps errors visible even when the failed URL is a health probe. */

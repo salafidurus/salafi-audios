@@ -24,9 +24,11 @@ const event = (eventId: string, consentState: 'essential' | 'optional_denied') =
 describe('AnalyticsService', () => {
   it('drops denied consent while preserving request order', async () => {
     const append = vi.fn().mockResolvedValue({ accepted: ['accepted'], deduplicated: [] });
+    const recordAnalyticsStage = vi.fn();
     const service = new AnalyticsService(
       { append } as never,
       { ANALYTICS_IDENTITY_HMAC_SECRET: '01234567890123456789012345678901' } as never,
+      { recordAnalyticsStage } as never,
     );
 
     await expect(
@@ -38,13 +40,17 @@ describe('AnalyticsService', () => {
       ],
     });
     expect(append).toHaveBeenCalledWith([expect.objectContaining({ event_id: 'accepted' })]);
+    expect(recordAnalyticsStage).toHaveBeenCalledWith('received', 2);
+    expect(recordAnalyticsStage).toHaveBeenCalledWith('dropped', 1);
   });
 
   it('derives a stable server pseudonym for authenticated ingestion', async () => {
     const append = vi.fn().mockResolvedValue({ accepted: ['accepted'], deduplicated: [] });
+    const recordAnalyticsStage = vi.fn();
     const service = new AnalyticsService(
       { append } as never,
       { ANALYTICS_IDENTITY_HMAC_SECRET: '01234567890123456789012345678901' } as never,
+      { recordAnalyticsStage } as never,
     );
 
     await service.ingest([event('accepted', 'essential')], 'user-42');

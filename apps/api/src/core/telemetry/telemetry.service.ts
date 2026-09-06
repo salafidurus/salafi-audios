@@ -1,4 +1,5 @@
 import { Injectable, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
+import { metrics } from '@opentelemetry/api';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
@@ -49,6 +50,11 @@ export function getTelemetryResourceAttributes(
 @Injectable()
 export class TelemetryService implements OnModuleInit, OnApplicationShutdown {
   private sdk: NodeSDK | undefined;
+  private readonly meter = metrics.getMeter('salafi-durus-api');
+  private readonly analyticsStageCounter = this.meter.createCounter(
+    'salafi_durus_analytics_events_total',
+    { description: 'Analytics events observed at each API pipeline stage' },
+  );
 
   public constructor(
     private readonly config: ConfigService,
@@ -95,5 +101,13 @@ export class TelemetryService implements OnModuleInit, OnApplicationShutdown {
         'OpenTelemetry SDK failed to shut down cleanly',
       );
     }
+  }
+
+  /** Records a bounded analytics pipeline stage without event payload attributes. */
+  recordAnalyticsStage(
+    stage: 'received' | 'accepted' | 'deduplicated' | 'dropped' | 'failed',
+    count = 1,
+  ): void {
+    this.analyticsStageCounter.add(count, { stage });
   }
 }
