@@ -101,12 +101,18 @@ limited to country, coarse region, or timezone.
 
 Record secret names and locations, never values:
 
-| Environment        | Destination          | Secret name    | Storage system                          | Scope                    | Rotation owner |
-| ------------------ | -------------------- | -------------- | --------------------------------------- | ------------------------ | -------------- |
-| development        | Mixpanel Development | To be assigned | developer-local secret store            | development project only | To be assigned |
-| preview            | Mixpanel Preview     | To be assigned | preview deployment secrets              | preview project only     | To be assigned |
-| production         | Mixpanel Production  | To be assigned | production deployment secrets           | production project only  | To be assigned |
-| preview/production | New Relic            | To be assigned | environment-specific deployment secrets | matching entity only     | To be assigned |
+| Environment        | Destination          | Secret name                  | Storage system                          | Scope                    | Rotation owner |
+| ------------------ | -------------------- | ---------------------------- | --------------------------------------- | ------------------------ | -------------- |
+| development        | Mixpanel Development | `MIXPANEL_PROJECT_TOKEN`     | developer-local secret store            | development project only | To be assigned |
+| preview            | Mixpanel Preview     | `MIXPANEL_PROJECT_TOKEN`     | preview deployment secrets              | preview project only     | To be assigned |
+| production         | Mixpanel Production  | `MIXPANEL_PROJECT_TOKEN`     | production deployment secrets           | production project only  | To be assigned |
+| preview/production | New Relic            | `OTEL_EXPORTER_OTLP_HEADERS` | environment-specific deployment secrets | matching entity only     | To be assigned |
+
+The matching non-secret OpenTelemetry settings are `OTEL_SERVICE_NAME`,
+`OTEL_RESOURCE_ATTRIBUTES`, `OTEL_EXPORTER_OTLP_ENDPOINT`,
+`OTEL_EXPORTER_OTLP_PROTOCOL`, and `OTEL_EXPORTER_OTLP_COMPRESSION`. The API
+template in [`apps/api/.env.example`](../../../apps/api/.env.example) contains
+development-safe placeholders and the EU endpoint alternative.
 
 Public client configuration is allowed only when a provider explicitly
 requires a public identifier. Keep it separate from write-capable or
