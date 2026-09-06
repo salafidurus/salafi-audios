@@ -21,6 +21,10 @@ export {
 } from "./types/access.types";
 
 export {
+  AnalyticsEventOutcomeSchema,
+  type AnalyticsEventOutcome,
+  IngestAnalyticsEventsResponseSchema,
+  type IngestAnalyticsEventsResponse,
   type StatusValue,
   StatusValueSchema,
   type PaginationParams,

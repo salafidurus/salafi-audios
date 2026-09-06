@@ -1,4 +1,4 @@
-/** Documents this module's responsibility and public boundary. */
+/** Selects the listing-editorial tab content and routes shared form state to each tab. */
 "use client";
 
 import type { Locale, ScholarListItemDto, TopicDetailDto } from "@sd/core-contracts";

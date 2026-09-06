@@ -1,10 +1,15 @@
 /**
- * Allowed persisted values for the web theme selector.
+ * Persistent preference accepted by both the pre-hydration theme bootstrap and
+ * the mounted web theme synchronizer.
  *
  * `system` resolves from the browser's `prefers-color-scheme` media query;
  * `light` and `dark` explicitly override that preference. Theme readers treat
- * unknown storage values as `system` so a stale value cannot break first paint.
- * This union is the storage and component contract for theme selection.
+ * unknown storage values as `system`, so stale local storage cannot break first
+ * paint. This union is the storage and component contract for theme selection.
+ */
+/**
+ * Theme preference values persisted by the web client and accepted by theme
+ * resolution. Unknown stored values are normalized to `system` by readers.
  */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- The theme union contract is documented above.
 export type ThemePreference = "system" | "light" | "dark";

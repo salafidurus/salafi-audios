@@ -54,6 +54,9 @@ export const endpoints = {
     profile: applicationPath("/account/profile"),
     deleteAccount: applicationPath("/account"),
   },
+  analytics: {
+    events: applicationPath("/analytics/events"),
+  },
   audio: {
     progress: {
       get: applicationPath("/audio/progress"),

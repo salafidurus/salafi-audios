@@ -1,5 +1,9 @@
+/** Small presentation-formatting helpers shared by web catalog surfaces. */
+
 /**
- * Formats a duration for compact playback metadata.
+ * Converts playback seconds into the compact hours/minutes label used by
+ * catalog metadata. Fractional seconds are truncated, seconds are omitted,
+ * and missing, non-positive, or sub-minute values return an empty label.
  *
  * @param durationSeconds - Duration in seconds; non-positive and missing values produce an empty label.
  * @returns A short hours-and-minutes or minutes-only label, or an empty string when no label is useful.
