@@ -10,7 +10,7 @@ import { ScholarsController } from './scholars.controller';
 import { AdminScholarsController } from './admin-scholars.controller';
 import { ScholarsService } from './scholars.service';
 import { PrimaryDbService } from '../../core/db/primary-db.service';
-import { ScholarPageFeedService } from '../recommendation/scholar-page-feed.service';
+import { ScholarsRecommendationService } from '../recommendation/scholars-recommendation.service';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../../core/auth/auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -46,7 +46,7 @@ describe('ScholarsController — auth boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: ScholarsService, useValue: mockScholarsService },
-        { provide: ScholarPageFeedService, useValue: { recommend: vi.fn() } },
+        { provide: ScholarsRecommendationService, useValue: { recommend: vi.fn() } },
         { provide: PrimaryDbService, useValue: mockPrisma },
       ],
     });

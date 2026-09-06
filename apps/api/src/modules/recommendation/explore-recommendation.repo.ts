@@ -1,8 +1,9 @@
 /** Internal recommendation selection adapter for ordered Explore candidates. */
 /* oxlint-disable anti-slop/require-tsdoc -- Internal candidate references are intentionally not public DTOs. */
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
 import { PrimaryDbService } from '../../core/db/primary-db.service';
+import { z } from 'zod';
 
 /** Entity references selected by a recommendation strategy. */
 export type ExploreRecommendationBatch =
@@ -23,6 +24,11 @@ export type ExploreRecommendationResult = {
 };
 
 type ListingCursor = { date: Date; slug?: string };
+
+const ListingCursorSchema = z.strictObject({
+  date: z.iso.datetime(),
+  slug: z.string().min(1),
+});
 
 function applyRecentFilters(where: Prisma.ListingWhereInput, cursor?: ListingCursor): void {
   if (!cursor) return;
@@ -49,18 +55,22 @@ function paginate<T>(items: T[], limit: number) {
   return { page: hasMore ? items.slice(0, limit) : items, hasMore };
 }
 
+/**
+ * Decodes the Explore-owned Listing keyset cursor.
+ *
+ * A malformed cursor is rejected instead of being interpreted as a new feed
+ * request; the cursor must preserve both parts of the `(createdAt, slug)`
+ * ordering so equal timestamps cannot repeat or skip Listings.
+ */
 function decodeCursor(cursor?: string): ListingCursor | undefined {
   if (!cursor) return undefined;
   try {
-    // SAFETY: the recommendation cursor encoder emits this shape; invalid values fall through to the legacy date parser.
-    const decoded = JSON.parse(Buffer.from(cursor, 'base64url').toString()) as {
-      date: string;
-      slug?: string;
-    };
+    const decoded = ListingCursorSchema.parse(
+      JSON.parse(Buffer.from(cursor, 'base64url').toString()),
+    );
     return { date: new Date(decoded.date), slug: decoded.slug };
   } catch {
-    const date = new Date(cursor);
-    return Number.isNaN(date.getTime()) ? undefined : { date };
+    throw new BadRequestException('The Explore recommendation cursor is invalid');
   }
 }
 

@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'bun:test';
 
-import { ScholarPageFeedRepo } from './scholar-page-feed.repo';
+import { ScholarsRecommendationRepo } from './scholars-recommendation.repo';
 
-describe('ScholarPageFeedRepo', () => {
-  let repo: ScholarPageFeedRepo;
+describe('ScholarsRecommendationRepo', () => {
+  let repo: ScholarsRecommendationRepo;
   let findMany: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     findMany = vi.fn().mockResolvedValue([]);
-    repo = new ScholarPageFeedRepo({
+    repo = new ScholarsRecommendationRepo({
       scholar: { findMany },
       listing: { findMany },
       topic: { findMany },
