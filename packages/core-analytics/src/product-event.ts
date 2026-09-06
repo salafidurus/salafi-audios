@@ -39,7 +39,6 @@ export const ProductEventContextSchema = z.strictObject({
   timezone: z.string().min(1).optional(),
   session_id: z.string().min(1).optional(),
   source_surface: z.string().min(1).optional(),
-  session_id: z.string().min(1).optional(),
   lifecycle_state: z.enum(["active", "background", "inactive"]).optional(),
   recommendation: z
     .strictObject({
