@@ -3,6 +3,7 @@ import type { Logger, LoggerOptions } from 'pino';
 import type { IncomingHttpHeaders } from 'node:http';
 import crypto from 'node:crypto';
 import { z } from 'zod';
+import { trace } from '@opentelemetry/api';
 
 /** API logger construction and request-path policy helpers. */
 
@@ -13,6 +14,13 @@ export const API_LOGGER = Symbol('API_LOGGER');
 
 /** Header used to correlate HTTP responses and log entries with one request. */
 export const REQUEST_ID_HEADER = 'x-request-id';
+
+/** Safe correlation fields shared by request logs and OpenTelemetry spans. */
+export type TelemetryCorrelationFields = {
+  request_id: string;
+  trace_id?: string;
+  span_id?: string;
+};
 
 let sharedApiLogger: Logger | undefined;
 const requestIdSchema = z.string().trim().min(1);
@@ -35,6 +43,17 @@ export function generateRequestId(headers: IncomingHttpHeaders): string {
   const requestId = headers[REQUEST_ID_HEADER];
   const parsedRequestId = requestIdSchema.safeParse(requestId);
   return parsedRequestId.success ? parsedRequestId.data : crypto.randomUUID();
+}
+
+/** Returns request and active trace identifiers without copying request payload data. */
+export function getTelemetryCorrelationFields(requestId: string): TelemetryCorrelationFields {
+  const spanContext = trace.getActiveSpan()?.spanContext();
+  const fields: TelemetryCorrelationFields = { request_id: requestId };
+  if (spanContext?.traceId && spanContext.spanId) {
+    fields.trace_id = spanContext.traceId;
+    fields.span_id = spanContext.spanId;
+  }
+  return fields;
 }
 
 /** Builds the shared Pino options while preserving the API's log contract. */

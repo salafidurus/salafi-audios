@@ -6,6 +6,7 @@ import { CanonicalProductEventSchema } from '@sd/core-analytics';
  * runs: it bounds the batch and serialized size, rejects unknown properties,
  * and reports duplicate event IDs without persisting anything.
  */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- The contract summary above documents this exported schema.
 export const IngestAnalyticsEventsDtoSchema = z
   .strictObject({
     events: z.array(CanonicalProductEventSchema).min(1).max(20),
