@@ -91,4 +91,31 @@ describe('ExploreRecommendationRepo', () => {
     expect(result.nextCursor).toBeDefined();
     expect(result.exhausted).toBe(false);
   });
+
+  it('rejects malformed cursors instead of restarting the initial feed', async () => {
+    await expect(repo.getRecommendations('not-a-valid-cursor', 10)).rejects.toThrow(
+      'The Explore recommendation cursor is invalid',
+    );
+    expect(scholarFindMany).not.toHaveBeenCalled();
+    expect(topicFindMany).not.toHaveBeenCalled();
+  });
+
+  it('continues equal-timestamp listings by slug without repeating or skipping', async () => {
+    const timestamp = new Date('2026-07-24T12:00:00.000Z');
+    listingFindMany
+      .mockResolvedValueOnce([
+        { id: 'listing-b', slug: 'listing-b', createdAt: timestamp },
+        { id: 'listing-a', slug: 'listing-a', createdAt: timestamp },
+      ])
+      .mockResolvedValueOnce([
+        { id: 'listing-a', slug: 'listing-a', createdAt: timestamp },
+        { id: 'listing-before', slug: 'listing-before', createdAt: new Date('2026-07-23') },
+      ]);
+
+    const firstPage = await repo.getRecommendations(undefined, 1);
+    const secondPage = await repo.getRecommendations(firstPage.nextCursor, 1);
+
+    expect(firstPage.batches[0]?.itemIds).toEqual(['listing-b']);
+    expect(secondPage.batches[0]?.itemIds).toEqual(['listing-a']);
+  });
 });
