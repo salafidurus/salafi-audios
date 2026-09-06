@@ -219,7 +219,12 @@ function DetailChanges({
   );
 }
 
-/** Renders localized, field-level summaries for changes detected in the listing form. */
+/**
+ * Summarizes pending listing edits before the editor submits them.
+ *
+ * Create-mode output reflects only fields accepted by the create workflow;
+ * edit-mode output compares the current form against its initial snapshot.
+ */
 export function ListingReviewSection({ state, mainLocale, topics }: ListingReviewSectionProps) {
   const { t, i18n } = useTranslation();
   const { title, description, status, orderIndex, selectedTopics, language } = state;

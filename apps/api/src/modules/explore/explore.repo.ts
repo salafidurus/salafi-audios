@@ -6,6 +6,7 @@ import type { ListingFormat, Locale, ScholarTitle } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { ConfigService } from '../../core/config/config.service';
 import { PrimaryDbService } from '../../core/db/primary-db.service';
+import { publishedTopLevelCatalogListingWhere } from '../recommendation/catalog-eligibility';
 import type {
   ExploreRecommendationBatch,
   ExploreRecommendationResult,
@@ -134,7 +135,11 @@ export class ExploreRepo {
   ): Promise<ExploreBatch> {
     if (batch.kind === 'listings') {
       const rows = await this.prisma.listing.findMany({
-        where: { id: { in: batch.itemIds } },
+        where: {
+          ...publishedTopLevelCatalogListingWhere(),
+          id: { in: batch.itemIds },
+          format: { in: ['single', 'series', 'collection'] },
+        },
         include: {
           translations: {
             where: { locale, status: TranslationStatus.published },
@@ -170,7 +175,7 @@ export class ExploreRepo {
     }
     if (batch.kind === 'scholars') {
       const rows = await this.prisma.scholar.findMany({
-        where: { id: { in: batch.itemIds } },
+        where: { id: { in: batch.itemIds }, isActive: true, title: 'allamah' },
         select: {
           id: true,
           slug: true,
@@ -219,7 +224,17 @@ export class ExploreRepo {
       };
     }
     const rows = await this.prisma.topic.findMany({
-      where: { id: { in: batch.itemIds } },
+      where: {
+        id: { in: batch.itemIds },
+        listingTopics: {
+          some: {
+            listing: {
+              ...publishedTopLevelCatalogListingWhere(),
+              format: { in: ['single', 'series', 'collection'] },
+            },
+          },
+        },
+      },
       select: {
         id: true,
         slug: true,

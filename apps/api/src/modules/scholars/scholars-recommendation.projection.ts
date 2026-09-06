@@ -1,7 +1,6 @@
 /** Scholars adapter that hydrates recommendation references into public feed batches. */
 /* oxlint-disable anti-slop/require-tsdoc -- Projection-local records are documented at the semantic fields that cross the hydration boundary. */
 import { Injectable } from '@nestjs/common';
-import { Status } from '@sd/core-db';
 import type {
   Locale,
   ScholarContentItemDto,
@@ -13,6 +12,7 @@ import { resolveContentTranslation } from '../../shared/i18n/resolve-content-tra
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { PrimaryDbService } from '../../core/db/primary-db.service';
 import type { ScholarsRecommendation } from '../recommendation/scholars-recommendation.repo';
+import { publishedTopLevelCatalogListingWhere } from '../recommendation/catalog-eligibility';
 
 type ScholarListRecord = {
   id: string;
@@ -45,8 +45,7 @@ function scholarListSelect(locale: Locale) {
         listings: {
           where: {
             format: 'single',
-            status: Status.published,
-            deletedAt: null,
+            ...publishedTopLevelCatalogListingWhere(),
           },
         },
       },
@@ -141,10 +140,7 @@ export class ScholarsRecommendationProjection {
             listingTopics: {
               some: {
                 listing: {
-                  parentId: null,
-                  status: Status.published,
-                  deletedAt: null,
-                  scholar: { isActive: true },
+                  ...publishedTopLevelCatalogListingWhere(),
                 },
               },
             },
@@ -157,10 +153,7 @@ export class ScholarsRecommendationProjection {
             listingTopics: {
               where: {
                 listing: {
-                  parentId: null,
-                  status: Status.published,
-                  deletedAt: null,
-                  scholar: { isActive: true },
+                  ...publishedTopLevelCatalogListingWhere(),
                 },
               },
               select: { listing: { select: { scholarId: true } } },
@@ -173,10 +166,8 @@ export class ScholarsRecommendationProjection {
       ? await this.prisma.listing.findMany({
           where: {
             id: { in: listingIds },
-            parentId: null,
-            status: Status.published,
-            deletedAt: null,
-            scholar: { isActive: true },
+            ...publishedTopLevelCatalogListingWhere(),
+            format: { in: ['single', 'series', 'collection'] },
           },
           select: {
             id: true,
@@ -288,7 +279,9 @@ export class ScholarsRecommendationProjection {
         const scholarItem = mapScholarListItem(scholar, locale);
         const items = recommendation.itemIds.flatMap((id) => {
           const listing = listingsById.get(id);
-          return listing ? [mapListing(listing, scholar.imageUrl)] : [];
+          return listing && listing.scholarId === recommendation.scholarId
+            ? [mapListing(listing, scholar.imageUrl)]
+            : [];
         });
         return items.length
           ? [

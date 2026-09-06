@@ -29,6 +29,7 @@ import { RolesBanner } from "./RolesBanner";
 type TargetState = {
   enabled: boolean;
   capabilities: { [key in AccessCapability]?: boolean };
+  /** Scholar slugs that constrain scholar-scoped grants for this target. */
   scholarSlugs: string[];
   locales: string[];
 };
@@ -153,10 +154,12 @@ const targetRowConfigs: TargetRowConfig[] = [
 
 interface AccessDialogBodyProps {
   snapshot?: UserAccessSnapshot;
+  /** User-facing load or save failure shown above the permission rows. */
   error?: string;
   saving: boolean;
   targetIsSuperadmin: boolean;
   currentUserIsSuperadmin?: boolean;
+  /** Editable target state used to preview and submit the replacement grants. */
   uiState: UiState;
   scholarOptions: { slug: string; name: string }[];
   onToggleTarget: (target: AccessTarget, enabled: boolean) => void;
@@ -285,7 +288,14 @@ function AccessDialogBody({
   );
 }
 
+/**
+ * Edits one user's administrative grants through the protected admin API.
+ *
+ * The dialog loads the current snapshot, presents capability and scope
+ * controls, and calls `onSaved` only after the replacement succeeds.
+ */
 export function AccessDialog({
+  /** Stable user identity used to load and replace access grants. */
   userId,
   userName,
   onClose,

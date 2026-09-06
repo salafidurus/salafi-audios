@@ -1,12 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { getApiEnv } from './env';
 
-/** NestJS config service service or controller coordinating the API boundary for this responsibility. */
+/**
+ * Provides validated API configuration to NestJS consumers.
+ *
+ * Production callers use the process environment by default. Tests and other
+ * controlled bootstraps may provide an explicit environment so configuration
+ * validation does not depend on dotenv files loaded by the runtime.
+ */
 @Injectable()
 /** Core API config.service module providing shared backend infrastructure and authority-boundary services. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ConfigService {
-  private readonly env = getApiEnv(process.env);
+  private readonly env: ReturnType<typeof getApiEnv>;
+
+  constructor(@Optional() rawEnv: NodeJS.ProcessEnv = process.env) {
+    this.env = getApiEnv(rawEnv);
+  }
 
   get PORT() {
     return this.env.PORT;
