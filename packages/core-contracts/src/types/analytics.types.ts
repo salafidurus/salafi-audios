@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+/** Shared validation and response contracts for analytics event ingestion. */
 /**
  * Validates the server disposition for one submitted event. The strict shape
  * preserves the event ID needed for client acknowledgements and distinguishes

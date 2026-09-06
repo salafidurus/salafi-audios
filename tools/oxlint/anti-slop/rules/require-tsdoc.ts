@@ -147,7 +147,12 @@ function reportMissing(node: ESTree.Node, context: Context, kind: string, name?:
   });
 }
 
-/** Require meaningful TSDoc coverage for human-maintained production declarations. */
+/**
+ * Requires meaningful TSDoc coverage for human-maintained production declarations.
+ *
+ * All mutable analysis state is reset at the per-file lifecycle boundary so
+ * diagnostics do not depend on worker assignment or file ordering.
+ */
 export const requireTSDocRule = defineRule({
   meta: {
     type: "problem",
@@ -220,7 +225,13 @@ export const requireTSDocRule = defineRule({
     };
 
     return {
-      Program(node) {
+      before() {
+        suppressed = false;
+        excluded = false;
+        moduleComment = undefined;
+        documentedOverloads.clear();
+        visitedFunctionNames.clear();
+
         const baseline = readBaseline(context, options.baseline);
         suppressed =
           mode === "migration" && isBaselineMatch(context, baseline, context.sourceCode.text);
@@ -229,8 +240,11 @@ export const requireTSDocRule = defineRule({
           (scope === "production" && !isProductionFile(context.filename))
         ) {
           excluded = true;
-          return;
+          return false;
         }
+      },
+      Program(node) {
+        if (excluded) return;
         const firstStatement = node.body.find(isMeaningfulStatement);
         if (firstStatement === undefined) return;
         const comments = context.sourceCode.getCommentsBefore(firstStatement);
