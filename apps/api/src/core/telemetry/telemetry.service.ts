@@ -55,6 +55,16 @@ export class TelemetryService implements OnModuleInit, OnApplicationShutdown {
     'salafi_durus_analytics_events_total',
     { description: 'Analytics events observed at each API pipeline stage' },
   );
+  private readonly httpRequestCounter = this.meter.createCounter(
+    'salafi_durus_http_requests_total',
+    {
+      description: 'API requests completed by method and status class',
+    },
+  );
+  private readonly httpRequestDuration = this.meter.createHistogram(
+    'salafi_durus_http_request_duration_ms',
+    { description: 'API request duration in milliseconds' },
+  );
 
   public constructor(
     private readonly config: ConfigService,
@@ -109,5 +119,12 @@ export class TelemetryService implements OnModuleInit, OnApplicationShutdown {
     count = 1,
   ): void {
     this.analyticsStageCounter.add(count, { stage });
+  }
+
+  /** Records API latency and outcome using bounded transport-level dimensions. */
+  recordHttpRequest(method: string, statusCode: number, durationMs: number): void {
+    const statusClass = `${Math.floor(statusCode / 100)}xx`;
+    this.httpRequestCounter.add(1, { method, status_class: statusClass });
+    this.httpRequestDuration.record(durationMs, { method, status_class: statusClass });
   }
 }

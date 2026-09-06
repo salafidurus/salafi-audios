@@ -42,6 +42,8 @@ export class ApiLogController extends LogController {
       return;
     }
 
+    if (this.isLogDisabled(request)) return;
+
     reply.log.info(
       {
         ...getTelemetryCorrelationFields(request.id),

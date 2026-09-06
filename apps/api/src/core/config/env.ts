@@ -5,6 +5,7 @@ const optionalString = z.preprocess(
   (value) => (value === '' ? undefined : value),
   z.string().min(1).optional(),
 );
+const optionalUrl = z.preprocess((value) => (value === '' ? undefined : value), z.url().optional());
 
 /** Core API env module providing shared backend infrastructure and authority-boundary services. */
 const ApiEnvSchema = z
@@ -29,8 +30,8 @@ const ApiEnvSchema = z
     PRISMA_LOG_QUERIES: z
       .preprocess((val) => val === 'true' || val === true, z.boolean())
       .default(false),
-    ASSET_CDN_BASE_URL: z.url().optional(),
-    SITEMAP_BASE_URL: z.url().optional(),
+    ASSET_CDN_BASE_URL: optionalUrl,
+    SITEMAP_BASE_URL: optionalUrl,
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.url(),
     COOKIE_DOMAIN: z.string().default('salafidurus.com'),

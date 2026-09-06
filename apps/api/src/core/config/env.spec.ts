@@ -106,6 +106,11 @@ describe('getApiEnv — operational telemetry', () => {
     expect(env.OTEL_DEPLOYMENT_VERSION).toBe('unknown');
   });
 
+  it('normalizes empty optional URLs from dotenv files', () => {
+    expect(getApiEnv({ ...baseDevEnv, SITEMAP_BASE_URL: '' }).SITEMAP_BASE_URL).toBeUndefined();
+    expect(getApiEnv({ ...baseDevEnv, ASSET_CDN_BASE_URL: '' }).ASSET_CDN_BASE_URL).toBeUndefined();
+  });
+
   it('allows deployment metadata to be explicitly supplied', () => {
     const env = getApiEnv({
       ...baseDevEnv,
