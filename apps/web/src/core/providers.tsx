@@ -20,7 +20,7 @@ import { ToastContainer } from "@/core/toast";
 import { useCookieConsent } from "@/features/legal/hooks/use-cookie-consent";
 import { hasDocument, hasWindow } from "@/shared/lib/runtime-guards";
 
-import { webAnalyticsBuffer } from "./analytics/web-analytics";
+import { subscribeWebAnalytics, webAnalyticsBuffer } from "./analytics/web-analytics";
 import { flushWebAnalytics } from "./analytics/web-analytics-delivery";
 import { initProgressPersistence } from "./audio/progress-persistence";
 import { createI18n } from "./i18n/i18n";
@@ -72,6 +72,7 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
 
   useEffect(() => {
     if (!hasAccepted) return;
+    webAnalyticsBuffer.hydrate();
     const flush = () => {
       const baseUrl = apiBaseUrl ?? getApiBaseUrl();
       if (baseUrl) void flushWebAnalytics(webAnalyticsBuffer, { apiBaseUrl: baseUrl });
@@ -82,8 +83,10 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
     document.addEventListener("visibilitychange", onVisibilityChange);
     window.addEventListener("pagehide", flush);
     const interval = window.setInterval(flush, 30_000);
+    const unsubscribe = subscribeWebAnalytics(flush);
     flush();
     return () => {
+      unsubscribe();
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("pagehide", flush);
       window.clearInterval(interval);

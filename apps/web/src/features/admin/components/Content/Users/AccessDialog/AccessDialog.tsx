@@ -29,6 +29,7 @@ import { RolesBanner } from "./RolesBanner";
 type TargetState = {
   enabled: boolean;
   capabilities: { [key in AccessCapability]?: boolean };
+  /** Scholar slugs to which the target's permission is scoped. */
   scholarSlugs: string[];
   locales: string[];
 };
@@ -153,12 +154,17 @@ const targetRowConfigs: TargetRowConfig[] = [
 
 interface AccessDialogBodyProps {
   snapshot?: UserAccessSnapshot;
+  /** Human-readable save/load error shown in the dialog. */
   error?: string;
   saving: boolean;
   targetIsSuperadmin: boolean;
   currentUserIsSuperadmin?: boolean;
+  /** Current capability and scope selections for every access target. */
   uiState: UiState;
-  scholarOptions: { slug: string; name: string }[];
+  scholarOptions: {
+    /** Stable scholar slug used for scope selection. */ slug: string;
+    name: string;
+  }[];
   onToggleTarget: (target: AccessTarget, enabled: boolean) => void;
   onToggleCapability: (
     target: AccessTarget,
@@ -285,12 +291,14 @@ function AccessDialogBody({
   );
 }
 
+/** Edits one user's scoped capabilities and persists the complete access snapshot. */
 export function AccessDialog({
   userId,
   userName,
   onClose,
   onSaved,
 }: {
+  /** User identifier whose access grants are being edited. */
   userId: string;
   userName: string;
   onClose: () => void;

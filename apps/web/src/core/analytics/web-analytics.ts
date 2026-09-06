@@ -25,6 +25,8 @@ export interface WebAnalyticsRuntime {
   /** Returns the browser interface language at observation time. */
   readonly language?: () => string | undefined;
   readonly timezone?: () => string | undefined;
+  /** Called after an event is accepted into the local queue. */
+  readonly onRecorded?: () => void;
 }
 
 /** Recorder boundary for browser product observations. */
@@ -83,7 +85,7 @@ export function createWebAnalyticsRecorder(
         priority: "best_effort",
         properties: references,
       });
-      void buffer.enqueue(event);
+      if (buffer.enqueue(event)) runtime.onRecorded?.();
     },
     withdrawConsent() {
       const optionalIds: string[] = [];
@@ -108,11 +110,26 @@ export const webAnalyticsBuffer = new AnalyticsBufferClass({
     important: 24 * 60 * 60 * 1000,
     best_effort: 15 * 60 * 1000,
   },
+  storage: hasWindow() ? window.localStorage : undefined,
+  storageKey: "sd:analytics:buffer:v1",
 });
+
+const webAnalyticsListeners = new Set<() => void>();
+
+/** Subscribes to local queue changes so runtime owners can trigger threshold flushes. */
+export function subscribeWebAnalytics(listener: () => void): () => void {
+  webAnalyticsListeners.add(listener);
+  return () => webAnalyticsListeners.delete(listener);
+}
 
 /** Default consent-gated web recorder used by public web surfaces. */
 export const webAnalytics = createWebAnalyticsRecorder(webAnalyticsBuffer, {
   storage: hasWindow() ? window.localStorage : undefined,
   language: () => document.documentElement.lang,
   timezone: () => Intl.DateTimeFormat().resolvedOptions().timeZone,
+  onRecorded: () => {
+    if (webAnalyticsBuffer.size >= 10) {
+      for (const listener of webAnalyticsListeners) listener();
+    }
+  },
 });

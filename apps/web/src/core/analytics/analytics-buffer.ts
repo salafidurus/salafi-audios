@@ -1,5 +1,10 @@
 /** Documents the browser event buffer's responsibility and delivery boundary. */
-import type { CanonicalProductEvent, ProductEventPriority } from "@sd/core-analytics";
+import {
+  CanonicalProductEventSchema,
+  type CanonicalProductEvent,
+  type ProductEventPriority,
+} from "@sd/core-analytics";
+import { z } from "zod";
 
 /** Retains browser-observed events under bounded expiry and priority policy. */
 
@@ -18,6 +23,10 @@ export interface AnalyticsBufferOptions {
   readonly maxEvents: number;
   readonly maxBytes: number;
   readonly ttlMs: Record<ProductEventPriority, number>;
+  /** Optional browser storage used to restore the queue across reloads. */
+  readonly storage?: Pick<Storage, "getItem" | "setItem">;
+  /** Versioned storage key for this queue. */
+  readonly storageKey?: string;
 }
 
 /**
@@ -33,6 +42,8 @@ export class AnalyticsBuffer {
   private readonly maxEvents: number;
   private readonly maxBytes: number;
   private readonly ttlMs: Record<ProductEventPriority, number>;
+  private readonly storage?: Pick<Storage, "getItem" | "setItem">;
+  private readonly storageKey: string;
   private readonly entries: BufferedAnalyticsEvent[] = [];
   private totalBytes = 0;
 
@@ -42,6 +53,32 @@ export class AnalyticsBuffer {
     this.maxEvents = options.maxEvents;
     this.maxBytes = options.maxBytes;
     this.ttlMs = options.ttlMs;
+    this.storage = options.storage;
+    this.storageKey = options.storageKey ?? "sd:analytics:buffer:v1";
+  }
+
+  /** Restores valid, bounded entries from browser storage without throwing. */
+  hydrate(): void {
+    if (!this.storage) return;
+    try {
+      const raw = this.storage.getItem(this.storageKey);
+      const persisted: unknown = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(persisted)) return;
+      this.entries.length = 0;
+      this.totalBytes = 0;
+      for (const item of persisted) {
+        const parsed = PersistedEntrySchema.safeParse(item);
+        if (!parsed.success) continue;
+        const sizeBytes = new TextEncoder().encode(JSON.stringify(parsed.data.event)).byteLength;
+        this.entries.push({ event: parsed.data.event, queuedAt: parsed.data.queuedAt, sizeBytes });
+        this.totalBytes += sizeBytes;
+      }
+      this.removeExpired();
+      this.evictUntilWithinLimits();
+    } catch {
+      this.entries.length = 0;
+      this.totalBytes = 0;
+    }
   }
 
   /** Number of currently retained events, after removing expired entries. */
@@ -61,6 +98,7 @@ export class AnalyticsBuffer {
     this.entries.push({ event, queuedAt: this.now(), sizeBytes });
     this.totalBytes += sizeBytes;
     this.evictUntilWithinLimits();
+    this.persist();
     return this.entries.some((entry) => entry.event.event_id === event.event_id);
   }
 
@@ -79,6 +117,7 @@ export class AnalyticsBuffer {
         this.removeAt(index);
       }
     }
+    this.persist();
   }
 
   private removeExpired(): void {
@@ -133,4 +172,21 @@ export class AnalyticsBuffer {
     this.entries.splice(index, 1);
     this.totalBytes -= removed.sizeBytes;
   }
+
+  private persist(): void {
+    if (!this.storage) return;
+    try {
+      this.storage.setItem(
+        this.storageKey,
+        JSON.stringify(this.entries.map(({ event, queuedAt }) => ({ event, queuedAt }))),
+      );
+    } catch {
+      // Storage is best-effort; delivery remains available in memory.
+    }
+  }
 }
+
+const PersistedEntrySchema = z.strictObject({
+  event: CanonicalProductEventSchema,
+  queuedAt: z.number(),
+});
