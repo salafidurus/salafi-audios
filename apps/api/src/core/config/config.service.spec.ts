@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { ConfigService } from './config.service';
 
 describe('ConfigService', () => {
+  const originalEnv = { ...process.env };
   const dummyEnv = {
     PRIMARY_DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
     ANALYTICS_DATABASE_URL: 'postgresql://user:pass@localhost:5432/analytics',
@@ -23,7 +24,13 @@ describe('ConfigService', () => {
   };
 
   beforeEach(() => {
+    for (const key of Object.keys(process.env)) delete process.env[key];
     Object.assign(process.env, dummyEnv);
+  });
+
+  afterEach(() => {
+    for (const key of Object.keys(process.env)) delete process.env[key];
+    Object.assign(process.env, originalEnv);
   });
 
   it('parses CORS_ORIGINS_NATIVE correctly into string array', () => {
