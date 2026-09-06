@@ -33,8 +33,8 @@ sections allowed by their capabilities and scope.
   destinations.
 - **Public navigation shell**: the contained, sticky, single-layer header that
   frames public content. It is presentation, not an authorization boundary.
-- **Compact navigation**: the icon-first header and Sheet composition used when
-  the desktop zones no longer fit without overlap.
+- **Compact navigation**: the icon-first header and Sheet composition used on
+  mobile widths; non-mobile widths retain the full public header.
 - **Public shell**: the reusable public navigation, fallback/content area, and
   footer composition. It is the visible shell for normal public routes and
   normal fallback states; consent-only side effects are composed outside it.
