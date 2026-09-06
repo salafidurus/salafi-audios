@@ -51,7 +51,10 @@ function GeneralTabContent({
   | "isEditing"
   | "onImageStaged"
   | "stagedImagePreview"
-> & { error: string | null }) {
+> & {
+  /** Validation failure text displayed above the listing form, when present. */
+  error: string | null;
+}) {
   return (
     <>
       <FormErrorBanner error={error} />
