@@ -165,6 +165,7 @@ function StatusChange({
   status,
   t,
 }: {
+  /** Current publication status shown when that field changed. */
   status: string;
   t: ReturnType<typeof useTranslation>["t"];
 }) {

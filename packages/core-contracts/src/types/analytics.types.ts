@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-/** Per-event disposition returned by the append-only analytics ingestion API. */
+/**
+ * Validates the server disposition for one submitted event. The strict shape
+ * preserves the event ID needed for client acknowledgements and distinguishes
+ * accepted, duplicate, and permanently dropped events from retryable failures.
+ */
 export const AnalyticsEventOutcomeSchema = z.strictObject({
   event_id: z.string().min(1),
   status: z.enum(["accepted", "deduplicated", "dropped"]),

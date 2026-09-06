@@ -29,6 +29,7 @@ import { RolesBanner } from "./RolesBanner";
 type TargetState = {
   enabled: boolean;
   capabilities: { [key in AccessCapability]?: boolean };
+  /** Scholar slugs that constrain access for scholar-targeted permissions. */
   scholarSlugs: string[];
   locales: string[];
 };
@@ -153,12 +154,18 @@ const targetRowConfigs: TargetRowConfig[] = [
 
 interface AccessDialogBodyProps {
   snapshot?: UserAccessSnapshot;
+  /** Server or validation failure shown while loading or saving permissions. */
   error?: string;
   saving: boolean;
   targetIsSuperadmin: boolean;
   currentUserIsSuperadmin?: boolean;
+  /** Draft permission state rendered by the dialog before it is persisted. */
   uiState: UiState;
-  scholarOptions: { slug: string; name: string }[];
+  scholarOptions: {
+    /** Stable scholar identifier submitted when a scope is selected. */
+    slug: string;
+    name: string;
+  }[];
   onToggleTarget: (target: AccessTarget, enabled: boolean) => void;
   onToggleCapability: (
     target: AccessTarget,
@@ -285,12 +292,14 @@ function AccessDialogBody({
   );
 }
 
+/** Edits one user's scoped administrative permissions and persists confirmed changes. */
 export function AccessDialog({
   userId,
   userName,
   onClose,
   onSaved,
 }: {
+  /** Identifier of the administrative user whose grants are being edited. */
   userId: string;
   userName: string;
   onClose: () => void;
