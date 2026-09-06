@@ -6,17 +6,20 @@ import { TestAuthFactory } from './helpers/test-auth.factory';
 
 describe('Infrastructure & Basic API Features (e2e)', () => {
   let app: NestFastifyApplication;
+  let rateLimitedApp: NestFastifyApplication;
   let prisma: PrismaService;
   let authFactory: TestAuthFactory;
 
   beforeAll(async () => {
-    ({ app } = await createE2eApp());
+    ({ app } = await createE2eApp({ disableThrottler: true }));
+    ({ app: rateLimitedApp } = await createE2eApp());
     prisma = app.get(PrismaService);
     authFactory = new TestAuthFactory(prisma);
   });
 
   afterAll(async () => {
     await authFactory.cleanup();
+    await rateLimitedApp.close();
     await app.close();
   });
 
@@ -39,7 +42,6 @@ describe('Infrastructure & Basic API Features (e2e)', () => {
   });
 
   it('GET /health/readyz - returns 200 when the database is healthy', async () => {
-    await Bun.sleep(1_100);
     const res = await request(app.getHttpServer()).get('/health/readyz').expect(200);
 
     expect(res.body).toMatchObject({
@@ -96,7 +98,7 @@ describe('Infrastructure & Basic API Features (e2e)', () => {
     const responses = [];
     for (let index = 0; index < 3; index += 1) {
       responses.push(
-        await request(app.getHttpServer()).get('/v1/account/profile').set(auth.headers),
+        await request(rateLimitedApp.getHttpServer()).get('/v1/account/profile').set(auth.headers),
       );
     }
     const has429 = responses.some((res) => res.status === 429);
@@ -107,10 +109,9 @@ describe('Infrastructure & Basic API Features (e2e)', () => {
   });
 
   it('rate limit - health probes use their own test budget', async () => {
-    await Bun.sleep(1_100);
     const responses = [];
     for (let index = 0; index < 3; index += 1) {
-      responses.push(await request(app.getHttpServer()).get('/health/healthz'));
+      responses.push(await request(rateLimitedApp.getHttpServer()).get('/health/healthz'));
     }
 
     expect(responses[0].status).toBe(200);
