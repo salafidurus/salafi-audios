@@ -17,7 +17,7 @@ import type {
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
-import { ScholarPageFeedService } from '../recommendation/scholar-page-feed.service';
+import { ScholarsRecommendationService } from '../recommendation/scholars-recommendation.service';
 
 /** NestJS scholars service service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
@@ -26,7 +26,8 @@ import { ScholarPageFeedService } from '../recommendation/scholar-page-feed.serv
 export class ScholarsService {
   constructor(
     @Inject(ScholarsRepository) private readonly repo: ScholarsRepository,
-    @Inject(ScholarPageFeedService) private readonly pageFeed: ScholarPageFeedService,
+    @Inject(ScholarsRecommendationService)
+    private readonly pageFeed: ScholarsRecommendationService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 

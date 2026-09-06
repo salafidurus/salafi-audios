@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'bun:test';
 
-import { ScholarPageFeedEngine } from './scholar-page-feed.engine';
+import { ScholarsRecommendationEngine } from './scholars-recommendation.engine';
 
 const recommendations = [
   {
@@ -33,14 +33,14 @@ const recommendations = [
   },
 ];
 
-describe('ScholarPageFeedEngine', () => {
+describe('ScholarsRecommendationEngine', () => {
   it('deduplicates references within each semantic batch before pagination', async () => {
     const repo = {
       getRecommendations: vi
         .fn()
         .mockResolvedValue([{ ...recommendations[0], itemIds: ['s1', 's1', 's2'] }]),
     };
-    const engine = new ScholarPageFeedEngine(repo as never);
+    const engine = new ScholarsRecommendationEngine(repo as never);
 
     const result = await engine.recommend(undefined, 1);
 
@@ -51,7 +51,7 @@ describe('ScholarPageFeedEngine', () => {
 
   it('returns an ordered first page with opaque continuation metadata', async () => {
     const repo = { getRecommendations: vi.fn().mockResolvedValue(recommendations) };
-    const engine = new ScholarPageFeedEngine(repo as never);
+    const engine = new ScholarsRecommendationEngine(repo as never);
 
     const result = await engine.recommend(undefined, 2);
 
@@ -65,7 +65,7 @@ describe('ScholarPageFeedEngine', () => {
 
   it('continues from the opaque cursor without repeating the previous page', async () => {
     const repo = { getRecommendations: vi.fn().mockResolvedValue(recommendations) };
-    const engine = new ScholarPageFeedEngine(repo as never);
+    const engine = new ScholarsRecommendationEngine(repo as never);
     const firstPage = await engine.recommend(undefined, 2);
 
     const result = await engine.recommend(firstPage.nextCursor, 2);
