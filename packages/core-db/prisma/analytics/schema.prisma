@@ -6,6 +6,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  schemas  = ["analytics"]
 }
 
 /// Immutable product-event archive owned by the analytics database.
@@ -32,4 +33,5 @@ model AnalyticsEvent {
   @@index([listingSlug, occurredAt], map: "idx_analytics_listing_occurred_at")
   @@index([scholarSlug, occurredAt], map: "idx_analytics_scholar_occurred_at")
   @@map("analytics_events")
+  @@schema("analytics")
 }

@@ -8,9 +8,12 @@ Accepted
 
 Backend-confirmed product outcomes such as registration, audio completion, and
 save transitions are produced by mutations to authoritative application state.
-The analytics archive is intentionally isolated and append-only. Writing the
+The analytics archive is intentionally isolated and append-only. Its code and
+Prisma migration boundary remain separate from the primary database; when
+operationally convenient, both boundaries may point at one PostgreSQL database
+while the archive remains in the dedicated `analytics` schema. Writing the
 archive directly inside a request transaction would couple business latency and
-availability to the analytics database, while writing an intent only after the
+availability to the analytics boundary, while writing an intent only after the
 business mutation could lose the event between those operations.
 
 ## Decision
@@ -22,8 +25,9 @@ and appends them to the analytics archive using the intent's stable event ID.
 
 The primary database owns the intent status (`pending`, `processing`,
 `delivered`, or `dead_letter`), retry count, lease, and last error. The
-analytics database owns the permanent canonical event archive and deduplicates
-repeated deliveries by event ID and payload fingerprint.
+analytics boundary owns the permanent canonical event archive and deduplicates
+repeated deliveries by event ID and payload fingerprint. When co-located with
+the primary database, the archive is stored in the `analytics` schema.
 
 User registration is covered by a primary-database trigger because the Better
 Auth user insert is the authoritative registration mutation. Progress and
@@ -43,7 +47,7 @@ intent participates in the same Prisma transaction as the state change.
 
 ## Alternatives rejected
 
-- **Write directly to the analytics database in the request:** couples product
+- **Write directly to the analytics archive in the request:** couples product
   mutations to analytics availability and adds latency to user actions.
 - **Put the outbox table in the analytics database:** cannot be atomically
   committed with primary application state.
