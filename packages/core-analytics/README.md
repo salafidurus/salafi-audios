@@ -16,6 +16,9 @@ buffering.
 - `listing_slug` and `scholar_slug` are the client-safe content references.
 - Anonymous identities are resettable; authenticated identities are
   pseudonymous and never raw database user IDs.
+- Native lifecycle observations (`app_opened`, `app_backgrounded`,
+  `session_started`, and `session_ended`) use the same envelope as web and API
+  events; platform-specific recording and delivery remain in `apps/native`.
 
 The owned event store, HTTP ingestion DTOs, Mixpanel adapter, and runtime
 buffering are downstream boundaries and must not be added here.

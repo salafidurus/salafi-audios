@@ -2,8 +2,11 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 
 import styles from "./feed-skeleton.module.css";
 
-/** Props controlling how many loading placeholders the Explore feed displays. */
-// oxlint-disable-next-line anti-slop/require-tsdoc -- The contract summary above documents this public props type.
+/**
+ * Controls the number of temporary Explore-feed cards shown while catalog data
+ * is pending. The value is presentation-only and defaults to six cards when
+ * omitted; it does not affect the eventual result set.
+ */
 export type FeedSkeletonProps = {
   /** Number of placeholder cards to render. */
   count?: number;

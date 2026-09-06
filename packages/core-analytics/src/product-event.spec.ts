@@ -24,6 +24,80 @@ const identity = {
 };
 
 describe("canonical product-event contract", () => {
+  it("accepts native lifecycle observations with runtime context", () => {
+    const result = ProductEventSchema.safeParse({
+      event_id: "native-session-start",
+      event_name: "session_started",
+      schema_version: "v1",
+      occurred_at: "2026-09-06T12:00:00.000Z",
+      source: "native",
+      platform: "android",
+      app_version: "1.0.0",
+      consent_state: "essential",
+      identity,
+      event_context: {
+        interface_language: "en",
+        timezone: "Asia/Riyadh",
+        session_id: "session-123",
+        lifecycle_state: "active",
+      },
+      content_references: {},
+      priority: "important",
+      authority: "client_observation",
+      producer: "native",
+      properties: {},
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts native listing observations and rejects mismatched runtime metadata", () => {
+    const nativeResult = ProductEventSchema.safeParse({
+      event_id: "native-listing-view",
+      event_name: "listing_viewed",
+      schema_version: "v1",
+      occurred_at: "2026-09-06T12:00:00.000Z",
+      source: "native",
+      platform: "ios",
+      app_version: "1.0.0",
+      consent_state: "essential",
+      identity,
+      event_context: {},
+      content_references: {
+        listing_slug: "foundations-of-tawheed",
+        scholar_slug: "salih-al-fawzan",
+      },
+      priority: "important",
+      authority: "client_observation",
+      producer: "native",
+      properties: {},
+    });
+
+    const mismatchedResult = ProductEventSchema.safeParse({
+      event_id: "mismatched-runtime",
+      event_name: "listing_viewed",
+      schema_version: "v1",
+      occurred_at: "2026-09-06T12:00:00.000Z",
+      source: "web",
+      platform: "ios",
+      app_version: "web-2026.09.06",
+      consent_state: "essential",
+      identity,
+      event_context: {},
+      content_references: {
+        listing_slug: "foundations-of-tawheed",
+        scholar_slug: "salih-al-fawzan",
+      },
+      priority: "important",
+      authority: "client_observation",
+      producer: "web",
+      properties: {},
+    });
+
+    expect(nativeResult.success).toBe(true);
+    expect(mismatchedResult.success).toBe(false);
+  });
+
   it("accepts a client observation with immutable slug references and context", () => {
     const result = ProductEventSchema.safeParse({
       event_id: "event-123",

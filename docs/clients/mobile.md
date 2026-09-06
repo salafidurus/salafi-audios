@@ -112,6 +112,23 @@ The client-side persisted progress outbox remains the recovery mechanism for
 network/API failures. The server-side Redis buffer only reduces PostgreSQL
 write frequency after a request has reached the API.
 
+### Native analytics delivery
+
+Native product analytics uses the same provider-neutral contracts as web, but
+its runtime adapter is owned by `apps/native/src/core/analytics/`. It persists
+canonical lifecycle events in a dedicated SQLite key/value entry before any
+network request. The bounded buffer retains at most 500 events or 512 KiB,
+expires entries after seven days, and retries delivery to
+`POST /v1/analytics/events` with stable event IDs. Foreground and network
+reconnect trigger delivery; analytics failures do not block playback, catalog,
+downloads, or personal-state synchronization.
+
+The first native slice records app/session lifecycle observations only. The
+device stores a resettable anonymous identity in SecureStore, while the API
+derives authenticated pseudonyms from the session when one is present. Native
+code does not send raw user IDs or call Mixpanel/New Relic directly; those
+providers remain downstream destinations of the owned event archive.
+
 - **Outbox is namespaced per user** (`progress:${userId}`, `saved:${userId}`) so switching accounts on the same device never leaks or retries another user's queued writes.
 - **Conflict resolution is last-write-wins by `updatedAt`**, mirroring the server's own `bulkSync` SQL (`INSERT ... ON CONFLICT DO UPDATE ... CASE WHEN updatedAt > ...`). Progress additionally merges `isCompleted` monotonically (a completion can't be un-completed by an older write); My Library saved state uses plain LWW on a `deletedAt` tombstone, since a later unsave must be able to override an earlier save and vice versa.
 - **Delta hydration** pulls only what changed since the last sync via `?since=` on both the progress and My Library saved-state endpoints.

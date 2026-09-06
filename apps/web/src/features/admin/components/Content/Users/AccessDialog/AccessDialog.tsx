@@ -161,7 +161,11 @@ interface AccessDialogBodyProps {
   currentUserIsSuperadmin?: boolean;
   /** Editable target state used to preview and submit the replacement grants. */
   uiState: UiState;
-  scholarOptions: { slug: string; name: string }[];
+  scholarOptions: {
+    /** Stable scholar identifier submitted when a scope is selected. */
+    slug: string;
+    name: string;
+  }[];
   onToggleTarget: (target: AccessTarget, enabled: boolean) => void;
   onToggleCapability: (
     target: AccessTarget,
@@ -301,6 +305,7 @@ export function AccessDialog({
   onClose,
   onSaved,
 }: {
+  /** Identifier of the administrative user whose grants are being edited. */
   userId: string;
   userName: string;
   onClose: () => void;
