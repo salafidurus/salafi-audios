@@ -62,6 +62,14 @@ export class TelemetryService implements OnModuleInit, OnApplicationShutdown {
     'salafi_durus_analytics_events_total',
     { description: 'Analytics events observed at each API pipeline stage' },
   );
+  private readonly analyticsDeliveryCounter = this.meter.createCounter(
+    'salafi_durus_analytics_delivery_total',
+    { description: 'Analytics provider delivery outcomes' },
+  );
+  private readonly analyticsDeliveryDuration = this.meter.createHistogram(
+    'salafi_durus_analytics_delivery_duration_ms',
+    { description: 'Analytics provider delivery latency in milliseconds' },
+  );
   private readonly httpRequestCounter = this.meter.createCounter(
     'salafi_durus_http_requests_total',
     {
@@ -129,6 +137,16 @@ export class TelemetryService implements OnModuleInit, OnApplicationShutdown {
     count = 1,
   ): void {
     this.analyticsStageCounter.add(count, { stage });
+  }
+
+  /** Records provider delivery state and latency without event or provider-secret attributes. */
+  recordAnalyticsDelivery(
+    stage: 'delivered' | 'disabled' | 'retry' | 'rejected' | 'dead_letter',
+    durationMs: number,
+    count = 1,
+  ): void {
+    this.analyticsDeliveryCounter.add(count, { stage });
+    this.analyticsDeliveryDuration.record(durationMs, { stage });
   }
 
   /** Records API latency and outcome using bounded transport-level dimensions. */

@@ -19,6 +19,8 @@ const ApiEnvSchema = z
     PRIMARY_SHADOW_DATABASE_URL: z.url().optional(),
     ANALYTICS_DATABASE_URL: z.url(),
     ANALYTICS_IDENTITY_HMAC_SECRET: z.string().min(32),
+    MIXPANEL_PROJECT_TOKEN: optionalString,
+    MIXPANEL_API_URL: optionalUrl.default('https://api.mixpanel.com'),
     // Neon control-plane credentials power the /health compute-endpoint check.
     // Optional in development/test; required together and required in prod.
     NEON_API_KEY: z.string().min(1).optional(),
