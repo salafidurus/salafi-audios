@@ -1,6 +1,9 @@
 /**
- * Theme preference persisted by the client; `system` defers to the operating
- * system's color-scheme media query while `light` and `dark` are explicit.
+ * Allowed persisted values for the web theme selector.
+ *
+ * `system` resolves from the browser's `prefers-color-scheme` media query;
+ * `light` and `dark` explicitly override that preference. Theme readers treat
+ * unknown storage values as `system` so a stale value cannot break first paint.
  */
 export type ThemePreference = "system" | "light" | "dark";
 

@@ -78,6 +78,7 @@ jobs:
         env:
           PRIMARY_DIRECT_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
           PRIMARY_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          ANALYTICS_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
         run: bun run build:all --filter=api...
 
       - name: Run Prisma migrations

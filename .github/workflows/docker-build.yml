@@ -64,6 +64,7 @@ jobs:
             -e PORT=4000 \
             -e PRIMARY_DATABASE_URL=postgresql://ci:ci@localhost:5432/ci \
             -e ANALYTICS_DATABASE_URL=postgresql://ci:ci@localhost:5432/ci_analytics \
+            -e ANALYTICS_IDENTITY_HMAC_SECRET=ci-analytics-identity-secret-0123456789 \
             -e NEON_API_KEY=dummy-neon-api-key \
             -e NEON_PROJECT_ID=dummy-neon-project \
             -e NEON_ENDPOINT_ID=ep-dummy-neon-endpoint \
