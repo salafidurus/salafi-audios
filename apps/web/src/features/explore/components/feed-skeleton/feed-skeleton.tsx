@@ -2,6 +2,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 
 import styles from "./feed-skeleton.module.css";
 
+/** Explore-feed loading presentation and its placeholder-card contract. */
 /**
  * Controls the number of temporary Explore-feed cards shown while catalog data
  * is pending. The value is presentation-only and defaults to six cards when

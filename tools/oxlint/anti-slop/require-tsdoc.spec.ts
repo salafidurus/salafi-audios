@@ -8,6 +8,18 @@ import { join, resolve } from "node:path";
 const pluginPath = resolve(import.meta.dir, "index.ts");
 const oxlintPath = resolve(import.meta.dir, "../../../node_modules/.bin/oxlint");
 
+type Fixture = {
+  relativePath: string;
+  source: string;
+};
+
+type Diagnostic = {
+  code?: string;
+  filename?: string;
+  labels?: Array<{ column?: number; line?: number; message?: string }>;
+  message?: string;
+};
+
 function lintFixture(
   source: string,
   relativePath = "apps/fixture/src/fixture.ts",
@@ -44,6 +56,47 @@ function lintFixture(
   } finally {
     rmSync(fixtureRoot, { recursive: true, force: true });
   }
+}
+
+function lintFixtures(fixtures: Fixture[], threads?: number): Diagnostic[] {
+  const fixtureRoot = mkdtempSync(join(tmpdir(), "require-tsdoc-multi-"));
+  const configPath = join(fixtureRoot, "oxlint.json");
+  const sourcePaths = fixtures.map(({ relativePath, source }) => {
+    const sourcePath = join(fixtureRoot, relativePath);
+    mkdirSync(join(sourcePath, ".."), { recursive: true });
+    writeFileSync(sourcePath, source);
+    return sourcePath;
+  });
+
+  writeFileSync(
+    configPath,
+    JSON.stringify({
+      jsPlugins: [{ name: "anti-slop", specifier: pluginPath }],
+      rules: { "anti-slop/require-tsdoc": ["error", { scope: "all" }] },
+    }),
+  );
+
+  try {
+    const args = ["--config", configPath, "--format", "json"];
+    if (threads !== undefined) args.push(`--threads=${threads}`);
+    const result = spawnSync(oxlintPath, [...args, ...sourcePaths], {
+      encoding: "utf8",
+    });
+    return (JSON.parse(result.stdout) as { diagnostics?: Diagnostic[] }).diagnostics ?? [];
+  } finally {
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+}
+
+function normalizeDiagnostics(diagnostics: Diagnostic[]) {
+  return diagnostics
+    .map((diagnostic) => ({
+      code: diagnostic.code,
+      filename: diagnostic.filename?.replace(/^.*?(?=apps[\\/])/u, ""),
+      labels: diagnostic.labels,
+      message: diagnostic.message,
+    }))
+    .sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)));
 }
 
 describe("require-tsdoc", () => {
@@ -131,5 +184,30 @@ describe("require-tsdoc", () => {
     const output = lintFixture("export const value = 2;\n", undefined, original);
 
     expect(output).toContain("require-tsdoc");
+  });
+
+  test("checks every production file after excluded files and repeated declarations", () => {
+    const fixtures = [
+      {
+        relativePath: "apps/fixture/src/generated/ignored.ts",
+        source: "export const ignored = 1;\n",
+      },
+      {
+        relativePath: "apps/fixture/src/first.ts",
+        source:
+          "/** First module. */\n/** Returns the first value. */\nexport function repeated() { return 1; }\n",
+      },
+      {
+        relativePath: "apps/fixture/src/second.ts",
+        source: "/** Second module. */\nexport function repeated() { return 2; }\n",
+      },
+    ];
+    const expected = normalizeDiagnostics(lintFixtures(fixtures, 1));
+
+    expect(expected).toHaveLength(1);
+    expect(expected[0]?.message).toContain("function");
+    expect(expected[0]?.filename).toContain("second.ts");
+    expect(normalizeDiagnostics(lintFixtures([...fixtures].toReversed(), 1))).toEqual(expected);
+    expect(normalizeDiagnostics(lintFixtures(fixtures))).toEqual(expected);
   });
 });
