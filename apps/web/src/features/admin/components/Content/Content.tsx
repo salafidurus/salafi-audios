@@ -5,10 +5,10 @@ import { Topic } from "./Topic/Topic";
 import { TopicModal } from "./Topic/TopicModal";
 
 /**
- * Exposes the admin content editors and their modal entry points as one stable namespace.
+ * Provides the admin dashboard's single registry for content editors and modal entry points.
  *
- * Consumers use this object to select the appropriate editor without importing each
- * content type's implementation details individually.
+ * The property names are the supported component identities; consumers select a content
+ * surface from this object without reaching into the individual editor implementation paths.
  */
 export const Content = {
   Topic,

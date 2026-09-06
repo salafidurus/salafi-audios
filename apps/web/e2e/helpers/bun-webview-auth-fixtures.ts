@@ -263,7 +263,7 @@ export async function installAuthFixtures(
     await Promise.allSettled(pendingPausedRequests);
     await journey.view.cdp("Fetch.disable").catch(() => undefined);
     await journey.view.cdp("Network.setExtraHTTPHeaders", { headers: {} }).catch(() => undefined);
-    fixtureServer?.stop(true);
+    await fixtureServer?.stop(true);
   };
 }
 
