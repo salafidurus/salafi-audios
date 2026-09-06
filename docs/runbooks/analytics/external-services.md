@@ -12,6 +12,15 @@ The canonical event vocabulary and privacy boundary are defined by
 [ADR 0010](../../adr/0010-canonical-product-event-contract.md). Do not add
 provider-specific event names or properties here.
 
+The API Mixpanel adapter reads `MIXPANEL_PROJECT_TOKEN` from the deployment
+environment and routes through `MIXPANEL_API_URL` (defaulting to the global
+Mixpanel import host). `OTEL_ENVIRONMENT` selects the `development`, `preview`,
+or `production` environment property; the token itself must belong to the
+matching isolated Mixpanel project. When the token is absent, the owned
+archive continues to receive events and external publication is disabled.
+Provider-specific fields remain inside the API adapter and are never added to
+the canonical event package.
+
 ## Ownership record
 
 Complete this table in the restricted operations record, not with credential

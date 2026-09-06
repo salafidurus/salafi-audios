@@ -63,6 +63,16 @@ export class ConfigService {
     return this.env.ANALYTICS_IDENTITY_HMAC_SECRET;
   }
 
+  /** Optional Mixpanel project token; absent configuration disables external publishing. */
+  get MIXPANEL_PROJECT_TOKEN(): string | undefined {
+    return this.env.MIXPANEL_PROJECT_TOKEN;
+  }
+
+  /** Mixpanel import host, configurable for regional or controlled test endpoints. */
+  get MIXPANEL_API_URL(): string {
+    return this.env.MIXPANEL_API_URL;
+  }
+
   get NEON_API_KEY(): string | undefined {
     return this.env.NEON_API_KEY;
   }
