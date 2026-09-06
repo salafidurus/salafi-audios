@@ -1,0 +1,35 @@
+generator client {
+  provider   = "prisma-client-js"
+  output     = "../../src/generated/analytics"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Immutable product-event archive owned by the analytics database.
+model AnalyticsEvent {
+  eventId              String   @id @map("event_id")
+  payloadFingerprint   String   @map("payload_fingerprint")
+  eventName            String   @map("event_name")
+  schemaVersion        String   @map("schema_version")
+  pseudonymousIdentity String?  @map("pseudonymous_identity")
+  consentState         String   @map("consent_state")
+  priority             String
+  source               String
+  platform             String
+  appVersion           String   @map("app_version")
+  occurredAt           DateTime @map("occurred_at")
+  receivedAt           DateTime @map("received_at")
+  listingSlug          String?  @map("listing_slug")
+  scholarSlug          String?  @map("scholar_slug")
+  canonicalJson        Json     @map("canonical_json")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  @@index([eventName, occurredAt], map: "idx_analytics_event_name_occurred_at")
+  @@index([pseudonymousIdentity, occurredAt], map: "idx_analytics_identity_occurred_at")
+  @@index([listingSlug, occurredAt], map: "idx_analytics_listing_occurred_at")
+  @@index([scholarSlug, occurredAt], map: "idx_analytics_scholar_occurred_at")
+  @@map("analytics_events")
+}

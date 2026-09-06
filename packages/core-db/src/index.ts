@@ -1,3 +1,4 @@
+import * as analyticsClient from "./generated/analytics/client";
 import * as client from "./generated/prisma/client";
 
 /** Repository-owned database boundary re-exporting generated Prisma client types and values. */
@@ -41,5 +42,12 @@ export const AccessCapability = client.AccessCapability;
 /** Runtime Prisma client constructor exposed at the package boundary. */
 export const PrismaClient = client.PrismaClient;
 
+/** Analytics Prisma client for the isolated append-only product-event archive. */
+export const AnalyticsPrismaClient = analyticsClient.PrismaClient;
+/** Analytics Prisma client type exposed through the unified database boundary. */
+export type AnalyticsPrismaClient = analyticsClient.PrismaClient;
+
 // Export Prisma namespace/types/values (models accessed via Prisma.Scholar, Prisma.User, etc.)
 export import Prisma = client.Prisma;
+/** Analytics Prisma namespace exposed through the unified database boundary. */
+export import AnalyticsPrisma = analyticsClient.Prisma;
