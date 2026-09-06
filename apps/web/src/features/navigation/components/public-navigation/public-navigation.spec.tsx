@@ -193,11 +193,10 @@ describe("PublicNavigation", () => {
     expect(screen.queryByRole("button", { name: "Main" })).not.toBeInTheDocument();
   });
 
-  it("keeps the full navigation on narrow desktop widths", () => {
+  it("keeps the full navigation at non-mobile widths", () => {
     (useResponsive as Mock<any>).mockReturnValue({
       isMobile: false,
       isTablet: false,
-      isNarrowDesktop: true,
       isWeb: true,
     });
 
