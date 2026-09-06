@@ -79,10 +79,12 @@ const NativeLifecycleEventNameSchema = z.enum([
 const ClientSourceSchema = z.enum(["web", "native"]);
 const ClientPlatformSchema = z.enum(["web", "ios", "android"]);
 const ClientProducerSchema = z.enum(["web", "native"]);
+const BackendPlatformSchema = z.literal("api");
 
 const AudioCompletedPropertiesSchema = z.strictObject({
   completion_source: z.literal("progress_persisted"),
 });
+const BackendOutcomePropertiesSchema = z.strictObject({});
 
 const CommonEventFields = {
   event_id: z.string().min(1),
@@ -130,7 +132,7 @@ const AudioCompletedEventSchema = z.strictObject({
   ...CommonEventFields,
   event_name: z.literal("audio_completed"),
   source: z.literal("api"),
-  platform: z.enum(["web", "ios", "android"]),
+  platform: z.enum(["api", "web", "ios", "android"]),
   content_references: z.strictObject({
     listing_slug: z.string().min(1),
     scholar_slug: z.string().min(1),
@@ -140,12 +142,56 @@ const AudioCompletedEventSchema = z.strictObject({
   properties: AudioCompletedPropertiesSchema,
 });
 
+/** Typed backend-confirmed registration outcome for a newly persisted user. */
+const UserRegisteredEventSchema = z.strictObject({
+  ...CommonEventFields,
+  event_name: z.literal("user_registered"),
+  source: z.literal("api"),
+  platform: BackendPlatformSchema,
+  authority: z.literal("backend_confirmed"),
+  producer: z.literal("api"),
+  properties: BackendOutcomePropertiesSchema,
+});
+
+/** Typed backend-confirmed transition for a listing becoming saved. */
+const ListingSavedEventSchema = z.strictObject({
+  ...CommonEventFields,
+  event_name: z.literal("listing_saved"),
+  source: z.literal("api"),
+  platform: BackendPlatformSchema,
+  content_references: z.strictObject({
+    listing_slug: z.string().min(1),
+    scholar_slug: z.string().min(1),
+  }),
+  authority: z.literal("backend_confirmed"),
+  producer: z.literal("api"),
+  properties: BackendOutcomePropertiesSchema,
+});
+
+/** Typed backend-confirmed transition for a listing becoming unsaved. */
+const ListingUnsavedEventSchema = z.strictObject({
+  ...CommonEventFields,
+  event_name: z.literal("listing_unsaved"),
+  source: z.literal("api"),
+  platform: BackendPlatformSchema,
+  content_references: z.strictObject({
+    listing_slug: z.string().min(1),
+    scholar_slug: z.string().min(1),
+  }),
+  authority: z.literal("backend_confirmed"),
+  producer: z.literal("api"),
+  properties: BackendOutcomePropertiesSchema,
+});
+
 /** The provider-neutral, immutable event union shared by future producers. */
 export const ProductEventSchema = z
   .discriminatedUnion("event_name", [
     ListingViewedEventSchema,
     NativeLifecycleEventSchema,
     AudioCompletedEventSchema,
+    UserRegisteredEventSchema,
+    ListingSavedEventSchema,
+    ListingUnsavedEventSchema,
   ])
   .superRefine((event, context) => {
     const runtime =

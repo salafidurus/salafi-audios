@@ -117,8 +117,9 @@ analysis. A sink is not the permanent source of truth.
 
 **Integration outbox**:
 A short-lived delivery mechanism for reliably forwarding selected
-backend-confirmed events after a transaction; it is not a permanent clickstream
-store.
+backend-confirmed events after a transaction. In this repository, an
+`AnalyticsDispatchIntent` is stored in the primary database and is not a
+permanent clickstream store or part of the analytics archive.
 
 ### Native rendering vocabulary
 

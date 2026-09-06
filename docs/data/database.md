@@ -8,13 +8,20 @@ Salafi Durus separates authoritative relational state, media storage, analytics,
 
 - **Core relational data**: scholars, listings (collections, series, and singles), publication state, and user-facing canonical state.
 - **Media data**: object storage files plus relational references to those files.
-- **Analytics and event data**: isolated from the authoritative core.
+- **Analytics and event data**: the immutable event archive is isolated from the
+  authoritative core by the analytics Prisma client and PostgreSQL `analytics`
+  schema; it may temporarily share the same physical database through separate
+  environment URLs. Only short-lived delivery coordination remains in the
+  primary `public` schema.
 - **Client-side data**: cached metadata, playback continuity, and temporary local state.
 
 ## 2. Core Relational Database
 
 - PostgreSQL is the authoritative database.
 - Prisma defines schema, migrations, and typed access.
+- Core tables live in PostgreSQL's `public` schema. Analytics archive tables
+  live in the explicit `analytics` schema, even when both Prisma clients point
+  at the same database.
 - The database stores metadata, relationships, publication state, aggregate access grants, and media references.
 
 ### Core Domain Shape
@@ -27,8 +34,9 @@ Salafi Durus separates authoritative relational state, media storage, analytics,
 
 - Audio or image blobs.
 - Client-only ephemeral UI state.
-- Analytics events (the Clickstream events table is fully removed from
-  PostgreSQL; current client analytics are external to the database).
+- The immutable analytics event archive. Backend-confirmed delivery intents are
+  the deliberate exception: they live in the primary database so they can be
+  committed atomically with the business mutation. See [ADR 0013](../adr/0013-primary-database-analytics-dispatch-intents.md).
 - Secrets or infrastructure credentials.
 
 These are structural rules, not optimization suggestions.
