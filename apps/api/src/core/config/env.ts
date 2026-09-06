@@ -56,6 +56,7 @@ const ApiEnvSchema = z
     OTEL_EXPORTER_OTLP_HEADERS: optionalString,
     OTEL_EXPORTER_OTLP_PROTOCOL: z.enum(['http/protobuf', 'grpc']).default('http/protobuf'),
     OTEL_EXPORTER_OTLP_COMPRESSION: z.enum(['none', 'gzip']).default('gzip'),
+    OTEL_ENVIRONMENT: z.enum(['development', 'preview', 'production']).optional(),
     OTEL_REGION: optionalString.default('unknown'),
     OTEL_DEPLOYMENT_VERSION: optionalString.default('unknown'),
     OTEL_PLATFORM: z.literal('api').default('api'),

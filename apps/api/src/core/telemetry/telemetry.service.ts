@@ -18,6 +18,7 @@ export type TelemetryEnvironment = Pick<
   | 'NODE_ENV'
   | 'OTEL_DEPLOYMENT_VERSION'
   | 'OTEL_PLATFORM'
+  | 'OTEL_ENVIRONMENT'
   | 'OTEL_REGION'
 >;
 
@@ -37,7 +38,7 @@ export function getTelemetryResourceAttributes(
 ): Attributes {
   return {
     'service.name': env.OTEL_SERVICE_NAME,
-    'deployment.environment.name': env.NODE_ENV,
+    'deployment.environment.name': env.OTEL_ENVIRONMENT ?? env.NODE_ENV,
     'service.version': env.OTEL_DEPLOYMENT_VERSION,
     'deployment.version': env.OTEL_DEPLOYMENT_VERSION,
     'service.namespace': 'salafi-durus',
@@ -89,7 +90,10 @@ export class TelemetryService implements OnModuleInit, OnApplicationShutdown {
       });
       this.sdk.start();
       this.logger.info(
-        { service: this.config.OTEL_SERVICE_NAME, environment: this.config.NODE_ENV },
+        {
+          service: this.config.OTEL_SERVICE_NAME,
+          environment: this.config.OTEL_ENVIRONMENT ?? this.config.NODE_ENV,
+        },
         'OpenTelemetry SDK started',
       );
     } catch (error) {

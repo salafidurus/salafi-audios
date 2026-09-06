@@ -154,6 +154,33 @@ Do not create reports that depend on events not yet implemented.
 - Alerts for sustained errors, latency, dependency failure, health failure,
   resource pressure, restarts, provider export failure, and analytics backlog.
 
+The initial API dashboard and alert definitions are versioned here so an
+operator can apply them consistently in each isolated New Relic environment.
+These queries use only bounded telemetry dimensions emitted by the API.
+
+```text
+-- API request rate
+FROM Metric SELECT rate(sum(salafi_durus_http_requests_total), 1 minute)
+FACET method, status_class
+
+-- API error percentage
+FROM Metric SELECT percentage(sum(salafi_durus_http_requests_total), WHERE status_class = '5xx')
+
+-- API latency p95
+FROM Metric SELECT percentile(salafi_durus_http_request_duration_ms, 95)
+FACET method
+
+-- Analytics pipeline stages
+FROM Metric SELECT sum(salafi_durus_analytics_events_total)
+FACET stage
+```
+
+Apply these initial alert conditions per environment: API 5xx percentage above
+5% for 5 minutes; API p95 latency above 2 seconds for 5 minutes; any analytics
+`failed` stage above 0 for 5 minutes; and missing telemetry from a normally
+active service for 10 minutes. Tune thresholds against the environment's
+baseline and record the final policy IDs in the restricted operations record.
+
 ## Retention and limits
 
 For each provider, record the account plan, effective retention settings,

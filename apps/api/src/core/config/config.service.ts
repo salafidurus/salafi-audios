@@ -158,6 +158,10 @@ export class ConfigService {
     return this.env.OTEL_EXPORTER_OTLP_COMPRESSION;
   }
 
+  get OTEL_ENVIRONMENT(): 'development' | 'preview' | 'production' | undefined {
+    return this.env.OTEL_ENVIRONMENT;
+  }
+
   get OTEL_REGION(): string {
     return this.env.OTEL_REGION;
   }

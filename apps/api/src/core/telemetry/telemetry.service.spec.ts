@@ -10,6 +10,7 @@ const baseEnv = {
   NODE_ENV: 'production',
   OTEL_DEPLOYMENT_VERSION: 'release-123',
   OTEL_PLATFORM: 'api',
+  OTEL_ENVIRONMENT: 'preview',
   OTEL_REGION: 'eu-west-1',
   OTEL_EXPORTER_OTLP_ENDPOINT: undefined,
   OTEL_EXPORTER_OTLP_HEADERS: undefined,
@@ -42,7 +43,7 @@ describe('operational telemetry configuration', () => {
   it('builds stable resource attributes without user or request identifiers', () => {
     expect(getTelemetryResourceAttributes(baseEnv)).toEqual({
       'service.name': 'salafi-durus-api',
-      'deployment.environment.name': 'production',
+      'deployment.environment.name': 'preview',
       'service.version': 'release-123',
       'deployment.version': 'release-123',
       'service.namespace': 'salafi-durus',
