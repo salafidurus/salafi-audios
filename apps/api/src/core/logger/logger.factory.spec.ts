@@ -1,9 +1,31 @@
-import { describe, expect, it } from 'bun:test';
+import { describe, expect, it, vi } from 'bun:test';
+import { trace } from '@opentelemetry/api';
 import Fastify from 'fastify';
-import { generateRequestId, isHealthProbePath, loggerOptionsFor } from './logger.factory';
+import {
+  generateRequestId,
+  getTelemetryCorrelationFields,
+  isHealthProbePath,
+  loggerOptionsFor,
+} from './logger.factory';
 import { ApiLogController } from './api-log.controller';
 
 describe('logger factory', () => {
+  it('includes active trace identifiers with the request identifier', () => {
+    const span = trace.wrapSpanContext({
+      traceId: '0123456789abcdef0123456789abcdef',
+      spanId: '0123456789abcdef',
+      traceFlags: 1,
+      isRemote: false,
+    });
+    const activeSpan = vi.spyOn(trace, 'getActiveSpan').mockReturnValue(span);
+    const result = getTelemetryCorrelationFields('request-123');
+
+    expect(result).toMatchObject({ request_id: 'request-123' });
+    expect(result.trace_id).toHaveLength(32);
+    expect(result.span_id).toHaveLength(16);
+    activeSpan.mockRestore();
+  });
+
   it('recognizes all health probe paths including query strings', () => {
     expect(isHealthProbePath('/health')).toBe(true);
     expect(isHealthProbePath('/health/healthz?probe=1')).toBe(true);

@@ -1,8 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
+import { describe, it, expect } from 'bun:test';
 import { ConfigService } from './config.service';
 
 describe('ConfigService', () => {
-  const originalEnv = { ...process.env };
   const dummyEnv = {
     PRIMARY_DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
     ANALYTICS_DATABASE_URL: 'postgresql://user:pass@localhost:5432/analytics',
@@ -23,62 +22,31 @@ describe('ConfigService', () => {
     R2_PUBLIC_BASE_URL: 'http://localhost:9000',
   };
 
-  beforeEach(() => {
-    for (const key of Object.keys(process.env)) delete process.env[key];
-    Object.assign(process.env, dummyEnv);
-  });
-
-  afterEach(() => {
-    for (const key of Object.keys(process.env)) delete process.env[key];
-    Object.assign(process.env, originalEnv);
-  });
-
   it('parses CORS_ORIGINS_NATIVE correctly into string array', () => {
-    const prevEnv = process.env.CORS_ORIGINS_NATIVE;
-    process.env.CORS_ORIGINS_NATIVE = 'salafidurus-dev://, exp://, salafidurus://';
+    const config = new ConfigService({
+      ...dummyEnv,
+      CORS_ORIGINS_NATIVE: 'salafidurus-dev://, exp://, salafidurus://',
+    });
 
-    try {
-      const config = new ConfigService();
-      expect(config.CORS_ORIGINS_NATIVE).toEqual([
-        'salafidurus-dev://',
-        'exp://',
-        'salafidurus://',
-      ]);
-    } finally {
-      if (prevEnv !== undefined) {
-        process.env.CORS_ORIGINS_NATIVE = prevEnv;
-      } else {
-        delete process.env.CORS_ORIGINS_NATIVE;
-      }
-    }
+    expect(config.CORS_ORIGINS_NATIVE).toEqual(['salafidurus-dev://', 'exp://', 'salafidurus://']);
   });
 
   it('exposes the primary database URL by role', () => {
-    const config = new ConfigService();
+    const config = new ConfigService(dummyEnv);
     expect(config.PRIMARY_DATABASE_URL).toBe('postgresql://user:pass@localhost:5432/db');
   });
 
   it('exposes analytics connection and identity configuration by role', () => {
-    const config = new ConfigService();
+    const config = new ConfigService(dummyEnv);
     expect(config.ANALYTICS_DATABASE_URL).toBe('postgresql://user:pass@localhost:5432/analytics');
     expect(config.ANALYTICS_IDENTITY_HMAC_SECRET).toHaveLength(32);
   });
 
   it('returns default fallback array when CORS_ORIGINS_NATIVE is empty or default', () => {
-    const prevEnv = process.env.CORS_ORIGINS_NATIVE;
-    delete process.env.CORS_ORIGINS_NATIVE;
+    const config = new ConfigService(dummyEnv);
 
-    try {
-      const config = new ConfigService();
-      expect(Array.isArray(config.CORS_ORIGINS_NATIVE)).toBe(true);
-      expect(config.CORS_ORIGINS_NATIVE).toContain('salafidurus-dev://');
-      expect(config.CORS_ORIGINS_NATIVE).toContain('exp://');
-    } finally {
-      if (prevEnv !== undefined) {
-        process.env.CORS_ORIGINS_NATIVE = prevEnv;
-      } else {
-        delete process.env.CORS_ORIGINS_NATIVE;
-      }
-    }
+    expect(Array.isArray(config.CORS_ORIGINS_NATIVE)).toBe(true);
+    expect(config.CORS_ORIGINS_NATIVE).toContain('salafidurus-dev://');
+    expect(config.CORS_ORIGINS_NATIVE).toContain('exp://');
   });
 });

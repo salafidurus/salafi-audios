@@ -11,7 +11,6 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 
 interface ListingReviewSectionProps {
-  /** Current listing form values, including the initial edit snapshot. */
   state: FormState;
   mainLocale: Locale;
   topics: TopicDetailDto[];
@@ -27,10 +26,10 @@ function sameTopics(a: string[], b: string[]) {
 type ReviewChanges = {
   titleChanged: boolean;
   descriptionChanged: boolean;
-  /** Whether the publication status differs from the initial value. */
+  /** Whether the editorial publication status differs from the initial snapshot. */
   statusChanged: boolean;
   orderIndexChanged: boolean;
-  /** Whether the content language differs from the initial value. */
+  /** Whether the listing's content language differs from the initial snapshot. */
   languageChanged: boolean;
   coverImageChanged: boolean;
   topicsChanged: boolean;
@@ -127,10 +126,10 @@ function MainChanges({ title, description, mainLocale, t, changes }: MainChanges
 }
 
 type DetailChangesProps = {
-  /** Current publication status rendered in the review summary. */
+  /** Current editorial status rendered when `statusChanged` is true. */
   status: string;
   orderIndex: number | null;
-  /** Current content language rendered in the review summary. */
+  /** Current content language rendered when `languageChanged` is true. */
   language: Locale;
   topicNames: string[];
   t: ReturnType<typeof useTranslation>["t"];
@@ -165,7 +164,6 @@ function StatusChange({
   status,
   t,
 }: {
-  /** Publication status to display as a pending change. */
   status: string;
   t: ReturnType<typeof useTranslation>["t"];
 }) {
@@ -220,7 +218,12 @@ function DetailChanges({
   );
 }
 
-/** Summarizes pending listing changes before an admin submits the form. */
+/**
+ * Summarizes pending listing edits before the editor submits them.
+ *
+ * Create-mode output reflects only fields accepted by the create workflow;
+ * edit-mode output compares the current form against its initial snapshot.
+ */
 export function ListingReviewSection({ state, mainLocale, topics }: ListingReviewSectionProps) {
   const { t, i18n } = useTranslation();
   const { title, description, status, orderIndex, selectedTopics, language } = state;

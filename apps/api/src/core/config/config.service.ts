@@ -1,12 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { getApiEnv } from './env';
 
-/** NestJS config service service or controller coordinating the API boundary for this responsibility. */
+/**
+ * Provides validated API configuration to NestJS consumers.
+ *
+ * Production callers use the process environment by default. Tests and other
+ * controlled bootstraps may provide an explicit environment so configuration
+ * validation does not depend on dotenv files loaded by the runtime.
+ */
 @Injectable()
 /** Core API config.service module providing shared backend infrastructure and authority-boundary services. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class ConfigService {
-  private readonly env = getApiEnv(process.env);
+  private readonly env: ReturnType<typeof getApiEnv>;
+
+  constructor(@Optional() rawEnv: NodeJS.ProcessEnv = process.env) {
+    this.env = getApiEnv(rawEnv);
+  }
 
   get PORT() {
     return this.env.PORT;
@@ -136,6 +146,46 @@ export class ConfigService {
   /** Number of trusted reverse-proxy hops used when resolving anonymous IP identity. */
   get TRUST_PROXY_HOPS(): number {
     return this.env.TRUST_PROXY_HOPS;
+  }
+
+  get OTEL_SERVICE_NAME(): string {
+    return this.env.OTEL_SERVICE_NAME;
+  }
+
+  get OTEL_EXPORTER_OTLP_ENDPOINT(): string | undefined {
+    return this.env.OTEL_EXPORTER_OTLP_ENDPOINT;
+  }
+
+  get OTEL_EXPORTER_OTLP_HEADERS(): string | undefined {
+    return this.env.OTEL_EXPORTER_OTLP_HEADERS;
+  }
+
+  get OTEL_EXPORTER_OTLP_PROTOCOL(): 'http/protobuf' | 'grpc' {
+    return this.env.OTEL_EXPORTER_OTLP_PROTOCOL;
+  }
+
+  get OTEL_EXPORTER_OTLP_COMPRESSION(): 'none' | 'gzip' {
+    return this.env.OTEL_EXPORTER_OTLP_COMPRESSION;
+  }
+
+  get OTEL_ENVIRONMENT(): 'development' | 'preview' | 'production' | undefined {
+    return this.env.OTEL_ENVIRONMENT;
+  }
+
+  get OTEL_REGION(): string {
+    return this.env.OTEL_REGION;
+  }
+
+  get OTEL_DEPLOYMENT_VERSION(): string {
+    return this.env.OTEL_DEPLOYMENT_VERSION;
+  }
+
+  get OTEL_PLATFORM(): 'api' {
+    return this.env.OTEL_PLATFORM;
+  }
+
+  get OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT(): number {
+    return this.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
   }
 
   get REDIS_PROGRESS_BUFFER_DELAY_MS(): number {

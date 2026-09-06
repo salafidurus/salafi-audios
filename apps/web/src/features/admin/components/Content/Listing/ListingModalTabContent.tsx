@@ -14,11 +14,11 @@ import { ListingSublistingsTab } from "./ListingSublistingsTab";
 import { ListingTranslatableFields } from "./ListingTranslatableFields";
 
 interface ListingModalTabContentProps {
-  /** Current listing form values and validation state. */
+  /** Mutable listing form state displayed by the active tab. */
   state: FormState;
   dispatch: React.Dispatch<FormAction>;
   activeTab: string;
-  /** Tabs whose fields currently contain validation errors. */
+  /** Tabs that contain validation errors and should show the error banner. */
   errorTabSet: Set<string>;
   scholars: ScholarListItemDto[];
   topics: TopicDetailDto[];
@@ -51,7 +51,7 @@ function GeneralTabContent({
   | "isEditing"
   | "onImageStaged"
   | "stagedImagePreview"
-> & { /** Form-level error rendered above the general fields. */ error: string | null }) {
+> & { error: string | null }) {
   return (
     <>
       <FormErrorBanner error={error} />
@@ -76,7 +76,7 @@ function MainTabContent({
   errorTabSet,
   handleTitleChange,
 }: Pick<ListingModalTabContentProps, "state" | "dispatch" | "errorTabSet" | "handleTitleChange"> & {
-  /** Form-level error rendered when the main tab is active. */
+  /** Validation error associated with the active form section. */
   error: string | null;
 }) {
   return (
@@ -101,7 +101,12 @@ function shouldShowSublistings(
   return activeTab === "sublistings" && showSublistingsTab && Boolean(listingId);
 }
 
-/** Renders the active listing-editor tab and its validation feedback. */
+/**
+ * Selects the listing editor panel for the active tab.
+ *
+ * Form state and validation errors remain owned by the parent editor; this
+ * component only routes them to the appropriate presentation section.
+ */
 export function ListingModalTabContent({
   state,
   dispatch,
