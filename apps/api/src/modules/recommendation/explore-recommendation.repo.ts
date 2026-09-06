@@ -26,7 +26,7 @@ export type ExploreRecommendationResult = {
 type ListingCursor = { date: Date; slug?: string };
 
 const ListingCursorSchema = z.strictObject({
-  date: z.string().datetime(),
+  date: z.iso.datetime(),
   slug: z.string().min(1),
 });
 
