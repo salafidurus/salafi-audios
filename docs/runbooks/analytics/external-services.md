@@ -33,6 +33,12 @@ and Production—and one New Relic account. New Relic isolation is enforced with
 distinct logical services and mandatory environment attributes rather than
 separate accounts.
 
+Use a separate `Ingest - License` key for each environment where the provider
+supports it. The keys authenticate ingestion and support independent rotation;
+the environment attributes below are still required to distinguish telemetry
+inside the shared New Relic account. Never use a `Users` key or an `Ingest -
+Browser` key for API OpenTelemetry ingestion.
+
 ## Naming convention
 
 Use exactly these environment values: `development`, `preview`, and
@@ -101,18 +107,23 @@ limited to country, coarse region, or timezone.
 
 Record secret names and locations, never values:
 
-| Environment        | Destination          | Secret name                  | Storage system                          | Scope                    | Rotation owner |
-| ------------------ | -------------------- | ---------------------------- | --------------------------------------- | ------------------------ | -------------- |
-| development        | Mixpanel Development | `MIXPANEL_PROJECT_TOKEN`     | developer-local secret store            | development project only | To be assigned |
-| preview            | Mixpanel Preview     | `MIXPANEL_PROJECT_TOKEN`     | preview deployment secrets              | preview project only     | To be assigned |
-| production         | Mixpanel Production  | `MIXPANEL_PROJECT_TOKEN`     | production deployment secrets           | production project only  | To be assigned |
-| preview/production | New Relic            | `OTEL_EXPORTER_OTLP_HEADERS` | environment-specific deployment secrets | matching entity only     | To be assigned |
+| Environment | Destination          | Secret name                  | Storage system                | Scope                    | Rotation owner |
+| ----------- | -------------------- | ---------------------------- | ----------------------------- | ------------------------ | -------------- |
+| development | Mixpanel Development | `MIXPANEL_PROJECT_TOKEN`     | developer-local secret store  | development project only | To be assigned |
+| preview     | Mixpanel Preview     | `MIXPANEL_PROJECT_TOKEN`     | preview deployment secrets    | preview project only     | To be assigned |
+| production  | Mixpanel Production  | `MIXPANEL_PROJECT_TOKEN`     | production deployment secrets | production project only  | To be assigned |
+| development | New Relic            | `OTEL_EXPORTER_OTLP_HEADERS` | developer-local secret store  | development API only     | To be assigned |
+| preview     | New Relic            | `OTEL_EXPORTER_OTLP_HEADERS` | preview deployment secrets    | preview API only         | To be assigned |
+| production  | New Relic            | `OTEL_EXPORTER_OTLP_HEADERS` | production deployment secrets | production API only      | To be assigned |
 
-The matching non-secret OpenTelemetry settings are `OTEL_SERVICE_NAME`,
-`OTEL_RESOURCE_ATTRIBUTES`, `OTEL_EXPORTER_OTLP_ENDPOINT`,
-`OTEL_EXPORTER_OTLP_PROTOCOL`, and `OTEL_EXPORTER_OTLP_COMPRESSION`. The API
-template in [`apps/api/.env.example`](../../../apps/api/.env.example) contains
-development-safe placeholders and the EU endpoint alternative.
+The matching non-secret OpenTelemetry settings include `OTEL_SERVICE_NAME`,
+`OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_PROTOCOL`, and
+`OTEL_EXPORTER_OTLP_COMPRESSION`. The API's `OTEL_RESOURCE_ATTRIBUTES` are
+runtime-derived and must be populated by code or deployment configuration from
+the conventions above; they are intentionally absent from
+[`apps/api/.env.example`](../../../apps/api/.env.example). The template contains
+development-safe placeholders and the EU endpoint alternative for the static
+exporter settings.
 
 Public client configuration is allowed only when a provider explicitly
 requires a public identifier. Keep it separate from write-capable or
@@ -156,8 +167,9 @@ after plan changes.
 1. Confirm primary and backup administrators and recovery access.
 2. Create the three Mixpanel projects, or document an equivalent isolation
    mechanism and its write-separation proof.
-3. Create New Relic application and infrastructure entities using the naming
-   convention above.
+3. Register the New Relic logical services and infrastructure entities using
+   the naming convention above, when the provider creates them from reported
+   telemetry or requires explicit registration.
 4. Configure environment-scoped credentials in the approved secret systems.
 5. Grant minimum required provider roles; separate administration and ingestion
    credentials where supported.
@@ -176,6 +188,7 @@ Use unique, clearly synthetic test identifiers. Never use real user data.
 | Preview Mixpanel event                    | Appears only in Preview project                    | Project event/debug view  |
 | Development credential against Production | Rejected or impossible by scope                    | Provider/API response     |
 | Preview credential against Production     | Rejected or impossible by scope                    | Provider/API response     |
+| Development New Relic telemetry           | `environment=development` and expected service     | NRQL/entity view          |
 | Preview New Relic telemetry               | `environment=preview` and expected service         | NRQL/entity view          |
 | Production New Relic telemetry            | `environment=production` and expected service      | NRQL/entity view          |
 | Secret scan                               | No credential value in repository, logs, or output | `security:secrets` output |
