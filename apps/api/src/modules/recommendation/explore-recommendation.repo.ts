@@ -1,9 +1,10 @@
 /** Internal recommendation selection adapter for ordered Explore candidates. */
 /* oxlint-disable anti-slop/require-tsdoc -- Internal candidate references are intentionally not public DTOs. */
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Prisma, Status } from '@sd/core-db';
+import { Prisma } from '@sd/core-db';
 import { PrimaryDbService } from '../../core/db/primary-db.service';
 import { z } from 'zod';
+import { publishedTopLevelCatalogListingWhere } from './catalog-eligibility';
 
 /** Entity references selected by a recommendation strategy. */
 export type ExploreRecommendationBatch =
@@ -40,11 +41,8 @@ function applyRecentFilters(where: Prisma.ListingWhereInput, cursor?: ListingCur
 
 function buildRecentWhere(cursor?: ListingCursor): Prisma.ListingWhereInput {
   const where: Prisma.ListingWhereInput = {
+    ...publishedTopLevelCatalogListingWhere(),
     format: { in: ['single', 'series', 'collection'] },
-    status: Status.published,
-    deletedAt: null,
-    parentId: null,
-    scholar: { isActive: true },
   };
   applyRecentFilters(where, cursor);
   return where;
@@ -115,11 +113,8 @@ export class ExploreRecommendationRepo {
             listingTopics: {
               some: {
                 listing: {
+                  ...publishedTopLevelCatalogListingWhere(),
                   format: { in: ['single', 'series', 'collection'] },
-                  status: Status.published,
-                  deletedAt: null,
-                  parentId: null,
-                  scholar: { isActive: true },
                 },
               },
             },

@@ -4,6 +4,7 @@
  * @param durationSeconds - Duration in seconds; non-positive and missing values produce an empty label.
  * @returns A short hours-and-minutes or minutes-only label, or an empty string when no label is useful.
  */
+/** Formats a positive duration as a compact playback label. */
 export function formatDuration(durationSeconds?: number): string {
   if (!durationSeconds || durationSeconds <= 0) {
     return "";

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrimaryDbService } from '../../core/db/primary-db.service';
+import { publishedTopLevelCatalogListingWhere } from './catalog-eligibility';
 
 /**
  * Carries ordered entity references across the recommendation/hydration seam;
@@ -63,10 +64,7 @@ export class ScholarsRecommendationRepo {
       }),
       this.prisma.listing.findMany({
         where: {
-          parentId: null,
-          status: 'published',
-          deletedAt: null,
-          scholar: { isActive: true },
+          ...publishedTopLevelCatalogListingWhere(),
         },
         select: {
           id: true,
