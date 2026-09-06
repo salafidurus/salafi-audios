@@ -5,6 +5,8 @@ import { HttpError } from "@sd/core-contracts/http";
 
 import type { AnalyticsBuffer, AnalyticsBufferEntry } from "./buffer";
 
+/** Native analytics batch delivery and retry policy. */
+
 /** Maximum number of events accepted by one analytics API request. */
 export const ANALYTICS_DELIVERY_BATCH_SIZE = 20;
 /** Number of transient delivery attempts before an event is abandoned. */

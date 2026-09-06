@@ -1,3 +1,5 @@
+/** Small presentation-formatting helpers shared by web catalog surfaces. */
+
 /**
  * Converts playback seconds into the compact hours/minutes label used by
  * catalog metadata. Fractional seconds are truncated, seconds are omitted,

@@ -1,6 +1,8 @@
 import type { CanonicalProductEvent } from "@sd/core-analytics";
 import type { StorageAdapter } from "@sd/core-sync";
 
+/** Native analytics queue limits and persistence behavior. */
+
 /** Maximum number of canonical events retained by the native analytics buffer. */
 export const ANALYTICS_BUFFER_MAX_EVENTS = 500;
 /** Maximum serialized buffer size retained by the native analytics buffer. */

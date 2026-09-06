@@ -1,13 +1,17 @@
 import { i18n } from "../i18n/i18n";
 
+/** Runtime context construction for native analytics observations. */
+
 /** Lifecycle state captured at the moment a native product event is recorded. */
 export type NativeAnalyticsLifecycleState = "active" | "background" | "inactive";
 
 /** Event-time runtime context owned by the native adapter. */
 export type NativeAnalyticsContext = {
+  /** Interface locale active when the event was observed. */
   interface_language?: string;
   timezone?: string;
   session_id: string;
+  /** App lifecycle state captured with the event rather than inferred later. */
   lifecycle_state: NativeAnalyticsLifecycleState;
 };
 
@@ -27,9 +31,8 @@ function getTimezone(): string | undefined {
 }
 
 /**
- * Builds native event-time context from runtime facts and optional immutable
- * catalog references. Missing optional locale or timezone data never prevents
- * a caller from recording an event.
+ * Builds native event-time context from runtime facts. Missing optional locale
+ * or timezone data never prevents a caller from recording an event.
  */
 export function createNativeAnalyticsContext(
   lifecycleState: NativeAnalyticsLifecycleState,

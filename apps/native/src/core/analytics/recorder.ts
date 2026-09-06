@@ -7,9 +7,13 @@ import type { AnalyticsBuffer } from "./buffer";
 import { createNativeAnalyticsContext, type NativeAnalyticsLifecycleState } from "./context";
 import { getAnonymousAnalyticsId } from "./identity";
 
+/** Construction and queuing of identity-safe native analytics events. */
+
 /** Stable public content references supplied by a native feature event. */
 export type NativeAnalyticsContentReferences = {
+  /** Public listing slug associated with the observation, when applicable. */
   listing_slug?: string;
+  /** Public scholar slug associated with the observation, when applicable. */
   scholar_slug?: string;
 };
 
