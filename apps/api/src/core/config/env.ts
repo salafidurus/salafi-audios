@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+/** Validated environment contract for API infrastructure and operational telemetry. */
+const optionalString = z.preprocess(
+  (value) => (value === '' ? undefined : value),
+  z.string().min(1).optional(),
+);
+const optionalUrl = z.preprocess((value) => (value === '' ? undefined : value), z.url().optional());
+
 /** Core API env module providing shared backend infrastructure and authority-boundary services. */
 const ApiEnvSchema = z
   .object({
@@ -23,8 +30,8 @@ const ApiEnvSchema = z
     PRISMA_LOG_QUERIES: z
       .preprocess((val) => val === 'true' || val === true, z.boolean())
       .default(false),
-    ASSET_CDN_BASE_URL: z.url().optional(),
-    SITEMAP_BASE_URL: z.url().optional(),
+    ASSET_CDN_BASE_URL: optionalUrl,
+    SITEMAP_BASE_URL: optionalUrl,
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.url(),
     COOKIE_DOMAIN: z.string().default('salafidurus.com'),
@@ -32,7 +39,7 @@ const ApiEnvSchema = z
     GOOGLE_CLIENT_SECRET: z.string(),
     APPLE_CLIENT_ID: z.string(),
     APPLE_CLIENT_SECRET: z.string(),
-    REDIS_URL: z.url().optional(),
+    REDIS_URL: optionalUrl,
     TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(10).default(0),
 
     R2_ACCOUNT_ID: z.string().min(1),
@@ -44,6 +51,16 @@ const ApiEnvSchema = z
     DISABLE_THROTTLER: z
       .preprocess((val) => val === 'true' || val === true, z.boolean())
       .default(false),
+    OTEL_SERVICE_NAME: optionalString.default('salafi-durus-api'),
+    OTEL_EXPORTER_OTLP_ENDPOINT: optionalString,
+    OTEL_EXPORTER_OTLP_HEADERS: optionalString,
+    OTEL_EXPORTER_OTLP_PROTOCOL: z.enum(['http/protobuf', 'grpc']).default('http/protobuf'),
+    OTEL_EXPORTER_OTLP_COMPRESSION: z.enum(['none', 'gzip']).default('gzip'),
+    OTEL_ENVIRONMENT: z.enum(['development', 'preview', 'production']).optional(),
+    OTEL_REGION: optionalString.default('unknown'),
+    OTEL_DEPLOYMENT_VERSION: optionalString.default('unknown'),
+    OTEL_PLATFORM: z.literal('api').default('api'),
+    OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT: z.coerce.number().int().positive().default(4095),
   })
   .superRefine((env, ctx) => {
     const providedNeonVars = [env.NEON_API_KEY, env.NEON_PROJECT_ID, env.NEON_ENDPOINT_ID].filter(

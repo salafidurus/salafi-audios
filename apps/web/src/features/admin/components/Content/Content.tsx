@@ -10,6 +10,7 @@ import { TopicModal } from "./Topic/TopicModal";
  * The property names are the supported component identities; consumers select a content
  * surface from this object without reaching into the individual editor implementation paths.
  */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- The registry contract is documented above.
 export const Content = {
   Topic,
   Listing,

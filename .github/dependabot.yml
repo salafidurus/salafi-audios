@@ -249,6 +249,17 @@ updates:
           - minor
           - patch
 
+      # OpenTelemetry packages share a cross-package release matrix and should
+      # be reviewed as one observability update.
+      opentelemetry:
+        applies-to: version-updates
+        patterns:
+          - "@opentelemetry/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
   # ──────────────────────────────────────────────
   # GitHub Actions ecosystem
   # ──────────────────────────────────────────────
