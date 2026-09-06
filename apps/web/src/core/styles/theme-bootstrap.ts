@@ -4,8 +4,7 @@
  * `system` resolves from the browser's `prefers-color-scheme` media query;
  * `light` and `dark` explicitly override that preference. Theme readers treat
  * unknown storage values as `system` so a stale value cannot break first paint.
- *
- * @remarks This union is the storage and component contract for theme selection.
+ * This union is the storage and component contract for theme selection.
  */
 export type ThemePreference = "system" | "light" | "dark";
 
