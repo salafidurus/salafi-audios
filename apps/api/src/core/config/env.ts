@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+/** Validated environment contract for API infrastructure and operational telemetry. */
+const optionalString = z.preprocess(
+  (value) => (value === '' ? undefined : value),
+  z.string().min(1).optional(),
+);
+
 /** Core API env module providing shared backend infrastructure and authority-boundary services. */
 const ApiEnvSchema = z
   .object({
@@ -44,6 +50,15 @@ const ApiEnvSchema = z
     DISABLE_THROTTLER: z
       .preprocess((val) => val === 'true' || val === true, z.boolean())
       .default(false),
+    OTEL_SERVICE_NAME: optionalString.default('salafi-durus-api'),
+    OTEL_EXPORTER_OTLP_ENDPOINT: optionalString,
+    OTEL_EXPORTER_OTLP_HEADERS: optionalString,
+    OTEL_EXPORTER_OTLP_PROTOCOL: z.enum(['http/protobuf', 'grpc']).default('http/protobuf'),
+    OTEL_EXPORTER_OTLP_COMPRESSION: z.enum(['none', 'gzip']).default('gzip'),
+    OTEL_REGION: optionalString.default('unknown'),
+    OTEL_DEPLOYMENT_VERSION: optionalString.default('unknown'),
+    OTEL_PLATFORM: z.literal('api').default('api'),
+    OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT: z.coerce.number().int().positive().default(4095),
   })
   .superRefine((env, ctx) => {
     const providedNeonVars = [env.NEON_API_KEY, env.NEON_PROJECT_ID, env.NEON_ENDPOINT_ID].filter(

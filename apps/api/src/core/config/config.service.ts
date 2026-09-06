@@ -138,6 +138,42 @@ export class ConfigService {
     return this.env.TRUST_PROXY_HOPS;
   }
 
+  get OTEL_SERVICE_NAME(): string {
+    return this.env.OTEL_SERVICE_NAME;
+  }
+
+  get OTEL_EXPORTER_OTLP_ENDPOINT(): string | undefined {
+    return this.env.OTEL_EXPORTER_OTLP_ENDPOINT;
+  }
+
+  get OTEL_EXPORTER_OTLP_HEADERS(): string | undefined {
+    return this.env.OTEL_EXPORTER_OTLP_HEADERS;
+  }
+
+  get OTEL_EXPORTER_OTLP_PROTOCOL(): 'http/protobuf' | 'grpc' {
+    return this.env.OTEL_EXPORTER_OTLP_PROTOCOL;
+  }
+
+  get OTEL_EXPORTER_OTLP_COMPRESSION(): 'none' | 'gzip' {
+    return this.env.OTEL_EXPORTER_OTLP_COMPRESSION;
+  }
+
+  get OTEL_REGION(): string {
+    return this.env.OTEL_REGION;
+  }
+
+  get OTEL_DEPLOYMENT_VERSION(): string {
+    return this.env.OTEL_DEPLOYMENT_VERSION;
+  }
+
+  get OTEL_PLATFORM(): 'api' {
+    return this.env.OTEL_PLATFORM;
+  }
+
+  get OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT(): number {
+    return this.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+  }
+
   get REDIS_PROGRESS_BUFFER_DELAY_MS(): number {
     return 120_000;
   }

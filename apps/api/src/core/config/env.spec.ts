@@ -75,3 +75,49 @@ describe('getApiEnv — Neon control-plane credentials', () => {
     expect(() => getApiEnv({ ...baseDevEnv, TRUST_PROXY_HOPS: '11' })).toThrow();
   });
 });
+
+describe('getApiEnv — operational telemetry', () => {
+  it('keeps telemetry disabled unless an endpoint and headers are configured', () => {
+    expect(getApiEnv(baseDevEnv).OTEL_EXPORTER_OTLP_ENDPOINT).toBeUndefined();
+    expect(getApiEnv(baseDevEnv).OTEL_EXPORTER_OTLP_HEADERS).toBeUndefined();
+
+    const configured = getApiEnv({
+      ...baseDevEnv,
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'https://otlp.nr-data.net',
+      OTEL_EXPORTER_OTLP_HEADERS: 'api-key=secret',
+    });
+
+    expect(configured.OTEL_EXPORTER_OTLP_ENDPOINT).toBe('https://otlp.nr-data.net');
+    expect(configured.OTEL_EXPORTER_OTLP_HEADERS).toBe('api-key=secret');
+  });
+
+  it('normalizes empty optional exporter values and applies API resource defaults', () => {
+    const env = getApiEnv({
+      ...baseDevEnv,
+      OTEL_EXPORTER_OTLP_ENDPOINT: '',
+      OTEL_EXPORTER_OTLP_HEADERS: '',
+    });
+
+    expect(env.OTEL_EXPORTER_OTLP_ENDPOINT).toBeUndefined();
+    expect(env.OTEL_EXPORTER_OTLP_HEADERS).toBeUndefined();
+    expect(env.OTEL_SERVICE_NAME).toBe('salafi-durus-api');
+    expect(env.OTEL_PLATFORM).toBe('api');
+    expect(env.OTEL_REGION).toBe('unknown');
+    expect(env.OTEL_DEPLOYMENT_VERSION).toBe('unknown');
+  });
+
+  it('allows deployment metadata to be explicitly supplied', () => {
+    const env = getApiEnv({
+      ...baseDevEnv,
+      NODE_ENV: 'production',
+      NEON_API_KEY: 'neon-key',
+      NEON_PROJECT_ID: 'neon-project',
+      NEON_ENDPOINT_ID: 'ep-neon-endpoint',
+      OTEL_DEPLOYMENT_VERSION: 'release-123',
+      OTEL_REGION: 'eu-west-1',
+    });
+
+    expect(env.OTEL_DEPLOYMENT_VERSION).toBe('release-123');
+    expect(env.OTEL_REGION).toBe('eu-west-1');
+  });
+});
