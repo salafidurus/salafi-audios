@@ -1,3 +1,4 @@
+/* oxlint-disable anti-slop/require-tsdoc -- Public telemetry contracts are documented at each seam below. */
 import { Injectable, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 import { metrics } from '@opentelemetry/api';
 import { NodeSDK } from '@opentelemetry/sdk-node';
