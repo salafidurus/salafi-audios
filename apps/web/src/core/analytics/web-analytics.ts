@@ -12,7 +12,9 @@ const SESSION_ID_KEY = "sd:analytics-session-id:v1";
 
 /** Stable public content identity captured by a web observation. */
 export interface WebAnalyticsContentReferences {
+  /** Immutable public listing slug observed by the detail surface. */
   readonly listing_slug: string;
+  /** Immutable public scholar slug associated with the listing. */
   readonly scholar_slug: string;
 }
 
@@ -20,6 +22,7 @@ export interface WebAnalyticsContentReferences {
 export interface WebAnalyticsRuntime {
   readonly now?: () => number;
   readonly storage?: Pick<Storage, "getItem" | "setItem" | "removeItem">;
+  /** Returns the browser interface language at observation time. */
   readonly language?: () => string | undefined;
   readonly timezone?: () => string | undefined;
 }

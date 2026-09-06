@@ -14,9 +14,11 @@ import { ListingSublistingsTab } from "./ListingSublistingsTab";
 import { ListingTranslatableFields } from "./ListingTranslatableFields";
 
 interface ListingModalTabContentProps {
+  /** Current listing form values and validation state. */
   state: FormState;
   dispatch: React.Dispatch<FormAction>;
   activeTab: string;
+  /** Tabs whose fields currently contain validation errors. */
   errorTabSet: Set<string>;
   scholars: ScholarListItemDto[];
   topics: TopicDetailDto[];
@@ -49,7 +51,7 @@ function GeneralTabContent({
   | "isEditing"
   | "onImageStaged"
   | "stagedImagePreview"
-> & { error: string | null }) {
+> & { /** Form-level error rendered above the general fields. */ error: string | null }) {
   return (
     <>
       <FormErrorBanner error={error} />
@@ -74,6 +76,7 @@ function MainTabContent({
   errorTabSet,
   handleTitleChange,
 }: Pick<ListingModalTabContentProps, "state" | "dispatch" | "errorTabSet" | "handleTitleChange"> & {
+  /** Form-level error rendered when the main tab is active. */
   error: string | null;
 }) {
   return (
@@ -98,6 +101,7 @@ function shouldShowSublistings(
   return activeTab === "sublistings" && showSublistingsTab && Boolean(listingId);
 }
 
+/** Renders the active listing-editor tab and its validation feedback. */
 export function ListingModalTabContent({
   state,
   dispatch,

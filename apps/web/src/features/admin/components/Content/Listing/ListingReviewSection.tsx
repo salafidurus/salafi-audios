@@ -11,6 +11,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 
 interface ListingReviewSectionProps {
+  /** Current listing form values, including the initial edit snapshot. */
   state: FormState;
   mainLocale: Locale;
   topics: TopicDetailDto[];
@@ -26,8 +27,10 @@ function sameTopics(a: string[], b: string[]) {
 type ReviewChanges = {
   titleChanged: boolean;
   descriptionChanged: boolean;
+  /** Whether the publication status differs from the initial value. */
   statusChanged: boolean;
   orderIndexChanged: boolean;
+  /** Whether the content language differs from the initial value. */
   languageChanged: boolean;
   coverImageChanged: boolean;
   topicsChanged: boolean;
@@ -124,8 +127,10 @@ function MainChanges({ title, description, mainLocale, t, changes }: MainChanges
 }
 
 type DetailChangesProps = {
+  /** Current publication status rendered in the review summary. */
   status: string;
   orderIndex: number | null;
+  /** Current content language rendered in the review summary. */
   language: Locale;
   topicNames: string[];
   t: ReturnType<typeof useTranslation>["t"];
@@ -160,6 +165,7 @@ function StatusChange({
   status,
   t,
 }: {
+  /** Publication status to display as a pending change. */
   status: string;
   t: ReturnType<typeof useTranslation>["t"];
 }) {
@@ -214,6 +220,7 @@ function DetailChanges({
   );
 }
 
+/** Summarizes pending listing changes before an admin submits the form. */
 export function ListingReviewSection({ state, mainLocale, topics }: ListingReviewSectionProps) {
   const { t, i18n } = useTranslation();
   const { title, description, status, orderIndex, selectedTopics, language } = state;

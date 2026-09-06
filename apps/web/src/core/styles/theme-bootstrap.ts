@@ -6,6 +6,7 @@
  * unknown storage values as `system` so a stale value cannot break first paint.
  * This union is the storage and component contract for theme selection.
  */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- The theme union contract is documented above.
 export type ThemePreference = "system" | "light" | "dark";
 
 /** Concrete theme values applied to the document after resolving a preference. */

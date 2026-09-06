@@ -11,7 +11,11 @@ const BATCH_SIZE = 20;
 
 /** Minimal response shape accepted from the append-only ingestion endpoint. */
 interface IngestResponse {
-  readonly outcomes?: readonly { event_id: string; status: string }[];
+  readonly outcomes?: readonly {
+    event_id: string;
+    /** Terminal or retryable disposition returned by ingestion. */
+    status: string;
+  }[];
 }
 
 /** Injectable delivery dependencies for browser and deterministic tests. */

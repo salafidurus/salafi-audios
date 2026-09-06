@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { CanonicalProductEventSchema } from '@sd/core-analytics';
 
 /** Validates bounded analytics batches, strict fields, payload size, and unique event IDs. */
+// oxlint-disable-next-line anti-slop/require-tsdoc -- The schema contract is documented above.
 export const IngestAnalyticsEventsDtoSchema = z
   .strictObject({
     events: z.array(CanonicalProductEventSchema).min(1).max(20),
