@@ -1,7 +1,7 @@
 import { Body, Controller, Patch } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UpdateLocaleDtoSchema, type UpdateLocaleDto } from '@sd/core-contracts';
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 import { CurrentUser } from './decorators';
 
 /** NestJS auth locale controller service or controller coordinating the API boundary for this responsibility. */
@@ -10,7 +10,7 @@ import { CurrentUser } from './decorators';
 /** Core API auth locale.controller module providing shared backend infrastructure and authority-boundary services. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class AuthLocaleController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrimaryDbService) {}
 
   @Patch('locale')
   @ApiOperation({ summary: 'Update the current user preferred language' })

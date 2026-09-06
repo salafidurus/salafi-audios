@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { packRules } from '@casl/ability/extra';
 import type { UserProfileDto } from '@sd/core-contracts';
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 import { defineAbilityFor } from '../auth/ability/ability.factory';
 import type { AccessGrantAttribute } from '../auth/ability/ability.types';
 
@@ -24,7 +24,7 @@ type AuthenticatedUser = {
 @Injectable()
 /** NestJS account service service or controller coordinating the API boundary for this responsibility. */
 export class AccountService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrimaryDbService) {}
 
   getProfile(user: AuthenticatedUser): UserProfileDto {
     const roles = deriveAccessRoles(user.roles ?? ['listener'], user.accessGrants ?? []);

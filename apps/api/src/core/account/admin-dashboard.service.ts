@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import type { AdminDashboardDto } from '@sd/core-contracts';
 
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 import { defineAbilityFor } from '../auth/ability/ability.factory';
 import { accessibleScopeIds } from '../auth/ability/accessible-scope';
 import type {
@@ -33,7 +33,7 @@ function buildDashboardMetrics(values: {
 @Injectable()
 /** NestJS admin dashboard service service or controller coordinating the API boundary for this responsibility. */
 export class AdminDashboardService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrimaryDbService) {}
 
   async getDashboard(user: DashboardUser): Promise<AdminDashboardDto> {
     const ability = defineAbilityFor(user);

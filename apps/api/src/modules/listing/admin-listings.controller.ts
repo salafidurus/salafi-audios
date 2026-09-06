@@ -43,7 +43,7 @@ import {
 import { defineAbilityFor } from '../../core/auth/ability/ability.factory';
 import type { AbilityInput } from '../../core/auth/ability/ability.types';
 import { subject } from '@casl/ability';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import { ListingService } from './listing.service';
 import { ListingEditorialService } from './listing-editorial.service';
 import { RateLimitPolicy } from '../../core/security/rate-limit.decorator';
@@ -58,7 +58,7 @@ export class AdminListingsController {
   constructor(
     private readonly service: ListingService,
     private readonly editorial: ListingEditorialService,
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrimaryDbService,
   ) {}
 
   @Get('promotions')

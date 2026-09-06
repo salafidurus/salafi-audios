@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, UserRole } from '@sd/core-db';
 
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 
 /** NestJS user directory repository service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
 /** Core API user directory.repository module providing shared backend infrastructure and authority-boundary services. */
 // oxlint-disable-next-line anti-slop/require-tsdoc -- NestJS decorators separate the declaration from its TSDoc.
 export class UserDirectoryRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrimaryDbService) {}
 
   async listUsers(query?: string, role?: string, cursor?: string) {
     const pageSize = 50;

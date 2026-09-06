@@ -37,7 +37,10 @@ describe("aggregate access schema", () => {
   it("defines canonical target and capability enums", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
-    const schema = fs.readFileSync(path.resolve(__dirname, "../prisma/schema.prisma"), "utf-8");
+    const schema = fs.readFileSync(
+      path.resolve(__dirname, "../prisma/primary/schema.prisma"),
+      "utf-8",
+    );
 
     expect(schema).toMatch(
       /enum AccessTarget\s*{[\s\S]*scholar[\s\S]*listing[\s\S]*media[\s\S]*topic[\s\S]*translation[\s\S]*user[\s\S]*}/,
@@ -50,7 +53,10 @@ describe("aggregate access schema", () => {
   it("stores normalized grants and a version on User", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
-    const schema = fs.readFileSync(path.resolve(__dirname, "../prisma/schema.prisma"), "utf-8");
+    const schema = fs.readFileSync(
+      path.resolve(__dirname, "../prisma/primary/schema.prisma"),
+      "utf-8",
+    );
 
     expect(schema).toMatch(
       /model UserAccessGrant\s*{[\s\S]*target\s+AccessTarget[\s\S]*capability\s+AccessCapability[\s\S]*scholarId\s+String\?[\s\S]*locale\s+Locale\?[\s\S]*}/,
@@ -63,7 +69,10 @@ describe("aggregate access schema", () => {
   it("uses only aggregate access structures", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
-    const schema = fs.readFileSync(path.resolve(__dirname, "../prisma/schema.prisma"), "utf-8");
+    const schema = fs.readFileSync(
+      path.resolve(__dirname, "../prisma/primary/schema.prisma"),
+      "utf-8",
+    );
 
     expect(schema).not.toMatch(/enum Permission\s*{/);
     expect(schema).not.toMatch(/enum ScholarPermissionType\s*{/);
@@ -86,7 +95,7 @@ describe("User.banned field", () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
 
-    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaPath = path.resolve(__dirname, "../prisma/primary/schema.prisma");
     const schemaContent = fs.readFileSync(schemaPath, "utf-8");
 
     // Match the model User block
@@ -109,7 +118,7 @@ describe("Listing model schema", () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
 
-    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaPath = path.resolve(__dirname, "../prisma/primary/schema.prisma");
     const schemaContent = fs.readFileSync(schemaPath, "utf-8");
 
     const listingModelMatch = schemaContent.match(/model Listing\s*{[^}]+}/);
@@ -123,7 +132,7 @@ describe("Listing model schema", () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
 
-    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaPath = path.resolve(__dirname, "../prisma/primary/schema.prisma");
     const schemaContent = fs.readFileSync(schemaPath, "utf-8");
 
     const listingModelMatch = schemaContent.match(/model Listing\s*{[^}]+}/);
@@ -139,7 +148,7 @@ describe("Listing model schema", () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
 
-    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaPath = path.resolve(__dirname, "../prisma/primary/schema.prisma");
     const schemaContent = fs.readFileSync(schemaPath, "utf-8");
 
     const listingModelMatch = schemaContent.match(/model Listing\s*{[^}]+}/);
@@ -153,7 +162,7 @@ describe("Listing model schema", () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
 
-    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaPath = path.resolve(__dirname, "../prisma/primary/schema.prisma");
     const schemaContent = fs.readFileSync(schemaPath, "utf-8");
 
     const listingModelMatch = schemaContent.match(/model Listing\s*{[^}]+}/);
@@ -177,7 +186,7 @@ describe("Decoupled audit columns (createdBy/updatedBy/deletedBy)", () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
 
-    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaPath = path.resolve(__dirname, "../prisma/primary/schema.prisma");
     const schemaContent = fs.readFileSync(schemaPath, "utf-8");
 
     const listingModelMatch = schemaContent.match(/model Listing\s*{[^}]+}/);
@@ -195,7 +204,7 @@ describe("Decoupled audit columns (createdBy/updatedBy/deletedBy)", () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
 
-    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaPath = path.resolve(__dirname, "../prisma/primary/schema.prisma");
     const schemaContent = fs.readFileSync(schemaPath, "utf-8");
 
     const scholarModelMatch = schemaContent.match(/model Scholar\s*{[^}]+}/);
@@ -215,7 +224,7 @@ describe("User cascade deletions", () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
 
-    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaPath = path.resolve(__dirname, "../prisma/primary/schema.prisma");
     const schemaContent = fs.readFileSync(schemaPath, "utf-8");
 
     const progressMatch = schemaContent.match(/model UserListingProgress\s*{[^}]+}/);

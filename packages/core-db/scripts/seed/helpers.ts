@@ -2,7 +2,7 @@
  * Helper utilities for seeding
  */
 
-import type { Status } from "../../src/generated/prisma/client.js";
+import type { Status } from "../../src/generated/primary/client.js";
 
 /**
  * Generate deterministic UUID for seed data

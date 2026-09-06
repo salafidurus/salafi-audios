@@ -1,4 +1,10 @@
-/** User-selected theme preference, including the system-color-scheme fallback. */
+/**
+ * Allowed persisted values for the web theme selector.
+ *
+ * `system` resolves from the browser's `prefers-color-scheme` media query;
+ * `light` and `dark` explicitly override that preference. Theme readers treat
+ * unknown storage values as `system` so a stale value cannot break first paint.
+ */
 export type ThemePreference = "system" | "light" | "dark";
 
 /** Concrete theme values applied to the document after resolving a preference. */

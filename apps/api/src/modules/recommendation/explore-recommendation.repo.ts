@@ -2,8 +2,8 @@
 /* oxlint-disable anti-slop/require-tsdoc -- Internal candidate references are intentionally not public DTOs. */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import { z } from 'zod';
-import { PrismaService } from '../../core/db/prisma.service';
 
 /** Entity references selected by a recommendation strategy. */
 export type ExploreRecommendationBatch =
@@ -81,7 +81,7 @@ function encodeCursor(date: Date, slug: string): string {
 @Injectable()
 /** Selects ordered entity references and continuation state for an Explore strategy. */
 export class ExploreRecommendationRepo {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrimaryDbService) {}
 
   // oxlint-disable-next-line complexity -- Selection coordinates three ordered recommendation families behind one small interface.
   async getRecommendations(cursor?: string, limit = 20): Promise<ExploreRecommendationResult> {

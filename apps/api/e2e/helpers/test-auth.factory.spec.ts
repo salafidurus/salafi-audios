@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'bun:test';
-import type { PrismaService } from '../../src/core/db/prisma.service';
+import type { PrimaryDbService } from '../../src/core/db/primary-db.service';
 import { TestAuthFactory } from './test-auth.factory';
 
 describe('TestAuthFactory.cleanup', () => {
@@ -8,7 +8,7 @@ describe('TestAuthFactory.cleanup', () => {
     const deleteMany = vi.fn().mockResolvedValue({ count: 1 });
     const prisma = {
       user: { findMany, deleteMany },
-    } as unknown as PrismaService;
+    } as unknown as PrimaryDbService;
 
     await new TestAuthFactory(prisma).cleanup();
 

@@ -8,6 +8,7 @@ import { DbHealthIndicator } from './db-health.indicator';
 import { RedisHealthIndicator } from './redis-health.indicator';
 import { HealthService, type HealthCheckResult } from './health.service';
 import { RedisService } from '../redis/redis.service';
+import { AnalyticsDbHealthIndicator } from './analytics-db-health.indicator';
 
 /** NestJS health controller service or controller coordinating the API boundary for this responsibility. */
 @RateLimitPolicy('health-probe')
@@ -24,6 +25,7 @@ export class HealthController {
     private readonly cdnHealth: CDNHealthIndicator,
     private readonly redis: RedisService,
     private readonly redisHealth: RedisHealthIndicator,
+    private readonly analyticsDbHealth: AnalyticsDbHealthIndicator,
   ) {}
 
   @Get()
@@ -32,6 +34,7 @@ export class HealthController {
   getHealth(): Promise<HealthCheckResult> {
     const checks = [
       () => this.dbHealth.pingCheck('database', { timeout: 5000 }),
+      () => this.analyticsDbHealth.pingCheck('analyticsDatabase'),
       () => this.cdnHealth.pingCheck('cdn', { timeout: 5000 }),
     ];
     if (this.redis.enabled) checks.push(() => this.redisHealth.pingCheck('redis'));
@@ -49,6 +52,9 @@ export class HealthController {
   @ApiOperation({ summary: 'Readiness probe – can the service accept traffic?' })
   @ApiOkResponse({ description: 'Ok when core dependencies (database) are available' })
   getReadiness(): Promise<HealthCheckResult> {
-    return this.health.check([() => this.dbHealth.pingCheck('database', { timeout: 5000 })]);
+    return this.health.check([
+      () => this.dbHealth.pingCheck('database', { timeout: 5000 }),
+      () => this.analyticsDbHealth.pingCheck('analyticsDatabase'),
+    ]);
   }
 }

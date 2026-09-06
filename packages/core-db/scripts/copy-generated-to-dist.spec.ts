@@ -63,11 +63,11 @@ it("generates and publishes the Prisma client", async () => {
     expect(exitCode).toBe(0);
 
     const generatedClient = await readFile(
-      join(packageRoot, "dist", "generated", "prisma", "client.js"),
+      join(packageRoot, "dist", "generated", "primary", "client.js"),
       "utf8",
     );
     const generatedIndex = await readFile(
-      join(packageRoot, "dist", "generated", "prisma", "index.js"),
+      join(packageRoot, "dist", "generated", "primary", "index.js"),
       "utf8",
     );
     expect(generatedClient).toContain("require('.')");

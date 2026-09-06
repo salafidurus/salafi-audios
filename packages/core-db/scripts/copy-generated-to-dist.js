@@ -8,13 +8,16 @@ const {
 } = require("./generated-client-lock.js");
 
 async function copyGeneratedClient(pkgRoot) {
-  const src = path.join(pkgRoot, "src", "generated", "prisma");
+  const primarySrc = path.join(pkgRoot, "src", "generated", "primary");
+  const analyticsSrc = path.join(pkgRoot, "src", "generated", "analytics");
   const generatedRoot = path.join(pkgRoot, "dist", "generated");
-  const dest = path.join(generatedRoot, "prisma");
+  const primaryDest = path.join(generatedRoot, "primary");
+  const analyticsDest = path.join(generatedRoot, "analytics");
 
   await fs.rm(generatedRoot, { recursive: true, force: true });
   await fs.mkdir(generatedRoot, { recursive: true });
-  await fs.cp(src, dest, { recursive: true });
+  await fs.cp(primarySrc, primaryDest, { recursive: true });
+  await fs.cp(analyticsSrc, analyticsDest, { recursive: true });
 }
 
 async function main() {

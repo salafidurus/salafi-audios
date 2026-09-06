@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { AppLoggerService } from '../../core/logger/app-logger.service';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import { ConfigService } from '../../core/config/config.service';
 import { RedisService } from '../../core/redis/redis.service';
 import { Status } from '@sd/core-db';
@@ -78,7 +78,7 @@ export function isPositionCompleted(
 /** NestJS audio repository service or controller coordinating the API boundary for this responsibility. */
 export class AudioRepository {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrimaryDbService,
     private readonly redis: RedisService,
     private readonly config: ConfigService,
     private readonly logger: AppLoggerService,

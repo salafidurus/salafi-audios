@@ -2,7 +2,7 @@
  * Seed audio assets
  */
 
-import type { PrismaClient } from "../../../src/generated/prisma/client.js";
+import type { PrismaClient } from "../../../src/generated/primary/client.js";
 
 import { SINGLES, SERIES, COLLECTIONS } from "../data/index.js";
 import { uuid, dur } from "../helpers.js";

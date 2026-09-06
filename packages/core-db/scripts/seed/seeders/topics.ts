@@ -2,7 +2,7 @@
  * Seed topics
  */
 
-import type { PrismaClient } from "../../../src/generated/prisma/client.js";
+import type { PrismaClient } from "../../../src/generated/primary/client.js";
 
 import { TOPICS } from "../data/index.js";
 

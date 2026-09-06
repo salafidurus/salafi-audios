@@ -2,7 +2,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 
 import styles from "./feed-skeleton.module.css";
 
-/** Documents this module's responsibility and public boundary. */
+/** Props controlling how many loading placeholders the Explore feed displays. */
 export type FeedSkeletonProps = {
   /** Number of placeholder cards to render. */
   count?: number;

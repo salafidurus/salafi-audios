@@ -7,7 +7,7 @@ on:
       - production # Production environment deployments
     paths:
       - packages/core-db/prisma/**
-      - packages/core-db/prisma.config.ts
+      - packages/core-db/prisma.*.config.ts
       - packages/core-db/package.json
 
 concurrency:
@@ -41,15 +41,22 @@ jobs:
 
       - name: Validate Prisma schema
         env:
-          DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+          PRIMARY_DATABASE_URL: ${{ secrets.PRIMARY_DATABASE_URL }}
+          ANALYTICS_DATABASE_URL: ${{ secrets.ANALYTICS_DATABASE_URL }}
         run: bun run --filter @sd/core-db prisma:validate
 
       - name: Apply migrations to ${{ github.ref_name }}
         env:
-          DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
-        run: bun run --filter @sd/core-db migrate:deploy
+          PRIMARY_DIRECT_DATABASE_URL: ${{ secrets.PRIMARY_DIRECT_DATABASE_URL }}
+        run: bun run --filter @sd/core-db primary:migrate:deploy
+
+      - name: Apply analytics migrations
+        env:
+          ANALYTICS_DATABASE_URL: ${{ secrets.ANALYTICS_DATABASE_URL }}
+        run: bun run --filter @sd/core-db analytics:migrate:deploy
 
       - name: Generate Prisma client
         env:
-          DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+          PRIMARY_DATABASE_URL: ${{ secrets.PRIMARY_DATABASE_URL }}
+          ANALYTICS_DATABASE_URL: ${{ secrets.ANALYTICS_DATABASE_URL }}
         run: bun run --filter @sd/core-db prisma:generate

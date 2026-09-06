@@ -1,4 +1,4 @@
-import { PrismaService } from '../../src/core/db/prisma.service';
+import { PrimaryDbService } from '../../src/core/db/primary-db.service';
 import { AccessCapability, AccessTarget, UserRole } from '@sd/core-db';
 import type { Locale } from '@sd/core-db';
 import { createId } from '@paralleldrive/cuid2';
@@ -29,7 +29,7 @@ export function accessGrant(
 export class TestAuthFactory {
   private readonly createdUserIds: Set<string> = new Set();
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrimaryDbService) {}
 
   async createUser(
     email?: string,

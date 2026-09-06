@@ -40,6 +40,7 @@
     "@paralleldrive/cuid2": "^3.3.0",
     "@prisma/adapter-pg": "catalog:",
     "@prisma/client": "catalog:",
+    "@sd/core-analytics": "workspace:*",
     "@sd/core-contracts": "workspace:*",
     "@sd/core-db": "workspace:*",
     "@sd/core-i18n": "workspace:*",

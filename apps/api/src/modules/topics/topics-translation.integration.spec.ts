@@ -10,7 +10,7 @@ import { PolicyGuard } from '../../core/auth/policy.guard';
 import { TopicsController } from './topics.controller';
 import { TopicsTranslationsController } from './topics-translations.controller';
 import { TopicsService } from './topics.service';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../../core/auth/auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -52,7 +52,7 @@ async function buildApp(): Promise<NestFastifyApplication> {
       { provide: APP_GUARD, useClass: AuthGuard },
       { provide: APP_GUARD, useClass: PolicyGuard },
       { provide: TopicsService, useValue: mockTopicsService },
-      { provide: PrismaService, useValue: mockPrisma },
+      { provide: PrimaryDbService, useValue: mockPrisma },
     ],
   });
 

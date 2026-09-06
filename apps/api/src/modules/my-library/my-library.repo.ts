@@ -10,7 +10,7 @@ import type {
   SavedDeltaItemDto,
   SavedSyncItemDto,
 } from '@sd/core-contracts';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { ListingRepository } from '../listing/listing.repo';
@@ -233,7 +233,7 @@ type ProgressLeafRecord = {
 /** NestJS my library repository service or controller coordinating the API boundary for this responsibility. */
 export class MyLibraryRepository {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrimaryDbService,
     private readonly listingRepo: ListingRepository,
     @Optional() private readonly config?: ConfigService,
   ) {}

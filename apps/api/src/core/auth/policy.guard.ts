@@ -8,7 +8,7 @@ import type {
   PolicyRequestContext,
 } from './decorators/check-policy.decorator';
 import { canAccess, type PolicyResource } from './policy';
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 
 /** NestJS policy guard service or controller coordinating the API boundary for this responsibility. */
 @Injectable()
@@ -17,7 +17,7 @@ import { PrismaService } from '../db/prisma.service';
 export class PolicyGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrimaryDbService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

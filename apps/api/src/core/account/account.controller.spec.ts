@@ -7,7 +7,7 @@ import request from 'supertest';
 import { AuthGuard } from '../auth/auth.guard';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -51,7 +51,7 @@ describe('AccountController — auth boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: AccountService, useValue: mockAccountService },
-        { provide: PrismaService, useValue: mockPrisma },
+        { provide: PrimaryDbService, useValue: mockPrisma },
       ],
     }).compile();
 

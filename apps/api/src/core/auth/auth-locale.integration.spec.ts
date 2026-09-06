@@ -6,14 +6,14 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { AuthGuard } from './auth.guard';
 import { AuthLocaleController } from './auth-locale.controller';
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 import { StandardSchemaValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from '../../shared/errors/http-exception.filter';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
-const mockPrismaService = {
+const mockPrimaryDbService = {
   userAccessGrant: {
     findMany: vi.fn<any>().mockResolvedValue([]),
   },
@@ -35,7 +35,7 @@ describe('AuthLocaleController — auth boundaries', () => {
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
     vi.clearAllMocks();
-    mockPrismaService.user.update.mockResolvedValue({
+    mockPrimaryDbService.user.update.mockResolvedValue({
       preferredLanguage: 'ar',
     });
 
@@ -43,7 +43,7 @@ describe('AuthLocaleController — auth boundaries', () => {
       controllers: [AuthLocaleController],
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
-        { provide: PrismaService, useValue: mockPrismaService },
+        { provide: PrimaryDbService, useValue: mockPrimaryDbService },
       ],
     }).compile();
 
@@ -70,7 +70,7 @@ describe('AuthLocaleController — auth boundaries', () => {
         .send({ preferredLanguage: 'ar' });
       expect(res.status).toBe(200);
       expect(res.body.preferredLanguage).toBe('ar');
-      expect(mockPrismaService.user.update).toHaveBeenCalledWith({
+      expect(mockPrimaryDbService.user.update).toHaveBeenCalledWith({
         where: { id: 'u1' },
         data: { preferredLanguage: 'ar' },
       });

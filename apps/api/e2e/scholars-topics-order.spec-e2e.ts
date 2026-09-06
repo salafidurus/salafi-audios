@@ -2,15 +2,15 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { createE2eApp } from './helpers/create-e2e-app';
 import { seedTestData, cleanupE2ETestData } from './helpers/seed-test-data';
-import { PrismaService } from '../src/core/db/prisma.service';
+import { PrimaryDbService } from '../src/core/db/primary-db.service';
 
 describe('Scholar/Topic order-by (e2e)', () => {
   let app: NestFastifyApplication;
-  let prisma: PrismaService;
+  let prisma: PrimaryDbService;
 
   beforeAll(async () => {
     ({ app } = await createE2eApp({ disableThrottler: true }));
-    prisma = app.get(PrismaService);
+    prisma = app.get(PrimaryDbService);
     await seedTestData(prisma);
   });
 

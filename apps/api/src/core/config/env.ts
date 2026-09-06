@@ -7,7 +7,11 @@ const ApiEnvSchema = z
     PORT: z.coerce.number().int().min(1).max(65535).default(4000),
     CORS_ORIGIN: z.string().default('http://localhost:3000'),
     CORS_ORIGINS_NATIVE: z.string().optional().default('salafidurus-dev://,exp://'),
-    DATABASE_URL: z.url(),
+    PRIMARY_DATABASE_URL: z.url(),
+    PRIMARY_DIRECT_DATABASE_URL: z.url().optional(),
+    PRIMARY_SHADOW_DATABASE_URL: z.url().optional(),
+    ANALYTICS_DATABASE_URL: z.url(),
+    ANALYTICS_IDENTITY_HMAC_SECRET: z.string().min(32),
     // Neon control-plane credentials power the /health compute-endpoint check.
     // Optional in development/test; required together and required in prod.
     NEON_API_KEY: z.string().min(1).optional(),

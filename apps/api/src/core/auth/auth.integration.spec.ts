@@ -7,7 +7,7 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { Public } from './decorators';
 import { AuthGuard } from './auth.guard';
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -45,7 +45,7 @@ describe('AuthGuard — HTTP integration', () => {
       controllers: [TestController],
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
-        { provide: PrismaService, useValue: mockPrisma },
+        { provide: PrimaryDbService, useValue: mockPrisma },
       ],
     }).compile();
 

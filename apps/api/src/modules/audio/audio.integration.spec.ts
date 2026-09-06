@@ -8,7 +8,7 @@ import request from 'supertest';
 import { AuthGuard } from '../../core/auth/auth.guard';
 import { AudioController } from './audio.controller';
 import { AudioService } from './audio.service';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../../core/auth/auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -46,7 +46,7 @@ describe('AudioController — boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: AudioService, useValue: mockAudioService },
-        { provide: PrismaService, useValue: mockPrisma },
+        { provide: PrimaryDbService, useValue: mockPrisma },
       ],
     }).compile();
 

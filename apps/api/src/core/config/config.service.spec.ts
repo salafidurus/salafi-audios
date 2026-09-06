@@ -3,7 +3,9 @@ import { ConfigService } from './config.service';
 
 describe('ConfigService', () => {
   const dummyEnv = {
-    DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+    PRIMARY_DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+    ANALYTICS_DATABASE_URL: 'postgresql://user:pass@localhost:5432/analytics',
+    ANALYTICS_IDENTITY_HMAC_SECRET: '01234567890123456789012345678901',
     NEON_API_KEY: 'dummy-neon-api-key',
     NEON_PROJECT_ID: 'dummy-project',
     NEON_ENDPOINT_ID: 'ep-dummy-endpoint',
@@ -42,6 +44,17 @@ describe('ConfigService', () => {
         delete process.env.CORS_ORIGINS_NATIVE;
       }
     }
+  });
+
+  it('exposes the primary database URL by role', () => {
+    const config = new ConfigService();
+    expect(config.PRIMARY_DATABASE_URL).toBe('postgresql://user:pass@localhost:5432/db');
+  });
+
+  it('exposes analytics connection and identity configuration by role', () => {
+    const config = new ConfigService();
+    expect(config.ANALYTICS_DATABASE_URL).toBe('postgresql://user:pass@localhost:5432/analytics');
+    expect(config.ANALYTICS_IDENTITY_HMAC_SECRET).toHaveLength(32);
   });
 
   it('returns default fallback array when CORS_ORIGINS_NATIVE is empty or default', () => {

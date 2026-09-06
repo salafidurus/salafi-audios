@@ -33,8 +33,24 @@ export class ConfigService {
       .filter(Boolean);
   }
 
-  get DATABASE_URL(): string {
-    return this.env.DATABASE_URL;
+  get PRIMARY_DATABASE_URL(): string {
+    return this.env.PRIMARY_DATABASE_URL;
+  }
+
+  get PRIMARY_DIRECT_DATABASE_URL(): string | undefined {
+    return this.env.PRIMARY_DIRECT_DATABASE_URL;
+  }
+
+  get PRIMARY_SHADOW_DATABASE_URL(): string | undefined {
+    return this.env.PRIMARY_SHADOW_DATABASE_URL;
+  }
+
+  get ANALYTICS_DATABASE_URL(): string {
+    return this.env.ANALYTICS_DATABASE_URL;
+  }
+
+  get ANALYTICS_IDENTITY_HMAC_SECRET(): string {
+    return this.env.ANALYTICS_IDENTITY_HMAC_SECRET;
   }
 
   get NEON_API_KEY(): string | undefined {

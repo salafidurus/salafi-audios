@@ -2,7 +2,7 @@
  * Seed scholars
  */
 
-import type { PrismaClient } from "../../../src/generated/prisma/client.js";
+import type { PrismaClient } from "../../../src/generated/primary/client.js";
 
 import { SCHOLARS } from "../data/index.js";
 

@@ -9,7 +9,7 @@ import { AuthGuard } from '../../core/auth/auth.guard';
 import { ScholarsController } from './scholars.controller';
 import { AdminScholarsController } from './admin-scholars.controller';
 import { ScholarsService } from './scholars.service';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import { ScholarsRecommendationService } from '../recommendation/scholars-recommendation.service';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
@@ -47,7 +47,7 @@ describe('ScholarsController — auth boundaries', () => {
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: ScholarsService, useValue: mockScholarsService },
         { provide: ScholarsRecommendationService, useValue: { recommend: vi.fn() } },
-        { provide: PrismaService, useValue: mockPrisma },
+        { provide: PrimaryDbService, useValue: mockPrisma },
       ],
     });
 

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
 import type { Locale, SearchCatalogItemDto, SearchQueryDto } from '@sd/core-contracts';
 import { ConfigService } from '../../core/config/config.service';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import { isTrigramSearchFailure } from './search-error.utils';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
@@ -25,7 +25,7 @@ type SearchQueryRow = SearchRow & { format: string };
 /** NestJS search repository service or controller coordinating the API boundary for this responsibility. */
 export class SearchRepository {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrimaryDbService,
     private readonly config: ConfigService,
     private readonly logger: AppLoggerService,
   ) {

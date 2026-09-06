@@ -3,7 +3,7 @@ import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { fromNodeHeaders } from 'better-auth/node';
-import { PrismaService } from '../db/prisma.service';
+import { PrimaryDbService } from '../db/primary-db.service';
 import { IS_PUBLIC_KEY } from './decorators';
 
 /** Core API auth.guard module providing shared backend infrastructure and authority-boundary services. */
@@ -21,7 +21,7 @@ type AuthenticatedSessionUser = SessionBanState & {
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrimaryDbService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

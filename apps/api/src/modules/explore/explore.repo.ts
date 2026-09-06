@@ -5,7 +5,7 @@ import { Status, TranslationStatus } from '@sd/core-db';
 import type { ListingFormat, Locale, ScholarTitle } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { ConfigService } from '../../core/config/config.service';
-import { PrismaService } from '../../core/db/prisma.service';
+import { PrimaryDbService } from '../../core/db/primary-db.service';
 import type {
   ExploreRecommendationBatch,
   ExploreRecommendationResult,
@@ -114,7 +114,7 @@ function listingItem(
 @Injectable()
 export class ExploreRepo {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrimaryDbService,
     private readonly config: ConfigService,
   ) {}
 

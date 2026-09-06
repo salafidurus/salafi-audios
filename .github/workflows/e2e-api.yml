@@ -76,20 +76,29 @@ jobs:
 
       - name: Build dependencies
         env:
-          DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
-          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          PRIMARY_DIRECT_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          PRIMARY_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          ANALYTICS_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
         run: bun run build:all --filter=api...
 
       - name: Run Prisma migrations
         env:
-          DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
-          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
-        run: bun run --filter @sd/core-db migrate:deploy
+          PRIMARY_DIRECT_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          ANALYTICS_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          PRIMARY_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+        run: bun run --filter @sd/core-db primary:migrate:deploy
+
+      - name: Run analytics migrations
+        env:
+          ANALYTICS_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+        run: bun run --filter @sd/core-db analytics:migrate:deploy
 
       - name: Run API E2E Tests
         env:
-          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
-          DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          PRIMARY_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          PRIMARY_DIRECT_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          ANALYTICS_DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          ANALYTICS_IDENTITY_HMAC_SECRET: e2e-analytics-identity-secret-0123456789
           NEON_API_KEY: "e2e-test-neon-api-key"
           NEON_PROJECT_ID: "e2e-test-project"
           NEON_ENDPOINT_ID: "ep-e2e-test-endpoint"
