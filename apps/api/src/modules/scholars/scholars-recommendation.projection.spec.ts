@@ -207,4 +207,55 @@ describe('ScholarsRecommendationProjection', () => {
       items: [{ slug: 'second-scholar' }],
     });
   });
+
+  it('does not hydrate a listing into a different scholar batch', async () => {
+    const projection = new ScholarsRecommendationProjection({
+      scholar: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 'scholar-1',
+            slug: 'first-scholar',
+            name: 'First Scholar',
+            imageUrl: null,
+            mainLanguage: 'en',
+            title: 'allamah',
+            translations: [],
+            _count: { listings: 1 },
+          },
+        ]),
+      },
+      listing: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 'listing-1',
+            scholarId: 'scholar-2',
+            slug: 'wrong-scholar-listing',
+            title: 'Wrong Scholar Listing',
+            format: 'single',
+            language: 'en',
+            coverImageUrl: null,
+            publishedLectureCount: null,
+            publishedDurationSeconds: null,
+            durationSeconds: 120,
+            publishedAt: new Date('2026-01-01T00:00:00.000Z'),
+            createdAt: new Date('2026-01-01T00:00:00.000Z'),
+            translations: [],
+          },
+        ]),
+      },
+    } as never);
+
+    const result = await projection.project([
+      {
+        form: 'scholar_listings',
+        id: 'scholar-listings:first-scholar',
+        scholarSlug: 'first-scholar',
+        scholarId: 'scholar-1',
+        titleKind: 'scholar_listings',
+        itemIds: ['listing-1'],
+      },
+    ]);
+
+    expect(result.batches).toEqual([]);
+  });
 });
