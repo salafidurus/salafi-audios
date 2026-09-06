@@ -11,6 +11,11 @@ import { AnalyticsBuffer as AnalyticsBufferClass, type AnalyticsBuffer } from ".
 const ANONYMOUS_ID_KEY = "sd:analytics-anonymous-id:v1";
 const SESSION_ID_KEY = "sd:analytics-session-id:v1";
 
+function getBrowserStorage(): WebAnalyticsRuntime["storage"] {
+  if (!hasWindow()) return undefined;
+  return window.localStorage;
+}
+
 /** Stable public content identity captured by a web observation. */
 export interface WebAnalyticsContentReferences {
   /** Immutable public listing slug observed by the detail surface. */
@@ -111,7 +116,7 @@ export const webAnalyticsBuffer = new AnalyticsBufferClass({
     important: 24 * 60 * 60 * 1000,
     best_effort: 15 * 60 * 1000,
   },
-  storage: hasWindow() ? window.localStorage : undefined,
+  storage: getBrowserStorage(),
   storageKey: "sd:analytics:buffer:v1",
 });
 
@@ -125,7 +130,7 @@ export function subscribeWebAnalytics(listener: () => void): () => void {
 
 /** Default consent-gated web recorder used by public web surfaces. */
 export const webAnalytics = createWebAnalyticsRecorder(webAnalyticsBuffer, {
-  storage: hasWindow() ? window.localStorage : undefined,
+  storage: getBrowserStorage(),
   language: () => document.documentElement.lang,
   timezone: () => Intl.DateTimeFormat().resolvedOptions().timeZone,
   onRecorded: () => {
