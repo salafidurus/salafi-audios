@@ -15,6 +15,7 @@ architecture, and policy documents.
 - Administration procedures: `../administration/`
 - Deployment procedures: `./deployment/`
 - Infrastructure procedures: `./infrastructure/`
+- Analytics procedures: `./analytics/`
 
 Prefer updating an existing runbook over creating a new file. Do not put
 application implementation details or secrets in operational runbooks.
