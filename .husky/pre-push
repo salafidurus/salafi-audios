@@ -58,7 +58,10 @@ E2E_PORT="$BUN_E2E_PORT"
 else
   WORKTREE_ROOT=$(git rev-parse --show-toplevel)
   WORKTREE_PORT_HASH=$(printf "%s" "$WORKTREE_ROOT" | cksum | awk '{print $1}')
-  E2E_PORT=$((3200 + WORKTREE_PORT_HASH % 500))
+  # Bun.WebView journeys use a local Chromium backend whose high-port
+  # behavior is unreliable; keep deterministic worktree isolation in the
+  # low ephemeral range instead.
+  E2E_PORT=$((3200 + WORKTREE_PORT_HASH % 200))
 fi
 
 if ! git diff --quiet "$COMPARISON_BASE"...HEAD -- \
