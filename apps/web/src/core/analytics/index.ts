@@ -8,4 +8,9 @@ export {
 } from "./web-analytics";
 export { flushWebAnalytics } from "./web-analytics-delivery";
 export type { AnalyticsBufferOptions, BufferedAnalyticsEvent } from "./analytics-buffer";
-export type { WebAnalyticsContentReferences, WebAnalyticsRecorder } from "./web-analytics";
+export type {
+  WebAnalyticsContentReferences,
+  WebAnalyticsRecorder,
+  WebRecommendationAnalyticsContext,
+  WebSearchAnalyticsContext,
+} from "./web-analytics";

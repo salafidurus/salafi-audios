@@ -21,6 +21,7 @@ import { mergeExplorePages, useExploreRecentScreen } from "@sd/domain-content";
 import { useRouter } from "next/navigation";
 import React, { useRef, useEffect, type ReactNode } from "react";
 
+import { webAnalytics, type WebRecommendationAnalyticsContext } from "@/core/analytics";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useToast } from "@/core/toast";
 import { audioService, usePlayListing } from "@/features/audio";
@@ -34,6 +35,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/shared/components/ui/empty";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
+import { useViewableImpression } from "@/shared/hooks/use-viewable-impression";
 
 import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import styles from "./explore-recent.screen.module.css";
@@ -80,6 +82,7 @@ function getFeedLessonCount(item: { publishedLectureCount?: number; lectureCount
 function FeedGridItemCard({
   item,
   onNavigate,
+  recommendation,
 }: {
   item: {
     id: string;
@@ -99,6 +102,7 @@ function FeedGridItemCard({
     lectureCount?: number;
   };
   onNavigate?: (slug: string) => void;
+  recommendation: WebRecommendationAnalyticsContext;
 }) {
   const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
   const { addToast } = useToast();
@@ -125,6 +129,14 @@ function FeedGridItemCard({
 
   const progress = useProgressStore((s) => s.progressMap[item.slug]);
   const progressPercent = getFeedProgress(progress);
+  const impressionRef = useViewableImpression<HTMLDivElement>({
+    identityKey: `listing:${item.slug}:${recommendation.candidate_set_id}:${recommendation.position}`,
+    onImpression: () =>
+      webAnalytics.recordRecommendationImpression(
+        { listing_slug: item.slug, scholar_slug: item.scholarSlug },
+        recommendation,
+      ),
+  });
 
   const handlePlay = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -139,21 +151,31 @@ function FeedGridItemCard({
     await play();
   };
 
+  const handleClick = () => {
+    webAnalytics.recordRecommendationClicked(
+      { listing_slug: item.slug, scholar_slug: item.scholarSlug },
+      recommendation,
+    );
+    onNavigate?.(item.slug);
+  };
+
   const totalLessons = getFeedLessonCount(item);
 
   return (
-    <LectureCard
-      title={item.title}
-      category={item.kind}
-      scholarName={item.scholarName}
-      scholarSlug={item.scholarSlug}
-      duration={formatDuration(item.durationSeconds)}
-      totalLessons={totalLessons}
-      progress={progressPercent / 100}
-      isPlaying={isCurrentTrack && isPlaying}
-      onClick={() => onNavigate?.(item.slug)}
-      onPlay={handlePlay}
-    />
+    <div ref={impressionRef}>
+      <LectureCard
+        title={item.title}
+        category={item.kind}
+        scholarName={item.scholarName}
+        scholarSlug={item.scholarSlug}
+        duration={formatDuration(item.durationSeconds)}
+        totalLessons={totalLessons}
+        progress={progressPercent / 100}
+        isPlaying={isCurrentTrack && isPlaying}
+        onClick={handleClick}
+        onPlay={handlePlay}
+      />
+    </div>
   );
 }
 
@@ -194,6 +216,12 @@ function buildFeedBlocks(
                   key={feedContentItem.id}
                   item={feedContentItem}
                   onNavigate={onNavigateToListing}
+                  recommendation={{
+                    surface: "explore",
+                    position: batch.items.indexOf(feedContentItem),
+                    candidate_set_id: batch.id,
+                    recommendation_source: batch.reason,
+                  }}
                 />
               ))
             : batch.kind === "scholars"
@@ -201,7 +229,32 @@ function buildFeedBlocks(
                   <ScholarGridCard
                     key={scholar.id}
                     scholar={scholar}
-                    onPress={onNavigateToScholar}
+                    onPress={(slug) => {
+                      const position = batch.items.indexOf(scholar);
+                      const recommendation = {
+                        surface: "explore" as const,
+                        position,
+                        candidate_set_id: batch.id,
+                        recommendation_source: batch.reason,
+                      };
+                      webAnalytics.recordRecommendationClicked(
+                        { scholar_slug: slug },
+                        recommendation,
+                      );
+                      onNavigateToScholar(slug);
+                    }}
+                    onImpression={() =>
+                      webAnalytics.recordRecommendationImpression(
+                        { scholar_slug: scholar.slug },
+                        {
+                          surface: "explore",
+                          position: batch.items.indexOf(scholar),
+                          candidate_set_id: batch.id,
+                          recommendation_source: batch.reason,
+                        },
+                      )
+                    }
+                    impressionKey={`scholar:${scholar.slug}:${batch.id}:${batch.items.indexOf(scholar)}`}
                   />
                 ))
               : batch.items.map((item) => <TopicGridItem key={item.id} item={item} />)}
@@ -294,6 +347,10 @@ export function FeedRecentScreen({
   const recentItems = mergeExplorePages(recentData?.pages ?? []);
   const visibleRecentItems = recentItems;
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    webAnalytics.recordExploreOpened();
+  }, []);
 
   useEffect(() => {
     if (!hasRecentNextPage || isRecentFetching) return;

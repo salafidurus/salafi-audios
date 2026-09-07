@@ -1,9 +1,11 @@
 import type { ExploreScholarItemDto } from "@sd/core-contracts";
 import type { ListRenderItemInfo } from "react-native";
 
+import { useCallback } from "react";
 import { FlatList, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { getNativeAnalyticsRecorder } from "@/core/analytics/runtime";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 import { AppText } from "@/shared/ui";
@@ -14,6 +16,12 @@ export type ExploreScholarRowProps = {
   scholars: ExploreScholarItemDto[];
   title?: string;
   onScholarPress?: (slug: string) => void;
+  recommendation?: {
+    surface: string;
+    candidate_set_id: string;
+    /** Backend-owned reason or strategy label for this scholar batch. */
+    recommendation_source: string;
+  };
 };
 
 /** Renders the native explore scholar row surface and coordinates its user-facing state. */
@@ -21,21 +29,48 @@ export function ExploreScholarRow({
   scholars,
   title = "Popular Scholars",
   onScholarPress,
+  recommendation,
 }: ExploreScholarRowProps) {
-  function renderScholar({ item: scholar }: ListRenderItemInfo<ExploreScholarItemDto>) {
-    return (
-      <Pressable
-        onPress={() => onScholarPress?.(scholar.slug)}
-        style={styles.scholar}
-        testID={`scholar-card-${scholar.slug}`}
-      >
-        <View style={styles.scholarContent}>
-          <UserAvatar image={scholar.imageUrl} name={scholar.name} size={48} />
-          <MarqueeText text={scholar.name} variant="caption" style={styles.name} />
-        </View>
-      </Pressable>
-    );
-  }
+  const renderScholar = useCallback(
+    ({ item: scholar, index }: ListRenderItemInfo<ExploreScholarItemDto>) => {
+      return (
+        <Pressable
+          onPress={() => {
+            void getNativeAnalyticsRecorder()?.recordRecommendationClicked(
+              { scholar_slug: scholar.slug },
+              recommendation && { ...recommendation, position: index },
+            );
+            onScholarPress?.(scholar.slug);
+          }}
+          style={styles.scholar}
+          testID={`scholar-card-${scholar.slug}`}
+        >
+          <View style={styles.scholarContent}>
+            <UserAvatar image={scholar.imageUrl} name={scholar.name} size={48} />
+            <MarqueeText text={scholar.name} variant="caption" style={styles.name} />
+          </View>
+        </Pressable>
+      );
+    },
+    [onScholarPress, recommendation],
+  );
+
+  const onViewableItemsChanged = useCallback(
+    ({
+      viewableItems,
+    }: {
+      viewableItems: Array<{ item: ExploreScholarItemDto; index: number | null }>;
+    }) => {
+      viewableItems.forEach(({ item: scholar, index }) => {
+        if (index === null || !recommendation) return;
+        void getNativeAnalyticsRecorder()?.recordRecommendationImpression(
+          { scholar_slug: scholar.slug },
+          { ...recommendation, position: index },
+        );
+      });
+    },
+    [recommendation],
+  );
 
   return (
     <View style={styles.container}>
@@ -49,6 +84,8 @@ export function ExploreScholarRow({
         data={scholars}
         keyExtractor={(item) => item.id}
         renderItem={renderScholar}
+        viewabilityConfig={{ itemVisiblePercentThreshold: 50, minimumViewTime: 1000 }}
+        onViewableItemsChanged={onViewableItemsChanged}
       />
     </View>
   );

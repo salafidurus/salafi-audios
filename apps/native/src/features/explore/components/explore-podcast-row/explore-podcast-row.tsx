@@ -15,6 +15,7 @@ import { useFormattedScholarName, useIsSaved, markSaved, markUnsaved } from "@sd
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { getNativeAnalyticsRecorder } from "@/core/analytics/runtime";
 import { audioService } from "@/features/audio";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { MarqueeText } from "@/shared/components/MarqueeText";
@@ -27,6 +28,13 @@ export type ExplorePodcastRowProps = {
   item: FeedContentItemDto;
   onPress?: () => void;
   onNavigateToListing?: (slug: string) => void;
+  recommendation?: {
+    surface: string;
+    position: number;
+    candidate_set_id: string;
+    /** Backend-owned reason or strategy label for this listing batch. */
+    recommendation_source: string;
+  };
 };
 
 async function toggleActiveTrack(isCurrentTrack: boolean, isPlaying: boolean) {
@@ -147,7 +155,12 @@ function getPublishedDateText(publishedAt?: string | null) {
  * Renders the explore podcast row while retaining an RN fallback for its
  * progress bar, remote artwork, marquee text, and long-press action menu.
  */
-export function ExplorePodcastRow({ item, onPress, onNavigateToListing }: ExplorePodcastRowProps) {
+export function ExplorePodcastRow({
+  item,
+  onPress,
+  onNavigateToListing,
+  recommendation,
+}: ExplorePodcastRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const scholarName = item.scholarName;
@@ -169,8 +182,15 @@ export function ExplorePodcastRow({ item, onPress, onNavigateToListing }: Explor
     { id: "save", title: "Save", state: isSaved ? "on" : "off" },
   ];
 
-  const handleAction = (id: string) =>
+  const handleAction = (id: string) => {
+    if (id === "details") {
+      void getNativeAnalyticsRecorder()?.recordRecommendationClicked(
+        { listing_slug: item.slug, scholar_slug: item.scholarSlug },
+        recommendation,
+      );
+    }
     handleExploreAction(id, item, isSaved, onPress, onNavigateToListing);
+  };
 
   return (
     <List.Item onPress={handlePlay} testID="podcast-row-item">

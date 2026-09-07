@@ -24,6 +24,7 @@ import { useDownloadsStore } from "@/features/downloads/store/downloads.store";
 import { createAnalyticsBuffer } from "./analytics/buffer";
 import { drainAnalyticsBuffer } from "./analytics/delivery";
 import { createNativeAnalyticsRecorder } from "./analytics/recorder";
+import { setNativeAnalyticsRecorder } from "./analytics/runtime";
 import { initProgressPersistence } from "./audio/progress-persistence";
 import { authClient } from "./auth/auth-client";
 import { useAuth } from "./auth/use-auth";
@@ -142,6 +143,7 @@ export function Providers({ children, apiBaseUrl }: Props) {
     let active = true;
     const buffer = createAnalyticsBuffer(createSqliteKvAdapter());
     const recorder = createNativeAnalyticsRecorder(buffer);
+    setNativeAnalyticsRecorder(recorder);
     audioService.setAnalyticsObserver({
       onStarted: (track) => recorder.recordAudioStarted(track),
       onMilestone: (track, milestone) => recorder.recordAudioMilestone(track, milestone),
@@ -174,6 +176,7 @@ export function Providers({ children, apiBaseUrl }: Props) {
 
     return () => {
       active = false;
+      setNativeAnalyticsRecorder(undefined);
       audioService.setAnalyticsObserver(undefined);
       unsubscribeNetwork();
       subscription.remove();

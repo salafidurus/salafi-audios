@@ -7,10 +7,11 @@ import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { mergeExplorePages, useExploreRecentScreen } from "@sd/domain-content";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { FlatList, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { getNativeAnalyticsRecorder } from "@/core/analytics/runtime";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { RootScreenHeader } from "@/features/navigation";
 import { AppText, ScreenView } from "@/shared/ui";
@@ -91,6 +92,12 @@ function renderFeedItem(
             key={subItem.id}
             item={subItem}
             onNavigateToListing={onNavigateToListing}
+            recommendation={{
+              surface: "explore",
+              position: item.items.indexOf(subItem),
+              candidate_set_id: item.id,
+              recommendation_source: item.reason,
+            }}
           />
         ))
       ) : (
@@ -98,6 +105,11 @@ function renderFeedItem(
           scholars={item.items}
           title={item.title.label}
           onScholarPress={onNavigateToScholar}
+          recommendation={{
+            surface: "explore",
+            candidate_set_id: item.id,
+            recommendation_source: item.reason,
+          }}
         />
       )}
     </View>
@@ -121,6 +133,10 @@ export function ExploreScreen({ onNavigateToListing, onNavigateToScholar }: Expl
     { locale: getExploreLocale(i18n.language) },
   );
   const items = mergeExplorePages(data?.pages ?? []);
+
+  useEffect(() => {
+    void getNativeAnalyticsRecorder()?.recordExploreOpened();
+  }, []);
 
   const renderItem = useCallback(
     ({

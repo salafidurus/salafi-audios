@@ -1,8 +1,9 @@
 import { useSearchProcessing } from "@sd/domain-search";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { getNativeAnalyticsRecorder } from "@/core/analytics/runtime";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText, NativeFormField, ScreenView } from "@/shared/ui";
@@ -60,12 +61,17 @@ function PopularSearches({
   );
 }
 
+function createSearchId(): string {
+  return `search-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
 /** Renders debounced catalog search, topic filters, and navigable result rows. */
 export function SearchScreen({ onNavigateToListing }: SearchScreenProps) {
   const { t } = useTranslation();
   const showOriginal = useShowOriginalContent();
   const {
     query,
+    debouncedQuery,
     setQuery,
     filter,
     setFilter,
@@ -75,9 +81,39 @@ export function SearchScreen({ onNavigateToListing }: SearchScreenProps) {
     shouldSearch,
     errorMessage,
   } = useSearchProcessing({ showOriginal });
+  const searchIds = useRef(new Map<string, string>());
+  const normalizedQuery = (debouncedQuery ?? query).trim();
+  const searchKey = `${normalizedQuery}\u0000${filter.toSorted().join(",")}`;
+  const searchId = normalizedQuery
+    ? (searchIds.current.get(searchKey) ??
+      (() => {
+        const next = createSearchId();
+        searchIds.current.set(searchKey, next);
+        return next;
+      })())
+    : undefined;
+
+  useEffect(() => {
+    if (!searchId) return;
+    void getNativeAnalyticsRecorder()?.recordSearchSubmitted({
+      search_id: searchId,
+      query_length: normalizedQuery.length,
+      filter_slugs: filter.length ? filter : undefined,
+    });
+  }, [filter, normalizedQuery, searchId]);
+
   const handleListingPress = useCallback(
-    (slug: string) => onNavigateToListing?.(slug),
-    [onNavigateToListing],
+    (slug: string) => {
+      if (searchId) {
+        void getNativeAnalyticsRecorder()?.recordSearchResultSelected(
+          { listing_slug: slug },
+          searchId,
+          items.findIndex((item) => item.slug === slug),
+        );
+      }
+      onNavigateToListing?.(slug);
+    },
+    [items, onNavigateToListing, searchId],
   );
   const renderSearchResult = useCallback(
     (item: SearchResultRow) => (
