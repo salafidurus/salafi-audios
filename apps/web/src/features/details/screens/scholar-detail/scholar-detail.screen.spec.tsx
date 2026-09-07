@@ -11,6 +11,11 @@ vi.mock("@sd/domain-content", () => ({
   useScholarTopics: vi.fn(),
 }));
 
+vi.mock("@tanstack/react-query", () => ({
+  useQuery: () => ({ data: undefined, refetch: vi.fn() }),
+  useMutation: () => ({ isPending: false, mutate: vi.fn() }),
+}));
+
 vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
   ScreenView: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
