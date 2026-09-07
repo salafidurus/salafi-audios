@@ -34,14 +34,18 @@ describe("Bun.WebView E2E configuration", () => {
 
   it("uses the configured API origin instead of the web origin", () => {
     expect(
-      getE2EConfig({ BUN_E2E_PORT: "3011", NEXT_PUBLIC_API_URL: "http://localhost:4000" }),
+      getE2EConfig({ BUN_E2E_PORT: "3011", NEXT_PUBLIC_API_URL: "http://localhost:4100" }),
     ).toEqual({
       port: 3011,
       origin: "http://127.0.0.1:3011",
-      apiOrigin: "http://localhost:4000",
+      apiOrigin: "http://localhost:4100",
       readyTimeoutMs: 120_000,
       skipBuild: false,
     });
+  });
+
+  it("uses the development API origin when no isolated API origin is configured", () => {
+    expect(getE2EConfig({ BUN_E2E_PORT: "3011" }).apiOrigin).toBe("http://localhost:4000");
   });
 });
 

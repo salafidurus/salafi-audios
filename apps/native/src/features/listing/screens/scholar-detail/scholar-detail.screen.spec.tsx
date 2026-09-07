@@ -10,6 +10,15 @@ jest.mock("@sd/domain-content", () => ({
   useScholarTopics: jest.fn(),
 }));
 
+jest.mock("@/core/auth/use-auth", () => ({
+  useAuth: () => ({ isAuthenticated: false, isLoading: false, user: undefined }),
+}));
+
+jest.mock("@tanstack/react-query", () => ({
+  useQuery: () => ({ data: undefined, refetch: jest.fn() }),
+  useMutation: () => ({ isPending: false, mutate: jest.fn() }),
+}));
+
 jest.mock("@/shared/ui/native-screen-view", () => ({
   ScreenView: ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports

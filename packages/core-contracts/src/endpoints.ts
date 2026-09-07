@@ -31,6 +31,8 @@ export const endpoints = {
     detail: (scholarSlug: string) => applicationPath(`/scholars/${scholarSlug}`),
     content: (scholarSlug: string) => applicationPath(`/scholars/${scholarSlug}/content`),
     topics: (scholarSlug: string) => applicationPath(`/scholars/${scholarSlug}/topics`),
+    followStatus: (scholarSlug: string) => applicationPath(`/me/scholars/${scholarSlug}/follow`),
+    follow: (scholarSlug: string) => applicationPath(`/me/scholars/${scholarSlug}/follow`),
   },
   listings: {
     detail: (listingSlug: string) => applicationPath(`/listings/${listingSlug}`),

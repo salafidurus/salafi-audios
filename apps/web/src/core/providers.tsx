@@ -17,6 +17,7 @@ import { I18nextProvider } from "react-i18next";
 import { authClient } from "@/core/auth/auth-client";
 import { useAuth } from "@/core/auth/use-auth";
 import { ToastContainer } from "@/core/toast";
+import { audioService } from "@/features/audio/audio-service";
 import { useCookieConsent } from "@/features/legal/hooks/use-cookie-consent";
 import { hasDocument, hasWindow } from "@/shared/lib/runtime-guards";
 
@@ -100,6 +101,33 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
       window.clearInterval(interval);
     };
   }, [apiBaseUrl, hasAccepted]);
+
+  useEffect(() => {
+    audioService.setAnalyticsObserver({
+      onStarted: (track) => {
+        if (track.scholarSlug)
+          webAnalytics.recordAudioStarted({
+            listing_slug: track.slug,
+            scholar_slug: track.scholarSlug,
+          });
+      },
+      onMilestone: (track, milestone) => {
+        if (track.scholarSlug)
+          webAnalytics.recordAudioMilestone(
+            { listing_slug: track.slug, scholar_slug: track.scholarSlug },
+            milestone,
+          );
+      },
+      onCompletedObserved: (track) => {
+        if (track.scholarSlug)
+          webAnalytics.recordAudioCompletedObserved({
+            listing_slug: track.slug,
+            scholar_slug: track.scholarSlug,
+          });
+      },
+    });
+    return () => audioService.setAnalyticsObserver(undefined);
+  }, []);
 
   // Sync i18n with cookie after hydration. The root layout is static so it
   // always passes "en" as the default. The inline script in layout.tsx sets

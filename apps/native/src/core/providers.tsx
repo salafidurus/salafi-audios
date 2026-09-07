@@ -16,6 +16,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { audioService } from "@/features/audio/audio-service";
 import { handleDownloadOutboxEntry } from "@/features/downloads/engine/download.engine";
 import { drainDownloadsOutbox } from "@/features/downloads/outbox/outbox.drain";
 import { useDownloadsStore } from "@/features/downloads/store/downloads.store";
@@ -141,6 +142,11 @@ export function Providers({ children, apiBaseUrl }: Props) {
     let active = true;
     const buffer = createAnalyticsBuffer(createSqliteKvAdapter());
     const recorder = createNativeAnalyticsRecorder(buffer);
+    audioService.setAnalyticsObserver({
+      onStarted: (track) => recorder.recordAudioStarted(track),
+      onMilestone: (track, milestone) => recorder.recordAudioMilestone(track, milestone),
+      onCompletedObserved: (track) => recorder.recordAudioCompletedObserved(track),
+    });
     const initialized = (async () => {
       await buffer.hydrate();
       if (!active) return;
@@ -168,6 +174,7 @@ export function Providers({ children, apiBaseUrl }: Props) {
 
     return () => {
       active = false;
+      audioService.setAnalyticsObserver(undefined);
       unsubscribeNetwork();
       subscription.remove();
     };

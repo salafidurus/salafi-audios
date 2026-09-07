@@ -19,6 +19,17 @@ export type ListeningPlayOptions = {
 
 /** Below this many seconds, previous restarts the current track. */
 const SKIP_PREVIOUS_RESTART_THRESHOLD_SECONDS = 3;
+const LISTENING_MILESTONES = [0.3, 0.5, 0.75] as const;
+
+/** Non-blocking product observations emitted by the shared listening lifecycle. */
+export type ListeningAnalyticsObserver = {
+  onStarted?: (track: Track) => void | Promise<void>;
+  onMilestone?: (
+    track: Track,
+    milestone: (typeof LISTENING_MILESTONES)[number],
+  ) => void | Promise<void>;
+  onCompletedObserved?: (track: Track) => void | Promise<void>;
+};
 
 /**
  * Platform-neutral Listening orchestration.
@@ -29,6 +40,13 @@ const SKIP_PREVIOUS_RESTART_THRESHOLD_SECONDS = 3;
  */
 export class ListeningSession {
   private readonly queueManager = new QueueManager();
+  private analyticsObserver?: ListeningAnalyticsObserver;
+  private readonly milestones = new Set<string>();
+  private readonly startedTracks = new Set<string>();
+
+  setAnalyticsObserver(observer: ListeningAnalyticsObserver | undefined): void {
+    this.analyticsObserver = observer;
+  }
 
   constructor(
     private readonly engine: PlaybackEngine,
@@ -36,7 +54,16 @@ export class ListeningSession {
   ) {
     this.engine.setEvents({
       onTrackEnd: () => this.onTrackEnd(),
-      onStatusChange: (status) => usePlaybackStore.getState().actions.setStatus(status),
+      onStatusChange: (status) => {
+        usePlaybackStore.getState().actions.setStatus(status);
+        if (status === "playing") {
+          const track = usePlaybackStore.getState().currentTrack;
+          if (track && !this.startedTracks.has(track.slug)) {
+            this.startedTracks.add(track.slug);
+            void this.observe(() => this.analyticsObserver?.onStarted?.(track));
+          }
+        }
+      },
       onPositionChange: (position) => this.onPositionChange(position),
       onDurationChange: (duration) => usePlaybackStore.getState().actions.setDuration(duration),
       onError: (error) => usePlaybackStore.getState().actions.setError(error),
@@ -108,6 +135,9 @@ export class ListeningSession {
   }
 
   private async loadAndPlay(track: Track, options: ListeningPlayOptions = {}): Promise<void> {
+    for (const key of this.milestones)
+      if (key.startsWith(`${track.slug}:`)) this.milestones.delete(key);
+    this.startedTracks.delete(track.slug);
     usePlaybackStore.getState().actions.setCurrentTrack(track);
     usePlaybackStore.getState().actions.setStatus("loading");
 
@@ -163,6 +193,7 @@ export class ListeningSession {
   private async onTrackEnd(): Promise<void> {
     const currentTrack = usePlaybackStore.getState().currentTrack;
     if (currentTrack) {
+      void this.observe(() => this.analyticsObserver?.onCompletedObserved?.(currentTrack));
       const duration = usePlaybackStore.getState().durationSeconds;
       useProgressStore.getState().actions.setProgress(currentTrack.slug, duration, duration);
       useProgressStore.getState().actions.markCompleted(currentTrack.slug);
@@ -189,5 +220,22 @@ export class ListeningSession {
       positionSeconds,
       durationSeconds: duration,
     });
+    if (duration > 0) {
+      for (const milestone of LISTENING_MILESTONES) {
+        const key = `${currentTrack.slug}:${milestone}`;
+        if (positionSeconds / duration >= milestone && !this.milestones.has(key)) {
+          this.milestones.add(key);
+          void this.observe(() => this.analyticsObserver?.onMilestone?.(currentTrack, milestone));
+        }
+      }
+    }
+  }
+
+  private async observe(callback: () => void | Promise<void>): Promise<void> {
+    try {
+      await callback();
+    } catch {
+      // Analytics is best-effort and must never affect playback or progress.
+    }
   }
 }

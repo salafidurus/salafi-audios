@@ -345,3 +345,4 @@ export {
   type ScholarPageFeedDto,
   parseScholarPageFeedDto,
 } from "./scholar-page-feed.types";
+export { ScholarFollowDtoSchema, type ScholarFollowDto } from "./scholar-follow.types";

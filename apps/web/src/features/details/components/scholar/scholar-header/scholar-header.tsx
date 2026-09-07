@@ -21,6 +21,7 @@ export type ScholarHeaderProps = {
     /** Total audio duration available for the scholar, in seconds. */
     totalDurationSeconds: number;
   };
+  following?: boolean;
   onFollow?: () => void;
   layout?: "inline" | "sidebar";
 };
@@ -85,6 +86,7 @@ function renderBio(
 
 function renderFollowButton(
   onFollow: ScholarHeaderProps["onFollow"],
+  following: boolean,
   t: ReturnType<typeof useTranslation>["t"],
 ) {
   if (!onFollow) return null;
@@ -96,13 +98,19 @@ function renderFollowButton(
       className={styles.followButton}
       onClick={onFollow}
     >
-      {t("scholarContent.follow", "Follow")}
+      {following ? t("scholarContent.unfollow", "Following") : t("scholarContent.follow", "Follow")}
     </Button>
   );
 }
 
 /** Renders scholar identity, localized summary information, bio, and follow action. */
-export function ScholarHeader({ scholar, onFollow, layout = "inline" }: ScholarHeaderProps) {
+// eslint-disable-next-line complexity -- header branches are independent presentation states.
+export function ScholarHeader({
+  scholar,
+  following = false,
+  onFollow,
+  layout = "inline",
+}: ScholarHeaderProps) {
   const { t } = useTranslation();
   const formatScholarName = useFormatScholarName();
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -127,7 +135,7 @@ export function ScholarHeader({ scholar, onFollow, layout = "inline" }: ScholarH
         {renderBio(scholar.bio, bioExpanded, setBioExpanded, t)}
       </div>
 
-      {renderFollowButton(onFollow, t)}
+      {renderFollowButton(onFollow, following, t)}
     </div>
   );
 }

@@ -6,12 +6,25 @@ import { ScholarsService } from './scholars.service';
 import { ScholarsRepository } from './scholars.repo';
 import { RecommendationModule } from '../recommendation/recommendation.module';
 import { ScholarsRecommendationProjection } from './scholars-recommendation.projection';
+import { ScholarFollowController } from './scholar-follow.controller';
+import { ScholarFollowService } from './scholar-follow.service';
+import { AnalyticsModule } from '../analytics/analytics.module';
 
 /** scholars application module responsible for scholars.module behavior at the backend boundary. */
 @Module({
-  imports: [RecommendationModule],
-  controllers: [ScholarsController, AdminScholarsController, ScholarsTranslationsController],
-  providers: [ScholarsService, ScholarsRepository, ScholarsRecommendationProjection],
+  imports: [RecommendationModule, AnalyticsModule],
+  controllers: [
+    ScholarsController,
+    AdminScholarsController,
+    ScholarsTranslationsController,
+    ScholarFollowController,
+  ],
+  providers: [
+    ScholarsService,
+    ScholarsRepository,
+    ScholarsRecommendationProjection,
+    ScholarFollowService,
+  ],
   exports: [ScholarsService, ScholarsRepository],
 })
 /** NestJS scholars module service or controller coordinating the API boundary for this responsibility. */
