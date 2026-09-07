@@ -75,11 +75,15 @@ jobs:
             -e GOOGLE_CLIENT_SECRET=dummy \
             -e APPLE_CLIENT_ID=dummy \
             -e APPLE_CLIENT_SECRET=dummy \
-            -e R2_ACCOUNT_ID=dummy \
-            -e R2_ACCESS_KEY_ID=dummy \
-            -e R2_SECRET_ACCESS_KEY=dummy \
-            -e R2_BUCKET_NAME=dummy \
-            -e R2_PUBLIC_BASE_URL=http://dummy.test \
+            -e R2_MEDIA_ACCOUNT_ID=dummy \
+            -e R2_MEDIA_ACCESS_KEY_ID=dummy \
+            -e R2_MEDIA_SECRET_ACCESS_KEY=dummy \
+            -e R2_MEDIA_BUCKET_NAME=dummy \
+            -e R2_MEDIA_PUBLIC_BASE_URL=http://dummy.test \
+            -e R2_ANALYTICS_ACCOUNT_ID=dummy \
+            -e R2_ANALYTICS_ACCESS_KEY_ID=dummy \
+            -e R2_ANALYTICS_SECRET_ACCESS_KEY=dummy \
+            -e R2_ANALYTICS_BUCKET_NAME=dummy \
             "${IMAGE_REPOSITORY}:sha-${{ github.event.pull_request.head.sha }}"
 
       - name: Wait for /health/healthz (assert HTTP 200)
