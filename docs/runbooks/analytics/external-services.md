@@ -214,6 +214,16 @@ after plan changes.
    dates without recording secret values.
 8. Run the verification matrix before enabling production collection.
 
+## Private R2 archive credentials
+
+Analytics export uses a separate Cloudflare R2 account/bucket and complete
+credential set: `R2_ANALYTICS_ACCOUNT_ID`, `R2_ANALYTICS_ACCESS_KEY_ID`,
+`R2_ANALYTICS_SECRET_ACCESS_KEY`, and `R2_ANALYTICS_BUCKET_NAME`. Media uses
+the independent `R2_MEDIA_*` set. Do not share keys, buckets, endpoints, or
+public CDN configuration between these consumers. Grant analytics credentials
+only the private archive bucket permissions required for object writes and
+verification.
+
 ## Verification matrix
 
 Use unique, clearly synthetic test identifiers. Never use real user data.

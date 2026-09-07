@@ -126,23 +126,38 @@ export class ConfigService {
     return this.env.APPLE_CLIENT_SECRET;
   }
 
-  get R2_ACCOUNT_ID(): string {
-    return this.env.R2_ACCOUNT_ID;
+  get R2_MEDIA_ACCOUNT_ID(): string {
+    return this.env.R2_MEDIA_ACCOUNT_ID;
   }
-  get R2_ACCESS_KEY_ID(): string {
-    return this.env.R2_ACCESS_KEY_ID;
+  get R2_MEDIA_ACCESS_KEY_ID(): string {
+    return this.env.R2_MEDIA_ACCESS_KEY_ID;
   }
-  get R2_SECRET_ACCESS_KEY(): string {
-    return this.env.R2_SECRET_ACCESS_KEY;
+  get R2_MEDIA_SECRET_ACCESS_KEY(): string {
+    return this.env.R2_MEDIA_SECRET_ACCESS_KEY;
   }
-  get R2_BUCKET_NAME(): string {
-    return this.env.R2_BUCKET_NAME;
+  get R2_MEDIA_BUCKET_NAME(): string {
+    return this.env.R2_MEDIA_BUCKET_NAME;
   }
-  get R2_PUBLIC_BASE_URL(): string {
-    return this.env.R2_PUBLIC_BASE_URL;
+  get R2_ANALYTICS_ACCOUNT_ID(): string {
+    return this.env.R2_ANALYTICS_ACCOUNT_ID;
   }
-  get R2_PRESIGN_EXPIRES_SECONDS(): number {
-    return this.env.R2_PRESIGN_EXPIRES_SECONDS;
+  get R2_ANALYTICS_ACCESS_KEY_ID(): string {
+    return this.env.R2_ANALYTICS_ACCESS_KEY_ID;
+  }
+  get R2_ANALYTICS_SECRET_ACCESS_KEY(): string {
+    return this.env.R2_ANALYTICS_SECRET_ACCESS_KEY;
+  }
+  get R2_ANALYTICS_BUCKET_NAME(): string {
+    return this.env.R2_ANALYTICS_BUCKET_NAME;
+  }
+  get R2_ANALYTICS_PREFIX(): string {
+    return this.env.R2_ANALYTICS_PREFIX;
+  }
+  get R2_MEDIA_PUBLIC_BASE_URL(): string {
+    return this.env.R2_MEDIA_PUBLIC_BASE_URL;
+  }
+  get R2_MEDIA_PRESIGN_EXPIRES_SECONDS(): number {
+    return this.env.R2_MEDIA_PRESIGN_EXPIRES_SECONDS;
   }
 
   get DISABLE_THROTTLER(): boolean {

@@ -1497,7 +1497,7 @@ export class ListingRepository {
         // the listing has none yet (updateMany alone would silently no-op).
         if (dto.audioKey) {
           const assetData = {
-            url: `${process.env['R2_PUBLIC_BASE_URL']}/${dto.audioKey}`,
+            url: `${process.env['R2_MEDIA_PUBLIC_BASE_URL']}/${dto.audioKey}`,
             objectKey: dto.audioKey,
             format: dto.audioKey.endsWith('.mp3') ? 'mp3' : undefined,
             sizeBytes: dto.sizeBytes,
@@ -1997,7 +1997,7 @@ export class ListingRepository {
 
   private arrangeAudioAssetData(audio: ArrangeAudioRef) {
     return {
-      url: `${process.env['R2_PUBLIC_BASE_URL']}/${audio.objectKey}`,
+      url: `${process.env['R2_MEDIA_PUBLIC_BASE_URL']}/${audio.objectKey}`,
       objectKey: audio.objectKey,
       format: audio.format ?? audio.objectKey.split('.').pop(),
       sizeBytes: audio.sizeBytes ?? undefined,

@@ -152,7 +152,7 @@ export class AdminListingsController {
     @Req() req: { user?: { id: string } },
   ): Promise<{ id: string; title: string }> {
     const publicUrl = dto.audioKey
-      ? `${process.env['R2_PUBLIC_BASE_URL']}/${dto.audioKey}`
+      ? `${process.env['R2_MEDIA_PUBLIC_BASE_URL']}/${dto.audioKey}`
       : undefined;
     return this.service.createListing({ ...dto, publicUrl }, req.user?.id);
   }

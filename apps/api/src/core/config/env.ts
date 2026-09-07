@@ -44,12 +44,17 @@ const ApiEnvSchema = z
     REDIS_URL: optionalUrl,
     TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(10).default(0),
 
-    R2_ACCOUNT_ID: z.string().min(1),
-    R2_ACCESS_KEY_ID: z.string().min(1),
-    R2_SECRET_ACCESS_KEY: z.string().min(1),
-    R2_BUCKET_NAME: z.string().min(1),
-    R2_PUBLIC_BASE_URL: z.url(),
-    R2_PRESIGN_EXPIRES_SECONDS: z.coerce.number().int().positive().default(3600),
+    R2_MEDIA_ACCOUNT_ID: z.string().min(1),
+    R2_MEDIA_ACCESS_KEY_ID: z.string().min(1),
+    R2_MEDIA_SECRET_ACCESS_KEY: z.string().min(1),
+    R2_MEDIA_BUCKET_NAME: z.string().min(1),
+    R2_ANALYTICS_ACCOUNT_ID: z.string().min(1),
+    R2_ANALYTICS_ACCESS_KEY_ID: z.string().min(1),
+    R2_ANALYTICS_SECRET_ACCESS_KEY: z.string().min(1),
+    R2_ANALYTICS_BUCKET_NAME: z.string().min(1),
+    R2_ANALYTICS_PREFIX: z.string().min(1).default('analytics'),
+    R2_MEDIA_PUBLIC_BASE_URL: z.url(),
+    R2_MEDIA_PRESIGN_EXPIRES_SECONDS: z.coerce.number().int().positive().default(3600),
     DISABLE_THROTTLER: z
       .preprocess((val) => val === 'true' || val === true, z.boolean())
       .default(false),

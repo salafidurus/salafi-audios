@@ -6,6 +6,10 @@ import { AnalyticsService } from './analytics.service';
 import { AnalyticsDispatchRepository } from './analytics-dispatch.repository';
 import { AnalyticsDispatchService } from './analytics-dispatch.service';
 import { MixpanelAdapter } from './mixpanel.adapter';
+import { AnalyticsIdentityLinkRepository } from './analytics-identity-link.repository';
+import { AnalyticsExportRepository } from './analytics-export.repository';
+import { AnalyticsExportService } from './analytics-export.service';
+import { AnalyticsExportStorage } from './analytics-export.storage';
 
 /** analytics application module responsible for analytics.module behavior at the backend boundary. */
 @Module({
@@ -17,6 +21,10 @@ import { MixpanelAdapter } from './mixpanel.adapter';
     AnalyticsDispatchRepository,
     AnalyticsDispatchService,
     MixpanelAdapter,
+    AnalyticsIdentityLinkRepository,
+    AnalyticsExportRepository,
+    AnalyticsExportService,
+    AnalyticsExportStorage,
   ],
   exports: [AnalyticsDispatchRepository],
 })

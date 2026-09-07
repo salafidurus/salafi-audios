@@ -161,6 +161,12 @@ See the [deployment policy](policies/deployment.md).
 Browser → Cloudflare DNS → Vercel → Next.js
 Web/mobile → API hostname → Cloudflare → Hetzner → Traefik → API
 API → Better Auth, Neon, environment Redis, and Cloudflare R2
+
+The API scheduler exports only newly received analytics events to a dedicated
+private R2 analytics bucket as versioned Parquet parts. Each export has a
+PostgreSQL lease, an `(received_at, event_id)` checkpoint, and a final manifest;
+there is no public or administrative export trigger. Raw canonical events and
+derived ML projections use separate object prefixes and versions.
 ```
 
 | Area   | Development     | Preview                         | Production                         |

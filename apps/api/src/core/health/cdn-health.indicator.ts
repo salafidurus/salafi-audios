@@ -16,10 +16,10 @@ export class CDNHealthIndicator {
 
   constructor(config: ConfigService) {
     this.s3 = new S3Client({
-      accessKeyId: config.R2_ACCESS_KEY_ID,
-      secretAccessKey: config.R2_SECRET_ACCESS_KEY,
-      bucket: config.R2_BUCKET_NAME,
-      endpoint: `https://${config.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      accessKeyId: config.R2_MEDIA_ACCESS_KEY_ID,
+      secretAccessKey: config.R2_MEDIA_SECRET_ACCESS_KEY,
+      bucket: config.R2_MEDIA_BUCKET_NAME,
+      endpoint: `https://${config.R2_MEDIA_ACCOUNT_ID}.r2.cloudflarestorage.com`,
     });
   }
 

@@ -110,11 +110,15 @@ jobs:
           GOOGLE_CLIENT_SECRET: "dummy"
           APPLE_CLIENT_ID: "dummy"
           APPLE_CLIENT_SECRET: "dummy"
-          R2_ACCOUNT_ID: "dummy"
-          R2_ACCESS_KEY_ID: "dummy"
-          R2_SECRET_ACCESS_KEY: "dummy"
-          R2_BUCKET_NAME: "dummy"
-          R2_PUBLIC_BASE_URL: "http://dummy.test"
+          R2_MEDIA_ACCOUNT_ID: "dummy"
+          R2_MEDIA_ACCESS_KEY_ID: "dummy"
+          R2_MEDIA_SECRET_ACCESS_KEY: "dummy"
+          R2_MEDIA_BUCKET_NAME: "dummy"
+          R2_MEDIA_PUBLIC_BASE_URL: "http://dummy.test"
+          R2_ANALYTICS_ACCOUNT_ID: "dummy"
+          R2_ANALYTICS_ACCESS_KEY_ID: "dummy"
+          R2_ANALYTICS_SECRET_ACCESS_KEY: "dummy"
+          R2_ANALYTICS_BUCKET_NAME: "dummy"
         run: bun run --filter api test:e2e
 
       - name: Delete Neon Branch

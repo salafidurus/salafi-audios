@@ -70,6 +70,10 @@ export class TelemetryService implements OnModuleInit, OnApplicationShutdown {
     'salafi_durus_analytics_delivery_duration_ms',
     { description: 'Analytics provider delivery latency in milliseconds' },
   );
+  private readonly analyticsExportCounter = this.meter.createCounter(
+    'salafi_durus_analytics_export_total',
+    { description: 'Scheduled analytics archive export outcomes' },
+  );
   private readonly httpRequestCounter = this.meter.createCounter(
     'salafi_durus_http_requests_total',
     {
@@ -147,6 +151,11 @@ export class TelemetryService implements OnModuleInit, OnApplicationShutdown {
   ): void {
     this.analyticsDeliveryCounter.add(count, { stage });
     this.analyticsDeliveryDuration.record(durationMs, { stage });
+  }
+
+  /** Records scheduler outcomes without event identifiers or storage credentials. */
+  recordAnalyticsExport(stage: 'started' | 'completed' | 'failed'): void {
+    this.analyticsExportCounter.add(1, { stage });
   }
 
   /** Records API latency and outcome using bounded transport-level dimensions. */

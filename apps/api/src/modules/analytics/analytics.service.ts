@@ -10,6 +10,7 @@ import { createHmac } from 'node:crypto';
 import { AnalyticsRepository } from './analytics.repository';
 import { ConfigService } from '../../core/config/config.service';
 import { TelemetryService } from '../../core/telemetry/telemetry.service';
+import { AnalyticsIdentityLinkRepository } from './analytics-identity-link.repository';
 
 /** NestJS analytics service coordinating the API boundary for this responsibility. */
 @Injectable()
@@ -20,6 +21,7 @@ export class AnalyticsService {
     private readonly repository: AnalyticsRepository,
     private readonly config: ConfigService,
     private readonly telemetry: TelemetryService,
+    private readonly identityLinks?: AnalyticsIdentityLinkRepository,
   ) {}
 
   /** Stores accepted events and maps persistence failures to stable API errors. */
@@ -59,6 +61,7 @@ export class AnalyticsService {
             event.consent_state === 'essential' || event.consent_state === 'optional_granted',
         ),
       );
+      await linkAuthenticatedIdentity(this.identityLinks, authenticatedUserId, normalized);
       const acceptedIds = new Set(result.accepted);
       const deduplicatedIds = new Set(result.deduplicated);
       this.telemetry.recordAnalyticsStage('accepted', result.accepted.length);
@@ -85,6 +88,17 @@ export class AnalyticsService {
   }
 }
 
+async function linkAuthenticatedIdentity(
+  repository: AnalyticsIdentityLinkRepository | undefined,
+  userId: string | undefined,
+  events: readonly CanonicalProductEvent[],
+): Promise<void> {
+  const identity = events.find((event) => event.identity.type === 'authenticated')?.identity;
+  if (repository && userId && identity?.type === 'authenticated') {
+    await repository.upsert(userId, identity.pseudonymous_id);
+  }
+}
+
 function normalizeIdentity(
   event: CanonicalProductEvent,
   authenticatedUserId: string | undefined,
@@ -94,7 +108,15 @@ function normalizeIdentity(
     if (event.identity.type !== 'anonymous') {
       throw new UnauthorizedException({ code: 'analytics_invalid_session' });
     }
-    return event;
+    return {
+      ...event,
+      identity: {
+        type: 'anonymous',
+        anonymous_id: createHmac('sha256', config.ANALYTICS_IDENTITY_HMAC_SECRET)
+          .update(`anonymous:${event.identity.anonymous_id}`)
+          .digest('base64url'),
+      },
+    };
   }
   if (event.identity.type !== 'anonymous') {
     throw new BadRequestException({ code: 'analytics_invalid_event' });

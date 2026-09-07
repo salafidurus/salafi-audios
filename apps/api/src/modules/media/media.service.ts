@@ -22,13 +22,13 @@ export class MediaService {
   private readonly presignExpiresSeconds: number;
 
   constructor(config: ConfigService) {
-    this.publicBaseUrl = config.R2_PUBLIC_BASE_URL;
-    this.presignExpiresSeconds = config.R2_PRESIGN_EXPIRES_SECONDS;
+    this.publicBaseUrl = config.R2_MEDIA_PUBLIC_BASE_URL;
+    this.presignExpiresSeconds = config.R2_MEDIA_PRESIGN_EXPIRES_SECONDS;
     this.s3 = new S3Client({
-      accessKeyId: config.R2_ACCESS_KEY_ID,
-      secretAccessKey: config.R2_SECRET_ACCESS_KEY,
-      bucket: config.R2_BUCKET_NAME,
-      endpoint: `https://${config.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      accessKeyId: config.R2_MEDIA_ACCESS_KEY_ID,
+      secretAccessKey: config.R2_MEDIA_SECRET_ACCESS_KEY,
+      bucket: config.R2_MEDIA_BUCKET_NAME,
+      endpoint: `https://${config.R2_MEDIA_ACCOUNT_ID}.r2.cloudflarestorage.com`,
     });
   }
 

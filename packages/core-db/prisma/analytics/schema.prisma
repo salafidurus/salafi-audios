@@ -9,6 +9,15 @@ datasource db {
   schemas  = ["analytics"]
 }
 
+enum AnalyticsExportRunStatus {
+  pending
+  processing
+  completed
+  failed
+
+  @@schema("analytics")
+}
+
 /// Immutable product-event archive owned by the analytics database.
 model AnalyticsEvent {
   eventId              String   @id @map("event_id")
@@ -32,6 +41,41 @@ model AnalyticsEvent {
   @@index([pseudonymousIdentity, occurredAt], map: "idx_analytics_identity_occurred_at")
   @@index([listingSlug, occurredAt], map: "idx_analytics_listing_occurred_at")
   @@index([scholarSlug, occurredAt], map: "idx_analytics_scholar_occurred_at")
+  @@index([receivedAt, eventId], map: "idx_analytics_event_received_cursor")
   @@map("analytics_events")
+  @@schema("analytics")
+}
+
+/// Durable state for one immutable, resumable R2 export.
+model AnalyticsExportRun {
+  id                  String                  @id @default(cuid())
+  parameterHash       String                  @unique @map("parameter_hash")
+  activationWatermark DateTime               @map("activation_watermark")
+  fromReceivedAt      DateTime               @map("from_received_at")
+  toReceivedAt        DateTime               @map("to_received_at")
+  formatVersion       String                 @map("format_version")
+  datasetVersion      String                 @map("dataset_version")
+  status              AnalyticsExportRunStatus @default(pending)
+  cursorReceivedAt    DateTime?              @map("cursor_received_at")
+  cursorEventId       String?                @map("cursor_event_id")
+  nextPart            Int                    @default(0) @map("next_part")
+  manifest            Json?
+  claimedAt           DateTime?              @map("claimed_at")
+  lastError           String?                @map("last_error")
+  createdAt           DateTime               @default(now()) @map("created_at")
+  updatedAt           DateTime               @updatedAt @map("updated_at")
+
+  @@index([status, claimedAt], map: "idx_analytics_export_run_lease")
+  @@map("analytics_export_runs")
+  @@schema("analytics")
+}
+
+/// The durable first-activation boundary; events received before it are never backfilled.
+model AnalyticsExportActivation {
+  id        String   @id
+  activatedAt DateTime @map("activated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("analytics_export_activation")
   @@schema("analytics")
 }
