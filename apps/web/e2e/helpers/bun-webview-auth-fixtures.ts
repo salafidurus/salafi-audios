@@ -106,7 +106,10 @@ export async function installAuthFixtures(
   options: AuthFixtureOptions = {},
 ): Promise<() => Promise<void>> {
   const apiOrigin = new URL(
-    options.apiOrigin ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000",
+    options.apiOrigin ??
+      process.env.BUN_E2E_API_ORIGIN ??
+      process.env.NEXT_PUBLIC_API_URL ??
+      "http://localhost:4000",
   ).origin;
   const role = options.role;
   const sessionDelayMs = options.sessionDelayMs ?? 0;
@@ -119,62 +122,75 @@ export async function installAuthFixtures(
 
   const apiUrl = new URL(apiOrigin);
   if (apiUrl.port !== "" && (apiUrl.hostname === "localhost" || apiUrl.hostname === "127.0.0.1")) {
-    fixtureServer = Bun.serve({
-      port: Number(apiUrl.port || 80),
-      reusePort: true,
-      async fetch(request) {
-        const url = new URL(request.url);
-        const fixtureRole = request.headers.get("x-e2e-auth-role");
-        const fixtureSession = isAuthRole(fixtureRole) ? sessionFor(fixtureRole) : session;
-        const fixtureProfileRole = isAuthRole(fixtureRole) ? fixtureRole : role;
-        const fixtureSessionStatus =
-          request.headers.get("x-e2e-session-status") === "500" ? 500 : sessionStatus;
-        const fixtureSignOutStatus =
-          request.headers.get("x-e2e-sign-out-status") === "500" ? 500 : signOutStatus;
+    try {
+      fixtureServer = Bun.serve({
+        port: Number(apiUrl.port || 80),
+        reusePort: true,
+        async fetch(request) {
+          const url = new URL(request.url);
+          const fixtureRole = request.headers.get("x-e2e-auth-role");
+          const fixtureSession = isAuthRole(fixtureRole) ? sessionFor(fixtureRole) : session;
+          const fixtureProfileRole = isAuthRole(fixtureRole) ? fixtureRole : role;
+          const fixtureSessionStatus =
+            request.headers.get("x-e2e-session-status") === "500" ? 500 : sessionStatus;
+          const fixtureSignOutStatus =
+            request.headers.get("x-e2e-sign-out-status") === "500" ? 500 : signOutStatus;
 
-        if (request.method === "OPTIONS") return localJsonResponse({}, 204, webOrigin);
-        if (url.pathname === "/api/auth/get-session") {
-          if (sessionDelayMs > 0) await Bun.sleep(sessionDelayMs);
-          return localJsonResponse(
-            fixtureSessionStatus === 200
-              ? fixtureSession
-              : { error: { message: "Provider failed" } },
-            fixtureSessionStatus,
-            webOrigin,
-          );
-        }
-        if (url.pathname === "/api/auth/sign-out") {
-          return localJsonResponse(
-            fixtureSignOutStatus === 200
-              ? { success: true }
-              : { error: { message: "Provider failed" } },
-            fixtureSignOutStatus,
-            webOrigin,
-          );
-        }
-        if (url.pathname === endpoints.account.profile && fixtureProfileRole) {
-          const user = users[fixtureProfileRole];
-          return localJsonResponse(
-            {
-              ...user,
-              avatarUrl: null,
-              displayName: user.name,
-              emailVerified: true,
-              roles: fixtureProfileRole === "superadmin" ? ["superadmin"] : [],
-              rules: rules[fixtureProfileRole],
-              createdAt: "2026-01-01T00:00:00.000Z",
-              updatedAt: "2026-01-01T00:00:00.000Z",
-            },
-            200,
-            webOrigin,
-          );
-        }
-        if (url.pathname === endpoints.admin.users.list) {
-          return localJsonResponse({ users: [], nextCursor: null, hasMore: false }, 200, webOrigin);
-        }
-        return localJsonResponse({}, 404, webOrigin);
-      },
-    });
+          if (request.method === "OPTIONS") return localJsonResponse({}, 204, webOrigin);
+          if (url.pathname === "/api/auth/get-session") {
+            if (sessionDelayMs > 0) await Bun.sleep(sessionDelayMs);
+            return localJsonResponse(
+              fixtureSessionStatus === 200
+                ? fixtureSession
+                : { error: { message: "Provider failed" } },
+              fixtureSessionStatus,
+              webOrigin,
+            );
+          }
+          if (url.pathname === "/api/auth/sign-out") {
+            return localJsonResponse(
+              fixtureSignOutStatus === 200
+                ? { success: true }
+                : { error: { message: "Provider failed" } },
+              fixtureSignOutStatus,
+              webOrigin,
+            );
+          }
+          if (url.pathname === endpoints.account.profile && fixtureProfileRole) {
+            const user = users[fixtureProfileRole];
+            return localJsonResponse(
+              {
+                ...user,
+                avatarUrl: null,
+                displayName: user.name,
+                emailVerified: true,
+                roles: fixtureProfileRole === "superadmin" ? ["superadmin"] : [],
+                rules: rules[fixtureProfileRole],
+                createdAt: "2026-01-01T00:00:00.000Z",
+                updatedAt: "2026-01-01T00:00:00.000Z",
+              },
+              200,
+              webOrigin,
+            );
+          }
+          if (url.pathname === endpoints.admin.users.list) {
+            return localJsonResponse(
+              { users: [], nextCursor: null, hasMore: false },
+              200,
+              webOrigin,
+            );
+          }
+          return localJsonResponse({}, 404, webOrigin);
+        },
+      });
+    } catch (error) {
+      // SAFETY: Bun listen failures expose a string `code` field when a port is occupied.
+      const errorCode = (error as { code?: string }).code;
+      const message = error instanceof Error ? error.message : String(error);
+      if (errorCode !== "EADDRINUSE" && !message.includes("EADDRINUSE")) throw error;
+      // The CDP Fetch interception below can fulfill these requests without
+      // owning the port when the real development API is already running.
+    }
     await journey.view.cdp("Network.setExtraHTTPHeaders", {
       headers: {
         "x-e2e-auth-role": role ?? "anonymous",
