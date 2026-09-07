@@ -6,24 +6,44 @@ import type { ScholarListItemDto } from "@sd/core-contracts";
 import Image from "next/image";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useViewableImpression } from "@/shared/hooks/use-viewable-impression";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import styles from "./scholar-grid-card.module.css";
+
+const noop = () => undefined;
 
 /** Scholar summary and navigation callback for one Explore grid card. */
 export type ScholarGridCardProps = {
   scholar: ScholarListItemDto;
   onPress?: (slug: string) => void;
+  onImpression?: () => void;
+  impressionKey?: string;
 };
 
 /** Renders a scholar avatar, localized identity, and optional detail navigation. */
-export function ScholarGridCard({ scholar, onPress }: ScholarGridCardProps) {
+// eslint-disable-next-line complexity -- the card's optional localized metadata and observer boundary are presentation concerns.
+export function ScholarGridCard({
+  scholar,
+  onPress,
+  onImpression,
+  impressionKey,
+}: ScholarGridCardProps) {
   const { t } = useTranslation();
   const formatScholarName = useFormatScholarName();
   const formattedName = formatScholarName(scholar);
+  const impressionRef = useViewableImpression<HTMLButtonElement>({
+    identityKey: impressionKey ?? `scholar:${scholar.slug}`,
+    onImpression: onImpression ?? noop,
+  });
 
   return (
-    <button type="button" className={styles.card} onClick={() => onPress?.(scholar.slug)}>
+    <button
+      ref={impressionRef}
+      type="button"
+      className={styles.card}
+      onClick={() => onPress?.(scholar.slug)}
+    >
       <span className={styles.avatarRing}>
         <span className={styles.avatar}>
           {scholar.imageUrl ? (

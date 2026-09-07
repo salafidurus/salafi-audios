@@ -42,7 +42,7 @@ export const ProductEventContextSchema = z.strictObject({
   lifecycle_state: z.enum(["active", "background", "inactive"]).optional(),
   recommendation: z
     .strictObject({
-      request_id: z.string().min(1),
+      request_id: z.string().min(1).optional(),
       surface: z.string().min(1),
       position: z.number().int().nonnegative(),
       candidate_set_id: z.string().min(1),
@@ -100,9 +100,88 @@ const CommonEventFields = {
   priority: ProductEventPrioritySchema,
 };
 
+const ClientEventFields = {
+  ...CommonEventFields,
+  source: ClientSourceSchema,
+  platform: ClientPlatformSchema,
+  authority: z.literal("client_observation"),
+  producer: ClientProducerSchema,
+};
+
+const ListingContentReferencesSchema = z.strictObject({
+  listing_slug: z.string().min(1),
+  scholar_slug: z.string().min(1),
+});
+const ScholarContentReferencesSchema = z.strictObject({ scholar_slug: z.string().min(1) });
+const DiscoveryContentReferencesSchema = z.strictObject({
+  listing_slug: z.string().min(1).optional(),
+  scholar_slug: z.string().min(1).optional(),
+});
+const EmptyClientPropertiesSchema = z.strictObject({});
+const SearchSubmittedPropertiesSchema = z.strictObject({
+  search_id: z.string().min(1),
+  query_length: z.number().int().nonnegative(),
+  filter_slugs: z.array(z.string().min(1)).optional(),
+});
+const SearchResultSelectedPropertiesSchema = z.strictObject({
+  search_id: z.string().min(1),
+  position: z.number().int().nonnegative(),
+});
+
+function createListingClientEventSchema(eventName: "listing_impression" | "listing_clicked") {
+  return z.strictObject({
+    ...ClientEventFields,
+    event_name: z.literal(eventName),
+    content_references: ListingContentReferencesSchema,
+    properties: EmptyClientPropertiesSchema,
+  });
+}
+
+function createScholarClientEventSchema(
+  eventName: "scholar_impression" | "scholar_clicked" | "scholar_viewed",
+) {
+  return z.strictObject({
+    ...ClientEventFields,
+    event_name: z.literal(eventName),
+    content_references: ScholarContentReferencesSchema,
+    properties: EmptyClientPropertiesSchema,
+  });
+}
+
+const ExploreOpenedEventSchema = z.strictObject({
+  ...ClientEventFields,
+  event_name: z.literal("explore_opened"),
+  content_references: z.strictObject({}),
+  properties: EmptyClientPropertiesSchema,
+});
+const RecommendationImpressionEventSchema = z.strictObject({
+  ...ClientEventFields,
+  event_name: z.literal("recommendation_impression"),
+  content_references: DiscoveryContentReferencesSchema,
+  properties: EmptyClientPropertiesSchema,
+});
+const RecommendationClickedEventSchema = z.strictObject({
+  ...ClientEventFields,
+  event_name: z.literal("recommendation_clicked"),
+  content_references: DiscoveryContentReferencesSchema,
+  properties: EmptyClientPropertiesSchema,
+});
+const SearchSubmittedEventSchema = z.strictObject({
+  ...ClientEventFields,
+  event_name: z.literal("search_submitted"),
+  content_references: z.strictObject({}),
+  properties: SearchSubmittedPropertiesSchema,
+});
+const SearchResultSelectedEventSchema = z.strictObject({
+  ...ClientEventFields,
+  event_name: z.literal("search_result_selected"),
+  content_references: DiscoveryContentReferencesSchema,
+  properties: SearchResultSelectedPropertiesSchema,
+});
+
 /** Typed client-owned observation of a listing being viewed. */
 const ListingViewedEventSchema = z.strictObject({
-  ...CommonEventFields,
+  ...ClientEventFields,
   event_name: z.literal("listing_viewed"),
   source: ClientSourceSchema,
   platform: ClientPlatformSchema,
@@ -256,8 +335,18 @@ const ScholarUnfollowedEventSchema = z.strictObject({
 
 /** The provider-neutral, immutable event union shared by future producers. */
 export const ProductEventSchema = z
-  .discriminatedUnion("event_name", [
+  .union([
+    ExploreOpenedEventSchema,
+    createListingClientEventSchema("listing_impression"),
+    createScholarClientEventSchema("scholar_impression"),
+    RecommendationImpressionEventSchema,
+    createListingClientEventSchema("listing_clicked"),
+    createScholarClientEventSchema("scholar_clicked"),
+    RecommendationClickedEventSchema,
     ListingViewedEventSchema,
+    createScholarClientEventSchema("scholar_viewed"),
+    SearchSubmittedEventSchema,
+    SearchResultSelectedEventSchema,
     NativeLifecycleEventSchema,
     AudioCompletedEventSchema,
     UserRegisteredEventSchema,
@@ -271,7 +360,7 @@ export const ProductEventSchema = z
   ])
   .superRefine((event, context) => {
     const runtime =
-      event.event_name === "listing_viewed"
+      event.authority === "client_observation"
         ? `${event.source}:${event.platform}:${event.producer}`
         : null;
     const validClientRuntimes = new Set([

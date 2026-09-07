@@ -267,6 +267,73 @@ describe("canonical product-event contract", () => {
     expect(result.success).toBe(true);
   });
 
+  it("accepts discovery event names and recommendation context without a request id", () => {
+    const clientEnvelope = {
+      schema_version: "v1",
+      occurred_at: "2026-09-07T12:00:00.000Z",
+      source: "web" as const,
+      platform: "web" as const,
+      app_version: "web-0.1.0",
+      consent_state: "essential" as const,
+      identity,
+      event_context: {
+        session_id: "session-123",
+        source_surface: "explore",
+        recommendation: {
+          surface: "explore",
+          position: 0,
+          candidate_set_id: "batch-123",
+          recommendation_source: "deterministic_recent",
+        },
+      },
+      content_references: {
+        listing_slug: "foundations-of-tawheed",
+        scholar_slug: "salih-al-fawzan",
+      },
+      priority: "best_effort" as const,
+      authority: "client_observation" as const,
+      producer: "web" as const,
+    };
+
+    const eventNames = [
+      "explore_opened",
+      "listing_impression",
+      "scholar_impression",
+      "recommendation_impression",
+      "listing_clicked",
+      "scholar_clicked",
+      "recommendation_clicked",
+      "listing_viewed",
+      "scholar_viewed",
+      "search_submitted",
+      "search_result_selected",
+    ] as const;
+
+    for (const [index, eventName] of eventNames.entries()) {
+      const result = ProductEventSchema.safeParse({
+        ...clientEnvelope,
+        event_id: `discovery-${index}`,
+        event_name: eventName,
+        content_references:
+          eventName === "scholar_impression" ||
+          eventName === "scholar_clicked" ||
+          eventName === "scholar_viewed"
+            ? { scholar_slug: "salih-al-fawzan" }
+            : eventName === "explore_opened" || eventName === "search_submitted"
+              ? {}
+              : clientEnvelope.content_references,
+        properties:
+          eventName === "search_submitted"
+            ? { search_id: "search-123", query_length: 4, filter_slugs: ["aqeedah"] }
+            : eventName === "search_result_selected"
+              ? { search_id: "search-123", position: 0 }
+              : {},
+      });
+
+      expect(result.success).toBe(true);
+    }
+  });
+
   it("rejects forbidden personal and exact-location properties", () => {
     const result = ProductEventSchema.safeParse({
       event_id: "event-forbidden",

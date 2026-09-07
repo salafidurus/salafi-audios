@@ -1,5 +1,9 @@
 /** Creates provider-neutral web analytics events and queues them for delivery. */
-import { parseProductEvent, type CanonicalProductEvent } from "@sd/core-analytics";
+import {
+  parseProductEvent,
+  type CanonicalProductEvent,
+  type ProductEventContext,
+} from "@sd/core-analytics";
 
 import { hasWindow } from "@/shared/lib/runtime-guards";
 
@@ -28,6 +32,37 @@ export interface WebAnalyticsContentReferences {
 /** Listing and scholar identities attached to player observations. */
 export type WebAudioAnalyticsReferences = WebAnalyticsContentReferences;
 
+/** Recommendation context supplied by an API-owned discovery batch. */
+export interface WebRecommendationAnalyticsContext {
+  readonly surface: string;
+  readonly position: number;
+  readonly candidate_set_id: string;
+  /** Backend-owned reason or strategy label for the candidate set. */
+  readonly recommendation_source: string;
+  readonly request_id?: string;
+  /** Optional backend algorithm revision used to reproduce an exposure. */
+  readonly algorithm_version?: string;
+  readonly experiment_id?: string;
+  /** Optional boolean treatment assignments; values contain no user identity. */
+  readonly feature_flag_state?: Record<string, boolean>;
+}
+
+/** Search identity and privacy-safe context used by search observations. */
+export interface WebSearchAnalyticsContext {
+  readonly search_id: string;
+  readonly query_length: number;
+  /** Topic slugs selected when the search request was submitted. */
+  readonly filter_slugs?: string[];
+}
+
+type DiscoveryEventProperties = {
+  readonly search_id?: string;
+  readonly query_length?: number;
+  /** Topic filter identities selected for the privacy-safe search event. */
+  readonly filter_slugs?: string[];
+  readonly position?: number;
+};
+
 /** Browser dependencies used by the recorder, injectable for deterministic tests. */
 export interface WebAnalyticsRuntime {
   readonly now?: () => number;
@@ -41,6 +76,32 @@ export interface WebAnalyticsRuntime {
 
 /** Recorder boundary for browser product observations. */
 export interface WebAnalyticsRecorder {
+  readonly recordExploreOpened: () => void;
+  readonly recordListingImpression: (
+    references: WebAnalyticsContentReferences,
+    recommendation?: WebRecommendationAnalyticsContext,
+  ) => void;
+  readonly recordScholarImpression: (
+    scholar_slug: string,
+    recommendation?: WebRecommendationAnalyticsContext,
+  ) => void;
+  readonly recordRecommendationImpression: (
+    references: Partial<WebAnalyticsContentReferences>,
+    recommendation: WebRecommendationAnalyticsContext,
+  ) => void;
+  readonly recordListingClicked: (references: WebAnalyticsContentReferences) => void;
+  readonly recordScholarClicked: (scholar_slug: string) => void;
+  readonly recordRecommendationClicked: (
+    references: Partial<WebAnalyticsContentReferences>,
+    recommendation?: WebRecommendationAnalyticsContext,
+  ) => void;
+  readonly recordScholarViewed: (scholar_slug: string) => void;
+  readonly recordSearchSubmitted: (context: WebSearchAnalyticsContext) => void;
+  readonly recordSearchResultSelected: (
+    references: Partial<WebAnalyticsContentReferences>,
+    search_id: string,
+    position: number,
+  ) => void;
   readonly recordListingViewed: (references: WebAnalyticsContentReferences) => void;
   readonly recordAudioStarted: (references: WebAudioAnalyticsReferences) => void;
   readonly recordAudioMilestone: (
@@ -81,8 +142,114 @@ export function createWebAnalyticsRecorder(
 ): WebAnalyticsRecorder {
   const now = runtime.now ?? Date.now;
   const storage = runtime.storage;
+  const impressionKeys = new Set<string>();
+
+  // oxlint-disable-next-line complexity -- This is the single provider-neutral construction boundary for the approved discovery event catalog.
+  function recordDiscoveryEvent(
+    eventName:
+      | "explore_opened"
+      | "listing_impression"
+      | "scholar_impression"
+      | "recommendation_impression"
+      | "listing_clicked"
+      | "scholar_clicked"
+      | "recommendation_clicked"
+      | "scholar_viewed"
+      | "search_submitted"
+      | "search_result_selected",
+    contentReferences: Partial<WebAnalyticsContentReferences>,
+    properties: DiscoveryEventProperties,
+    recommendation?: WebRecommendationAnalyticsContext,
+    dedupeKey?: string,
+  ) {
+    if (dedupeKey && impressionKeys.has(dedupeKey)) return;
+    if (dedupeKey) impressionKeys.add(dedupeKey);
+    const eventContext: ProductEventContext = {
+      interface_language: runtime.language?.() || undefined,
+      timezone: runtime.timezone?.() || undefined,
+      session_id: getOrCreate(storage, SESSION_ID_KEY, "session"),
+      source_surface: recommendation?.surface ?? "discovery",
+    };
+    if (recommendation) eventContext.recommendation = recommendation;
+    // SAFETY: eventName is restricted to the approved discovery schemas and the parser validates the runtime payload before enqueueing.
+    const event: CanonicalProductEvent = parseProductEvent({
+      event_id: id("event"),
+      event_name: eventName,
+      schema_version: "v1",
+      occurred_at: new Date(now()).toISOString(),
+      app_version: `web-${webPackage.version}`,
+      source: "web",
+      platform: "web",
+      consent_state: "optional_granted",
+      identity: {
+        type: "anonymous",
+        anonymous_id: getOrCreate(storage, ANONYMOUS_ID_KEY, "anonymous"),
+      },
+      event_context: eventContext,
+      content_references: contentReferences,
+      authority: "client_observation",
+      producer: "web",
+      priority: "best_effort",
+      properties,
+    } as Parameters<typeof parseProductEvent>[0]);
+    if (buffer.enqueue(event)) runtime.onRecorded?.();
+  }
 
   return {
+    recordExploreOpened() {
+      recordDiscoveryEvent("explore_opened", {}, {}, undefined, "explore_opened");
+    },
+    recordListingImpression(references, recommendation) {
+      recordDiscoveryEvent(
+        "listing_impression",
+        references,
+        {},
+        recommendation,
+        `listing_impression:${references.listing_slug}:${recommendation?.candidate_set_id ?? ""}:${recommendation?.position ?? ""}`,
+      );
+    },
+    recordScholarImpression(scholar_slug, recommendation) {
+      recordDiscoveryEvent(
+        "scholar_impression",
+        { scholar_slug },
+        {},
+        recommendation,
+        `scholar_impression:${scholar_slug}:${recommendation?.candidate_set_id ?? ""}:${recommendation?.position ?? ""}`,
+      );
+    },
+    recordRecommendationImpression(references, recommendation) {
+      recordDiscoveryEvent(
+        "recommendation_impression",
+        references,
+        {},
+        recommendation,
+        `recommendation_impression:${references.listing_slug ?? references.scholar_slug ?? ""}:${recommendation.candidate_set_id}:${recommendation.position}`,
+      );
+    },
+    recordListingClicked(references) {
+      recordDiscoveryEvent("listing_clicked", references, {});
+    },
+    recordScholarClicked(scholar_slug) {
+      recordDiscoveryEvent("scholar_clicked", { scholar_slug }, {});
+    },
+    recordRecommendationClicked(references, recommendation) {
+      recordDiscoveryEvent("recommendation_clicked", references, {}, recommendation);
+    },
+    recordScholarViewed(scholar_slug) {
+      recordDiscoveryEvent("scholar_viewed", { scholar_slug }, {});
+    },
+    recordSearchSubmitted(context) {
+      recordDiscoveryEvent(
+        "search_submitted",
+        {},
+        context,
+        undefined,
+        `search_submitted:${context.search_id}`,
+      );
+    },
+    recordSearchResultSelected(references, search_id, position) {
+      recordDiscoveryEvent("search_result_selected", references, { search_id, position });
+    },
     recordListingViewed(references) {
       const event: CanonicalProductEvent = parseProductEvent({
         event_id: id("event"),
@@ -98,8 +265,8 @@ export function createWebAnalyticsRecorder(
           anonymous_id: getOrCreate(storage, ANONYMOUS_ID_KEY, "anonymous"),
         },
         event_context: {
-          interface_language: runtime.language?.(),
-          timezone: runtime.timezone?.(),
+          interface_language: runtime.language?.() || undefined,
+          timezone: runtime.timezone?.() || undefined,
           session_id: getOrCreate(storage, SESSION_ID_KEY, "session"),
           source_surface: "listing_detail",
         },

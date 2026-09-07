@@ -28,6 +28,24 @@ Recommendation exposure context is represented as metadata—request, surface,
 position, candidate set, source, algorithm, experiment, and feature flags—without
 coupling the contract to a recommendation implementation.
 
+The discovery vocabulary is specialized and shared by web and native clients:
+`explore_opened`, `listing_impression`, `scholar_impression`,
+`recommendation_impression`, `listing_clicked`, `scholar_clicked`,
+`recommendation_clicked`, `listing_viewed`, `scholar_viewed`,
+`search_submitted`, and `search_result_selected`. Clients do not emit a second
+generic event for the same observation.
+
+An impression is recorded only when at least 50% of the item remains visible for
+one continuous second. Each client deduplicates an impression within the
+session by event name, surface, public content slug, candidate-set identity,
+and position. Recommendation `request_id` is optional: unavailable request
+identifiers are omitted rather than fabricated.
+
+Search submission records an opaque `search_id`, normalized query length, and
+selected topic slugs. Raw query text, keystrokes, and result text are never
+part of the event. Result selection records the same `search_id`, public
+listing identity, and result position.
+
 ## Consequences
 
 - Mixpanel and future sinks consume the canonical value through adapters and

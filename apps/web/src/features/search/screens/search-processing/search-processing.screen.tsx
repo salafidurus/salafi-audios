@@ -3,8 +3,9 @@
 
 import { getLocalizedName } from "@sd/core-i18n";
 import { useInfiniteSearch, useTopicsList } from "@sd/domain-search";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 
+import { webAnalytics } from "@/core/analytics";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { LectureRow } from "@/features/home/components/lecture-row/lecture-row";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
@@ -103,6 +104,10 @@ function getSearchItems(data: ReturnType<typeof useInfiniteSearch>["data"]) {
   return data?.pages.flatMap((page) => page.items) ?? [];
 }
 
+function createSearchId(): string {
+  return `search-${globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`}`;
+}
+
 /**
  * Renders debounced lecture search with localized topic filters and paginated
  * results. The URL-provided values seed local state; subsequent input remains
@@ -115,6 +120,7 @@ export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessin
   const { query, setQuery, debouncedQuery } = useDebouncedSearch({ initialValue: searchKey });
   const { data: topics = [] } = useTopicsList();
   const [filter, setFilter] = useState<string[]>(topicSlug ? [topicSlug] : []);
+  const searchIds = useRef(new Map<string, string>());
 
   const filterChips = useMemo(() => {
     return topics
@@ -145,8 +151,34 @@ export function SearchProcessingScreen({ searchKey, topicSlug }: SearchProcessin
   });
 
   const allItems = getSearchItems(data);
+  const normalizedQuery = debouncedQuery.trim();
+  const searchKeyValue = `${normalizedQuery}\u0000${filter.toSorted().join(",")}`;
+  const searchId = normalizedQuery
+    ? (searchIds.current.get(searchKeyValue) ??
+      (() => {
+        const next = createSearchId();
+        searchIds.current.set(searchKeyValue, next);
+        return next;
+      })())
+    : undefined;
+
+  useEffect(() => {
+    if (!searchId) return;
+    webAnalytics.recordSearchSubmitted({
+      search_id: searchId,
+      query_length: normalizedQuery.length,
+      filter_slugs: filter.length ? filter : undefined,
+    });
+  }, [filter, normalizedQuery, searchId]);
 
   const handleItemPress = (slug: string) => {
+    if (searchId) {
+      webAnalytics.recordSearchResultSelected(
+        { listing_slug: slug },
+        searchId,
+        allItems.findIndex((item) => item.slug === slug),
+      );
+    }
     navigateToListing(slug);
   };
 

@@ -13,8 +13,9 @@ import { pickContentField } from "@sd/core-i18n";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
+import { webAnalytics } from "@/core/analytics";
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScholarHeader } from "@/features/details/components/scholar/scholar-header/scholar-header";
@@ -281,6 +282,7 @@ function ScholarLoadedView({
 }
 
 /** Coordinates scholar loading, topic filtering, search, and listing navigation. */
+// eslint-disable-next-line complexity -- the screen coordinates existing query, follow, and analytics lifecycle boundaries.
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
@@ -328,6 +330,10 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   };
 
   const scholarState = getScholarState(isScholarError, isFetchingScholar, Boolean(scholar));
+  useEffect(() => {
+    if (scholar) webAnalytics.recordScholarViewed(scholar.slug);
+  }, [scholar?.slug]);
+
   if (scholarState !== "ready") {
     return (
       <ScholarState
@@ -344,6 +350,10 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const rawItems = selectTopicItems(contentData?.items ?? [], topicsData?.topics, selectedTopicId);
   const query = searchQuery.trim().toLowerCase();
   const filteredItems = filterTopicItems(rawItems, query, showOriginal);
+  const handleNavigateToListing = (listingSlug: string) => {
+    webAnalytics.recordListingClicked({ listing_slug: listingSlug, scholar_slug: scholar.slug });
+    navigateToListing(listingSlug);
+  };
 
   return (
     <ScholarLoadedView
@@ -355,7 +365,7 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
       showOriginal={showOriginal}
       onSearchChange={setSearchQuery}
       onTopicChange={handleChipChange}
-      onNavigateToListing={navigateToListing}
+      onNavigateToListing={handleNavigateToListing}
       onFollow={handleFollow}
       following={followQuery.data?.following}
       t={t}

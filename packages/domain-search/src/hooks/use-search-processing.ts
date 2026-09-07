@@ -61,6 +61,7 @@ export function useSearchProcessing({
 
   return {
     query,
+    debouncedQuery,
     setQuery,
     filter,
     setFilter,
