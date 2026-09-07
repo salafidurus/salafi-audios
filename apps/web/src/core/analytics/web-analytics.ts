@@ -25,6 +25,9 @@ export interface WebAnalyticsContentReferences {
   readonly scholar_slug: string;
 }
 
+/** Listing and scholar identities attached to player observations. */
+export type WebAudioAnalyticsReferences = WebAnalyticsContentReferences;
+
 /** Browser dependencies used by the recorder, injectable for deterministic tests. */
 export interface WebAnalyticsRuntime {
   readonly now?: () => number;
@@ -39,6 +42,12 @@ export interface WebAnalyticsRuntime {
 /** Recorder boundary for browser product observations. */
 export interface WebAnalyticsRecorder {
   readonly recordListingViewed: (references: WebAnalyticsContentReferences) => void;
+  readonly recordAudioStarted: (references: WebAudioAnalyticsReferences) => void;
+  readonly recordAudioMilestone: (
+    references: WebAudioAnalyticsReferences,
+    milestone: 0.3 | 0.5 | 0.75,
+  ) => void;
+  readonly recordAudioCompletedObserved: (references: WebAudioAnalyticsReferences) => void;
   readonly withdrawConsent: () => void;
 }
 
@@ -102,6 +111,17 @@ export function createWebAnalyticsRecorder(
       });
       if (buffer.enqueue(event)) runtime.onRecorded?.();
     },
+    recordAudioStarted(references) {
+      recordAudioObservation(buffer, runtime, references, "audio_started", {});
+    },
+    recordAudioMilestone(references, milestone) {
+      recordAudioObservation(buffer, runtime, references, "audio_milestone", {
+        milestone_percent: milestone,
+      });
+    },
+    recordAudioCompletedObserved(references) {
+      recordAudioObservation(buffer, runtime, references, "audio_completed_observed", {});
+    },
     withdrawConsent() {
       const optionalIds: string[] = [];
       for (const entry of buffer.peek()) {
@@ -114,6 +134,44 @@ export function createWebAnalyticsRecorder(
       storage?.removeItem(SESSION_ID_KEY);
     },
   };
+}
+
+function recordAudioObservation(
+  buffer: Pick<AnalyticsBuffer, "enqueue">,
+  runtime: WebAnalyticsRuntime,
+  references: WebAudioAnalyticsReferences,
+  eventName: "audio_started" | "audio_milestone" | "audio_completed_observed",
+  properties: { milestone_percent?: 0.3 | 0.5 | 0.75 },
+): void {
+  const eventProperties =
+    eventName === "audio_milestone"
+      ? { milestone_percent: properties.milestone_percent ?? 0.3 }
+      : {};
+  // SAFETY: eventName is restricted to the three schemas below and milestone properties are selected by that discriminator.
+  const event = parseProductEvent({
+    event_id: id("event"),
+    event_name: eventName,
+    schema_version: "v1",
+    occurred_at: new Date((runtime.now ?? Date.now)()).toISOString(),
+    app_version: `web-${webPackage.version}`,
+    source: "web",
+    platform: "web",
+    consent_state: "optional_granted",
+    identity: {
+      type: "anonymous",
+      anonymous_id: getOrCreate(runtime.storage, ANONYMOUS_ID_KEY, "anonymous"),
+    },
+    event_context: {
+      session_id: getOrCreate(runtime.storage, SESSION_ID_KEY, "session"),
+      source_surface: "audio_player",
+    },
+    content_references: references,
+    authority: "client_observation",
+    producer: "web",
+    priority: "best_effort",
+    properties: eventProperties,
+  } as Parameters<typeof parseProductEvent>[0]);
+  if (buffer.enqueue(event)) runtime.onRecorded?.();
 }
 
 /** Process-wide web queue shared by feature observers and lifecycle flushing. */

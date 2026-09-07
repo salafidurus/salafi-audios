@@ -183,6 +183,77 @@ const ListingUnsavedEventSchema = z.strictObject({
   properties: BackendOutcomePropertiesSchema,
 });
 
+/** Typed client observation emitted when playback meaningfully starts. */
+const AudioStartedEventSchema = z.strictObject({
+  ...CommonEventFields,
+  event_name: z.literal("audio_started"),
+  source: ClientSourceSchema,
+  platform: ClientPlatformSchema,
+  content_references: z.strictObject({
+    listing_slug: z.string().min(1),
+    scholar_slug: z.string().min(1),
+  }),
+  authority: z.literal("client_observation"),
+  producer: ClientProducerSchema,
+  properties: z.strictObject({}),
+});
+
+/** Typed client observation emitted once per meaningful listening milestone. */
+const AudioMilestoneEventSchema = z.strictObject({
+  ...CommonEventFields,
+  event_name: z.literal("audio_milestone"),
+  source: ClientSourceSchema,
+  platform: ClientPlatformSchema,
+  content_references: z.strictObject({
+    listing_slug: z.string().min(1),
+    scholar_slug: z.string().min(1),
+  }),
+  authority: z.literal("client_observation"),
+  producer: ClientProducerSchema,
+  properties: z.strictObject({
+    milestone_percent: z.union([z.literal(0.3), z.literal(0.5), z.literal(0.75)]),
+  }),
+});
+
+/** Typed client observation emitted when the player reaches natural completion. */
+const AudioCompletedObservedEventSchema = z.strictObject({
+  ...CommonEventFields,
+  event_name: z.literal("audio_completed_observed"),
+  source: ClientSourceSchema,
+  platform: ClientPlatformSchema,
+  content_references: z.strictObject({
+    listing_slug: z.string().min(1),
+    scholar_slug: z.string().min(1),
+  }),
+  authority: z.literal("client_observation"),
+  producer: ClientProducerSchema,
+  properties: z.strictObject({}),
+});
+
+/** Typed backend-confirmed transition for a scholar becoming followed. */
+const ScholarFollowedEventSchema = z.strictObject({
+  ...CommonEventFields,
+  event_name: z.literal("scholar_followed"),
+  source: z.literal("api"),
+  platform: BackendPlatformSchema,
+  content_references: z.strictObject({ scholar_slug: z.string().min(1) }),
+  authority: z.literal("backend_confirmed"),
+  producer: z.literal("api"),
+  properties: BackendOutcomePropertiesSchema,
+});
+
+/** Typed backend-confirmed transition for a scholar becoming unfollowed. */
+const ScholarUnfollowedEventSchema = z.strictObject({
+  ...CommonEventFields,
+  event_name: z.literal("scholar_unfollowed"),
+  source: z.literal("api"),
+  platform: BackendPlatformSchema,
+  content_references: z.strictObject({ scholar_slug: z.string().min(1) }),
+  authority: z.literal("backend_confirmed"),
+  producer: z.literal("api"),
+  properties: BackendOutcomePropertiesSchema,
+});
+
 /** The provider-neutral, immutable event union shared by future producers. */
 export const ProductEventSchema = z
   .discriminatedUnion("event_name", [
@@ -192,6 +263,11 @@ export const ProductEventSchema = z
     UserRegisteredEventSchema,
     ListingSavedEventSchema,
     ListingUnsavedEventSchema,
+    AudioStartedEventSchema,
+    AudioMilestoneEventSchema,
+    AudioCompletedObservedEventSchema,
+    ScholarFollowedEventSchema,
+    ScholarUnfollowedEventSchema,
   ])
   .superRefine((event, context) => {
     const runtime =

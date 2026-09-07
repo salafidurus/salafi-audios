@@ -16,6 +16,8 @@ export type ScholarHeaderProps = {
     /** Renders the native total duration seconds surface and coordinates its user-facing state. */
     totalDurationSeconds: number;
   };
+  following?: boolean;
+  onFollow?: () => void;
 };
 
 function openLink(url: string) {
@@ -64,7 +66,7 @@ function renderSocialLinks(scholar: ScholarHeaderProps["scholar"]) {
 }
 
 /** Renders the native scholar header surface and coordinates its user-facing state. */
-export function ScholarHeader({ scholar }: ScholarHeaderProps) {
+export function ScholarHeader({ scholar, following = false, onFollow }: ScholarHeaderProps) {
   const formatScholarName = useFormatScholarName();
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
 
@@ -89,6 +91,11 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
 
       {renderStats(scholar, totalHours)}
       {renderSocialLinks(scholar)}
+      {onFollow ? (
+        <Pressable onPress={onFollow} style={styles.followButton}>
+          <AppText variant="labelMd">{following ? "Following" : "Follow"}</AppText>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -130,5 +137,10 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     gap: theme.spacing.scale.md,
     marginTop: theme.spacing.scale.lg,
+  },
+  followButton: {
+    marginTop: theme.spacing.scale.lg,
+    paddingHorizontal: theme.spacing.scale.lg,
+    paddingVertical: theme.spacing.scale.sm,
   },
 }));

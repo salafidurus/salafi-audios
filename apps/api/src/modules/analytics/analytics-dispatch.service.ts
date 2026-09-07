@@ -17,7 +17,10 @@ import { TelemetryService } from '../../core/telemetry/telemetry.service';
 /** Analytics dispatch module coordinating durable intent claims, retries, and canonical archive delivery. */
 const MAX_ATTEMPTS = 5;
 const MAX_BACKOFF_MS = 60_000;
-const DispatchPayloadSchema = z.object({ listing_id: z.string().min(1).optional() });
+const DispatchPayloadSchema = z.object({
+  listing_id: z.string().min(1).optional(),
+  scholar_id: z.string().min(1).optional(),
+});
 
 @Injectable()
 /** Owns leased analytics intent delivery without making business requests depend on archive availability. */
@@ -91,6 +94,7 @@ export class AnalyticsDispatchService {
   private async translate(intent: ClaimedAnalyticsDispatchIntent): Promise<CanonicalProductEvent> {
     const payload = parseDispatchPayload(intent.payload);
     const listingId = payload.listing_id;
+    const scholarId = payload.scholar_id;
     const listing = listingId
       ? await this.prisma.listing.findUnique({
           where: { id: listingId },
@@ -98,7 +102,11 @@ export class AnalyticsDispatchService {
         })
       : null;
 
-    if (intent.eventName !== 'user_registered' && !listing) {
+    const scholar = scholarId
+      ? await this.prisma.scholar.findUnique({ where: { id: scholarId }, select: { slug: true } })
+      : null;
+
+    if (intent.eventName !== 'user_registered' && !listing && !scholar) {
       throw new Error(`analytics_dispatch_listing_missing:${listingId ?? 'unknown'}`);
     }
 
@@ -126,6 +134,17 @@ export class AnalyticsDispatchService {
         event_name: 'user_registered',
         content_references: {},
         priority: 'critical',
+        properties: {},
+      });
+    }
+
+    if (intent.eventName === 'scholar_followed' || intent.eventName === 'scholar_unfollowed') {
+      if (!scholar) throw new Error(`analytics_dispatch_scholar_missing:${scholarId ?? 'unknown'}`);
+      return parseProductEvent({
+        ...common,
+        event_name: intent.eventName,
+        content_references: { scholar_slug: scholar.slug },
+        priority: 'important',
         properties: {},
       });
     }

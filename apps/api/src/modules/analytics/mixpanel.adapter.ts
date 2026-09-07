@@ -120,7 +120,11 @@ function toMixpanelEvent(event: CanonicalProductEvent, environment: string): Mix
   addOptional(properties, 'content_language', context.content_language);
   addOptional(properties, 'audio_language', context.audio_language);
   addOptional(properties, 'country_code', context.country_code);
-  addOptional(properties, 'listing_slug', content.listing_slug);
+  addOptional(
+    properties,
+    'listing_slug',
+    'listing_slug' in content ? content.listing_slug : undefined,
+  );
   addOptional(properties, 'scholar_slug', content.scholar_slug);
   addOptional(properties, 'source_surface', context.source_surface);
   Object.assign(properties, event.properties);

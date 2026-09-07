@@ -58,8 +58,11 @@ export class AnalyticsRepository {
           appVersion: event.app_version,
           occurredAt: new Date(event.occurred_at),
           receivedAt,
-          listingSlug: event.content_references.listing_slug,
-          scholarSlug: event.content_references.scholar_slug,
+          listingSlug:
+            'listing_slug' in event.content_references
+              ? event.content_references.listing_slug
+              : null,
+          scholarSlug: event.content_references.scholar_slug ?? null,
           canonicalJson: event,
         })),
       });

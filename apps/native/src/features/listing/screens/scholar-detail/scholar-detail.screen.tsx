@@ -1,10 +1,13 @@
+import { endpoints, httpClient, type ScholarFollowDto } from "@sd/core-contracts";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react-native";
 import { useState, useCallback } from "react";
 import "react-native-reanimated";
 import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
 import { ScholarContentList } from "@/features/listing/components/scholar-content-list/scholar-content-list";
 import { ScholarHeader } from "@/features/listing/components/scholar-header/scholar-header";
 import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
@@ -87,7 +90,27 @@ function TopicSections({
 }
 
 /** Renders the native scholar detail screen surface and coordinates its user-facing state. */
+// eslint-disable-next-line complexity -- scholar loading and follow mutation are independent UI states.
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
+  const { isAuthenticated } = useAuth();
+  const followQuery = useQuery({
+    queryKey: ["scholar-follow", slug],
+    queryFn: () =>
+      httpClient<ScholarFollowDto>({ url: endpoints.scholars.followStatus(slug), method: "GET" }),
+    enabled: isAuthenticated,
+  });
+  const followMutation = useMutation({
+    mutationFn: (following: boolean) =>
+      httpClient<ScholarFollowDto>({
+        url: endpoints.scholars.follow(slug),
+        method: following ? "DELETE" : "POST",
+      }),
+    onSuccess: () => followQuery.refetch().catch(() => undefined),
+  });
+  const handleFollow = useCallback(() => {
+    if (!isAuthenticated || followMutation.isPending) return;
+    followMutation.mutate(followQuery.data?.following ?? false);
+  }, [followMutation, followQuery.data?.following, isAuthenticated]);
   const { data: scholar, isFetching: isScholarFetching } = useScholarDetail(slug);
   const { data: content, isFetching: isContentFetching } = useScholarContent(slug);
   const { data: topicsData } = useScholarTopics(slug);
@@ -112,7 +135,11 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   return (
     <ScreenView>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingVertical: 16 }}>
-        <ScholarHeader scholar={scholar} />
+        <ScholarHeader
+          scholar={scholar}
+          following={followQuery.data?.following}
+          onFollow={handleFollow}
+        />
         <View style={{ marginTop: 24 }}>
           <ScholarContentList items={content?.items ?? []} />
         </View>

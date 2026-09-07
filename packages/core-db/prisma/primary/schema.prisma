@@ -116,6 +116,7 @@ model User {
   // Content Management
   progress  UserListingProgress[]
   favorites FavoriteListing[]
+  scholarFollows ScholarFollow[]
 }
 
 /// Short-lived backend analytics delivery coordination; the permanent event archive is separate.
@@ -202,6 +203,7 @@ model Scholar {
   listings     Listing[]
   accessGrants UserAccessGrant[]
   translations ScholarTranslation[]
+  followers ScholarFollow[]
 
   @@unique([slug], map: "uq_scholar_slug")
   @@index([isActive], map: "idx_scholar_active")
@@ -378,6 +380,20 @@ model FavoriteListing {
   @@index([userId, createdAt], map: "idx_fav_user_createdat")
   @@index([userId, updatedAt], map: "idx_fav_user_updatedat")
   @@index([listingId], map: "idx_fav_listing")
+}
+
+model ScholarFollow {
+  userId    String
+  scholarId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scholar Scholar @relation(fields: [scholarId], references: [id], onDelete: Cascade)
+
+  @@id([userId, scholarId])
+  @@index([userId, updatedAt], map: "idx_scholar_follow_user_updatedat")
+  @@index([scholarId], map: "idx_scholar_follow_scholar")
 }
 
 //////////////////////////

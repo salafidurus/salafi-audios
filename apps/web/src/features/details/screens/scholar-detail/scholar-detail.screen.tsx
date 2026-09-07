@@ -5,13 +5,17 @@ import type {
   ScholarContentItemDto,
   ScholarDetailDto,
   ScholarDetailStats,
+  ScholarFollowDto,
 } from "@sd/core-contracts";
 
+import { endpoints, httpClient } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { useState, useMemo } from "react";
 
+import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScholarHeader } from "@/features/details/components/scholar/scholar-header/scholar-header";
 import { LectureRow } from "@/features/home/components/lecture-row/lecture-row";
@@ -163,6 +167,7 @@ type ScholarLoadedViewProps = {
   onTopicChange: (topicId: string) => void;
   onNavigateToListing: (slug: string) => void;
   onFollow: () => void;
+  following?: boolean;
   t: ReturnType<typeof useTranslation>["t"];
 };
 
@@ -177,6 +182,7 @@ function ScholarLoadedView({
   onTopicChange,
   onNavigateToListing,
   onFollow,
+  following,
   t,
 }: ScholarLoadedViewProps) {
   return (
@@ -195,7 +201,12 @@ function ScholarLoadedView({
               {t("scholars.backToScholars", "Back to Scholars")}
             </Button>
           </div>
-          <ScholarHeader scholar={scholar} onFollow={onFollow} layout="sidebar" />
+          <ScholarHeader
+            scholar={scholar}
+            following={following}
+            onFollow={onFollow}
+            layout="sidebar"
+          />
           <div className={styles.searchFilterWrapper}>
             <div className={styles.searchWrapper}>
               <Search.Bar
@@ -272,6 +283,7 @@ function ScholarLoadedView({
 /** Coordinates scholar loading, topic filtering, search, and listing navigation. */
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const showOriginal = useShowOriginalContent();
   const { navigateToListing } = useListingNavigation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -285,6 +297,20 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   } = useScholarDetail(slug);
   const { data: contentData } = useScholarContent(slug);
   const { data: topicsData } = useScholarTopics(slug);
+  const followQuery = useQuery({
+    queryKey: ["scholar-follow", slug],
+    queryFn: () =>
+      httpClient<ScholarFollowDto>({ url: endpoints.scholars.followStatus(slug), method: "GET" }),
+    enabled: isAuthenticated,
+  });
+  const followMutation = useMutation({
+    mutationFn: (following: boolean) =>
+      httpClient<ScholarFollowDto>({
+        url: endpoints.scholars.follow(slug),
+        method: following ? "DELETE" : "POST",
+      }),
+    onSuccess: () => followQuery.refetch().catch(() => undefined),
+  });
 
   const topicChips: FilterChip[] = useMemo(() => buildTopicChips(topicsData?.topics), [topicsData]);
 
@@ -297,7 +323,8 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   };
 
   const handleFollow = () => {
-    console.log(`Follow scholar: ${slug}`);
+    if (!isAuthenticated || followMutation.isPending) return;
+    followMutation.mutate(followQuery.data?.following ?? false);
   };
 
   const scholarState = getScholarState(isScholarError, isFetchingScholar, Boolean(scholar));
@@ -330,6 +357,7 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
       onTopicChange={handleChipChange}
       onNavigateToListing={navigateToListing}
       onFollow={handleFollow}
+      following={followQuery.data?.following}
       t={t}
     />
   );

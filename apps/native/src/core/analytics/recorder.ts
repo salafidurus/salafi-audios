@@ -1,3 +1,5 @@
+import type { Track } from "@sd/domain-audio";
+
 import { parseProductEvent, type CanonicalProductEvent } from "@sd/core-analytics";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
@@ -30,6 +32,9 @@ export type NativeAnalyticsRecorder = {
     lifecycleState: NativeAnalyticsLifecycleState,
     contentReferences?: NativeAnalyticsContentReferences,
   ) => Promise<void>;
+  recordAudioStarted: (track: Track) => Promise<void>;
+  recordAudioMilestone: (track: Track, milestone: 0.3 | 0.5 | 0.75) => Promise<void>;
+  recordAudioCompletedObserved: (track: Track) => Promise<void>;
 };
 
 function createEventId(now: () => number): string {
@@ -67,5 +72,48 @@ export function createNativeAnalyticsRecorder(
       });
       await buffer.enqueue(event);
     },
+    async recordAudioStarted(track) {
+      await recordAudioEvent(buffer, now, "audio_started", track, {});
+    },
+    async recordAudioMilestone(track, milestone) {
+      await recordAudioEvent(buffer, now, "audio_milestone", track, {
+        milestone_percent: milestone,
+      });
+    },
+    async recordAudioCompletedObserved(track) {
+      await recordAudioEvent(buffer, now, "audio_completed_observed", track, {});
+    },
   };
+}
+
+async function recordAudioEvent(
+  buffer: AnalyticsBuffer,
+  now: () => number,
+  eventName: "audio_started" | "audio_milestone" | "audio_completed_observed",
+  track: Track,
+  properties: { milestone_percent?: 0.3 | 0.5 | 0.75 },
+): Promise<void> {
+  if (!track.scholarSlug) return;
+  // SAFETY: eventName is restricted to the three schemas below and the milestone property is supplied only for audio_milestone.
+  const event = parseProductEvent({
+    event_id: createEventId(now),
+    event_name: eventName,
+    schema_version: "v1",
+    occurred_at: new Date(now()).toISOString(),
+    app_version: Constants.expoConfig?.version ?? "unknown",
+    source: "native",
+    platform: Platform.OS === "ios" ? "ios" : "android",
+    consent_state: "essential",
+    identity: { type: "anonymous", anonymous_id: await getAnonymousAnalyticsId() },
+    event_context: { source_surface: "audio_player" },
+    content_references: { listing_slug: track.slug, scholar_slug: track.scholarSlug },
+    authority: "client_observation",
+    producer: "native",
+    priority: "best_effort",
+    properties:
+      eventName === "audio_milestone"
+        ? { milestone_percent: properties.milestone_percent ?? 0.3 }
+        : {},
+  } as Parameters<typeof parseProductEvent>[0]);
+  await buffer.enqueue(event);
 }

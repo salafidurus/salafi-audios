@@ -5,6 +5,7 @@ export type { HttpClientConfig } from "./http";
 
 // Export endpoint constants
 export { endpoints } from "./endpoints";
+export { ScholarFollowDtoSchema, type ScholarFollowDto } from "./types/scholar-follow.types";
 
 // Export all shared types
 export {
