@@ -117,6 +117,19 @@ model User {
   progress  UserListingProgress[]
   favorites FavoriteListing[]
   scholarFollows ScholarFollow[]
+  analyticsIdentityLink AnalyticsIdentityLink?
+}
+
+/// Recoverability edge from a primary user to the pseudonym in retained analytics.
+model AnalyticsIdentityLink {
+  userId               String   @id @map("user_id")
+  pseudonymousIdentity String   @unique @map("pseudonymous_identity")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("analytics_identity_links")
 }
 
 /// Short-lived backend analytics delivery coordination; the permanent event archive is separate.

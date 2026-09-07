@@ -37,6 +37,12 @@ Salafi Durus separates authoritative relational state, media storage, analytics,
 - The immutable analytics event archive. Backend-confirmed delivery intents are
   the deliberate exception: they live in the primary database so they can be
   committed atomically with the business mutation. See [ADR 0013](../adr/0013-primary-database-analytics-dispatch-intents.md).
+- Scheduled archive exports are downstream Parquet artifacts in a dedicated,
+  private Cloudflare R2 analytics bucket. The analytics PostgreSQL archive is
+  authoritative; R2 parts and manifests are resumable derivatives.
+- Primary `AnalyticsIdentityLink` rows are the only recoverability edge from a
+  user to an analytics pseudonym. Account deletion cascades through that link,
+  leaving retained analytics rows unlinkable.
 - Secrets or infrastructure credentials.
 
 These are structural rules, not optimization suggestions.

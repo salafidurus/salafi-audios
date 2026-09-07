@@ -14,10 +14,14 @@ describe('CDNHealthIndicator', () => {
         {
           provide: ConfigService,
           useValue: {
-            R2_BUCKET_NAME: 'test-bucket',
-            R2_ACCOUNT_ID: 'test-account',
-            R2_ACCESS_KEY_ID: 'test-key',
-            R2_SECRET_ACCESS_KEY: 'test-secret',
+            R2_MEDIA_BUCKET_NAME: 'test-bucket',
+            R2_MEDIA_ACCOUNT_ID: 'test-account',
+            R2_MEDIA_ACCESS_KEY_ID: 'test-key',
+            R2_MEDIA_SECRET_ACCESS_KEY: 'test-secret',
+            R2_ANALYTICS_ACCOUNT_ID: 'analytics-account',
+            R2_ANALYTICS_ACCESS_KEY_ID: 'analytics-key',
+            R2_ANALYTICS_SECRET_ACCESS_KEY: 'analytics-secret',
+            R2_ANALYTICS_BUCKET_NAME: 'analytics-bucket',
           },
         },
       ],

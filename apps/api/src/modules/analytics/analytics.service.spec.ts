@@ -47,10 +47,12 @@ describe('AnalyticsService', () => {
   it('derives a stable server pseudonym for authenticated ingestion', async () => {
     const append = vi.fn().mockResolvedValue({ accepted: ['accepted'], deduplicated: [] });
     const recordAnalyticsStage = vi.fn();
+    const upsert = vi.fn();
     const service = new AnalyticsService(
       { append } as never,
       { ANALYTICS_IDENTITY_HMAC_SECRET: '01234567890123456789012345678901' } as never,
       { recordAnalyticsStage } as never,
+      { upsert } as never,
     );
 
     await service.ingest([event('accepted', 'essential')], 'user-42');
@@ -59,5 +61,23 @@ describe('AnalyticsService', () => {
       type: 'authenticated',
       pseudonymous_id: '-eI_Vkl5ilwhqwejIHG4jWB2GtgfYAR-w9pY8zJuCDY',
     });
+    expect(upsert).toHaveBeenCalledWith('user-42', '-eI_Vkl5ilwhqwejIHG4jWB2GtgfYAR-w9pY8zJuCDY');
+  });
+
+  it('pseudonymizes anonymous identities before archive persistence', async () => {
+    const append = vi.fn().mockResolvedValue({ accepted: ['accepted'], deduplicated: [] });
+    const service = new AnalyticsService(
+      { append } as never,
+      { ANALYTICS_IDENTITY_HMAC_SECRET: '01234567890123456789012345678901' } as never,
+      { recordAnalyticsStage: vi.fn() } as never,
+    );
+
+    await service.ingest([event('accepted', 'essential')]);
+    const [storedEvent] = append.mock.calls[0] as [CanonicalProductEvent[]];
+    expect(storedEvent[0]?.identity).toEqual({
+      type: 'anonymous',
+      anonymous_id: 'lnU2Pd1_ph58kNOSPbhwiRqfDxtL_ckZyFmAWd31j_g',
+    });
+    expect(storedEvent[0]?.identity).not.toEqual(event('accepted', 'essential').identity);
   });
 });

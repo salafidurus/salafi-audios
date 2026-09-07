@@ -12,11 +12,15 @@ const baseDevEnv = {
   GOOGLE_CLIENT_SECRET: 'dummy-google-secret',
   APPLE_CLIENT_ID: 'dummy-apple-id',
   APPLE_CLIENT_SECRET: 'dummy-apple-secret',
-  R2_ACCOUNT_ID: 'dummy-r2-account',
-  R2_ACCESS_KEY_ID: 'dummy-r2-key',
-  R2_SECRET_ACCESS_KEY: 'dummy-r2-secret',
-  R2_BUCKET_NAME: 'dummy-r2-bucket',
-  R2_PUBLIC_BASE_URL: 'http://localhost:9000',
+  R2_MEDIA_ACCOUNT_ID: 'dummy-r2-media-account',
+  R2_MEDIA_ACCESS_KEY_ID: 'dummy-r2-media-key',
+  R2_MEDIA_SECRET_ACCESS_KEY: 'dummy-r2-media-secret',
+  R2_MEDIA_BUCKET_NAME: 'dummy-r2-media-bucket',
+  R2_ANALYTICS_ACCOUNT_ID: 'dummy-r2-analytics-account',
+  R2_ANALYTICS_ACCESS_KEY_ID: 'dummy-r2-analytics-key',
+  R2_ANALYTICS_SECRET_ACCESS_KEY: 'dummy-r2-analytics-secret',
+  R2_ANALYTICS_BUCKET_NAME: 'dummy-r2-analytics-bucket',
+  R2_MEDIA_PUBLIC_BASE_URL: 'http://localhost:9000',
 };
 
 describe('getApiEnv — Neon control-plane credentials', () => {
