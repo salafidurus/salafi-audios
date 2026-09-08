@@ -219,7 +219,7 @@
         "clsx": "^2.1.1",
         "framer-motion": "^13.2.0",
         "i18next": "catalog:",
-        "lucide-react": "^1.40.0",
+        "lucide-react": "^1.41.0",
         "next": "16.3.4",
         "radix-ui": "^1.6.7",
         "react": "catalog:",
@@ -3240,7 +3240,7 @@
 
     "lru.min": ["lru.min@1.1.4", "", {}, "sha512-DqC6n3QQ77zdFpCMASA1a3Jlb64Hv2N2DciFGkO/4L9+q/IpIAuRlKOvCXabtRW6cQf8usbmM6BE/TOPysCdIA=="],
 
-    "lucide-react": ["lucide-react@1.40.0", "", { "peerDependencies": { "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-MaG+8WnOXkDWz9XeElj7TnQ890tTZUB0a36i03aRRCKGWE6e7jJpmdCvtxxuxcjjdqyN6m4sL6qlHVuSUDtYgg=="],
+    "lucide-react": ["lucide-react@1.41.0", "", { "peerDependencies": { "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-6lksP35l6KszDKUeRTi4LV7i6DEe0Yzl2ALJm9j4c5xEYN91GdW1xGsawGMOg2mgjF5GHBVX8pKX9kP+cWsP3Q=="],
 
     "lucide-react-native": ["lucide-react-native@1.40.0", "", { "peerDependencies": { "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react-native": "*", "react-native-svg": "^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0" } }, "sha512-cTqUrmMgwAX0P1pd3EGiIXboPAjMgh539/93g1AGsZ3s3+vrID3M6eIPBL2CF9YYtxInQssxOwOUJCKxtfJWNw=="],
 
