@@ -244,7 +244,7 @@
     "infra/dependabot-helper": {
       "name": "dependabot-helper",
       "dependencies": {
-        "@clack/prompts": "^1.7.0",
+        "@clack/prompts": "^1.8.0",
         "picocolors": "^1.1.1",
       },
     },
@@ -650,9 +650,9 @@
 
     "@casl/ability": ["@casl/ability@7.0.1", "", { "dependencies": { "@ucast/mongo2js": "^2.0.0" } }, "sha512-krOW1zQGEie5lH6fpryrcsPvc5r2pe5Vn5xbthuzc5X9gwzHIyZgGGgw9dMoSLHXdjB4BIVxGG/HBkG+1NuyZQ=="],
 
-    "@clack/core": ["@clack/core@1.4.3", "", { "dependencies": { "fast-wrap-ansi": "^0.2.0", "sisteransi": "^1.0.5" } }, "sha512-/kr3UWNtdJfxZtPgDqUOmG2pvwlmcLGheex5yiZKdwbzZJxhV+HMNR9QNmyY5cGwTNV6LrR7Jtp+KjhUAP1qBQ=="],
+    "@clack/core": ["@clack/core@1.5.0", "", { "dependencies": { "fast-wrap-ansi": "^0.2.0", "sisteransi": "^1.0.5" } }, "sha512-zNikCcd8BbcEvzzG1sbXFrRHFk5kHPrpwZwksPvf9qyQO1Teb7JaXaOAxXZei9nZLDW0gaZawiuTCji88bTBhw=="],
 
-    "@clack/prompts": ["@clack/prompts@1.7.0", "", { "dependencies": { "@clack/core": "1.4.3", "fast-string-width": "^3.0.2", "fast-wrap-ansi": "^0.2.0", "sisteransi": "^1.0.5" } }, "sha512-y7/yvZ2TPAnR9+jnc00klvNNLkJiXFFrQA/hlLCcxA9a2A4zQIOimyFQ9XfwYKiGD1fb5GY8vbKIIgO8d5Tb2A=="],
+    "@clack/prompts": ["@clack/prompts@1.8.0", "", { "dependencies": { "@clack/core": "1.5.0", "fast-string-width": "^3.0.2", "fast-wrap-ansi": "^0.2.0", "sisteransi": "^1.0.5" } }, "sha512-PXzLZ8N34rxmuo4dJg3xtOXhcBse94qGjDqsteoEYrFrrZ5FSjIGwMAuOcv64ln8rHVBBD06XeVGr+/JX+plcA=="],
 
     "@colors/colors": ["@colors/colors@1.5.0", "", {}, "sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ=="],
 
