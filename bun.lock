@@ -162,7 +162,7 @@
         "expo-web-browser": "~57.0.2",
         "i18next": "catalog:",
         "intl-pluralrules": "^2.0.1",
-        "lucide-react-native": "^1.40.0",
+        "lucide-react-native": "^1.42.0",
         "react": "catalog:",
         "react-content-loader": "^7.1.2",
         "react-dom": "catalog:",
@@ -3244,7 +3244,7 @@
 
     "lucide-react": ["lucide-react@1.42.0", "", { "peerDependencies": { "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-b3jprplnoLS8n5etw1z8xODe3hF/yjKATrTitsrKrnjUhCef5BdDct6Ppv3zVvzFwmtfWgLO6XNM3C9fAD93ug=="],
 
-    "lucide-react-native": ["lucide-react-native@1.40.0", "", { "peerDependencies": { "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react-native": "*", "react-native-svg": "^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0" } }, "sha512-cTqUrmMgwAX0P1pd3EGiIXboPAjMgh539/93g1AGsZ3s3+vrID3M6eIPBL2CF9YYtxInQssxOwOUJCKxtfJWNw=="],
+    "lucide-react-native": ["lucide-react-native@1.42.0", "", { "peerDependencies": { "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react-native": "*", "react-native-svg": "^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0" } }, "sha512-FMQR09HRyIBT2aCtzWcKXImeJ9dFziq92EanZof5P8iHXZuzGmSUBoVVqJpjwtc4OI7he9E7yn7HoFVHRPjteg=="],
 
     "luxon": ["luxon@3.7.2", "", {}, "sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew=="],
 
